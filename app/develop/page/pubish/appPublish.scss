@@ -1,0 +1,77 @@
+.app-publish {
+  padding-top: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .uploadBtn:hover{
+    background-color: white;
+    border-color: #108ee9;
+    input::-webkit-input-placeholder{
+      color: #108ee9 !important;
+    }
+    input:-ms-input-placeholder{
+      color: #108ee9 !important;
+    }
+    input:-moz-placeholder{
+      color: #108ee9 !important;
+    }
+  }
+  .uploadBtn{
+    margin-right: 40px;
+    position: relative;
+    .text-input{
+      height: 100%;
+      input{
+        height: 100%;
+        text-align: center;
+      }
+      input::-webkit-input-placeholder{
+        color: #ffffff;
+      }
+      input:-ms-input-placeholder{
+        color: #ffffff;
+      }
+      input:-moz-placeholder{
+        color: #ffffff;
+      }
+    }
+  }
+  //.app-item{
+  //  text-align: center;
+  //}
+  //.app-item.buttons{
+  //  padding-top: 90px;
+  //  .function-btn {
+  //    margin-right: 20px;
+  //    width: 106px;
+  //    height: 36px;
+  //    background-color: #37ba9d;
+  //    border-radius: 3px;
+  //    font-size: 16px;
+  //    color: #ffffff;
+  //    border: none;
+  //  }
+  //}
+  //.step-btn,.prev-step-btn{
+  //  width: 89px;
+  //  height: 36px;
+  //  background-color: #f2f2f2;
+  //  border-radius: 3px;
+  //  border: solid 1px #e2e2e2;
+  //  font-size: 16px;
+  //  color: #666666;
+  //}
+  //.prev-step-btn{
+  //  margin-right: 20px;
+  //}
+  .function-btn {
+    margin-right: 20px;
+    width: 130px;
+    height: 36px;
+    background-color: #37ba9d;
+    border-radius: 3px;
+    font-size: 16px;
+    color: #ffffff;
+    border: 1px solid #37ba9d;
+  }
+}

@@ -1,0 +1,134 @@
+.edit-wrapper {
+  .form-com-wrapper {
+    .form-com-item {
+      line-height: 40px;
+      margin-bottom: 15px;
+
+      &::after{
+        display: block;
+        clear: both;
+        content: "";
+      }
+
+      .le-edit-qrcode{
+        float: left;
+      }
+      .form-com-title {
+        //display: inline-block;
+        float: left;
+        line-height: inherit;
+        width: 120px;
+        text-align: right;
+        margin-right: 10px;
+        color: #666;
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .textarea-input{
+        float: left;
+        //display: inline-block;
+        line-height: 1.6;
+        width: 180px;
+        background-color: #ffffff;
+        border-radius: 5px;
+        border: solid 1px #d8e3e9;
+        resize: none;
+        height: 86px;
+      }
+      .text-input{
+        float: left;
+        //display: inline-block;
+        line-height: inherit;
+        width: 180px;
+        background-color: #ffffff;
+        border-radius: 5px;
+        border: solid 1px #d8e3e9;
+        height: 40px;
+        input {
+          height: 100%;
+        }
+      }
+      .le-button-group{
+        float: left;
+        display: inline-block;
+        button{
+          margin: 0;
+        }
+      }
+      .img-uploader-wrapper{
+        float: left;
+        display: inline-block;
+        margin-right: 0;
+        margin-left: 0;
+        width: calc(100% - 130px);
+      }
+      .upload{
+        float: left;
+        display: inline-block;
+        margin-right: 0;
+        margin-left: 0;
+        .lesson-form-group{
+          position: relative;
+
+          &>div{
+            display: inline-block;
+            color: #91a8b0;
+          }
+          .uploader-wrapper{
+            color: #33484f;
+            margin-right: 10px;
+            height: 40px;
+            padding: 0 7px;
+            background-color: #ffffff;
+            border-radius: 5px;
+            border: solid 1px #d8e3e9;
+          }
+
+          &:not(:first-child):last-child{
+            width: 181px;
+            height: 181px;
+            margin-top: 10px;
+            border: solid 1px #d8e3e9;
+            overflow: hidden;
+
+            .placeholder-img{
+              display: block;
+              text-align: center;
+            }
+            img{
+              position: absolute;
+              height: 100%;
+              //width: 100%;
+              left: 0;
+              top: 0;
+            }
+          }
+        }
+
+      }
+
+
+      .form-com-view{
+        width: 280px!important;
+        border-color: transparent!important;
+        &.disabled, &[disabled], .disabled, [disabled]{
+          opacity: 1!important;
+          cursor: default!important;
+        }
+        .btn-group, .btn-wrapper{
+          display: none!important;
+        }
+        &.textarea-input{
+          height: 86px;
+          line-height: inherit;
+          width: 280px;
+        }
+      }
+    }
+  }
+  //.btn-wrapper {
+  //  button {
+  //    margin: 20px 0 0 130px;
+  //  }
+  //}
+}

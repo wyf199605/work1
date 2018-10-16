@@ -1,0 +1,632 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>移动端触底按钮加载</title>
+    <link rel="stylesheet" href="../../../font/iconfont/iconfont.css">
+    <link rel="stylesheet" href="../../components/table.pc.css">
+    <link rel="stylesheet" href="../../components/paging.css">
+    <link rel="stylesheet" href="../../../plugin/bootstrap/bootstrap3/dist/css/bootstrap.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .blue {
+            color: blue;
+        }
+        .btn-control{
+            padding: 10px;
+        }
+        .btn-control button{ margin: 0 5px; padding: 3px 5px; }
+        .row{ margin: 10px 0;}
+    </style>
+</head>
+<body>
+    <div class="row mt15">
+        <div class="col-md-6 col-sm-6 col-xs-6 text-left">
+            <a href="../" class="btn btn-default"><i class="glyphicon glyphicon-chevron-left"></i> 返回</a>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6 text-right">
+            <button class="btn btn-default" id="submit">重置查询</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div id="page">
+                <table id="pcTable" class="min-width">
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+<script src="../../../plugin/y-ui/dist/js/utils.min.js"></script>
+<script src="../../../plugin/y-ui/dist/js/modal.min.js"></script>
+<script src="../../../plugin/y-ui/dist/js/tableExport.min.js"></script>
+<script src="../../../dist/require.js"></script>
+<script src="../../../dist/require.config.js"></script>
+<script>
+    require.config({
+        baseUrl: '../../../dist/',
+        bundles: {
+            'components/tablePc': ['BasicTable', 'PcTable'],
+            'components/tableMb': ['BasicTable', 'MbTable'],
+            'components/dialog': ['dialog'],
+            'components/statistic': ['statistic'],
+            'components/paging': ['paging']
+        }
+    });
+    var __extends = (this && this.__extends) || (function () {
+        var extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+</script>
+<script src="../../../dist/global.pc.js"></script>
+<script src="../../../dist/components.js"></script>
+<script>
+
+    require(['PcTable', 'paging', 'dialog', 'statistic'], function (PcTable, paging, dialog, statistic) {
+        var table = document.getElementById('pcTable');
+
+
+        window.Table = new PcTable.PcTable({
+            ajax: function (mtData, myData, callback) {
+                callback([]);
+            },
+            length: 20,
+            thead: true,
+            table: table,
+            cols: getCols1(),
+            lockRow: true,  // 锁行
+            move: true,
+            indexCol: true,
+            /*pseudoCol: {
+                width: 30,
+                render: function(index) {
+                    var btn;
+
+//                    btn = document.createElement('button');
+//                    btn.innerHTML= '设置';
+
+                    btn = '<i class="iconfont icon-weihu"></i>';
+                    return btn;
+                },
+                click: function(index, event) {
+                    console.log(index, event);
+                }
+            },*/
+            colResize: true, // 列宽调整
+            lockColNum: 1,
+//            colGroup: true,
+            cellMaxWidth: 150,
+            dragSelect: function (data) {
+                console.log(data);
+            },
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [{
+                multi: true,
+                title: '锁定/解锁列',
+                callback: function (btn, cols, btnDom, bt) {
+                    bt.colToggleLock(cols[0].dataset.col);
+                    bt.rowToggleLock();
+                }
+            }],
+            onComplete: function (bt, isEnd) {
+
+
+
+            }
+        });
+
+        window.page = new paging.Paging({
+            el: document.getElementById('page'),
+            scroll: {
+                content: '加载中',
+                nomore: '完了'
+            },
+            change: function(state) {
+                console.log(state);
+                reload(function() {
+                    page.reset();
+                });
+            }
+        });
+
+        // 伪列
+        Table.pseudoColFun.init({
+            width: 30,
+            render: function (index) {
+                var btn;
+                btn = '<i class="iconfont icon-weihu"></i>';
+                return btn;
+            },
+            click: function (index, event) {
+                console.log(index, event);
+            }
+        });
+
+        function reload(callback, type) {
+            G.tools.XMLRequest('../data/table.json', {
+                type: 'GET',
+                dataType: 'json',
+                success: function(result) {
+                    if(type) {
+                        Table.data.set(result.data);
+                    }
+                    else {
+                        Table.data.insert(result.data);
+                    }
+
+                    Table.render(0, result.length, true);
+                    page.reset({
+                        recordTotal: result.count
+                    });
+                    callback && callback();
+                }
+            });
+        }
+        reload();
+
+        G.d.on(document.getElementById('submit'), 'click', function() {
+            page.reset({offset: 0});
+            reload(null, true);
+        });
+
+
+
+
+        function getCols1() {
+            return [{
+                "caption": "配货单号",
+                "title": "配货单号",
+                "name": "配货单号",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": "",
+                "comType": "input"
+            }, {
+                "caption": "分部号",
+                "title": "分部号",
+                "name": "BRA_ID",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 8,
+                "comType": "input"
+            }, {
+                "caption": "MOM订单号",
+                "title": "MOM订单号",
+                "name": "MOM订单号",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": "",
+                "comType": "input"
+            }, {
+                "caption": "订单号",
+                "title": "订单号",
+                "name": "订单号",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": "",
+                "comType": "input"
+            }, {
+                "caption": "ASN单据号",
+                "title": "ASN单据号",
+                "name": "ASN单据号",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": "",
+                "comType": "input"
+            }, {
+                "caption": "收货流水号",
+                "title": "收货流水号",
+                "name": "收货流水号",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": "",
+                "comType": "input"
+            }, {
+                "caption": "源店号",
+                "title": "源店号",
+                "name": "FROMSHOPID",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "地区号",
+                "title": "地区号",
+                "name": "ARE_ID",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "目标店号",
+                "title": "目标店号",
+                "name": "TOSHOPID",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "店名",
+                "title": "店名",
+                "name": "SHO_NAME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "创建时间",
+                "title": "创建时间",
+                "name": "CREATETIME",
+                "noEdit": false,
+                "dataType": "12",
+                "displayFormat": "yyyy-MM-dd HH:mm:ss",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "datetime"
+            }, {
+                "caption": "结束时间",
+                "title": "结束时间",
+                "name": "FINISHTIME",
+                "noEdit": false,
+                "dataType": "12",
+                "displayFormat": "yyyy-MM-dd HH:mm:ss",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "datetime"
+            }, {
+                "caption": "货号",
+                "title": "货号",
+                "name": "GOO_ID",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 7,
+                "comType": "input"
+            }, {
+                "caption": "条码",
+                "title": "条码",
+                "name": "BARCODE",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 10,
+                "comType": "input"
+            }, {
+                "caption": "品名",
+                "title": "品名",
+                "name": "GOO_NAME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "顾客群",
+                "title": "顾客群",
+                "name": "CUSGROUPNAME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "品类组",
+                "title": "品类组",
+                "name": "CATEGORYGROUP",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "品类",
+                "title": "品类",
+                "name": "CATEGORIES",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "子品类",
+                "title": "子品类",
+                "name": "SUBCATEGORY",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "季节",
+                "title": "季节",
+                "name": "SEASON",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "款式",
+                "title": "款式",
+                "name": "PATTERN",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "特征",
+                "title": "特征",
+                "name": "SPECS",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "风格",
+                "title": "风格",
+                "name": "GOOSTYLE",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "主题",
+                "title": "主题",
+                "name": "THEME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 12,
+                "comType": "input"
+            }, {
+                "caption": "质地",
+                "title": "质地",
+                "name": "MATERIAL",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "系列",
+                "title": "系列",
+                "name": "SERIES",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "设计方式",
+                "title": "设计方式",
+                "name": "DESIGNMODE",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "流行度",
+                "title": "流行度",
+                "name": "POPULARITY",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "厚度",
+                "title": "厚度",
+                "name": "WARMDEGREE",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "商品类别",
+                "title": "商品类别",
+                "name": "GOOSTYLENAME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 0,
+                "comType": "input"
+            }, {
+                "caption": "集中管理",
+                "title": "集中管理",
+                "name": "ISUM",
+                "noEdit": false,
+                "dataType": "17",
+                "displayFormat": "",
+                "trueExpr": "1",
+                "displayWidth": 0,
+                "comType": "toggle"
+            }, {
+                "caption": "必订店群",
+                "title": "必订店群",
+                "name": "MUSTSHOPGROUPS",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 40,
+                "comType": "input"
+            }, {
+                "caption": "供应商",
+                "title": "供应商",
+                "name": "SUP_NAME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 30,
+                "comType": "input"
+            }, {
+                "caption": "颜色",
+                "title": "颜色",
+                "name": "COLORNAME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 20,
+                "comType": "input"
+            }, {
+                "caption": "码数",
+                "title": "码数",
+                "name": "SIZENAME",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 10,
+                "comType": "input"
+            }, {
+                "caption": "建议分配量",
+                "title": "建议分配量",
+                "name": "PASSIGNAMOUNT",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 6,
+                "comType": "input"
+            }, {
+                "caption": "建议分配额",
+                "title": "建议分配额",
+                "name": "PASSIGNMONEY",
+                "noEdit": false,
+                "dataType": "11",
+                "displayFormat": "###.00",
+                "trueExpr": "",
+                "displayWidth": 16,
+                "comType": "input"
+            }, {
+                "caption": "实际分配量",
+                "title": "实际分配量",
+                "name": "RASSIGNAMOUNT",
+                "noEdit": false,
+                "dataType": "",
+                "displayFormat": "",
+                "trueExpr": "",
+                "displayWidth": 6,
+                "comType": "input"
+            }, {
+                "caption": "实际分配额",
+                "title": "实际分配额",
+                "name": "RASSIGNMONEY",
+                "noEdit": false,
+                "dataType": "11",
+                "displayFormat": "###.00",
+                "trueExpr": "",
+                "displayWidth": 15,
+                "comType": "input"
+            }]
+        }
+
+    });
+</script>
+</body>
+</html>

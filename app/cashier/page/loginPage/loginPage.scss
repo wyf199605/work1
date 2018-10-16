@@ -1,0 +1,371 @@
+#login{
+  background-color: rgb(51, 51, 51);
+  height: 100vh;
+  color: white;
+  padding-top: 100px;
+  .main-login{
+    animation-duration: 0.75s;
+    animation-fill-mode: both;
+    animation-name: fadeInUp;
+    max-width: 360px;
+    text-align: center;
+    margin: 0 auto;
+    .center-title{
+      margin: 0 auto;
+      position: relative;
+      height: 50px;
+      >span{
+        font-size: 30px;
+        display: block;
+        margin-left: 20px;
+        width: 150px;
+        float: left;
+      }
+      img{
+        height: 50px;
+        display: block;
+        float: left;
+        margin-left: 66px;
+      }
+    }
+    .center-log{
+      width: 250px;
+      background: white;
+      font-size: 20px;
+      padding: 15px 30px;
+      border-radius: 4px;
+      color: black;
+      margin: 80px auto;
+    }
+    .info{
+      width: 250px;
+      padding: 8px;
+      height: 36px;
+      margin: 80px auto;
+      background-color: #232323;
+      border-radius: 100px;
+      -moz-border-radius: 100px;
+      -webkit-border-radius: 100px;
+      box-shadow: inset 0 5px 10px -5px #191919, 0 1px 0 0 #444;
+      -moz-box-shadow: inset 0 5px 10px -5px #191919,0 1px 0 0 #444;
+      -webkit-box-shadow: inset 0 5px 10px -5px #191919, 0 1px 0 0 #444;
+    }
+
+  }
+  .msg-login{
+    position: fixed;
+    left: 10px;
+    bottom: 8px;
+  }
+
+}
+.cashier-conf{
+  .nav.nav-tabs.nav-tabs-line{
+    padding-left: 0;
+    margin-bottom: 18px;
+    display: -webkit-box;
+    list-style: none;
+    margin-top: 0;
+    &:first-child{
+      margin-left: 90px;
+    }
+    li{
+      &:focus{
+        outline: 1px dotted;
+      }
+      float: left;
+      margin-bottom: -1px;
+      position: relative;
+      display: block;
+      a{
+        cursor: default;
+        background-color: #fff;
+        margin-right: 2px;
+        line-height: 1.42857143;
+        position: relative;
+        display: block;
+        padding: 6px 15px;
+      }
+    }
+  }
+  .text-input{
+    >input{
+      height: 25px;
+    }
+  }
+  .print-conf{
+    .conf-row{
+      //width: 230px;
+      margin-bottom: 10px;
+      .select-box:focus{
+        outline: 1px dotted;
+      }
+      .print-server,.print-printer,.print-row,.print-scenes,.print-msg,.print-text{
+        width: 220px;
+        border: .5px solid #ccc;
+        border-radius: 3px;
+        margin-left: 7px;
+      }
+      .print-check{
+        margin-left: 88px;
+      }
+      .print-server-text{
+        width: 44%;
+        margin-left: 6px;
+        border: .5px solid #ccc;
+        border-radius: 3px;
+      }
+      .print-btn{
+        button{
+          &:focus{
+            outline: 1px dotted #aaaaaa;
+          }
+        }
+      }
+      .print-msg{
+        color: #000000;
+        width: 70px;
+        height: 26px;
+        padding: 4px;
+      }
+      .text-input{
+        width: 100%;
+      }
+      .print-showdown{
+        margin-left: 30px;
+      }
+      .text{
+        width: 78px;
+        text-align: right;
+        font-weight: 600;
+        color: black;
+      }
+      .print-row{
+        border: none;
+        width: 72px;
+        margin-left: 6px;
+        .text-input{
+          input{
+            margin-left: 24px;
+            border: 1px solid #ccc;
+          }
+          .icon-jiahao{
+            padding: 3px;
+            border: 1px solid #ccc;
+            margin-left: -53px;
+            position: absolute;
+            border-right: none;
+            width: 25px;
+            &:before{
+              font-size: 12px;
+              display: block;
+              color: black;
+              font-weight: 600;
+            }
+          }
+          .icon-jianhao{
+            border: 1px solid #ccc;
+            display: block;
+            border-left: none;
+            margin-right: -7px;
+            width: 25px;
+            &:before{
+              font-size: 12px;
+              display: block;
+              margin-top: 3px;
+              color: black;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+      .print-boot{
+        margin-left: 88px;
+      }
+      >div{
+        display: inline-block;
+      }
+    }
+  }
+  .rfid-conf{
+    .rfid-row{
+      margin-left: 10px;
+      .text{
+        color: #000000;
+        font-weight: 600;
+      }
+      >div{
+        display: inline-block;
+      }
+      .btn-left,.btn-center,.btn-right{
+        .btn{
+          border: .5px solid #cccccc;
+          color: #000000;
+          outline: none;
+          cursor: pointer;
+          &:focus{
+            outline: 1px dotted #cccccc;
+          }
+        }
+      }
+      .row-left{
+        .rfid-select{
+          &:focus{
+            outline: 1px dotted;
+          }
+          [data-index="0"]{
+            .label-radio{
+              margin-bottom: 15px;
+            }
+          }
+          .label-radio{
+            font-weight: 600;
+            color: black;
+            font-size: 12px;
+            &:before{
+              border: 1px solid #007AFF;
+              width: 15px;
+              height: 15px;
+              bottom: 4px;
+            }
+            &:after{
+              width: 9px;
+              height: 9px;
+              top: 6px;
+              left: 3px;
+
+            }
+          }
+        }
+
+      }
+      .row-right{
+        width: 233px;
+        margin-left: 10px;
+        .line,.unline{
+          height: 37px;
+        }
+        >div{
+          display: inline-block;
+        }
+        .rfid-ip{
+          width: 103px;
+        }
+        .rfid-port{
+          width: 70px;
+        }
+        .text-baud{
+          margin-left: 10px;
+        }
+        .rfid-com,.rfid-baud{
+          .text-input{
+            border: .5px solid #ccc;
+            border-radius: 3px;
+            width: 70px;
+            input{
+              width: 100%!important;
+            }
+            .iconfont{
+              padding: 4px;
+            }
+          }
+        }
+      }
+      .text{
+
+      }
+      .rfid-aerial{
+        border: none;
+        width: 72px;
+        .text-input{
+          input{
+            margin-left: 24px;
+            border: 1px solid #ccc;
+          }
+          .icon-jiahao{
+            padding: 3px;
+            border: 1px solid #ccc;
+            margin-left: -53px;
+            position: absolute;
+            border-right: none;
+            width: 25px;
+            &:before{
+              font-size: 12px;
+              display: block;
+              color: black;
+              font-weight: 600;
+            }
+          }
+          .icon-jianhao{
+            border: 1px solid #ccc;
+            display: block;
+            border-left: none;
+            margin-right: -7px;
+            width: 25px;
+            &:before{
+              font-size: 12px;
+              display: block;
+              margin-top: 3px;
+              color: black;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+      .rfid-buzz{
+        margin-left: 15px;
+      }
+      .rfid-led{
+        margin-left: 20px;
+      }
+      .rfid-buzz,.rfid-led{
+
+      }
+    }
+    .rfid-content{
+      border: .5px solid #bbb;
+      border-radius: 4px;
+      padding: 5px;
+      overflow-y: auto;
+      margin-bottom: 13px;
+      margin-top: 12px;
+      height: 124px;
+    }
+    .btn-group{
+      margin-left: 0;
+      margin-bottom: 8px;
+    }
+  }
+  .foot-wrapper{
+    button{
+      border: 1px solid #d9d9d9;
+      cursor: pointer;
+    }
+  }
+  .text-input{
+    input:focus{
+      outline: 1px dotted;
+    }
+  }
+}
+.cashier-quit{
+  .quit{
+    padding: 10px;
+  }
+}
+.dropdown-menu{
+  min-width: 160px;
+}
+.select-box{
+  .label-checkbox{
+    color: #000000;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
+.modal-box{
+  .modal-loading.modal-wrapper{
+    z-index: 1010;
+  }
+}

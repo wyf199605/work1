@@ -1,0 +1,53 @@
+.crossTab{
+  .modal-body {
+    .col-xs-4 {
+      width: 33%;
+      display: inline-block;
+      vertical-align: top;
+      fieldset {
+        .select-box {
+            margin-left: 0px;
+            margin-top: 5px;
+            width: 27vw;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+
+        }
+        .statistic_row{
+          height: 60vh;
+          overflow-y: scroll;
+        }
+        .statistic_col{
+          height: 60vh;
+          overflow-y: scroll;
+        }
+        .statistic_val{
+          height: 60vh;
+          overflow-y: scroll;
+        }
+      }
+    }
+    .col-xs-8{
+      width: 70%;
+      display: inline-block;
+      margin-top: 35px;
+    }
+    .statistic_select{
+      display: inline-block;
+      width: 100%;
+      .select-box {
+        width: 50%;
+        display: inline-block;
+      }
+    }
+    .row:last-child{
+      .col-xs-4{
+        width: 30% !important;
+        display: inline-block;
+        margin-top: 35px;
+        width: 33%;
+      }
+    }
+  }
+}

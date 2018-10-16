@@ -1,0 +1,212 @@
+.preview{
+  min-width: 590px;
+  background-color: #8C8C8C !important;
+  .modal-body{
+    padding: 0;
+    overflow-y:scroll;
+    overflow-x: scroll;
+    background-color: white;
+    max-height:640px;
+    svg{
+      overflow: auto;
+    }
+    &:hover{
+      cursor:pointer;
+    }
+  }
+  max-height:680px;
+  .range{
+    float: left;
+    margin-top: 20px;
+    width: 200px;
+    margin-left: 10px;
+  }
+  .rangeLabel{
+    float: left;
+    margin-top: 20px;
+    margin-left: 10px;
+  }
+  .rangeSize{
+    float: left;
+    margin-top: 20px;
+    margin-left: 10px;
+  }
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+  -khtml-user-select: none; /* Konqueror */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently not supported by any browser */
+}
+.labelPrint {
+  width:700px;
+  .modal-body{
+    padding: 0;
+  }
+  .text-input {
+    border-bottom: 1px solid rgb(221, 221, 221);
+    padding: 0;
+    display: inline-block;
+    width: 75px;
+    margin-left: 10px;
+  }
+  span {
+    display: inline-block;
+  }
+  fieldset{
+    padding:15px;
+    margin-bottom: 10px;
+  }
+  .text-input {
+    display: inline-block;
+    width: 75px;
+    margin-left: 10px;
+  }
+  .select-box {
+    display: inline-block;
+    margin-left: 20px;
+
+  }
+  .inline{
+    display: inline-block;
+  }
+  .setDom,.labelTypeDom{
+    height: 380px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .setDom{
+    .leftSet{
+      float: left;
+      width: 50%;
+      padding-right: 30px;
+      padding-top: 10px;
+      .printer{
+        display: inline-block;
+        width: 65%;
+        .text-input{
+          width: 100%;
+        }
+      }
+      .port{
+        display: inline-block;
+        width: 30%;
+        .text-input{
+          width: 100%;
+        }
+      }
+      .scale{
+        display: inline-block;
+        margin-left: 28px;
+        margin-top: 20px;
+      }
+      .ratio{
+        display: inline-block;
+        margin-left: 69px;
+      }
+      .range{
+        [data-name="pageRange"]{
+          margin-left: 13px;
+          [data-index = "1"]{
+            margin-left: 13px;
+          }
+        }
+        [data-name="from"]{
+          margin-left: 16px;
+        }
+        [data-name="to"]{
+          margin-left: 41px;
+        }
+      }
+      .direction{
+        [data-name="direction"]{
+          margin-left: 13px;
+          [data-index="1"]{
+            margin-left: 26px;
+          }
+        }
+      }
+      .content{
+        [data-name="printData"]{
+          margin-left: 13px;
+        }
+      }
+    }
+    .rightSet{
+      float: left;
+      width: 50%;
+      padding-left: 30px;
+      padding-right: 15px;
+      padding-top: 10px;
+      .paper{
+        .text-input{
+          width: 100%;
+        }
+      }
+      .size{
+        margin-top: 20px;
+        padding-left: 16px;
+        margin-left: 12px;
+        [data-name="width"]{
+          display: inline-block;
+        }
+        [data-name="height"]{
+          display: inline-block;
+          margin-left: 40px;
+        }
+      }
+      .pagePadding{
+        margin-left: 12px;
+        margin-top:10px;
+        [data-name]{
+          display: inline-block;
+        }
+        [data-name="up"]{
+          margin-top: 20px;
+          margin-left: 15px;
+        }
+        [data-name="down"]{
+          margin-left: 30px;
+        }
+        [data-name="left"]{
+          margin-left: 15px;
+          margin-top: 10px;
+        }
+        [data-name="right"]{
+          margin-left: 30px;
+          margin-top: 10px;
+        }
+      }
+      .otherSetting{
+        margin-top: 44px;
+        [data-name]{display: inline-block;}
+        [data-name="horizontalRank"]{
+          margin-left: 6px;
+        }
+        [data-name="fillMethod"]{
+          margin-left: 46px;
+        }
+        [data-name="rowSpace"]{
+          margin-left: 28px;
+          margin-top: 10px;
+        }
+        [data-name="colSpace"]{
+          margin-left: 41px;
+        }
+      }
+      .copies{
+        margin-top: 20px;
+        margin-left: 29px;
+      }
+    }
+  }
+  .labelTypeDom{
+    .text-input{
+      width: 200px;
+    }
+    [data-name="labelType"]{
+      margin-left: 15px;
+      padding-top: 20px;
+    }
+  }
+}

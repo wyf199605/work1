@@ -1,0 +1,45 @@
+.statistic{
+  .modal-body {
+    .col-xs-5{
+      display: inline-block;
+      width: 33%;
+      vertical-align: top;
+      fieldset:first-child{
+        height: 40vh;
+        .statisticsContent{
+          height: 97%;
+          overflow-y: scroll;
+        }
+      }
+      fieldset:last-child{
+        height: 20vh;
+        .statisticsRange{
+          height: 100%;
+        }
+      }
+    }
+    .col-xs-3{
+      display: inline-block;
+      width: 31%;
+      vertical-align: top;
+    }
+    fieldset {
+      height: 60vh;
+      .select-box {
+          width: 27vw;
+          overflow: hidden;
+          text-overflow:ellipsis;
+          white-space: nowrap;
+      }
+
+      .statisticsField{
+        height: 97%;
+        overflow-y: scroll;
+      }
+      .groupingField{
+        height: 97%;
+        overflow-y: scroll;
+      }
+    }
+  }
+}

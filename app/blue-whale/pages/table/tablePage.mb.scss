@@ -1,0 +1,149 @@
+.tablePage {
+  & > header.mui-bar-nav.mui-bar {
+    [data-action="indexCol"]{
+      margin-left: 0;
+    }
+
+    h1.mui-title {
+      [data-action="down-menu"] {
+        display: inline-block;
+        position: absolute;
+        width: 30px;
+        height: 44px;
+
+        &:before {
+          content: ' ';
+          border-bottom: 1px solid #000;
+          display: inline-block;
+          position: absolute;
+          width: 6px;
+          height: 6px;
+          border-bottom: 2px solid #666;
+          border-left: 2px solid #666;
+          transform: rotate(-45deg);
+          top: 19px;
+          left: 8px;
+        }
+      }
+
+    }
+  }
+
+  .text-input{
+    &>input{
+      margin-bottom: 0;
+    }
+  }
+  .aggr-wrapper {
+    background-color: #FAFBFC;
+    padding: 0 8px;
+    height: 20px;
+    font-size: 12px;
+    overflow-x: scroll;
+    width: 100%;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  header [data-action="indexCol"] .select-box {
+
+    display: block;
+    .check-span {
+      padding-left: 35px;
+      line-height: 25px;
+      font-size: 20px;
+
+      &:before, &:after {
+        font-family: "iconfont";
+        background: transparent;
+        border: none;
+        //width: 35px;
+        //height: 25px;
+        //line-height: 25px;
+        //text-align: center;
+      }
+      &:before{
+        content: "\e652";
+      }
+
+    }
+    input:checked + .check-span {
+      &:before{
+        content: "\e63e";
+      }
+
+      &:after {
+        content: "";
+      }
+    }
+  }
+
+  .mui-content {
+    height: 100% ;
+  }
+  .mobileTableWrapper{
+    min-height: 100%;
+  }
+  .search-input {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 1px;
+  }
+
+  .nodata {
+    width: 100vw;
+  }
+  .mui-indexed-list-search {
+    border-bottom: 1px #ddd solid;
+  }
+
+  .mui-indexed-list-search input {
+    border-radius: 0;
+    margin: 0;
+    background-color: #fafafa;
+  }
+
+  .mui-indexed-list-search.mui-search:before {
+    margin-top: -10px;
+  }
+
+  .table-module-wrapper footer{
+    .edit-toggle{
+      vertical-align: top;
+      display: inline-block;
+      width: 45px;
+      height: 35px;
+      text-align:center;
+      border-right: 1px solid #e1e1e1;
+      .check-span{;
+        line-height: 30px;
+        height: 30px;
+        padding: 0 15px;
+        font-size: 16px;
+        color: #fff;
+        background: #007aff;
+        border-radius: 50%;
+        margin-top: 5px;
+        &:before,&:after{
+          font-family: "iconfont";
+          background: transparent;
+          border: none;
+        }
+        &:before{
+          content:"\e627";
+        }
+      }
+      input:checked + .check-span{
+        &:before{
+          content:"\e75d";
+        }
+        &:after{
+           content:"";
+         }
+      }
+    }
+    .all-btn{
+      display: inline-block;
+      width: calc(100% - 38px);
+    }
+  }
+}

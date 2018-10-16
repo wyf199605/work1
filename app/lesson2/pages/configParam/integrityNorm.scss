@@ -1,0 +1,35 @@
+.config-param-page {
+  .set-title{
+    margin-bottom: 20px;
+  }
+  .set-title .set-tips{
+    margin-left: 12px;
+  }
+  .set-content{
+    width:80%;
+    border: dotted 1px #d8e3e9;
+    padding: 20px;
+  }
+  .set-content p {
+    margin: 8px;
+  }
+  .set-item-group{
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  .set-item-group:last-child{
+    margin-bottom: 0;
+  }
+  span.no-shrink{
+    flex-shrink: 0;
+  }
+  .set-item-group input.default{
+    margin: 0 12px;
+  }
+  .set-item-group input.default:nth-of-type(1){
+    margin-right:20px;
+  }
+
+}

@@ -1,0 +1,62 @@
+.drillPage{
+  .mui-bar-nav {
+    -webkit-box-shadow: 0 1px 3px #ccc;
+    box-shadow: 0 1px 3px #ccc;
+  }
+  .statisticsChart{
+    display: none;
+  }
+  .mui-active .statisticsChart{
+    display: block;
+    position: absolute;
+    z-index: 9;
+    height:31px;
+    line-height: 31px;
+    top: 6px;
+    right: 40px;
+    .statistics-chart{
+      display: inline-block;
+      padding: 6px;
+      padding-top: 0;
+    }
+  }
+  ul.mui-table-view a.mui-navigate-right span.mui-icon{
+    font-size: .96em;
+    color: #3494FD;
+  }
+  [class*=" mui-icon-"]{
+    font-size: 1.3em;
+  }
+
+  .mui-content {
+    margin-top: 2px;
+    overflow: scroll;
+  }
+  .mui-content>.mui-table-view:first-child{
+    margin-top: 0;
+  }
+  .mui-table-view-cell.mui-collapse .mui-collapse-content{
+    padding: 0;
+  }
+  .mui-table-view-cell.mui-collapse.mui-active .mui-collapse-content, .mui-table-view-cell.mui-collapse.mui-active .mui-table-view{
+    padding-bottom: 15px;
+    background-color: #fff;
+  }
+  .mui-table-view-cell>a:not(.mui-btn){
+    color: #555;
+    font-weight: bold;
+    font-size: 15px;
+  }
+  .mui-active a.mui-navigate-right{
+    color: #3494FD;
+    box-shadow: 0 0 10px #999;
+    z-index: 5;
+    /* background-color: #FcFcFc; */
+  }
+  .mui-active:nth-child(even) a.mui-navigate-right{
+    color: #4cd964;
+  }
+  .mui-table-view-cell:after{
+    background-color: #999;
+  }
+}

@@ -1,0 +1,80 @@
+.modal-body {
+  .device-view {
+    position: relative;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+    background-color: #fff;
+    .device-cell {
+      padding: 10px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .device-cell:after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 15px;
+      height: 1px;
+      content: '';
+      -webkit-transform: scaleY(.5);
+      transform: scaleY(.5);
+      background-color: #c8c7cc;
+    }
+    .icon-box {
+      width: 15%;
+      float: left;
+      height: 65px;
+      .icon-device-pc{
+        margin: 4px 10px;
+        display: block;
+        font-size: 40px;
+      }
+      .icon-device-mb {
+        margin: 22px 11px;
+        display: block;
+        font-size: 40px;
+      }
+    }
+    .device-name {
+      width: 65%;
+      float: left;
+      height: 65px;
+      .device-modal {
+        padding-left: 10px;
+        font-size: 17px;
+        font-weight: bold;
+      }
+      .device-time, .device-vendor {
+        padding-left: 10px;
+        font-size: 13px;
+        color: #787779;
+      }
+      .device-vendor {
+
+      }
+      .device-time {
+
+      }
+    }
+    .btn-group {
+      width: 20%;
+      float: left;
+      height: 65px;
+      .unbind {
+        margin: 15px 0;
+        width: 63px;
+        background: #007AFF;
+        color: white;
+        border-radius: 4px;
+      }
+    }
+    .device-content {
+      background-color: #fff;
+      height: 100%;
+      overflow-y: auto;
+      padding-top: 44px;
+    }
+  }
+}

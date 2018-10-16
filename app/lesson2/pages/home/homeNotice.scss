@@ -1,0 +1,38 @@
+.home-notice{
+  height: 100%;
+  ul{
+    padding: 10px 15px;
+    background-color: #ffffff;
+    margin-top: 16px;
+    height: calc(100% - 36px);
+    overflow: auto;
+    li{
+      border-bottom: 1px dashed #d9e4ea;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      a{
+        padding: 14px 6px;
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        text-decoration: none;
+        color: #5d6a6f;
+        font-size: 14px;
+      }
+      .notice-content{
+        text-overflow: ellipsis;
+        word-break: break-all;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .notice-time{
+        margin-left: 10px;
+        flex-basis: 86px;
+        text-align: right;
+        flex-shrink: 0;
+      }
+    }
+  }
+}

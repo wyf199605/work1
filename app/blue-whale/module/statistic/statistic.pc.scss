@@ -1,0 +1,67 @@
+.statistic {
+  .modal-body {
+    overflow-x: hidden;
+  }
+  .col-xs-5 {
+    width: 260px;
+    & > fieldset:nth-child(n) {
+      padding-left: 0;
+      padding-right: 0;
+      width: 230px;
+      margin-bottom: 0;
+      legend {
+        font-size: 13px !important;
+      }
+    }
+  }
+  .row {
+    & > fieldset:nth-child(n) {
+      padding-left: 0;
+      width: 140px;
+      padding-bottom: 6px;
+      padding-right: 0;
+      margin-bottom: 0;
+      legend {
+        font-size: 13px !important;
+      }
+    }
+  }
+}
+
+.statisticsContent, .statisticsRange {
+  margin-top: -10px;
+  color: rgb(133, 133, 133);
+  .select-box {
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 10px;
+    padding-right: 18px;
+  }
+}
+
+.statisticsContent {
+  .select-box:nth-child(even) {
+    margin-left: 20px;
+  }
+}
+
+.statisticsField, .groupingField {
+  height: 240px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-top: -10px;
+  color: rgb(133, 133, 133);
+  .select-box {
+    margin-left: 10px;
+    margin-top: 10px;
+    width: 120px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+  }
+}
+
+.groupingField_grouping {
+  padding-right: 0;
+  margin-left: 15px;
+}

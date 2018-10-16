@@ -1,0 +1,48 @@
+.operation {
+  width: 100%;
+  .dropDownContainer {
+    width: 140px;
+    height: 36px;
+    background-color: #ffffff;
+    border-radius: 3px;
+    border: solid 1px #e2e2e2;
+  }
+  .operation-condition {
+    overflow: hidden;
+    padding: 5px 0;
+    .buttons, .element-type {
+      float: left;
+    }
+    button {
+      margin-right: 20px;
+      background-color: #f2f2f2;
+      border-radius: 3px;
+      border: solid 1px #e2e2e2;
+      height: 30px;
+    }
+    label{
+      font-weight: normal;
+    }
+  }
+}
+.elementModal{
+  .modal-body {
+    overflow-y: hidden !important;
+    .modal-body-container {
+      .conditions {
+        label {
+          font-weight: normal;
+        }
+        .textInputContent {
+          width: 120px;
+          border: 1px solid #e2e2e2;
+          border-radius: 3px;
+          height: 36px;
+        }
+      }
+      .fast-table-container {
+        height: 370px;
+      }
+    }
+  }
+}

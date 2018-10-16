@@ -1,0 +1,135 @@
+////@import "../helpers/parameters";
+////$color-default-font: #8e8e93;
+////$nav-height: 40px;
+////$spinner-font: $nav-height/2;
+//.popup-left
+//{
+//  position: fixed;
+//  background:#fff;
+//  transition:left .5s;
+//  -moz-transition:left .5s; /* Firefox 4 */
+//  -webkit-transition:left .5s; /* Safari and Chrome */
+//  -o-transition:left .5s; /* Opera */
+//  left: -400px;
+//  top:0px;
+//  /*right: 0;*/
+//  bottom:44px;
+//  z-index: 999;
+//  width: 400px;
+//  height: 100%;
+//}
+//.popup-bottom
+//{
+//  position: fixed;
+//  background:#fff;
+//  transition:bottom .5s;
+//  -moz-transition:bottom .5s; /* Firefox 4  */
+//  -webkit-transition:bottom .5s; /* Safari and Chrome */
+//  -o-transition:bottom .5s; /* Opera */
+//  left: 0;
+//  /*top:0;*/
+//  right: 0;
+//  bottom: -400px;
+//  z-index: 999;
+//  height: 400px;
+//  width: 100%;
+//  .popup-body{
+//    height: 358px;
+//  }
+//}
+//.popup-right
+//{
+//  position: fixed;
+//  background:#fff;
+//  transition:right .5s;
+//  -moz-transition:right .5s; /* Firefox 4 */
+//  -webkit-transition:right .5s; /* Safari and Chrome */
+//  -o-transition:right .5s; /* Opera */
+//  /*left: 0;*/
+//  top:0px;
+//  /*right: 0;*/
+//  bottom:44px;
+//  z-index: 999;
+//  width: 400px;
+//  right: -400px;
+//  height: 100%;
+//
+//}
+//.hide-bottom{
+//  bottom: 0!important;
+//}
+//.hide-top{
+//  top: 0!important;
+//}
+//.hide-left{
+//  left: 0!important;
+//}
+//.hide-right{
+//  right: 0!important;
+//}
+//.popup-top
+//{
+//  position: fixed;
+//  background:#fff;
+//  transition:top .5s;
+//  -moz-transition:top .5s; /* Firefox 4 */
+//  -webkit-transition:top .5s; /* Safari and Chrome */
+//  -o-transition:top .5s; /* Opera */
+//  left: 0;
+//  top:-400px;
+//  right: 0;
+//  /*bottom:0;*/
+//  z-index: 999;
+//  height: 400px;
+//  width: 100%;
+//  .popup-body{
+//    height: 358px;
+//  }
+//}
+//.popup-content {
+//  position: absolute;
+//  border-right: none;
+//  border-left: none;
+//  top:0;
+//  bottom:0;
+//  left: 0;
+//  right: 0;
+//  background-color: #fff;
+//  -webkit-background-clip: padding-box;
+//  background-clip: padding-box;
+//  border-top: 1px solid $color-default-font;
+//  border-top: 1px solid rgba(0,0,0,.2);
+//  outline: 0;
+//}
+//.popup-header{
+//  padding: 8px;
+//  min-height: 16.43px;
+//  border-bottom: 1px solid #e5e5e5;
+//  cursor: all-scroll;
+//  .glyphicon{
+//    float: right;
+//    right: 37px;
+//    font-size: 12px;
+//    opacity: 0.4;
+//    top: 5px;
+//    cursor: pointer;
+//  }
+//}
+//.popup-body{
+//  overflow: auto;
+//  width: 100%;
+//  display: inline-block;
+//  .mobileTableWrapper{
+//    border-top: 1px solid #2196F3;
+//    margin-top: 0;
+//  }
+//  //padding: 3px;
+//}
+//
+//
+////.popup-footer{
+////
+////  padding: 8px 15px;
+////  text-align: right;
+////  border-top: 1px solid #e5e5e5;
+////}

@@ -1,0 +1,212 @@
+.formPage{
+
+  .form{
+    width: 100%;
+  }
+  padding-bottom: 0!important;
+  .l-wrapper {
+    display: none;
+  }
+  .fa {
+    line-height: 38px;
+  }
+
+  .fa-folder-open {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .fa-plus-square {
+    font-size: 18px;
+    height: 0;
+  }
+
+  .fa-minus-square {
+    font-size: 18px;
+  }
+
+  .span-up {
+    width: 110px;
+    height: 36px;
+    line-height: 36px;
+    display: block;
+    text-align: center;
+  }
+
+  /*文本编辑兼容性调整*/
+  .pad-top {
+    float: left;
+  }
+
+  .pad-top div.note-editor {
+    margin-top: 11px;
+  }
+
+  .panel-default {
+    padding-top: 0;
+  }
+
+  .form-group {
+    margin-top: 6px;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    float: left;
+    height: 40px;
+  }
+
+  .form-group label.col-xs-3 {
+    /*min-width: 96px;*/
+    white-space: nowrap;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+  }
+
+  /*加急*/
+  .botdashed {
+    padding-bottom: 10px;
+    float: left;
+  }
+
+  .botdashed label.col-xs-3 {
+    white-space: nowrap;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+  }
+
+  div[data-input-type]>div {
+    overflow: inherit !important;
+    margin: auto;
+  }
+
+  /*file*/
+  .posLeft {
+    position: absolute;
+    left: 26%;
+  }
+
+  /*richText*/
+  .note-toolbar {
+    min-height: 41px;
+  }
+
+  .note-btn-group button {
+    border: none;
+    background: #f5f5f5;
+  }
+
+  .note-editor .note-toolbar.panel-heading .btn-group:after {
+    position: absolute;
+    top: 2px;
+    left: -12px;
+    width: 2px;
+    height: 28px;
+    margin: 0 7px;
+    content: "";
+    background: #e4e8e9;
+  }
+
+  .note-image-input {
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 12px;
+    height: 22px;
+    box-shadow: none;
+  }
+
+  /*checkbox*/
+  .switchery > small {
+    height: 32px;
+  }
+
+  .switchery {
+    height: 32px;
+  }
+
+  .webuploader-container span{
+    top: -33px;
+  }
+
+
+  .margin-top-8{
+    margin-top: 8px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+  }
+  .list-group-item{
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border-radius: 0!important;
+    border:none;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    min-height: 38px;
+
+    &>.list-left{
+      display: flex;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 0;
+      background: rgba(232, 242, 255, 0.6);
+      color: #858585;
+      width: 90px;
+      label{
+        color: #333;
+        margin: auto;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+    .list-right[data-input-type="toggle"]{
+      display: flex;
+      min-height: 38px;
+    }
+    .list-right{
+      padding: 0;
+      width: calc(100% - 90px);
+      input[type="checkbox"]{
+        margin: auto;
+      }
+    }
+    &>.width-125{
+      width: calc(100% - 125px);
+    }
+    .text-input > input{
+      min-height: 38px;
+    }
+    div[id^='rt_rt_']{
+      width: 100%!important;
+      height: 38px!important;
+      left: inherit!important;
+    }
+
+  }
+  .form{
+    display: inline-block;
+  }
+
+  /*文本编辑*/
+  .note-editor.note-frame{
+    border: none;
+    margin-bottom: 0;
+  }
+
+  [data-balloon]:after{
+    color: rgb(252,67,67);
+    background-color: white;
+    border: 1px solid rgb(252,67,67);
+    font-size: 14px;
+    text-align: left;
+  }
+  [data-balloon]:before{
+    background: white;
+    border-top: 7px solid rgb(252,67,67);
+    width: 0;
+    height: 0;
+    border-right: 7px solid transparent;
+    border-left: 7px solid transparent;
+  }
+}

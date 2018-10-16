@@ -1,0 +1,97 @@
+.myChart{
+  width: 100vw;
+  .modal-body {
+    overflow-x: hidden;
+    max-height: none;
+    height: calc(100vh - 146px);
+    fieldset{
+      padding: 15px 15px;
+      legend{
+        font-size: 13px !important;
+      }
+    }
+  }
+  .EChart_tabFirst{
+    .select-box:not(:first-child){
+      margin-top: 10px;
+    }
+    .select-box{
+      display: block;
+    }
+    .rowClass{
+      .text-input{
+        border: 1px solid #e6e8e8;
+        height: 30px;
+        line-height: 30px;
+        margin-top: 10px;
+        input{
+          font-size: 12px;
+        }
+      }
+    }
+    .col-xs-4{
+      padding: 0 0;
+      display: inline-block;
+      vertical-align: text-top;
+    }
+    .col-xs-4:nth-child(1){
+      width: 45vw;
+      fieldset{
+        height: 40vh;
+        width: 45vw;
+      }
+    }
+    .col-xs-4:nth-child(2){
+      width: 45vw;
+      margin-left: 5vw;
+      fieldset{
+        height: 40vh;
+        width: 45vw;
+
+        .colClass{
+          overflow: scroll;
+          height: 95%;
+          overflow-x: hidden;
+          .select-box {
+              margin-left: 0px;
+              width: 35vw;
+              overflow: hidden;
+              text-overflow:ellipsis;
+              white-space: nowrap;
+
+          }
+        }
+      }
+    }
+    .col-xs-4:nth-child(3){
+      width: 100vw;
+      fieldset{
+        display: inline-block;
+        height: 110px;
+        width: 45vw;
+        vertical-align: text-top;
+      }
+      fieldset:nth-child(2){
+        margin-left: 5vw;
+      }
+    }
+
+  }
+}
+
+
+  .Echart_body{
+    overflow-x: scroll;
+    max-height: none;
+    height: calc(100vh - 93px);
+    width: 100vw;
+    position: relative;
+  }
+  .detailDiv{
+    position: absolute;
+    background-color: rgb(111,111,111);
+    padding: 5px 5px;
+  }
+.mui-collapse-content{
+  overflow-x: scroll !important;
+}

@@ -1,0 +1,16 @@
+//@import "../helpers/parameters";
+$color-default: #007AFF;
+.fa{
+  color: $color-default;
+  cursor: pointer;
+}
+#sidebar > div nav > ul > li a i {
+  font-weight: normal;
+  font-size: 12px;
+}
+#sidebar nav>ul .sub-menu>li.active .fa{
+  color: #fff;
+}
+#sidebar nav>ul .sub-menu>li.active>a i{
+  color: #fff;
+}

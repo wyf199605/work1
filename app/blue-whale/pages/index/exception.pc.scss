@@ -1,0 +1,44 @@
+.errorPage{
+  overflow-y: auto;
+  height: 100%;
+  .errPage{
+    text-align: center;
+  }
+  .page-copyright{
+    margin-top: 10px;
+    font-size: 12px;
+    color: #424242;
+    letter-spacing: 1px;
+  }
+  .error-icon{
+    font-size: 150px;
+    margin-top: 5vh;
+    width: 170px;
+    height: 170px;
+    line-height: 1;
+    color: #606060;
+    display: inline-block;
+  }
+  .error-icon~.text{
+    font-size: 16px;
+    color: #333;
+  }
+  .text{
+    font-size: 21px;
+  }
+  .cent{
+    text-align: center;
+    padding-top: 8%;
+  }
+  body{
+    padding: 0;
+  }
+  @media (max-width: 400px) {
+    .buttons .btn.active{
+      margin-top: 11px;
+      width: 90%;
+      height: 40px;
+      margin-left: 4px;
+    }
+  }
+}

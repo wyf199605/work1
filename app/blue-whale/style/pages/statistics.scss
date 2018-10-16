@@ -1,0 +1,77 @@
+
+#statisticsDom,#crosstabDom,#ABCDom,#chartDom{
+  .modal-body{
+    padding: 5px 15px;
+    fieldset{
+      padding: 10px;
+      margin: 0;
+      margin-top: 20px;
+    }
+    &>fieldset{
+      margin-left: -1px;
+      min-height: 188px;
+      &>div{
+        min-height: 188px;
+        max-height: 188px;
+        overflow: auto;
+        &>.red{
+          position: absolute;
+          top: 50px;
+          left: 20px;
+          font-size: 15px;
+        }
+      }
+    }
+    fieldset.col-xs-3{
+      width: 29%;
+    }
+    &>div{
+      fieldset:first-child{
+        height: 140px;
+      }
+      fieldset:last-child{
+        margin-top: 10px;
+        height: 60px;
+      }
+    }
+    .radio{
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+    &>.col-xs-12{
+      &>div{
+        margin-top: 10px;
+        margin-bottom: 0;
+      }
+    }
+    .ABCProportion{
+      p{
+        margin-top: 20px;
+      }
+    }
+  }
+}
+#ABCDom{
+  .form-control{
+    display: inline;
+    padding:0;
+    height: 25px;
+    width: 40px;
+  }
+}
+#chartDom{
+  .modal-body{
+    .radio{
+      margin-top: 3px;
+    }
+    &>div{
+      fieldset:first-child{
+        height: 150px;
+      }
+      fieldset:last-child{
+        margin-top: 15px;
+        height: 45px;
+      }
+    }
+  }
+}

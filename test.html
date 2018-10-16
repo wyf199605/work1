@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<!-- start: HEAD -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <title>蓝鲸后台</title>
+    <link href="plugin/bootstrap/bootstrap3/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+</head>
+<!-- end: HEAD -->
+<body>
+<button id="print">执行</button>
+<select id="selectId">
+</select>
+
+<script>
+    var db = openDatabase('myTel','1.0','test db',1024*100);
+    db.transaction(function (tx){console.log('test');
+        tx.executeSql('select count(*) from testitems',[],function(tx,result){
+            var j = 0;console.log(result.rows.length);
+            for(var i = 0 ;i<result.rows.length;i++){
+                console.log(result.rows[i]);
+            }
+
+        })
+    })
+    var print = document.getElementById('print');
+    var selectId = document.getElementById('selectId');
+    let option = `<option value ="0">默认</option>`;
+    selectId.innerHTML = option;
+    print.onclick = function(){
+        var code = document.getElementById("selectId").value;
+        if(code === '0') {
+            console.log(db);
+            db.transaction(function (tx){
+                tx.executeSql('create table if not exists testitems(name1 TEXT,name2 TEXT,name3 TEXT,name4 TEXT,name5 TEXT,name6 TEXT,name7 TEXT,name8 TEXT,name9 TEXT,name10 TEXT,name11 TEXT,name12 TEXT,name13 TEXT,name14 TEXT,name15 TEXT,name16 TEXT,name17 TEXT,name18 TEXT,name19 TEXT,name20 TEXT)',[],function(tx,res){
+                },function(tx,err){
+                    alert(err.message);
+                });
+                var name1 = '123',name2 = '123',name3 = '123',name4 = '123',name5 = '123',name6 = '123',name7 = '123',name8 = '123',name9 = '123',name10 = '123',name11 = '123',name12 = '123',name13 = '123',name14 = '123',name15 = '123',name16 = '123',name17 = '123',name18 = '123',name19 = '123',name20 = '123';
+                for(var i=0; i<100; i++){
+                    tx.executeSql('insert into testitems values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',[name1,name2,name3,name4,name5,name6,name7,name8,name9,name10,name11,name12,name13,name14,name15,name16,name17,name18,name19,name20],function(tx,rs){
+                        console.log(i);
+                    },
+                    function (tx,err){
+                        alert(err.source +'===='+err.message);
+                    })
+                }
+                tx.executeSql('select count(*) from testitems',[],function(tx,result){
+                    var j = 0;
+                    for(var i = 0 ;i<result.rows.length;i++){
+                        console.log(result.rows[i]);
+                    }
+                })
+            })
+        }
+    }
+</script>
+</body>
+
+</html>

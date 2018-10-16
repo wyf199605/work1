@@ -1,0 +1,37 @@
+.menu-develop{
+  padding-top: 60px;
+  .saveBtn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+    //.btn:active:focus, .btn:focus{
+    //  outline: none;
+    //}
+    button{
+      height: 62px;
+      width: 188px;
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 24px;
+      span{
+        margin-left: 10px;
+      }
+    }
+    .save{
+      background-color: #37ba9d;
+      padding-bottom: 4px;
+      i{
+        font-size: 30px;
+        position: relative;
+        top: 1px;
+      }
+    }
+    .save.btn.button-type-default{
+      border-color: #37ba9d;
+    }
+    .save.btn.button-type-default:hover{
+      color: #ffffff;
+    }
+  }
+}

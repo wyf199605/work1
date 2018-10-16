@@ -1,0 +1,154 @@
+.formPrint{
+   width:700px;
+  .modal-body{
+    padding: 0;
+  }
+  .text-input {
+    border-bottom: 1px solid rgb(221, 221, 221);
+    padding: 0;
+    display: inline-block;
+    width: 75px;
+    margin-left: 10px;
+  }
+   span {
+    display: inline-block;
+  }
+  fieldset{
+    padding:15px;
+    margin-bottom: 10px;
+  }
+  .text-input {
+    display: inline-block;
+    width: 75px;
+    margin-left: 10px;
+  }
+  .select-box {
+    display: inline-block;
+    margin-left: 20px;
+  }
+  .inline{
+    display: inline-block;
+  }
+  .setDom,.optionDom,.dataDom,.suppleDom{
+    height: 325px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .setDom{
+    .leftSet{
+      float: left;
+      width: 50%;
+      padding-right: 30px;
+      padding-top: 10px;
+      .printer{
+        .text-input{
+          width: 100%;
+        }
+      }
+      .range{
+        [data-name="pageRange"]{
+          margin-left: 13px;
+          [data-index = "1"]{
+            margin-left: 13px;
+          }
+        }
+        [data-name="from"]{
+          margin-left: 16px;
+        }
+        [data-name="to"]{
+          margin-left: 41px;
+        }
+      }
+      .direction{
+        [data-name="direction"]{
+          margin-left: 13px;
+          [data-index="1"]{
+            margin-left: 26px;
+          }
+        }
+      }
+      .content{
+        [data-name="printData"]{
+          margin-left: 13px;
+        }
+      }
+    }
+    .rightSet{
+      float: left;
+      width: 50%;
+      padding-left: 30px;
+      padding-right: 15px;
+      padding-top: 10px;
+      .paper{
+        .text-input{
+          width: 100%;
+        }
+      }
+      .size{
+        margin-top: 20px;
+        padding-left: 16px;
+        [data-name="width"]{
+          display: inline-block;
+        }
+        [data-name="height"]{
+          display: inline-block;
+          margin-left: 40px;
+        }
+      }
+      .pagePadding{
+        [data-name]{
+          display: inline-block;
+        }
+        [data-name="up"]{
+          margin-top: 20px;
+          margin-left: 14px;
+        }
+        [data-name="down"]{
+          margin-left: 30px;
+        }
+        [data-name="left"]{
+          margin-left: 14px;
+          margin-top: 10px;
+        }
+        [data-name="right"]{
+          margin-left: 30px;
+          margin-top: 10px;
+        }
+      }
+      .otherSetting{
+        margin-top: 20px;
+        [data-name]{display: inline-block;}
+        [data-name="lanNum"]{
+          margin-left: 16px;
+        }
+        [data-name="lanSpace"]{
+          margin-left: 41px;
+        }
+        [data-name="rowSpace"]{
+          margin-left: 16px;
+          margin-top: 20px;
+        }
+        [data-name="colSpace"]{
+          margin-left: 41px;
+        }
+      }
+    }
+  }
+  .optionDom{
+
+  }
+  .dataDom{
+
+  }
+  .suppleDom{
+
+  }
+}
+.preview{
+  .previewBody{
+    text-align: center;
+    .svgText{
+      height:13px;text-overflow: ellipsis;white-space: nowrap;display: block;overflow: hidden;
+    }
+  }
+}

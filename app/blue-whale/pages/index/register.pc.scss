@@ -1,0 +1,122 @@
+.regPage{
+  overflow-y: auto;
+  .content{
+    max-width: 360px;
+    margin: 0 auto;
+    padding: 0 10px;
+    .reg-content{
+      #login-form{
+        .input-group{
+          padding-top: 20px;
+          width: 100%;
+          &>input{
+            height: 42px;
+            border-radius: 4px!important;
+          }
+          #verify{
+            padding-right: 80px;
+          }
+        }
+
+        #sendVerify{
+          position: absolute;
+          text-align: center;
+          right: 5px;
+          top: 26px;
+          padding: 6px 12px;
+          width: auto;
+          line-height: 1.1;
+          float: right;
+          color: #fff;
+          border: 1px solid #007aff;
+          background-color: #007aff;
+          font-size: 14px;
+          font-weight: 400;
+          z-index: 2;
+          border-radius: 3px;
+        }
+      }
+      .reg-btn{
+        width: 100%;
+        //padding: 0 7px;
+        position: relative;
+        #saveReg,#goLogin{
+          font-size: 16px;
+          display: block;
+          width: 46%;
+          margin-bottom: 10px;
+          padding: 7px 0;
+          color: #fff;
+          border-radius: 3px;
+          border: 1px solid #007aff;
+          background-color: #007aff;
+          float: left;
+        }
+        #goLogin{
+          margin-right: 8%;
+        }
+      }
+      .msg-tip{
+        h5{
+          font-weight: 400;
+          color: #8f8f94;
+        }
+      }
+      .msg-device{
+        position: relative;
+        padding: 0;
+        background-color: #fff;
+        .input-row{
+          height: 40px;
+          position: relative;
+          clear: left;
+          overflow: hidden;
+          &:after{
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 15px;
+            height: 1px;
+            content: '';
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+            background-color: #c8c7cc;
+          }
+          label{
+            width: 115px;
+            font-family: 'Helvetica Neue',Helvetica,sans-serif;
+            line-height: 1.1;
+            float: left;
+            padding: 11px 15px;
+          }
+          input{
+            height: 100%;
+            width: calc(100% - 115px);
+            float: right;
+            margin-bottom: 0;
+            padding-left: 0;
+            border: 0;
+          }
+        }
+
+      }
+    }
+    .reg-head{
+      padding-top: 80px;
+      text-align: center;
+      .reg-title{
+        font-family: "NSimSun",新宋体!important;
+      }
+    }
+
+
+  }
+
+  .device-view{
+    .unbind{
+      border: none;
+      height: 30px;
+    }
+  }
+
+}

@@ -1,0 +1,195 @@
+.myselfMenuPage{
+  #setFontSize.active{
+    &>a::after{
+      transition: 0.2ms linear all;
+      transform-origin: 76% 30%;
+      transform: rotate(90deg);
+    }
+  }
+  .select-panel{
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    align-items: center;
+    .fs-item{
+      width: 33.33%;
+      line-height: 40px;
+      font-size: inherit;
+      text-align: center;
+      height: 40px;
+    }
+    .fs-item.small{
+      font-size: 12px;
+    }
+    .fs-item.middle{
+      font-size: 16px;
+    }
+    .fs-item.big{
+      font-size: 20px;
+    }
+    .fs-item.active{
+      background-color: #eee;
+    }
+  }
+  .select-panel.hide{
+    display: none;
+  }
+  .mui-page .mui-table-view:first-child {
+  margin-top: 15px;
+  }
+  .mui-page .mui-table-view:last-child {
+  margin-bottom: 30px;
+  }
+  .mui-table-view {
+
+  }
+  .head-img {
+    width: 40px;
+    height: 40px;
+    font-size: 52px !important;
+    margin-right: 26px !important;
+  }
+  .update{
+  font-style: normal;
+  color: #999999;
+  margin-right: -25px;
+  font-size: 15px;
+  }
+}
+
+.mui-content{
+  &:before{
+    content:"";
+    display:table;
+  }
+  .mui-rotate-box{
+    position:relative;
+    width:200px;
+    height:200px;
+    line-height: 200px;
+    text-align:center;
+    border-radius:50%;
+    margin:30px auto 50px;
+    cursor: pointer;
+    box-shadow:0 0 10px 4px #007aff;
+    transition:.2s;
+    -webkit-transition:.2s;
+    .box-content {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      font-size: 25px;
+      color: #fff;
+      border-radius: 50%;
+      background: transparent;
+      z-index: 1000;
+    }
+    .circle-box1 ,
+    .circle-box2{
+      position:absolute;
+      top:0;
+      left:0;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background:rgba(0,122,255,.5);
+    }
+    .circle-box1{
+      transition:scale .5s;
+    }
+    .circle-box2{
+      visibility: hidden;
+      transform:scale(0);
+    }
+  }
+  .mui-progress{
+    transition:1s;
+    -webkit-transition:1s;
+    opacity:0;
+    width:200px;
+    margin:0 auto ;
+    height:8px;
+    border-radius:4px;
+    background:#fff;
+    overflow:hidden;
+    .mui-progress-bar{
+      background:#007aff;
+      height:100%;
+      width:0;
+    }
+  }
+  .animate_start{
+    box-shadow:none;
+    & + .mui-progress{
+      opacity:1;
+    }
+    .circle-box1{
+      animation: load 1.8s .1s ease-in-out infinite;
+      -webkit-animation: load 1.8s .1s ease-in-out infinite;
+    }
+    .circle-box2{
+      visibility:visible;
+      animation: load-reverse 1.8s .1s ease-in-out infinite;
+      -webkit-animation: load-reverse 1.8s .1s ease-in-out infinite;
+    }
+  }
+}
+@keyframes load
+{
+  0%{
+    transform: scale(1);
+  }
+  50%{
+    transform: scale(0);
+  }
+  100%{
+    transform: scale(1);
+  }
+}
+@-webkit-keyframes load
+{
+  0%{
+    -webkit-transform: scale(1);
+  }
+  50%{
+    -webkit-transform: scale(0);
+  }
+  100%{
+    -webkit-transform:scale(1);
+  }
+}
+@keyframes load-reverse
+{
+  0%{
+    transform: scale(0);
+  }
+  50%{
+    transform: scale(1);
+  }
+  100%{
+    transform: scale(0);
+  }
+}
+@-webkit-keyframes load-reverse
+{
+  0%{
+    -webkit-transform: scale(0);
+  }
+  50%{
+    -webkit-transform: scale(1);
+  }
+  100%{
+    -webkit-transform:scale(0);
+  }
+}
+.big{
+  .select-panel{
+    font-size: 16px;
+  }
+}
+.super-fontsize{
+  .select-panel{
+    font-size: 20px;
+  }
+}

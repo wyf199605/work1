@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "sourceMap": false,
+    "module": "amd",
+    "baseUrl": "./",
+    "noEmitHelpers": true,
+    "paths": {
+    },
+    "lib": ["dom", "es2015.promise", "es5"],
+    "jsx": "react",
+    "jsxFactory": "h"
+  },
+  "exclude": [
+    "../../node_modules"
+  ]
+}

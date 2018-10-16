@@ -1,0 +1,66 @@
+.tempModal {
+  overflow: scroll;
+}
+
+.crossTab {
+  .modal-body {
+    overflow-x: hidden;
+    .statistic_row, .statistic_col, .statistic_val {
+      height: 200px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      margin-top: -10px;
+      color: rgb(133, 133, 133);
+      .select-box {
+        margin-left: 10px;
+        margin-top: 10px;
+        width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+      }
+    }
+    .statistic_select {
+      .select-box {
+        display: inline-block;
+        margin-left: 12px;
+        padding-left: 28px;
+        margin-top: 10px;
+
+        //&:last-child{
+        //  margin-left:63px;
+        //}
+      }
+    }
+    .statistic_sum, .statistic_fixed {
+      //margin-left: 16px;
+      .select-box {
+        //margin-left: 10px;
+        //padding-left: 28px;
+        margin-top: 10px;
+
+      }
+    }
+    .col-xs-8 {
+      width: 370px;
+    }
+    .col-xs-4 {
+      &:first-child {
+        margin-left: 23px;
+      }
+      width: 180px;
+      fieldset {
+        padding-left: 0;
+        width: 155px;
+        padding-right: 0;
+        padding-bottom: 6px;
+        margin-bottom: 10px;
+        legend {
+          font-size: 13px !important;
+        }
+      }
+    }
+  }
+
+}

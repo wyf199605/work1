@@ -1,0 +1,133 @@
+.mail-detail{
+  //min-width: 450px;
+  font-size: 12px;
+  position: relative;
+  margin-bottom: 12px;
+  height: 100%;
+  display: block;
+  .txt-left{
+    [data-name]:not([data-href='']){
+      color: #007aff;
+      cursor: pointer;
+      &:hover{
+        text-decoration: underline;
+      }
+  }
+    .caption{
+      width: 72px;
+      display: inline-block;
+      text-align: right;
+    }
+  }
+  .mail-btn-group{
+    padding: 6px 0;
+    button {
+      border: none;
+      background-color: transparent;
+      padding: 0 6px;
+      .appcommon{
+        padding-right: 6px;
+        font-size: 15px;
+      }
+      &:hover{
+        color: $primary;
+        background-color: transparent;
+      }
+    }
+  }
+  //.mail-top{
+  //  margin-bottom: 5px;
+  //  .btn-group{
+  //    display: inline-block;
+  //  }
+  //
+  //}
+  .mail-head{
+    width: 100%;
+    position: relative;
+    display: inline-block;
+    border-top: 1px solid #fff;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid #EBEBEB;
+    background: $default_2;
+    .txt-left{
+      text-align: left;
+      color: #524f4f;
+      padding: 1px 0 1px 10px;
+    }
+    .mail-title{
+      width: 100%;
+      padding: 6px 9px;
+      font-weight: bold;
+      font-size: 14px;
+      position: relative;
+      display: inline-block;
+      .txt-left{
+        padding: 0;
+        width: 98%;
+        color: #000;
+        display: inline-block;
+      }
+      .btn-group-right {
+        position: absolute;
+        display: inline-block;
+        //margin-left: -86px;
+        right: 3px;
+        top: 3px
+      }
+      .avatar-right{
+        display: inline-block;
+        position: absolute;
+        right: 10px;
+        top: 63px;
+
+        .mail-avatar{
+
+        }
+        .mail-icon{
+          display: block;
+          .icon-arrow-down,.icon-arrow-up{
+            float: right;
+            cursor: pointer;
+          }
+        }
+
+      }
+    }
+    .icon-arrow-down{
+      display: none;
+      font-size: 18px;
+    }
+    &.mail-hide{
+      .mail-more{
+        display: none;
+      }
+      .icon-arrow-up{
+        display: none;
+        font-size: 18px;
+      }
+      .icon-arrow-down{
+        display: block;
+      }
+    }
+  }
+  .mail-body{
+    padding: 6px 9px;
+    .txt-left{
+      .caption{
+        display: inline;
+      }
+      font-size: 12px;
+    }
+  }
+  .mail-content{
+    border-top: 1px solid #EBEBEB;
+    position: relative;
+    font-size: 14px;
+    padding: 10px 15px 0 7px;
+    z-index: 1;
+    zoom: 1;
+    line-height: 1.7;
+  }
+}

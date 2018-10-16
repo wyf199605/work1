@@ -1,0 +1,84 @@
+.analysis{
+  .modal-body {
+    max-height: none;
+    .col-xs-4 {
+      width: 33%;
+      display: inline-block;
+      vertical-align: top;
+      fieldset {
+        .select-box {
+            margin-left: 0px;
+            margin-top: 5px;
+            width: 27vw;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+
+        }
+        .statistic_classify{
+          height: 60vh;
+          overflow-y: scroll;
+        }
+        .statistic_value{
+          height: 60vh;
+          overflow-y: scroll;
+        }
+        .statistic_proport{
+          height: 60vh;
+          overflow-y: scroll;
+          font-size: 12px;
+          .text-input{
+            width: 30px;
+            display: inline-block;
+            min-width : unset;
+            [type='text']{
+              font-size: 12px;
+            }
+          }
+          .aClass{
+            position: relative;
+            &:after{
+              margin-top: 10px;
+              content: '%';
+              position: absolute;
+              line-height: 12px;
+            }
+          }
+          .bClass{
+            margin-top: 10px;
+            &:after{
+              content: '%';
+              position: absolute;
+              line-height: 30px;
+            }
+          }
+          .cClass{
+            line-height: 30px;
+            margin-top: 10px;
+          }
+        }
+      }
+    }
+    .col-xs-8{
+      width: 70%;
+      display: inline-block;
+      margin-top: 35px;
+    }
+    .statistic_select{
+      display: inline-block;
+      width: 100%;
+      .select-box {
+        width: 50%;
+        display: inline-block;
+      }
+    }
+    .row:last-child{
+      .col-xs-4{
+        width: 30% !important;
+        display: inline-block;
+        margin-top: 35px;
+        width: 33%;
+      }
+    }
+  }
+}

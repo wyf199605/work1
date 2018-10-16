@@ -1,0 +1,143 @@
+.detailPage{
+  .row{
+    margin-right: -1px;
+        margin-left: 0;
+  }
+  li.row{
+    div{
+      white-space:nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  .list-group{
+    margin-bottom: 0;
+  }
+
+  .ellipsis-row3.blue{
+    cursor: pointer;
+  }
+  .ellipsis-row3.blue:hover{
+    text-decoration: underline;
+  }
+  .list-group-item {
+    margin: 0;
+    padding: 0;
+    border-radius: 0!important;
+    border:none;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    .fold{
+      overflow: hidden;
+    }
+  }
+  .mailContent {
+    width: 100%;
+    margin-top: -1px;
+    min-height: 100px;
+    border-right: 1px solid #ddd;
+    display: flex;
+    overflow-x: hidden;
+    .list-left{
+      display: flex;
+      width: 10%;
+      height: 100%;
+      position: absolute;
+      div{
+        margin: auto;
+        white-space: initial;
+      }
+    }
+    .list-right{
+      margin-left: 10%;
+      text-align: left;
+      width: 90%;
+      height: 100%;
+      overflow-x: auto;
+    }
+  }
+
+  .list-left{
+    padding: 10px;
+    text-align: center;
+    background: rgba(232, 242, 255, 0.6);
+    width: 40%;
+    float: left;
+    display: flex;
+    &>div{
+      margin: auto;
+      .colon{
+        display: none;
+      }
+    }
+  }
+
+  .list-right{
+    //padding: 10px;
+    //white-space: nowrap;
+    line-height: 35px;
+    height: 35px;
+    overflow-y: auto!important;
+    text-align: center;
+    background: white;
+    width: 60%;
+    float: left;
+    word-break: break-all;
+  }
+
+  .margin-top-8{
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+  }
+  @media (max-width: 1200px){
+    .col-md-3 {
+      width: 33.33333333%;
+    }
+    .mailContent{
+      .list-left{
+        width: 13.3%;
+      }
+      .list-right{
+        width: 86.7%;
+        margin-left: 13.3%;
+      }
+
+    }
+  }
+
+  @media (max-width: 790px) {
+    .col-xs-3{
+      width: 50%;
+    }
+    .mailContent{
+      .list-left{
+        width: 20%;
+      }
+      .list-right{
+        width: 80%;
+        margin-left: 20%;
+      }
+    }
+  }
+  @media (max-width: 790px) {
+    .col-xs-12{
+      width: 50%;
+    }
+  }
+  @media (max-width: 580px) {
+    .col-xs-12{
+      width: 100%;
+    }
+    .mailContent{
+      .list-left{
+        width: 40%;
+      }
+      .list-right{
+        width: 60%;
+        margin-left: 40%;
+      }
+    }
+  }
+
+}

@@ -1,0 +1,840 @@
+/// <amd-module name="FastBtnTable"/>
+import {FastTable, IFastTablePara} from "../newTable/FastTable";
+import {Button, IButton} from "../general/button/Button";
+import d = G.d;
+import tools = G.tools;
+import {InputBox} from "../general/inputBox/InputBox";
+import {IPopoverItemPara, Popover} from "../ui/popover/popover";
+import {Modal} from "../feedback/modal/Modal";
+import {TextInput} from "../form/text/text";
+import {DropDown} from "../ui/dropdown/dropdown";
+import {TableDataCell} from "../newTable/base/TableCell";
+import {SelectBox} from "../form/selectBox/selectBox";
+import {Spinner} from "../ui/spinner/spinner";
+export interface IFastBtnTablePara extends IFastTablePara{
+    btn?: IFastBtnTableBtn;
+}
+interface IFastBtnTableBtn {
+    name: ('search' | 'statistic' | 'export')[];
+    type?: 'button' | 'dropdown';
+    target?: HTMLElement; // button 时代表放button的容器, dropdown时代表点击触发出现dropdown的元素
+    isReplaceTable?: boolean;
+}
+type statisticType = 'count' | 'statistic' | 'chart' | 'crosstab' | 'analysis';
+
+export class FastBtnTable extends FastTable{
+    protected inputBox: InputBox;
+    protected popover: Popover;
+    protected spinner: Spinner;
+    protected isButton: boolean;
+    protected isReplaceTable: boolean;
+    public btnWrapper: HTMLElement;
+    protected modals: Modal[] = [];
+
+    wrapperInit(){
+        let wrapper = super.wrapperInit();
+        this.btnWrapper = <div className='fast-table-btns'></div>;
+        d.prepend(wrapper, this.btnWrapper);
+        return wrapper;
+    }
+
+    constructor(para: IFastBtnTablePara){
+        super(para);
+        if(tools.isNotEmpty(para.btn)){
+            this.isReplaceTable = tools.isEmpty(para.btn.isReplaceTable) ? false : para.btn.isReplaceTable;
+            this.isButton = (tools.isEmpty(para.btn.type) ? 'button' : para.btn.type) === 'button';
+            if(this.isButton){
+                this.inputBox = new InputBox({
+                    container: this.btnWrapper,
+                    className: 'fast-table-statistic-btns'
+                });
+
+                // d.classAdd(this.wrapper, 'has-top-btn');
+            }else{
+                this.popover = new Popover({
+                    items: [],
+                    target: para.btn.target,
+                    position: "down",
+                    isWatch: true
+                });
+            }
+
+            if(this.isReplaceTable && !tools.isMb){
+                let parent = d.closest(this.wrapper, '.panel.panel-white');
+                let isFirst = true;
+                d.on(parent, 'click', 'a.statistics-chart', (ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if(isFirst){
+                        this.spinner = new Spinner({
+                            el: d.query('a.statistics-chart' ,parent),
+                            type: 1,
+                        });
+                        this.spinner.show();
+                        isFirst = false;
+                    }
+                    this.statistic('chart');
+                });
+            }
+            tools.toArray(para.btn.name).forEach((name) => {
+                name && this.btnAdd(name);
+            });
+        }
+
+        window['f'] = this;
+    }
+
+    static readonly names = ['search', 'statistic', 'export'];
+
+    private initSearch(){
+        if(this.isButton){
+            return new Button({
+                type: 'default',
+                icon: 'wangyuanjing',
+                content: '本地查找',
+                onClick: () => {
+                    this.search.init();
+                },
+            });
+        }else{
+            let prevValue = '';
+            let input = <input type="text"
+                               placeholder="请输入..."
+                               className="mui-input-clear mui-input"
+                               autocapitalize="off"
+                               autocorrect="off"/>;
+            let searchEl =
+                <div className="search-input mui-input-row">
+                    <label><span className="mui-icon mui-icon-search grey"></span></label>
+                </div>;
+
+            d.append(searchEl, input);
+            d.append(this.btnWrapper, searchEl);
+            d.classAdd(this.wrapper, 'has-top-search');
+            d.on(input, 'blur', () => {
+                let val = input.value;
+                if(val !== prevValue){
+                    prevValue = val;
+                    if(tools.isEmpty(val)){
+                        this.search.removeHighLightTag();
+                        this.filter.clear();
+                    }else{
+                        let params = {
+                            op: 9,
+                            field: 0,
+                            not: false,
+                            values: [val],
+                        };
+                        this.filter.set([params]);
+                        this.search.findCellByKey(val);
+                    }
+                }
+            });
+            d.on(input, 'keyup', (ev) => {
+                if(ev.keyCode === 13){
+                    input.blur();
+                }
+            });
+        }
+    }
+
+    // 创建本地查找模态框
+    protected search = (() => {
+        let self = this,
+            prevKey = '',
+            index = 0,
+            input = null,
+            prevCell: TableDataCell = null,
+            cells = null;
+
+        // 初始化本地查找框中body内容
+        function initBody(){
+            let container = <div className="search-group"></div>,
+                inputGroup = <div className="modal-input-group"></div>,
+                btnGroup = <div className="modal-btn-group"></div>,
+                inputBox = new InputBox({
+                    container: btnGroup
+                });
+
+            d.append(container, inputGroup);
+            d.append(container, btnGroup);
+            input = new TextInput({
+                container: inputGroup,
+                placeholder: '请输入要查找的内容...',
+            });
+            let prev = new Button({
+                content: '查找上一个',
+                isDisabled: false,
+                onClick: () => {
+                    let key = input.get();
+                    if(tools.isNotEmpty(key)) {
+                        if (key !== prevKey) {
+                            prevKey = key;
+                            index = 0;
+                            findCellByKey(key);
+                        }else{
+                            index--;
+                            if (index === -1) {
+                                index = cells.length - 1;
+                            }
+                        }
+                        cellScrollIntoView();
+                    }
+                }
+            });
+            let next = new Button({
+                content: '查找下一个',
+                onClick: () => {
+                    let key = input.get();
+                    if(tools.isNotEmpty(key)) {
+                        if (key !== prevKey) {
+                            prevKey = key;
+                            index = 0;
+                            removeHighLightTag();
+                            findCellByKey(key);
+                        }else{
+                            index++;
+                            if (index === cells.length) {
+                                index = 0;
+                            }
+                        }
+                        cellScrollIntoView();
+                    }
+                }
+            });
+            inputBox.addItem(prev);
+            inputBox.addItem(next);
+
+            /*if(self.editing){
+                let reInputWrapper = <div className="modal-input-group"/>,
+                    reInput = new TextInput({
+                        container: reInputWrapper,
+                        placeholder: '请输入替换的内容',
+                    });
+                let replace = new Button({
+                    content: '替换',
+                    onClick: () => {
+                        let search = input.get(),
+                            replace = reInput.get();
+                        if(tools.isNotEmpty(search)) {
+                            replaceContent(search, replace);
+                        }
+                    }
+                });
+                let replaceAll = new Button({
+                    content: '全部替换',
+                    onClick: () => {
+                        let search = input.get(),
+                            replace = reInput.get();
+                        if(tools.isNotEmpty(search)) {
+                            replaceContent(search, replace, true);
+                        }
+                    }
+                });
+                inputBox.addItem(replace);
+                inputBox.addItem(replaceAll);
+                d.after(inputGroup, reInputWrapper);
+            }*/
+
+            return container;
+        }
+
+        /*function replaceContent(search: string, replace: string, isAll = false){
+            if(self.editing){
+                findCellByKey(search);
+                cellScrollIntoView();
+                let replaceCells = [cells[0]];
+                if(isAll){
+                    replaceCells = cells;
+                }
+                removeHighLightTag();
+            }else{
+                Modal.toast('请点击编辑再进行替换');
+            }
+        }*/
+
+        // 按下按钮，跳转至对应可视区中
+        function cellScrollIntoView(){
+            prevCell && prevCell.wrapper.classList.remove('searched');
+            let cell = cells[index];
+            prevCell = cell;
+            if (cell) {
+                let td = cell.wrapper;
+                td.classList.add('searched');
+                d.queryAll(".main-table table", self.wrapper).forEach(el => {
+                    el.style.transform = `translateX(${0}px) translateZ(0)`;
+                });
+                d.query(".scroll-container", self.wrapper).scrollLeft = 0;
+                if ('scrollIntoViewIfNeeded' in td) {
+                    td.scrollIntoViewIfNeeded(false)
+                } else {
+                    td.scrollIntoView(false);
+                }
+            }
+        }
+
+        // 删除高亮显示
+        function removeHighLightTag(){
+            cells && cells.forEach((cell) => {
+                cell.highLight = null;
+            });
+        }
+
+        // 查找对应内容，给予高亮显示
+        function findCellByKey(str: string){
+            removeHighLightTag();
+            cells = [];
+            self.rows.forEach((row) => {
+                row.cells.forEach((cell) => {
+                    if(cell.text.toUpperCase().indexOf(str.toUpperCase()) > -1){
+                        cell.highLight = str;
+                        cells.push(cell);
+                    }
+                });
+            });
+        }
+
+        return {
+            findCellByKey,
+            removeHighLightTag,
+            init: () => {
+                let modal = new Modal({
+                    className: 'search-replace',
+                    isBackground: false,
+                    header: self.editing ? '查找/替换' : '查找',
+                    body: initBody(),
+                    isShow : true,
+                    isOnceDestroy: true,
+                    onClose: () => {
+                        input.set('');
+                        prevKey = '';
+                        prevCell && prevCell.wrapper.classList.remove('searched');
+                        prevCell = null;
+                        removeHighLightTag();
+                        let index = this.modals.indexOf(modal);
+                        if(index > -1){
+                            this.modals.splice(index, 1);
+                        }
+                    }
+                });
+                this.modals.push(modal);
+            }
+        }
+    })();
+
+   /* private initFilter(){
+        return new Button({
+            type: 'default',
+            icon: 'sousuo',
+            content: '本地过滤',
+            onClick: () => {
+            },
+        });
+    }
+
+    protected filter(){
+
+        let show = (() => {
+
+            let modal:Modal = null,
+                builder = null;
+
+            let searchHandler = () => {
+                // search();
+                modal.isShow = false;
+            };
+
+            let showOriginTable = () => {
+
+            };
+
+            let init = () => {
+                if(builder === null) {
+                    let body = tools.isMb ?
+                        <div className="mui-content">
+                            <ul className="mui-table-view" data-query-name="local"></ul>
+                            <div data-action="add" data-name="local" className="mui-btn mui-btn-block mui-btn-primary">
+                                <span className="mui-icon mui-icon-plusempty"></span> 添加条件
+                            </div>
+                        </div>
+                        :
+                        <form className="filter-form" data-query-name="local">
+                            <span data-action="add" className="iconfont blue icon-jiahao"></span>
+                        </form>;
+
+                    modal = new Modal({
+                        container: d.closest(this.wrapper, '.page-container'),
+                        header: '本地过滤',
+                        body: body,
+                        position: tools.isMb ? 'full' : '',
+                        width: '730px',
+                        isShow: true,
+                    });
+                    modal.className = 'local';
+                    modal.className = 'queryBuilder';
+
+                    if(tools.isMb){
+                        modal.className = 'modal-mobile';
+
+                        modal.modalHeader.rightPanel = (()=>{
+                            let rightInputBox = new InputBox(),
+                                clearBtn = new Button({
+                                    content: '清除',
+                                    onClick: () => {
+                                        showOriginTable();
+                                        modal.isShow = false;
+                                    }
+                                }),
+                                saveBtn = new Button({
+                                    icon: 'sousuo',
+                                    onClick:searchHandler
+                                });
+                            rightInputBox.addItem(clearBtn);
+                            rightInputBox.addItem(saveBtn);
+                            return rightInputBox;
+                        })();
+
+                        mui(body).on('tap', '[data-action="add"]', function () {
+                            builder.rowAdd();
+
+                            let ul = (this as HTMLElement).previousElementSibling;
+                            ul.scrollTop = ul.scrollHeight;
+
+                        });
+                    } else {
+
+                        modal.footer = {
+                            rightPanel: (() => {
+                                let rightBox = new InputBox();
+                                rightBox.addItem(new Button({
+                                    content: '取消',
+                                    type: 'default',
+                                    key: 'cancelBtn'
+                                }));
+                                rightBox.addItem(new Button({
+                                    content: '清除',
+                                    type: 'default',
+                                    key: 'clearBtn',
+                                    onClick: () => {
+                                        showOriginTable();
+                                        modal.isShow = false;
+                                    }
+                                }));
+                                rightBox.addItem(new Button({
+                                    content: '查询',
+                                    type: 'primary',
+                                    onClick: searchHandler,
+                                    key: 'queryBtn'
+                                }));
+
+                                return rightBox;
+                            })()
+                        }
+                    }
+
+                    builder = new QueryBuilder({
+                        queryConfigs: initQueryConfigs(this.dataTools.getCols()), // 查询字段名、值等一些配置，后台数据直接传入
+                        resultDom: tools.isMb ? d.query('ul.mui-table-view', body) : body, // 查询条件容器
+                        setting: null  // 默认值
+                    });
+
+                }
+
+                function initQueryConfigs(cols: R_Field[]): QueryConf[] {
+                    return cols.map(col => {
+                        return {
+                            caption: col.title,
+                            field_name: col.name,
+                            dynamic: 0,
+                            link: '',
+                            type: '',
+                            atrrs: col.atrrs
+                        }
+                    });
+                }
+            };
+
+            return () => {
+                init();
+            }
+        })();
+    }*/
+
+    private initStatistic(){
+        if(this.isButton){
+            let btn = new Button({
+                type: 'default',
+                icon: 'tongji',
+                content: '统计',
+            });
+            let exportStaBut = [
+                {
+                    content: '列统计',
+                    icon: 'pinlei',
+                    type:'default',
+                    onClick : () => this.statistic('count'),
+                },
+                {
+                    content: '数据统计',
+                    icon: 'statistic',
+                    type:'default',
+                    onClick : () => this.statistic('statistic'),
+                },
+                {
+                    content: '图形报表',
+                    icon: 'bingzhuangtu',
+                    type:'default',
+                    onClick: () => this.statistic('chart'),
+                },
+                {
+                    content: '交叉制表',
+                    icon: 'shejiqijiaohuanxinglie',
+                    type:'default',
+                    onClick: () => this.statistic('crosstab'),
+                },
+                {
+                    content: 'abc分析',
+                    icon: 'tongji',
+                    type:'default',
+                    onClick: () => this.statistic('analysis'),
+                }
+            ];
+            btn.dropDown = new DropDown({
+                el: btn.wrapper,
+                inline: false,
+                data: [],
+                multi: null,
+                className: "input-box-morebtn"
+            });
+            for(let i = 0,l = exportStaBut.length; i < l; i++){
+                btn.dropDown.getUlDom().appendChild(new Button(exportStaBut[i]).wrapper);
+            }
+
+            return btn;
+        }else{
+            let data = [{value: 'count', text: '列统计'},
+                {value: 'statistic', text: '数据统计'},
+                {value: 'chart', text: '图形报表'},
+                {value: 'crosstab', text: '交叉制表'},
+                {value: 'analysis', text: 'abc分析'}];
+            return {
+                title: '统计字段',
+                onClick: () => {
+                    this.initModal('统计字段', data, (ev) => {
+                        this.statistic(ev)
+                    })
+                }
+            }
+        }
+
+    }
+
+    dataTools = (() => {
+        return {
+            getColCounts: () => {
+                return Object.assign({}, this.mainTable.tableData.getColCounts(),
+                    tools.isEmpty(this.leftTable) ? {} : this.leftTable.tableData.getColCounts())
+            },
+            getCols: () => {
+                let cols = [];
+                this.columns.forEach((col) => {
+                    cols.push({
+                        name: col.name,
+                        title: col.title,
+                        isNumber: col.isNumber,
+                        content: col.content,
+                    })
+                });
+                return cols;
+            }
+        };
+    })();
+
+    statistic (type: statisticType): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            let initCount = () => {
+                require(['NewCount'], (Count) => {
+                    new Count({
+                        container: tools.isMb ? document.body : d.closest(this.wrapper, '.table-module-wrapper'),
+                        cols: this.dataTools.getCols(),
+                        isShow: true,
+                        colDataGet: (colName) => {
+                            let colCounts = this.dataTools.getColCounts()[colName];
+                            let obj = {};
+                            for (let value of Object.values(colCounts)) {
+                                obj[value[0]] = value[1]
+                            }
+                            return obj;
+                        },
+                        getVisibleCol: () => this.visibleCol
+                    });
+                });
+            };
+            let hasStatistic = () => {
+                for (let col of this.columns) {
+                    if (col.isNumber) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            let initStatistic = (type: statisticType) => {
+                if (hasStatistic()) {
+                    switch (type) {
+                        case 'statistic':
+                            require(['NewStatisticBasic'], (Statistic) => {
+                                new Statistic({
+                                    container: tools.isMb ? document.body : d.closest(this.wrapper, '.table-module-wrapper'),
+                                    cols: this.dataTools.getCols(),
+                                    colDataGet: (index) => this.columnGet(index).data,
+                                    isShow: true,
+                                    getVisibleCol: () => this.visibleCol
+                                });
+                            });
+                            break;
+                        case 'chart':
+                            require(['NewChartBasic'], (ChartBasic) => {
+                                if(!tools.isMb){
+                                    this.spinner && this.spinner.hide();
+                                }
+                                resolve();
+                                new ChartBasic({
+                                    container: tools.isMb ? document.body : d.closest(this.wrapper, '.table-module-wrapper'),
+                                    cols: this.dataTools.getCols(),
+                                    allData: () => this.tableData.data,
+                                    selectedData: () => this.selectedRowsData,
+                                    colDataGet: (index) => this.columnGet(index).data,
+                                    getTablePara: () => {
+                                        let name = '';
+                                        this.columns.forEach((col) => {
+                                            for (let attr of ['drillAddr', 'webDrillAddr', 'webDrillAddrWithNull']) {
+                                                if (attr in col.content) {
+                                                    name = col.name;
+                                                }
+                                            }
+                                        });
+                                        return {
+                                            keyField: name,
+                                            isReplaceTable: this.isReplaceTable,
+                                        };
+                                    },
+                                    getWrapper: () => {
+                                        return this.wrapper;
+                                    },
+                                    getVisibleCol: () => this.visibleCol,
+                                    isShow: true,
+                                    callBack: resolve,
+                                });
+                            });
+                            break;
+                        case 'crosstab':
+                            require(['NewCrossTabBasic'], (CrossTabBasic) => {
+                                new CrossTabBasic({
+                                    container: tools.isMb ? document.body : d.closest(this.wrapper, '.table-module-wrapper'),
+                                    cols: this.dataTools.getCols(),
+                                    allData: () => this.tableData.data,
+                                    selectedData: () => this.selectedRowsData,
+                                    getVisibleCol: () => this.visibleCol
+                                });
+                            });
+                            break;
+                        case 'analysis':
+                            require(['NewAnalysisBasic'], (AnalysisBasic) => {
+                                new AnalysisBasic({
+                                    container: tools.isMb ? document.body : d.closest(this.wrapper, '.table-module-wrapper'),
+                                    cols: this.dataTools.getCols(),
+                                    allData: () => this.tableData.data,
+                                    selectedData: () => this.selectedRowsData,
+                                    getVisibleCol: () => this.visibleCol
+                                });
+                            });
+                            break;
+                    }
+                } else {
+                    Modal.alert('无可统计字段');
+                }
+            };
+
+            switch (type) {
+                case 'count':
+                    initCount();
+                    break;
+                default:
+                    initStatistic(type);
+                    break;
+            }
+        })
+    }
+
+    private initExport(){
+        if(this.isButton){
+            let btn = new Button({
+                type: 'default',
+                icon: 'daochu2',
+                content: '导出'
+            });
+            let exportBut = [
+                {content: 'csv',icon: 'csv1',type:'default',onClick:() => this.export('csv')},
+                {content: 'excel',icon: 'excel',type:'default',onClick:() => this.export('xls')},
+                {content: 'word',icon: 'word',type:'default',onClick:() => this.export('doc')},
+                {content: 'pdf',icon: 'pdf',type:'default', onClick:() => this.export('pdf')},
+                {content: 'png',icon: 'png',type:'default',onClick:() => this.export('image')}
+            ];
+            btn.dropDown = new DropDown({
+                el: btn.wrapper,
+                inline: false,
+                data: [],
+                multi: null,
+                className: "input-box-morebtn"
+            });
+            for(let i = 0,l = exportBut.length; i < l; i++){
+                btn.dropDown.getUlDom().appendChild(new Button(exportBut[i]).wrapper);
+            }
+            return btn;
+        }else{
+            let data = [{value: 'csv', text: '导出csv'},
+                {value: 'xls', text: '导出excel'},
+                {value: 'doc', text: '导出word'},
+                {value: 'pdf', text: '导出pdf'},
+                {value: 'image', text: '导出png'}];
+            return {
+                title: '导出报表',
+                onClick: () => {
+                    this.initModal('导出报表', data, (ev) => {
+                        this.export(ev);
+                    })
+                }
+            }
+        }
+    }
+    /**
+     * 导出报表
+     */
+    protected export(action : string){
+        require(['tableExport'], (tableExport) => {
+            let names = [];
+            this.columns.forEach((col) => {
+                 if(col.isFixed){
+                     col.isFixed = false;
+                     names.push(col.name);
+                 }
+            });
+            let table = this.mainTable.body.tableEl.cloneNode(true),
+                thead = d.query('thead', this.mainTable.head.tableEl).cloneNode(true);
+            table.appendChild(thead);
+            let div = <div style="overflow: auto; height: auto; width: 100%"></div>;
+            d.append(document.body, div);
+            d.append(div, table);
+            tableExport(table, '', action);
+            d.remove(div, true);
+            this.columns.forEach((col) => {
+                if(names.indexOf(col.name) > -1){
+                    col.isFixed = true;
+                }
+            });
+        })
+    }
+
+    /**
+     * 添加一个新的按钮
+     * @param {string} name - 按钮名
+     * @param {IButton} btn - 外部按钮
+     * @param {number} index - 插入位置
+     */
+    protected btnNameGroup = [];
+    btnAdd(name: string, btn?: IButton, index?: number) {
+        let btnGroup: any = this.isButton ? this.inputBox : this.popover;
+        if(FastBtnTable.names.indexOf(name) > -1){
+            switch (name){
+                case 'search':
+                    this.isButton ? btnGroup.addItem(this.initSearch()) : this.initSearch();
+                    break;
+                // case 'filter':
+                //     this.inputBox.addItem(this.initFilter());
+                //     break;
+                case 'statistic':
+
+                    btnGroup.addItem(this.initStatistic());
+                    break;
+                case 'export':
+                    btnGroup.addItem(this.initExport());
+                    break;
+            }
+            typeof index === 'number' ? this.btnNameGroup.splice(index, 0, name) : this.btnNameGroup.push(name);
+        }else{
+            if(!this.isButton){
+                let obj: IPopoverItemPara = {
+                    title: btn.content,
+                    onClick: btn.onClick
+                };
+                this.popover.addItem(obj);
+                this.btnNameGroup.push(name);
+            }else{
+                this.inputBox.addItem(new Button(btn), index);
+                typeof index === 'number' ? this.btnNameGroup.splice(index, 0, name) : this.btnNameGroup.push(name);
+            }
+        }
+    }
+
+    btnRemove(name: string){
+        let index = this.btnNameGroup.indexOf(name);
+        if(index > -1){
+            this.inputBox.delItem(index);
+            this.btnNameGroup.splice(index, 1);
+        }
+    }
+
+    btnGet(name: string){
+        let index = this.btnNameGroup.indexOf(name);
+        return index > -1 ? this.inputBox.getItem(index) : null;
+    }
+
+    removeAllModal(){
+        this.modals.forEach((modal) => {
+            modal.destroy();
+        });
+        this.modals = [];
+    }
+
+    public initModal(header: string, data:ListItem[], callback: Function){
+        let body = <div className="fast-btn-modal-body" data-name="export"></div>;
+        let sel = new SelectBox({
+            container: body,
+            select: {
+                multi: false,
+                isRadioNotchecked: false
+            },
+            data: data
+        });
+        let previewRB = new InputBox();
+        let okBtn = new Button({
+            key: 'okBtn',
+            content: '确定',
+            type: 'primary',
+            onClick: () => {
+                typeof callback === 'function' && callback(data[sel.get()[0]].value);
+                modal.isShow = false;
+            }
+        });
+        previewRB.addItem(okBtn);
+        let modal = new Modal({
+            header: header,
+            body: body,
+            position: tools.isMb ? 'center' : 'top',
+            container : document.body,
+            isOnceDestroy: true,
+            footer: {
+                rightPanel: previewRB
+            },
+            isMb: false,
+            onClose: () => {
+                let index = this.modals.indexOf(modal);
+                if(index > -1){
+                    this.modals.splice(index, 1);
+                }
+            }
+        });
+        this.modals.push(modal);
+        return modal;
+    }
+}

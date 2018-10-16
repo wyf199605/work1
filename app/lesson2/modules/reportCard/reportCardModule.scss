@@ -1,0 +1,307 @@
+.report-card {
+  min-width: 908px;
+  &.print-card{
+    .grade-input{
+      .btn-group{
+        top: -6px;
+      }
+    }
+  }
+  .head-wrapper{
+    padding: 0 14px;
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 40px;
+    height: 70px;
+    border-bottom-color: #00a6ed;
+    .modal-title {
+      font-size: 20px;
+      color: #0099ff;
+      padding-left: 6px;
+    }
+    .close {
+      line-height: 68px;
+      color: #b0b0b0;
+      font-weight: bold;
+    }
+  }
+  .canvasInner,.qrCodeEl{
+    width: 100%;
+    height: 100%;
+  }
+  .qrCodeEl{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .print {
+    width: 100px;
+    height: 40px;
+    background-color: #0099ff;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 16px;
+    border: none;
+  }
+  .print.btn.button-type-default:hover {
+    color: #ffffff;
+    border: none;
+  }
+  .print.btn:hover, .print.btn.avtive {
+    background-color: #0089e5;
+  }
+  .btn:active:focus, .btn:focus{
+    outline: none;
+  }
+  .reportCardBody{
+    width: 100%;
+    padding: 14px 0 20px 0;
+    .report-header{
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px 30px 30px;
+      img{
+        height: auto;
+        width: 28%;
+      }
+      .report-title{
+        color: #33484f;
+        text-align: center;
+        .lang-ch{
+          font-size: 26px;
+        }
+        .lang-en{
+          font-size: 20px;
+        }
+      }
+      .report-card-num{
+        width: 28%;
+        text-align: right;
+        font-size: 14px;
+        color: #33484f;
+      }
+    }
+    .student-header{
+      padding: 0 7px;
+      .student-title{
+        height: 85px;
+        color: #33484f;
+        text-align: center;
+        .lang-ch{
+          font-size: 28px;
+          font-weight: 600;
+        }
+        .lang-en{
+          font-size: 20px;
+          padding-top: 3px;
+        }
+      }
+      .flex-layout{
+        border-bottom: 1px solid #364960;
+        .student-modal-left{
+          display: inline-block;
+          width: 55%;
+          >div{
+            margin: auto;
+            display: inline-block;
+            color: #364960;
+            float: left;
+            font-size: 16px;
+            p{
+              span{
+                margin-left: 10px;
+              }
+            }
+          }
+          .stu-total{
+            float: right;
+            position: relative;
+            .total-score{
+              position: absolute;
+              right: 11px;
+              bottom: -21px;
+            }
+          }
+          .rank{
+            font-size: 22px;
+            color: #ffffff;
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            text-align: center;
+          }
+        }
+        .student-modal-right{
+          display: inline-block;
+          float: right;
+          img{
+            margin-right: 30px;
+            margin-top: -8px;
+          }
+        }
+      }
+    }
+  }
+  .report-body{
+    padding: 0 40px 0px;
+    .userInfo{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      background-color: #004b7d;
+      padding: 20px 40px;
+      .item{
+        width: 33.33%;
+        display: flex;
+        align-items: center;
+        color: #ffffff;
+        font-size: 16px;
+        line-height: 40px;
+        .text-input{
+          width: 100px;
+          font-size: 14px;
+          color: #ffffff;
+          a{
+            color: #ffffff;
+          }
+        }
+      }
+    }
+  }
+  .total{
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 30px;
+    div{
+      height: 50px;
+      background-color: #004b7d;
+      flex-grow: 1;
+      width: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    div:nth-child(1){
+      margin-right: 20px;
+    }
+  }
+  .report-imgs{
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    border: solid 1px #d8e3e9;
+    .img-item{
+      border-right: solid 1px #d8e3e9;
+      height: 100%;
+      &:nth-last-child{
+        border-right: none;
+      }
+    }
+    .signature{
+      width: 18.5%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      color: #33484f;
+      &.stu{
+        width: 40%;
+        border-right: none;
+      }
+      .signature-name{
+        position: absolute;
+        right: 10px;
+        bottom: 20px;
+      }
+      .stamp{
+        margin-left: 10px;
+      }
+    }
+    .charts{
+      width: 38%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &>div:first-child{
+        margin-top: 20px !important;
+      }
+    }
+    .report-card-num{
+      position: absolute;
+      bottom: -10px;
+      left: -12px;
+    }
+    }
+    .qrcode{
+      width: 25%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      canvas{
+        display: block;
+        flex-grow: 1;
+      }
+    }
+  }
+  .report-table{
+    margin-top: 40px;
+    width: 100%;
+    table{
+      width: 100%;
+      margin-top: 20px;
+      .table-head{
+        background-color: #d8e3e9;
+      }
+      tbody{
+        tr{
+          border-bottom: 1px solid #d8e3e9;
+        }
+      }
+      td,th{
+        height: 60px;
+        width: 25%;
+        text-align: center;
+        font-size: 16px;
+        color: #33484f;
+      }
+    }
+    .table-title{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 20px;
+      .caption{
+        color: #004b7d;
+      }
+      .credit{
+        color: #ef895e;
+      }
+    }
+  }
+
+ul.list.report-list{
+  width: 100px;
+  min-width: 100px;
+}
+
+.modal-body{
+  &::-webkit-scrollbar{
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb{
+    background-color:#364960;
+    border-radius: 3px;
+  }
+}

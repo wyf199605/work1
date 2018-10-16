@@ -1,0 +1,40 @@
+.regist-module1 {
+  .confirm-code {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .input-wrapper{
+      flex-grow: 1;
+      height: 40px;
+    }
+    button.btn {
+      width: 116px;
+      flex-shrink: 0;
+      height: 40px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .btn {
+      background-color: #d8e3e9;
+      color: #91a8b0;
+      border: none;
+      &:focus {
+        outline: none;
+      }
+    }
+    canvas {
+      margin: 0 4px 0 6px;
+    }
+  }
+  .back-login {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: #0099ff;
+    padding-top: 10px;
+    a {
+      cursor: pointer;
+      color: #0099ff;
+    }
+  }
+}

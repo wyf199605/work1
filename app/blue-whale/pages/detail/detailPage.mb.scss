@@ -1,0 +1,37 @@
+.detailPage{
+  #content .mui-table-view-cell.title{
+    font-weight: bold;
+    color: #666;
+    letter-spacing: 0;
+  }
+  .mui-table-view-cell.mui-media p{
+    font-size: 13px;
+  }
+  .mui-table-view-cell{
+    font-size: 14px;
+    padding: 5px 14px;
+  }
+  .mui-table-view-cell.mui-row:after {
+    display: block;
+  }
+  .mui-table-view .mui-table-view-cell div:first-child{
+    color: #666;
+  }
+  .mui-table-view .mui-table-view-cell div:first-child:after{
+    content: ':';
+  }
+  .mui-table-view .mui-table-view-cell div:last-child{
+    word-wrap: break-word;
+  }
+  .right-icon {
+    font-size: 20px;
+    position: absolute;
+    top: calc(50% - 19px);
+    line-height: 36px;
+    right: 0;
+    width: 38px;
+    height: 38px;
+    text-align: center;
+    color: #999;
+  }
+}

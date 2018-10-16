@@ -1,0 +1,31 @@
+.homePage {
+  .module1 {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 5px;
+    min-width: 850px;
+    .m1-left {
+      width: 66%;
+      height: 344px;
+    }
+    .m1-right {
+      width: 34%;
+      height: 344px;
+      padding-left: 20px;
+    }
+  }
+  .module2{
+    margin-top: 30px;
+    min-width: 850px;
+  }
+  .title {
+    height: 20px;
+    border-left: 4px solid #0099ff;
+    font-size: 16px;
+    color: #33484f;
+    line-height: 20px;
+    padding-left: 15px;
+    font-weight: bold;
+  }
+}

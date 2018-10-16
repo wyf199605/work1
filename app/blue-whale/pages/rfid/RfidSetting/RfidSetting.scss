@@ -1,0 +1,119 @@
+.rfid-setting-page {
+  font-size: 16px;
+  font-weight: bold;
+  height: 100%;
+     .rfid-model{
+       width: 100%;
+       margin: 15px 0px;
+        div {
+          display: inline-block;
+          label {
+            margin-right: 5vw;
+          }
+        }
+       span {
+         width: 35%;
+         text-align: center;
+         display: inline-block;
+       }
+      }
+      .rfid-power{
+        width: 100%;
+        padding: 15px 0;
+        div {
+          display: inline-block;
+          select {
+            border-bottom: 1px solid #a4a8ad !important;
+            background-color: white;
+            width: 150px;
+            height: 40px;
+            margin-right: 10px;
+
+          }
+         }
+        span {
+          width: 35%;
+          text-align: center;
+          display: inline-block;
+         }
+       }
+     .rfid-job,.rfid-rest {
+        margin: 15px 0px;
+        span {
+          width: 35%;
+          display: inline-block;
+          text-align: center;
+        }
+        .rfid-number{
+           position: relative;
+           border: 1px solid #a4a8ad;;
+           width: 150px;
+           display: inline-block;
+           border-radius: 5px;
+           .rfid-reduce {
+             position: absolute;
+             width: 40px;
+             height: 39px;
+             text-align: center;
+             line-height: 2.5;
+           }
+          .rfid-add {
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            width: 40px;
+            height: 39px;
+            line-height: 2.5;
+            text-align: center;
+          }
+          input {
+            width: 66px;
+            margin-bottom: 0px;
+            margin-left: 41px;
+          }
+
+        }
+     }
+     .rfid-setting-btn {
+       margin: auto;
+       text-align: center;
+       input{
+         width: 45vw;
+         height: 8vh;
+         margin: 12px;
+         border-radius: 2%;
+         border: 0px;
+         color: white;
+         background-color: #a4a8ad
+       }
+     }
+  .rfid-frequency{
+     span {
+      display: inline-block;
+      width: 35%;
+      text-align: center;
+     }
+     select {
+       width: 150px;
+       height: 40px;
+       border-bottom: 1px solid #a4a8ad !important;
+     }
+  }
+  .rfid-gun{
+    width: 100%;
+    padding: 8px 0;
+    span{
+      width: 35%;
+      display: inline-block;
+      text-align: center
+    }
+    .rfid-gun-set{
+      width: 150px;
+      height: 40px;
+      display: inline-block;
+         select {
+           width: 100%;
+         }
+    }
+  }
+}

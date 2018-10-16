@@ -1,0 +1,12 @@
+.main{
+  height: 100vh;
+  background-image: url("img/bg.jpg");
+  .text-loading{
+      text-align: center;
+      font-size: 20px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 40vh;
+    }
+}

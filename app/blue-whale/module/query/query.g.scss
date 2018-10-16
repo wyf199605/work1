@@ -1,0 +1,366 @@
+.queryBuilder {
+  .item-count {
+    .modal-body {
+      min-width: 200px;
+      margin-bottom: 25px;
+      .caption-item {
+        padding-left: 0;
+        > div {
+          margin: 5px 10px;
+          display: inline-block;
+        }
+        .caption-span {
+          font-size: 13px;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  [data-type="andOr"] {
+    .select-box {
+      input:checked + .check-span {
+        background-color: $green;
+        &:before {
+          content: "且";
+        }
+        &:after {
+          content: '';
+        }
+      }
+      .check-span {
+        background-color: $yellow;
+
+        &:before {
+          background: transparent;
+          border: none;
+          color: #fff;
+          content: "或";
+        }
+      }
+    }
+  }
+}
+.option {
+  span.drop-span {
+    display: block;
+    margin-left: 11%;
+    padding-left: 5px;
+    text-align: left;
+  }
+
+  position: relative;
+  display: block;
+  padding: 0 15px;
+  .checkbox-custom {
+    position: relative;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  label {
+    font-size: 13px;
+  }
+  & > .option-limit {
+    margin-top: 10px;
+    height: 70px;
+    border-bottom: 1px dashed #ddd;
+    & > .checkbox-custom {
+      float: left;
+      width: 33.333333333333%;;
+    }
+    & > :last-child {
+      float: right;
+    }
+    & > .limitInput {
+      float: left;
+      font-size: 13px;
+      width: 120px;
+    }
+    .topN {
+      display: inline-block;
+      margin-top: -3px;
+      color: #858585;
+      height: 25px;
+      .btn-group {
+        display: none;
+      }
+      .topN-input input{
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        height: 25px;
+        width: 50px !important;
+      }
+    }
+  }
+  .multi-select {
+    height: 289px;
+    width: 100%;
+    margin-top: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #ddd;
+    .dropdown-menu {
+      min-width: 130px;
+      z-index: 0;
+      > li:hover {
+        background-color: white;
+        color: #757575;
+      }
+      .drop-span {
+        display: block;
+        margin-left: 14%;
+        padding-left: 5px;
+        text-align: left;
+      }
+      span.check-span {
+        margin-top: -22px !important;
+      }
+    }
+    .select-left {
+      float: left;
+      width: 45%;
+      position: relative;
+      .all-dec, .all-select {
+        float: right;
+        color: #007aff;
+        font-size: 12px;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      & > .select-box {
+
+        position: absolute;
+        margin-left: 60%;
+        margin-top: -25px;
+        .check-span {
+          font-size: 13px;
+        }
+      }
+      .show-field {
+        max-height: 247px;
+        height: 247px;
+        width: 100%;
+        margin-top: 4px;
+        & > li {
+          text-align: center;
+        }
+      }
+    }
+    .icon-box {
+      height: 100%;
+      float: left;
+      width: 15%;
+      & > span {
+        display: block;
+        margin-left: 33%;
+      }
+      .icon-arrow-right-2.sort {
+        margin-top: 45px;
+      }
+      .icon-close.sort {
+        margin-top: 30px;
+      }
+      .icon-arrow-right-2.group {
+        margin-top: 63px;
+      }
+      .icon-close.group {
+        margin-top: 30px;
+      }
+
+    }
+    .select-right {
+      float: left;
+      width: 40%;
+      position: relative;
+      .sort-field, .group-field {
+        height: 110px;
+        width: 100%;
+      }
+      .group-field {
+        margin-top: 27px;
+        & > li {
+          text-align: center;
+          padding-left: 0;
+          span.drop-span {
+            margin-left: 0;
+            text-align: center;
+          }
+        }
+      }
+      .sort-field {
+        margin-top: 4px;
+        input[type=checkbox]:checked + .check-span::after {
+          content: "\e62e" !important;
+        }
+        .check-span::after {
+          font-family: "iconfont";
+          content: "\e6bc";
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          padding-top: 1px;
+          font-size: 12px;
+          font-weight: bold;
+          line-height: 20px;
+          color: #007AFF;
+          text-align: center;
+        }
+        & > li {
+          text-align: center;
+          .drop-span {
+            margin-left: 16%;
+          }
+        }
+      }
+      label.group-word {
+        display: block;
+        position: absolute;
+        top: 141px;
+      }
+    }
+  }
+  .option-section {
+    width: 100%;
+    min-height: 185px;
+    margin-top: 13px;
+    .section {
+      min-height: 130px;
+      .section-col {
+        height: 60px;
+        .section-6 {
+          width: 50%;
+          padding-right: 13px;
+          float: left;
+        }
+      }
+      [data-name="avgSection"] {
+        height: 30px;
+      }
+      .customGrading {
+        min-height: 35px;
+        .icon-box-2 {
+          width: 50%;
+          height: 110px;
+          float: left;
+          .icon-arrow-right-2 {
+            display: block;
+            margin-left: 90%;
+            margin-top: 10px;
+          }
+          .icon-close {
+            display: block;
+            margin-left: 90%;
+            margin-top: 20px;
+          }
+        }
+        .section-6 {
+          //padding-left: 9%;
+          position: absolute;
+          margin-left: 53%;
+          margin-top: -25px;
+          float: left;
+          .field-col {
+            height: 110px;
+            min-width: 150px;
+          }
+          label {
+            position: absolute;
+            margin-top: -22px;
+          }
+        }
+
+      }
+      [data-name="numSection"] {
+        & > label {
+        }
+        .text-input {
+          width: 46%;
+          .icon {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+    .section-checkbox {
+      height: 30px;
+      & > div {
+        float: left;
+        width: 50%;
+      }
+    }
+    [data-name="sectionField"], [data-name="avgSection"], [data-name="sectionNorm"], [data-name="numSection"] {
+      .text-input {
+        height: 25px;
+        border-bottom: 1px solid #ddd;
+        //width: 80%;
+        input {
+          font-size: 12px;
+        }
+      }
+    }
+
+    [data-name="avgSection"] {
+      .select-box {
+        width: 50%;
+        float: left;
+      }
+    }
+  }
+
+  .show-field, .sort-field {
+    .select {
+      span.drop-span {
+        background: #007aff;
+        color: white;
+      }
+    }
+  }
+  .field-col, .group-field {
+    .drop-item:hover {
+      background: #f5f5f5;
+      color: #757575;
+    }
+    li.select {
+      background: #007aff;
+      color: white;
+      &:hover {
+        background: #007aff;
+        color: white;
+      }
+    }
+  }
+}
+.asynQuery{
+  width: 270px;
+  font-size: 12px;
+  .asyn-ul{
+    padding: 0 0 0 7px;
+    margin-bottom:0;
+    .asyn-li{
+      height: 35px;
+      white-space: nowrap;
+      .asyn-left{
+        height: 35px;
+        line-height: 28px;
+        .asyn-time{
+          display: inline-block;
+        }
+        button{
+          display: inline-block;
+        }
+        width: 69%;
+        float: left;
+      }
+      .asyn-right{
+        float: left;
+        padding-left: 5px;
+      }
+    }
+  }
+}
+

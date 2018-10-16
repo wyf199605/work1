@@ -1,0 +1,210 @@
+$scrren-width: 100%;
+.mui-content {
+  &.flowList {
+    .tabParent .nav-tabs li:last-child {
+      border-left: none;
+    }
+    .tabParent .nav-tabs > li.active > a {
+      display: inline-block;
+      height: 100%;
+      border-bottom: 2px solid #005bac;
+    }
+    .panelParent .tab-content {
+      background-color: #f8f8f8;
+      .tab-pane {
+        padding-top: 84px;
+        background-color: #f8f8f8;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+        .item-wrapper {
+          margin-top: 10px;
+          width: 100%;
+          background-color: #ffffff;
+          border-radius: 8px;
+          padding: 0 10px;
+          .item-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #3a3a3a;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e2e2;
+            i {
+              color: #b0b0b0;
+            }
+          }
+          .item-content {
+            padding: 12px 0 8px 0;
+            //.item-reason{
+            //  font-size: 14px;
+            //  color: #3a3a3a;
+            //  width: 100%;
+            //  overflow: hidden;
+            //  text-overflow:ellipsis;
+            //  white-space:nowrap
+            //}
+            .item-info {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              font-size: 11px;
+              //margin-top: 11px;
+              .item-time {
+                color: #b0b0b0;
+              }
+              .draft, .withdraw {
+                color: #666666;
+              }
+              .check {
+                color: #ffb400;
+              }
+              .sendBack {
+                color: #ff4d6b;
+              }
+              .agree {
+                color: #38ba9e;
+              }
+              .close {
+                color: #4ca9ee;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  &.flowReport {
+    font-size: 18px;
+    position: relative;
+    $data-type-list: ("input", "datetime", "richText");
+    .disabled {
+      pointer-events: none !important;
+    }
+    .form-wrapper {
+      font-size: 15px;
+      width: $scrren-width;
+      color: #3a3a3a;
+      margin: 10px auto;
+      label {
+        width: 34.1%;
+        min-width: 108px;
+      }
+      div[data-element-type="value"] input {
+        pointer-events: none;
+      }
+
+            @each $data-type in $data-type-list {
+                @if $data-type == 'input' or $data-type == 'datetime' {
+                    div[data-type=#{$data-type}] {
+                        background-color: #ffffff;
+                        border-bottom: 1px solid #e2e2e2;
+                        label {
+                            margin: 8px auto;
+                            margin-right: 0;
+                            padding-right: 0;
+                        }
+                        div[data-input-type=#{$data-type}] {
+                            width: 59%;
+                            position: absolute;
+                            right: 4.4%;
+                            .text-input {
+                                padding-top: 11px;
+                                input {
+                                    text-align: right;
+                                    @if $data-type == 'datetime' {
+                                        pointer-events: none;
+                                    }
+                                }
+                                .btn-group {
+                                    padding-top: 16px;
+                                }
+                            }
+                        }
+                    }
+                } @else if $data-type == 'richText' {
+                    div[data-type=#{$data-type}] {
+                        background-color: #ffffff;
+                        margin: 12px 0 0 0;
+                        div[data-input-type=#{$data-type}] {
+                            position: relative;
+                            width: 60.2%;
+                            height: 100px;
+                            overflow: scroll;
+                            .rich-text-base {
+                                min-height: 90px;
+                                margin: 2px 0;
+                                padding: 5px 0;
+                                text-align: right;
+                            }
+                        }
+                        // 使richText之后的input有上边距
+                        &+div[data-type="input"]{
+                            margin-top: 12px;
+                        }
+                    }
+                }
+            }
+        }
+        .sub-btns {
+            $sub-btn-item-width: 43.7%;
+            $sub-btns-height: 70px;
+            $sub-btn-item-height: 44px;
+
+            width: $scrren-width;
+            height: $sub-btns-height;
+            position: fixed;
+            bottom: 0;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-top: 1px solid #e2e2e2;
+            .sub-btn-item {
+                width: $sub-btn-item-width;
+                height: $sub-btn-item-height;
+                text-align: center;
+                border-radius: 5px;
+                letter-spacing: 0px;
+
+                &[data-index="0"] {
+                    border: solid 1px #e2e2e2;
+                    background-color: #f6f6f6;
+                    color: #666666;
+                    line-height: 42px;
+                }
+                &[data-index="1"] {
+                    background-color: #005bac;
+                    margin-left: 4%;
+                    color: #ffffff;
+                    line-height: $sub-btn-item-height;
+                }
+            }
+        }
+    }
+}
+.flow-remark-modal{
+  .modal-body{
+    padding: 6px 15px;
+  }
+  .title{
+    font-size:15px;
+    color: #3a3a3a;
+    margin-top: 20px;
+  }
+  .text-input{
+    margin-top: 15px;
+    width: 100%;
+    height: 44px;
+    background-color: #ffffff;
+    border: solid 1px #e9e9e9;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    font-size:15px;
+    &>input{
+      height: calc(100% - 2px);
+      margin-bottom: 0;
+    }
+  }
+}

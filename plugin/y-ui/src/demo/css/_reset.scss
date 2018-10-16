@@ -1,0 +1,36 @@
+//HTML/BODY specific styles
+
+html, 
+button, 
+input, 
+select, 
+textarea{
+  font-family: $baseFontFamily;
+}
+h1,h2,h3,h4,h5,h6,p,figure,form,blockquote {
+  margin:0;
+}
+// ul ol dl
+ul,ol,li,dl,dd{
+  margin: 0;
+  padding:0;
+}
+ul{
+  list-style: none outside none;
+}
+
+body {
+  color: $bodyColor;
+  font-family: $baseFontFamily;
+  font-size: $baseFontSize;
+  overflow-y: scroll;
+}
+
+a {
+  text-decoration: none;
+}
+
+::placeholder {
+  color: $placeholderColor;
+}
+

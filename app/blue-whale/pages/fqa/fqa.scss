@@ -1,0 +1,25 @@
+.fqa-modal{
+  .fqa-content{
+    padding-bottom:50px;
+    .panel-item-content{
+      padding: 0 15px;
+      p{
+        margin: 0;
+        color: $text;
+        .bold{
+          font-weight: bold;
+        }
+      }
+      img{
+        display: block;
+        margin: 15px auto;
+        width: 100%;
+        max-width: 375px;
+        &.qrcode{
+          width: 100px;
+        }
+      }
+    }
+  }
+
+}

@@ -1,0 +1,51 @@
+.sqlPage{
+  background-color: white;
+  .inputArea{
+    width: 25%;
+    float: left;
+    span{
+      display: inline-block;
+      width: 70px;
+      text-align: right;
+    }
+    .text-input{
+      display: inline-block;
+      border-bottom: 1px solid #ddd;
+    }
+  }
+  .start,.end,.clearBut{
+    float: right;
+    margin-top: 10px;
+    margin-right: 25px;
+  }
+  .searchInp{
+    .serachIcon{
+      &:hover{
+        cursor: pointer;
+      }
+    }
+  }
+  .content{
+    user-select: text;
+    position: relative;
+    background-color: white;
+    margin-top: 15px;
+    width: 100%;
+    overflow-x: scroll;
+  }
+  .sqlTop{
+    width: 100%;
+    position: absolute;
+    top: 23px;
+    left: 0px;
+    background-color: rgb(247,247,248);
+    z-index: 1;
+    right: 25px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgb(200,199,204);
+
+  }
+  .padding-bottom-10{
+    padding-bottom: 10px;
+  }
+}

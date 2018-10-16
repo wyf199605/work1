@@ -1,0 +1,30 @@
+.login-info{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    .login-detail{
+        &>div{
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+    }
+    .item{
+        line-height: 30px;
+        margin: 0 5px;
+    }
+    .line{
+        font-size: 16px;
+        margin-top: -4px;
+    }
+    img{
+        width: 30px;
+        height: 30px;
+    }
+    .logout{
+        padding: 0 8px;
+        background-color: #ffc059;
+        border-radius: 4px;
+        color: #ffffff;
+    }
+}

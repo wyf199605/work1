@@ -1,0 +1,108 @@
+.l-wrapper{
+  display: none;
+}
+.ti{
+  font-size: 40px;
+}
+.textContent{
+  position: absolute;
+  left:0;
+  right: 0;
+  bottom: -30px;
+}
+nav.links a{
+  margin:30px 15px;
+}
+.container-fullw{
+  border-bottom: 0;
+  margin: 0;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+.file .icon{
+  padding: 15px 10px;
+  text-align: center;
+  overflow: hidden;
+  height: 80px;
+  color: #dadada;
+}
+.corner {
+  position: absolute;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  line-height: 0;
+  border: 0.6em solid transparent;
+  border-right: 0.6em solid #f1f1f1;
+  border-bottom: 0.6em solid #f1f1f1;
+  right: 0em;
+  bottom: 0em;
+}
+@-webkit-keyframes pulse {
+  0% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
+  50% {
+    -webkit-transform: scale(1.1);
+    -ms-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
+}
+.pulse{
+  -webkit-animation-name: pulse;
+  animation-name: pulse;
+}
+.animated{
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  -moz-animation-fill-mode: both;
+  -o-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.file .file-name {
+  padding: 10px;
+  height: 39px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background-color: #f8f8f8;
+  border-top: 1px solid #e7eaec;
+}
+.file-box{
+  padding: 0;
+  margin:15px;
+}
+.top{
+  margin-top: 33px;
+  margin-right: -50px;
+  /*margin-left: -25px;*/
+}
+.top .col-md-2{
+  width: 137px;
+  /*min-width: 104px;*/
+  float: left;
+}

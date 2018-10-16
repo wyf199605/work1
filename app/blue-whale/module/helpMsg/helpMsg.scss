@@ -1,0 +1,33 @@
+.btn.help-module{
+  position: fixed;
+  bottom: 5px;
+  border: none;
+  right: 5px;
+  background: none;
+  >i{
+    font-size: 18px;
+  }
+}
+.help-modal.modal-wrapper{
+  z-index: 1100;
+  .modal-body{
+    background-color: white;
+    .help-body{
+      padding: 0 15px;
+      .help-text{
+        margin: 10px 0;
+        font-size: 14px;
+        border-bottom: 1px solid #c8c7cc;
+        background: white;
+        padding: 5px 0;
+        color: #666;
+      }
+      img,audio,video{
+        display: block;
+        margin: 15px auto;
+        width: 100%;
+      }
+    }
+  }
+
+}

@@ -1,0 +1,45 @@
+.queryDevicePage{
+  max-height: 100%;
+  .queryItems,.queryContent,.item-container{
+    padding: 0 10px;
+    width: 100%;
+  }
+  .queryItems{
+    padding-top: 20px;
+  }
+  .item-container{
+    background-color: #ffffff;
+  }
+  .queryItems{
+    width: 90%;
+    margin: 0 auto;
+    min-width: 100%;
+    margin-bottom: 10px;
+  }
+  .stepBtn{
+    margin: 20px auto 0 auto;
+    text-align: center;
+    button{
+      width: 98px;
+      height: 36px;
+      background-color: #37ba9d;
+      border-radius: 3px;
+      color: #ffffff;
+      font-size: 16px;
+    }
+    .btn:active:focus, .btn:focus {
+      outline: none;
+    }
+    .btn.button-type-default{
+      border-color: #37ba9d;
+    }
+    .btn.button-type-default:hover {
+      border-color: #37ba9d;
+      background-color: #37ba9d;
+      color: #ffffff;
+    }
+    .save.btn.button-type-default:hover{
+      border-color: #37ba9d;
+    }
+  }
+}

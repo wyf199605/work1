@@ -1,0 +1,100 @@
+.app-packaging {
+  overflow: hidden;
+  .publish-btn {
+    position: absolute;
+    width: 100%;
+    height: 36px;
+    text-align: center;
+    top: calc(100% - 46px);
+    button {
+      width: 154px;
+      height: 36px;
+      background-color: #37ba9d;
+      border-radius: 3px;
+      font-size: 16px;
+      color: #ffffff;
+      border-color: #37ba9d;
+    }
+  }
+  .table {
+    height: calc(100% - 130px);
+    margin-bottom: 0;
+    position: absolute;
+    .modal-loading{
+      left: calc(50% - 79px) !important;
+    }
+    .fast-table-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: calc(100% - 20px);
+      min-width: calc(100% - 20px);
+    }
+  }
+  .conditions {
+    padding: 20px 10px 5px 10px;
+    font-size: 14px;
+    overflow: hidden;
+    .time {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      float: left;
+      width: 28%;
+      label {
+        text-align: left;
+        font-weight: normal;
+        color: #3a3a3a;
+        font-size: 14px;
+        min-width: 80px;
+      }
+      .text-input {
+        width: 300px;
+        height: 36px;
+        background-color: #ffffff;
+        border-radius: 3px;
+        border: solid 1px #e2e2e2;
+        padding-top: 2px;
+        input:focus {
+          outline: none;
+        }
+        .icon-calendar:before {
+          line-height: 2;
+        }
+      }
+    }
+    .textInputModule, .dropDownModule {
+      float: left;
+      width: 24%;
+      input:focus {
+        outline: none;
+        outline-offset: 0;
+      }
+      label {
+        text-align: left;
+        font-weight: normal;
+        color: #3a3a3a;
+        font-size: 14px;
+      }
+      .textInputContent {
+        width: 140px;
+        height: 36px;
+        background-color: #ffffff;
+        border-radius: 3px;
+        border: solid 1px #e2e2e2;
+        padding-top: 2px;
+        input:focus {
+          outline: none;
+        }
+      }
+
+      .dropDownContainer {
+        width: 140px;
+        height: 36px;
+        background-color: #ffffff;
+        border-radius: 3px;
+        border: solid 1px #e2e2e2;
+      }
+    }
+  }
+}

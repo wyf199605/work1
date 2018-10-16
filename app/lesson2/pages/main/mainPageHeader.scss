@@ -1,0 +1,53 @@
+.lesson-header{
+  height: 68px;
+  width: 100%;
+  background-color: #0099ff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #ffffff;
+  font-size: 16px;
+  .header-left-logo{
+    padding-left: 20px;
+    width: 212px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .school{
+      font-weight: bold;
+      color: #ffffff;
+      cursor: pointer;
+    }
+  }
+  .header-right-info{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    span.welcome{
+      margin-right:  48px;
+      font-size: 14px;
+    }
+    .header-link{
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      color: #ffffff;
+      margin-right: 20px;
+      cursor: pointer;
+      i.sec{
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+@media all and (max-width: 750px){
+  .header{
+    .welcome{
+      display: none;
+    }
+  }
+}

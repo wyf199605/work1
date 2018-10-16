@@ -1,0 +1,57 @@
+.authoritySearchPage {
+  height: 100%;
+  width: 100%;
+  padding: 10px;
+  &.modal-box .modal-wrapper {
+    height: 450px !important;
+  }
+  .priv-query {
+    //权限查询
+    .priv-condition {
+      padding: 0;
+      background-color: #fff;
+      list-style: none;
+      display: block;
+      height: 40px;
+      input {
+        border-bottom: 1px solid #ddd;
+      }
+      .width-50 {
+        width: 50px;
+        padding: 5px;
+      }
+      .priv-node {
+        padding: 5px;
+      }
+      .priv-user {
+        width: 100px;
+      }
+      .priv-user-drop {
+        .hide + .btn-group {
+          display: none;
+        }
+      }
+      > div {
+        display: inline-block;
+        padding: 5px;
+      }
+    }
+    .parent-table {
+      display: block;
+      height: 34vh;
+      overflow-y: auto;
+    }
+    .child-table {
+      display: block;
+      height: 34vh;
+      margin-top: 15px;
+      .oper-priv, .prop-priv, .level-priv {
+        max-height: 28vh;
+        overflow-y: auto;
+      }
+    }
+    .scroll-el {
+      margin-top: 10px;
+    }
+  }
+}

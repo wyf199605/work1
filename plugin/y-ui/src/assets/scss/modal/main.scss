@@ -1,0 +1,23 @@
+@import "keyframes";
+div.y-modal, .y-modal{
+	position: absolute; bottom: initial; right: initial;	
+}
+
+.y-modal{
+	&-opening {
+	    animation: y-modal-flipin-horizontal .5s;
+	}
+	&-closing {
+	    animation: y-modal-flipout-horizontal .5s;
+	}
+	&-graging {
+		box-shadow: 5px 5px 2px #E5E5E5;
+	}
+	&-btn-resize{
+		position: absolute; right: 0; bottom: 0; width: 15px; height: 15px; cursor: nw-resize;
+	}
+
+	.modal-dialog{ margin: 0;}
+
+}
+

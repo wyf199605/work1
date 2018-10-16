@@ -1,0 +1,88 @@
+.rule-setting {
+  font-size: 14px;
+  .sign-in-item,.sign-back-item {
+    width: 100%;
+    padding: 30px 20px 30px 0;
+    margin-bottom: 20px;
+    border: dashed 1px #d8e3e9;
+    margin-bottom: 20px;
+.btns{
+  text-align: center;
+  padding-top: 20px;
+}
+  }
+  .zhi {
+    margin: 0 20px;
+  }
+  .sign-content {
+    width: 100%;
+    .row {
+      margin-right: 0;
+      margin-left: 0;
+    }
+  }
+  .select-role {
+    .role-item:last-child {
+      .role-item-row:last-child {
+        .role-row-right {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+  .showOrHide {
+    .select-file-btn{
+      margin-right: 12px !important;
+    }
+    .row.time{
+      margin-bottom: 0 !important;
+      .lesson-label{
+        margin-right: 10px !important;
+        width: 100px !important;
+        margin-left: 12px;
+      }
+    }
+    & > span {
+      margin-right: 8px;
+      color: #91a8b0;
+    }
+    .download {
+      color: #0099ff;
+    }
+  }
+  .role-item:last-child {
+    .role-item-row:last-child {
+      margin-bottom: 0;
+      .role-row-right{
+        padding-bottom: 0;
+      }
+    }
+  }
+}
+.isSignBack{
+  .lesson-form-group{
+    display: flex;
+    align-items: center;
+  }
+  .type {
+    display: flex;
+    width: 206px;
+    height: 46px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: solid 1px #0099ff;
+    color: #0099ff;
+    box-sizing: content-box;
+    .sign-item {
+      width: 50%;
+      height: 100%;
+      text-align: center;
+      line-height: 46px;
+      transition: background-color 0.1s linear;
+    }
+    .sign-item.active {
+      background-color: #0099ff;
+      color: #ffffff;
+    }
+  }
+}

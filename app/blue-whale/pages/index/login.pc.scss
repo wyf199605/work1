@@ -1,0 +1,102 @@
+.loginPage{
+  .error{
+    color: red !important;
+    border-color: red!important;
+  }
+  #login-form .form-control.error + .fa{
+    color: red!important;
+  }
+  .main-login .form-actions {
+    padding-top: 0;
+    display: block;
+  }
+  .page-header{
+    text-align: center;
+    border-bottom: 0;
+    margin-top: 80px;
+  }
+  .page-header img{
+    height: 40px;
+    margin-right: 5px;
+  }
+  .clip-check{
+    display: inline-block;
+    margin: 0;
+  }
+
+  .main-login{
+    animation-duration: 0.75s;
+    animation-fill-mode: both;
+    animation-name: fadeInUp;
+    max-width: 360px;
+    margin:0 auto;
+    padding: 0 10px;
+  }
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @media screen and (min-width: 1400px) {
+    .main-login {
+      /*padding:0px 50px;*/
+    }
+  }
+  .input-icon>input{
+    height: 42px;
+    font-size: 16px;
+  }
+  //.fa{
+  //  top: 4px !important;
+  //}
+  .forgot{
+    top: 13px !important;
+  }
+  .popover{
+    width: 200px;
+  }
+  .popover .arrow{
+    top: 50%;
+  }
+  #urlBtn{
+    height: 40px;
+    margin-right: 5px;
+  }
+  .form-actions{
+    margin-top: 20px !important;
+  }
+  #login{
+    width:80px;
+    position: relative;
+    float: right;
+  }
+  #login:hover .iconfont{
+    left: 40%;
+  }
+  .otherLogin{
+    border-top: 1px dashed #ccc
+  }
+  .otherLogin .btn{
+    margin-top: 20px;
+    height: 42px;
+    padding: 0;
+  }
+  .otherLogin>.btn>span{
+    line-height: 42px;
+  }
+  .otherLogin span.text{
+    font-size: 16px;
+  }
+  .modal-body i{
+    float: left;
+  }
+  #fingerTip{
+    padding-left: 40px;
+    margin-top: 10px;
+  }
+}

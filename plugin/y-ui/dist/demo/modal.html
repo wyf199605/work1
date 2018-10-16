@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ccc</title>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" type="text/css" href="../assets/y-ui/css/modal.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/demo.css">
+</head>
+<body>
+  
+  <div class="demo-left-menu" id="leftmenu">
+
+	<div class="panel-group">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion" 
+					   href="#collapseOne">
+						模态框
+					</a>
+				</h4>
+			</div>
+			<div class="panel-collapse collapse">
+				<ul class="list-group">
+				  <li class="list-group-item"><a href="modal.html"><i class="glyphicon glyphicon-play"></i> 弹出</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion" 
+					   href="#collapseTwo">
+						拖拽
+					</a>
+				</h4>
+			</div>
+			<div class="panel-collapse collapse">
+				<ul class="list-group">
+				  <li class="list-group-item"><a href="javascript://"><i class="glyphicon glyphicon-play"></i> default</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion" 
+					   href="#collapseTwo">
+						表格
+					</a>
+				</h4>
+			</div>
+			<div class="panel-collapse collapse">
+				<ul class="list-group">
+				  <li class="list-group-item"><a href="table.html"><i class="glyphicon glyphicon-play"></i> 基础表格</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+
+
+</div>
+  <div class="demo-main">
+      <div class="row">
+          <div class="col-md-12">
+            <button type="button" class="btn btn-primary" onclick="msg.show()">显示模态框</button>              
+          </div>
+      </div>
+      <div class="row" style="margin-top: 20px;">
+        <div class="col-md-12">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">资源文件</h3>
+            </div>
+            <div class="panel-body">
+              <figure>
+                <pre><code data-lang="html">&lt;link&nbsp;rel=&quot;stylesheet&quot;&nbsp;type=&quot;text/css&quot;&nbsp;href=&quot;../assets/y-ui/css/modal.css&quot;&nbsp;/&gt;
+&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;../assets/y-ui/js/utils.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;../assets/y-ui/js/modal.min.js&quot;&gt;&lt;/script&gt;</code></pre></figure>
+            </div>
+          </div>
+        </div>        
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">HTML</h3>
+            </div>
+            <div class="panel-body">
+              <figure>
+                <pre><code data-lang="html">&lt;div class=&quot;modal fade&quot; tabindex=&quot;-1&quot; role=&quot;dialog&quot; id=&quot;dialog&quot;&gt;
+  &lt;div class=&quot;modal-dialog&quot; role=&quot;document&quot;&gt;
+    &lt;div class=&quot;modal-content&quot;&gt;
+      &lt;div class=&quot;modal-header titleBar&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;close close-btn&quot; data-dismiss=&quot;modal&quot; aria-label=&quot;Close&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;&amp;times;&lt;/span&gt;&lt;/button&gt;
+        &lt;h4 class=&quot;modal-title&quot;&gt;Modal title&lt;/h4&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-body&quot;&gt;
+        &lt;p&gt;One fine body&amp;hellip;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;modal-footer&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-default&quot; data-dismiss=&quot;modal&quot; onclick=&quot;msg.hide();&quot;&gt;Close&lt;/button&gt;
+        &lt;button type=&quot;button&quot; class=&quot;btn btn-primary&quot;&gt;Save changes&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></figure>
+            </div>
+          </div>
+        </div>        
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">JS</h3>
+            </div>
+            <div class="panel-body">
+              <figure>
+                <pre><code data-lang="html">&lt;link&nbsp;rel=&quot;stylesheet&quot;&nbsp;type=&quot;text/css&quot;&nbsp;href=&quot;../assets/y-ui/css/modal.css&quot;&nbsp;/&gt;
+&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;../assets/y-ui/js/utils.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&nbsp;type=&quot;text/javascript&quot;&nbsp;src=&quot;../assets/y-ui/js/modal.min.js&quot;&gt;&lt;/script&gt;
+
+var msg = new $y.Modal({
+    el: '#dialog',  // 模态框主对象
+    title: document.querySelector('.titleBar'),     // 标题栏对象
+    close: document.querySelector('.close-btn'),    // 关闭按钮对象
+    panel: document.querySelector('.demo-main'),    // 外容器对象，限制在某个div中拖动，默认全屏幕边界内可拖动
+    // $autoWidthTarget: document.querySelector('.modal-dialog'),   // 内部容器对象，用于改变窗口宽度实际控制对象，无配置默认获取 modal-dialog（控制宽）
+    // $autoHeightTarget: document.querySelector('.modal-body'),   // 内部容器对象，用于改变窗口高度实际控制对象，无配置默认获取 modal-body(控制高) 
+    top: 150   // 模态框初始top
+});</code></pre></figure>
+            </div>
+          </div>
+        </div>        
+      </div>
+      
+  </div>
+  
+
+<div class="modal fade" tabindex="-1" role="dialog" id="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header titleBar">
+        <button type="button" class="close close-btn" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <p>One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="msg.hide();">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="../assets/y-ui/js/utils.min.js"></script>
+<!--modal js-->
+<script type="text/javascript" src="../assets/y-ui/js/modal.min.js"></script>
+<script type="text/javascript" src="assets/js/demo.js"></script>
+<script type="text/javascript">
+  var msg = new $y.Modal({
+    el: '#dialog',
+    title: document.querySelector('.titleBar'),
+    close: document.querySelector('.close-btn'),
+    panel: document.querySelector('.demo-main'),
+    top: 150
+  });
+</script>
+
+</body>
+</html>

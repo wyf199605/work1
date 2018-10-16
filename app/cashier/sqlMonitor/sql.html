@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>收银sql监控</title>
+    <link href="../cashier/global.pc.css?v=0" rel="stylesheet">
+    <link href="sqlMonitor.css" rel="stylesheet">
+
+</head>
+<body class="sqlPage">
+<div class="sql">
+
+</div>
+<div id="sqlMonitorContent">
+
+</div>
+<script src="../cashier/plugin/requirejs/require.js"></script>
+<script src="../cashier/global.js?v=0"></script>
+<!--<script src="cashier/cashier.js?v=0"></script>-->
+
+<script>
+    require(['SqlMonitor'], function (e) {
+        new e.SqlMonitor({
+            container : C.d.query('.sql')
+        })
+    });
+    require(['BwWebsocket'], function(e){
+        console.log( 'ws://bwt.sanfu.com/cashier/websocket/cms3/single');
+        new e.BwWebsocket({
+            url : 'ws://bwt.sanfu.com/cashier/websocket/CMS3/single',
+            onMessage : r => {
+                debugger
+                let data = JSON.parse(r && r.data);
+                switch (data.respType){
+                    case 'sql':
+                        let content = C.d.query('#sqlMonitorContent',document.body);
+                        if(content) {
+                            let pageContainer = d.closest(content, '.page-container');
+                            for (let i = 0, l = data.data.length; i < l; i++) {
+                                C.d.append(content,document.createElement('br'));
+                                C.d.append(content,data.data[i].replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0").replace(/\n/g, ""));
+                            }
+                            C.d.append(content,document.createElement('br'));
+                            pageContainer.scrollTop = content.scrollHeight;
+                        }
+                        break;
+                    case 'posdata':
+                        break;
+                }
+            },
+            onOpen : r => {
+
+            },
+        });
+    });
+</script>
+</body>
+</html>

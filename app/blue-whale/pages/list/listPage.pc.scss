@@ -1,0 +1,117 @@
+.listPage.tablePage {
+  padding-bottom: 0;
+  padding-top: 0;
+  position: relative;
+  height: calc(100vh - 65px);
+  .table-module-wrapper{
+    overflow-x: hidden;
+    .mobileTableWrapper{
+      overflow-y: auto;
+    }
+  }
+  .btnsLeft{
+    width: 100%;
+  }
+  .modal-animate-down {
+    &.animate-in {
+      animation: none!important;
+    }
+  }
+  .topBtns{
+    padding-top: 5px;
+    .btnsMiddle,.btnsRight{
+      display: none;
+    }
+  }
+  .mobileTableWrapper{
+
+    &.hasIndexCol .indexCol > div{
+      line-height: 25px;
+      height: 25px;
+    }
+    table.mobileTable{
+      tbody tr td{
+        height: 25px;
+        cursor: pointer;
+      }
+      thead tr th{
+         padding: 3px 7px;
+        &.sort .td-content{
+          height:15px!important;
+        }
+      }
+      tr th:first-child{
+        display: none;
+      }
+      tr td:first-child{
+        display: none;
+      }
+
+    }
+    table{
+      text-align: center;
+    }
+
+    .tr-read{
+      font-weight: bold;
+      td:nth-child(2):after{
+        position: absolute;
+        top: 10px;
+        left: 7%;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        border: 1px solid #108ee9;
+        content: "";
+        animation: badgeStatuBlue 1.2s infinite ease-in-out;
+      }
+      td:nth-child(2):before{
+        position: absolute;
+        top: 10px;
+        left: 7%;
+        width: 8px;
+        height: 8px;
+        border-radius: 4px;
+        content: "";
+        background-color: #108ee9;
+      }
+    }
+  }
+  .table-module-wrapper{
+    overflow-y: hidden;
+  }
+  .mail-module{
+    position: absolute!important;
+    bottom: 0;
+    min-height: 200px;
+    width: calc(100% - 30px);
+
+    .modal-mail{
+      height: 100%;
+      z-index: 0;
+      box-shadow: none;
+      border:1px solid #e5e5e5;
+      &.full-screen-fixed{
+        z-index: 1003;
+      }
+      .mail-container{
+        height: 99%;
+      }
+      .modal-body{
+        top:40px;
+        width: 100%;
+        bottom:0;
+        position: absolute;
+        max-height: none;
+        padding-bottom: 10px;
+      }
+    }
+  }
+
+}
+
+
+
+
+
+

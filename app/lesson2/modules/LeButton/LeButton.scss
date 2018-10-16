@@ -1,0 +1,49 @@
+.le-button, .btn.le-button {
+  height: 40px;
+  width: 100px;
+  background: #0099FF;
+  border-radius: 5px;
+  line-height: 40px;
+  text-align: center;
+  color: #fff;
+  margin: 20px 10px 0;
+  cursor: pointer;
+  border: none;
+
+  &:hover {
+    color: #fff;
+    background-color: #3bb5ff;
+  }
+
+  &.red{
+    background: #F5956B;
+    &:hover{
+      background: #f5b18e;
+    }
+  }
+  &.light-blue {
+    background: #65b3f1;
+    &:hover{
+      background: #84bef1;
+    }
+  }
+  &.green{
+    background: #41cbbb;
+    &:hover{
+      background: #7CCBBB;
+    }
+  }
+
+
+}
+
+.basic-page-header-btns {
+  .le-button, .btn.le-button {
+    margin: 10px;
+  }
+}
+
+
+.btn.le-button{
+
+}

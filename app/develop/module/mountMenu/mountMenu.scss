@@ -1,0 +1,70 @@
+.mount-body{
+  overflow: hidden;
+}
+.mountmenu{
+  position: relative;
+  height: 100%;
+  width: 100%;
+  .tree{
+    width: 25%;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    height: 100%;
+    padding: 0 5px;
+    overflow: auto;
+    color: #3a3a3a;
+    .element-tree-node.selected > .tree-text-wrapper {
+      background-color: #f2f2f2;
+      color: #3a3a3a;
+      span {
+        font-weight: bold;
+      }
+    }
+    &::-webkit-scrollbar {
+      width: 0px;
+    }
+    .tree-icon {
+      color: #007aff;
+      margin-top: 3px;
+    }
+  }
+  .content{
+    width: 75%;
+    position: absolute;
+    left: 25%;
+    top: 0;
+    height: 100%;
+    .saveBtn
+    {
+      padding: 10px 10px 10px 30px;
+      button {
+        background-color: #f2f2f2;
+        border-radius: 3px;
+        color: #666666;
+        border: solid 1px #e2e2e2;
+        height: 30px;
+        & > span {
+          margin-left: 6px;
+        }
+      }
+      .btn.button-type-default:hover {
+        border-color: #004c8f;
+      }
+    }
+    .designContentItems{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-content: flex-start;
+      align-items: center;
+      .designContentItem{
+        width: 33%;
+        padding-left: 30px;
+        label{
+          text-align: left;
+        }
+      }
+    }
+  }
+}

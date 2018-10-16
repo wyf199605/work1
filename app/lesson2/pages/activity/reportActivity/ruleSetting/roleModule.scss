@@ -1,0 +1,118 @@
+.role-item {
+  width: 100%;
+  .mutil-select {
+    width: 50px;
+  }
+
+  .role-item-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    .uploader-wrapper{
+      margin-left: 8px;
+    }
+    .check-wrapper{
+      width: 62px;
+      margin-right: 10px;
+    }
+    .check-text{
+      font-weight: normal;
+      color: #33484f;
+    }
+    button{
+      margin-left: 10px;
+      margin-right: 8px;
+    }
+    .role-row-right{
+      display: flex;
+      align-items: center;
+      width: calc(100% - 145px);
+      .text-input{
+        width: 120px;
+        margin-left: 10px;
+        margin-right: 8px;
+      }
+      .text-input.count{
+        width: 190px;
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+  }
+  .role-item-row:last-child{
+    .role-row-right{
+      padding-bottom: 30px;
+      border-bottom: 1px solid #d8e3e9;
+    }
+  }
+  .assign-success{
+    color: #41ccba;
+    display: flex;
+    align-items: center;
+    i{
+      border-radius: 50%;
+      border: 1px solid #41ccba;
+      width: 18px;
+      height: 18px;
+      position: relative;
+      display: block;
+      margin-right: 4px;
+    }
+    i::before{
+      position: absolute;
+      top: 0;
+      left: 0;
+      line-height: 18px;
+    }
+  }
+  .upload-student-number{
+    span{
+      color: #0099ff;
+    }
+  }
+}
+.role-item.viewCredit{
+  display: flex;
+  align-items: center;
+  .look{
+    width: 220px;
+  }
+  .downloadTemplate{
+    height: 40px !important;
+    margin-left: 20px;
+  }
+}
+.role-item.participant{
+  .role-item-row:last-child{
+    .role-row-right{
+      padding-bottom: 30px;
+      border-bottom: none;
+    }
+  }
+}
+.table-modal{
+  .tables{
+    height: 344px !important;
+  }
+}
+.modal-row-btn{
+  .addBtn {
+    width: 140px;
+    height: 40px;
+    background-color: #0099ff;
+    border-radius: 5px;
+    color: #ffffff;
+    text-align: center;
+    line-height: 40px;
+    border: none;
+    outline: none;
+  }
+  .addBtn.btn.button-type-default:hover {
+    color: #ffffff;
+    border: none;
+  }
+  .addBtn.btn:hover, .addBtn.btn.avtive {
+    background-color: #0089e5;
+    outline: none;
+  }
+}

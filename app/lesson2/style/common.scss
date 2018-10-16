@@ -1,0 +1,322 @@
+@mixin body-color($val) {
+  .page-container {
+    .lesson-main {
+      .lesson-header {
+        background-color: unquote($val);
+      }
+    }
+  }
+  .homePage .title {
+    border-color: unquote($val);
+  }
+  .side-bar .element-tree-node.menu-node.tree-virtual .element-tree-node.menu-node .element-tree-node.menu-node.selected > .tree-text-wrapper{
+    background-color: unquote($val);
+  }
+  .menu-tabs ul.nav > li.active > a {
+    background-color: unquote($val);
+  }
+  .le-button, .btn.le-button{
+    background: unquote($val);
+  }
+  .basic-page-header .basic-page-line{
+    border-color: unquote($val);
+  }
+  .basic-page-header .basic-page-header-btns button.btn.button-type-default{
+    background: unquote($val);
+  }
+  .query-module-wrapper .form-com-wrapper div.form-com-item .query-search-btn{
+    background:unquote($val);
+  }
+  .config-param-page .editing{
+    background:unquote($val);
+  }
+  .query-module-wrapper .form-com-wrapper div.form-com-item .query-search-btn{
+    background:unquote($val);
+  }
+  .menu-tabs ul.nav > li{
+    border-color: #e2e2e2;
+  }
+  .menu-tabs ul.nav{
+    border-color: #e2e2e2;
+  }
+  .side-bar .element-tree-node.menu-node.selected > .tree-text-wrapper{
+    color: unquote($val);
+  }
+  .element-tree-node.menu-node:not(.selected) > .tree-text-wrapper:hover {
+    color: unquote($val);
+  }
+  .menu-tabs ul.nav > li > a{
+    color: unquote($val);
+  }
+  .menu-tabs ul.nav > li.active > a{
+    color: white;
+  }
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  .huanfu {
+    background: red;
+  }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  .skin-1 {
+    @include body-color('#FA8072')
+
+  }
+  .skin-2 {
+    @include body-color('#FFC0CB')
+  }
+  .skin-3 {
+    @include body-color('#A9A9A9')
+  }
+  .skin-4 {
+    @include body-color('#48D1CC')
+  }
+  .skin-5{
+    @include body-color('#0099ff')
+  }
+}
+
+input:-webkit-autofill {
+  //使用足够大的纯色内阴影覆盖黄色背景
+  -webkit-box-shadow: 0 0 0 1000px white inset;
+}
+
+* {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #364960;
+    border-radius: 3px;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:active {
+  text-decoration: none;
+}
+
+a:focus {
+  outline: none;
+  text-decoration: none;
+}
+
+ul, li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.select-box input[type=checkbox]:checked + .check-span::before {
+  border-color: #007AFF;
+}
+
+.btn {
+  width: 115px;
+  height: 40px;
+  padding: 0;
+  border-radius: 5px;
+  text-align: center;
+  line-height: 40px;
+}
+
+.btn-blue {
+  background-color: #0099FF;
+  color: white;
+  &:hover {
+    background-color: #0289e5;
+    color: #ffffff;
+  }
+}
+
+.btn-dark {
+  background: #D8E3E9;
+  color: #354852;
+  &:hover {
+    background-color: #c4dae6;
+    color: #28363e;
+  }
+}
+
+input {
+  background-color: transparent;
+}
+
+input.default {
+  outline: none;
+  -webkit-appearance: none;
+  padding: 0 8px;
+  box-shadow: none;
+  height: 40px;
+  border-radius: 5px;
+  margin-left: 3px;
+  border: solid 1px #d8e3e9;
+  &:focus {
+    outline: none;
+    border-color: #0099ff;
+    box-shadow: 0 0 10px #9ecaed;
+  }
+  &:disabled {
+    background-color: #f2f2f2;
+  }
+}
+
+// 模态框
+.lesson-modal {
+  .head-wrapper {
+    width: calc(100% - 30px);
+    margin-left: 15px;
+    .modal-header {
+      border-bottom: 1px solid #00a6ed;
+      .modal-title {
+        color: #00a6ed;
+      }
+      .close {
+        color: #00a6ed;
+      }
+    }
+  }
+  .modal-footer {
+    display: flex;
+    border-top: none;
+    .right-plane, .left-plane {
+      height: 45px;
+      display: inline-block;
+      margin: auto;
+      position: initial;
+    }
+  }
+}
+
+input[type=radio].normal {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: #ffffff;
+  border: solid 1px #e2e2e2;
+  border-radius: 50%;
+  padding: 0;
+  position: relative;
+  margin-right: 10px;
+  margin-left: 0;
+  outline: none;
+}
+
+input[type=radio].normal:checked {
+  border: solid 1px #0099ff;
+  &::after {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background-color: #0099ff;
+    border-radius: 50%;
+  }
+}
+
+input[type=checkbox].normal {
+  border: solid 1px #0099ff;
+  outline: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 18px;
+  height: 18px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  padding: 0;
+  position: relative;
+  margin-right: 10px;
+  margin-left: 0;
+}
+
+input[type=checkbox].normal:checked {
+  border: solid 1px #0099ff;
+  &:after {
+    content: '\2714';
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    justify-tab-content: center;
+    align-items: center;
+    color: #0099ff;
+    margin-left: 2px;
+    margin-top: -1px;
+  }
+}
+
+.menu-tabs {
+  ul.nav {
+    border-bottom: 1px solid #0099ff;
+
+    > li {
+      background-color: #ffffff;
+      min-width: 100px;
+      text-align: center;
+      border: solid 1px #0099ff;
+      border-right: none;
+      color: #0099ff;
+      font-size: 14px;
+      margin-left: -1px;
+      > a {
+        line-height: 1.7;
+        margin-right: 0;
+        color: #0099ff;
+        border: none;
+        &:hover, &:focus {
+          background: none;
+          border: none;
+          cursor: pointer;
+
+        }
+      }
+    }
+    > li.active {
+      > a {
+        background: #0099ff;
+        color: white;
+        border-bottom: none;
+        //&:hover {
+        //  border-bottom: none;
+        //}
+        //&:focus {
+        //  border: none;
+        //}
+      }
+    }
+    > li:last-child {
+      border-top-right-radius: 5px;
+      border-right: solid 1px #0099ff;
+    }
+    > li:first-child {
+      border-top-left-radius: 5px;
+    }
+  }
+}
+//html,body {
+//  //换肤操作
+//  .skin-red {
+//    @include body-color('#FF0000')
+//  }
+//  .skin-pink {
+//    @include body-color('#FFC0CB')
+//  }
+//
+//}

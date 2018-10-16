@@ -1,0 +1,139 @@
+.tempModal {
+  overflow: scroll;
+}
+
+.analysis {
+  .modal-body {
+    overflow-x: hidden;
+    fieldset {
+      padding-left: 1px;
+      padding-right: 0;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      legend {
+        font-size: 13px !important;
+      }
+    }
+    .statistic_classify, .statistic_value, .statistic_proport {
+      height: 200px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      margin-top: -10px;
+      color: rgb(133, 133, 133);
+      .select-box {
+        margin-left: 10px;
+        margin-top: 10px;
+        width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+    .statistic_select {
+      .select-box {
+        display: inline-block;
+        margin-left: 10px;
+        padding-left: 28px;
+        margin-top: 10px;
+
+        &:last-child {
+          margin-left: 39px;
+        }
+      }
+    }
+    .statistic_showClass {
+      .select-box {
+        margin-left: 10px;
+        padding-left: 28px;
+        margin-top: 10px;
+
+      }
+    }
+    .statistic_proport {
+      overflow: hidden;
+      span {
+        display: inline-block;
+      }
+      .aClass {
+        display: inline-block;
+        margin-top: 15px;
+        margin-left: 15px;
+        .text-input {
+          margin-left: 15px;
+        }
+        span {
+          span {
+            margin-left: 15px;
+          }
+        }
+        &:after {
+          margin-top: 10px;
+          content: '%';
+          position: absolute;
+          line-height: 12px;
+        }
+      }
+      .bClass {
+        display: inline-block;
+        margin-top: 15px;
+        margin-left: 15px;
+        span {
+          span {
+            margin-left: 8px;
+          }
+        }
+        &:after {
+          margin-top: 10px;
+          content: '%';
+          position: absolute;
+          line-height: 15px;
+        }
+      }
+      .cClass {
+        margin-top: 15px;
+        margin-left: 15px;
+        line-height: 30px;
+        span {
+          span {
+            margin-left: 8px;
+          }
+        }
+      }
+      span {
+        display: inline-block;
+      }
+      .text-input {
+        display: inline-block;
+        width: 50px;
+        margin-left: 10px;
+        border-bottom: 1px solid rgb(221, 221, 221);
+      }
+      line-height: 30px;
+    }
+    .row {
+      margin-left: -40px;
+    }
+    .row:first-child {
+      & > div:nth-child(1) {
+        width: 155px;
+        margin-left: 20px;
+      }
+      & > div:nth-child(2) {
+        width: 155px;
+      }
+      & > div:nth-child(3) {
+        width: 220px;
+      }
+    }
+    .row:last-child {
+      .col-xs-8 {
+        width: 350px;
+      }
+      .col-xs-4 {
+        width: 190px;
+        padding: 0;
+      }
+    }
+  }
+
+}

@@ -1,0 +1,129 @@
+.login-page-common {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-width: 1260px;
+  min-height: 100%;
+  background-image: url("../../../img/lesson2/bg.png");
+  background-size: 100% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  .college-name {
+    font-size: 50px;
+    color: #ffffff;
+    margin-top: 60px;
+  }
+  .lesson2-title {
+    margin-top: 10px;
+    text-align: center;
+    color: #ffffff;
+    .lang-ch {
+      font-size: 24px;
+    }
+    .lang-en {
+      font-size: 16px;
+    }
+  }
+  .login-form-common {
+    margin-bottom: 100px;
+    min-width: 400px;
+    width: 34.72%;
+    background-color: #fafcff;
+    box-shadow: 0px 20px 70px 0px rgba(0, 153, 255, 0.5);
+    margin-top: 20px;
+    padding: 30px 50px;
+    .group {
+      margin-top: 18px;
+    }
+    .input-wrapper {
+      .text-input{
+        height: 100%;
+      }
+      input {
+        border: none;
+        padding-left: 4px;
+        width: 100%;
+        height: 100%;
+        border-bottom: 1px solid #d8e3e9;
+        padding-top: 12px;
+        padding-bottom: 12px;
+      }
+      input:focus {
+        outline: none;
+        border-color: #0099ff;
+      }
+    }
+  }
+  .log-btn {
+    width: 100%;
+    height: 50px;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-size: 16px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  .log-btn.btn:focus{
+    outline: none;
+  }
+  .log-btn.login.nouse {
+    pointer-events: none;
+  }
+  .login {
+    background-color: #0099ff;
+    color: #ffffff;
+  }
+  .login:hover {
+    background-color: #0089e5;
+  }
+  .reset {
+    border: solid 1px #0099ff;
+    color: #0099ff;
+  }
+  .reset:hover {
+    border-color: #0089e5;
+  }
+  .sys-btn{
+    border: none !important;
+  }
+  .sys-btn.btn.button-type-default:hover{
+    background-color: #0089e5;
+    color: #ffffff;
+  }
+  .submit {
+    background-color: #0099ff;
+    color: #ffffff;
+  }
+}
+
+.login-page {
+  .forget-and-regist {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #0099ff;
+    .forget-pwd, .regist {
+      cursor: pointer;
+      color: #0099ff;
+      text-decoration: none;
+    }
+  }
+  .login-form {
+    padding-bottom: 50px;
+  }
+}
+
+.modal-wrapper:focus {
+  outline: none;
+}
+
+.modal-box .modal-prompt .modal-footer .right-plane button:focus {
+  outline: none;
+}

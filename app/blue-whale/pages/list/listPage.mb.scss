@@ -1,0 +1,44 @@
+.listPage{
+  .mui-col-xs-1.mui-checkbox{
+    position: absolute;
+    height: 100%;
+    left: -5px;
+  }
+  .mui-col-xs-1.mui-checkbox input[type=checkbox]{
+    right : 0;
+    top : calc(50% - 13px);
+  }
+
+  .mui-table-view-cell .mui-table-cell h5{
+    color: #333;
+    font-weight: bold;
+  }
+  .mui-table-view-cell .mui-table-cell .title{
+    color: #333;
+  }
+  .unread.mui-badge{
+    margin-left: -15px;
+    margin-right: 3px;
+  }
+  .mui-table-view-cell > .mui-slider-handle{
+    background-color: transparent;
+  }
+  .mui-search .mui-placeholder{
+    height: 40px;
+  }
+
+  .mui-icon.mui-icon-paperclip{
+    transform: rotate(90deg);
+  }
+  .mui-pull-top-pocket{
+    top:44px;
+  }
+  .mui-title .mui-badge{
+    vertical-align: text-top;
+  }
+  .swipe-out-bar{
+    .mui-btn{
+      line-height: 80px;
+    }
+  }
+}

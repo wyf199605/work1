@@ -1,0 +1,23 @@
+.modal-mobile{
+  .modal-body.modal-search{
+    max-height: 92vh;
+  }
+  .search-content{
+    position: relative;
+  }
+  .search-scroll{
+    position: relative;
+  }
+  .search-input{
+    margin-top: 3px;
+    .searchInput{
+      padding : 0;
+    }
+  }
+  .no-data{
+    text-align: center;
+    font-size: 12px;
+    padding: 5px;
+    background: white;
+  }
+}

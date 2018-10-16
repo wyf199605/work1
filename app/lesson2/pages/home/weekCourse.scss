@@ -1,0 +1,49 @@
+.week-course {
+  .title {
+    span {
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 24px;
+      color: #33484f;
+      margin-left: 16px;
+    }
+  }
+  .course-table {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffffff;
+    padding: 30px 20px;
+    margin-top: 20px;
+    .table-col:nth-child(n+2){
+      margin-left: 4px;
+      flex-grow: 1;
+    }
+    .first-col{
+      width: 72px;
+    }
+    .table-th{
+      height: 28px;
+      background-color: #d8e3e9;
+      text-align: center;
+      line-height: 28px;
+      font-size: 14px;
+    }
+    .table-cell{
+      height: 50px;
+      background-color: #d8e3e9;
+      margin-top: 20px;
+      text-align: center;
+      line-height: 50px;
+      font-size: 14px;
+      &.has-course{
+        background-color: #65b3f0;
+        color: #ffffff;
+        cursor: pointer;
+      }
+    }
+    .table-title{
+      width: 72px;
+    }
+  }
+}

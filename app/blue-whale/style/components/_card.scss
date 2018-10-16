@@ -1,0 +1,30 @@
+.panel {
+  position: relative;
+  //margin-top: 30px;
+  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.1);
+  box-shadow: 0 0 4px 0 rgba(0,0,0,.1);
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.panel-body{
+  padding-top: 0;
+}
+.container-fluid {
+  //padding-right: 15px;
+  //padding-left: 15px;
+  //margin-right: auto;
+  //margin-left: auto;
+  //margin-top: 32px;
+}
+.panel-heading {
+  position: relative;
+  padding: 3px 0;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom: solid 1px #f7f7f8;
+}
+.panel-body.container-fluid{
+  margin-top: 0;
+}

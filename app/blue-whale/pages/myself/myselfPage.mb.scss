@@ -1,0 +1,63 @@
+.myselfPage {
+  .mui-table-view {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .mui-table-view-cell.sep {
+    height: 20px;
+    background-color: #efeff4;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-top: 1px solid #c8c7cc;
+  }
+  .mui-table-view-cell.sep:after {
+    left: 0;
+  }
+  .mui-table-view span {
+    vertical-align: middle;
+  }
+  .mui-table-view span.col-content {
+    color: #999;
+    width: calc(100% - 75px);
+    display: inline-block;
+    word-wrap: break-word;
+    white-space: normal;
+    text-align: right;
+  }
+  .mui-table-view span.col-name {
+    width: 70px;
+    display: inline-block;
+  }
+  .button-group{
+    display: flex;
+    .button-call{
+      margin: auto;
+      button{
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        margin: 0 20px;
+        color: white;
+        &.xiaoxi{
+          background: #FF9800;
+        }
+        &.call{
+          background: #0baf0b;
+        }
+        &.message{
+          background: #3478F7;
+        }
+        i{
+          font-size: 20px;
+        }
+        span{
+          position: absolute;
+          left: 4px;
+          top: 40px;
+          color: #999;
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}

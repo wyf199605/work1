@@ -1,0 +1,315 @@
+//
+//$color-black: black;
+//$color-black-font: 13px;
+//$font-size-black-max: 14px;
+//$border-black: black;
+//$font-size-black-min: 12px;
+//$top-background-black: aliceblue;//header background
+//.skin-black{
+//  //buttons
+//  .btn-primary {
+//    background-color: $color-black;
+//    border-color: $color-black;
+//  }
+//  .btn-primary:hover {
+//    background-color: #5a5a5a;
+//    border-color: #5a5a5a;
+//  }
+//  .btn-primary:active, .btn-primary.active, .btn-primary.active:focus, .btn-primary:active:focus, .btn-primary:active:hover, .btn-primary.dropdown-toggle:active:hover {
+//    background-color: $color-black !important;
+//    border-color: $color-black;
+//  }
+//  .btn-primary.btn-o {
+//    border: 1px solid $color-black;
+//    color: $color-black;
+//  }
+//  .btn-primary.btn-o .caret {
+//    border-top-color: $color-black;
+//  }
+//  .dropup .btn-primary.btn-o .caret {
+//    border-bottom: 4px solid $color-black;
+//  }
+//  .btn-blue{
+//    border: 1px solid $color-black;
+//    color: $color-black;
+//  }
+//  .btn-blue:hover {
+//    background-color: $color-black !important;
+//    border-color: $color-black;
+//  }
+//  .btn-blue:focus {
+//    border-color: $color-black;
+//    color: $color-black;
+//  }
+//  .webuploader-element-invisible {
+//    background: $color-black ;
+//  }
+//  .hidebox{
+//    color: $color-black!important;
+//  }
+//  .btn-blu{
+//    border: 1px solid $color-black!important;
+//    color: $color-black!important;
+//  }
+//  //checkbox
+//  .clip-radio.radio-primary input[type="radio"]:checked + label:before {
+//    background: $color-black;
+//  }
+//  .clip-check.check-primary input[type="checkbox"]:checked + label:before {
+//    border-color: $color-black;
+//  }
+//
+//  //contact
+//  #indexedDom .modal-footer .btn.close{
+//    opacity: .85;
+//    color: $color-black;
+//  }
+//
+//  //left-siderbar
+//  #sidebar{
+//    background: $color-black;
+//  }
+//  #sidebar > div nav > ul li a i[class*="ti-"] {
+//    color: $color-black;
+//  }
+//  #sidebar > div nav > ul > li.active {
+//    background: $color-black;
+//  }
+//  #sidebar > div nav > ul > li.active:hover {
+//    background: $color-black;
+//  }
+//  .app-sidebar-closed >#sidebar > div nav > ul > li.active > a i {
+//    color: $color-black;
+//  }
+//  #sidebar nav > ul .sub-menu > li.active > a {
+//    background: $color-black;
+//  }
+//  .no-touch #sidebar > div nav > ul.sub-menu li:hover{
+//    background: $top-background-black;
+//  }
+//  #sidebar > div nav > ul {
+//    background: $top-background-black;
+//    border-top: 1px solid #c8c7cc;
+//    border-bottom: 1px solid #c8c7cc;
+//  }
+//
+//  //nav-header
+//  .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+//    background-color: $color-black;
+//  }
+//  #sidebar nav > ul .sub-menu > li.active > a {
+//    background: $color-black;
+//  }
+//  .navbar {
+//    .nav {
+//      & > li {
+//        &.open > a {
+//          background: $color-black;
+//        }
+//        & > a {
+//          color: $color-black;
+//        }
+//        &:not(.open) > a:hover {
+//          color: $color-black;
+//        }
+//      }
+//      &.navbar-right {
+//
+//        & > li {
+//          & > a {
+//            color: $color-black;
+//          }
+//          &.open > a {
+//            color: $color-black;
+//          }
+//          &.current-user {
+//            & > a {
+//              & > div {
+//                span:first-child {
+//                  color: $color-black;
+//                }
+//              }
+//            }
+//          }
+//        }
+//      }
+//    }
+//    .navbar-collapse {
+//      .nav {
+//        & > li {
+//          &.open > a{
+//            background: $color-black;
+//          }
+//          & > a {
+//            color: $color-black;
+//          }
+//          &:not(.open) > a:hover{
+//            color: $color-black;
+//          }
+//        }
+//        &.navbar-right {
+//          & > li {
+//            & > a {
+//              color: $color-black;
+//            }
+//            &.open > a {
+//              color: $color-black;
+//            }
+//            &.current-user {
+//              & > a {
+//                & > div {
+//                  span:first-child {
+//                    color: $color-black;
+//                    font-size: $font-size-black-max;
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        }
+//        .dropdown {
+//          //line-height: 49px;
+//          //height: 49px;
+//          border-right: solid 1px #f1f1f1;
+//          transition: background-color 0.3s ease;
+//          cursor: pointer;
+//
+//          .close {
+//            font-size: $font-size-black-min;
+//            position: absolute;
+//            color: #f00;
+//            display: none;
+//            top: -23px;
+//            right: -25px;
+//            font-weight: bold;
+//            transform: scale(0.9) rotate(45deg);
+//            padding: 31px 17px 2px 17px;
+//            background-color: rgba(200, 200, 200, 0.2);
+//            opacity: 1;
+//          }
+//
+//          &:hover .close {
+//            display: inline-block;
+//          }
+//
+//          .pull-right {
+//            padding: 0;
+//          }
+//
+//          &:last-child {
+//            border-left: $border-black;
+//          }
+//        }
+//
+//      }
+//
+//      .top-navbar-menu {
+//        position: relative;
+//        width: calc(100% - 215px);
+//
+//        @media (min-width: 768px) {
+//          .page-tabs-content > li {
+//            //float: left;
+//            display: inline-block;
+//          }
+//        }
+//        @media (max-width: 767px) {
+//          .navbar .page-tabs-content > li {
+//            border-bottom: 1px solid #c8c7cc;
+//          }
+//          .navbar .page-tabs-content > li:last-child {
+//            margin-bottom: 40px;
+//          }
+//        }
+//
+//        .page-tabs{
+//          overflow: scroll;
+//          width: 100%;
+//
+//          &::-webkit-scrollbar{
+//            height: 0;
+//            width: 0;
+//          }
+//
+//          .page-tabs-content{
+//            white-space: nowrap;
+//            float: left;
+//            padding-right: 20px;
+//          }
+//        }
+//
+//        &.hover:hover .tab-ctl-btn{
+//          opacity: 1;
+//        }
+//
+//        .tab-ctl-btn{
+//          height: 50px;
+//          line-height: 50px;
+//          padding: 0 3px;
+//          top: 0;
+//          font-size: 22px;
+//          z-index: 1;
+//          position: absolute;
+//          background-color: rgba(180, 180, 180, 0.6);
+//          opacity: 0;
+//          transition: opacity 0.3s ease;
+//          color: #fff;
+//          &.J_tabLeft{
+//            left: 0;
+//          }
+//          &.J_tabRight{
+//            right: 0;
+//          }
+//        }
+//      }
+//    }
+//  }
+//  .navbar .navbar-right .dropdown-menu.dropdown-messages .drop-down-wrapper ul > li.view-all a{
+//    color: $color-black;
+//  }
+//  .navbar .navbar-right .dropdown-menu.dropdown-messages .drop-down-wrapper ul > li a .preview {
+//    color: $color-black;
+//  }
+//  .navbar .navbar-right .dropdown-menu.dropdown-messages .drop-down-wrapper ul > li.defaultContent a .preview{
+//    color: $color-black;
+//  }
+//  .dropdown-menu.dropdown-light li a {
+//    color: $color-black;
+//  }
+//  #app{
+//    .navbar-collapse{
+//      background: $top-background-black;
+//    }
+//    .navbar-header{
+//      background: $top-background-black;
+//    }
+//  }
+//
+//
+//  //about blueware
+//  .button-o {
+//    border: 1px solid $color-black;
+//    color: $color-black;
+//  }
+//  a {
+//    color: #8e8e93;
+//  }
+//  a:hover, a:focus, a:active {
+//    color: #8e8e93;
+//  }
+//
+//  //icon
+//  .fa{
+//    color: $color-black;
+//  }
+//
+//  //conditionQry
+//  .nav-tabs > li.active a, .nav-tabs > li.active a:hover, .nav-tabs > li.active a:focus {
+//    border-bottom: 2px solid $color-black;
+//    color: $color-black;
+//  }
+//
+//
+//
+//
+//}

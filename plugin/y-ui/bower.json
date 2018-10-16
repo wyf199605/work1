@@ -1,0 +1,20 @@
+{
+  "name": "y-ui",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "yrh"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}

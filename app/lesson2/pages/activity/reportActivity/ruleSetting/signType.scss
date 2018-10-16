@@ -1,0 +1,82 @@
+.sign-type-wrapper.lesson-form-group{
+  align-items: flex-start !important;
+  height: auto !important;
+  .radio-group.sign-type-radio {
+    flex-direction: column;
+    width: calc(100% - 102px);
+    .face,.qrcode{
+      display: flex;
+      width: 100%;
+      align-items: flex-start;
+      &>.radio-wrapper{
+        width: 110px;
+      }
+      .group-oriented-radio{
+        display: flex;
+        width: calc(100% - 110px);
+        .check-title{
+          width: 60px !important;
+          margin-right: 8px !important;
+        }
+        .radio-group,.selectMap{
+          flex-direction: column;
+          width:calc(100% - 60px);
+          align-items: flex-start;
+          .radio-wrapper{
+            margin-bottom: 20px;
+            width: auto !important;
+            margin-right: 8px;
+          }
+        }
+        .selectMap{
+          display: flex;
+          flex-direction: row;
+        }
+        //.selectMap.nowSelect{
+        //  .position-setting{
+        //    display: flex;
+        //    flex-direction: row;
+        //    align-items: center;
+        //    &>span{
+        //      margin: 0 8px;
+        //    }
+        //  }
+        //}
+        .position-setting{
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 20px;
+          margin-top: -14px;
+          .select-pos{
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            &>span{
+              margin: 0 8px;
+            }
+          }
+          .addBtn{
+            width: 46px !important;
+          }
+          .text-input{
+            width: 100px !important;
+          }
+        }
+      }
+      .text-input{
+        width: 200px !important;
+        input:focus{
+          outline: none;
+        }
+      }
+    }
+    .qrcode{
+      align-items: center;
+    }
+  }
+}
+ul.list.sign-type-drop{
+  width: 200px;
+  min-width: 200px;
+  text-align: left;
+}

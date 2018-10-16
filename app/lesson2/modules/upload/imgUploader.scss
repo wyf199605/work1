@@ -1,0 +1,92 @@
+.img-uploader-wrapper {
+  .btn-wrapper {
+    position: relative;
+
+    .uploader-wrapper {
+      color: #33484f;
+      margin-right: 10px;
+      height: 40px;
+      padding: 0 7px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      border: solid 1px #d8e3e9;
+    }
+    .uploader-tip {
+      display: inline-block;
+      color: #91a8b0;
+    }
+  }
+
+  .pictures-wrapper{
+    margin-right: -20px;
+    .pic-item{
+      width: 181px;
+      height: 181px;
+      margin-top: 20px;
+      margin-right: 20px;
+      border: solid 1px #d8e3e9;
+      display: inline-block;
+      position: relative;
+      .pic{
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        img{
+          height: 100%;
+        }
+      }
+
+      .pic-close{
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        color: #333;
+        background: #fff;
+        border: 1px solid #d8e3e9;
+        border-radius: 10px;
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        cursor: pointer;
+      }
+      .pic-close:hover{
+        background-color: #d8e3e9;
+        color: #fff;
+      }
+    }
+  }
+}
+
+.picture-modal-body{
+  position: relative;
+  .arrow{
+    display: block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    color: #fff;
+    background: #000;
+    opacity: .2;
+    cursor: pointer;
+    .sec{
+      font-size: 30px;
+    }
+
+    &:hover{
+      opacity: .4;
+    }
+  }
+  .arrow-left{
+    left: 40px;
+  }
+  .arrow-right{
+    right: 40px;
+  }
+}

@@ -1,0 +1,55 @@
+.productScript{
+    padding-top: 30px;
+    width: 100%;
+    .buttons{
+        width: 50%;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        //.btn:active:focus, .btn:focus{
+        //    outline: none;
+        //}
+
+        button{
+            height: 62px;
+            width: 188px;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 24px;
+            span{
+                margin-left: 10px;
+            }
+        }
+        .save{
+            background-color: #37ba9d;
+            padding-bottom: 4px;
+            i{
+                font-size: 30px;
+                position: relative;
+                top: 1px;
+            }
+        }
+        .save.btn.button-type-default{
+            border-color: #37ba9d;
+        }
+        .save.btn.button-type-default:hover{
+            color: #ffffff;
+        }
+        .preview{
+            background-color: #ffc059;
+            padding-bottom: 8px;
+            i{
+                font-size: 40px;
+                position: relative;
+                top: 4px;
+            }
+        }
+        .preview.btn.button-type-default{
+            border-color: #ffc059;
+        }
+        .preview.btn.button-type-default:hover{
+            color: #ffffff;
+        }
+    }
+}

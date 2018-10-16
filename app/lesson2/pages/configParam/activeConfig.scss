@@ -1,0 +1,25 @@
+.config-param-page{
+  .credit-setting{
+    display: flex;
+    align-items: center;
+    height: 112px;
+    .line{
+      height: 72px;
+      width: 15px;
+      border: 1px solid #d8e3e9;
+      border-right: none;
+      margin-right: 4px;
+    }
+  }
+  .credit-content .base-manager-input{
+    margin-right: 10px;
+  }
+
+  .credit-content{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+}

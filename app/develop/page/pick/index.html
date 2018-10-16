@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>蓝鲸后台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no,
+        viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="//at.alicdn.com/t/font_604786_4pbkou6z62c8r529.css" rel="stylesheet" type="text/css"/>
+    <link href="../../img/favicon.ico" rel="shortcut icon"/>
+    <link href="../../plugin/mui/css/mui.min.css" rel="stylesheet">
+    <!-- Font -->
+    <link href="../../font/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="../../font/themify-icons/css/themify-icons.css" rel="stylesheet"/>
+    <link href="//at.alicdn.com/t/font_177085_93dxgpx8y5m3rf6r.css" rel="stylesheet" type="text/css">
+
+    <link href="../global.mb.css" rel="stylesheet">
+    <link href="../blue-whale/css/app.mb.css" rel="stylesheet">
+</head>
+<body class="indexedPage">
+<header class="mui-bar mui-bar-nav">
+    <a class="sys-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+    <h1 class="mui-title">用户名</h1>
+    <a id="done" class="mui-btn mui-btn-link mui-pull-right mui-btn-blue mui-disabled">完成</a>
+</header>
+
+<div id="list" class="mui-content mui-scroll-wrapper">
+    <div class="mui-scroll">
+        <div class="search-input mui-input-row ${table.queryModule ? '' : 'hide'}">
+            <label><span class="mui-icon mui-icon-search grey"></span></label>
+            <input id="searchInput" type="text" placeholder="工号、姓名、电话、城市、地址、岗位" class="mui-input-clear mui-input"
+                   autocapitalize="off" autocorrect="off">
+        </div>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell" style="text-align: center">
+                <span class="mui-spinner" style="vertical-align: bottom;"></span>
+            </li>
+        </ul>
+    </div>
+</div>
+<script type="text/html" id="leaf">
+    <li class="mui-table-view-cell mui-indexed-list-item mui-checkbox mui-left">
+        <input type="checkbox" value="{{from}}" data-value="{{valueJson,1}}"/>
+        <span class="text">{{name}}</span>
+    </li>
+</script>
+<script type="text/html" id="notLeaf">
+    <li class="mui-table-view-cell mui-collapse">
+        <a data-level="{{level}}" data-query="{{query}}" data-id="{{id}}" class="mui-navigate-right notLoad" href="#">{{name}}</a>
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell" style="text-align: center">
+                <span class="mui-spinner" style="vertical-align: bottom;"></span>
+            </li>
+        </ul>
+    </li>
+</script>
+<script src="../../plugin/mui/js/mui.min.js"></script>
+<script>
+(function(){
+    if(!('Promise' in window)) {
+        document.write('\<script src="../../plugin/es6-promise-master/dist/es6-promise.min.js"\>\<\/script\>');
+        document.write('\<script\>var Promise = ES6Promise;\<\/script\>');
+    }
+})();
+</script>
+<script src="../../plugin/jquery/jquery-3.2.1.min.js"></script>
+<script src="../../plugin/requirejs/require.js"></script>
+<script src="../../plugin/gesture/gesture.js"></script>
+<script>
+    var __extends = (this && this.__extends) || (function () {
+        var extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    var Tools = {
+        event : {
+            fire : function () {
+                G.tools.event.fire.apply(null, arguments);
+            }
+        }
+    };
+</script>
+<script src="../global.js"></script>
+<script src="../blue-whale/bw.js"></script>
+<script src="../blue-whale/require.config.js"></script>
+<script>__setRequireBaseUrl('../../dist/');</script>
+<script>
+// BW.__initSys('mb');
+BW.CONF.init('http://bwd.fastlion.cn:7776/sf', '', '', '');
+(typeof mui !== 'undefined') && mui.init({
+    gestureConfig: {
+        tap: true, //默认为true
+        //            doubletap: true, //默认为false
+        longtap: true, //默认为false
+        swipe: true, //默认为true
+        drag: true ////默认为false
+    }
+});
+
+</script>
+<script>
+    require(['contactsPage'], function (contactsPage) {
+        let elements = localStorage.getItem('authority_search_elements');
+        elements = elements ? JSON.parse(elements) : null;
+        elements && new contactsPage({
+            levelField : elements.levelField,
+            treeField : elements.treeField,
+            fromField : elements.fromField,
+            multValue : elements.multiValue,
+            otherField: elements.otherField,
+            recursion : elements.recursion,
+            dom : document.querySelector('.indexedPage'),
+            dataAddr: elements.dataAddr
+        });
+    });
+</script>
+</body>
+
+</html>

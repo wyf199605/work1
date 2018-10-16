@@ -1,0 +1,132 @@
+.modal-cashier{
+  padding: 0 20px 0 20px!important;
+  border-radius: 8px;
+  .modal-header{
+    .modal-title{
+      padding-left: 0;
+    }
+  }
+  .menu{
+    margin-top: -2px;
+  }
+  .menu-bar{
+    margin-top: 6px;
+    border-top: none;
+    th,td{
+      font-size: 16px;
+    }
+    tbody{
+      margin-bottom: 6px;
+      tr{
+        td{
+          padding: 3px 4px!important;
+        }
+      }
+    }
+  }
+}
+.cashier-body{
+  position: relative;
+  max-height: 70vh!important;
+  min-width: 170px!important;
+  overflow-y: unset;
+  overflow-x: hidden;
+  .inputBox {
+    background: #ccc;
+    border-radius: 4px;
+    line-height: 20px;
+    color: black;
+    margin: 15px 0 15px 0;
+    text-align: center;
+    height: 40px;
+    padding: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    border-top: 1px solid #e5e5e5;
+  }
+  .has-table{
+    max-height: 70vh;
+    overflow-y: auto;
+    width: auto;
+  }
+  .sale-bill{
+    min-height: 35px;
+    .bill-content{
+      font-size: 16px;
+      padding: 6px 0;
+      max-width: 250px;
+      word-break: break-all;
+    }
+  }
+  .padding-30{
+    text-align: center;
+    font-size: 16px;
+  }
+  .cashier-caption{
+    border-bottom: 1px solid #e5e5e5;
+    padding: 7px 0;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .padding-2{
+    padding: 2px 0;
+  }
+  .swipe{
+    display: inline-block;
+    padding: 7px 15px;
+  }
+  .table-container{
+    border-bottom: 1px solid #e5e5e5;
+  }
+  >.inputBox{
+    border-top: none;
+  }
+}
+.modal-wrapper.width-500{
+  min-width: 580px!important;
+  padding: 0 3px 35px 3px!important;
+  .modal-body.cashier-body{
+    padding: 0 7px 0 7px!important;
+  }
+  .head-wrapper{
+    width: calc(100% - 40px);
+    margin-left: 20px;
+  }
+  .has-table{
+    border: .5px solid #EEEEEE;
+    border-radius: 4px;
+  }
+}
+.modal-wrapper{
+  min-width: 0!important;
+  outline: none;
+}
+.has-table{
+  min-width: 0!important;
+}
+.head-wrapper{
+    .close{
+      display: none;
+    }
+}
+.menu-value{
+  .table-container{
+    th{
+      padding: 10px;
+      font-size: 18px;
+    }
+    td{
+      padding: 7px 16px;
+      font-size: 18px;
+    }
+  }
+}
+.menu-value.modal-body{
+  width: 500px;
+  font-size: 16px;
+  .has-table{
+    border: 1px solid #ccc;
+    margin-top: -2px;
+    border-radius: 4px;
+  }
+}

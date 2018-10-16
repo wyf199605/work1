@@ -1,0 +1,115 @@
+.school-year-module {
+  width: 100%;
+  .title.school-year-title {
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    .text-input {
+      width: 90px;
+      height: 30px;
+      background-color: #ffffff;
+      border-radius: 3px;
+      border: solid 1px #d8e3e9;
+      margin-left: 15px;
+      input {
+        color: #91a8b0;
+        height: 29px;
+      }
+      a {
+        color: #91a8b0;
+        height: 28px;
+        position: relative;
+        &::before{
+          position: absolute;
+          top: 0;
+          right: 4px;
+          line-height: 26px;
+        }
+      }
+      input:focus {
+        outline: none;
+      }
+    }
+  }
+  .school-year-items {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 20px 0 0 0;
+    .school-year-item:hover{
+      i.sec {
+        font-size: 45px !important;
+      }
+    }
+    .school-year-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+      width: 33.33%;
+      height: 104px;
+      border-radius: 5px;
+      overflow: hidden;
+      color: #ffffff;
+      a{
+        height: 100%;
+        width: 100%;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      &:nth-child(2) {
+        margin: 0 20px;
+      }
+      .right-icon {
+        width: 36%;
+        height: 100%;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        i.sec {
+          transition: font-size linear 0.1s;
+          font-size: 50px;
+        }
+      }
+      .number {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 64%;
+        height: 100%;
+        .num-bold {
+          font-size: 24px;
+          font-weight: bold;
+          margin-top: 20px;
+        }
+      }
+    }
+  }
+  .student .number {
+    background-color: #41ccba;
+  }
+  .student .right-icon {
+    background-color: #40baad;
+  }
+  .lesson .number {
+    background-color: #65b3f0;
+  }
+  .lesson .right-icon {
+    background-color: #5da9e4;
+  }
+  .ctr .number {
+    background-color: #f5956c;
+  }
+  .ctr .right-icon {
+    background-color: #ef895e;
+  }
+}
+
+ul.list.selectYear {
+  width: 90px;
+  min-width: 0;
+  text-align: left;
+}

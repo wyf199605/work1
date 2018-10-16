@@ -1,0 +1,149 @@
+#app .app-content .page-container.table-page {
+  height: calc(100vh - 40px);
+  overflow: hidden;
+
+  & > .tablePage {
+    height: calc(100% - 24px);
+  }
+}
+
+.tablePage{
+  .aggr-wrapper {
+    background-color: #FAFBFC;
+    padding: 0 8px;
+    height: 20px;
+    font-size: 12px;
+    line-height: 20px;
+    width: 100%;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  &.has-subTable{
+    height: calc(100% - 24px);
+
+    .table-module-wrapper{
+
+      overflow-y: scroll;
+      overflow-x: hidden;
+      &::-webkit-scrollbar{
+        display: none;
+      }
+      &::-webkit-scrollbar-thumb{
+
+      }
+
+      &.main-table {
+        height: 70%;
+
+      }
+
+      &.sub-table{
+        height: 30%;
+        border-top:1px #ffe33e solid;
+        .mobileTableWrapper {
+          margin-top: 0;
+        }
+      }
+    }
+  }
+
+
+  .nav-tabs > li.active a, .nav-tabs > li.active a:hover, .nav-tabs > li.active a:focus{
+    box-shadow:none;
+  }
+  .container-fluid{
+    overflow: auto;
+    padding-top: 24px;
+  }
+  .nodata{
+    height: 300px;
+    text-align: center;
+  }
+  .nodata .iconfont{
+    font-size: 200px;
+  }
+  .topBtns  .btn{
+    //padding: 0 6px;
+    //height: 28px;
+    //line-height: 28px;
+  }
+  .modal-loading{
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 180px;
+    text-align: center;
+  }
+  /*.modal-loading .spinner{
+    height: 50px;
+    width: 50px;
+  }*/
+  .lmodal-oading .loadTitle{
+    top: -17px;
+    font-size: 25px;
+  }
+  .is-fullscreen {
+    height: 100%!important;
+  }
+  .btnsLeft{
+    padding-right: 10px;
+    padding-left: 1px;
+  }
+  .btnsRight{
+    float: right;
+    right: 26px;
+    padding-right: 4px;
+    padding-left: 10px;
+  }
+  //.dropdown-menu{
+  //  right: 0;
+  //  left: inherit;
+  //  min-width: 0;
+  //  padding-right: 5px;
+  //}
+  //.dropdown-menu>li>a{
+  //  padding: 3px 10px;
+  //}
+  //.open>.dropdown-toggle.btn-default {
+  //  border:1px solid #007AFF;
+  //}
+  //.dropdown-toggle.btn{
+  //  width: 26px;
+  //  height: 24px;
+  //}
+  .caret{
+    position: absolute;
+    top:12px;
+    left: 8px;
+  }
+
+
+
+}
+
+.modal-wrapper.search-replace{
+  .modal-header{
+    height: 36px;
+    h1{
+      line-height: 36px;
+    }
+  }
+
+  .replace{
+    .rows > div[class^='col-']{
+      padding-left: 0;
+    }
+  }
+
+  [data-input] {
+    margin-bottom: 10px;
+    .text-input {
+      border-bottom: 1px solid $grey;
+      input {
+        height: 24px;
+      }
+    }
+  }
+
+
+}

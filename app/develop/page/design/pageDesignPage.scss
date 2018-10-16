@@ -1,0 +1,55 @@
+.pageDesign{
+  .conditions{
+    padding: 20px 10px 5px 10px;
+    font-size: 14px;
+    .textInputModule,.dropDownModule{
+      float: left;
+      width: 24%;
+      input:focus{
+        outline: none;
+        outline-offset: 0;
+      }
+      label{
+        width: 80px;
+        text-align: left;
+        font-weight: normal;
+        color: #3a3a3a;
+      }
+    }
+    .textInputContent{
+      border: 1px solid #e2e2e2;
+      width: 140px;
+      height: 36px;
+      border-radius: 3px;
+    }
+    .dropDownContainer{
+      width: 140px;
+      height: 36px;
+      background-color: #ffffff;
+      border-radius: 3px;
+      border: solid 1px #e2e2e2;
+    }
+  }
+  .buttons{
+    padding-left: 10px;
+    button{
+      margin-right: 20px;
+      background-color: #f2f2f2;
+      border-radius: 3px;
+      border: solid 1px #e2e2e2;
+      height: 30px;
+    }
+  }
+  .table{
+    height: calc(100% - 120px);
+    margin-bottom: 0;
+    position: absolute;
+    .fast-table-container{
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: calc(100% - 20px);
+      min-width: calc(100% - 20px);
+    }
+  }
+}

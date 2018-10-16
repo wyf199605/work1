@@ -1,0 +1,103 @@
+.imgRotationPage{
+  .pswp__bg{
+    background-color: #fcfcfc;
+  }
+  .pswp__button {
+    float: left;
+  }
+
+  .pswp__counter {
+    left: auto;
+    right: 0;
+  }
+  .pswp__preloader{
+    float: left;
+  }
+  .pswp__img--placeholder--blank{
+    background-color: #eee;
+  }
+
+  .mui-input-row.mui-input-range{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    z-index: 2000;
+  }
+  .mui-bar{
+    z-index: 1600;
+    height: 50px;
+    box-shadow: none;
+    padding: 0 5px;
+    background: rgba(0,0,0,0.1);
+  }
+  #headerBar{
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0) 100%);
+  }
+  #headerBar .mui-icon-closeempty{
+    color: white;
+    font-size: 50px;
+    padding: 0;
+    text-shadow: 0 0 3px #666;
+  }
+  #headerBar .mui-title{
+    color: #666;
+    line-height: 50px;
+    font-size: 12px;
+    padding-left: 10px;
+    overflow-x: scroll;
+    text-overflow: clip;
+  }
+  #footerBar{
+    overflow: visible;
+    background: -webkit-linear-gradient(bottom, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.1) 0%, rgba(255,255,255,0) 100%);
+  }
+  #footerBar [data-action="download"]{
+    display: none;
+  }
+  #footerBar .mui-input-range{
+    padding: 0;
+    top:10px;
+  }
+  #footerBar .mui-input-range > *{
+    vertical-align: middle;
+  }
+  #footerBar .mui-input-range .pageNum{
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+    color: #666;
+  }
+  #footerBar .mui-input-range input[type=range]{
+    width: calc(100% - 70px);
+  }
+  #footerBar .mui-input-range input[type=range]::-webkit-slider-thumb{
+    background-color: #bbb;
+    border: none;
+    height: 25px;
+    width:25px;
+  }
+  .imgPage{
+    font-size: 14px;
+    color: #666;
+    margin-top: 13px;
+  }
+
+  #footerBar.download > * {
+    float: right;
+  }
+  #footerBar.download [data-action="download"]{
+    display: block;
+    text-align: center;
+    line-height: 31px;
+    font-size: 31px;
+    color: #777;
+  }
+  #footerBar.download .mui-input-row{
+    margin-right: 5px;
+    width: calc(100% - 36px)
+  }
+
+}

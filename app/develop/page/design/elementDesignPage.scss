@@ -1,0 +1,74 @@
+.elementManagerment{
+  .buttons{
+    padding: 0px 10px;
+    button{
+      margin-right: 20px;
+      background-color: #f2f2f2;
+      border-radius: 3px;
+      border: solid 1px #e2e2e2;
+      height: 30px;
+    }
+  }
+  .table{
+    height: calc(100% - 120px);
+    margin-bottom: 0;
+    position: absolute;
+    .fast-table-container{
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: calc(100% - 20px);
+      min-width: calc(100% - 20px);
+    }
+  }
+  .conditions{
+    padding: 20px 10px 5px 10px;
+    font-size: 14px;
+    .dropDown{
+      float: left;
+      width: 25%;
+      input:focus{
+        outline: none;
+        outline-offset: 0;
+      }
+      label{
+        text-align: left;
+        font-weight: normal;
+        color: #3a3a3a;
+      }
+      .textInputContent{
+        width: 140px;
+        height: 36px;
+        background-color: #ffffff;
+        border-radius: 3px;
+        border: solid 1px #e2e2e2;
+        padding-top: 2px;
+        input:focus{
+          outline: none;
+        }
+      }
+      .dropDownContainer{
+        width: 140px;
+        height: 36px;
+        background-color: #ffffff;
+        border-radius: 3px;
+        border: solid 1px #e2e2e2;
+      }
+    }
+  }
+}
+.element-modal{
+  .modal-body{
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    padding-right: 20px;
+    .form-horizontal .form-group{
+      margin-left: 0 !important;
+      margin-bottom: 5px !important;
+    }
+    option{
+      border: none !important;
+      border-right: 1px solid #00b3ee;
+    }
+  }
+}

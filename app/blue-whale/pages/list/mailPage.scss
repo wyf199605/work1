@@ -1,0 +1,31 @@
+.mail-container {
+  height: 100%;
+  position: relative;
+  .mail-wrapper {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    //.mail-modal-wrapper{
+    //  height: 50%;
+    //}
+    //.table-module-wrapper{
+    //  height: 50%!important;
+    //}
+    .modal-mail {
+      .modal-body {
+        padding: 0 !important;
+      }
+    }
+  }
+}
+
+.mail-body {
+  .buttons-wrapper {
+    display: inline-block;
+    &::after {
+      content: "";
+      display: block;
+      clear: both;
+    }
+  }
+}

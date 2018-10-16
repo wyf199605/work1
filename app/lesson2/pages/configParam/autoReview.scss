@@ -1,0 +1,33 @@
+.config-param-page{
+  .auto-review{
+    .tips{
+      padding: 10px 0;
+    }
+    .select{
+      padding: 10px 0;
+    }
+    .line{
+      border-bottom: 1px solid #d8e3e9;
+    }
+    .select-set{
+      margin-bottom: 30px;
+      label:not(:last-of-type){
+        margin-right: 30px;
+      }
+    }
+    .explain{
+      width: 98px;
+      text-align: right;
+      margin-right: 18px;
+    }
+    .flow{
+      display: flex;
+      align-items: center;
+    }
+    .flow~.select-set{
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+  }
+
+}

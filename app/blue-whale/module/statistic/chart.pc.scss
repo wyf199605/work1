@@ -1,0 +1,52 @@
+.echart{
+  .modal-body {
+    overflow-x: hidden;
+    fieldset{
+      padding: 15px 15px;
+      legend{
+        font-size: 13px !important;
+      }
+    }
+  }
+    .EChart_tabFirst{
+      .select-box:not(:first-child){
+        margin-top: 10px;
+      }
+      .select-box{
+        display: block;
+      }
+      .rowClass{
+        .text-input{
+          border: 1px solid #e6e8e8;
+        }
+      }
+      .col-xs-4:nth-child(2){
+        fieldset{
+          height: 243px;
+          padding-bottom: 0px;
+          padding-right: 0px;
+        }
+        .colClass{
+          overflow-y: scroll;
+          overflow-x: hidden;
+          height: 100%;
+          .select-box {
+              margin-left: 0px;
+              margin-top: 5px;
+              width: 115px;
+              overflow: hidden;
+              text-overflow:ellipsis;
+              white-space: nowrap;
+
+          }
+        }
+      }
+    }
+  }
+
+.tempModal{
+  .modal-body{
+    overflow: visible;
+  }
+  overflow: visible;
+}

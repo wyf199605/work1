@@ -1,0 +1,15 @@
+.config-param-page{
+  label[for=yes]{
+    margin-right: 36px;
+  }
+  input[data-name="facerecognition"]{
+    width: 132px;
+  }
+  .rec-face{
+    .select-set {
+      input[type=radio].normal{
+        margin-left: 10px;
+      }
+    }
+  }
+}

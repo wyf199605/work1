@@ -1,0 +1,59 @@
+.myselfPage{
+  .list-group {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .list-group.sep{
+    height: 20px;
+    background-color: #efeff4;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    border-top: 1px solid #c8c7cc;
+  }
+  .list-group.sep:after{
+    left : 0;
+  }
+  .list-group span{
+    vertical-align: middle;
+  }
+  .list-group span.col-content {
+    color: #999;
+    display: inline-block;
+    word-wrap: break-word;
+    white-space: normal;
+    float: right;
+  }
+  .list-group span.col-name{
+    width: 70px;
+    display: inline-block;
+  }
+  .list-group-item>a:not(.mui-btn){
+    white-space: inherit;
+  }
+  .l-wrapper{
+    display: none;
+  }
+  body {
+    padding-top: 20px;
+  }
+  .navbar-text{
+    text-align: center;
+    float: none;
+    color: #999;
+    margin: 0;
+    padding-top: 14px;
+    font-size: 16px;
+  }
+  #returnBtn{
+    position: absolute;
+    font-size: 20px;
+    padding:10px 0px 0px 10px;
+  }
+  .navbar{
+    min-height: 20px;
+    height: 30px;
+  }
+  .list-group-item .col-name{
+    color: #999;
+  }
+}

@@ -1,0 +1,118 @@
+.mainPage {
+  .mui-icon-extra, .mui-icon {
+    color: #929292;
+  }
+
+  .mui-active .mui-icon-extra, .mui-active .mui-icon {
+    color: #007aff;
+  }
+
+  .mui-bar-tab .mui-tab-item .mui-icon-extra ~ .mui-tab-label {
+    font-size: 11px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mui-bar-tab .mui-tab-item .mui-icon-extra {
+    top: 6px;
+    width: 24px;
+    height: 24px;
+    padding-top: 0;
+    padding-bottom: 0;
+    position: relative;
+    font-size: 18px;
+  }
+
+  #pagesContainer {
+    position: fixed;
+    top: 0;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+  }
+  #pagesContainer iframe {
+    border: none;
+  }
+  #pagesContainer.has-spinner {
+    line-height: 100vh;
+  }
+  #pagesContainer .mui-spinner {
+    display: none;
+  }
+  #pagesContainer.has-spinner .mui-spinner {
+    display: inline-block;
+  }
+  .full-height.has-footer-tab {
+    height: calc(100% - 50px);
+    min-height: calc(100% - 25px);
+    text-align: center;
+    width: 100%;
+  }
+}
+.mui-android-4{
+  .full-height.has-footer-tab {
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+}
+
+.big {
+  .homePage .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body,
+  .menuPage .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body,
+  .myselfPage .button-group .button-call button span ,
+  table.mobileTable thead tr th div,
+  table.mobileTable tbody tr td,
+  .mobileTableWrapper.hasIndexCol .indexCol > div, .mobileTableWrapper.hasPseudoCol .pseudoCol > div,
+  .mui-segmented-control{
+    font-size: 16px;
+  }
+  .listPage {
+    span.mui-h5,.mui-table-view-cell p{
+      font-size: 14px;
+    }
+    .mail-title{
+      font-size: 16px;
+    }
+  }
+  .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body{
+    padding-top: 2px;
+    line-height: 18px;
+  }
+}
+
+.super-fontsize {
+  .homePage .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body,
+  .menuPage .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body,
+  .myselfPage .button-group .button-call button span,
+  .mui-segmented-control{
+    font-size: 20px;
+  }
+  .mui-table-view-cell p,
+  table.mobileTable tbody tr td,
+  table.mobileTable thead tr th div,
+  .mobileTableWrapper.hasIndexCol .indexCol > div, .mobileTableWrapper.hasPseudoCol .pseudoCol > div {
+    font-size: 18px;
+  }
+  table.mobileTable tbody tr td{
+    padding: 6px 16px !important;
+  }
+  .listPage {
+    span.mui-h5{
+      font-size: 18px;
+    }
+    .mail-title{
+      font-size: 20px;
+      max-width: calc(100% - 204px);
+      display: inline-block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-all;
+    }
+  }
+  .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body{
+    padding-top: 2px;
+    line-height: 22px;
+  }
+}

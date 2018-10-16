@@ -1,0 +1,57 @@
+.regist-module2 {
+  .binding {
+    color: #33484f;
+    .explain {
+      font-size: 16px;
+    }
+    .radio-group {
+      display: flex;
+      align-items: center;
+      margin-top: 30px;
+      .radio-wrapper {
+        width: 50%;
+        display: flex;
+        align-items: center;
+        input {
+          outline: none;
+          -webkit-appearance: none;
+        }
+        input[type=radio].radio-normal {
+          display: block;
+          width: 16px;
+          height: 16px;
+          background-color: #ffffff;
+          border: solid 1px #e2e2e2 !important;
+          border-radius: 50%;
+          padding: 0;
+          position: relative;
+          margin: 0;
+          margin-right: 12px;
+        }
+        input[type=radio]:checked {
+          border: solid 1px #0099ff !important;
+        }
+        input[type=radio]:checked::after {
+          position: absolute;
+          top: 3px;
+          left: 3px;
+          content: '';
+          display: block;
+          width: 8px;
+          height: 8px;
+          background-color: #0099ff;
+          border-radius: 50%;
+        }
+        label {
+          font-size: 14px;
+          color: #33484f;
+          font-weight: normal;
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+  .hide{
+    display: none;
+  }
+}

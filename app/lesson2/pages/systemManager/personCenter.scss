@@ -1,0 +1,76 @@
+.system-manager-page{
+  input:focus {
+    outline: none;
+    border-color: #0099ff;
+    box-shadow: 0 0 10px #9ecaed;
+  }
+  .base-system-input,[data-name="jobtitle"]{
+    width: 220px;
+    height: 40px;
+    border-radius: 5px;
+    margin-left: 3px;
+    border: solid 1px #d8e3e9;
+    padding: 0 8px;
+    &:disabled{
+      background-color: #f2f2f2;
+    }
+  }
+  .sys-disabled{
+    pointer-events: none !important;
+    opacity: .8;
+    background: #f2f2f2;
+  }
+  [data-name="research"]{
+    width: 220px;
+    background-color: #fff;
+    border: 1px solid #e3e3e3;
+    padding: 15px 8px 16px;
+    color: #666;
+    margin-left: 2px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-size: 14px;
+    &:focus{
+      outline: 0;
+      border-color: #0099ff;
+      box-shadow: 0 0 10px #9ecaed;
+    }
+  }
+  [data-name="jobtitle"]{
+    display: inline-block;
+    background-color: white;
+    padding: 0;
+    input{
+      border: none;
+      box-shadow: none;
+      height: 40px;
+    }
+    a:before{
+      position: absolute;
+      right: 0;
+    }
+  }
+  .save{
+    background-color: #0099ff;
+    color: #ffffff;
+    width: 135px;
+    margin-left: 73px;
+    height: 40px;
+    padding: 0;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 40px;
+  }
+  .sys-item-group{
+    display: block;
+    align-items: center;
+    margin-bottom: 30px;
+    .sys-title{
+      width: 70px;
+      text-align: right;
+      display: inline-block;
+      float: left;
+      margin-top: 10px;
+    }
+  }
+}

@@ -1,0 +1,32 @@
+.overviewItems{
+    width: 100%;
+    overflow: hidden;
+    &>.overviewItem{
+        overflow: hidden;
+        width: 33.33%;
+        float: left;
+        margin-bottom: 20px;
+        font-size: 14px;
+        label{
+            text-align: right;
+            font-weight: normal;
+            min-width: 100px !important;
+        }
+        .textInputContent,.dropDownContainer{
+            width: 140px;
+            height: 36px;
+            border-radius: 3px;
+            border: solid 1px #e2e2e2;
+        }
+        input{
+            height: 34px;
+        }
+        input:focus{
+            outline: none;
+        }
+        .checkboxContent{
+            padding-top: 6px;
+            margin-left: 6px;
+        }
+    }
+}

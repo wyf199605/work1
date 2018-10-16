@@ -1,0 +1,205 @@
+//@import "../helpers/parameters";
+$font-size-min: 12px;
+$font-size-default: 13px;
+$color-default: #007AFF;
+/*----------------------checkbox1------------------*/
+.checkbox-custom{
+  padding-left: 20px;
+  position: relative;
+  display: block;
+  //margin-top: 10px;
+  margin-bottom: 10px;
+}
+.checkbox-custom input[type=checkbox] {
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  opacity: 0;
+  position: absolute;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: -20px;
+}
+.checkbox-custom label:empty {
+  padding-left: 0;
+}
+.checkbox-custom label {
+  position: relative;
+  display: inline-block;
+  padding-left: 10px;
+  vertical-align: middle;
+  min-height: 22px;
+  margin-bottom: 0;
+  font-weight: 300;
+  cursor: pointer;
+}
+.checkbox-default input[type=checkbox]:checked+label::before {
+  background-color: #fff;
+  border-color: #e0e0e0;
+  border-width: 1px;
+  -webkit-transition: all .3s ease-in-out 0s;
+  -o-transition: all .3s ease-in-out 0s;
+  transition: all .3s ease-in-out 0s;
+}
+.checkbox-custom label::before {
+  position: absolute;
+  left: 0;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-left: -20px;
+  content: "";
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  -webkit-transition: all .3s ease-in-out 0s;
+  -o-transition: all .3s ease-in-out 0s;
+  transition: all .3s ease-in-out 0s;
+}
+.checkbox-custom label::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  padding-top: 1px;
+  margin-left: -20px;
+  font-size: $font-size-min;
+  line-height: 20px;
+  color: #757575;
+  text-align: center;
+}
+.checkbox-custom input[type=checkbox]:checked+label::after {
+  font-family: "FontAwesome";
+  content: "\f00c";
+  color: #3f51b5;
+}
+.checkbox-custom input[type=checkbox]:focus{
+  border-color: #3f51b5;
+}
+.checkbox-custom input[type=checkbox]:focus+label::before {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px
+}
+
+
+/*----------------------checkbox2------------------*/
+.clip-check {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  padding-left: 0;
+}
+.clip-check label {
+  cursor: pointer;
+  display: inline-block;
+  font-size: $font-size-default;
+  margin-right: 15px;
+  padding-left: 30px !important;
+  position: relative;
+  line-height: 23px;
+  transition: border 0.2s linear 0s, color 0.2s linear 0s;
+  white-space: nowrap;
+  width: 100%;
+}
+.clip-check label:before {
+  background-color: #ffffff;
+  border: 1px solid #c8c7cc;
+  content: "";
+  display: inline-block;
+  height: 20px;
+  left: 0;
+  margin-right: 10px;
+  position: absolute;
+  width: 20px;
+  border-radius: 0;
+  top: 1px;
+  transition: border 0.2s linear 0s, color 0.2s linear 0s;
+}
+.clip-check label:after {
+  display: inline-block;
+  font-size: 11px;
+  height: 19px;
+  left: 4px;
+  position: absolute;
+  top: -1px;
+  transition: border 0.2s linear 0s, color 0.2s linear 0s;
+  width: 19px;
+}
+.clip-check input[type="checkbox"] {
+  display: none;
+}
+.clip-check input[type="checkbox"]:checked + label:before {
+  border-width: 10px;
+}
+.clip-check input[type="checkbox"]:checked + label:after {
+  color: #fff;
+  content: "\f00c";
+  font-family: "FontAwesome";
+}
+.clip-check input[type="checkbox"][disabled] + label {
+  opacity: 0.65;
+}
+.clip-check input[type="checkbox"][disabled] + label:before {
+  background-color: #F8F8F8;
+}
+.clip-radio {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  padding-left: 0;
+}
+.clip-radio label {
+  cursor: pointer;
+  display: inline-block;
+  font-size: 13px;
+  margin-right: 15px;
+  padding-left: 25px !important;
+  position: relative;
+  margin-bottom: 6px;
+  line-height: 23px;
+}
+.clip-radio label:before {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  content: "";
+  display: inline-block;
+  height: 20px;
+  left: 0;
+  margin-right: 10px;
+  position: absolute;
+  width: 20px;
+  border-radius: 99px;
+  bottom: 2px;
+  transition: all 0.3s cubic-bezier(0.455, 0.03, 0.215, 1.33) 0s;
+}
+.clip-radio label:after {
+  border: 1px solid #c8c7cc;
+  content: "";
+  display: inline-block;
+  height: 20px;
+  left: 0;
+  margin-right: 10px;
+  position: absolute;
+  width: 20px;
+  border-radius: 99px;
+  bottom: 2px;
+  transition: all 0.3s cubic-bezier(0.455, 0.03, 0.215, 1.33) 0s;
+}
+.clip-radio input[type="radio"] {
+  display: none;
+}
+.clip-radio input[type="radio"]:checked + label:before {
+  border-width: 6px;
+  background: #F8F8F8;
+  border-color: #ffffff;
+}
+.clip-radio input[type="radio"][disabled] + label {
+  opacity: 0.65;
+}
+.clip-radio.radio-primary input[type="radio"]:checked + label:before {
+  background: $color-default;
+}
+.clip-check.check-primary input[type="checkbox"]:checked + label:before {
+  border-color: $color-default;
+}

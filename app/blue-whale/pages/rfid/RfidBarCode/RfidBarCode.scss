@@ -1,0 +1,115 @@
+
+
+.tablePage{
+
+  .rfid-bar-code{
+    .modal-body{
+      background-color: #FFFFFF;
+    }
+  }
+}
+
+.rfidBarCode-page{
+  padding-bottom: 35px;
+  .rfid-barCode-body {
+    margin: 10px;
+
+    .rfid-barCode-title {
+      font-size: 22px;
+      margin: 8.88px 0;
+      span {
+        margin-right: 8.888px;
+      }
+
+    }
+    .rfid-barCode-inventory {
+      font-size: 19.999px;
+      border-bottom: 1px solid #cccc;
+      padding-bottom: 6.666px;
+    }
+    .rfid-shelf-number{
+      text-align: center;
+    }
+    .rfid-barCode-content {
+      display: flex;
+      flex-wrap: nowrap;
+      .rfid-barCode-right {
+        width: 33%;
+        text-align: center;
+      }
+      .rfid-barCode-left {
+        width: 33%;
+        text-align: center;
+      }
+      .rfid-barCode-center {
+        width: 33%;
+        text-align: center;
+        i{
+          font-size: 58px;
+          line-height: 1.5;
+        }
+      }
+      //.shelf-number {
+      //  margin-bottom: 7px;
+      //  i{
+      //    color: #4682b4;
+      //    margin-right: 6.66px;
+      //  }
+      //}
+      //.bar-code {
+      //  margin-bottom: 7px;
+      //  i{
+      //    color: #4682b4;
+      //    margin-right: 6.66px;
+      //  }
+      //}
+      //.describe {
+      //  height: 66.66px;
+      //  border-bottom: 1px solid #ccc;
+      //}
+    }
+    .rifd-bar-code-describe{
+      text-align: center;
+      border-bottom: 1px solid #cccc;
+    }
+
+    .rfid-barCode-nums {
+      margin-top: 7.777px;
+      .rfid-barCode-set {
+        display: flex;
+        .set-row{
+          width: 50%;
+          text-align: center;
+        }
+      }
+    }
+    .total-nums {
+      margin-bottom: 7.77px;
+      border-bottom: 1px solid #ccc;
+      padding: 3px;
+    }
+    .total-rfid{
+      display: flex;
+      justify-content: space-around;
+    }
+  }
+  .rfid-barCode-footer{
+    height: 40px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-bottom: 3px;
+    border-top: 1px solid #cccccc;
+    div{
+      height: 100%;
+      overflow-y: hidden;
+      white-space: nowrap;
+      margin-bottom: 5px;
+      button{
+        height: 100%;
+        border-top: 0px;
+      }
+    }
+  }
+}

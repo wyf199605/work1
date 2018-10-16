@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>开发平台</title>
+    <link href="../../plugin/bootstrap/bootstrap3/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_177085_93dxgpx8y5m3rf6r.css">
+    <!--开发平台-->
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_604784_3yudhiopzqizr529.css">
+    <!--通用-->
+    <link href="//at.alicdn.com/t/font_604786_ftlx4vg99gam7vi.css" rel="stylesheet" type="text/css"/>
+    <link href="../../font/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="../../font/themify-icons/css/themify-icons.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="./global.pc.css">
+    <link rel="stylesheet" href="../../dist/develop/css/style.css">
+    <link type="text/css" rel="stylesheet" href="../../plugin/flatpickr/flatpickr.min.css">
+</head>
+<body>
+<div class="dev-main">
+    <div class="dev-left">
+        <div data-name="header-menu" class="left-menu"></div>
+    </div>
+    <div class="dev-right">
+        <div class="dev-right-header">
+            <div class="dev-right-header-top">
+                <img src="../../img/develop/logo.png" class="logo" alt="\">
+                <div data-name="user-info" class="user-info"></div>
+                <div data-name="quick-develop-btn" class="quick-develop-btn"></div>
+                <div class="clear"></div>
+            </div>
+            <div class="dev-tab"></div>
+        </div>
+        <div class="dev-content" id="body">
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../plugin/requirejs/require.js"></script>
+<script src="../../plugin/jquery/jquery-3.2.1.min.js"></script>
+<script src="require.config.js"></script>
+<script src="./global.js"></script>
+<script>
+    __setRequireBaseUrl('../');
+    require(['DevelopApp'], function (di) {
+        di.init();
+    })
+</script>
+
+</html>

@@ -1,0 +1,41 @@
+.messagePage{
+  .mui-table h4,.mui-table h5,.mui-table .mui-h5,.mui-table .mui-h6,.mui-table p{
+    margin-top: 0;
+  }
+  .mui-table-view-cell{
+    padding-left: 20px;
+  }
+  .mui-table-view-cell .mui-slider-handle h5{
+    color: #333;
+    font-weight: bold;
+  }
+  .mui-table-view-cell .mui-slider-handle .title{
+    color: #333;
+  }
+  .mui-table-view-cell .mui-slider-handle h5 .pull-right .mui-icon{
+    font-size: 16px;
+  }
+  .unread.mui-badge{
+    position: absolute;
+    left: -13px;
+    top: 5px;
+  }
+  .mui-table-view-cell > .mui-slider-handle{
+    background-color: transparent;
+  }
+  .mui-search .mui-placeholder{
+    height: 40px;
+  }
+  .mui-search .mui-placeholder .mui-icon{
+    line-height: 40px;
+  }
+  .mui-icon.mui-icon-paperclip{
+    transform: rotate(90deg);
+  }
+  .mui-pull-top-pocket{
+    top:44px;
+  }
+  .mui-title .mui-badge{
+    vertical-align: text-top;
+  }
+}

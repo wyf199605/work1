@@ -1,0 +1,115 @@
+.loginPage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  width: 100%;
+  height: 100%;
+  background-image: url("../../../img/develop/login-bg.png");
+  background-size: 100% 100%;
+  .logo {
+    margin-top: 60px;
+    text-align: center;
+    img {
+      width: 180px;
+      height: auto;
+    }
+  }
+  .login-form {
+    width: 36%;
+    max-width: 476px;
+    background-color: #ffffff;
+    box-shadow: -1px 1px 21px 0px rgba(0, 91, 172, 0.11);
+    border-radius: 3px;
+    margin: 0 auto;
+    border-top: 5px solid #005bac;
+    margin-top: 30px;
+    padding: 30px 60px 30px 8px;
+    .from-group {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 20px;
+      .pwd,.account{
+        input:focus {
+          outline-color: #005bac;
+        }
+      }
+      .text-input {
+        height: 40px;
+        flex-grow: 1;
+        font-size: 14px;
+        color: #3a3a3a;
+        background-color: #ffffff;
+        border-radius: 3px;
+        border: solid 1px #e2e2e2;
+      }
+      input {
+        height: 100%;
+      }
+      input::-webkit-input-placeholder { /* WebKit browsers*/
+        color: #b0b0b0;
+      }
+      input:-moz-placeholder { /* Mozilla Firefox 4 to 18*/
+        color: #b0b0b0;
+      }
+      input:-moz-placeholder { /* Mozilla Firefox 19+*/
+        color:#b0b0b0;
+      }
+      input:-ms-input-placeholder { /* Internet Explorer 10+*/
+        color: #b0b0b0;
+      }
+      label {
+        width: 90px;
+        color: #3a3a3a;
+        font-size: 14px;
+        text-align: right;
+        flex-shrink: 0;
+        //line-height: 40px;
+        flex-grow: 0;
+        margin-bottom: 0;
+      }
+      .remember-pwd{
+        .check-text {
+          color: #b0b0b0;
+          font-size: 14px;
+        }
+      }
+      button{
+        height: 40px;
+        background-color: #005bac;
+        border-radius: 3px;
+        flex-grow: 1;
+        color: #ffffff;
+        font-size: 14px;
+        border: none;
+      }
+      .btn.active, .btn:active{
+        background-color: #004c8f;
+      }
+    }
+    .login-btn{
+      margin-bottom: 0;
+    }
+  }
+  .select-sys{
+    .text-input > .btn-group .icon{
+      line-height: 2 !important;
+    }
+    input:focus {
+      outline:none;
+      outline-offset: 0;
+    }
+  }
+  .info{
+    font-size: 14px;
+    color: #b0b0b0;
+    text-align: center;
+    margin-top: 40px;
+  }
+}
+
+ul.list.appId{
+  width: calc(36% - 158px);
+}

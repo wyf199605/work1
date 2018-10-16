@@ -1,0 +1,23 @@
+@keyframes y-modal-flipin-horizontal {
+  0% {
+    opacity: 0;
+    transform: rotateY(-90deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+}
+
+@keyframes y-modal-flipout-horizontal {
+  0% {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotateY(90deg);
+  }
+}
