@@ -192,22 +192,27 @@ class SqlLiteRequest {
     }
 }
 
+// 复杂促销
 function cpxPromotion() {
     
 }
 
+// 交易
 function transaction() {
     
 }
 
+// 挂单
 function pendOrder() {
 
 }
 
+// 取单
 function takeOrder() {
 
 }
 
+// esc
 function mainEsc() {
 
 }
@@ -221,10 +226,14 @@ function mainEsc() {
  */
 function finger(response : obj, data) {
     // TODO 校验指纹
+    return resParam('指纹验证通过', '1')
+}
+
+function resParam(msg : string, type : string) {
     return {
         errorCode : 0,
-        msg : '指纹验证成功',
-        type : '1'
+        msg : msg,
+        type : type
     }
 }
 
