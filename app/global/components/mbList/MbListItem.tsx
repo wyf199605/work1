@@ -27,6 +27,7 @@ export class MbListItem {
     constructor(private para: IMbListItemPara){
         this.list = para.list;
         this.index = para.index;
+        tools.isNotEmpty(para.data) && this.render(para.data);
     }
 
     protected _wrapper: HTMLElement = null;
@@ -40,8 +41,16 @@ export class MbListItem {
     render(data: MbListItemData){
         let isImage = this.para.isImage;
         if(!!isImage){
+            // img模板
+            let itemContent:HTMLElement = null;
+            this.wrapper.appendChild(<div className="item-body">
+                <img className="item-img" src={data.img || '../img/noimg.jpg'} alt=""/>
+                <div className="item-content">
 
+                </div>
+            </div>);
         }else{
+            // status模板
 
         }
     }
