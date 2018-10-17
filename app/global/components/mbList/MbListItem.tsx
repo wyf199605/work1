@@ -2,18 +2,23 @@
 
 import {MbList} from "./MbList";
 import d = G.d;
+import tools = G.tools;
+import {CheckBox} from "../form/checkbox/checkBox";
+import Component = G.Component;
+import IComponentPara = G.IComponentPara;
 
-export interface IMbListItemPara {
-    list: MbList;
-    index: number;
+export interface IMbListItemPara extends IComponentPara{
+    list?: MbList;
+    index?: number;
     data?: MbListItemData;
-    isImage?: boolean;
+    isImg?: boolean;
+    isCheckBox?: boolean;
 }
 
 export interface MbListItemData{
     body?: [string, string][];
-    title?: string;
     label?: string[];
+    title?: string;
     img?: string;
     imgLabel?: string;
     status?: number;
@@ -21,37 +26,165 @@ export interface MbListItemData{
     countDown?: number;
 }
 
-export class MbListItem {
+export class MbListItem extends Component {
     protected list: MbList;
-    public index: number;
-    constructor(private para: IMbListItemPara){
+    protected checkBox: CheckBox;
+    protected imgWrapper: HTMLElement;
+    protected details: objOf<HTMLElement>;
+
+    constructor(para: IMbListItemPara) {
+        super(para);
         this.list = para.list;
-        this.index = para.index;
-        tools.isNotEmpty(para.data) && this.render(para.data);
+        this._index = para.index;
+        this.isShowCheckBox = para.isCheckBox || false;
+        this.render(para.data || {});
     }
 
-    protected _wrapper: HTMLElement = null;
-    get wrapper() {
-        if(this._wrapper === null){
-            this._wrapper = <div class="list-item"/>;
-        }
-        return this._wrapper;
-    }
-
-    render(data: MbListItemData){
-        let isImage = this.para.isImage;
-        if(!!isImage){
-            // img模板
-            let itemContent:HTMLElement = null;
-            this.wrapper.appendChild(<div className="item-body">
-                <img className="item-img" src={data.img || '../img/noimg.jpg'} alt=""/>
-                <div className="item-content">
-
+    protected wrapperInit(para: IMbListItemPara) {
+        let isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
+        this._isImg = isImg;
+        this.details = {};
+        return <div className="list-item-wrapper" data-index={para.index}>
+            {this.checkBox = <CheckBox className="hide"/>}
+            <div className="list-item-content">
+                {this.imgWrapper = isImg ? <div className="list-item-img"/> : null}
+                <div className="list-item-details">
+                    {this.details['title'] = <div className="list-item-title"/>}
+                    {this.details['body'] = <div className="list-item-body"/>}
+                    {this.details['label'] = <div className="list-item-labels"/>}
+                    {this.details['countDown'] = <div className="list-item-count-down"/>}
+                    {this.details['status'] = <div className="list-item-status"/>}
                 </div>
-            </div>);
-        }else{
-            // status模板
+            </div>
+        </div>;
+    }
 
+    // 获取当前listItem是否有图片
+    protected _isImg: boolean;
+    get isImg(){
+        return this._isImg;
+    }
+
+    // 获取当前索引
+    protected _index: number;
+    get index() {
+        return this._index;
+    }
+
+    set index(index: number) {
+        this._index = index;
+        this.wrapper && (this.wrapper.dataset['index'] = index + '');
+    }
+
+    // 获取、设置当前行是否是选中
+    get selected() {
+        return this.checkBox.checked;
+    }
+
+    set selected(selected: boolean) {
+        this.checkBox && (this.checkBox.checked = selected);
+    }
+
+    // 获取、设置是否显示checkBox
+    set isShowCheckBox(flag: boolean) {
+        if (!flag) {
+            this.selected = false;
         }
+        this.checkBox && this.checkBox.wrapper.classList.toggle('hide', !flag);
+    }
+
+    get isShowCheckBox() {
+        return this.checkBox ? this.checkBox.wrapper.classList.contains('hide') : false;
+    }
+
+    // 渲染数据
+    render(data: MbListItemData) {
+        // 渲染图片
+        if(this.isImg && this.imgWrapper){
+            this.imgWrapper.innerHTML = '';
+            let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
+            d.append(this.imgWrapper, <img src={img} alt=""/>);
+            if(tools.isNotEmpty(data.imgLabel)){
+                d.append(this.imgWrapper, <div className='img-label'>{data.imgLabel}</div>)
+            }
+        }
+
+        // 渲染内容
+        for(let name in this.details){
+            let el = this.details[name],
+                content = data[name];
+            el.classList.toggle('hide', tools.isEmpty(content));
+
+            switch (name){
+                case 'body':
+                    el.innerHTML = '';
+                    content && content.forEach((arr) => {
+                        d.append(el, <p>
+                            {arr[0] + '：' + arr[1]}
+                        </p>)
+                    });
+                    break;
+                case 'label':
+                    el.innerHTML = '';
+                    content && content.forEach((label) => {
+                        d.append(el, <span className="label">{label}</span>)
+                    });
+                    break;
+                case 'status':
+                    el.style.color = data.statusColor;
+                    el.innerHTML = content || '';
+                    break;
+                case 'countDown':
+                    this.initCountDown(el, content);
+                    break;
+                case 'title':
+                default:
+                    el.innerHTML = content || '';
+                    break;
+            }
+        }
+    }
+
+    // 设置倒计时定时器
+    protected timer: number;
+    protected initCountDown(el: HTMLElement, countDown: number){
+        let toTwo = (num) => {
+            return num < 10 ? '0' + num : num + '';
+        };
+        clearInterval(this.timer);
+        typeof countDown === 'number' && (this.timer = setInterval(() => {
+            let date = new Date(),
+                targetTime = new Date(countDown),
+                total = (targetTime.getTime() - date.getTime()) / 1000;
+
+            if (targetTime.getTime() < date.getTime()) {
+                el.innerText = '已结束';
+                clearInterval(this.timer);
+                this.timer = null;
+                return;
+            }
+            let day = Math.floor(total / (24 * 60 * 60)),
+                afterDay = total - day * 24 * 60 * 60,
+                hour = Math.floor(afterDay / (60 * 60)),
+                afterHour = total - day * 24 * 60 * 60 - hour * 60 * 60,
+                min = Math.floor(afterHour / 60),
+                sec = Math.floor(total - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
+
+            el.innerText = '倒计时：' +
+                (day > 0 ? day + '天' : '') + ' ' +
+                toTwo(hour) + ':' + toTwo(min) + ':' + toTwo(sec);
+        }, 1000));
+    }
+
+    destroy(){
+        clearInterval(this.timer);
+        this.checkBox && this.checkBox.destroy();
+        this.checkBox = null;
+        this.details = null;
+        this.list = null;
+        this.imgWrapper = null;
+        super.destroy();
     }
 }
+
+
