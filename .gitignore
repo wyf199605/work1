@@ -5,3 +5,4 @@ dist/
 dist.min/
 test/
 app/package-lock.json
+.gulp-scss-cache/

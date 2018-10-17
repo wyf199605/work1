@@ -229,21 +229,4 @@ export class TableLite{
         this.para.data = [];
         this.tbody.innerHTML = null;
     }
-
-
-    /**
-     * 计算总数量,总金额
-     * @returns {Array}
-     */
-    getCount() : number[] {
-        let data = this.para.data,
-            sum = 0, n = 0,count = [];
-        data && data.forEach(d => {
-            sum += d.AMOUNT * d.COUNT; //总金额 = 数量乘以单价
-            n += parseInt(d.AMOUNT);  //总件数 = 所有件数相加
-        });
-        count.push(sum);
-        count.push(n);
-        return count;
-    }
 }

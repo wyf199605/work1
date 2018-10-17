@@ -16,7 +16,7 @@ export class ConfPage extends SPAPage{
     protected init(para : Primitive[], p : IMainPagePara){
         this.p = Object.assign({}, p);
 
-        if( Com.isShell){
+        if(!Com.isShell){
             Modal.alert('未获取到设备信息，请使用速狮客户端登陆。');
             if(CA.Config.isProduct){
                   return;

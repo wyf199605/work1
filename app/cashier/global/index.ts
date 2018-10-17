@@ -4,7 +4,6 @@
 
 /// <reference path="pollfily.ts"/>
 /// <reference path="rule.ts"/>
-/// <reference path="storage.ts"/>
 /// <reference path="tools.ts"/>
 /// <reference path="dom.ts"/>
 /// <reference path="requireConfig.ts"/>
