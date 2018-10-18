@@ -189,7 +189,7 @@ export class NewTableModule {
                                     body: tabEl,
                                     className: 'full-screen sub-table-full',
                                     header: {
-                                        title: '子表全屏'
+                                        title: this.bwEl.subTableList[this.subTabActiveIndex].caption
                                     },
                                     onClose: () => {
                                         this.sub[this.subTabActiveIndex].ftable.removeAllModal();

@@ -28,7 +28,7 @@ interface QueryParam {
 }
 interface IBw_Query{
     queryType: number;
-    atvarparams : QueryConf[]
+    atvarparams? : QueryConf[]
     queryparams0? : QueryConf;
     queryparams1? : QueryConf[];
     hasOption : boolean;
@@ -36,8 +36,8 @@ interface IBw_Query{
     scannableType? : number;
     scannableTime? : number
     autTag: number;
-    uiPath: R_ReqAddr;
-    setting : {
+    uiPath?: R_ReqAddr;
+    setting? : {
         settingId: number;
         setContent : string;
     }
