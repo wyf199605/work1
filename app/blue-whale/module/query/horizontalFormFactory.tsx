@@ -53,7 +53,7 @@ export class HorizontalQueryModule extends Component {
             </div>);
         }
         // 自定义内容
-        d.append(this.wrapper,this.extraWrapper);
+        d.append(d.query('.query-form',this.wrapper),this.extraWrapper);
     }
 
     // 获取默认数据
@@ -157,20 +157,10 @@ export class HorizontalQueryModule extends Component {
                 }
 
                 this.forms.push(com);
-                return props.showFlag ? <div style={{display: 'inline-block'}}
-                                             className={"form-com-item "}>
+                return props.showFlag ? <div className={"form-com-item"}>
                     <div className="form-com-title">{c.caption + '：'}</div>
                     {com}
                 </div> : com.wrapper && d.remove(com.wrapper);
-                // if (props.showFlag) {
-                //     d.append(this.wrapper, <div style={{display: 'inline-block'}}
-                //                                 className={"form-com-item "}>
-                //         <div className="form-com-title">{c.caption + '：'}</div>
-                //         {com}
-                //     </div>);
-                // } else {
-                //     com.wrapper && d.remove(com.wrapper);
-                // }
             })}
         </div>);
     }
