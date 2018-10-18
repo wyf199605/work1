@@ -25,6 +25,13 @@ export class HorizontalQueryModule extends Component {
 
     protected forms: FormCom[];
     protected defaultData: obj;
+    private _extraWrapper:HTMLElement;
+    get extraWrapper(){
+        if (!this._extraWrapper){
+            this._extraWrapper = <div className="extra-wrapper"/>;
+        }
+        return this._extraWrapper;
+    }
     protected _search: (data) => Promise<any>;
     set search(flag) {
         this._search = flag;
@@ -40,12 +47,14 @@ export class HorizontalQueryModule extends Component {
         this.search = para.search;
         this.__initForms(para);
         if (this.forms.length > 0 && (para.qm.queryType == 2 || para.qm.queryType == 4)) {
-            d.append(this.wrapper, <div className="form-com-item">
+            d.append(d.query('.query-form',this.wrapper), <div className="form-com-item">
                 <Button className="query-search-btn" content="查询" onClick={() => {
                     typeof this.search === 'function' && this.search(this.json);
                 }}/>
             </div>);
         }
+        // 自定义内容
+        d.append(this.wrapper,this.extraWrapper);
     }
 
     // 获取默认数据
@@ -61,103 +70,110 @@ export class HorizontalQueryModule extends Component {
     private __initForms(para: IHorizontalQueryModule) {
         let cond: QueryConf[] = para.qm.queryparams1 || [];
         this.forms = [];
-        tools.isNotEmpty(this.wrapper) && cond.map(c => {
-            let extra: obj = {};
-            if (para.qm.queryType == 2 || para.qm.queryType == 4) {
-                extra.onSet = () => {
-                    typeof this.search === 'function' && this.search(this.json);
+        tools.isNotEmpty(this.wrapper) && d.append(this.wrapper,<div className="query-form">
+            {cond.map(c => {
+                let extra: obj = {};
+                if (para.qm.queryType == 2 || para.qm.queryType == 4) {
+                    extra.onSet = () => {
+                        typeof this.search === 'function' && this.search(this.json);
+                    }
                 }
-            }
-            let com,
-                props = Object.assign({}, {
-                    custom: c,
-                    showFlag: true,
-                    placeholder: c.caption,
-                }, extra),
-                fieldName = c.field_name,
-                type = c.type || c.atrrs.dataType;
-            switch (type) {
-                case 'VALUELIST':
-                    com = <SelectInput clickType={0} readonly={true}
-                                       data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                           let data = this.formatData(res);
-                                           return {text: data.title, value: data.value};
-                                       })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                        fun: (url, val, callback) => {
-                            this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
-                                typeof callback === 'function' && callback(result);
-                            })
-                        }
-                    }} {...props}/>;
-                    break;
-                case 'VALUE':
-                    com = <SelectInput clickType={0} readonly={true}
-                                       data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                           let data = this.formatData(res);
-                                           return {text: data.title, value: data.value};
-                                       })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                        fun: (url, val, callback) => {
-                            this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
-                                typeof callback === 'function' && callback(result);
-                            })
-                        }
-                    }} {...props}/>;
-                    break;
-                case 'QRYVALUE':
-                    com = <SelectInput clickType={0} readonly={true}
-                                       data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                           let data = this.formatData(res);
-                                           return {text: data.title, value: data.value};
-                                       })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                        fun: (url, val, callback) => {
-                            this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
-                                typeof callback === 'function' && callback(result);
-                            })
-                        }
-                    }} {...props}/>;
-                    break;
-                case 'RESVALUE':
-                    com = <SelectInput clickType={0} readonly={true}
-                                       data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                           let data = this.formatData(res);
-                                           return {text: data.title, value: data.value};
-                                       })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                        fun: (url, val, callback) => {
-                            this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
-                                typeof callback === 'function' && callback(result);
-                            })
-                        }
-                    }} {...props}/>;
-                    break;
-                case '12':
-                    com = <Datetime format="yyyy-MM-dd" {...props}/>;
-                    break;
-                case '13':
-                    com = <Datetime format="yyyy-MM-dd HH:mm:ss" {...props}/>;
-                    break;
-                case '10':
-                    com = <NumInput defaultNum={0} {...props}/>;
-                    break;
-                default:
-                    com = <TextInput {...props}/>;
-            }
+                let com,
+                    props = Object.assign({}, {
+                        custom: c,
+                        showFlag: true,
+                        placeholder: c.caption,
+                    }, extra),
+                    fieldName = c.field_name,
+                    type = c.type || c.atrrs.dataType;
+                switch (type) {
+                    case 'VALUELIST':
+                        com = <SelectInput clickType={0} readonly={true}
+                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                               let data = this.formatData(res);
+                                               return {text: data.title, value: data.value};
+                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                            fun: (url, val, callback) => {
+                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                    typeof callback === 'function' && callback(result);
+                                })
+                            }
+                        }} {...props}/>;
+                        break;
+                    case 'VALUE':
+                        com = <SelectInput clickType={0} readonly={true}
+                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                               let data = this.formatData(res);
+                                               return {text: data.title, value: data.value};
+                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                            fun: (url, val, callback) => {
+                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                    typeof callback === 'function' && callback(result);
+                                })
+                            }
+                        }} {...props}/>;
+                        break;
+                    case 'QRYVALUE':
+                        com = <SelectInput clickType={0} readonly={true}
+                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                               let data = this.formatData(res);
+                                               return {text: data.title, value: data.value};
+                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                            fun: (url, val, callback) => {
+                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                    typeof callback === 'function' && callback(result);
+                                })
+                            }
+                        }} {...props}/>;
+                        break;
+                    case 'RESVALUE':
+                        com = <SelectInput clickType={0} readonly={true}
+                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                               let data = this.formatData(res);
+                                               return {text: data.title, value: data.value};
+                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                            fun: (url, val, callback) => {
+                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                    typeof callback === 'function' && callback(result);
+                                })
+                            }
+                        }} {...props}/>;
+                        break;
+                    case '12':
+                        com = <Datetime format="yyyy-MM-dd" {...props}/>;
+                        break;
+                    case '13':
+                        com = <Datetime format="yyyy-MM-dd HH:mm:ss" {...props}/>;
+                        break;
+                    case '10':
+                        com = <NumInput defaultNum={0} {...props}/>;
+                        break;
+                    default:
+                        com = <TextInput {...props}/>;
+                }
 
-            if (fieldName in this.defaultData) {
-                tools.isNotEmpty(this.defaultData[fieldName])
-                && com.set(this.defaultData[fieldName]);
-            }
+                if (fieldName in this.defaultData) {
+                    tools.isNotEmpty(this.defaultData[fieldName])
+                    && com.set(this.defaultData[fieldName]);
+                }
 
-            this.forms.push(com);
-            if (props.showFlag) {
-                d.append(this.wrapper, <div style={{display: 'inline-block'}}
-                                            className={"form-com-item "}>
+                this.forms.push(com);
+                return props.showFlag ? <div style={{display: 'inline-block'}}
+                                             className={"form-com-item "}>
                     <div className="form-com-title">{c.caption + '：'}</div>
                     {com}
-                </div>);
-            } else {
-                com.wrapper && d.remove(com.wrapper);
-            }
-        });
+                </div> : com.wrapper && d.remove(com.wrapper);
+                // if (props.showFlag) {
+                //     d.append(this.wrapper, <div style={{display: 'inline-block'}}
+                //                                 className={"form-com-item "}>
+                //         <div className="form-com-title">{c.caption + '：'}</div>
+                //         {com}
+                //     </div>);
+                // } else {
+                //     com.wrapper && d.remove(com.wrapper);
+                // }
+            })}
+        </div>);
     }
 
     // 获取数据
