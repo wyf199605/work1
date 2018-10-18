@@ -196,9 +196,7 @@ export class FlowReport extends BasicPage {
                                     url: BW.CONF.url.myApplication
                                 });
                             }else{
-                                sys.window.open({
-                                    url: BW.CONF.url.myApplicationPC
-                                });
+                                sys.window.close('',null,undefined,BW.CONF.url.myApplicationPC);
                             }
                         }, self.url);
                     });
