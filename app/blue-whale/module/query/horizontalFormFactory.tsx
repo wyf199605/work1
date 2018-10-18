@@ -17,7 +17,6 @@ export interface IHorizontalQueryModule extends IComponentPara {
     qm: IBw_Query;
     search?: (data) => Promise<any>;
 }
-
 export class HorizontalQueryModule extends Component {
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
         return <div className="horizontalQueryModule"/>;
@@ -46,7 +45,7 @@ export class HorizontalQueryModule extends Component {
         this.defaultData = this.getDefaultData(para.qm.queryparams1);
         this.search = para.search;
         this.__initForms(para);
-        if (this.forms.length > 0 && (para.qm.queryType == 2 || para.qm.queryType == 4)) {
+        if (this.forms.length > 0 && (para.qm.queryType == 1 || para.qm.queryType == 3)) {
             d.append(d.query('.query-form',this.wrapper), <div className="form-com-item">
                 <Button className="query-search-btn" content="查询" onClick={() => {
                     typeof this.search === 'function' && this.search(this.json);
