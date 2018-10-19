@@ -20,7 +20,7 @@ import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import {FormCom} from "../../../global/components/form/basic";
 import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 
-export interface ITableModulePara extends IComponentPara {
+export interface ITableModulePara extends IComponentPara{
     bwEl: IBW_Table;
     ajaxData?: obj;
     data?: obj[];
@@ -28,7 +28,6 @@ export interface ITableModulePara extends IComponentPara {
 
 export class NewTableModule {
 
-    static EVT_EXPORT_DATA = '__EVENT_EXPORT_TABLE_DATA__';
     static EVT_EDIT_SAVE = "__event_edit_save__";
 
     main: BwMainTableModule = null;
@@ -63,8 +62,9 @@ export class NewTableModule {
             ajaxData: para.ajaxData,
             tableModule: this,
         });
+
         main.onFtableReady = () => {
-            if (tools.isNotEmpty(this.bwEl.subButtons)) {
+            if(tools.isNotEmpty(this.bwEl.subButtons)) {
                 main.subBtns.init(this.btnWrapper);
             }
 
@@ -139,9 +139,10 @@ export class NewTableModule {
                     if (mftable.editing) {
                         return;
                     }
+
                     !(this.subIndex in mftable.rows) && (this.subIndex = 0);
                     let firstRow = mftable.rowGet(this.subIndex);
-                    if (!firstRow) {
+                    if(!firstRow) {
                         this.mobileModal && (this.mobileModal.isShow = false);
                         return;
                     }
@@ -189,7 +190,7 @@ export class NewTableModule {
                                     body: tabEl,
                                     className: 'full-screen sub-table-full',
                                     header: {
-                                        title: this.bwEl.subTableList[this.subTabActiveIndex].caption
+                                        title: '子表全屏'
                                     },
                                     onClose: () => {
                                         this.sub[this.subTabActiveIndex].ftable.removeAllModal();
@@ -206,10 +207,10 @@ export class NewTableModule {
                     let rowIndex = parseInt(this.dataset.index),
                         row = mftable.rowGet(rowIndex);
                     self.subIndex = rowIndex;
-                    if (row && row.selected) {
+                    if(row && row.selected){
                         self.subRefresh(row.data);
                         pseudoTable && pseudoTable.setPresentSelected(rowIndex);
-                    } else {
+                    }else{
                         self.mobileModal && (self.mobileModal.isShow = false);
                     }
                 });
@@ -218,14 +219,13 @@ export class NewTableModule {
     }
 
     protected subIndex = 0;
-
-    subRefresh(rowData?: obj) {
+    subRefresh(rowData?:obj) {
         let bwEl = this.bwEl,
-            subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex],
+            subUi = bwEl.subTableList && bwEl.subTableList[0],
             main = this.main,
             mftable = main.ftable;
 
-        if (tools.isEmpty(subUi)) {
+        if(tools.isEmpty(subUi)) {
             return;
         }
 
@@ -239,15 +239,6 @@ export class NewTableModule {
             subTable.refresh(ajaxData).catch();
         });
 
-        // if (!tools.isNotEmpty(this.sub[this.subTabActiveIndex])) {
-        //     let {subParam} = getMainSubVarList(bwEl.tableAddr);
-        //     this.subInit(subUi, subParam, ajaxData);
-        // } else {
-        //     this.mobileModal && (this.mobileModal.isShow = true);
-        //     this.sub.forEach((subTable) => {
-        //         subTable.refresh(ajaxData).catch();
-        //     });
-        // }
     }
 
     public mobileModal: Modal = null;
@@ -283,7 +274,7 @@ export class NewTableModule {
                     d.off(document, 'mouseup', mouseUpHandler);
                     d.on(document, 'mousemove', mouseMoveHandler = (ev) => {
                         let translate = ev.clientY - disY;
-                        if (mainHeight + translate > 200 && subHeight - translate > 200) {
+                        if(mainHeight + translate > 200 && subHeight - translate > 200) {
                             disY = ev.clientY;
                             mainHeight += translate;
                             subHeight -= translate;
@@ -494,13 +485,13 @@ export class NewTableModule {
 
         return {
             on, off,
-            get isMain() {
+            get isMain(){
                 return isMainActive;
             },
             set isMain(isMain: boolean) {
                 isMainActive = isMain;
             },
-            set onChange(hander: (iMain: boolean) => void) {
+            set onChange(hander: (iMain: boolean) => void){
                 onChange = hander;
             }
         }
@@ -511,7 +502,7 @@ export class NewTableModule {
         let self = this,
             editModule: EditModule = null;
 
-        let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
+        let tableEach = (fun: (tm: BwTableModule, index:number) => void) => {
             [this.main, ...Object.values(this.sub)].forEach((table, i) => {
                 fun(table, i)
             })
@@ -568,7 +559,6 @@ export class NewTableModule {
                     let rowIndex = cell.row.index,
                         row = bwTable.ftable.rowGet(rowIndex),
                         field = col.content as R_Field;
-
                     let value = data;
                     if (field.elementType === 'lookup') {
                         let lookUpKeyField = field.lookUpKeyField,
@@ -612,6 +602,14 @@ export class NewTableModule {
                                             });
                                     }
                                 }
+                            } else if(Array.isArray(field.relateFields) || Array.isArray(field.assignSelectFields)){
+                                // 上传文件返回File_id，需要设置file_id值， 或者修改关联的assign的值
+                                (field.relateFields || field.assignSelectFields).forEach((name) => {
+                                    let cell = row.cellGet(name) as TableDataCell;
+                                    if(cell){
+                                        cell.data = data[name] || '';
+                                    }
+                                })
                             }
                         }
                     }) : null;

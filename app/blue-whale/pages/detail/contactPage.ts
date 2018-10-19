@@ -66,17 +66,17 @@ export = class contactPage extends BasicPage {
             BwRule.Ajax.fetch(CONF.ajaxUrl.myself, {
                 data: userId ? {userid: userId} : null
             }).then(({response}) => {
-                    let dataCols = sys.isMb ? d.queryAll('.mui-table-view-cell [data-col]') :
-                        d.queryAll('.list-group-item [data-col]', para.dom);
+                let dataCols = sys.isMb ? d.queryAll('.mui-table-view-cell [data-col]') :
+                    d.queryAll('.list-group-item [data-col]', para.dom);
 
-                    dataCols.forEach(function (el) {
-                        let html = response.data[0][el.dataset.col];
-                        if (html === null || html === undefined) {
-                            d.remove(el.parentElement.parentElement);
-                        } else {
-                            el.innerHTML = html;
-                        }
-                    });
+                dataCols.forEach(function (el) {
+                    let html = response.data[0] ? response.data[0][el.dataset.col] : null;
+                    if (html === null || html === undefined) {
+                        d.remove(el.parentElement.parentElement);
+                    } else {
+                        typeof html === 'string' && (el.innerHTML = html);
+                    }
+                });
                     // detailData = response.data[0];
                 if(tools.isMb) {
                     self.btnInit();

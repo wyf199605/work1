@@ -670,6 +670,7 @@ export class LoginPage{
                 callback(result).then(() => {
                     loginPage.loginBtnState(10);
                     let user = User.get();
+                    user.clearStorage();
                     response.dataArr.forEach((col, index) => {
                         if (col.NAME === 'are_id') {
                             user.are_id = col.VALUE;

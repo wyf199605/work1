@@ -65,6 +65,7 @@ interface ITableColPara {    // 创建列对象参数
     content?: any;
     // inputInit?(cell: TableDataCell, col: TableColumn): FormCom;
     isVirtual?: boolean;
+    isCanSort?: boolean
 }
 
 

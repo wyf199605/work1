@@ -104,6 +104,15 @@ export class User implements IUser{
         this.are_id = user.are_id;
     }
 
+    clearStorage(){
+        this._userid = '';
+        this._username = '';
+        this._department = '';
+        this._loginType = undefined;
+        this._are_id = '';
+        localStorage.setItem('userInfo',null);
+    }
+
     static get() {
         if (!User.user)
             User.user = new User();

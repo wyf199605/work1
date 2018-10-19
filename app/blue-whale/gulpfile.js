@@ -110,7 +110,6 @@ gulp.task('js', function () {
         'query/queryModule.mb',
         'query/queryConfig',
         'query/asynQuery',
-        'query/horizontalFormFactory'
     ], 'query.mb.js');
 
     // pc查询器

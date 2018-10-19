@@ -37,7 +37,14 @@ export default class BasicPage{
             this.destroy();
         });
 
-        if(/*para.subButtons && */sys.isMb){
+        //判断是否是安卓5及以上版本才开启手势
+        let version = 5;
+        if(/(Android)/i.test(navigator.userAgent)){
+            let andrVersionArr = navigator.userAgent.match(/Android (\d+)\.(\d+)\.?(\d+)?/);
+            //去除匹配的第一个下标的元素
+            version = andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
+        }
+        if(/*para.subButtons && */version > 4 && sys.isMb){
             let timeOut = null;
             d.on(document,'touchstart',()=>{
                 let gestureIcon = d.query('.blue-gesture',document.body);
@@ -106,7 +113,6 @@ export default class BasicPage{
                 new ges({
                     container : document.body,
                     onFinsh : (ges)=>{
-                        console.log(ges);
                         let hasGesture = false;
                         if(gesture[ges] === 'backHome'){
                             Modal.confirm({
@@ -119,7 +125,7 @@ export default class BasicPage{
                                     }
                                 }
                             });
-                            // 画个X表示跳转到首页
+                            // 画个"/\"表示跳转到首页
                             hasGesture = true;
                         }else{
                             let subButtomsPara = para.subButtons || {};
