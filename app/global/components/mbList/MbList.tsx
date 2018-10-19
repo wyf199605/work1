@@ -14,7 +14,7 @@ export interface IMbListPara extends IComponentPara{
 
 export class MbList extends Component{
     protected wrapperInit(){
-        return <div class="mb-list-wrapper"/>;
+        return <div className="mb-list-wrapper"/>;
     }
     constructor(para: IMbListPara){
         super(para);

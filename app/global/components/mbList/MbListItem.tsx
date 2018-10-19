@@ -105,7 +105,7 @@ export class MbListItem extends Component {
             let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
             if(tools.isNotEmpty(data.imgLabel)){
-                d.append(this.imgWrapper, <div className='img-label'>{data.imgLabel}</div>)
+                d.append(this.imgWrapper, <div className='img-label'><span>{data.imgLabel}</span></div>)
             }
         }
 
@@ -120,7 +120,7 @@ export class MbListItem extends Component {
                     el.innerHTML = '';
                     content && content.forEach((arr) => {
                         d.append(el, <p>
-                            {arr[0] + '：' + arr[1]}
+                            <span className="body-title">{arr[0] + '：'}</span><span className="body-value">{arr[1]}</span>
                         </p>)
                     });
                     break;
