@@ -13,6 +13,7 @@ export interface IMbListItemPara extends IComponentPara{
     data?: MbListItemData;
     isImg?: boolean;
     isCheckBox?: boolean;
+    btns?: string[];
 }
 
 export interface MbListItemData{
@@ -30,6 +31,7 @@ export class MbListItem extends Component {
     protected list: MbList;
     protected checkBox: CheckBox;
     protected imgWrapper: HTMLElement;
+    protected btnWrapper: HTMLElement;
     protected details: objOf<HTMLElement>;
 
     constructor(para: IMbListItemPara) {
@@ -175,6 +177,30 @@ export class MbListItem extends Component {
                 (day > 0 ? day + '天' : '') + ' ' +
                 toTwo(hour) + ':' + toTwo(min) + ':' + toTwo(sec);
         }, 1000));
+    }
+
+    protected _isShowBtns: boolean = false;
+    set isShowBtns(flag: boolean){
+        this._isShowBtns = flag;
+        this.btnWrapper && this.btnWrapper.classList.toggle('hide', !flag);
+    }
+    get isShowBtns(){
+        return this.btnWrapper ? this._isShowBtns : false;
+    }
+
+    // 初始化按钮配置
+    initBtn(btns: string[]){
+        this.btnWrapper = <div className="btn-group"/>
+    }
+
+    // 添加按钮，index插入位置
+    addBtn(btn: string, index: number){
+
+    }
+
+    // 删除按钮
+    delBtn(index: number){
+
     }
 
     destroy(){
