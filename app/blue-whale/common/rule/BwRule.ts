@@ -599,6 +599,7 @@ export class BwRule extends Rule {
 
                     //富文本
                     col.comType = 'richText';// --------------
+                    col.isCanSort = false;
 
                 } else if (col.atrrs && col.atrrs.dataType == '17') {
                     //toggle
@@ -667,8 +668,8 @@ export class BwRule extends Rule {
         2: function (reqAddr: R_ReqAddr, data?: obj | obj[]) {
             //参数构造
             let newData = [],
-                params;
-            if (data) {
+                params: any = data;
+            if (data && data[0]) {
                 data[0].forEach((s, i) => {
                     newData.push({});
                     for (let item in s) {

@@ -1,10 +1,18 @@
 /// <amd-module name="GlobalTestModule"/>
-/// <amd-dependency path="raphael" name="Raphael"/>
 
-declare const Raphael;
+import {MbList} from "./components/mbList/MbList";
 
-export class GlobalTestModule{
-    constructor(){
-        console.log(Raphael)
-    }
-}
+new MbList({
+    data: [
+        {
+            title: '测试',
+            body: [
+                ['姓名', '阿猫'],
+                ['性别', '公']
+            ],
+            label: ['动物', '性感'],
+            status: 1,
+        }
+    ],
+    isMulti: true
+});

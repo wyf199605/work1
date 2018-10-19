@@ -26,8 +26,8 @@ export interface QueryModulePara{
 export abstract class QueryModule {
     protected queriesCpt : objOf<QueryBuilder | AtVarBuilder> = {};
     protected settingConf : obj;
-    protected abstract queryParamTplGet() : string;
-    protected abstract atVarTplGet() : string;
+    protected abstract queryParamTplGet() : HTMLElement;
+    protected abstract atVarTplGet() : HTMLElement;
 
     public abstract show(); // 显示查询框
     public abstract hide(); // 隐藏查询框
@@ -85,7 +85,7 @@ export abstract class QueryModule {
             }
             if(queryName !== 'atvarparams'){
                 queriesCpt[queryName] = new QueryBuilder({
-                    tpl: this.queryParamTplGet(),
+                    tpl: this.queryParamTplGet,
                     queryName,
                     queryConfigs: para.qm[queryName],
                     resultDom: form,
@@ -102,7 +102,7 @@ export abstract class QueryModule {
                 });
             }else{
                 queriesCpt[queryName] = new AtVarBuilder({
-                    tpl: this.atVarTplGet(),
+                    tpl: this.atVarTplGet,
                     queryConfigs: para.qm[queryName],
                     resultDom: form,
                     setting: this.settingConf && this.settingConf[queryName],

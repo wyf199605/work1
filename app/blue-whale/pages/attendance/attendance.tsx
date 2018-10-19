@@ -22,8 +22,9 @@ export = class AttendancePage extends BasicPage {
     /*
     * 初始化页面
     * */
+    protected msgTimer = null;
     protected initPage() {
-        let self = this, para = self.para;
+        let self = this, para = self.para, text = '指纹机正在初始化，请稍后';
         let detail = <div class="attend-detail"/>;
         //创建左侧框
         let content = <div class="attend-content">
@@ -32,7 +33,7 @@ export = class AttendancePage extends BasicPage {
         //指纹考勤块
         self.fingerNode = <div class="finger-content">
             <p class="finger-title">考勤信息</p>
-            <p class="finger-msg">指纹机准备就绪，请按下手指...</p>
+            <p class="finger-msg">{text}</p>
         </div>;
 
         //创建右侧考勤展示框
@@ -51,6 +52,23 @@ export = class AttendancePage extends BasicPage {
             dateEl.innerHTML = getDate()
         }, 1000);
 
+        let i = 0,
+            dots = '';
+        let fingerMsg = this.fingerNode.querySelector('.finger-msg') as HTMLElement;
+        self.msgTimer = setInterval(() => {
+            if(i >= 10){
+                Modal.alert('初始化指纹机失败，请重新刷新!');
+                fingerMsg.innerHTML = '初始化指纹机失败！';
+                clearInterval(self.msgTimer);
+                return ;
+            }
+            dots += '.';
+            fingerMsg.innerHTML = text + dots;
+            if(i ++ % 3 === 0) {
+                dots = '';
+            }
+
+        }, 1000);
         /*
         * 获取时间
         * */
@@ -71,12 +89,12 @@ export = class AttendancePage extends BasicPage {
         let self = this;
         let fingerMsg = this.fingerNode.querySelector('.finger-msg') as HTMLElement;
         let fingerTitle = this.fingerNode.querySelector('.finger-title');
-        let myDB = {
-            storeName: 'fingers',
-            version: 3
-        };
         let fingerObj = new NewFinger({
             callFinger: (text) => {
+                if(self.msgTimer !== null){
+                    clearInterval(self.msgTimer);
+                    self.msgTimer = null;
+                }
                 fingerMsg.innerHTML = '<span>' + text + '</span>';
             },
             fingerFinish: (e) => {
@@ -137,14 +155,14 @@ export = class AttendancePage extends BasicPage {
     //右侧展示考勤成功信息
     protected addList(result) {
         let list = this.dom.querySelector('.list-msg');
-        let li = d.create(`<li class="animated">
+        let li = d.create(`<li>
                         <span class="arrow">${result.datetime}</span>
                         <span>${result.userName + result.result}</span></li>`);
         list.insertBefore(li, list.firstChild);
         let timer = setTimeout(() => {
-            li.className = '';
+            li.className = 'animated';
             clearTimeout(timer);
-        }, 1000);
+        }, 1);
     }
 
     //销毁

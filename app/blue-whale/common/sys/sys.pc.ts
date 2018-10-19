@@ -144,7 +144,7 @@ namespace BW {
                     localStorage.setItem('viewData', JSON.stringify(o.extras));
                 },
 
-                close: function (event: string = '', data: any = null, url?: string,destUrl?:string) {
+                close: function (event: string = '', data: any = null, url?: string) {
                     let lastUrl = sysPcHistory.last();
                     typeof url === 'undefined' && (url = lastUrl);
                     if (sysPcHistory.indexOf(url) > -1) {
@@ -156,12 +156,8 @@ namespace BW {
                         self.pages.close(url);
                         self.tabs.close(url);
                         // 如果关闭当前打开的页面，则关闭后打开历史倒数第二位置的页面
-                        if (tools.isNotEmpty(destUrl)){
-                            self.window.open({url: destUrl});
-                        }else{
-                            if (sysPcHistory.len() > 0 && isLast) {
-                                self.window.open({url: sysPcHistory.last()});
-                            }
+                        if (sysPcHistory.len() > 0 && isLast) {
+                            self.window.open({url: sysPcHistory.last()});
                         }
                     }
                 },

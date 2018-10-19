@@ -46,8 +46,8 @@ export = class BugListPage {
             new BugReportModal(-1,true);
         };
         return {
-            on: () => d.on(d.query('.mui-bar'), 'click', '#editBug', eidtHanlder),
-            off: () => d.off(d.query('.mui-bar'), 'click', '#editBug', eidtHanlder)
+            on: () => d.on(d.query('.mui-bar'), 'tap', '#editBug', eidtHanlder),
+            off: () => d.off(d.query('.mui-bar'), 'tap', '#editBug', eidtHanlder)
         }
     })();
 }

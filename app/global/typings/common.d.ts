@@ -10,7 +10,7 @@ interface objOf<T> {
 //     tabIndex? : boolean;
 //     tabIndexKey? : number
 // }
-type Primitive = string | number | boolean;
+type Primitive = string | number | boolean
 
 interface COL{
     title: string;
@@ -90,7 +90,7 @@ interface R_VarList{
 }//变量名称
 interface R_ReqAddr {
     dataAddr: string;
-    varType?: number; //
+    varType?: number; // 0 默认参数，2：selection（用逗号隔开），3 将参数放在body中
     commitType?: number; //
     needGps?:number; // 是否开启GPS：0 => false, 1 => true
     varList?: R_VarList[];

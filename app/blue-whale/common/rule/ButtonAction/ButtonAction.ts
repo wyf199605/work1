@@ -11,7 +11,7 @@ import {SelectInput} from "../../../../global/components/form/selectInput/select
 import {Loading} from "../../../../global/components/ui/loading/loading";
 import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
-import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
+// import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
 
@@ -29,17 +29,23 @@ export class ButtonAction {
         let self = this;
         if (btn.subType === 'excel') {
 
-            let tableData;
+            let com;
             let uploderModal = new Modal({
                 header: '选择导入的文件',
                 body: d.create(`<div></div>`),
                 className: 'upload-modal',
                 isOnceDestroy: true,
+                onClose: () => {
+                    com = null;
+                    uploderModal.destroy();
+                },
                 footer: {
                     rightPanel: [
                         {
                             content: '取消',
                             onClick: () => {
+                                com && com.destroy();
+                                com = null;
                                 uploderModal.destroy();
                             }
                         }
@@ -65,7 +71,7 @@ export class ButtonAction {
             //TODO 将UploadModule过程效果整合到upload组件
             require(['UploadModule'], function (upload) {
                 let loadUrl = CONF.siteUrl + btn.actionAddr.dataAddr;
-                new upload.default({
+                com = new upload.default({
                     container: <HTMLElement>uploderModal.body,
                     uploadUrl: loadUrl + (loadUrl.indexOf('?') > -1 ? '&' : '?') + "item_id=" + itemId,
                     onChange: () => {
@@ -85,6 +91,8 @@ export class ButtonAction {
                         // });
                         uploderModal.destroy();
                         setTimeout(() => {
+                            com && com.destroy();
+                            com = null;
                             self.btnRefresh(btn.refresh, url);
                         }, 100)
                         // G.tools.event.fire(NewTableModule.EVT_EXPORT_DATA, data);
@@ -233,13 +241,13 @@ export class ButtonAction {
             response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
         })
 
-        new RfidBarCode({
-             codeStype:codeStype,
-             SHO_ID:dataObj['SHO_ID'],
-             USERID:dataObj['USERID'],
-             url:ajaxUrl,
-            uniqueFlag
-        })
+        // new RfidBarCode({
+        //      codeStype:codeStype,
+        //      SHO_ID:dataObj['SHO_ID'],
+        //      USERID:dataObj['USERID'],
+        //      url:ajaxUrl,
+        //     uniqueFlag
+        // })
     }
 
     /**
@@ -290,7 +298,9 @@ export class ButtonAction {
     //     });
     // }
     private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
-        let varType = btn.actionAddr.varType, self = this;
+        let self = this,
+            varType = btn.actionAddr.varType;
+
         if (varType === 3 && typeof ajaxData !== 'string') {
             // 如果varType === 3 则都转为数组传到后台
             if (!Array.isArray(ajaxData)) {
@@ -299,7 +309,7 @@ export class ButtonAction {
             ajaxData = JSON.stringify(ajaxData);
         }
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
-            data2url: varType !== 3,
+            data2url: btn.actionAddr.varType !== 3,
             type: ajaxType,
             // defaultCallback : btn.openType !== 'popup',
             data: ajaxData,
@@ -726,8 +736,8 @@ export class ButtonAction {
                 BwRule.atvar = new q.AtVarBuilder({
                     queryConfigs: res.atvarparams,
                     resultDom: avatarLoad,
-                    tpl: `<div class="atvarDom ${disabled}"><div style="display: inline-block;" data-type="title"></div>
-                    <span>：</span><div data-type="input"></div></div>`,
+                    tpl: () => d.create(`<div class="atvarDom ${disabled}"><div style="display: inline-block;" data-type="title"></div>
+                    <span>：</span><div data-type="input"></div></div>`),
                     setting: res.setting
                 });
                 let coms = BwRule.atvar.coms,
