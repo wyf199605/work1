@@ -261,6 +261,7 @@ export class InputBox extends Component {
         // setTimeout(() => {
             // debugger;
         let width = 10;
+
         for(let i = 0; i < 4; i ++ ){
             let child: HTMLElement = this.wrapper.children[i] as HTMLElement;
             if(child){

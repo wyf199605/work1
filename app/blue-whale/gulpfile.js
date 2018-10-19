@@ -163,6 +163,11 @@ gulp.task('js', function () {
         'flowReport/Accessory'
     ], 'flowReport.js');
 
+    // 移动化详情页
+    gulpTsModule([
+        'listDetail/ListItemDetail'
+    ], 'listDetail.js');
+
     //process模块
     gulpTsModule([
         'sqlMonitor/sqlMonitor'

@@ -220,6 +220,7 @@ export class BwTableModule extends Component {
         let ui = this.ui;
         this.ftable = new FastBtnTable(
             Object.assign(this.baseFtablePara, {
+                exportTitle: this.ui.caption,
                 cols: this.colParaGet(this._cols), // 把fields转为表格的参数
                 ajax: {
                     ajaxData,
@@ -378,6 +379,7 @@ export class BwTableModule extends Component {
                 colspan: hasSubCol ? subCols.length : 1, // 其他列有子列
                 rowspan: isAbsField && !hasSubCol ? 2 : 1,
                 maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
+                isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true, // 是否可排序
             } as IFastTableCol);
 
             if (hasSubCol) {
@@ -398,35 +400,43 @@ export class BwTableModule extends Component {
         return colsPara;
     }
 
+    private pivotRefresh(ajaxData: obj = {}): Promise<any>{
+        return new Promise((resolve, reject) => {
+            let loading = new Loading({
+                msg: '加载中...',
+                container: this.wrapper
+            });
+            this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(this.ui.dataAddr), {
+                data: Object.assign({}, ajaxData, {pageparams: `{"index"=1,"size"=3000,"total"=1}`})  //设置初始分页条件
+            }).then(({response}) => {
+                resolve(response);
+            }).catch((e) => {
+                reject(e);
+            }).finally(() => {
+                loading.destroy();
+                loading = null;
+            });
+        })
+
+    }
     /**
      * 初始化交叉制表
      * @param ajaxData - 查询参数
      */
     private pivotInit(ajaxData: obj = {}) {
         // let isFirst = tableDom.classList.contains('mobileTable');
-
-        let loading = new Loading({
-            msg: '加载中...',
-            container: this.wrapper
-        });
-        this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(this.ui.dataAddr), {
-            data: Object.assign({}, ajaxData, {pageparams: `{"index"=1,"size"=3000,"total"=1}`})  //设置初始分页条件
-        }).then(({response}) => {
-
+        this.pivotRefresh(ajaxData).then((response) => {
             if (tools.isEmpty(response)) {
                 return;
             }
-
             this.ftable = new FastBtnTable(
                 Object.assign(this.baseFtablePara, {
+                    exportTitle: this.ui.caption,
                     cols: colsParaGet(response.meta),
                     data: response.data
                 })
             );
             this.ftableReady();
-        }).finally(() => {
-            loading.destroy();
-            loading = null;
         });
 
         /**
@@ -478,6 +488,7 @@ export class BwTableModule extends Component {
                         isNumber: subName ? void 0 :
                             BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: subName ? void 0 : field.noShow,
+                        isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
                     } as IFastTableCol);
 
                     currentOriginField = {
@@ -497,7 +508,8 @@ export class BwTableModule extends Component {
                         isNumber: BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: field.noShow,
                         colspan: 1,
-                        rowspan: 1
+                        rowspan: 1,
+                        isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
                     } as IFastTableCol);
                 }
 
@@ -665,9 +677,16 @@ export class BwTableModule extends Component {
     }
 
     refresh(data?: obj) {
-        return this.ftable.tableData.refresh(data).then(() => {
-            this.aggregate.get(data);
-        });
+        if(this.isPivot){
+            return this.pivotRefresh(data).then((response) => {
+                this.ftable && (this.ftable.data = response.data || []);
+            });
+        }else{
+            return this.ftable.tableData.refresh(data).then(() => {
+                this.aggregate.get(data);
+            });
+        }
+
     }
 
     // protected fastTableInit
@@ -922,12 +941,15 @@ export class BwTableModule extends Component {
         let getCols = () => {
             let cols = [];
             this.ftable && this.ftable.columns.forEach((col) => {
-                cols.push({
-                    name: col.name,
-                    title: col.title,
-                    isNumber: col.isNumber,
-                    content: col.content
-                })
+                if(col && col.show && !col.isVirtual){
+                    cols.push({
+                        name: col.name,
+                        title: col.title,
+                        isNumber: col.isNumber,
+                        content: col.content
+                    })
+                }
+
             });
             return cols;
         };
@@ -1763,7 +1785,7 @@ export class BwTableModule extends Component {
                                     }
                                 })
                             }
-                            new FlowDesigner(dataAddr);
+                            // new FlowDesigner(dataAddr);
                         } else {
                             // 通用操作按钮
                             // if (multiselect === 2 && !selectedData[0]) {
@@ -1775,7 +1797,6 @@ export class BwTableModule extends Component {
                             //     Modal.alert('请选最多一条数据');
                             //     return;
                             // }
-
                             let btnUi = btn.data as R_Button,
                                 {multiselect, selectionFlag} = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?

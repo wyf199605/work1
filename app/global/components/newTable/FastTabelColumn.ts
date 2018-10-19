@@ -6,6 +6,7 @@ import {IColumnDelObj} from "./base/TableBase";
 import tools = G.tools;
 import d = G.d;
 import {SortType} from "../DataManager/DataManager";
+import {Modal} from "../feedback/modal/Modal";
 
 interface IFastTableColumnPara extends ITableColumnPara {
     sortState?: SortType;
@@ -97,6 +98,10 @@ export class FastTableColumn extends TableColumn {
 
     sort(order: SortType) {
         // 清除其他列的状态 并设置本列状态
+        if(!this.isCanSort){
+            Modal.toast('该列无排序功能');
+            return null;
+        }
         this.ftable.columns.forEach((col) => {
             col._sortState = col === this ? order : 'NO';
             let sortCol = col.cells[0][0],

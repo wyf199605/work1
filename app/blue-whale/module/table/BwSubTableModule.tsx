@@ -8,7 +8,6 @@ export class BwSubTableModule extends BwTableModule{
         super(para);
 
     }
-
     protected ftableReady() {
         super.ftableReady();
         tools.isNotEmpty(this.ui.subButtons) && this.subBtns.init(this.subBtnWrapper);

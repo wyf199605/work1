@@ -7,22 +7,20 @@ import {ListData, SelectDataPara} from "../../ui/dropdown/dropdown";
 import {Spinner} from "../../ui/spinner/spinner";
 import {Picker, PickerList} from "../../ui/picker/picker";
 
-export class SelectInputMb extends TextInput {
+export class SelectInputMb extends TextInput{
     onSet: (val) => void;
-    data: ListItem[] = [];
+    data : ListItem[] = [];
 
     protected pickList: PickerList;
     protected pickers: Picker[] = [];
-
-    constructor(protected para: ISelectInputPara) {
+    constructor(protected para: ISelectInputPara){
         super(Object.assign({}, para, {
-            icons: ['iconfont icon-arrow-down'],
-            iconHandle: para.clickType !== 0 ? () => {
-                this.showList()
-            } : null
+            icons : ['iconfont icon-arrow-down'],
+            iconHandle : para.clickType !== 0 ? () => {this.showList()} : null
         }));
+
         this.pickList = <PickerList isBackground={false} isShow={false} isOnceDestroy={false}
-                                    container={document.body} onSet={(val) => {
+            container={document.body} onSet={(val) => {
             let value = val[0];
             value = typeof value === 'string' || typeof value === 'number' ? value : value.value;
             this.set(value);
@@ -34,8 +32,8 @@ export class SelectInputMb extends TextInput {
         this.ajaxFun(para);
         this.initData(para.data);
         // clickType为0时
-        if (para.clickType === 0) {
-            d.on(this.wrapper, 'click', () => {
+        if(para.clickType === 0){
+           d.on(this.wrapper, 'click', () => {
                 this.showList();
                 let data = this.pickers[0].optionData;
                 // if(this.hasSelectItem && this.hasSelectItem.length > 0){
@@ -55,8 +53,8 @@ export class SelectInputMb extends TextInput {
 
     }
 
-    protected initData(data: ListData) {
-        if (Array.isArray(data)) {
+    protected initData(data: ListData){
+        if(Array.isArray(data)){
             this.data = data.map((data) => {
                 return typeof data === 'string' || typeof data === 'number'
                     ? {text: data + '', value: data} : data;
@@ -64,24 +62,23 @@ export class SelectInputMb extends TextInput {
             this.pickers[0] && (this.pickers[0].optionData = this.data);
         }
     }
-
-    private ajaxFun(para: SelectDataPara) {
-        if (para.ajax) {
+    private ajaxFun(para : SelectDataPara){
+        if(para.ajax){
             let fun = para.ajax.fun;
             this.para.ajax.fun = (url, value, callback) => {
-                fun(url, value === '' ? super.get() : value, callback)
+                fun(url, value === '' ? super.get() : value, callback )
             }
         }
     }
 
-    showList() {
+    showList(){
         let ajax = this.para.ajax,
             data = this.para.data;
 
         this.pickList.show();
-        let showData = (data: ListData) => {
+        let showData = (data : ListData) => {
             this.data = data.map((d) => typeof d === 'object'
-                ? d as ListItem : {text: d + '', value: d} as ListItem);
+                ? d as ListItem : {text: d + '', value: d} as ListItem );
             let showData = this.getShowData();
             this.initData(showData);
         };
@@ -101,16 +98,16 @@ export class SelectInputMb extends TextInput {
                 }
                 spinner.hide();
             });
-        } else if (Array.isArray(data)) {
+        } else if(Array.isArray(data)){
             showData(data);
         }
     }
 
-    setPara(para: SelectDataPara) {
+    setPara(para: SelectDataPara){
         let data = para.data,
             ajax = para.ajax;
 
-        if (data && data[0]) {
+        if( data && data[0] ){
 
             this.para.data = data;
 
@@ -118,7 +115,7 @@ export class SelectInputMb extends TextInput {
 
             this.para.ajax = null;
 
-        } else if (ajax) {
+        }else if (ajax){
 
             this.para.ajax = tools.obj.merge(this.para.ajax, ajax);
 
@@ -126,17 +123,16 @@ export class SelectInputMb extends TextInput {
 
         }
     }
-
-    private getShowData() {
-        let showData: ListItem[] = [];
-        if (this.showIndexes[0]) {
+    private getShowData(){
+        let showData : ListItem[] = [];
+        if(this.showIndexes[0]){
             this.showIndexes.forEach(i => {
                 let d = this.data[i];
-                if (d) {
+                if(d){
                     showData.push(d)
                 }
             });
-        } else {
+        }else {
             showData = this.data;
         }
 
@@ -144,40 +140,38 @@ export class SelectInputMb extends TextInput {
     }
 
     protected showIndexes = [];
-
-    showItems(indexes: number[]) {
+    showItems(indexes :number[]) {
         this.showIndexes = Array.isArray(indexes) ? indexes : [];
     }
 
-    get() {
+    get(){
         let data = this.pickers[0].value as ListData;
         let result = "";
-        if (this.para && this.para.multi && Array.isArray(data)) {
-            if (data && data.length > 0) {
+        if(this.para && this.para.multi && Array.isArray(data)) {
+            if(data && data.length > 0){
                 result += (typeof data[0] === 'string' || typeof data[0] === 'number')
                     ? data[0] : (data[0] as ListItem).value;
-                for (let i = 1, l = data.length; i < l; i++) {
+                for(let i = 1,l = data.length;i < l;i++){
                     result += `,${data[i]['value']}`;
                 }
             }
         }
-        else {
+        else{
             let opt = data;
             // return this.para.useInputVal ? super.get() : selected.value;
-            result = (this.para && this.para.useInputVal) ? super.get() : opt ? (opt as ListItem).value : '';
+            result = (this.para && this.para.useInputVal) ?  super.get() : opt ? (opt as ListItem).value : '';
         }
         return result;
     }
-
-    getText() {
+    getText(){
         return this.input.value;
     }
 
-    set(value) {
-        let index: number = -1;
-        for (let d: ListItem = null, i = 0; d = this.data[i]; i++) {
-            if (d.value === value) {
-                if (this.pickers[0]) {
+    set(value){
+        let index : number = -1;
+        for (let d:ListItem = null, i = 0; d = this.data[i]; i++){
+            if (d.value === value){
+                if(this.pickers[0]){
                     this.pickers[0].current !== i && (this.pickers[0].current = i);
                     index = i;
                     this.para.onSet && this.para.onSet(d, index);
@@ -188,13 +182,12 @@ export class SelectInputMb extends TextInput {
         this.input.value = tools.str.toEmpty(index === -1 ? value : this.data[index][this.para.useInputVal ? 'value' : 'text']);
     }
 
-    destroy() {
+    destroy(){
         this.pickList && this.pickList.hide(true);
         super.destroy();
     }
 
 }
-
 //
 // export class SelectInputMb extends TextInput{
 //     onSet: (val) => void;

@@ -154,11 +154,12 @@ export class MbListItem extends Component {
         clearInterval(this.timer);
         typeof countDown === 'number' && (this.timer = setInterval(() => {
             let date = new Date(),
+                html = '',
                 targetTime = new Date(countDown),
                 total = (targetTime.getTime() - date.getTime()) / 1000;
 
             if (targetTime.getTime() < date.getTime()) {
-                el.innerText = '已结束';
+                html = '活动已开始';
                 clearInterval(this.timer);
                 this.timer = null;
                 return;

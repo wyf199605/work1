@@ -172,7 +172,6 @@ export class FlowReport extends BasicPage {
         function subBtnEvent(index) {
             let btn = para.fm.subButtons[index],
                 pageData = self.dataGet();
-            //给open方法加入默认回调
             switch (btn.subType) {
                 case 'save':
                     if (!self.validate(pageData)) {
@@ -206,11 +205,8 @@ export class FlowReport extends BasicPage {
                 case 'with_draw':
                     btn.hintBeforeAction = true;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
-                        // sys.window.open({
-                        //     url:BW.CONF.siteUrl + '/' + response.body.bodyList[0].dataList[0] + '&page=flowReport'
-                        // });
                         sys.window.open({
-                            url:BW.CONF.url.myApplication
+                            url: BW.CONF.siteUrl + '/' + response.body.bodyList[0].dataList[0] + '?page=flowReport'
                         });
                     }, self.url);
                     break;
