@@ -125,12 +125,14 @@
           left: calc(-170px + .7em);
           top: 0;
           background: #007AFF;
-          color: #fff;
           height: 2em;
-          width: calc(170px - 1em);
           line-height: 2em;
           text-align: center;
           font-weight: bold;
+          width: 0;
+          color: transparent;
+          transition: width 1s, color 1s;
+          -webkit-transition: width 1s, color 1s;
           &:after, &:before {
             display: block;
             width: 0;
@@ -158,7 +160,9 @@
       }
       li.animated {
         .arrow {
-          animation: arrow 1s forwards;
+          //animation: arrow 1s forwards;
+          width: calc(170px - 1em);
+          color: #fff;
         }
       }
     }

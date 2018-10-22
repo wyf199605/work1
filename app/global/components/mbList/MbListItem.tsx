@@ -13,6 +13,7 @@ export interface IMbListItemPara extends IComponentPara{
     data?: MbListItemData;
     isImg?: boolean;
     isCheckBox?: boolean;
+    btns?: string[];
 }
 
 export interface MbListItemData{
@@ -30,6 +31,7 @@ export class MbListItem extends Component {
     protected list: MbList;
     protected checkBox: CheckBox;
     protected imgWrapper: HTMLElement;
+    protected btnWrapper: HTMLElement;
     protected details: objOf<HTMLElement>;
 
     constructor(para: IMbListItemPara) {
@@ -105,7 +107,7 @@ export class MbListItem extends Component {
             let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
             if(tools.isNotEmpty(data.imgLabel)){
-                d.append(this.imgWrapper, <div className='img-label'>{data.imgLabel}</div>)
+                d.append(this.imgWrapper, <div className='img-label'><span>{data.imgLabel}</span></div>)
             }
         }
 
@@ -120,7 +122,7 @@ export class MbListItem extends Component {
                     el.innerHTML = '';
                     content && content.forEach((arr) => {
                         d.append(el, <p>
-                            {arr[0] + '：' + arr[1]}
+                            <span className="body-title">{arr[0] + '：'}</span><span className="body-value">{arr[1]}</span>
                         </p>)
                     });
                     break;
@@ -154,11 +156,12 @@ export class MbListItem extends Component {
         clearInterval(this.timer);
         typeof countDown === 'number' && (this.timer = setInterval(() => {
             let date = new Date(),
+                html = '',
                 targetTime = new Date(countDown),
                 total = (targetTime.getTime() - date.getTime()) / 1000;
 
             if (targetTime.getTime() < date.getTime()) {
-                el.innerText = '已结束';
+                html = '活动已开始';
                 clearInterval(this.timer);
                 this.timer = null;
                 return;
@@ -174,6 +177,30 @@ export class MbListItem extends Component {
                 (day > 0 ? day + '天' : '') + ' ' +
                 toTwo(hour) + ':' + toTwo(min) + ':' + toTwo(sec);
         }, 1000));
+    }
+
+    protected _isShowBtns: boolean = false;
+    set isShowBtns(flag: boolean){
+        this._isShowBtns = flag;
+        this.btnWrapper && this.btnWrapper.classList.toggle('hide', !flag);
+    }
+    get isShowBtns(){
+        return this.btnWrapper ? this._isShowBtns : false;
+    }
+
+    // 初始化按钮配置
+    initBtn(btns: string[]){
+        this.btnWrapper = <div className="btn-group"/>
+    }
+
+    // 添加按钮，index插入位置
+    addBtn(btn: string, index: number){
+
+    }
+
+    // 删除按钮
+    delBtn(index: number){
+
     }
 
     destroy(){

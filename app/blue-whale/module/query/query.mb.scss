@@ -121,6 +121,11 @@
         font-size: 16px;
         padding: 10px 5px;
 
+        .swipe-out-left{
+          & > * {
+            padding: 0;
+          }
+        }
         .mui-row > div{
           height:30px;
         }

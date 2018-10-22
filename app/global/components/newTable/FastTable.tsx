@@ -1939,7 +1939,7 @@ export class FastTable extends Component {
                         topRow = this.rowGet(index - topIndex);
                     while (topRow && index - topIndex >= 0) {
                         let topCell = topRow.cellGet(columnIndex);
-                        if (!topCell.isVirtual && topCell.show) {
+                        if (topCell && !topCell.isVirtual && topCell.show) {
                             topCell.selected && cell.wrapper.classList.remove('topBorder');
                             break;
                         }
@@ -1957,7 +1957,7 @@ export class FastTable extends Component {
                         bottomRow = this.rowGet(index + bottomIndex);
                     while (bottomRow && index + bottomIndex < array.length) {
                         let bottomCell = bottomRow.cellGet(columnIndex);
-                        if (!bottomCell.isVirtual && bottomCell.show) {
+                        if (bottomCell && !bottomCell.isVirtual && bottomCell.show) {
                             bottomCell.selected && cell.wrapper.classList.remove('bottomBorder');
                             break;
                         }
@@ -1976,7 +1976,7 @@ export class FastTable extends Component {
                         leftRow = this.rowGet(index);
                     while (leftRow && columnIndex - leftIndex >= 0) {
                         let leftCell = leftRow.cellGet(columnIndex - leftIndex);
-                        if (!leftCell.isVirtual && leftCell.show) {
+                        if (leftRow && !leftCell.isVirtual && leftCell.show) {
                             leftCell.selected && cell.wrapper.classList.remove('leftBorder');
                             break;
                         }
@@ -1988,7 +1988,7 @@ export class FastTable extends Component {
                         rightRow = this.rowGet(index);
                     while (rightRow && columnIndex + rightIndex < this.columns.length) {
                         let rightCell = rightRow.cellGet(columnIndex + rightIndex);
-                        if (!rightCell.isVirtual && rightCell.show) {
+                        if (rightCell && !rightCell.isVirtual && rightCell.show) {
                             rightCell.selected && cell.wrapper.classList.remove('rightBorder');
                             break;
                         }
@@ -2603,6 +2603,7 @@ export class FastTable extends Component {
                 data[key] = obj[key];
             }
         }
+
         return {
             keys,
             data
@@ -2621,7 +2622,7 @@ export class FastTable extends Component {
         if (this.editing) {
             this.edit.destroyCellInput();
             let edit = this.edit,
-                result: objOf<Array<obj>> = {
+                result: objOf<any> = {
                     update: [],
                     insert: [],
                     delete: [],
@@ -2667,7 +2668,7 @@ export class FastTable extends Component {
                 let pivotResult = {
                     update: [],
                     insert: [],
-                    delete: []
+                    delete: [],
                 };
                 console.log(result);
                 for(let operation in result){
@@ -2717,12 +2718,13 @@ export class FastTable extends Component {
                         }
                     })
                 }
-
                 console.log(pivotResult);
 
+                pivotResult['isPivot'] = true;
                 return pivotResult;
             }
 
+            result['isPivot'] = false;
             return result;
         }
         return null;

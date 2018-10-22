@@ -13,6 +13,7 @@ import {SelectBox} from "../form/selectBox/selectBox";
 import {Spinner} from "../ui/spinner/spinner";
 export interface IFastBtnTablePara extends IFastTablePara{
     btn?: IFastBtnTableBtn;
+    exportTitle?: string;
 }
 interface IFastBtnTableBtn {
     name: ('search' | 'statistic' | 'export')[];
@@ -28,6 +29,7 @@ export class FastBtnTable extends FastTable{
     protected spinner: Spinner;
     protected isButton: boolean;
     protected isReplaceTable: boolean;
+    protected exportTitle: string = '';
     public btnWrapper: HTMLElement;
     protected modals: Modal[] = [];
 
@@ -40,6 +42,7 @@ export class FastBtnTable extends FastTable{
 
     constructor(para: IFastBtnTablePara){
         super(para);
+        this.exportTitle = para.exportTitle || '';
         if(tools.isNotEmpty(para.btn)){
             this.isReplaceTable = tools.isEmpty(para.btn.isReplaceTable) ? false : para.btn.isReplaceTable;
             this.isButton = (tools.isEmpty(para.btn.type) ? 'button' : para.btn.type) === 'button';
@@ -538,12 +541,14 @@ export class FastBtnTable extends FastTable{
             getCols: () => {
                 let cols = [];
                 this.columns.forEach((col) => {
-                    cols.push({
-                        name: col.name,
-                        title: col.title,
-                        isNumber: col.isNumber,
-                        content: col.content,
-                    })
+                    if(col.show && !col.isVirtual){
+                        cols.push({
+                            name: col.name,
+                            title: col.title,
+                            isNumber: col.isNumber,
+                            content: col.content,
+                        })
+                    }
                 });
                 return cols;
             }
@@ -725,7 +730,7 @@ export class FastBtnTable extends FastTable{
             let div = <div style="overflow: auto; height: auto; width: 100%"></div>;
             d.append(document.body, div);
             d.append(div, table);
-            tableExport(table, '', action);
+            tableExport(table, this.exportTitle, action);
             d.remove(div, true);
             this.columns.forEach((col) => {
                 if(names.indexOf(col.name) > -1){

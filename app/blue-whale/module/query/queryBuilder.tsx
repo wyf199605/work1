@@ -36,7 +36,7 @@ interface QueryDisplayControl {
 interface QueryBuilderPara{
     queryConfigs: QueryConf[], // 查询字段名、值等一些配置，后台数据直接传入
     queryName?: string, // 联动查询时需要的参数名
-    tpl?: string, // 必须在tpl中包含data-type属性的div, 值有:field | not | operator | input1 | input2
+    tpl?: () => HTMLElement, // 必须在tpl中包含data-type属性的div, 值有:field | not | operator | input1 | input2
     resultDom: HTMLElement, // 查询条件容器
     setting: QueryParam  // 默认值
     atVarDataGet?(): obj;
@@ -196,7 +196,7 @@ export class QueryBuilder {
         let self = this;
 
         if(!para.tpl){
-            para.tpl = tplGet();
+            para.tpl = tplGet;
         }
 
         this.queryConfigs = para.queryConfigs;
@@ -320,7 +320,7 @@ export class QueryBuilder {
      * @return {QueryComs}
      */
     protected rowCreate(index : number){
-        let row = d.create(this.para.tpl),
+        let row = this.para.tpl(),
             coms : QueryComs = {};
 
         row.dataset.index = index.toString();
@@ -848,7 +848,7 @@ export class AtVarBuilder{
      * @return {QueryComs}
      */
     protected rowAdd(index : number ,conf : QueryConf, value:any){
-        let row = d.create(this.para.tpl);
+        let row = this.para.tpl();
 
         row.dataset.index = index.toString();
 
@@ -911,27 +911,27 @@ export class AtVarBuilder{
 }
 
 function tplGet(){
-    let mb = '<li class="mui-table-view-cell">' +
-        '<div class="mui-slider-right mui-disabled" data-action="del"><a class="mui-btn mui-btn-red">删除</a></div>' +
-        '<div class="mui-slider-left mui-disabled">' +
-        '<a class="mui-btn" data-type="andOr"></a>' +
-        '</div>' +
-        '<div class="mui-slider-handle inner-padding-row">' +
-        '<div data-type="field"></div>' +
-        '<div data-type="not"></div>' +
-        '<div data-type="operator"></div>' +
-        '<div data-type="input1"></div>' +
-        '<div data-type="input2"></div>' +
-        '</div></li>';
+    let mb = <li class="mui-table-view-cell">
+            <div class="mui-slider-right mui-disabled" data-action="del"><a class="mui-btn mui-btn-red">删除</a></div>
+            <div class="mui-slider-left mui-disabled">
+            <a class="mui-btn" data-type="andOr"></a>
+            </div>
+            <div class="mui-slider-handle inner-padding-row">
+            <div data-type="field"></div>
+            <div data-type="not"></div>
+            <div data-type="operator"></div>
+            <div data-type="input1"></div>
+            <div data-type="input2"></div>
+        </div></li>;
 
-    let pc = '<div class="row"> ' +
-        '<div class="col-sm-3" data-type="field"></div> ' +
-        '<div class="col-sm-1" data-type="not"></div> ' +
-        '<div class="col-sm-2" data-type="operator"></div> ' +
-        '<div class="col-sm-3" data-type="input1"></div> ' +
-        '<div class="col-sm-3" data-type="input2"></div> ' +
-        '<span data-action="del" class="iconfont red icon-close"></span> ' +
-        '<span data-type="andOr"></span>' +
-        '</div>';
+    let pc = <div class="row">
+            <div class="col-sm-3" data-type="field"></div>
+            <div class="col-sm-1" data-type="not"></div>
+            <div class="col-sm-2" data-type="operator"></div>
+            <div class="col-sm-3" data-type="input1"></div>
+            <div class="col-sm-3" data-type="input2"></div>
+            <span data-action="del" class="iconfont red icon-close"></span>
+            <span data-type="andOr"></span>
+        </div>;
     return sys.isMb ? mb : pc;
 }

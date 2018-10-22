@@ -15,6 +15,7 @@ export interface IUploaderPara extends IFormComPara{
     text?: string;
     accept?: obj;
 }
+// TODO 使用完该控件需销毁，否则后续上传会多次
 export class Uploader extends FormCom{
     onSet: (val) => void;
     private com;

@@ -28,9 +28,11 @@ export class Mask extends Component {
     protected init() {
         let type = 'click';
         d.on(this.wrapper, type, (e) => {
-            e.preventDefault && e.preventDefault();
-            e.stopPropagation();
-            // typeof this.onClick === 'function' && this.onClick(e);
+            if(this.background){
+                e.preventDefault && e.preventDefault();
+                e.stopPropagation();
+                // typeof this.onClick === 'function' && this.onClick(e);
+            }
             this.clickHandlers[Mask.key] && this.clickHandlers[Mask.key](e)
         });
         // this.container = this.para.container;
@@ -47,7 +49,9 @@ export class Mask extends Component {
             }
         }
         d.on(this.wrapper, 'touchmove', (e) => {
-            e.preventDefault();
+            if(this.background) {
+                e.preventDefault();
+            }
         });
     }
 

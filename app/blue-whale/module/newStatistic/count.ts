@@ -80,12 +80,15 @@ export = class NewCount extends NewStatisticBase{
                         break;
                     }
                 }
+                if(colIndex === -1){
+                    return null;
+                }
 
                 return {
                     text: cols[colIndex].title,
                     value: colName
                 }
-            });
+            }).filter((item) => item);
 
             let selectInput = new (sys.isMb ? SelectInputMb : SelectInput)({
                 container: <HTMLElement>this.modal.body,

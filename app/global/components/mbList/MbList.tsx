@@ -14,7 +14,7 @@ export interface IMbListPara extends IComponentPara{
 
 export class MbList extends Component{
     protected wrapperInit(){
-        return <div class="mb-list-wrapper"/>;
+        return <div className="mb-list-wrapper"/>;
     }
     constructor(para: IMbListPara){
         super(para);
@@ -35,10 +35,10 @@ export class MbList extends Component{
             create: (n) => {
                 this._listItems.push(this.createListItem({data: n}));
             },
-            replace: (n, o:MbListItem) => {
-                o.render(n || {});
+            replace: (n, o) => {
+                o.data = n || {};
             },
-            destroy: (o:MbListItem) => {
+            destroy: (o) => {
                 o.destroy();
                 let index = this._listItems.indexOf(o);
                 if(index > -1)

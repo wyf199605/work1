@@ -8,6 +8,8 @@ interface IUploadModulePara extends IUploaderPara{
     onChange?: Function;
     showNameOnComplete?:boolean;// 默认true
 }
+
+// TODO 使用完该控件需销毁，否则后续上传会多次
 export default class UploadModule extends FormCom{
     onSet: (val) => void;
 
@@ -33,7 +35,7 @@ export default class UploadModule extends FormCom{
                     this.para.onComplete && this.para.onComplete.call(this, data, file);
                 } else {
                     this.para.onError && this.para.onError.call(this,file);
-                    Modal.alert(data.message);
+                    Modal.alert(data.msg || data.errorMsg);
                 }
             }
         });
