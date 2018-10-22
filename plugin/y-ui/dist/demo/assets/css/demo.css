@@ -1,0 +1,47 @@
+a:hover, a:focus {
+  text-decoration: none;
+  color: #376B7C;
+}
+
+.demo-main {
+  margin-left: 200px;
+  padding: 20px;
+  min-height: 800px;
+  width: 1300px;
+}
+
+.demo-left-menu {
+  width: 200px;
+  padding-bottom: 10000px;
+  margin-bottom: -10000px;
+  background: #F3F3F3;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.demo-left-menu .panel-heading {
+  padding: 0;
+}
+
+.demo-left-menu .panel-heading a {
+  padding: 10px 15px;
+  display: block;
+  background: #4D86B9;
+  font-weight: bold;
+  color: #fff;
+}
+
+.demo-left-menu .panel-collapse li {
+  padding: 0;
+}
+
+.demo-left-menu .panel-collapse li a {
+  padding: 10px 15px;
+  display: block;
+}
+
+.demo-left-menu .panel-collapse li a.active, .demo-left-menu .panel-collapse li a:hover {
+  background: #5BB4DA;
+  color: #fff;
+}

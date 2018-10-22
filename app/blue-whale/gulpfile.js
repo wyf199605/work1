@@ -165,7 +165,8 @@ gulp.task('js', function () {
 
     // 移动化详情页
     gulpTsModule([
-        'listDetail/ListItemDetail'
+        'listDetail/ListItemDetail',
+        'listDetail/ListItemDetailCell',
     ], 'listDetail.js');
 
     //process模块
