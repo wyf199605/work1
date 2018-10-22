@@ -553,7 +553,7 @@ export class NewTableModule {
 
             bwTable.ftable.editorInit({
                 defData,
-                isPivot: this.bwEl.relateType === 'P',
+                isPivot: bwTable.isPivot,
                 autoInsert: false,
                 inputInit: (cell, col, data) => {
                     let rowIndex = cell.row.index,
@@ -705,14 +705,14 @@ export class NewTableModule {
             })
         };
 
-        let editParamDataGet = (tableData, varList: IBW_TableAddrParam) => {
+        let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
             let paramData: obj = {};
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
 
                     let data = BwRule.varList(varList[key], tableData[dataKey], true,
-                        this.bwEl.relateType !== 'P');
+                        !isPivot);
                     if (data) {
                         paramData[key] = data;
                     }
@@ -735,7 +735,9 @@ export class NewTableModule {
                     return;
                 }
 
-                let editData = bwTable.ftable.editedData;
+                let editData = bwTable.ftable.editedData,
+                    isPivot = editData.isPivot;
+                delete editData.isPivot;
                 if (i === 1) {
                     // 带上当前主表的字段
                     let mainData = this.main.ftable.edit;
@@ -748,7 +750,7 @@ export class NewTableModule {
                     }
                 }
                 //
-                let data = editParamDataGet(editData, bwTable.editParam);
+                let data = editParamDataGet(editData, bwTable.editParam, isPivot);
                 // tm.table.edit.reshowEditing();
                 //
                 if (!tools.isEmpty(data)) {

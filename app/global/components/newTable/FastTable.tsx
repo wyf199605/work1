@@ -2603,6 +2603,7 @@ export class FastTable extends Component {
                 data[key] = obj[key];
             }
         }
+
         return {
             keys,
             data
@@ -2621,7 +2622,7 @@ export class FastTable extends Component {
         if (this.editing) {
             this.edit.destroyCellInput();
             let edit = this.edit,
-                result: objOf<Array<obj>> = {
+                result: objOf<any> = {
                     update: [],
                     insert: [],
                     delete: [],
@@ -2667,7 +2668,7 @@ export class FastTable extends Component {
                 let pivotResult = {
                     update: [],
                     insert: [],
-                    delete: []
+                    delete: [],
                 };
                 console.log(result);
                 for(let operation in result){
@@ -2717,12 +2718,13 @@ export class FastTable extends Component {
                         }
                     })
                 }
-
                 console.log(pivotResult);
 
+                pivotResult['isPivot'] = true;
                 return pivotResult;
             }
 
+            result['isPivot'] = false;
             return result;
         }
         return null;
