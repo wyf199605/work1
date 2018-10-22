@@ -8,14 +8,18 @@ import d = G.d;
 import tools = G.tools;
 import Shell = G.Shell;
 import {UnBinding} from "../../module/unBinding/UnBinding";
+import {Button} from "../../../global/components/general/button/Button";
+import {FqaModal} from "../fqa/fqa";
+
 interface IProps {
-    goLogin: HTMLElement,
-    saveReg: HTMLElement,
-    sendVerify: HTMLElement,
-    tel: HTMLInputElement,
-    verifyELCodeInput?:HTMLInputElement,
-    verifyELCode?: HTMLCanvasElement,
-    smsCheckCode: HTMLInputElement;
+    goLogin: HTMLElement,   // 返回登录
+    saveReg: HTMLElement,   // 注册
+    sendVerify: HTMLElement,// 获取短信验证码
+    tel: HTMLInputElement,  // 输入手机号
+    verifyELCodeInput?:HTMLInputElement,    // 输入前端的验证码
+    verifyELCode?: HTMLCanvasElement,       // 显示前端的验证码
+    smsCheckCode: HTMLInputElement;         // 输入短信验证码
+    fqaBtn?: Button,
 }
 declare const double_back: any;
 /**
@@ -139,6 +143,12 @@ export class RegPage {
         });
         if (sys.os !== 'pc') {
             sys.window.close = double_back;
+        }
+
+        if(props.fqaBtn){
+            props.fqaBtn.onClick = tools.pattern.throttling(() => {
+                new FqaModal({});
+            }, 1000);
         }
     }
 

@@ -44,7 +44,7 @@ export class BwTableModule extends Component {
     }
 
     protected readonly isDrill: boolean;   // 是否钻取
-    protected readonly isPivot: boolean;   // 是否是交叉表
+    readonly isPivot: boolean;   // 是否是交叉表
     protected readonly hasQuery: boolean;  // 是否有查询器
     public ui: IBW_Table;                  // 表格UI JSON
     public readonly editParam: IBW_TableAddrParam; // 表格编辑的JSON
