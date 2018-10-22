@@ -806,7 +806,7 @@ export class LoginPage{
     private loginBtnState(type:number){
         let btn = this.props.loginButton,
             login = btn instanceof Button ? btn.wrapper : btn,
-            loginText = sys.isMb ? login : login.querySelector('.text');
+            loginText = login;
         switch (type) {
             case 0:
                 login.classList.remove('disabled');
