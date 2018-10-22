@@ -110,7 +110,6 @@ gulp.task('js', function () {
         'query/queryModule.mb',
         'query/queryConfig',
         'query/asynQuery',
-        'query/horizontalFormFactory'
     ], 'query.mb.js');
 
     // pc查询器
@@ -163,6 +162,12 @@ gulp.task('js', function () {
         'flowReport/FlowList',
         'flowReport/Accessory'
     ], 'flowReport.js');
+
+    // 移动化详情页
+    gulpTsModule([
+        'listDetail/ListItemDetail',
+        'listDetail/ListItemDetailCell',
+    ], 'listDetail.js');
 
     //process模块
     gulpTsModule([
