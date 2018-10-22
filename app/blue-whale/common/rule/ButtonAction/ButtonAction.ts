@@ -233,13 +233,14 @@ export class ButtonAction {
             response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
         })
 
-        new RfidBarCode({
-             codeStype:codeStype,
-             SHO_ID:dataObj['SHO_ID'],
-             USERID:dataObj['USERID'],
-             url:ajaxUrl,
-            uniqueFlag
-        })
+        require(['RfidBarCode'], (p) => {
+            new p.RfidBarCode({
+                codeStype:codeStype,
+                SHO_ID:dataObj['SHO_ID'],
+                USERID:dataObj['USERID'],
+                url:ajaxUrl,
+            })
+        });
     }
 
     /**

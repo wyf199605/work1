@@ -184,6 +184,9 @@ function down(url: string, uploadUrl: string, btn: Button, bwTable: BwTableModul
                 resolve();
 
             });
+            if(!inVen){
+                btn.isDisabled = false;
+            }
 
         }
 

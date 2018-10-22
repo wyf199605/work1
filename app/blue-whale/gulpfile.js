@@ -178,6 +178,9 @@ gulp.task('js', function () {
     //upload模块
     gulpTsModule(['uploadModule/uploadModule'], 'uploadModule.js');
 
+    //drawpoint模块
+    gulpTsModule(['DrawPoint/DrawPoint'],'DrawPoint.js');
+
     //unBinding模块
     gulpTsModule(['unBinding/UnBinding'], 'unBinding.js');
 
@@ -286,6 +289,7 @@ gulp.task('js', function () {
     gulpTsPage('rfid/RfidSetting/RfidSetting', 'RfidSetting.js');
 
     gulpTsPage('rfid/RfidBarCode/RfidBarCode','RfidBarCode.js');
+    gulpTsPage('plan/PlanPage','PlanPage.js');
 });
 
 /**
