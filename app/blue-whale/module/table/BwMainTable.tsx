@@ -11,7 +11,6 @@ export class BwMainTableModule extends BwTableModule{
         d.classAdd(this.wrapper, 'table-module-main');
 
     }
-
     protected ftableReady(){
         super.ftableReady();
         this.tableHeightInit();

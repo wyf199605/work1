@@ -14,6 +14,7 @@ interface IInputBoxPara extends IComponentPara{
     children?: Button[];
     moreBtn?: Button;
     isResponsive?: boolean;
+    limitCount?: number; // isResponsive为true是有效，限制显示按钮数量，其余的在更多中
 
     responsive?(): void;
 
@@ -31,7 +32,7 @@ interface IInputBoxPara extends IComponentPara{
  */
 export class InputBox extends Component {
 
-
+    public limitCount: number;
     private _lastNotMoreIndex: number; //记录最后一个未放入更多下拉列表容器的下标
 
     protected wrapperInit(): HTMLElement {
@@ -40,6 +41,7 @@ export class InputBox extends Component {
 
     private init(inputBox: IInputBoxPara) {
         // debugger;
+        this.limitCount = inputBox.limitCount || 4;
         this.isVertical = !!inputBox.isVertical;
         this.wrapper.classList.add(this.isVertical ? 'input-box-vertical' : 'input-box-horizontal');
 
@@ -217,7 +219,7 @@ export class InputBox extends Component {
         // }
         //如果当前组件集合宽度 > 父容器宽度
         // if (parseInt(this.wrapper.style.width) > paWidth && this.children.length > 0) {
-        if (this.children.length > 4) {
+        if (this.children.length > this.limitCount) {
             //判断是否有更多下拉列表
             tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button({
                 content: '更多',
@@ -239,7 +241,7 @@ export class InputBox extends Component {
             }
             //从组件集合末尾倒序调整
             let len = this.children.length;
-            for (let i = len - 1; i >= 3; i--) {
+            for (let i = len - 1; i >= this.limitCount - 1; i--) {
                 //当组件集合宽度超过限制的最大宽度时，将最后一个非更多下拉列表内的组件放置于更多下拉列表容器内（插入到其第一个子元素之前）
                 // if (parseInt(this.wrapper.style.width) > paWidth) {
                     let com = this.children[i];
@@ -261,7 +263,8 @@ export class InputBox extends Component {
         // setTimeout(() => {
             // debugger;
         let width = 10;
-        for(let i = 0; i < 4; i ++ ){
+
+        for(let i = 0; i < this.limitCount; i ++ ){
             let child: HTMLElement = this.wrapper.children[i] as HTMLElement;
             if(child){
                 width += child.offsetWidth;

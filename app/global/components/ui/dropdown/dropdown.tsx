@@ -277,7 +277,7 @@ export class DropDown {
                     if (Array.isArray(d)) {
                         this.initListData(d);
                     }
-                    this.spinner && this.spinner.hide();
+                    this.spinner.hide();
                     this.spinner = null;
                 });
             }

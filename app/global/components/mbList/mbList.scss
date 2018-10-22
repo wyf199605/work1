@@ -1,3 +1,116 @@
 .mb-list-wrapper{
+  background:#fff;
+  font-size: 30px;
+  .check-span.label-checkbox{
+    &::before{
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+  }
+  .select-box{
+    font-size: 40px;
+    input[type=checkbox]:checked +.check-span{
+      &::after{
+        padding-top: 15px;
+      }
+    }
+    .check-span{
+      width: 50px;
+      height: 50px;
+    }
+  }
+  .body-title{
+    display: inline-block;
+    width: 160px;
+  }
+  .img-label{
+    width: 0;
+    height: 0;
+    border-width: 100px 100px 0 0;
+    border-style: solid;
+    border-color: #FF9C00 transparent transparent transparent;
+    position: relative;
+    top: -200px;
+    left: 0px;
+    span{
+      display: inline-block;
+      width: 140px;
+      transform: rotate(-45deg);
+      position: relative;
+      top: -120px;
+      left: -10px;
+    }
+  }
+  .label{
+    color: #b4b4b4;
+    font-weight: normal;
+    border: 1px solid #b4b4b4;
+    border-radius: 4px;
+    margin-right: .6em;
+    font-size: 85%;
+  }
+  .list-item-wrapper{
+    &::after{
+      content: "";
+      clear: both;
+      display: block;
+    }
+    padding: 40px;
+    padding-right: 0;
+    &>.checkbox-wrapper{
+      width: 60px;
+      height: 60px;
+      float: left;
+      margin-top: 70px;
+      margin-left: 20px;
+      &+.list-item-content{
+        border: none;
+        padding-bottom: 0;
+      }
+    }
+    &>.list-item-content{
+      width: calc(100% - 160px);
+      float: left;
+      border-bottom: 2px solid #F8F8F8;
+      padding-bottom: 40px;
+      margin-left: 60px;
+      &::after{
+        content: "";
+        clear: both;
+        display: block;
+      }
+      .list-item-img{
+        float: left;
+        width: 200px;
+        height: 200px;
+        margin-right: 50px;
+        img{
+          width: 200px;
+          height: 200px;
+        }
+        &+.list-item-details{
+          width:auto;
+          .list-item-title{
+            padding: 0;
+            border-bottom: none;
+          }
+        }
+      }
+      .list-item-details{
+        float: left;
+        color: #666;
+        width: 100%;
+      }
+      .list-item-title {
+        font-size: 30px;
+        font-weight: bolder;
+        color: #000;
+        margin-bottom: 10px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #F8F8F8 ;
+      }
 
+    }
+  }
 }

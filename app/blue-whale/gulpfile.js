@@ -163,6 +163,12 @@ gulp.task('js', function () {
         'flowReport/Accessory'
     ], 'flowReport.js');
 
+    // 移动化详情页
+    gulpTsModule([
+        'listDetail/ListItemDetail',
+        'listDetail/ListItemDetailCell',
+    ], 'listDetail.js');
+
     //process模块
     gulpTsModule([
         'sqlMonitor/sqlMonitor'
@@ -272,9 +278,11 @@ gulp.task('js', function () {
 
     gulpTsPage('index/login', 'login.js');
     gulpTsPage('index/login.mb', 'login.mb.js');
+    gulpTsPage('index/login.pc', 'login.pc.js');
 
     gulpTsPage('index/register', 'register.js');
     gulpTsPage('index/register.mb', 'register.mb.js');
+    gulpTsPage('index/register.pc', 'register.pc.js');
     gulpTsPage('index/exception', 'exception.js');
 
     gulpTsPage('attendance/attendance', 'attendance.js');
