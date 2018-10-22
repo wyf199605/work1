@@ -1,8 +1,6 @@
 node_modules/
-dist/
 .idea/
 .sass-cache/
-dist.min/
 test/
 app/package-lock.json
 .gulp-scss-cache/
