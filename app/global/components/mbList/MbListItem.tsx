@@ -6,6 +6,7 @@ import tools = G.tools;
 import {CheckBox} from "../form/checkbox/checkBox";
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import {InputBox} from "../general/inputBox/InputBox";
 
 export interface IMbListItemPara extends IComponentPara{
     list?: MbList;
@@ -178,7 +179,7 @@ export class MbListItem extends Component {
                 toTwo(hour) + ':' + toTwo(min) + ':' + toTwo(sec);
         }, 1000));
     }
-
+    //是否显示按钮
     protected _isShowBtns: boolean = false;
     set isShowBtns(flag: boolean){
         this._isShowBtns = flag;
@@ -191,6 +192,7 @@ export class MbListItem extends Component {
     // 初始化按钮配置
     initBtn(btns: string[]){
         this.btnWrapper = <div className="btn-group"/>
+        InputBox
     }
 
     // 添加按钮，index插入位置

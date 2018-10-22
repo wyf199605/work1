@@ -13,6 +13,7 @@ new MbList({
             ],
             label: ['手工确认完成', '谢晋超'],
             imgLabel: '标签',
+            btns: ['确认核验', '加入色码打印', '测试'],
             status: 1,
         }
     ],
