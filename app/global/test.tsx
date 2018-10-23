@@ -1,15 +1,5 @@
 /// <amd-module name="GlobalTestModule"/>
-
-
-import {UploadFileList} from "./components/uploadFile/UploadFileList";
-
-new UploadFileList({
-    data: [
-        {
-            uploadUrl: 'test',
-            fileInfo: ['1.pdf', '123M']
-        }
-    ]
+import {Accessory} from "./components/form/upload/accessory";
+new Accessory({
+    container:document.body
 });
-
-

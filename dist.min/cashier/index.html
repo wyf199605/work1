@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>速狮收银台</title>
+    <link href="img/logo.png" rel="shortcut icon"/>
+    <!-- Font -->
+    <link href="font/iconfont/iconfont.css" rel="stylesheet" type="text/css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="HandheldFriendly" content="true"/>
+    <link href="global.pc.css?v=0" rel="stylesheet">
+    <link href="cashier.css?v=0" rel="stylesheet">
+</head>
+
+<body>
+<!--<body>-->
+<div id="loginReg"></div>
+</body>
+<script src="plugin/requirejs/require.js"></script>
+<script src="global.js?v=0"></script>
+<script src="cashier.js?v=0"></script>
+
+<script>
+    __setRequireBase('./cashier', '0');
+    var __extends = (this && this.__extends) || (function () {
+            var extendStatics = Object.setPrototypeOf ||
+                ({__proto__: []} instanceof Array && function (d, b) {
+                    d.__proto__ = b;
+                }) ||
+
+                function (d, b) {
+                    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+                };
+            return function (d, b) {
+                extendStatics(d, b);
+
+                function __() {
+                    this.constructor = d;
+                }
+
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+    // var Tools = {
+    //     event : {
+    //         fire : function () {
+    //             G.tools.event.fire.apply(null, arguments);
+    //         }
+    //     }
+    // };
+
+    require(['CashierPage'], function(CashierPage){
+        CashierPage.init()
+    });
+
+</script>
+
+</html>
+
+
+
+
