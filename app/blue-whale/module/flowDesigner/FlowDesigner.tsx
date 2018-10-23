@@ -84,7 +84,7 @@ export class FlowDesigner {
         let body = <div className="design-canvas" id="design-canvas"/>;
         let modal = new Modal({
             body: body,
-            header: tools.isNotEmpty(url)? '查看流程': '新增流程',
+            header: '新增流程',
             className: 'flow-modal',
             width: '90%',
             height: '90%',
@@ -93,9 +93,11 @@ export class FlowDesigner {
                 modal.destroy();
             }
         });
-        let Tip = new Tips({
+        let Tip: Tips;
+        tools.isEmpty(url) && (Tip = new Tips({
             container: body
-        });
+        }));
+
         let paper = window.getComputedStyle(body),
             paperWidth = paper.width,
             paperHeight = paper.height;
@@ -110,11 +112,11 @@ export class FlowDesigner {
         // 如果有url传入，根据url获取xml==>根据xml绘制流程（流程不可修改）
         // 如果没有则需要自己绘制流程
         if (tools.isNotEmpty(url)) {
-
-            // 从xml中读取时，没有工具集并且节点、连接线都不可操作
-            d.query('#design-canvas').style.pointerEvents = 'none';
-            Tip.destroy();
             BwRule.Ajax.fetch(url).then(({response}) => {
+
+                // 从xml中读取时，节点、连接线都不可操作,标题需要改变
+                d.query('#design-canvas').style.pointerEvents = 'none';
+                modal.modalHeader.title = '查看流程';
 
                 // 从字符串中加载
                 function LoadXMLStr(xmlStr) {
@@ -144,14 +146,18 @@ export class FlowDesigner {
                 rootElement.childNodes.forEach((child) => {
                     if (child.nodeType === 1) {
                         let layout = child.attributes.layout.value.split(',').map(item => parseInt(item)),
-                            isComplete: boolean = false;
+                            isComplete: boolean = false,
+                            displayName: string;
                         // 存在xml中没有isComplete属性情况
                         'isComplete' in child.attributes && (
                             isComplete = child.attributes.isComplete.value === 'true' ? true : false
                         );
+                        'displayName' in child.attributes && (
+                            displayName = child.attributes.displayName.value
+                        )
                         let shape = new FlowItem({
                             type: child.tagName,
-                            text: '',
+                            text: displayName,
                             position: {x: layout[0], y: layout[1]},
                             width: layout[2],
                             height: layout[3],

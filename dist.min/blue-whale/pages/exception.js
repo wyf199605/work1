@@ -1,0 +1,1 @@
+define(["require","exports","BugReport"],function(e,o,t){"use strict";var r=BW.sys,a=G.d;return function(e){a.on(e.buttons,"click","[data-action]",function(){switch(this.dataset.action){case"bugReport":new t.BugReportModal(-1,!1,{url:location.href,param:"",reqType:"0",errMsg:e.errMsg});break;case"back":r.window.close();break;case"goLogin":r.window.logout()}})}});

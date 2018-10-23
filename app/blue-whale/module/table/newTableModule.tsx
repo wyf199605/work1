@@ -602,14 +602,21 @@ export class NewTableModule {
                                             });
                                     }
                                 }
-                            } else if(Array.isArray(field.relateFields) || Array.isArray(field.assignSelectFields)){
+                            } else if(Array.isArray(field.assignSelectFields)){
                                 // 上传文件返回File_id，需要设置file_id值， 或者修改关联的assign的值
-                                (field.relateFields || field.assignSelectFields).forEach((name) => {
+                                field.assignSelectFields.forEach((name) => {
                                     let cell = row.cellGet(name) as TableDataCell;
                                     if(cell){
                                         cell.data = data[name] || '';
                                     }
                                 })
+                            } else if(Array.isArray(field.relateFields)){
+                                for(let key in data){
+                                    let cell = row.cellGet(key) as TableDataCell;
+                                    if(cell){
+                                        cell.data = data[key] || '';
+                                    }
+                                }
                             }
                         }
                     }) : null;
