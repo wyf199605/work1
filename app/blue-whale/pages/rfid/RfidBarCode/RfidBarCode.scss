@@ -22,31 +22,26 @@
     }
     .rfid-barCode-inventory {
       font-size: 19.999px;
-      border-bottom: 1px solid #cccc;
+      border-bottom: 1px solid #cccccc;
       padding-bottom: 6.666px;
     }
     .rfid-shelf-number{
       text-align: center;
+      font-size: 14px;
     }
     .rfid-barCode-content {
       display: flex;
       flex-wrap: nowrap;
       .rfid-barCode-right {
-        width: 33%;
+        width: 50%;
         text-align: center;
+        border-left: 1px solid #cccccc;
       }
       .rfid-barCode-left {
-        width: 33%;
+        width: 50%;
         text-align: center;
       }
-      .rfid-barCode-center {
-        width: 33%;
-        text-align: center;
-        i{
-          font-size: 58px;
-          line-height: 1.5;
-        }
-      }
+
       //.shelf-number {
       //  margin-bottom: 7px;
       //  i{

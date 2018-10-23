@@ -219,18 +219,22 @@ export class ButtonAction {
             codeStype:object[],
             url:string,
             uniqueFlag:string,
-            ajaxUrl:string;
+            analysis:string,
+            downUrl:string,
+            uploadUrl:string;
         for(let i = 0;i < dataAddr.length;i++){
             url =   dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
+            downUrl = dataAddr[i].downloadAddr.dataAddr;
+            uploadUrl = dataAddr[i].uploadAddr.dataAddr;
         }
         console.log(codeStype[0]["IMPORTDATAMODE"])
         BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
             data:data
         }).then(({response})=>{
             console.log(response)
-            response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
+            response.body && (analysis =  response.body.bodyList[0].inventData)
         })
 
         require(['RfidBarCode'], (p) => {
@@ -238,7 +242,10 @@ export class ButtonAction {
                 codeStype:codeStype,
                 SHO_ID:dataObj['SHO_ID'],
                 USERID:dataObj['USERID'],
-                url:ajaxUrl,
+                analysis:analysis,
+                uploadUrl:uploadUrl,
+                downUrl:downUrl,
+                uniqueFlag:uniqueFlag
             })
         });
     }

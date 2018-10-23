@@ -31,7 +31,9 @@ export class PlanPage extends BasicPage{
             queryType:qData['queryType'],
             queryparams1:qData['queryparams1'],
             scannableTime:0,
-            uiPath:qData['uiPath']
+            atvarparams:[],
+            uiPath:qData['uiPath'],
+            setting:null
             }} search={
             (data)=>{
                 return new Promise((resolve)=>{
@@ -71,6 +73,12 @@ export class PlanPage extends BasicPage{
         </div>
         d.append(this.wrapper,content)
         console.log(para.ui)
+        let drawContent = <div class="drawPage">
+             //在里面实例化一个 drawPoint!
+            //先判断后台有没有字段 ！有 要根据坐标渲染path
+            //
+        </div>
+
     }
     public hanshu(){
         console.log("22")
