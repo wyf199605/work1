@@ -159,6 +159,18 @@ namespace G {
                 } else {
                     return url;
                 }
+            },
+            getObjPara(url: string){
+                let theRequest = {};
+                if (url.indexOf("?") != -1) {
+                    let str = url.substr(1),
+                        strs = str.split("&");
+                    for(let i = 0; i < strs.length; i ++) {
+                        let map = strs[i].split("=");
+                        theRequest[map[0]] = decodeURIComponent(map[1]);
+                    }
+                }
+                return theRequest;
             }
         },
         str: {
