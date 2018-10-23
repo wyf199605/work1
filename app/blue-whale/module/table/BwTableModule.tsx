@@ -379,7 +379,7 @@ export class BwTableModule extends Component {
                 colspan: hasSubCol ? subCols.length : 1, // 其他列有子列
                 rowspan: isAbsField && !hasSubCol ? 2 : 1,
                 maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
-                isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true, // 是否可排序
+                isCanSort: field.isCanSort, // 是否可排序
             } as IFastTableCol);
 
             if (hasSubCol) {
@@ -488,7 +488,7 @@ export class BwTableModule extends Component {
                         isNumber: subName ? void 0 :
                             BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: subName ? void 0 : field.noShow,
-                        isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
+                        isCanSort: field.isCanSort,
                     } as IFastTableCol);
 
                     currentOriginField = {
@@ -509,7 +509,7 @@ export class BwTableModule extends Component {
                         isVirtual: field.noShow,
                         colspan: 1,
                         rowspan: 1,
-                        isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
+                        isCanSort: field.isCanSort,
                     } as IFastTableCol);
                 }
 
