@@ -52,7 +52,7 @@ export = class myselfMbPage {
             d.append(list, li);
         }
 
-        d.on(d.query('.myselfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
+        d.on(d.query('.selfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
             let dataset = d.closest(e.target as HTMLElement,'.mui-table-view-cell[data-page-name]').dataset.pageName;
             let pageUrl = BW.CONF.url[dataset];
             if (pageUrl) {
