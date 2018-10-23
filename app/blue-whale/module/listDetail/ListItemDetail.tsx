@@ -4,75 +4,157 @@ import {BwRule} from "../../common/rule/BwRule";
 import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
 import tools = G.tools;
 import {Button} from "../../../global/components/general/button/Button";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export class ListItemDetail {
     // DOM容器
     private wrapper: HTMLElement;
     private cells: objOf<ListItemDetailCell> = {};
-    private defaultData:obj = {};
+    private defaultData: obj = {};
+    private currentPage: number = 1;
+    private totalNumber: number = 1;
+    private ajaxUrl: string = '';
+
     constructor(private para: EditPagePara) {
         let wrapper = <div className="list-item-detail-wrapper"/>;
         para.dom.appendChild(wrapper);
         this.wrapper = wrapper;
+        this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.initDetailTpl(para.fm.fields);
-        this.initDetailData(para.fm.fields).then(data => {
-            let cells = this.cells;
-            for (let key in cells){
-                cells[key].render(data[key] || '');
-            }
-        });
+        // this.changePage();
         this.initDetailButtons(para.fm.subButtons);
     }
 
+    // 初始化详情DOM
     initDetailTpl(fields: R_Field[]) {
+        let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
+        this.wrapper.appendChild(cellsWrapper);
         fields.forEach(field => {
             if (!!!field.noShow) {
                 this.cells[field.name] = new ListItemDetailCell({
                     caption: field.caption,
                     type: this.getType(field.dataType || field.atrrs.dataType || ''),
-                    container: this.wrapper
+                    container: cellsWrapper
                 });
             }
         })
     }
 
-    // 初始化详情DOM
-    initDetailData(fields: R_Field[]): Promise<obj> {
+    // 初始化详情数据
+    initDetailData(): Promise<obj> {
+        let fields: R_Field[] = this.para.fm.fields;
         return new Promise<obj>((resolve, reject) => {
             let data: obj = {};
-            let dataAddr = this.para.fm.dataAddr;
-            if (tools.isNotEmpty(dataAddr)) {
-                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(dataAddr)).then(({response}) => {
-                    let res = response.data[0] || {};
+            if (tools.isNotEmpty(this.ajaxUrl)) {
+                let url = tools.url.addObj(this.ajaxUrl, {
+                    pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=' + this.totalNumber + '}'
+                });
+                BwRule.Ajax.fetch(url).then(({response}) => {
+                    let res: obj = {};
+                    let meta = response.body.bodyList[0].meta,
+                        dataTab = response.body.bodyList[0].dataList[0];
+                    for (let i = 0, len = meta.length; i < len; i++) {
+                        res[meta[i]] = dataTab[i];
+                    }
+                    this.totalNumber = response.head.totalNum;
                     this.defaultData = res;
-                    if (tools.isNotEmpty(res)){
-                        for (let key in this.cells){
-                            let field = fields.filter((f) => f.name === key)[0],
-                                value = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key],field) : '';
-                            data[key] = value;
+                    if (tools.isNotEmpty(res)) {
+                        for (let key in this.cells) {
+                            let field = fields.filter((f) => f.name === key)[0];
+                            data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
                         }
                     }
                     resolve(data);
                 })
             } else {
+                for (let key in this.cells) {
+                    data[key] = '';
+                }
+                Modal.alert('无数据地址!');
                 resolve(data);
             }
         })
     }
 
+    // 上一页下一页加载数据
+    private changePage() {
+        this.initDetailData().then(data => {
+            this.render(data);
+        });
+    }
+
     // 设置详情数据
     render(data: obj) {
-
+        let cells = this.cells;
+        for (let key in cells) {
+            cells[key].render(data[key] || '');
+        }
     }
 
     // 初始化详情按钮
     initDetailButtons(buttons: R_Button[]) {
-        if (tools.isNotEmpty(buttons)){
-            this.wrapper.appendChild(<div className="list-item-detail-buttons">
-                <Button content="上一页" className="list-detail-btn prev-page" color="success"/>
-                <Button content="下一页" className="list-detail-btn next-page" color="warning"/>
-            </div>)
+        this.createPageButton();
+        if (this.para.uiType === 'detail') {
+            let btnWrapper = this.createPageButton();
+            if (tools.isNotEmpty(buttons)) {
+                new Button({
+                    content:'更多',
+                    className:'more',
+                    container:btnWrapper,
+                    onClick:()=>{
+                        // 点击更多
+                    }
+                });
+            }
+        } else {
+            if (tools.isNotEmpty(buttons)) {
+
+            } else {
+                this.wrapper.style.height = 'calc(100% - 44px)';
+                this.wrapper.style.paddingBottom = '0px';
+            }
         }
+    }
+
+    private createPageButton(): HTMLElement {
+        let prev: Button = null,
+            next: Button = null;
+        let checkPageButtonDisabled = () => {
+            if (this.totalNumber === 1) {
+                prev.disabled = true;
+                next.disabled = true;
+                return;
+            }
+            if (this.currentPage === 1) {
+                prev.disabled = true;
+            } else if (this.currentPage === this.totalNumber) {
+                next.disabled = true;
+            } else {
+                prev.disabled = false;
+                next.disabled = false;
+            }
+        };
+        let btnWrapper = <div className="list-item-detail-buttons">
+            {prev = <Button content="上一页" className="list-detail-btn prev-page" onClick={() => {
+                // 更新页数
+                this.currentPage !== 1 && (this.currentPage = this.currentPage - 1);
+                // 检测按钮是否可用
+                checkPageButtonDisabled();
+                // 加载数据
+                this.changePage();
+            }
+            }/>}
+            {
+                next = <Button content="下一页" className="list-detail-btn next-page" onClick={() => {
+                    this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
+                    checkPageButtonDisabled();
+                    this.changePage();
+                }}/>
+            }
+        </div>;
+        this.wrapper.appendChild(btnWrapper);
+        checkPageButtonDisabled();
+        return btnWrapper;
     }
 
     getType(t: string): DetailCellType {
