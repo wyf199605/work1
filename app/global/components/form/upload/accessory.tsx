@@ -61,13 +61,13 @@ export class Accessory extends FormCom {
     // 渲染附件列表
     render(data: IFileInfo[]) {
         d.diff(data, this.listItems, {
-            create: (n) => {
+            create: (n:IFileInfo) => {
                 this._listItems.push(this.createListItem({data: n}));
             },
-            replace: (n, o) => {
-                o.data = n || {};
+            replace: (n:IFileInfo, o:AccessoryItem) => {
+                o.render(n || {});
             },
-            destroy: (o) => {
+            destroy: (o:AccessoryItem) => {
                 o.destroy();
                 let index = this._listItems.indexOf(o);
                 if(index > -1)
@@ -107,9 +107,13 @@ export class Accessory extends FormCom {
         };
 
         let deleteEt = (e)=>{
-            let index = d.closest(e.target,'.accessory-item');
+            let indexEl = d.closest(e.target,'.accessory-item'),
+                index = parseInt(indexEl.dataset.index);
+            let value = this.value || [];
+            delete value[index];
+            this.value = value;
             // 删除
-            index.remove();
+            indexEl.remove();
         };
 
         return {
