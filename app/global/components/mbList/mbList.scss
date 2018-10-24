@@ -1,45 +1,45 @@
 .mb-list-wrapper{
   background:#fff;
-  font-size: 30px;
+  font-size: 13px;
   .check-span.label-checkbox{
     &::before{
-      width: 50px;
-      height: 50px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
     }
   }
   .select-box{
-    font-size: 40px;
+    font-size: 20px;
     input[type=checkbox]:checked +.check-span{
       &::after{
-        padding-top: 15px;
+        //padding-top: 10px;
       }
     }
     .check-span{
-      width: 50px;
-      height: 50px;
+      width: 20px;
+      height: 20px;
     }
   }
   .body-title{
     display: inline-block;
-    width: 160px;
+    width: 70px;
   }
   .img-label{
     width: 0;
     height: 0;
-    border-width: 100px 100px 0 0;
+    border-width: 45px 45px 0 0;
     border-style: solid;
     border-color: #FF9C00 transparent transparent transparent;
     position: relative;
-    top: -200px;
+    top: -90px;
     left: 0px;
     span{
       display: inline-block;
-      width: 140px;
+      width: 70px;
       transform: rotate(-45deg);
       position: relative;
-      top: -120px;
-      left: -10px;
+      top: -55px;
+      left: -5px;
     }
   }
   .label{
@@ -56,25 +56,24 @@
       clear: both;
       display: block;
     }
-    padding: 40px;
+    padding: 16px;
     padding-right: 0;
     &>.checkbox-wrapper{
-      width: 60px;
-      height: 60px;
+      width: 20px;
+      height: 20px;
       float: left;
-      margin-top: 70px;
-      margin-left: 20px;
+      margin-top: 30px;
       &+.list-item-content{
         border: none;
         padding-bottom: 0;
       }
     }
     &>.list-item-content{
-      width: calc(100% - 160px);
+      width: calc(100% - 40px);
       float: left;
       border-bottom: 2px solid #F8F8F8;
-      padding-bottom: 40px;
-      margin-left: 60px;
+      padding-bottom: 10px;
+      margin-left: 14px;
       &::after{
         content: "";
         clear: both;
@@ -82,12 +81,12 @@
       }
       .list-item-img{
         float: left;
-        width: 200px;
-        height: 200px;
-        margin-right: 50px;
+        width: 90px;
+        height: 90px;
+        margin-right: 14px;
         img{
-          width: 200px;
-          height: 200px;
+          width: 90px;
+          height: 90px;
         }
         &+.list-item-details{
           width:auto;
@@ -103,12 +102,12 @@
         width: 100%;
       }
       .list-item-title {
-        font-size: 30px;
+        font-size: 15px;
         font-weight: bolder;
         color: #000;
-        margin-bottom: 10px;
-        padding-bottom: 30px;
-        border-bottom: 2px solid #F8F8F8 ;
+        margin-bottom: 5px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #F8F8F8 ;
       }
 
     }
