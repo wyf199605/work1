@@ -615,3 +615,25 @@
     }
   }
 }
+.modal-animate-up-mb{
+  animation: aumb 0.3s ease;
+  @keyframes aumb {
+    from{
+      top: 100%;
+    }
+    to{
+      top: 0;
+    }
+  }
+}
+.modal-animate-down-mb{
+  animation: admb 0.3s ease;
+  @keyframes admb {
+    from{
+      top: 0;
+    }
+    to{
+      top: 100%;
+    }
+  }
+}

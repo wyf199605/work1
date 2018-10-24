@@ -1,12 +1,71 @@
-.accessory-wrapper{
+.accessory-wrapper {
   width: 100%;
-  padding: 0 16px;
   font-size: 15px;
-  .accessory-title{
-    height: 45px;
+  padding-bottom: 10px;
+  .accessory-title {
+    height: 50px;
     display: flex;
     display: -webkit-flex;
     align-items: center;
     justify-content: flex-start;
+    padding-left: 16px;
+  }
+  .accessory-body {
+    padding: 0 16px;
+    .upload {
+      color: #666;
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      background-color: #f8f8f8;
+      border: 1px solid #e2e2e2;
+      .app-jia {
+        margin-right: 10px;
+      }
+    }
+  }
+  .file-wrapper {
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    height: 80px;
+    padding: 15px 0;
+
+    .app-wenjian {
+      font-size: 30px;
+      color: #fff;
+      width: 50px;
+      height: 50px;
+      padding: 5px 10px;
+      background-color: #48afe7;
+    }
+
+    .file-info {
+      display: flex;
+      display: -webkit-flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: flex-start;
+      .file-name {
+        color: #333;
+      }
+      .file-size {
+        color: #b0b0b0;
+        font-size: 12px;
+      }
+    }
+  }
+  .accessory-item {
+    width: calc(100% - 16px);
+    margin: 0 auto;
+    padding: 10px 0;
+    display: flex;
+    display: -webkit-flex;
+    justify-content: space-between;
+    .deleteBtn {
+      color: #005bad;
+      line-height: 50px;
+    }
   }
 }
