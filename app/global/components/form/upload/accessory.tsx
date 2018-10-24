@@ -36,6 +36,7 @@ export class Accessory extends FormCom {
     }
 
     private accessoryBodyWrapper: HTMLElement = null;
+
     protected wrapperInit(para: IAccessory): HTMLElement {
         return <div className="accessory-wrapper">
             <div className="accessory-title">{para.caption || '附件'}</div>
@@ -54,23 +55,23 @@ export class Accessory extends FormCom {
     }
 
     protected _listItems: AccessoryItem[] = [];
-    get listItems(){
+    get listItems() {
         return this._listItems.slice();
     }
 
     // 渲染附件列表
     render(data: IFileInfo[]) {
         d.diff(data, this.listItems, {
-            create: (n:IFileInfo) => {
+            create: (n: IFileInfo) => {
                 this._listItems.push(this.createListItem({data: n}));
             },
-            replace: (n:IFileInfo, o:AccessoryItem) => {
+            replace: (n: IFileInfo, o: AccessoryItem) => {
                 o.render(n || {});
             },
-            destroy: (o:AccessoryItem) => {
+            destroy: (o: AccessoryItem) => {
                 o.destroy();
                 let index = this._listItems.indexOf(o);
-                if(index > -1)
+                if (index > -1)
                     delete this._listItems[index]
             }
         });
@@ -78,19 +79,20 @@ export class Accessory extends FormCom {
         this.refreshIndex();
     }
 
-    refreshIndex(){
+    refreshIndex() {
         this._listItems.forEach((item, index) => {
             item.index = index;
         });
     }
 
     // 实例化MvListItem
-    protected createListItem(para: IAccessoryItem){
+    protected createListItem(para: IAccessoryItem) {
         para = Object.assign({}, para, {
             container: this.wrapper
         });
         return new AccessoryItem(para);
     }
+
     private initEvent = (() => {
         let uploadEt = () => {
             // let el = d.closest(<div/>,'.accessory-wrapper');
@@ -106,27 +108,33 @@ export class Accessory extends FormCom {
             // </div>);
         };
 
-        let deleteEt = (e)=>{
-            let indexEl = d.closest(e.target,'.accessory-item'),
+        let deleteEt = (e) => {
+            let indexEl = d.closest(e.target, '.accessory-item'),
                 index = parseInt(indexEl.dataset.index);
-            let value = this.value || [];
-            delete value[index];
-            this.value = value;
             // 删除
-            indexEl.remove();
+            this.deleteAccessoryItem(index);
         };
 
         return {
             on: () => {
-                d.on(this.wrapper,'click','.upload',uploadEt);
-                d.on(this.wrapper,'click','.deleteBtn',deleteEt);
+                d.on(this.wrapper, 'click', '.upload', uploadEt);
+                d.on(this.wrapper, 'click', '.deleteBtn', deleteEt);
             },
             off: () => {
-                d.off(this.wrapper,'click','.upload',uploadEt);
-                d.off(this.wrapper,'click','.deleteBtn',deleteEt);
+                d.off(this.wrapper, 'click', '.upload', uploadEt);
+                d.off(this.wrapper, 'click', '.deleteBtn', deleteEt);
             }
         }
     })();
+
+    private deleteAccessoryItem(index) {
+        let item = this._listItems[index];
+        if (item) {
+            item.destroy();
+            this._listItems.splice(index, 1);
+            this._value.splice(index, 1);
+        }
+    }
 
     destroy() {
         super.destroy();
