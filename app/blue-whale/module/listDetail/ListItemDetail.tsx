@@ -5,6 +5,8 @@ import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
 import tools = G.tools;
 import {Button} from "../../../global/components/general/button/Button";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {DetailModal} from "./DetailModal";
 
 export class ListItemDetail {
     // DOM容器
@@ -21,8 +23,8 @@ export class ListItemDetail {
         this.wrapper = wrapper;
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.initDetailTpl(para.fm.fields);
-        // this.changePage();
-        this.initDetailButtons(para.fm.subButtons);
+        this.changePage();
+        this.initDetailButtons();
     }
 
     // 初始化详情DOM
@@ -59,9 +61,15 @@ export class ListItemDetail {
                     this.totalNumber = response.head.totalNum;
                     this.defaultData = res;
                     if (tools.isNotEmpty(res)) {
-                        for (let key in this.cells) {
-                            let field = fields.filter((f) => f.name === key)[0];
-                            data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
+                        let cells = this.cells;
+                        for (let key in cells) {
+                            if (cells[key].type === 'file'){
+                                // 如果是文件类型，直接把获取文件信息的接口传进去
+
+                            }else{
+                                let field = fields.filter((f) => f.name === key)[0];
+                                data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
+                            }
                         }
                     }
                     resolve(data);
@@ -92,33 +100,113 @@ export class ListItemDetail {
     }
 
     // 初始化详情按钮
-    initDetailButtons(buttons: R_Button[]) {
-        this.createPageButton();
-        if (this.para.uiType === 'detail') {
-            let btnWrapper = this.createPageButton();
-            if (tools.isNotEmpty(buttons)) {
+    initDetailButtons() {
+        let buttons: R_Button[] = this.para.fm.subButtons;
+        if (tools.isNotEmpty(buttons)) {
+            let btnWrapper = <div className="list-item-detail-buttons"/>;
+            this.wrapper.appendChild(btnWrapper);
+            if (this.para.uiType === 'detail') {
                 new Button({
-                    content:'更多',
-                    className:'more',
-                    container:btnWrapper,
-                    onClick:()=>{
+                    content: '更多',
+                    className: 'more',
+                    container: btnWrapper,
+                    onClick: () => {
                         // 点击更多
                     }
                 });
+                this.createPageButton(btnWrapper);
+            } else {
+                if (buttons.length > 2) {
+                    new Button({
+                        content: '更多',
+                        className: 'more',
+                        container: btnWrapper,
+                        onClick: () => {
+                            // 点击更多
+                        }
+                    });
+                    let btns = buttons.slice(0, 2);
+                    btns.forEach((button, index) => {
+                        new Button({
+                            content: button.caption,
+                            container: btnWrapper,
+                            className: 'list-detail-btn',
+                            onClick: () => {
+                                subBtnEvent(index);
+                            }
+                        })
+                    });
+
+                } else {
+                    buttons.forEach((button, index) => {
+                        new Button({
+                            content: button.caption,
+                            container: btnWrapper,
+                            className: 'list-detail-btn',
+                            onClick: () => {
+                                subBtnEvent(index);
+                            }
+                        })
+                    });
+                }
             }
         } else {
-            if (tools.isNotEmpty(buttons)) {
-
+            if (this.para.uiType === 'detail') {
+                let btnWrapper = <div className="list-item-detail-buttons"/>;
+                this.wrapper.appendChild(btnWrapper);
+                this.createPageButton(btnWrapper);
             } else {
-                this.wrapper.style.height = 'calc(100% - 44px)';
                 this.wrapper.style.paddingBottom = '0px';
+            }
+        }
+
+        // 处理按钮触发
+        let self = this;
+
+        function subBtnEvent(index) {
+            let btn = self.para.fm.subButtons[index];
+            switch (btn.subType) {
+                case 'save' :
+                    btn.hintAfterAction = true;
+                    ButtonAction.get().clickHandle(btn, this.defaultData, () => {
+                    });
+                    break;
+                case 'action':
+                    ButtonAction.get().clickHandle(btn, this.defaultData, () => {
+                    });
+                    break;
+                default:
+                    new DetailModal(self.para);
+                    break;
             }
         }
     }
 
-    private createPageButton(): HTMLElement {
-        let prev: Button = null,
-            next: Button = null;
+    private createPageButton(btnWrapper: HTMLElement) {
+
+        let prev = new Button({
+                content: '上一页',
+                className: 'list-detail-btn',
+                container: btnWrapper,
+                onClick: () => {
+                    // 更新页数
+                    this.currentPage !== 1 && (this.currentPage = this.currentPage - 1);
+                    // 检测按钮是否可用
+                    checkPageButtonDisabled();
+                    // 加载数据
+                    this.changePage();
+                }
+            }),
+            next = new Button({
+                content: '下一页',
+                container: btnWrapper,
+                onClick: () => {
+                    this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
+                    checkPageButtonDisabled();
+                    this.changePage();
+                },
+                className: 'list-detail-btn'
+            });
         let checkPageButtonDisabled = () => {
             if (this.totalNumber === 1) {
                 prev.disabled = true;
@@ -134,34 +222,14 @@ export class ListItemDetail {
                 next.disabled = false;
             }
         };
-        let btnWrapper = <div className="list-item-detail-buttons">
-            {prev = <Button content="上一页" className="list-detail-btn prev-page" onClick={() => {
-                // 更新页数
-                this.currentPage !== 1 && (this.currentPage = this.currentPage - 1);
-                // 检测按钮是否可用
-                checkPageButtonDisabled();
-                // 加载数据
-                this.changePage();
-            }
-            }/>}
-            {
-                next = <Button content="下一页" className="list-detail-btn next-page" onClick={() => {
-                    this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
-                    checkPageButtonDisabled();
-                    this.changePage();
-                }}/>
-            }
-        </div>;
-        this.wrapper.appendChild(btnWrapper);
         checkPageButtonDisabled();
-        return btnWrapper;
     }
 
     getType(t: string): DetailCellType {
         let type: DetailCellType;
         if (t === '18') {
             type = 'textarea';
-        } else if (t === '20' || t === '22' || t === '24') {
+        } else if (t === '20' || t === '27' || t === '28') {
             type = 'img';
         } else if (t === '43' || t === '44') {
             type = 'file';
@@ -181,7 +249,7 @@ export class ListItemDetail {
             type = tools.isNotEmpty(format) ? format.dataType || format.atrrs.dataType : '';
         if (type === '18') {
             t = 'textarea';
-        } else if (type === '20' || type === '22' || type === '24') {
+        } else if (type === '20' || type === '27' || type === '28') {
             t = 'img';
         } else if (type === '43' || type === '44') {
             t = 'file';
@@ -198,18 +266,12 @@ export class ListItemDetail {
             } else if (type === '20' || type === '40') {
                 // BLOB类型
                 v = BW.CONF.siteUrl + text;
-            } else if (type === '21' || type === '22') {
-                // 单图和多图（md5）
+            } else if (type === '27' || type === '28' || type === '47' || type === '48') {
+                // 单图和多图（唯一值） 单文件和多文件(唯一值)
                 let addrArr = text.split(',');
-                addrArr.forEach(ad => {
+                addrArr.forEach(md5 => {
                     // 根据md5获取文件地址
-                    v.push(BwRule.fileUrlGet(ad, format.name || format.atrrs.fieldName, true));
-                })
-            } else if (type === '24' || type === '25') {
-                // 单图和多图（相对地址）
-                let addrArr = text.split(',');
-                addrArr.forEach(ad => {
-                    v.push(BW.CONF.siteUrl + ad)
+                    v.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
                 })
             }
         }
