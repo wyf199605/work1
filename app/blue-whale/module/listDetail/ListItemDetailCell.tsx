@@ -3,7 +3,8 @@
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {BwRule} from "../../common/rule/BwRule";
-
+import tools = G.tools;
+import d = G.d;
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
 
 // 文件信息
@@ -65,11 +66,6 @@ export class ListItemDetailCell extends Component {
         super(para);
         this.para = para;
         para.value && this.render(para.value);
-
-    }
-
-    get type() {
-        return this.para.type;
     }
 
     createImgs(value: string | string[], imgsWrapper: HTMLElement) {

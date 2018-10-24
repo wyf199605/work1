@@ -18,8 +18,9 @@ export class ListItemDetail {
     private ajaxUrl: string = '';
 
     constructor(private para: EditPagePara) {
-        let wrapper = <div className="list-item-detail-wrapper"/>;
-        para.dom.appendChild(wrapper);
+        let wrapper = <div className="list-item-detail-wrapper"/>,
+            dom = para.dom || document.body;
+        dom.appendChild(wrapper);
         this.wrapper = wrapper;
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.initDetailTpl(para.fm.fields);
@@ -63,13 +64,8 @@ export class ListItemDetail {
                     if (tools.isNotEmpty(res)) {
                         let cells = this.cells;
                         for (let key in cells) {
-                            if (cells[key].type === 'file'){
-                                // 如果是文件类型，直接把获取文件信息的接口传进去
-
-                            }else{
-                                let field = fields.filter((f) => f.name === key)[0];
-                                data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
-                            }
+                            let field = fields.filter((f) => f.name === key)[0];
+                            data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
                         }
                     }
                     resolve(data);
@@ -231,7 +227,7 @@ export class ListItemDetail {
             type = 'textarea';
         } else if (t === '20' || t === '27' || t === '28') {
             type = 'img';
-        } else if (t === '43' || t === '44') {
+        } else if (t === '43' || t === '47' || t === '48' || t === '40') {
             type = 'file';
         } else if (t === '12') {
             type = 'date';
@@ -256,25 +252,39 @@ export class ListItemDetail {
         } else {
             t = 'text';
         }
-        let types = ['10', '11', '12', '13', '14', '17', '30', '31', '43'];
+        let types = ['10', '11', '12', '13', '14', '17', '30', '31'];
         if (types.indexOf(type)) {
             v = G.Rule.formatTableText(text, format);
         } else {
             if (type === '18') {
                 // 多行文本
                 v = text;
-            } else if (type === '20' || type === '40') {
+            } else if (type === '20') {
                 // BLOB类型
                 v = BW.CONF.siteUrl + text;
-            } else if (type === '27' || type === '28' || type === '47' || type === '48') {
+            } else if (type === '27' || type === '28') {
                 // 单图和多图（唯一值） 单文件和多文件(唯一值)
                 let addrArr = text.split(',');
                 addrArr.forEach(md5 => {
                     // 根据md5获取文件地址
                     v.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
                 })
+            } else if (type === '47' || type === '48' || type === '40') {
+                // 获取文件信息地址 （md5,unique）
+                let uniques = text.split(',');
+                uniques.forEach(uniq => {
+
+                })
+            }else if(type === '43'){
+                // 附件名称
+
             }
         }
         return v;
+    }
+
+    // 获取文件信息地址
+    private getFileInfoAddr(uniq?:string){
+
     }
 }

@@ -167,7 +167,7 @@ export class NewTableModule {
                             }
                         });
                         if (!tools.isMb){
-                            d.query('ul.nav-tabs').appendChild(<i className="fa fa-expand full-icon"/>)
+                            d.query('ul.nav-tabs',this.main.container).appendChild(<i className="fa fa-expand full-icon"/>)
                         }
                     }
                     this.tab.len <= 0 && this.bwEl.subTableList.forEach((sub) => {
@@ -190,7 +190,7 @@ export class NewTableModule {
                                     body: tabEl,
                                     className: 'full-screen sub-table-full',
                                     header: {
-                                        title: '子表全屏'
+                                        title: this.bwEl.subTableList[this.subTabActiveIndex].caption
                                     },
                                     onClose: () => {
                                         this.sub[this.subTabActiveIndex].ftable.removeAllModal();
