@@ -1,0 +1,9 @@
+node_modules/
+.idea/
+.sass-cache/
+test/
+app/package-lock.json
+.gulp-scss-cache/
+/dist/
+/dist.min/
+.gitignore

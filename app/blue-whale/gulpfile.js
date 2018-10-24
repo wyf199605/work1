@@ -167,6 +167,7 @@ gulp.task('js', function () {
     gulpTsModule([
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
+        'listDetail/DetailModal',
     ], 'listDetail.js');
 
     //process模块

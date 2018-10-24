@@ -28,7 +28,7 @@ interface QueryParam {
 }
 interface IBw_Query{
     queryType: number;
-    atvarparams : QueryConf[]
+    atvarparams? : QueryConf[]
     queryparams0? : QueryConf;
     queryparams1? : QueryConf[];
     hasOption : boolean;
