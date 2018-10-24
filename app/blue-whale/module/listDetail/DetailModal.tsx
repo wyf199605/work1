@@ -10,6 +10,8 @@ export class DetailModal{
                 title:para.fm.caption
             },
             className:'detail-modal',
+            isModal:true,
+            isOnceDestroy:true,
             footer:{
                 leftPanel:[{
                     content:'取消',
@@ -18,7 +20,7 @@ export class DetailModal{
                         Modal.confirm({
                             msg:'确定取消编辑吗?',
                             callback:(flag) => {
-                                flag && modal.destroy();
+                                flag && (modal.isShow = false);
                             }
                         })
                     }
