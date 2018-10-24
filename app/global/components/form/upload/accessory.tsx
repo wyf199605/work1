@@ -3,12 +3,12 @@
 import {FormCom, IFormComPara} from "../basic";
 import tools = G.tools;
 import d = G.d;
+import {AccessoryItem, IAccessoryItem} from "./accessoryItem";
 
 export interface IFileInfo {
-    type?: string;
-    size?: string;
-    name?: string;
-    downloadUrl?: string;
+    fileSize?: number;
+    fileName?: string;
+    addr?: string;
 }
 
 export interface IAccessory extends IFormComPara {
@@ -41,7 +41,7 @@ export class Accessory extends FormCom {
             <div className="accessory-title">{para.caption || '附件'}</div>
             {
                 this.accessoryBodyWrapper = <div className="accessory-body">
-                    <div className="uplaod"><i className="appcommon app-jia"/>添加附件</div>
+                    <div className="upload"><i className="appcommon app-jia"/>添加附件</div>
                 </div>
             }
         </div>;
@@ -53,28 +53,72 @@ export class Accessory extends FormCom {
         this.initEvent.on();
     }
 
-    // 渲染附件列表
-    render(data: IFileInfo[]) {
-
+    protected _listItems: AccessoryItem[] = [];
+    get listItems(){
+        return this._listItems.slice();
     }
 
-    private initEvent = (() => {
-        let uplaodEt = () => {
+    // 渲染附件列表
+    render(data: IFileInfo[]) {
+        d.diff(data, this.listItems, {
+            create: (n) => {
+                this._listItems.push(this.createListItem({data: n}));
+            },
+            replace: (n, o) => {
+                o.data = n || {};
+            },
+            destroy: (o) => {
+                o.destroy();
+                let index = this._listItems.indexOf(o);
+                if(index > -1)
+                    delete this._listItems[index]
+            }
+        });
+        this._listItems = this._listItems.filter((item) => item);
+        this.refreshIndex();
+    }
 
+    refreshIndex(){
+        this._listItems.forEach((item, index) => {
+            item.index = index;
+        });
+    }
+
+    // 实例化MvListItem
+    protected createListItem(para: IAccessoryItem){
+        para = Object.assign({}, para, {
+            container: this.wrapper
+        });
+        return new AccessoryItem(para);
+    }
+    private initEvent = (() => {
+        let uploadEt = () => {
+            // let el = d.closest(<div/>,'.accessory-wrapper');
+            // d.append(el,<div className="accessory-item">
+            //     <div className="file-wrapper">
+            //         <i className="appcommon app-wenjian"/>
+            //         <div className="file-info">
+            //             <div c-var="fileName" className="file-name">test.pdf</div>
+            //             <div c-var="fileSize" className="file-size">89</div>
+            //         </div>
+            //     </div>
+            //     <div className="deleteBtn">删除</div>
+            // </div>);
         };
 
         let deleteEt = (e)=>{
-            let index = parseInt(e.closest(e.target,'.accessory-item'));
+            let index = d.closest(e.target,'.accessory-item');
             // 删除
+            index.remove();
         };
 
         return {
             on: () => {
-                d.on(this.wrapper,'click','.uplaod',uplaodEt);
+                d.on(this.wrapper,'click','.upload',uploadEt);
                 d.on(this.wrapper,'click','.deleteBtn',deleteEt);
             },
             off: () => {
-                d.off(this.wrapper,'click','.uplaod',uplaodEt);
+                d.off(this.wrapper,'click','.upload',uploadEt);
                 d.off(this.wrapper,'click','.deleteBtn',deleteEt);
             }
         }
