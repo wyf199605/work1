@@ -130,6 +130,11 @@ namespace G {
             return {r, g, b};
         },
         url: {
+            replaceTmpUrl(url: string, data: obj){
+                return url.replace(/{([\w\W]+?)}/g, (str, name) => {
+                    return tools.isEmpty(data[name]) ? name : data[name];
+                })
+            },
             /**
              * 获取url中请求参数的值
              * @param {string} name - 参数名

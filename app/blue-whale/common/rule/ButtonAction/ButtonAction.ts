@@ -180,6 +180,10 @@ export class ButtonAction {
         let {addr, data} = BwRule.reqAddrFull(btn.actionAddr, dataObj),
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
+
+        if(!Array.isArray(dataObj) || dataObj.length === 1){
+            addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
+        }
         switch (btn.openType) {
             case 'none' :
                 if (!ajaxType) {
