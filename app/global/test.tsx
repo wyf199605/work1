@@ -1,1 +1,1 @@
-/// <amd-module name="GlobalTestModule"/>
+// <amd-module name="GlobalTestModule"/>
