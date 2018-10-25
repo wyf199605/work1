@@ -56,7 +56,6 @@ export = class MainPage {
         MainPage.search.init(props);
       /*let url = `${conf.urlAppid}/v1/commonui/pageroute?page=defaultTab`;
         sys.window.open({url});*/
-
     }
     private static search = (function () {
         let ajax = new BwRule.Ajax();

@@ -75,8 +75,8 @@ export = class LabelPrintModule {
     protected defaultData: obj = {};
 
     constructor(private para: LabelPrintModulePara) {
-        this.initModal();
         this.defaultData = tools.isEmpty(para.defaultVal) ? LabelPrintModule.getDefaultData() : para.defaultVal;
+        this.initModal();
         this.printUtil.getPrinterList();
     }
 
