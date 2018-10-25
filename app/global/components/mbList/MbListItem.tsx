@@ -52,11 +52,11 @@ export class MbListItem extends Component {
             <div className="list-item-content">
                 {this.imgWrapper = isImg ? <div className="list-item-img"/> : null}
                 <div className="list-item-details">
-                    {this.details['title'] = <div className="list-item-title"/>}
-                    {this.details['body'] = <div className="list-item-body"/>}
-                    {this.details['label'] = <div className="list-item-labels"/>}
-                    {this.details['countDown'] = <div className="list-item-count-down"/>}
-                    {this.details['status'] = <div className="list-item-status"/>}
+                    {this.details['title'] = <div className="list-detail-item list-item-title"/>}
+                    {this.details['body'] = <div className="list-detail-item list-item-body"/>}
+                    {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
+                    {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
+                    {this.details['status'] = <div className="list-detail-item list-item-status"/>}
                 </div>
             </div>
         </div>;

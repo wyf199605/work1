@@ -2,7 +2,7 @@
 
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
-import UploadModule from "../uploadModule/uploadModule";
+import UploadModule from "./uploadModule";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import d = G.d;
 import tools = G.tools;
