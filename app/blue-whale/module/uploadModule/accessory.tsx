@@ -1,9 +1,13 @@
 /// <amd-module name="Accessory"/>
 
-import {FormCom, IFormComPara} from "../basic";
+import {FormCom} from "../../../global/components/form/basic";
 import tools = G.tools;
 import d = G.d;
 import {AccessoryItem, IAccessoryItem} from "./accessoryItem";
+import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import UploadModule from "./uploadModule";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 export interface IFileInfo {
     fileSize?: number;
@@ -11,12 +15,18 @@ export interface IFileInfo {
     addr?: string;
 }
 
-export interface IAccessory extends IFormComPara {
+export interface IAccessory extends IUploaderPara {
     caption?: string;
     files?: IFileInfo[];
+    onComplete?(this: UploadModule, ...any); // 上传完成回调
+    onError?(file: obj); // 上传失败回调
+    onChange?: Function; // 上传成功回调
 }
 
 export class Accessory extends FormCom {
+
+    public uploader: Uploader;
+
     get(): any {
         return this.value;
     }
@@ -42,16 +52,77 @@ export class Accessory extends FormCom {
             <div className="accessory-title">{para.caption || '附件'}</div>
             {
                 this.accessoryBodyWrapper = <div className="accessory-body">
-                    <div className="upload"><i className="appcommon app-jia"/>添加附件</div>
+                    <div c-var="uploader" className="upload"><i className="appcommon app-jia"/>添加附件</div>
                 </div>
             }
         </div>;
     }
 
-    constructor(para: IAccessory) {
+    constructor(private para: IAccessory) {
         super(para);
         tools.isNotEmpty(para.files) && (this.value = para.files);
+        this.createUploader();
         this.initEvent.on();
+    }
+    private uploadState: number = 0;
+    private loading:Loading = null;
+    private createUploader() {
+        if (tools.isEmpty(this.para.uploadUrl)){
+            Modal.alert('附件上传地址不能为空!');
+            return;
+        }
+        this.uploader = new Uploader({
+            container: this.innerEl.uploader,
+            uploadUrl: this.para.uploadUrl,
+            accept: this.para.accept,
+            nameField: this.para.nameField,
+            thumbField: this.para.thumbField,
+            onComplete: (data, file) => {
+                if (this.loading){
+                    this.loading.hide();
+                    this.loading.destroy();
+                    this.loading = null;
+                }
+                document.body.classList.remove('up-disabled');
+                if (data.code == 200 || data.errorCode === 0) {
+                    Modal.toast('上传成功!');
+                    this.para.onComplete && this.para.onComplete.call(this, data, file);
+                } else {
+                    this.para.onError && this.para.onError.call(this,file);
+                    Modal.alert(data.msg || data.errorMsg);
+                }
+            }
+        });
+
+        // 有文件被选中时
+        this.uploader.on('fileQueued', (file: File) => {
+            this.para.onChange && this.para.onChange();
+            //开始上传
+            this.loading = new Loading({
+                msg:'上传中...',
+                container:document.body
+            });
+            document.body.classList.add('up-disabled');
+            this.uploader.upload();
+        });
+
+        this.uploader.on("error", function (type) {
+            const msg = {
+                'Q_TYPE_DENIED': '文件类型有误',
+                'F_EXCEED_SIZE': '文件大小不能超过4M',
+            };
+            if (this.loading){
+                this.loading.hide();
+                this.loading.destroy();
+                this.loading = null;
+            }
+            document.body.classList.remove('up-disabled');
+            Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
+        });
+
+        this.uploader.on('uploadProgress', function (file, percentage) {
+            // 上传过程中触发，携带上传进度
+        });
     }
 
     protected _listItems: AccessoryItem[] = [];
@@ -94,20 +165,6 @@ export class Accessory extends FormCom {
     }
 
     private initEvent = (() => {
-        let uploadEt = () => {
-            // let el = d.closest(<div/>,'.accessory-wrapper');
-            // d.append(el,<div className="accessory-item">
-            //     <div className="file-wrapper">
-            //         <i className="appcommon app-wenjian"/>
-            //         <div className="file-info">
-            //             <div c-var="fileName" className="file-name">test.pdf</div>
-            //             <div c-var="fileSize" className="file-size">89</div>
-            //         </div>
-            //     </div>
-            //     <div className="deleteBtn">删除</div>
-            // </div>);
-        };
-
         let deleteEt = (e) => {
             let indexEl = d.closest(e.target, '.accessory-item'),
                 index = parseInt(indexEl.dataset.index);
@@ -117,11 +174,9 @@ export class Accessory extends FormCom {
 
         return {
             on: () => {
-                d.on(this.wrapper, 'click', '.upload', uploadEt);
                 d.on(this.wrapper, 'click', '.deleteBtn', deleteEt);
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.upload', uploadEt);
                 d.off(this.wrapper, 'click', '.deleteBtn', deleteEt);
             }
         }

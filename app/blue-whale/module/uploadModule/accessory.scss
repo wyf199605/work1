@@ -12,6 +12,9 @@
   }
   .accessory-body {
     padding: 0 16px;
+    .text-input{
+      display: none;
+    }
     .upload {
       color: #666;
       width: 100%;
@@ -68,4 +71,7 @@
       line-height: 50px;
     }
   }
+}
+.up-disabled{
+  pointer-events: none !important;
 }
