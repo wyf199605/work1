@@ -19,6 +19,8 @@ import {BarCode} from "../../../global/utils/barCode";
 import {DrawSvg} from "../../../global/utils/drawSvg";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import d = G.d;
+import {TableColumn} from "../../../global/components/newTable/base/TableColumn";
+import Rule = G.Rule;
 
 interface IPagePara {
     paperWidth?: number,
@@ -39,8 +41,9 @@ interface LabelPrintModulePara {
     container: HTMLElement;
     getData(): obj[];
     selectedData(): obj[];
-    cols?: string[];
-    callBack?:Function
+    cols?: TableColumn[];
+    callBack?:Function,
+    moneys: objOf<obj>;
 }
 
 interface rowAndCol {
@@ -216,10 +219,13 @@ export = class LabelPrintModule {
      */
     private getPrintData(tempUrl, ajaxObj, type?, sp?, shouldData?) {
         let self = this,
+            printList = self.para.printList[self.labelType],
             tempTemplateData,
             shouldLength = shouldData.length,
-            selectFieldNames = self.para.printList[self.labelType].selectFields,
+            selectFieldNames = printList.selectFields,
             isAjax: boolean = false; // 判断selectFieldNames中的所有字段在表格中是否存在  都存在直接使用表格数据，不存在则请求后台
+
+
         // 循环替换模板数据
         function re(data: objOf<obj>, jsonData) {
             let parseURLReg = /\[(\S+?)]/g;
@@ -297,13 +303,17 @@ export = class LabelPrintModule {
             }
         }
 
+        let colName = self.para.cols.map((col) => col.name);
         //判断selectFieldNames中所有字段是否在表格字段中都存在
         for (let j = 0; j < selectFieldNames.length; j++) {
-            if (self.para.cols.indexOf(selectFieldNames[j]) === -1) {
-                isAjax = true;
-                break;
+            if(selectFieldNames[j] && selectFieldNames[j].atrrs){
+                if (colName.indexOf(selectFieldNames[j].atrrs.fieldName) === -1) {
+                    isAjax = true;
+                    break;
+                }
             }
         }
+        // isAjax = true;
         if (isAjax) {
             BwRule.Ajax.fetch(CONF.siteUrl + tempUrl, {
                 data2url: ajaxObj.varType !== 3,
@@ -311,7 +321,7 @@ export = class LabelPrintModule {
                 data: ajaxObj.ajaxData,
             }).then(({response}) => {
                 if((response.data instanceof Array)&&response.data.length > 0){
-                    dealData(response.data);
+                    dealData(formatData(response.data));
                 }
                 else{
                     Modal.toast("暂无数据");
@@ -322,7 +332,28 @@ export = class LabelPrintModule {
             });
         }
         else {
-            dealData(shouldData);
+            dealData(formatData(shouldData));
+        }
+
+        function formatData(data: obj[]){
+            let moneys = {};
+            selectFieldNames.forEach((field) => {
+                if(field.atrrs && field.atrrs.dataType === '11'){
+                    moneys[field.atrrs.fieldName] = field.atrrs.displayFormat || '';
+                }
+            });
+            console.log(moneys);
+            let res = data.map((item) => {
+                let obj = Object.assign({}, item || {});
+                for(let key in moneys){
+                    if(obj[key]){
+                        obj[key] = '¥' + Rule.parseNumber(obj[key], moneys[key].slice(1));
+                    }
+                }
+                return obj;
+            });
+            console.log(res);
+            return res;
         }
     }
 
@@ -439,11 +470,17 @@ export = class LabelPrintModule {
             if ('BlueWhaleShell' in window) {
                 let result = BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + uri + '"}');
                 Modal.alert(result);
+            }else if('AppShell' in window){
+                Shell.printer.labelPrint(1, 3, uri, () => {
+                    Modal.toast('打印成功');
+                })
+            }else{
+                Modal.alert('无法连接到打印机')
             }
         };
         let s = new XMLSerializer().serializeToString(this.pageSvgArray[0]);
         let encodedData = Base64.encode(s);
-        console.log(encodedData)
+        dealPrintData(encodedData);
        /* for(let i = 0,l = this.pageSvgArray.length;i < l;i++){
             let s = new XMLSerializer().serializeToString(this.pageSvgArray[i]);
             let encodedData = Base64.encode(s);
@@ -978,10 +1015,17 @@ export = class LabelPrintModule {
          */
         let printLabel = (data, x: number, y: number, currentPageCanvas: number)=>{
             if (data.body !== undefined) {
+                let svgWidth = data.body.bodyList[0].width * 3.78,
+                    svgHeight = data.body.bodyList[0].height * 3.78;
                 let drawSvg = new DrawSvg({
-                    width: data.body.bodyList[0].width * 3.78,
-                    height: data.body.bodyList[0].height * 3.78
+                    width: svgWidth,
+                    height: svgHeight
                 });
+                //渲染到大纸张上
+                let svgData = drawSvg.getSvg();
+                svgData.setAttribute('x', `${x}`);
+                svgData.setAttribute('y', `${y}`);
+                self.pageSvgArray[currentPageCanvas].appendChild(svgData);
                 let codeData = data.body.bodyList[0].lableCodes;//一维码以及二维码数据
                 let textData = data.body.bodyList[0].lableDatas;//文字的数据
                 let shapeData = data.body.bodyList[0].lableShapes;//图形的数据
@@ -1049,11 +1093,24 @@ export = class LabelPrintModule {
                 if (codeData) {
                     for (let k = 0; k < codeData.length; k++) {
                         if ((typeof codeData[k].condition) === 'undefined' || codeData[k].condition) {
+                            let x = codeData[k].leftPos * 3.78,
+                                w = codeData[k].width * 3.78;
+                            switch (codeData[k].alignment){
+                                case 0:
+                                    break;
+                                case 1:
+                                    x = svgWidth - w;
+                                    break;
+                                case 2:
+                                    x = (svgWidth - w) / 2;
+                                    break;
+                            }
                             if (codeData[k].codeType === 99) {
+
                                 new QrCode(drawSvg.getSvg(), {
-                                        x: codeData[k].leftPos * 3.78,
+                                        x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: codeData[k].width * 3.78,
+                                        w: w,
                                         h: codeData[k].height * 3.78
                                     },
                                     {
@@ -1063,9 +1120,9 @@ export = class LabelPrintModule {
                             else {
                                 new BarCode(drawSvg.getSvg(),
                                     {
-                                        x: codeData[k].leftPos * 3.78,
+                                        x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: codeData[k].width * 3.78,
+                                        w: w,
                                         h: codeData[k].height * 3.78
                                     },
                                     {
@@ -1076,11 +1133,6 @@ export = class LabelPrintModule {
                         }
                     }//循环调用绘制一维码或者二维码
                 }
-                //渲染到大纸张上
-                let svgData = drawSvg.getSvg();
-                svgData.setAttribute('x', `${x}`);
-                svgData.setAttribute('y', `${y}`);
-                self.pageSvgArray[currentPageCanvas].appendChild(svgData);
             }
         };
 

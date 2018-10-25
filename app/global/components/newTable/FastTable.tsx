@@ -2764,11 +2764,13 @@ export class FastTable extends Component {
                 this.rowDel(this.edit.addIndex.spaceRowIndex());
                 this.tablesEach(table => {
                     table.tableData.edit.close();
-                    table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
+                    if(table.body && table.body.rows)
+                        table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this.render(0, void 0);
                 this.tablesEach(table => {
-                    table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
+                    if(table.body && table.body.rows)
+                        table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this._rows = this.rows.filter(row => tools.isNotEmpty(row));
                 this.edit.addIndex.del();

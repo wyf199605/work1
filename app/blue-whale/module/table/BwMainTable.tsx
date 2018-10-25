@@ -142,23 +142,27 @@ export class BwMainTableModule extends BwTableModule{
                     sp.show();
 
                     require(['LabelPrintModule'], (Print) => {
-                        let moneys = [];
+                        let moneys = {};
                         this.ftable.columnsVisible.forEach((col) => {
                             if(col.content && col.content.dataType === '11'){
-                                moneys.push(col.name);
+                                moneys[col.name.toLowerCase()] = col.content;
                             }
                         });
+                        try{
                         label = new Print({
                             moneys,
                             printList: this.para.ui.printList,
                             container: this.wrapper,
-                            cols: this.ftable.columnsVisible,
+                            cols: this.ftable.columns,
                             getData: () => this.ftable.data,
                             selectedData: () => this.ftable.selectedRowsData,
                             callBack : () => {
                                 callback && callback();
                             }
                         });
+                        }catch (e){
+                            console.log(e);
+                        }
                         sp.hide();
                     });
                 }else{

@@ -135,7 +135,7 @@ export let MENU_FAVORITE = {
             edit_req = <HTMLInputElement>edit.querySelector('.edit-req'),
             txt_edit = <HTMLInputElement>edit.querySelector('.txt_edit'),
             closeBtn = <HTMLInputElement>edit.querySelector('.edit-close'),
-            blur = document.querySelector('.mui-backdrop'),
+            blur = document.querySelector('.global-mark'),
             edit_del = edit.querySelector('.edit-del');
 
         d.on(closeBtn, 'click', function () {
@@ -278,8 +278,8 @@ export let MENU_FAVORITE = {
             txt_t.blur();
         },false);
         open && open.addEventListener('click',function(){
-            set_s.blur();
-            txt_t.blur();
+            // set_s.blur();
+            // txt_t.blur();
         },false);
     },
     /**
@@ -320,7 +320,7 @@ export let MENU_FAVORITE = {
                         }).then(({response}) => {
                             //查询遍历收藏分组
                             let set_s = set.querySelector('.set_s'),
-                                len = response.data.length,
+                                len = response.data ? response.data.length : 0,
                                 fragment = document.createDocumentFragment();
                             set_s.innerHTML = '';
                             if( len === 0){

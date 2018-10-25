@@ -233,7 +233,7 @@ export class ButtonAction {
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
         }
-        console.log(codeStype[0]["IMPORTDATAMODE"])
+
         BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
             data:data
         }).then(({response})=>{
