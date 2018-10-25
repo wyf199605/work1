@@ -8,5 +8,13 @@ function __setRequireBaseUrl(baseUrl, urlArg) { G.setRequire({ baseUrl: baseUrl,
         "BwSubTableModule",
         "BwTableModule",
         "newTableModule"
+    ],
+    "blue-whale/module/query.pc.js?v=1540456873531": [
+        "AsynQuery",
+        "HorizontalQueryModule",
+        "QueryBuilder",
+        "QueryConfig",
+        "QueryModule",
+        "QueryModulePc"
     ]
 } }, urlArg); }

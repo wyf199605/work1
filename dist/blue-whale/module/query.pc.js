@@ -170,7 +170,7 @@ define("QueryBuilder", ["require", "exports", "BwRule", "SelectInput", "CheckBox
             })();
             var self = this;
             if (!para.tpl) {
-                para.tpl = tplGet();
+                para.tpl = tplGet;
             }
             this.queryConfigs = para.queryConfigs;
             // 配置得出字段名选项
@@ -289,7 +289,7 @@ define("QueryBuilder", ["require", "exports", "BwRule", "SelectInput", "CheckBox
          */
         QueryBuilder.prototype.rowCreate = function (index) {
             var _this = this;
-            var row = d.create(this.para.tpl), coms = {};
+            var row = this.para.tpl(), coms = {};
             row.dataset.index = index.toString();
             d.queryAll('[data-type]', row).forEach(function (container) {
                 var type = container.dataset.type;
@@ -695,7 +695,7 @@ define("QueryBuilder", ["require", "exports", "BwRule", "SelectInput", "CheckBox
          */
         AtVarBuilder.prototype.rowAdd = function (index, conf, value) {
             var _this = this;
-            var row = d.create(this.para.tpl);
+            var row = this.para.tpl();
             row.dataset.index = index.toString();
             d.queryAll('[data-type]', row).forEach(function (container) {
                 var type = container.dataset.type;
@@ -759,27 +759,25 @@ define("QueryBuilder", ["require", "exports", "BwRule", "SelectInput", "CheckBox
     }());
     exports.AtVarBuilder = AtVarBuilder;
     function tplGet() {
-        var mb = '<li class="mui-table-view-cell">' +
-            '<div class="mui-slider-right mui-disabled" data-action="del"><a class="mui-btn mui-btn-red">删除</a></div>' +
-            '<div class="mui-slider-left mui-disabled">' +
-            '<a class="mui-btn" data-type="andOr"></a>' +
-            '</div>' +
-            '<div class="mui-slider-handle inner-padding-row">' +
-            '<div data-type="field"></div>' +
-            '<div data-type="not"></div>' +
-            '<div data-type="operator"></div>' +
-            '<div data-type="input1"></div>' +
-            '<div data-type="input2"></div>' +
-            '</div></li>';
-        var pc = '<div class="row"> ' +
-            '<div class="col-sm-3" data-type="field"></div> ' +
-            '<div class="col-sm-1" data-type="not"></div> ' +
-            '<div class="col-sm-2" data-type="operator"></div> ' +
-            '<div class="col-sm-3" data-type="input1"></div> ' +
-            '<div class="col-sm-3" data-type="input2"></div> ' +
-            '<span data-action="del" class="iconfont red icon-close"></span> ' +
-            '<span data-type="andOr"></span>' +
-            '</div>';
+        var mb = h("li", { class: "mui-table-view-cell" },
+            h("div", { class: "mui-slider-right mui-disabled", "data-action": "del" },
+                h("a", { class: "mui-btn mui-btn-red" }, "\u5220\u9664")),
+            h("div", { class: "mui-slider-left mui-disabled" },
+                h("a", { class: "mui-btn", "data-type": "andOr" })),
+            h("div", { class: "mui-slider-handle inner-padding-row" },
+                h("div", { "data-type": "field" }),
+                h("div", { "data-type": "not" }),
+                h("div", { "data-type": "operator" }),
+                h("div", { "data-type": "input1" }),
+                h("div", { "data-type": "input2" })));
+        var pc = h("div", { class: "row" },
+            h("div", { class: "col-sm-3", "data-type": "field" }),
+            h("div", { class: "col-sm-1", "data-type": "not" }),
+            h("div", { class: "col-sm-2", "data-type": "operator" }),
+            h("div", { class: "col-sm-3", "data-type": "input1" }),
+            h("div", { class: "col-sm-3", "data-type": "input2" }),
+            h("span", { "data-action": "del", class: "iconfont red icon-close" }),
+            h("span", { "data-type": "andOr" }));
         return sys.isMb ? mb : pc;
     }
 });
@@ -854,7 +852,7 @@ define("QueryModule", ["require", "exports", "QueryBuilder", "QueryConfig", "BwR
                 }
                 if (queryName !== 'atvarparams') {
                     queriesCpt[queryName] = new queryBuilder_1.QueryBuilder({
-                        tpl: _this.queryParamTplGet(),
+                        tpl: _this.queryParamTplGet,
                         queryName: queryName,
                         queryConfigs: para.qm[queryName],
                         resultDom: form,
@@ -873,7 +871,7 @@ define("QueryModule", ["require", "exports", "QueryBuilder", "QueryConfig", "BwR
                 }
                 else {
                     queriesCpt[queryName] = new queryBuilder_1.AtVarBuilder({
-                        tpl: _this.atVarTplGet(),
+                        tpl: _this.atVarTplGet,
                         queryConfigs: para.qm[queryName],
                         resultDom: form,
                         setting: _this.settingConf && _this.settingConf[queryName],
@@ -1213,18 +1211,19 @@ define("QueryModulePc", ["require", "exports", "QueryModule", "Tab", "Modal", "B
             return this.queryDom;
         };
         QueryModulePc.prototype.queryParamTplGet = function () {
-            return '<div class="row"> ' +
-                '<div class="col-xs-3" data-type="field"></div> ' +
-                '<div class="col-xs-1" data-type="not"></div> ' +
-                '<div class="col-xs-2" data-type="operator"></div> ' +
-                '<div class="col-xs-3" data-type="input1"></div> ' +
-                '<div class="col-xs-3" data-type="input2"></div> ' +
-                '<span data-action="del" class="iconfont red icon-close"></span> ' +
-                '<span data-type="andOr"></span>' +
-                '</div>';
+            return h("div", { class: "row" },
+                h("div", { class: "col-xs-3", "data-type": "field" }),
+                h("div", { class: "col-xs-1", "data-type": "not" }),
+                h("div", { class: "col-xs-2", "data-type": "operator" }),
+                h("div", { class: "col-xs-3", "data-type": "input1" }),
+                h("div", { class: "col-xs-3", "data-type": "input2" }),
+                h("span", { "data-action": "del", class: "iconfont red icon-close" }),
+                h("span", { "data-type": "andOr" }));
         };
         QueryModulePc.prototype.atVarTplGet = function () {
-            return "<div class=\"col-sm-5\"><div data-type=\"title\"></div><div data-type=\"input\"></div></div>";
+            return h("div", { class: "col-sm-5" },
+                h("div", { "data-type": "title" }),
+                h("div", { "data-type": "input" }));
         };
         QueryModulePc.prototype.show = function () {
             if (this.modal) {
@@ -2130,6 +2129,220 @@ define("AsynQuery", ["require", "exports", "Button", "SlideUp"], function (requi
         return AsynQuery;
     }());
     exports.AsynQuery = AsynQuery;
+});
+
+/// <amd-module name="HorizontalQueryModule"/>
+define("HorizontalQueryModule", ["require", "exports", "SelectInput", "Datetime", "NumInput", "TextInput", "BwRule", "BasicBoxGroup", "Button"], function (require, exports, selectInput_1, datetime_1, numInput_1, text_1, BwRule_1, selectBoxGroup_1, Button_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Component = G.Component;
+    var d = G.d;
+    var tools = G.tools;
+    var HorizontalQueryModule = /** @class */ (function (_super) {
+        __extends(HorizontalQueryModule, _super);
+        function HorizontalQueryModule(para) {
+            var _this = _super.call(this, para) || this;
+            _this.defaultData = _this.getDefaultData(para.qm.queryparams1);
+            _this.search = para.search;
+            _this.__initForms(para);
+            if (_this.forms.length > 0 && (para.qm.queryType == 1 || para.qm.queryType == 3)) {
+                d.append(d.query('.query-form', _this.wrapper), h("div", { className: "form-com-item" },
+                    h(Button_1.Button, { className: "query-search-btn", content: "\u67E5\u8BE2", onClick: function () {
+                            typeof _this.search === 'function' && _this.search(_this.json);
+                        } })));
+            }
+            // 自定义内容
+            d.append(d.query('.query-form', _this.wrapper), _this.extraWrapper);
+            return _this;
+        }
+        HorizontalQueryModule.prototype.wrapperInit = function (para) {
+            return h("div", { className: "horizontalQueryModule" });
+        };
+        Object.defineProperty(HorizontalQueryModule.prototype, "extraWrapper", {
+            get: function () {
+                if (!this._extraWrapper) {
+                    this._extraWrapper = h("div", { className: "extra-wrapper" });
+                }
+                return this._extraWrapper;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(HorizontalQueryModule.prototype, "search", {
+            get: function () {
+                return this._search;
+            },
+            set: function (flag) {
+                this._search = flag;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // 获取默认数据
+        HorizontalQueryModule.prototype.getDefaultData = function (data) {
+            var obj = {};
+            for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+                var item = data_1[_i];
+                obj[item.field_name] = item.atrrs.defaultValue || '';
+            }
+            return obj;
+        };
+        // 初始化FormCom控件
+        HorizontalQueryModule.prototype.__initForms = function (para) {
+            var _this = this;
+            var cond = para.qm.queryparams1 || [];
+            this.forms = [];
+            tools.isNotEmpty(this.wrapper) && d.append(this.wrapper, h("div", { className: "query-form" }, cond.map(function (c) {
+                var extra = {};
+                if (para.qm.queryType == 2 || para.qm.queryType == 4) {
+                    extra.onSet = function () {
+                        typeof _this.search === 'function' && _this.search(_this.json);
+                    };
+                }
+                var com, props = Object.assign({}, {
+                    custom: c,
+                    showFlag: true,
+                    placeholder: c.caption,
+                }, extra), fieldName = c.field_name, type = c.type || c.atrrs.dataType;
+                switch (type) {
+                    case 'VALUELIST':
+                        com = h(selectInput_1.SelectInput, __assign({ clickType: 0, readonly: true, data: tools.isEmpty(c.value_list) ? [] : c.value_list.map(function (res) {
+                                var data = _this.formatData(res);
+                                return { text: data.title, value: data.value };
+                            }), ajax: tools.isEmpty(c.link) ? void 0 : {
+                                fun: function (url, val, callback) {
+                                    _this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then(function (result) {
+                                        typeof callback === 'function' && callback(result);
+                                    });
+                                }
+                            } }, props));
+                        break;
+                    case 'VALUE':
+                        com = h(selectInput_1.SelectInput, __assign({ clickType: 0, readonly: true, data: tools.isEmpty(c.value_list) ? [] : c.value_list.map(function (res) {
+                                var data = _this.formatData(res);
+                                return { text: data.title, value: data.value };
+                            }), ajax: tools.isEmpty(c.link) ? void 0 : {
+                                fun: function (url, val, callback) {
+                                    _this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then(function (result) {
+                                        typeof callback === 'function' && callback(result);
+                                    });
+                                }
+                            } }, props));
+                        break;
+                    case 'QRYVALUE':
+                        com = h(selectInput_1.SelectInput, __assign({ clickType: 0, readonly: true, data: tools.isEmpty(c.value_list) ? [] : c.value_list.map(function (res) {
+                                var data = _this.formatData(res);
+                                return { text: data.title, value: data.value };
+                            }), ajax: tools.isEmpty(c.link) ? void 0 : {
+                                fun: function (url, val, callback) {
+                                    _this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then(function (result) {
+                                        typeof callback === 'function' && callback(result);
+                                    });
+                                }
+                            } }, props));
+                        break;
+                    case 'RESVALUE':
+                        com = h(selectInput_1.SelectInput, __assign({ clickType: 0, readonly: true, data: tools.isEmpty(c.value_list) ? [] : c.value_list.map(function (res) {
+                                var data = _this.formatData(res);
+                                return { text: data.title, value: data.value };
+                            }), ajax: tools.isEmpty(c.link) ? void 0 : {
+                                fun: function (url, val, callback) {
+                                    _this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then(function (result) {
+                                        typeof callback === 'function' && callback(result);
+                                    });
+                                }
+                            } }, props));
+                        break;
+                    case '12':
+                        com = h(datetime_1.Datetime, __assign({ format: "yyyy-MM-dd" }, props));
+                        break;
+                    case '13':
+                        com = h(datetime_1.Datetime, __assign({ format: "yyyy-MM-dd HH:mm:ss" }, props));
+                        break;
+                    case '10':
+                        com = h(numInput_1.NumInput, __assign({ defaultNum: 0 }, props));
+                        break;
+                    default:
+                        com = h(text_1.TextInput, __assign({}, props));
+                }
+                if (fieldName in _this.defaultData) {
+                    tools.isNotEmpty(_this.defaultData[fieldName])
+                        && com.set(_this.defaultData[fieldName]);
+                }
+                _this.forms.push(com);
+                return props.showFlag ? h("div", { className: "form-com-item" },
+                    h("div", { className: "form-com-title" }, c.caption + '：'),
+                    com) : com.wrapper && d.remove(com.wrapper);
+            })));
+        };
+        Object.defineProperty(HorizontalQueryModule.prototype, "json", {
+            // 获取数据
+            get: function () {
+                var json = {};
+                this.forms.forEach(function (form) {
+                    var cond = form.custom, value = form.value;
+                    json.params = json.params || [];
+                    if (form instanceof selectBoxGroup_1.BasicBoxGroup && Array.isArray(value)) {
+                        value = value.join(',');
+                    }
+                    value = Array.isArray(value) ? value : [value];
+                    if (!(value.length === 1 && tools.isEmpty(value[0]))) {
+                        if (!(value.length === 2 && tools.isEmpty(value[0]) && tools.isEmpty(value[1]))) {
+                            json.params.push([cond.field_name, value]);
+                        }
+                    }
+                });
+                for (var key in json) {
+                    json[key] = JSON.stringify(json[key]);
+                }
+                return json;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        HorizontalQueryModule.prototype.getDropDownData = function (url, fieldName) {
+            return new Promise(function (resolve, reject) {
+                if (tools.isEmpty(url)) {
+                    reject();
+                }
+                else {
+                    BwRule_1.BwRule.Ajax.fetch(url).then(function (_a) {
+                        var response = _a.response;
+                        var fields = [];
+                        if (response.data[0]) {
+                            fields = Object.keys(response.data[0]);
+                        }
+                        var options = response.data.map(function (data) {
+                            return {
+                                value: data[fieldName],
+                                text: fields.map(function (key) { return data[key]; }).join(','),
+                            };
+                        });
+                        resolve(options);
+                    });
+                }
+            });
+        };
+        HorizontalQueryModule.prototype.formatData = function (data) {
+            if (data === void 0) {
+                return undefined;
+            }
+            return {
+                title: typeof data === 'string' ? data : data.title,
+                value: typeof data === 'string' ? data : data.value,
+            };
+        };
+        HorizontalQueryModule.prototype.destroy = function () {
+            this.forms && this.forms.forEach(function (form) {
+                form.destroy();
+            });
+            this.forms = null;
+            this.search = null;
+            _super.prototype.destroy.call(this);
+        };
+        return HorizontalQueryModule;
+    }(Component));
+    exports.HorizontalQueryModule = HorizontalQueryModule;
 });
 
 /**

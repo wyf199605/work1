@@ -15,6 +15,7 @@ import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
 
+
 /**
  * Created by zhengchao on 2017/12/21.
  * 业务按钮统一控制器
@@ -230,19 +231,18 @@ export class ButtonAction {
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
         }
         console.log(codeStype[0]["IMPORTDATAMODE"])
-        BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
-            data:data
-        }).then(({response})=>{
-            console.log(response)
-            response.body && (analysis =  response.body.bodyList[0].inventData)
-        })
+        // BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
+        //     data:data
+        // }).then(({response})=>{
+        //     console.log(response)
+        //     response.body && (analysis =  response.body.bodyList[0].inventData)
+        // })
 
         require(['RfidBarCode'], (p) => {
             new p.RfidBarCode({
                 codeStype:codeStype,
                 SHO_ID:dataObj['SHO_ID'],
                 USERID:dataObj['USERID'],
-                analysis:analysis,
                 uploadUrl:uploadUrl,
                 downUrl:downUrl,
                 uniqueFlag:uniqueFlag

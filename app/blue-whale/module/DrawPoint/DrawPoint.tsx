@@ -1,5 +1,5 @@
 /// <amd-dependency path="D3" name="D3"/>
-
+/// <amd-module name="DrawPoint"/>
 declare const D3;
 //开启描点连线功能
 //开启地图放大功能以及拖动功能
@@ -7,14 +7,14 @@ declare const D3;
 
 interface IDrapPoint {
     wraperId?:string //父元素
-    width:number
-    height:number
+    width:number | string
+    height:number | string
 }
 export  class DrawPoint {
     public svg;
     public g;
     public index;
-    public points = [];
+    public points:Array<any>;
     public map
     public selected
     public line;
@@ -25,33 +25,44 @@ export  class DrawPoint {
         this.map = D3.map(this.points, function (d, i) {
             return i;
         })
-        this.line = D3.svg.line();
         this.r = D3.scale.linear()
             .domain([1,6])
             .range([5.5,1])
         this.InitSvg(para)
+        this.test();
     }
+    private point = [2];
+
 
     public InitSvg(para) {
         this.svg = D3.select(para.wraperId).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
-            .on('mousedown', this.mousedown)
+            .on('mousedown',()=>{
+                return this.mousedown()
+            })
+        console.log(para.wraperId);
+        console.log(D3.select(para.wraperId));
         this.g = this.svg.append('g');
         this.g.append('image')//添加背景图
-
     }
 
     private mousedown() {
         var svg = D3.select('svg').select('g')
-
-        this.points.push(this.selected = D3.mouse(svg.node()))
+        console.log(D3.mouse(svg.node()));
+        console.log(this.point);
+        this.point.push(this.selected = D3.mouse(svg.node()))
         console.log(this.points)
         this.map.set(this.index, this.points)
         console.log(this.map);
         this.redraw();
 
     }
+
+    private test(){
+        console.log(this.point);
+    }
+
 
     //绘图
     private redraw() {

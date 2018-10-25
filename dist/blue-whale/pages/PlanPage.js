@@ -1,5 +1,5 @@
 /// <amd-module name="PlanPage"/>
-define("PlanPage", ["require", "exports", "BasicPage", "HorizontalQueryModule"], function (require, exports, basicPage_1, horizontalFormFactory_1) {
+define("PlanPage", ["require", "exports", "BasicPage", "HorizontalQueryModule", "DrawPoint"], function (require, exports, basicPage_1, horizontalFormFactory_1, DrawPoint_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var d = G.d;
@@ -9,17 +9,7 @@ define("PlanPage", ["require", "exports", "BasicPage", "HorizontalQueryModule"],
             var _this = _super.call(this, para) || this;
             _this.wrapper = para.dom;
             var qData = para.ui.body.elements[0];
-            // let queryForm =  new HorizontalQueryModule({
-            //   qm:{
-            //        autTag:qData['autTag'],
-            //       hasOption:qData['hasOption'],
-            //       queryType:qData['queryType'],
-            //       queryparams1:qData['queryparams1'],
-            //       scannableTime:0,
-            //       uiPath:qData['uiPath']
-            //
-            //   }
-            // })
+            console.log(qData);
             var content = h("div", { class: "plan-Head" },
                 h(horizontalFormFactory_1.HorizontalQueryModule, { qm: {
                         autTag: qData['autTag'],
@@ -27,14 +17,12 @@ define("PlanPage", ["require", "exports", "BasicPage", "HorizontalQueryModule"],
                         queryType: qData['queryType'],
                         queryparams1: qData['queryparams1'],
                         scannableTime: 0,
-                        uiPath: qData['uiPath']
+                        uiPath: qData['uiPath'],
+                        setting: null
                     }, search: function (data) {
                         return new Promise(function (resolve) {
                             //
                             console.log(data.params);
-                            var str = data.params;
-                            console.log(str.length);
-                            console.log(str[0]);
                             resolve(data);
                         });
                     } }),
@@ -58,11 +46,17 @@ define("PlanPage", ["require", "exports", "BasicPage", "HorizontalQueryModule"],
                         h("i", { className: "iconfont icon-suofang" },
                             h("span", null, "\u7F29\u653E(\u6EDA\u8F6E)")))));
             d.append(_this.wrapper, content);
-            console.log(para.ui);
+            //下半部
+            var drawContent = h("div", { class: "drawPage", id: "drawPage" }, "}");
+            d.append(_this.wrapper, drawContent);
+            _this.draw = new DrawPoint_1.DrawPoint({
+                wraperId: '#drawPage',
+                height: 400,
+                width: 700
+            });
             return _this;
         }
-        PlanPage.prototype.hanshu = function () {
-            console.log("22");
+        PlanPage.prototype.InitDrawPoint = function () {
         };
         return PlanPage;
     }(basicPage_1.default));

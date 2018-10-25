@@ -367,8 +367,8 @@ export const Shell = ((window, document) => {
             return ShellBase.handler('getColumnCount',{when:when,time:time,turn:false,inventory:inventoryKey,once:true,out:true},back);
         },
         //条码扫码下载的
-        downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,data:string,back:IShellEventHandler){
-           return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl,data:data},back);
+        downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,back:IShellEventHandler){
+           return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl},back);
         },
         //注入监听事件
         openRegistInventory(type:number,params:obj,back:IShellEventHandler){
@@ -376,19 +376,23 @@ export const Shell = ((window, document) => {
         },
         closeRegistInventory(type:number,params:obj,back:IShellEventHandler){
             ShellBase.eventOff('registInventory');
-            return ShellBase.handler('registInventory',{type:type,params:params},back,null,false);
+            return ShellBase.handler('registInventory',{type:type,params:params},back);
         },
         //删除条码数据
-        delInventoryData(nameId:string,category:string[],barcode:string,back:IShellEventHandler){
-            return ShellBase.handler('delInventoryData',{nameId:nameId,category:category,barcode:barcode},back,null,false);
+        delInventoryData(nameId:string,where:object,back:IShellEventHandler){
+            return ShellBase.handler('delInventoryData',{nameId:nameId,where:where},back);
         },
         //上传条码数据
-        inputcodedata(nameId:string,barcode:string,category:string,optionStype:number,back:IShellEventHandler){
-            return ShellBase.handler('inputcodedata',{nameId:nameId,barcode:barcode,category:category,optionStype:optionStype},back,null,false);
+        uploadcodedata(nameId:string,back:IShellEventHandler){
+            return ShellBase.handler('uploadcodedata',{nameId:nameId},back,null,false);
         },
         //获取盘点数据
-        getTableInfo(uniqueFlag:string,back:IShellEventHandler){
-          return ShellBase.handler('getTableInfo',{uniqueFlag:uniqueFlag},back)
+        getTableInfo(uniqueFlag:string){
+          return ShellBase.handler('getTableInfo',{uniqueFlag:uniqueFlag})
+        },
+        //输入条码扫码查询
+        inputcodedata(optionStype:number,uniqueFlag:string,value:string,category:string[],back:IShellEventHandler){
+           return ShellBase.handler('inputcodedata',{uniqueFlag:uniqueFlag,value:value,category:category,optionStype:optionStype},back)
         },
         scan2dOn(back: IShellEventHandler) {
             return ShellBase.handler('startScan2DResult', '', back, null, false);
@@ -507,11 +511,8 @@ const ShellBase = (() => {
 
                     // 异步完成通知
                     if (eventBack) {
-                        alert('ppp')
-                        alert(eventBack);
                         d.on(window, eventBack, function (e: CustomEvent) {
                             let detail = e.detail;
-                            alert("aaaa")
                             if (isAutoOff) {
 
                                 d.off(window, eventInfor);

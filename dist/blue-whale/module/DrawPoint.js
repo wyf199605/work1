@@ -1,34 +1,44 @@
-/// <amd-dependency path="D3" name="D3"/>
-define(["require", "exports", "D3"], function (require, exports, D3) {
+define("DrawPoint", ["require", "exports", "D3"], function (require, exports, D3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-dependency path="D3" name="D3"/>
     var DrawPoint = /** @class */ (function () {
         function DrawPoint(para) {
-            this.points = [];
+            this.point = [2];
             this.map = D3.map(this.points, function (d, i) {
                 return i;
             });
-            this.line = D3.svg.line();
             this.r = D3.scale.linear()
                 .domain([1, 6])
                 .range([5.5, 1]);
             this.InitSvg(para);
+            this.test();
         }
         DrawPoint.prototype.InitSvg = function (para) {
+            var _this = this;
             this.svg = D3.select(para.wraperId).append('svg')
                 .attr('width', para.width)
                 .attr('height', para.height)
-                .on('mousedown', this.mousedown);
+                .on('mousedown', function () {
+                return _this.mousedown();
+            });
+            console.log(para.wraperId);
+            console.log(D3.select(para.wraperId));
             this.g = this.svg.append('g');
             this.g.append('image'); //添加背景图
         };
         DrawPoint.prototype.mousedown = function () {
             var svg = D3.select('svg').select('g');
-            this.points.push(this.selected = D3.mouse(svg.node()));
+            console.log(D3.mouse(svg.node()));
+            console.log(this.point);
+            this.point.push(this.selected = D3.mouse(svg.node()));
             console.log(this.points);
             this.map.set(this.index, this.points);
             console.log(this.map);
             this.redraw();
+        };
+        DrawPoint.prototype.test = function () {
+            console.log(this.point);
         };
         //绘图
         DrawPoint.prototype.redraw = function () {
