@@ -1605,7 +1605,7 @@ export class FastTable extends Component {
             let rowObj = this.rowGet(row);
             if (rowObj) {
                 let cell = rowObj.cellGet(column);
-                if (!cell.isVirtual)
+                if (cell && !cell.isVirtual)
                     cell._selectedInnerSet(true);
             }
         };
@@ -1798,14 +1798,8 @@ export class FastTable extends Component {
         this.pseudoTable && this.pseudoTable.render();
         this.noData.toggle(Object.keys(this.tableData.data).length === 0);
 
-        let handlers = this.eventHandlers[FastTable.EVT_RENDERED];
-        Array.isArray(handlers) && handlers.forEach(handler => {
-            handler();
-        });
-
-
-        this.isWrapLine && this.setRowsHeight();
         this.wrapper.style.display = 'block';
+        this.isWrapLine && this.setRowsHeight();
         //   监听滚动事件
 
         this.calcWidth();
@@ -1826,6 +1820,11 @@ export class FastTable extends Component {
             this.touchMoveEvent.on();
 
         }
+
+        let handlers = this.eventHandlers[FastTable.EVT_RENDERED];
+        Array.isArray(handlers) && handlers.forEach(handler => {
+            handler();
+        });
     }
 
 

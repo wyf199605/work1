@@ -82,6 +82,7 @@ export = class LabelPrintModule {
                 content: '设为默认值',
                 type: 'primary',
                 onClick: () => {
+                    // TODO 这里是还原
                     this.printUtil.setInputDefault();
                     return false;
                 }
@@ -931,30 +932,35 @@ export = class LabelPrintModule {
          * 设置页面输入框默认值
          */
          let setInputDefault = ()=>{
+             let defaultValue = {};
+             for(let key in self.coms){
+                 defaultValue[key] = self.coms[key].get();
+             }
+             console.log(defaultValue);
 
-             self.coms['printer'].get() !== 0 && self.coms['printer'].set(0);
-             self.coms['port'].get() !== 25 && self.coms['port'].set(25);
-             self.coms['paper'].get() !== '215.9*279.4' && self.coms['paper'].set('215.9*279.4');
-             self.coms['labelType'].get() !== 0 && self.coms['labelType'].set(0);
-             self.coms['up'].set(0);
-             self.coms['down'].set(0);
-             self.coms['left'].set(0);
-             self.coms['right'].set(0);
-             self.coms['rowSpace'].set(10);
-             self.coms['colSpace'].set(10);
-
-             let width = self.coms['width'],
-                 height = self.coms['height'];
-
-             width.on('change', function () {
-                 self.coms['paper'].set(0);
-             });
-
-             height.on('change', function () {
-                 self.coms['paper'].set(0);
-             });
-
-             self.labelType = 0;
+            // self.coms['printer'].get() !== 0 && self.coms['printer'].set(0);
+            //  self.coms['port'].get() !== 25 && self.coms['port'].set(25);
+            //  self.coms['paper'].get() !== '215.9*279.4' && self.coms['paper'].set('215.9*279.4');
+            //  self.coms['labelType'].get() !== 0 && self.coms['labelType'].set(0);
+            //  self.coms['up'].set(0);
+            //  self.coms['down'].set(0);
+            //  self.coms['left'].set(0);
+            //  self.coms['right'].set(0);
+            //  self.coms['rowSpace'].set(10);
+            //  self.coms['colSpace'].set(10);
+            //
+            //  let width = self.coms['width'],
+            //      height = self.coms['height'];
+            //
+            //  width.on('change', function () {
+            //      self.coms['paper'].set(0);
+            //  });
+            //
+            //  height.on('change', function () {
+            //      self.coms['paper'].set(0);
+            //  });
+            //
+            //  self.labelType = 0;
          };
 
         /**

@@ -188,7 +188,9 @@ export class ButtonAction {
                 }
                 self.checkAction(btn, dataObj, addr, ajaxType, data, url).then(response => {
                     callback(response);
-                }).catch(() => {
+                    self.btnRefresh(btn.refresh, url);
+                }).catch((e) => {
+                    console.log(e);
                 });
                 break;
             case 'popup':

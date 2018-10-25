@@ -140,8 +140,8 @@ export class FastTableRow {
         this.rowsEach((row, rowindex, rowArr) => {
             row.selected = selected;
 
-            row.cells.forEach((cell, index, array) => {
-                (<FastTableCell>cell)._selectedInnerSet(selected);
+            row.cells.forEach((cell: FastTableCell, index, array) => {
+                cell && cell._selectedInnerSet && cell._selectedInnerSet(selected);
             });
         });
 
