@@ -3,6 +3,8 @@ import {BwTableModule, IBwTableModulePara} from "./BwTableModule";
 import tools = G.tools;
 import d = G.d;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import {BwRule} from "../../common/rule/BwRule";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export class BwMainTableModule extends BwTableModule{
 
@@ -148,9 +150,16 @@ export class BwMainTableModule extends BwTableModule{
                                 moneys[col.name.toLowerCase()] = col.content;
                             }
                         });
+                        let defalutVal;
+                        try{
+                            defalutVal = JSON.parse(this.ui.printSetting);
+                        }catch (e){
+                            console.log(e);
+                        }
                         try{
                         label = new Print({
                             moneys,
+                            defaultVal: defalutVal,
                             printList: this.para.ui.printList,
                             container: this.wrapper,
                             cols: this.ftable.columns,
@@ -158,6 +167,19 @@ export class BwMainTableModule extends BwTableModule{
                             selectedData: () => this.ftable.selectedRowsData,
                             callBack : () => {
                                 callback && callback();
+                            },
+                            onSetDefault: (data: string) => {
+                                console.log(data);
+                                BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.ajaxUrl.labelDefault, {'item_id': this.ui.itemId}), {
+                                    type: 'POST',
+                                    data: {
+                                        printSetting: data
+                                    }
+                                }).then(() => {
+                                    Modal.toast('设置默认值成功');
+                                }).catch(() => {
+                                    Modal.toast('设置默认值失败');
+                                })
                             }
                         });
                         }catch (e){

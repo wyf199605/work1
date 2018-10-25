@@ -130,6 +130,11 @@ namespace G {
             return {r, g, b};
         },
         url: {
+            /*
+            * 替换url中的模板数据
+            * @param {string} url - 要替换的路径地址
+            * @param {obj} data - 根据数据替换url中花括号{}的数据
+            * */
             replaceTmpUrl(url: string, data: obj){
                 return url.replace(/{([\w\W]+?)}/g, (str, name) => {
                     return tools.isEmpty(data[name]) ? name : data[name];
