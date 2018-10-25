@@ -100,12 +100,16 @@
         float: left;
         color: #666;
         width: 100%;
+        display: flex;
+        align-items:flex-start;
+        flex-direction:column;
+        justify-content: center;
       }
       .list-item-title {
         font-size: 15px;
         font-weight: bolder;
         color: #000;
-        margin-bottom: 5px;
+        //margin-bottom: 5px;
         padding-bottom: 15px;
         border-bottom: 1px solid #F8F8F8 ;
       }
