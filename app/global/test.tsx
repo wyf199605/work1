@@ -1,20 +1,19 @@
 /// <amd-module name="GlobalTestModule"/>
+import {Accessory} from "./components/form/upload/accessory";
 
-import {MbList} from "./components/mbList/MbList";
-
-new MbList({
-    data: [
+new Accessory({
+    container:document.body,
+    files:[
         {
-            title: '9825445464456 驼色',
-            body: [
-                ['码数', '张三'],
-                ['库存量', '2016-8-23 08:00'],
-                ['异店库存', '2016-8-23 08:00']
-            ],
-            label: ['手工确认完成', '谢晋超'],
-            imgLabel: '标签',
-            status: 1,
+            fileSize: 123,
+            fileName: '测试1.pdf',
+            addr: 'test.php'
+        },
+        {
+            fileSize: 456,
+            fileName: '测试2.pdf',
+            addr: 'test.php'
         }
-    ],
-    isMulti: true
+    ]
 });
+
