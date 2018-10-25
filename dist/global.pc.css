@@ -2118,20 +2118,6 @@ button[data-balloon] {
     .modal-box .modal-footer button span {
       height: auto; }
 
-.modal-animate-up-mb {
-  animation: aumb 0.3s ease; }
-@keyframes aumb {
-  from {
-    top: 100%; }
-  to {
-    top: 0; } }
-.modal-animate-down-mb {
-  animation: admb 0.3s ease; }
-@keyframes admb {
-  from {
-    top: 0; }
-  to {
-    top: 100%; } }
 .slide-up {
   background: #fff;
   z-index: 1002; }

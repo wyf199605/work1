@@ -1,7 +1,6 @@
 define("UploadModule", ["require", "exports", "Uploader", "FormCom", "Modal"], function (require, exports, uploader_1, basic_1, Modal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    // TODO 使用完该控件需销毁，否则后续上传会多次
     var UploadModule = /** @class */ (function (_super) {
         __extends(UploadModule, _super);
         function UploadModule(para) {
@@ -23,7 +22,7 @@ define("UploadModule", ["require", "exports", "Uploader", "FormCom", "Modal"], f
                     }
                     else {
                         _this.para.onError && _this.para.onError.call(_this, file);
-                        Modal_1.Modal.alert(data.msg || data.errorMsg);
+                        Modal_1.Modal.alert(data.message);
                     }
                 }
             });

@@ -2072,14 +2072,11 @@ define("NewCount", ["require", "exports", "NewStatisticBase", "SelectInput", "Mo
                         break;
                     }
                 }
-                if (colIndex === -1) {
-                    return null;
-                }
                 return {
                     text: cols[colIndex].title,
                     value: colName
                 };
-            }).filter(function (item) { return item; });
+            });
             var selectInput = new (sys.isMb ? selectInput_mb_1.SelectInputMb : selectInput_1.SelectInput)({
                 container: this.modal.body,
                 data: listItems,

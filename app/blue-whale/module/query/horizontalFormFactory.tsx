@@ -17,13 +17,10 @@ export interface IHorizontalQueryModule extends IComponentPara {
     qm: IBw_Query;
     search?: (data) => Promise<any>;
 }
-
-
 export class HorizontalQueryModule extends Component {
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
         return <div className="horizontalQueryModule"/>;
     }
-
 
     protected forms: FormCom[];
     protected defaultData: obj;
@@ -232,5 +229,4 @@ export class HorizontalQueryModule extends Component {
         this.search = null;
         super.destroy();
     }
-
 }

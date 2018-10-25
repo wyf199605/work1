@@ -61,12 +61,12 @@ define(["require", "exports", "BasicPage", "BwRule", "Modal", "PopMenu", "InputB
                     var dataCols = sys.isMb ? d.queryAll('.mui-table-view-cell [data-col]') :
                         d.queryAll('.list-group-item [data-col]', para.dom);
                     dataCols.forEach(function (el) {
-                        var html = response.data[0] ? response.data[0][el.dataset.col] : null;
+                        var html = response.data[0][el.dataset.col];
                         if (html === null || html === undefined) {
                             d.remove(el.parentElement.parentElement);
                         }
                         else {
-                            typeof html === 'string' && (el.innerHTML = html);
+                            el.innerHTML = html;
                         }
                     });
                     // detailData = response.data[0];

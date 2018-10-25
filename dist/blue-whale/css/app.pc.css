@@ -2845,6 +2845,51 @@ div.item-media {
 .fl-pc .sub-table-full .modal-body {
   max-height: none !important; }
 
+.mbPage-body {
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  transform: translateZ(0);
+  position: relative;
+  padding-top: 70px !important; }
+  .mbPage-body .nav-tabs {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    left: 0;
+    width: auto;
+    background-color: #ffffff;
+    position: fixed;
+    top: 30px;
+    z-index: 1;
+    overflow-x: auto;
+    overflow-y: hidden; }
+    .mbPage-body .nav-tabs li {
+      height: 40px;
+      text-align: center;
+      width: auto;
+      padding: 0 15px;
+      line-height: 40px;
+      border-bottom: 1px solid #e2e2e2;
+      outline: none;
+      flex-shrink: 0;
+      flex-grow: 0; }
+    .mbPage-body .nav-tabs li.active > a {
+      display: inline-block;
+      height: 100%;
+      border-bottom: 2px solid #005bac;
+      color: #007AFF; }
+      .mbPage-body .nav-tabs li.active > a:hover {
+        border: none;
+        border-bottom: 2px solid #007AFF;
+        color: #007AFF; }
+  .mbPage-body .nav-tabs > li > a {
+    color: #8e8e93;
+    border-radius: 0;
+    border: none; }
+
 .hints-body {
   min-height: 150px; }
 
@@ -3409,128 +3454,77 @@ div.item-media {
     border-right: 7px solid transparent;
     border-left: 7px solid transparent; }
 
-.login-page-container {
-  width: 100%;
-  min-height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center; }
-  .login-page-container .login-wrapper {
-    width: 40.5%;
-    height: 73.4%;
-    font-family: MicrosoftYaHei;
-    min-width: 375px;
-    font-size: 14px;
-    font-weight: normal;
-    font-stretch: normal; }
-    .login-page-container .login-wrapper .logo {
-      text-align: center; }
-    .login-page-container .login-wrapper .login-form {
-      width: 100%;
-      height: 66.4%;
-      margin-top: 8.1%;
-      background-color: #ffffff;
-      box-shadow: -2px 1px 21px 0px rgba(0, 91, 172, 0.11);
-      border-radius: 3px;
-      border-top: 5px solid #005bac;
-      padding-top: 65px;
-      padding-bottom: 31px; }
-      .login-page-container .login-wrapper .login-form .form-group {
-        width: 65.4%;
-        margin: 0 auto;
-        margin-top: 20px; }
-        .login-page-container .login-wrapper .login-form .form-group > input {
-          width: 100%;
-          height: 40px;
-          background-color: #ffffff;
-          border-radius: 3px;
-          color: #3a3a3a;
-          padding-left: 10px;
-          border: solid 1px #e2e2e2; }
-          .login-page-container .login-wrapper .login-form .form-group > input:focus {
-            border: solid 1px #005bac; }
-        .login-page-container .login-wrapper .login-form .form-group.checkbox-group {
-          color: #b0b0b0; }
-          .login-page-container .login-wrapper .login-form .form-group.checkbox-group div.checkbox-wrapper {
-            float: left;
-            font-size: 14px; }
-          .login-page-container .login-wrapper .login-form .form-group.checkbox-group div.forget-pwd {
-            float: right; }
-            .login-page-container .login-wrapper .login-form .form-group.checkbox-group div.forget-pwd a {
-              color: #b0b0b0; }
-          .login-page-container .login-wrapper .login-form .form-group.checkbox-group:after {
-            content: '';
-            width: 0;
-            height: 0;
-            display: block;
-            visibility: hidden;
-            clear: both; }
-      .login-page-container .login-wrapper .login-form .btn-group {
-        width: 65.4%;
-        height: 40px;
-        margin-top: 24px;
-        position: relative;
-        left: 50%;
-        transform: translate(-50%); }
-        .login-page-container .login-wrapper .login-form .btn-group button {
-          width: 100%;
-          height: 100%;
-          background-color: #005bac;
-          border-radius: 3px;
-          color: #ffffff; }
-      .login-page-container .login-wrapper .login-form .login-option {
-        width: 218px;
-        height: 72px;
-        margin: 0 auto;
-        margin-top: 21px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-box-align: center;
-        display: -webkit-flex;
-        display: flex;
-        -webkit-justify-content: space-around;
-        justify-content: space-around; }
-        .login-page-container .login-wrapper .login-form .login-option a {
-          display: inline-block;
-          color: #333333; }
-          .login-page-container .login-wrapper .login-form .login-option a .iconfont {
-            display: block;
-            width: 46px;
-            height: 46px;
-            border-radius: 23px;
-            color: #ffffff;
-            text-align: center;
-            margin: 0 auto 10px; }
-          .login-page-container .login-wrapper .login-form .login-option a.zhiwen .iconfont {
-            background-color: #ffb400;
-            line-height: 50px;
-            font-size: 27px; }
-          .login-page-container .login-wrapper .login-form .login-option a.device .iconfont {
-            background-color: #33c3a2;
-            line-height: 52px;
-            font-size: 35px; }
-    .login-page-container .login-wrapper .footer {
-      width: 33.7%;
-      height: 8.6%;
-      margin: 0 auto;
-      margin-top: 22px; }
-      .login-page-container .login-wrapper .footer .login-fqa button {
-        border: none;
-        background-color: transparent;
-        color: #004078;
-        position: relative;
-        left: 50%;
-        transform: translate(-50%); }
-        .login-page-container .login-wrapper .footer .login-fqa button span {
-          margin: 0 auto; }
-      .login-page-container .login-wrapper .footer .copyright {
-        color: #b0b0b0;
-        text-align: center;
-        min-width: 160px; }
+.loginPage .error {
+  color: red !important;
+  border-color: red !important; }
+.loginPage #login-form .form-control.error + .fa {
+  color: red !important; }
+.loginPage .main-login .form-actions {
+  padding-top: 0;
+  display: block; }
+.loginPage .page-header {
+  text-align: center;
+  border-bottom: 0;
+  margin-top: 80px; }
+.loginPage .page-header img {
+  height: 40px;
+  margin-right: 5px; }
+.loginPage .clip-check {
+  display: inline-block;
+  margin: 0; }
+.loginPage .main-login {
+  animation-duration: 0.75s;
+  animation-fill-mode: both;
+  animation-name: fadeInUp;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 0 10px; }
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px); }
+  100% {
+    opacity: 1;
+    transform: translateY(0); } }
+@media screen and (min-width: 1400px) {
+  .loginPage .main-login {
+    /*padding:0px 50px;*/ } }
+.loginPage .input-icon > input {
+  height: 42px;
+  font-size: 16px; }
+.loginPage .forgot {
+  top: 13px !important; }
+.loginPage .popover {
+  width: 200px; }
+.loginPage .popover .arrow {
+  top: 50%; }
+.loginPage #urlBtn {
+  height: 40px;
+  margin-right: 5px; }
+.loginPage .form-actions {
+  margin-top: 20px !important; }
+.loginPage #login {
+  width: 80px;
+  position: relative;
+  float: right; }
+.loginPage #login:hover .iconfont {
+  left: 40%; }
+.loginPage .otherLogin {
+  border-top: 1px dashed #ccc; }
+.loginPage .otherLogin .btn {
+  margin-top: 20px;
+  height: 42px;
+  padding: 0; }
+.loginPage .otherLogin > .btn > span {
+  line-height: 42px; }
+.loginPage .otherLogin span.text {
+  font-size: 16px; }
+.loginPage .modal-body i {
+  float: left; }
+.loginPage #fingerTip {
+  padding-left: 40px;
+  margin-top: 10px; }
 
-@media all and (min-width: 1200px) {
-  .login-wrapper {
-    width: 35% !important; } }
 /***  Parameters  ***/
 /***  Parameters  ***/
 @media (min-width: 992px) {
@@ -4637,211 +4631,96 @@ div.item-media {
 .myselfPage .list-group-item .col-name {
   color: #999; }
 
-.reg-page-container {
-  width: 100%;
-  min-height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center; }
-  .reg-page-container .register-wrapper {
-    width: 40.5%;
-    min-width: 375px;
-    height: 580px;
-    font-family: MicrosoftYaHei;
-    font-size: 14px;
-    font-weight: normal;
-    font-stretch: normal; }
-    .reg-page-container .register-wrapper .logo {
-      text-align: center; }
-    .reg-page-container .register-wrapper .register-content {
-      width: 100%;
-      height: 385px;
-      margin-top: 8.1%;
-      background-color: #ffffff;
-      box-shadow: -2px 1px 21px 0px rgba(0, 91, 172, 0.11);
-      border-radius: 3px;
-      border-top: 5px solid #005bac;
-      padding-top: 48px; }
-      .reg-page-container .register-wrapper .register-content .register-title {
-        text-align: center;
-        font-size: 24px;
-        color: #333333;
-        line-height: 50px; }
-      .reg-page-container .register-wrapper .register-content .register-form .form-group {
-        margin: 0 auto;
-        margin-top: 20px;
-        width: 65.4%; }
-        .reg-page-container .register-wrapper .register-content .register-form .form-group input {
-          width: 100%;
-          height: 40px;
-          background-color: #ffffff;
-          border-radius: 3px;
-          border: solid 1px #e2e2e2;
-          color: #b0b0b0;
-          padding-left: 10px; }
-          .reg-page-container .register-wrapper .register-content .register-form .form-group input:focus {
-            border: solid 1px #005bac; }
-        .reg-page-container .register-wrapper .register-content .register-form .form-group .more-group {
-          width: 81px;
-          height: 22px;
-          position: absolute;
-          right: 1px;
-          top: 10px; }
-          .reg-page-container .register-wrapper .register-content .register-form .form-group .more-group button {
-            width: calc(100% - 2px);
-            height: 22px;
-            line-height: 22px;
-            background-color: #f2f2f2;
-            border-radius: 2px; }
-            .reg-page-container .register-wrapper .register-content .register-form .form-group .more-group button span {
-              width: 60px;
-              height: 11px;
-              font-size: 12px;
-              line-height: 11px;
-              color: #005bac; }
-      .reg-page-container .register-wrapper .register-content .register-form .btn-group {
-        display: block;
-        width: 65.4%;
-        height: 92px;
-        margin: 0 auto;
-        margin-top: 30px;
-        text-align: center; }
-        .reg-page-container .register-wrapper .register-content .register-form .btn-group .register-submit {
-          width: 100%;
-          height: 40px;
-          background-color: #005bac;
-          border-radius: 3px;
-          color: #ffffff; }
-        .reg-page-container .register-wrapper .register-content .register-form .btn-group .goLogin {
-          width: 23.3%;
-          margin-top: 20px;
-          background-color: transparent;
-          color: #005bac;
-          border: none;
-          position: relative;
-          left: 50%;
-          transform: translate(-50%); }
-    .reg-page-container .register-wrapper .footer {
-      width: 33.7%;
-      height: 8.6%;
-      margin: 0 auto;
-      margin-top: 22px; }
-      .reg-page-container .register-wrapper .footer .login-fqa button {
-        border: none;
-        background-color: transparent;
-        color: #004078;
-        position: relative;
-        left: 50%;
-        transform: translate(-50%); }
-        .reg-page-container .register-wrapper .footer .login-fqa button span {
-          margin: 0 auto; }
-      .reg-page-container .register-wrapper .footer .copyright {
-        color: #b0b0b0;
-        text-align: center;
-        min-width: 160px; }
-  .reg-page-container .reg-page-container {
-    width: 100%;
-    min-height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center; }
-    .reg-page-container .reg-page-container .register-wrapper {
-      width: 40.5%;
-      height: 580px;
-      font-family: MicrosoftYaHei;
+.regPage {
+  overflow-y: auto; }
+  .regPage .content {
+    max-width: 360px;
+    margin: 0 auto;
+    padding: 0 10px; }
+    .regPage .content .reg-content #login-form .input-group {
+      padding-top: 20px;
+      width: 100%; }
+      .regPage .content .reg-content #login-form .input-group > input {
+        height: 42px;
+        border-radius: 4px !important; }
+      .regPage .content .reg-content #login-form .input-group #verify {
+        padding-right: 80px; }
+    .regPage .content .reg-content #login-form #sendVerify {
+      position: absolute;
+      text-align: center;
+      right: 5px;
+      top: 26px;
+      padding: 6px 12px;
+      width: auto;
+      line-height: 1.1;
+      float: right;
+      color: #fff;
+      border: 1px solid #007aff;
+      background-color: #007aff;
       font-size: 14px;
-      font-weight: normal;
-      font-stretch: normal; }
-      .reg-page-container .reg-page-container .register-wrapper .logo {
-        text-align: center; }
-      .reg-page-container .reg-page-container .register-wrapper .register-content {
-        width: 100%;
-        height: 385px;
-        margin-top: 8.1%;
-        background-color: #ffffff;
-        box-shadow: -2px 1px 21px 0px rgba(0, 91, 172, 0.11);
+      font-weight: 400;
+      z-index: 2;
+      border-radius: 3px; }
+    .regPage .content .reg-content .reg-btn {
+      width: 100%;
+      position: relative; }
+      .regPage .content .reg-content .reg-btn #saveReg, .regPage .content .reg-content .reg-btn #goLogin {
+        font-size: 16px;
+        display: block;
+        width: 46%;
+        margin-bottom: 10px;
+        padding: 7px 0;
+        color: #fff;
         border-radius: 3px;
-        border-top: 5px solid #005bac;
-        padding-top: 48px; }
-        .reg-page-container .reg-page-container .register-wrapper .register-content .register-title {
-          text-align: center;
-          font-size: 24px;
-          color: #333333;
-          line-height: 50px; }
-        .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .form-group {
-          margin: 0 auto;
-          margin-top: 20px;
-          width: 65.4%; }
-          .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .form-group input {
-            width: 100%;
-            height: 40px;
-            background-color: #ffffff;
-            border-radius: 3px;
-            border: solid 1px #e2e2e2;
-            color: #b0b0b0; }
-            .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .form-group input:focus {
-              border: solid 1px #005bac; }
-          .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .form-group .more-group {
-            width: 81px;
-            height: 22px;
-            position: absolute;
-            right: 1px;
-            top: 10px; }
-            .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .form-group .more-group button {
-              width: calc(100% - 2px);
-              height: 22px;
-              background-color: #f2f2f2;
-              border-radius: 2px; }
-              .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .form-group .more-group button span {
-                width: 60px;
-                height: 11px;
-                font-size: 12px;
-                line-height: 11px;
-                color: #005bac; }
-        .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .btn-group {
-          display: block;
-          width: 65.4%;
-          height: 92px;
-          margin: 0 auto;
-          margin-top: 30px;
-          text-align: center; }
-          .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .btn-group .register-submit {
-            width: 100%;
-            height: 40px;
-            background-color: #005bac;
-            border-radius: 3px;
-            color: #ffffff; }
-          .reg-page-container .reg-page-container .register-wrapper .register-content .register-form .btn-group .goLogin {
-            width: 23.3%;
-            margin-top: 20px;
-            background-color: transparent;
-            color: #005bac;
-            border: none;
-            position: relative;
-            left: 50%;
-            transform: translate(-50%); }
-      .reg-page-container .reg-page-container .register-wrapper .footer {
-        width: 33.7%;
-        height: 8.6%;
-        margin: 0 auto;
-        margin-top: 22px; }
-        .reg-page-container .reg-page-container .register-wrapper .footer .login-fqa button {
-          border: none;
-          background-color: transparent;
-          color: #004078;
-          position: relative;
-          left: 50%;
-          transform: translate(-50%); }
-          .reg-page-container .reg-page-container .register-wrapper .footer .login-fqa button span {
-            margin: 0 auto; }
-        .reg-page-container .reg-page-container .register-wrapper .footer .copyright {
-          color: #b0b0b0;
-          text-align: center;
-          min-width: 160px; }
+        border: 1px solid #007aff;
+        background-color: #007aff;
+        float: left; }
+      .regPage .content .reg-content .reg-btn #goLogin {
+        margin-right: 8%; }
+    .regPage .content .reg-content .msg-tip h5 {
+      font-weight: 400;
+      color: #8f8f94; }
+    .regPage .content .reg-content .msg-device {
+      position: relative;
+      padding: 0;
+      background-color: #fff; }
+      .regPage .content .reg-content .msg-device .input-row {
+        height: 40px;
+        position: relative;
+        clear: left;
+        overflow: hidden; }
+        .regPage .content .reg-content .msg-device .input-row:after {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          left: 15px;
+          height: 1px;
+          content: '';
+          -webkit-transform: scaleY(0.5);
+          transform: scaleY(0.5);
+          background-color: #c8c7cc; }
+        .regPage .content .reg-content .msg-device .input-row label {
+          width: 115px;
+          font-family: 'Helvetica Neue',Helvetica,sans-serif;
+          line-height: 1.1;
+          float: left;
+          padding: 11px 15px; }
+        .regPage .content .reg-content .msg-device .input-row input {
+          height: 100%;
+          width: calc(100% - 115px);
+          float: right;
+          margin-bottom: 0;
+          padding-left: 0;
+          border: 0; }
+    .regPage .content .reg-head {
+      padding-top: 80px;
+      text-align: center; }
+      .regPage .content .reg-head .reg-title {
+        font-family: "NSimSun", 新宋体 !important; }
+  .regPage .device-view .unbind {
+    border: none;
+    height: 30px; }
 
-@media all and (min-width: 1200px) {
-  .register-wrapper {
-    width: 35% !important; } }
 #app .app-content .page-container.table-page {
   height: calc(100vh - 40px);
   overflow: hidden; }
@@ -5106,14 +4985,12 @@ div.item-media {
         left: calc(-170px + .7em);
         top: 0;
         background: #007AFF;
+        color: #fff;
         height: 2em;
+        width: calc(170px - 1em);
         line-height: 2em;
         text-align: center;
-        font-weight: bold;
-        width: 0;
-        color: transparent;
-        transition: width 1s, color 1s;
-        -webkit-transition: width 1s, color 1s; }
+        font-weight: bold; }
         .attendancePage .attend-msg .list-msg li .arrow:after, .attendancePage .attend-msg .list-msg li .arrow:before {
           display: block;
           width: 0;
@@ -5134,8 +5011,7 @@ div.item-media {
       .attendancePage .attend-msg .list-msg li .time {
         margin-right: 10px; }
     .attendancePage .attend-msg .list-msg li.animated .arrow {
-      width: calc(170px - 1em);
-      color: #fff; }
+      animation: arrow 1s forwards; }
 
 @keyframes arrow {
   0% {
@@ -5250,14 +5126,9 @@ div.item-media {
     background-color: #ffffff;
     box-shadow: 0px 3px 4px 0px rgba(164, 164, 164, 0.14); }
     .plan-page .plan-Head .plan-opera div {
-      margin: 0px 20px;
-      padding: 0px 8px; }
+      margin: 0px 20px; }
       .plan-page .plan-Head .plan-opera div:hover {
-        cursor: pointer;
-        border: 0.5px solid #cccc;
-        border-radius: 5%;
-        text-align: center;
-        box-shadow: 0px 0px 1px #c8c8c8 inset; }
+        cursor: pointer; }
 
 .preview {
   min-width: 590px;

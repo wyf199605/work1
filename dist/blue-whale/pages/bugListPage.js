@@ -10,8 +10,8 @@ define("bugListPage", ["require", "exports", "Tab", "BugList", "BugReport"], fun
                     new BugReport_1.BugReportModal(-1, true);
                 };
                 return {
-                    on: function () { return d.on(d.query('.mui-bar'), 'tap', '#editBug', eidtHanlder); },
-                    off: function () { return d.off(d.query('.mui-bar'), 'tap', '#editBug', eidtHanlder); }
+                    on: function () { return d.on(d.query('.mui-bar'), 'click', '#editBug', eidtHanlder); },
+                    off: function () { return d.off(d.query('.mui-bar'), 'click', '#editBug', eidtHanlder); }
                 };
             })();
             var muiContent = d.query('.mui-content'), tabParent = h("div", { className: "tabParent" }), panelParent = h("div", { className: "panelParent" });
