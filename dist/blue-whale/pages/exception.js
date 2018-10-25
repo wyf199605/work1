@@ -15,7 +15,7 @@ define(["require", "exports", "BugReport"], function (require, exports, BugRepor
                         });
                         break;
                     case 'back':
-                        sys.window.close();
+                        sys.window.backHome();
                         break;
                     case 'goLogin':
                         sys.window.logout();

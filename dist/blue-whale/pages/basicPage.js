@@ -37,7 +37,7 @@ define("BasicPage", ["require", "exports", "ButtonAction", "Modal"], function (r
                 //去除匹配的第一个下标的元素
                 version = andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
             }
-            if ( /*para.subButtons && */version > 4 && sys.isMb) {
+            if ( /*para.subButtons && */version > 4 && tools.isMb) {
                 var timeOut_1 = null;
                 d.on(document, 'touchstart', function () {
                     var gestureIcon = d.query('.blue-gesture', document.body);

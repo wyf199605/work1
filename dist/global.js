@@ -3532,8 +3532,32 @@ var G;
                 return ShellBase.handler('getColumnCount', { when: when, time: time, turn: false, inventory: inventoryKey, once: true, out: true }, back);
             },
             //条码扫码下载的
-            downloadbarcode: function (uniqueFlag, url, back) {
-                return ShellBase.handler('downloadbarcode', { uniqueFlag: uniqueFlag, url: url }, back);
+            downloadbarcode: function (uniqueFlag, downUrl, uploadUrl, back) {
+                return ShellBase.handler('downloadbarcode', { uniqueFlag: uniqueFlag, downUrl: downUrl, uploadUrl: uploadUrl }, back);
+            },
+            //注入监听事件
+            openRegistInventory: function (type, params, back) {
+                return ShellBase.handler('registInventory', { type: type, params: params }, back, null, false);
+            },
+            closeRegistInventory: function (type, params, back) {
+                ShellBase.eventOff('registInventory');
+                return ShellBase.handler('registInventory', { type: type, params: params }, back);
+            },
+            //删除条码数据
+            delInventoryData: function (nameId, where, back) {
+                return ShellBase.handler('delInventoryData', { nameId: nameId, where: where }, back);
+            },
+            //上传条码数据
+            uploadcodedata: function (nameId, back) {
+                return ShellBase.handler('uploadcodedata', { nameId: nameId }, back, null, false);
+            },
+            //获取盘点数据
+            getTableInfo: function (uniqueFlag) {
+                return ShellBase.handler('getTableInfo', { uniqueFlag: uniqueFlag });
+            },
+            //输入条码扫码查询
+            inputcodedata: function (optionStype, uniqueFlag, value, category, back) {
+                return ShellBase.handler('inputcodedata', { uniqueFlag: uniqueFlag, value: value, category: category, optionStype: optionStype }, back);
             },
             scan2dOn: function (back) {
                 return ShellBase.handler('startScan2DResult', '', back, null, false);
@@ -4145,7 +4169,7 @@ var G;
                 flatpickr: ['../plugin/flatpickr/flatpickr.min.1'],
                 AceEditor: ['../plugin/aceEditor/ace'],
                 raphael: ['../plugin/raphael/raphael.min'],
-                D3: ['../plugin/d3/d3.v4.min'],
+                D3: ['../plugin/d3/d3.v3.min'],
             }, config.paths),
             bundles: Object.assign({
             // 'utils' : ['Validate','Draw','BarCode','QrCode','Statistic','Echart','DrawSvg']
@@ -6186,6 +6210,95 @@ define("BaseShellImpl", ["require", "exports"], function (require, exports) {
         return BaseShellImpl;
     }());
     exports.BaseShellImpl = BaseShellImpl;
+});
+
+define("Affix", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="Affix"/>
+    var tools = G.tools;
+    var d = G.d;
+    var Affix = /** @class */ (function () {
+        function Affix(para) {
+            this.initPos = (function (self) {
+                var conf, marTop = 0;
+                var init = function () {
+                    var relativePar = self.getRelativeParent(self.conf.el);
+                    marTop === 0 && (marTop = relativePar.getBoundingClientRect().top - self.conf.target.getBoundingClientRect().top);
+                    conf = self.conf;
+                };
+                var setNewPos = function () {
+                    var elTop;
+                    if (conf.offsetTop >= 0) {
+                        elTop = conf.target.scrollTop + conf.offsetTop;
+                    }
+                    else {
+                        elTop = conf.target.scrollTop + conf.target.offsetHeight - marTop - conf.el.offsetHeight - conf.offsetBottom;
+                    }
+                    conf.el.style.top = elTop + 'px';
+                };
+                return { init: init, setNewPos: setNewPos };
+            })(this);
+            var defaultConf = {
+                el: document.body,
+                target: document.body,
+                offsetBottom: 0,
+                onChange: function () {
+                }
+            };
+            this.conf = tools.obj.merge(defaultConf, para); //如果offsetBottom和offsetTop都没传 默认固定在最底部
+            this.initStyle();
+            this.initEvent();
+        }
+        Affix.prototype.initStyle = function () {
+            var elStyle = this.conf.el.style;
+            elStyle.position = 'absolute';
+            elStyle.zIndex = '999';
+            this.initPos.init();
+            this.initPos.setNewPos();
+        };
+        Affix.prototype.initEvent = function () {
+            var _this = this;
+            //target大小变化调整事件
+            var resizeEvent = function () {
+                var element = _this.conf.target;
+                var lastWidth = element.offsetWidth;
+                var lastHeight = element.offsetHeight;
+                var lastInner = element.innerHTML;
+                setInterval(function () {
+                    if (lastInner !== element.innerHTML) {
+                        _this.initPos.setNewPos();
+                        lastInner = element.innerHTML;
+                    }
+                    if (lastWidth === element.offsetWidth && lastHeight === element.offsetHeight) {
+                        return;
+                    }
+                    _this.initPos.setNewPos();
+                    lastWidth = element.offsetWidth;
+                    lastHeight = element.offsetHeight;
+                }, 100);
+            };
+            //滚动事件
+            d.on(this.conf.target, 'scroll', function () {
+                _this.initPos.setNewPos();
+            });
+            d.on(window, 'resize', function () {
+                _this.initPos.init();
+            });
+            resizeEvent();
+        };
+        Affix.prototype.getRelativeParent = function (el) {
+            var elPar = el.parentNode;
+            if (window.getComputedStyle(elPar, null).position !== 'static') {
+                return elPar;
+            }
+            else {
+                return this.getRelativeParent(elPar);
+            }
+        };
+        return Affix;
+    }());
+    exports.Affix = Affix;
 });
 
 define("BarCode", ["require", "exports", "JsBarcode"], function (require, exports, JsBarcode) {
@@ -8329,95 +8442,6 @@ define("BDMap", ["require", "exports"], function (require, exports) {
     exports.BDMap = BDMap;
 });
 
-define("Affix", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="Affix"/>
-    var tools = G.tools;
-    var d = G.d;
-    var Affix = /** @class */ (function () {
-        function Affix(para) {
-            this.initPos = (function (self) {
-                var conf, marTop = 0;
-                var init = function () {
-                    var relativePar = self.getRelativeParent(self.conf.el);
-                    marTop === 0 && (marTop = relativePar.getBoundingClientRect().top - self.conf.target.getBoundingClientRect().top);
-                    conf = self.conf;
-                };
-                var setNewPos = function () {
-                    var elTop;
-                    if (conf.offsetTop >= 0) {
-                        elTop = conf.target.scrollTop + conf.offsetTop;
-                    }
-                    else {
-                        elTop = conf.target.scrollTop + conf.target.offsetHeight - marTop - conf.el.offsetHeight - conf.offsetBottom;
-                    }
-                    conf.el.style.top = elTop + 'px';
-                };
-                return { init: init, setNewPos: setNewPos };
-            })(this);
-            var defaultConf = {
-                el: document.body,
-                target: document.body,
-                offsetBottom: 0,
-                onChange: function () {
-                }
-            };
-            this.conf = tools.obj.merge(defaultConf, para); //如果offsetBottom和offsetTop都没传 默认固定在最底部
-            this.initStyle();
-            this.initEvent();
-        }
-        Affix.prototype.initStyle = function () {
-            var elStyle = this.conf.el.style;
-            elStyle.position = 'absolute';
-            elStyle.zIndex = '999';
-            this.initPos.init();
-            this.initPos.setNewPos();
-        };
-        Affix.prototype.initEvent = function () {
-            var _this = this;
-            //target大小变化调整事件
-            var resizeEvent = function () {
-                var element = _this.conf.target;
-                var lastWidth = element.offsetWidth;
-                var lastHeight = element.offsetHeight;
-                var lastInner = element.innerHTML;
-                setInterval(function () {
-                    if (lastInner !== element.innerHTML) {
-                        _this.initPos.setNewPos();
-                        lastInner = element.innerHTML;
-                    }
-                    if (lastWidth === element.offsetWidth && lastHeight === element.offsetHeight) {
-                        return;
-                    }
-                    _this.initPos.setNewPos();
-                    lastWidth = element.offsetWidth;
-                    lastHeight = element.offsetHeight;
-                }, 100);
-            };
-            //滚动事件
-            d.on(this.conf.target, 'scroll', function () {
-                _this.initPos.setNewPos();
-            });
-            d.on(window, 'resize', function () {
-                _this.initPos.init();
-            });
-            resizeEvent();
-        };
-        Affix.prototype.getRelativeParent = function (el) {
-            var elPar = el.parentNode;
-            if (window.getComputedStyle(elPar, null).position !== 'static') {
-                return elPar;
-            }
-            else {
-                return this.getRelativeParent(elPar);
-            }
-        };
-        return Affix;
-    }());
-    exports.Affix = Affix;
-});
-
 define("DataManager", ["require", "exports", "Pagination", "Loading"], function (require, exports, pagination_1, loading_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -9570,6 +9594,285 @@ define("Virtual", ["require", "exports", "FormCom"], function (require, exports,
         return Virtual;
     }(basic_1.FormCom));
     exports.Virtual = Virtual;
+});
+
+/// <amd-module name="MbList"/>
+define("MbList", ["require", "exports", "MbListItem"], function (require, exports, MbListItem_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Component = G.Component;
+    var d = G.d;
+    var tools = G.tools;
+    var MbList = /** @class */ (function (_super) {
+        __extends(MbList, _super);
+        function MbList(para) {
+            var _this = _super.call(this, para) || this;
+            _this._listItems = [];
+            // 设置是否多选
+            _this._multiple = false;
+            _this._isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
+            _this._multiple = para.isMulti || false;
+            _this.render(para.data || []);
+            window['l'] = _this;
+            return _this;
+        }
+        MbList.prototype.wrapperInit = function () {
+            return h("div", { className: "mb-list-wrapper" });
+        };
+        Object.defineProperty(MbList.prototype, "isImg", {
+            get: function () {
+                return this._isImg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        MbList.prototype.render = function (data) {
+            var _this = this;
+            d.diff(data, this.listItems, {
+                create: function (n) {
+                    _this._listItems.push(_this.createListItem({ data: n }));
+                },
+                replace: function (n, o) {
+                    o.data = n || {};
+                },
+                destroy: function (o) {
+                    o.destroy();
+                    var index = _this._listItems.indexOf(o);
+                    if (index > -1)
+                        delete _this._listItems[index];
+                }
+            });
+            this._listItems = this._listItems.filter(function (item) { return item; });
+            this.refreshIndex();
+        };
+        MbList.prototype.delItem = function (index) {
+            var item = this._listItems[index];
+            if (item) {
+                item.destroy();
+                this._listItems.splice(index, 1);
+            }
+        };
+        MbList.prototype.refreshIndex = function () {
+            this._listItems.forEach(function (item, index) {
+                item.index = index;
+            });
+        };
+        Object.defineProperty(MbList.prototype, "listItems", {
+            get: function () {
+                return this._listItems.slice();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MbList.prototype, "multiple", {
+            get: function () {
+                return this._multiple;
+            },
+            set: function (flag) {
+                if (this._multiple !== flag) {
+                    this._multiple = flag;
+                    this._listItems.forEach(function (item, index) {
+                        item.isShowCheckBox = flag;
+                    });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // 实例化MvListItem
+        MbList.prototype.createListItem = function (para) {
+            para = Object.assign({}, para, {
+                container: this.wrapper,
+                isImg: this.isImg,
+                isCheckBox: this.multiple
+            });
+            return new MbListItem_1.MbListItem(para);
+        };
+        return MbList;
+    }(Component));
+    exports.MbList = MbList;
+});
+
+/// <amd-module name="MbListItem"/>
+define("MbListItem", ["require", "exports", "CheckBox", "InputBox"], function (require, exports, checkBox_1, InputBox_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var d = G.d;
+    var tools = G.tools;
+    var Component = G.Component;
+    var MbListItem = /** @class */ (function (_super) {
+        __extends(MbListItem, _super);
+        function MbListItem(para) {
+            var _this = _super.call(this, para) || this;
+            //是否显示按钮
+            _this._isShowBtns = false;
+            _this.list = para.list;
+            _this._index = para.index;
+            _this.isShowCheckBox = para.isCheckBox || false;
+            _this.render(para.data || {});
+            return _this;
+        }
+        MbListItem.prototype.wrapperInit = function (para) {
+            var isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
+            this._isImg = isImg;
+            this.details = {};
+            return h("div", { className: "list-item-wrapper", "data-index": para.index },
+                this.checkBox = h(checkBox_1.CheckBox, { className: "hide" }),
+                h("div", { className: "list-item-content" },
+                    this.imgWrapper = isImg ? h("div", { className: "list-item-img" }) : null,
+                    h("div", { className: "list-item-details" },
+                        this.details['title'] = h("div", { className: "list-item-title" }),
+                        this.details['body'] = h("div", { className: "list-item-body" }),
+                        this.details['label'] = h("div", { className: "list-item-labels" }),
+                        this.details['countDown'] = h("div", { className: "list-item-count-down" }),
+                        this.details['status'] = h("div", { className: "list-item-status" }))));
+        };
+        Object.defineProperty(MbListItem.prototype, "isImg", {
+            get: function () {
+                return this._isImg;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MbListItem.prototype, "index", {
+            get: function () {
+                return this._index;
+            },
+            set: function (index) {
+                this._index = index;
+                this.wrapper && (this.wrapper.dataset['index'] = index + '');
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MbListItem.prototype, "selected", {
+            // 获取、设置当前行是否是选中
+            get: function () {
+                return this.checkBox.checked;
+            },
+            set: function (selected) {
+                this.checkBox && (this.checkBox.checked = selected);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(MbListItem.prototype, "isShowCheckBox", {
+            get: function () {
+                return this.checkBox ? this.checkBox.wrapper.classList.contains('hide') : false;
+            },
+            // 获取、设置是否显示checkBox
+            set: function (flag) {
+                if (!flag) {
+                    this.selected = false;
+                }
+                this.checkBox && this.checkBox.wrapper.classList.toggle('hide', !flag);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // 渲染数据
+        MbListItem.prototype.render = function (data) {
+            // 渲染图片
+            if (this.isImg && this.imgWrapper) {
+                this.imgWrapper.innerHTML = '';
+                var img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
+                d.append(this.imgWrapper, h("img", { src: img, alt: "" }));
+                if (tools.isNotEmpty(data.imgLabel)) {
+                    d.append(this.imgWrapper, h("div", { className: 'img-label' },
+                        h("span", null, data.imgLabel)));
+                }
+            }
+            var _loop_1 = function (name_1) {
+                var el = this_1.details[name_1], content = data[name_1];
+                el.classList.toggle('hide', tools.isEmpty(content));
+                switch (name_1) {
+                    case 'body':
+                        el.innerHTML = '';
+                        content && content.forEach(function (arr) {
+                            d.append(el, h("p", null,
+                                h("span", { className: "body-title" }, arr[0] + '：'),
+                                h("span", { className: "body-value" }, arr[1])));
+                        });
+                        break;
+                    case 'label':
+                        el.innerHTML = '';
+                        content && content.forEach(function (label) {
+                            d.append(el, h("span", { className: "label" }, label));
+                        });
+                        break;
+                    case 'status':
+                        el.style.color = data.statusColor;
+                        el.innerHTML = content || '';
+                        break;
+                    case 'countDown':
+                        this_1.initCountDown(el, content);
+                        break;
+                    case 'title':
+                    default:
+                        el.innerHTML = content || '';
+                        break;
+                }
+            };
+            var this_1 = this;
+            // 渲染内容
+            for (var name_1 in this.details) {
+                _loop_1(name_1);
+            }
+        };
+        MbListItem.prototype.initCountDown = function (el, countDown) {
+            var _this = this;
+            var toTwo = function (num) {
+                return num < 10 ? '0' + num : num + '';
+            };
+            clearInterval(this.timer);
+            typeof countDown === 'number' && (this.timer = setInterval(function () {
+                var date = new Date(), html = '', targetTime = new Date(countDown), total = (targetTime.getTime() - date.getTime()) / 1000;
+                if (targetTime.getTime() < date.getTime()) {
+                    html = '活动已开始';
+                    clearInterval(_this.timer);
+                    _this.timer = null;
+                    return;
+                }
+                var day = Math.floor(total / (24 * 60 * 60)), afterDay = total - day * 24 * 60 * 60, hour = Math.floor(afterDay / (60 * 60)), afterHour = total - day * 24 * 60 * 60 - hour * 60 * 60, min = Math.floor(afterHour / 60), sec = Math.floor(total - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
+                el.innerText = '倒计时：' +
+                    (day > 0 ? day + '天' : '') + ' ' +
+                    toTwo(hour) + ':' + toTwo(min) + ':' + toTwo(sec);
+            }, 1000));
+        };
+        Object.defineProperty(MbListItem.prototype, "isShowBtns", {
+            get: function () {
+                return this.btnWrapper ? this._isShowBtns : false;
+            },
+            set: function (flag) {
+                this._isShowBtns = flag;
+                this.btnWrapper && this.btnWrapper.classList.toggle('hide', !flag);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // 初始化按钮配置
+        MbListItem.prototype.initBtn = function (btns) {
+            this.btnWrapper = h("div", { className: "btn-group" });
+            var ibox = new InputBox_1.InputBox();
+        };
+        // 添加按钮，index插入位置
+        MbListItem.prototype.addBtn = function (btn, index) {
+        };
+        // 删除按钮
+        MbListItem.prototype.delBtn = function (index) {
+        };
+        MbListItem.prototype.destroy = function () {
+            clearInterval(this.timer);
+            this.checkBox && this.checkBox.destroy();
+            this.checkBox = null;
+            this.details = null;
+            this.list = null;
+            this.imgWrapper = null;
+            _super.prototype.destroy.call(this);
+        };
+        return MbListItem;
+    }(Component));
+    exports.MbListItem = MbListItem;
 });
 
 define("FastPseudoTable", ["require", "exports", "TableBase", "CheckBox", "FastTable"], function (require, exports, TableBase_1, checkBox_1, FastTable_1) {
@@ -13899,283 +14202,6 @@ define("FastTableMenu", ["require", "exports", "Menu", "PopMenu"], function (req
 //     }
 // }
 
-/// <amd-module name="MbList"/>
-define("MbList", ["require", "exports", "MbListItem"], function (require, exports, MbListItem_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Component = G.Component;
-    var d = G.d;
-    var tools = G.tools;
-    var MbList = /** @class */ (function (_super) {
-        __extends(MbList, _super);
-        function MbList(para) {
-            var _this = _super.call(this, para) || this;
-            _this._listItems = [];
-            // 设置是否多选
-            _this._multiple = false;
-            _this._isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
-            _this._multiple = para.isMulti || false;
-            _this.render(para.data || []);
-            window['l'] = _this;
-            return _this;
-        }
-        MbList.prototype.wrapperInit = function () {
-            return h("div", { className: "mb-list-wrapper" });
-        };
-        Object.defineProperty(MbList.prototype, "isImg", {
-            get: function () {
-                return this._isImg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        MbList.prototype.render = function (data) {
-            var _this = this;
-            d.diff(data, this.listItems, {
-                create: function (n) {
-                    _this._listItems.push(_this.createListItem({ data: n }));
-                },
-                replace: function (n, o) {
-                    o.data = n || {};
-                },
-                destroy: function (o) {
-                    o.destroy();
-                    var index = _this._listItems.indexOf(o);
-                    if (index > -1)
-                        delete _this._listItems[index];
-                }
-            });
-            this._listItems = this._listItems.filter(function (item) { return item; });
-            this.refreshIndex();
-        };
-        MbList.prototype.delItem = function (index) {
-            var item = this._listItems[index];
-            if (item) {
-                item.destroy();
-                this._listItems.splice(index, 1);
-            }
-        };
-        MbList.prototype.refreshIndex = function () {
-            this._listItems.forEach(function (item, index) {
-                item.index = index;
-            });
-        };
-        Object.defineProperty(MbList.prototype, "listItems", {
-            get: function () {
-                return this._listItems.slice();
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MbList.prototype, "multiple", {
-            get: function () {
-                return this._multiple;
-            },
-            set: function (flag) {
-                if (this._multiple !== flag) {
-                    this._multiple = flag;
-                    this._listItems.forEach(function (item, index) {
-                        item.isShowCheckBox = flag;
-                    });
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        // 实例化MvListItem
-        MbList.prototype.createListItem = function (para) {
-            para = Object.assign({}, para, {
-                container: this.wrapper,
-                isImg: this.isImg,
-                isCheckBox: this.multiple
-            });
-            return new MbListItem_1.MbListItem(para);
-        };
-        return MbList;
-    }(Component));
-    exports.MbList = MbList;
-});
-
-/// <amd-module name="MbListItem"/>
-define("MbListItem", ["require", "exports", "CheckBox"], function (require, exports, checkBox_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var d = G.d;
-    var tools = G.tools;
-    var Component = G.Component;
-    var MbListItem = /** @class */ (function (_super) {
-        __extends(MbListItem, _super);
-        function MbListItem(para) {
-            var _this = _super.call(this, para) || this;
-            _this._isShowBtns = false;
-            _this.list = para.list;
-            _this._index = para.index;
-            _this.isShowCheckBox = para.isCheckBox || false;
-            _this.render(para.data || {});
-            return _this;
-        }
-        MbListItem.prototype.wrapperInit = function (para) {
-            var isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
-            this._isImg = isImg;
-            this.details = {};
-            return h("div", { className: "list-item-wrapper", "data-index": para.index },
-                this.checkBox = h(checkBox_1.CheckBox, { className: "hide" }),
-                h("div", { className: "list-item-content" },
-                    this.imgWrapper = isImg ? h("div", { className: "list-item-img" }) : null,
-                    h("div", { className: "list-item-details" },
-                        this.details['title'] = h("div", { className: "list-item-title" }),
-                        this.details['body'] = h("div", { className: "list-item-body" }),
-                        this.details['label'] = h("div", { className: "list-item-labels" }),
-                        this.details['countDown'] = h("div", { className: "list-item-count-down" }),
-                        this.details['status'] = h("div", { className: "list-item-status" }))));
-        };
-        Object.defineProperty(MbListItem.prototype, "isImg", {
-            get: function () {
-                return this._isImg;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MbListItem.prototype, "index", {
-            get: function () {
-                return this._index;
-            },
-            set: function (index) {
-                this._index = index;
-                this.wrapper && (this.wrapper.dataset['index'] = index + '');
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MbListItem.prototype, "selected", {
-            // 获取、设置当前行是否是选中
-            get: function () {
-                return this.checkBox.checked;
-            },
-            set: function (selected) {
-                this.checkBox && (this.checkBox.checked = selected);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(MbListItem.prototype, "isShowCheckBox", {
-            get: function () {
-                return this.checkBox ? this.checkBox.wrapper.classList.contains('hide') : false;
-            },
-            // 获取、设置是否显示checkBox
-            set: function (flag) {
-                if (!flag) {
-                    this.selected = false;
-                }
-                this.checkBox && this.checkBox.wrapper.classList.toggle('hide', !flag);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        // 渲染数据
-        MbListItem.prototype.render = function (data) {
-            // 渲染图片
-            if (this.isImg && this.imgWrapper) {
-                this.imgWrapper.innerHTML = '';
-                var img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
-                d.append(this.imgWrapper, h("img", { src: img, alt: "" }));
-                if (tools.isNotEmpty(data.imgLabel)) {
-                    d.append(this.imgWrapper, h("div", { className: 'img-label' },
-                        h("span", null, data.imgLabel)));
-                }
-            }
-            var _loop_1 = function (name_1) {
-                var el = this_1.details[name_1], content = data[name_1];
-                el.classList.toggle('hide', tools.isEmpty(content));
-                switch (name_1) {
-                    case 'body':
-                        el.innerHTML = '';
-                        content && content.forEach(function (arr) {
-                            d.append(el, h("p", null,
-                                h("span", { className: "body-title" }, arr[0] + '：'),
-                                h("span", { className: "body-value" }, arr[1])));
-                        });
-                        break;
-                    case 'label':
-                        el.innerHTML = '';
-                        content && content.forEach(function (label) {
-                            d.append(el, h("span", { className: "label" }, label));
-                        });
-                        break;
-                    case 'status':
-                        el.style.color = data.statusColor;
-                        el.innerHTML = content || '';
-                        break;
-                    case 'countDown':
-                        this_1.initCountDown(el, content);
-                        break;
-                    case 'title':
-                    default:
-                        el.innerHTML = content || '';
-                        break;
-                }
-            };
-            var this_1 = this;
-            // 渲染内容
-            for (var name_1 in this.details) {
-                _loop_1(name_1);
-            }
-        };
-        MbListItem.prototype.initCountDown = function (el, countDown) {
-            var _this = this;
-            var toTwo = function (num) {
-                return num < 10 ? '0' + num : num + '';
-            };
-            clearInterval(this.timer);
-            typeof countDown === 'number' && (this.timer = setInterval(function () {
-                var date = new Date(), html = '', targetTime = new Date(countDown), total = (targetTime.getTime() - date.getTime()) / 1000;
-                if (targetTime.getTime() < date.getTime()) {
-                    html = '活动已开始';
-                    clearInterval(_this.timer);
-                    _this.timer = null;
-                    return;
-                }
-                var day = Math.floor(total / (24 * 60 * 60)), afterDay = total - day * 24 * 60 * 60, hour = Math.floor(afterDay / (60 * 60)), afterHour = total - day * 24 * 60 * 60 - hour * 60 * 60, min = Math.floor(afterHour / 60), sec = Math.floor(total - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60);
-                el.innerText = '倒计时：' +
-                    (day > 0 ? day + '天' : '') + ' ' +
-                    toTwo(hour) + ':' + toTwo(min) + ':' + toTwo(sec);
-            }, 1000));
-        };
-        Object.defineProperty(MbListItem.prototype, "isShowBtns", {
-            get: function () {
-                return this.btnWrapper ? this._isShowBtns : false;
-            },
-            set: function (flag) {
-                this._isShowBtns = flag;
-                this.btnWrapper && this.btnWrapper.classList.toggle('hide', !flag);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        // 初始化按钮配置
-        MbListItem.prototype.initBtn = function (btns) {
-            this.btnWrapper = h("div", { className: "btn-group" });
-        };
-        // 添加按钮，index插入位置
-        MbListItem.prototype.addBtn = function (btn, index) {
-        };
-        // 删除按钮
-        MbListItem.prototype.delBtn = function (index) {
-        };
-        MbListItem.prototype.destroy = function () {
-            clearInterval(this.timer);
-            this.checkBox && this.checkBox.destroy();
-            this.checkBox = null;
-            this.details = null;
-            this.list = null;
-            this.imgWrapper = null;
-            _super.prototype.destroy.call(this);
-        };
-        return MbListItem;
-    }(Component));
-    exports.MbListItem = MbListItem;
-});
-
 define("TreeNodeBase", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -14811,6 +14837,126 @@ define("ShellErpManageAd", ["require", "exports", "BaseShellImpl"], function (re
 //
 //
 
+define("AndroidFactory", ["require", "exports", "ShellDeviceAd", "ShellErpManageAd", "ShellFactory"], function (require, exports, ShellDevice_1, ShellErpManage_1, ShellFactory_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Created by zhengchao on 2017/12/6.
+     * 安卓接口工厂类
+     */
+    var AndroidFactory = /** @class */ (function (_super) {
+        __extends(AndroidFactory, _super);
+        function AndroidFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        AndroidFactory.prototype.device = function () {
+            return new ShellDevice_1.ShellDeviceAd();
+        };
+        AndroidFactory.prototype.erp = function () {
+            return new ShellErpManage_1.ShellErpManageAd();
+        };
+        return AndroidFactory;
+    }(ShellFactory_1.ShellFactory));
+    exports.AndroidFactory = AndroidFactory;
+});
+
+define("H5Factory", ["require", "exports", "ShellErpManageH5", "ShellFactory", "ShellDeviceH5"], function (require, exports, ShellErpManage_1, ShellFactory_1, ShellDevice_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Created by zhengchao on 2017/12/6.
+     * H5接口工厂类
+     */
+    var H5Factory = /** @class */ (function (_super) {
+        __extends(H5Factory, _super);
+        function H5Factory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        H5Factory.prototype.device = function () {
+            return new ShellDevice_1.ShellDeviceH5();
+        };
+        H5Factory.prototype.erp = function () {
+            return new ShellErpManage_1.ShellErpManageH5();
+        };
+        return H5Factory;
+    }(ShellFactory_1.ShellFactory));
+    exports.H5Factory = H5Factory;
+});
+
+define("IosFactory", ["require", "exports", "ShellDeviceIp", "ShellErpManageIp", "ShellFactory"], function (require, exports, ShellDevice_1, ShellErpManage_1, ShellFactory_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Created by zhengchao on 2017/12/4.
+     * 苹果接口工厂类
+     */
+    var IosFactory = /** @class */ (function (_super) {
+        __extends(IosFactory, _super);
+        function IosFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        IosFactory.prototype.device = function () {
+            return new ShellDevice_1.ShellDeviceIp();
+        };
+        IosFactory.prototype.erp = function () {
+            return new ShellErpManage_1.ShellErpManageIp();
+        };
+        return IosFactory;
+    }(ShellFactory_1.ShellFactory));
+    exports.IosFactory = IosFactory;
+});
+
+define("PcFactory", ["require", "exports", "ShellErpManagePc", "ShellFactory", "ShellDevicePc"], function (require, exports, ShellErpManage_1, ShellFactory_1, ShellDevice_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /**
+     * Created by wengyifan on 2017/12/9.
+     * Pc接口工厂类
+     */
+    var PcFactory = /** @class */ (function (_super) {
+        __extends(PcFactory, _super);
+        function PcFactory() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        PcFactory.prototype.device = function () {
+            return new ShellDevice_1.ShellDevicePc();
+        };
+        PcFactory.prototype.erp = function () {
+            return new ShellErpManage_1.ShellErpManagePc();
+        };
+        return PcFactory;
+    }(ShellFactory_1.ShellFactory));
+    exports.PcFactory = PcFactory;
+});
+
+define("ShellFactory", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="ShellFactory"/>
+    /**
+     * Created by zhengchao on 2017/12/4.
+     * 硬件设备抽象工厂
+     */
+    var ShellFactory = /** @class */ (function () {
+        /**
+         * 窗口操作接口
+         */
+        // protected abstract webView( pageContainer?:HTMLDivElement , navBar?:HTMLDivElement );
+        /**
+         * 原生界面操作接口
+         */
+        // protected abstract nativeUi();
+        /**
+         * 本地缓存操作接口
+         */
+        // protected abstract storage();
+        function ShellFactory() {
+        }
+        return ShellFactory;
+    }());
+    exports.ShellFactory = ShellFactory;
+});
+
 define("ShellDeviceH5", ["require", "exports", "Result", "BaseShellImpl", "Modal"], function (require, exports, Result_1, BaseShellImpl_1, Modal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -15042,126 +15188,6 @@ define("ShellErpManageH5", ["require", "exports", "BaseShellImpl"], function (re
 // }
 //
 //
-
-define("AndroidFactory", ["require", "exports", "ShellDeviceAd", "ShellErpManageAd", "ShellFactory"], function (require, exports, ShellDevice_1, ShellErpManage_1, ShellFactory_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Created by zhengchao on 2017/12/6.
-     * 安卓接口工厂类
-     */
-    var AndroidFactory = /** @class */ (function (_super) {
-        __extends(AndroidFactory, _super);
-        function AndroidFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        AndroidFactory.prototype.device = function () {
-            return new ShellDevice_1.ShellDeviceAd();
-        };
-        AndroidFactory.prototype.erp = function () {
-            return new ShellErpManage_1.ShellErpManageAd();
-        };
-        return AndroidFactory;
-    }(ShellFactory_1.ShellFactory));
-    exports.AndroidFactory = AndroidFactory;
-});
-
-define("H5Factory", ["require", "exports", "ShellErpManageH5", "ShellFactory", "ShellDeviceH5"], function (require, exports, ShellErpManage_1, ShellFactory_1, ShellDevice_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Created by zhengchao on 2017/12/6.
-     * H5接口工厂类
-     */
-    var H5Factory = /** @class */ (function (_super) {
-        __extends(H5Factory, _super);
-        function H5Factory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        H5Factory.prototype.device = function () {
-            return new ShellDevice_1.ShellDeviceH5();
-        };
-        H5Factory.prototype.erp = function () {
-            return new ShellErpManage_1.ShellErpManageH5();
-        };
-        return H5Factory;
-    }(ShellFactory_1.ShellFactory));
-    exports.H5Factory = H5Factory;
-});
-
-define("IosFactory", ["require", "exports", "ShellDeviceIp", "ShellErpManageIp", "ShellFactory"], function (require, exports, ShellDevice_1, ShellErpManage_1, ShellFactory_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Created by zhengchao on 2017/12/4.
-     * 苹果接口工厂类
-     */
-    var IosFactory = /** @class */ (function (_super) {
-        __extends(IosFactory, _super);
-        function IosFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        IosFactory.prototype.device = function () {
-            return new ShellDevice_1.ShellDeviceIp();
-        };
-        IosFactory.prototype.erp = function () {
-            return new ShellErpManage_1.ShellErpManageIp();
-        };
-        return IosFactory;
-    }(ShellFactory_1.ShellFactory));
-    exports.IosFactory = IosFactory;
-});
-
-define("PcFactory", ["require", "exports", "ShellErpManagePc", "ShellFactory", "ShellDevicePc"], function (require, exports, ShellErpManage_1, ShellFactory_1, ShellDevice_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /**
-     * Created by wengyifan on 2017/12/9.
-     * Pc接口工厂类
-     */
-    var PcFactory = /** @class */ (function (_super) {
-        __extends(PcFactory, _super);
-        function PcFactory() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        PcFactory.prototype.device = function () {
-            return new ShellDevice_1.ShellDevicePc();
-        };
-        PcFactory.prototype.erp = function () {
-            return new ShellErpManage_1.ShellErpManagePc();
-        };
-        return PcFactory;
-    }(ShellFactory_1.ShellFactory));
-    exports.PcFactory = PcFactory;
-});
-
-define("ShellFactory", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="ShellFactory"/>
-    /**
-     * Created by zhengchao on 2017/12/4.
-     * 硬件设备抽象工厂
-     */
-    var ShellFactory = /** @class */ (function () {
-        /**
-         * 窗口操作接口
-         */
-        // protected abstract webView( pageContainer?:HTMLDivElement , navBar?:HTMLDivElement );
-        /**
-         * 原生界面操作接口
-         */
-        // protected abstract nativeUi();
-        /**
-         * 本地缓存操作接口
-         */
-        // protected abstract storage();
-        function ShellFactory() {
-        }
-        return ShellFactory;
-    }());
-    exports.ShellFactory = ShellFactory;
-});
 
 define("ShellDeviceIp", ["require", "exports", "Result", "BaseShellImpl", "Modal"], function (require, exports, Result_1, BaseShellImpl_1, Modal_1) {
     "use strict";
@@ -15908,207 +15934,6 @@ define("ShellErpManagePc", ["require", "exports", "BaseShellImpl", "Result"], fu
 //
 // }
 
-/// <amd-module name="Badge"/>
-// import d = G.d;
-// import tools = G.tools;
-// import {Component, IComponentPara} from "../../Component";
-//
-// interface IBadge extends IComponentPara{
-//     count?: number;
-//     maxcount?: number;
-//     isShowZero?: boolean;
-//     isDot?: boolean;
-//     position?: string;
-//     container: HTMLElement;
-//     color?: string;
-// }
-//
-// /**
-//  * 徽标组件对象
-//  */
-// export class Badge extends Component implements IBadge {
-//     protected wrapperInit(): HTMLElement {
-//         return d.create(`<span class="badge">` + container.innerHTML + `<sup class="badge-count">.</sup></span>`);
-//     }
-//
-//     private init(badge: IBadge) {
-//         // this._wrapper = d.createByHTML(`<sup class="badge-count"></sup>`);
-//         // this.container = badge.container;
-//         this.count = badge.count;
-//         this.isShowZero = badge.isShowZero;
-//         this.isDot = badge.isDot;
-//         this.color = badge.color;
-//         this.maxcount = badge.maxcount;
-//         this.position = badge.position;
-//     }
-//
-//     /*
-//     * 展示的数字，大于 maxcount 时显示为 ${maxcount}+，为 0 时隐藏
-//     * 类型number
-//     * */
-//     private _count: number;
-//     set count(count: number) {
-//         this._count = tools.isEmpty(count) ? 0 : count;
-//         let curCount = tools.isEmpty(count) ? 0 : count > this._maxcount ? this._maxcount + '+' : count;
-//         if (this._container) {
-//             let countWrapper = d.query(`.badge-count`, this._container);
-//             if (countWrapper) {
-//                 if (!this._isShowZero && curCount === 0) {
-//                     countWrapper.style.display = 'none';
-//                     return;
-//                 }
-//                 countWrapper.innerHTML = curCount + '';
-//             }
-//         }
-//     }
-//
-//     get count() {
-//         return this._count;
-//     }
-//
-//     /*
-//     *  展示封顶的数字值
-//     *  类型：number
-//     *  默认值：99
-//     * */
-//     private _maxcount;
-//     set maxcount(maxcount: number) {
-//         this._maxcount = tools.isEmpty(maxcount) ? 99 : maxcount;
-//         let countWrapper = d.query(`.badge-count`, this._container);
-//         if (countWrapper && this._maxcount) {
-//             if (this._count > this._maxcount) {
-//                 countWrapper.innerHTML = this.maxcount + '+';
-//             } else {
-//                 countWrapper.innerHTML = this._count + '';
-//             }
-//         }
-//     }
-//
-//     get maxcount() {
-//         return this._maxcount;
-//     }
-//
-//     /*
-//     * 当数值为 0 时，是否展示 Badge
-//     * 类型：boolean
-//     * 默认：false
-//     * */
-//     private _isShowZero: boolean;
-//     set isShowZero(isShowZero: boolean) {
-//         this._isShowZero = tools.isEmpty(isShowZero) ? false : isShowZero;
-//         let countWrapper = d.query('sup', this._container);
-//         if (countWrapper && this._isShowZero) {
-//             if (this._count === 0) {
-//                 countWrapper.style.display = 'inline-block';
-//             }
-//         } else if(countWrapper && this._count === 0){
-//             countWrapper.style.display = 'none';
-//         }
-//     }
-//
-//     get isShowZero() {
-//         return this._isShowZero;
-//     }
-//
-//     /*
-//     *  不展示数字，只有一个小红点
-//     *  类型：boolean
-//     *  默认值：false
-//     * */
-//     private _isDot: boolean;
-//     set isDot(isDot: boolean) {
-//         this._isDot = tools.isEmpty(isDot) ? false : isDot;
-//         let sup = d.query('sup', this._container);
-//         if (this._isDot && sup) {
-//             sup.classList.remove('badge-count');
-//             sup.classList.add('badge-dot');
-//         } else if (sup) {
-//             sup.classList.remove('badge-dot');
-//             sup.classList.add('badge-count');
-//         }
-//     }
-//
-//     get isDot() {
-//         return this._isDot;
-//     }
-//
-//     /*
-//     * 徽标背景颜色
-//     * 默认：green
-//     * green|red|gray|blue|yellow
-//     * */
-//     private _color;
-//     set color(color: string) {
-//         color = tools.isEmpty(color) ? 'red' : color;
-//         let sup = d.query('sup', this._container);
-//         if (!sup) {
-//             return;
-//         }
-//         if (this._color) {
-//             sup.classList.remove(this._color);
-//         }
-//         switch (color) {
-//             case 'green':
-//                 sup.classList.add('badge-green');
-//                 break;
-//             case 'red':
-//                 sup.classList.add('badge-red');
-//                 break;
-//             case 'gray':
-//                 sup.classList.add('badge-gray');
-//                 break;
-//             case 'yellow':
-//                 sup.classList.add('badge-yellow');
-//                 break;
-//             case 'blue':
-//                 sup.classList.add('badge-blue');
-//                 break;
-//         }
-//         this._color = color;
-//     }
-//
-//     get color() {
-//         return this._color;
-//     }
-//
-//     /*
-//     * 徽标出现位置
-//     * 默认值：rightTop:右上 | center: 居中
-//     * */
-//     private _position;
-//     set position(position: string) {
-//         position = tools.isEmpty(position) ? 'rightTop' : position;
-//         let sup = d.query('sup', this._container);
-//         switch (position) {
-//             case 'rightTop':
-//                 sup.classList.add('right-top');
-//                 break;
-//             case 'center':
-//                 sup.classList.add('center');
-//                 break;
-//         }
-//         this._position = position;
-//     }
-//
-//     get position() {
-//         return this._position;
-//     }
-//
-//
-//
-//     // set container(container) {
-//     //     //如果container存在，则将container装载到徽标容器
-//     //     if (container) {
-//     //
-//     //     }
-//     //     this._container = container;
-//     // }
-//     constructor(private badge?: IBadge) {
-//         super(badge);
-//         this.init(badge);
-//     }
-// }
-
 /// <amd-module name="Avatar"/>
 // import d = G.d;
 // import tools = G.tools;
@@ -16377,214 +16202,206 @@ define("ShellErpManagePc", ["require", "exports", "BaseShellImpl", "Result"], fu
 //
 // }
 
-define("Notify", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var d = G.d;
-    var Notify = /** @class */ (function () {
-        function Notify(para) {
-            this.para = para;
-            // super(para);
-            var defaultPara = {
-                title: "标题",
-                container: document.body,
-                // link : '#',
-                position: 'bottomRight',
-                content: '内容',
-                duration: 5000,
-                icon: '',
-                isNoHide: false,
-                background: 'white'
-            };
-            para = Object.assign(defaultPara, para);
-            this.init(para);
-        }
-        Notify.prototype.init = function (para) {
-            var _this = this;
-            var mainCon = d.query('.notify', this.para.container);
-            if (mainCon) {
-                this.mainContainter = mainCon;
-            }
-            else {
-                this.mainContainter = h("div", { className: "notify" });
-                para.container.appendChild(this.mainContainter);
-            }
-            this._wrapper = h("a", { className: "notifyItem" });
-            this.initClose();
-            this.icon = para.icon;
-            this.title = para.title;
-            this.content = para.content;
-            this.position = para.position;
-            this.isNoHide = para.isNoHide;
-            this.duration = para.duration;
-            this.background = para.background;
-            // this.link = para.link;
-            this.onClick = para.onClick;
-            this.mainContainter.appendChild(this._wrapper);
-            setTimeout(function () {
-                _this._wrapper.style.opacity = '1';
-            }, 50);
-        };
-        Object.defineProperty(Notify.prototype, "title", {
-            get: function () {
-                return this._title;
-            },
-            set: function (title) {
-                if (this._title) {
-                    var titleSpan = d.query('span', this._wrapper);
-                    titleSpan.innerHTML = title;
-                }
-                else {
-                    this._wrapper.appendChild(h("span", { className: "title" }, title));
-                }
-                this._title = title;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Notify.prototype, "position", {
-            get: function () {
-                return this._position;
-            },
-            set: function (position) {
-                this._position = position;
-                if (position === 'topLeft') {
-                    this.mainContainter.style.top = '20px';
-                    this.mainContainter.style.left = '40px';
-                }
-                else if (position === 'topRight') {
-                    this.mainContainter.style.top = '20px';
-                    this.mainContainter.style.right = '40px';
-                }
-                else if (position === 'bottomLeft') {
-                    this.mainContainter.style.bottom = '20px';
-                    this.mainContainter.style.left = '40px';
-                }
-                else {
-                    this.mainContainter.style.bottom = '20px';
-                    this.mainContainter.style.right = '40px';
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Notify.prototype, "content", {
-            get: function () {
-                return this._content;
-            },
-            set: function (content) {
-                if (this._content) {
-                    var contentP = d.query('p', this._wrapper);
-                    contentP.innerHTML = content;
-                }
-                else {
-                    this._wrapper.appendChild(h("p", { className: "content" }, content));
-                }
-                this._content = content;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Notify.prototype, "isNoHide", {
-            get: function () {
-                return this._isNoHide;
-            },
-            set: function (isNoHide) {
-                this._isNoHide = isNoHide;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Notify.prototype, "duration", {
-            get: function () {
-                return this._duration;
-            },
-            set: function (duration) {
-                var _this = this;
-                this._duration = duration;
-                setTimeout(function () {
-                    if (_this._wrapper && !_this.isNoHide) {
-                        _this._wrapper.style.opacity = '0';
-                        var par_1 = _this._wrapper.parentElement;
-                        setTimeout(function () {
-                            _this._wrapper && _this._wrapper.remove();
-                            if (par_1.children.length === 0) {
-                                par_1.remove();
-                            }
-                        }, 2000);
-                    }
-                }, duration);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Notify.prototype, "icon", {
-            get: function () {
-                return this._icon;
-            },
-            set: function (icon) {
-                if (this._icon) {
-                    var myIcon = d.query('.myIcon', this._wrapper);
-                    myIcon.classList.remove('icon-' + this._icon);
-                    myIcon.classList.add('icon-' + icon);
-                }
-                else {
-                    if (icon !== "") {
-                        this._wrapper.appendChild(h("i", { className: "iconfont icon-" + icon + " myIcon" }));
-                        this._wrapper.style.paddingLeft = "50px";
-                    }
-                }
-                this._icon = icon;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Notify.prototype, "background", {
-            get: function () {
-                return this._background;
-            },
-            set: function (background) {
-                this._background = background;
-                this._wrapper.style.background = background;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Notify.prototype, "onClick", {
-            get: function () {
-                return this._onClick;
-            },
-            set: function (onClick) {
-                if (this._onClick) {
-                    d.off(this._wrapper, 'click', this._onClick);
-                }
-                if (onClick) {
-                    d.on(this._wrapper, 'click', onClick);
-                    this._onClick = onClick;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Notify.prototype.initClose = function () {
-            var _this = this;
-            var i = h("i", { className: "iconfont icon-close close" });
-            this._wrapper.appendChild(i);
-            d.on(i, 'click', function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                var par = _this._wrapper.parentElement;
-                d.remove(_this._wrapper);
-                _this._wrapper = null;
-                if (par.children.length === 0) {
-                    par.remove();
-                }
-            });
-        };
-        return Notify;
-    }());
-    exports.Notify = Notify;
-});
+/// <amd-module name="Badge"/>
+// import d = G.d;
+// import tools = G.tools;
+// import {Component, IComponentPara} from "../../Component";
+//
+// interface IBadge extends IComponentPara{
+//     count?: number;
+//     maxcount?: number;
+//     isShowZero?: boolean;
+//     isDot?: boolean;
+//     position?: string;
+//     container: HTMLElement;
+//     color?: string;
+// }
+//
+// /**
+//  * 徽标组件对象
+//  */
+// export class Badge extends Component implements IBadge {
+//     protected wrapperInit(): HTMLElement {
+//         return d.create(`<span class="badge">` + container.innerHTML + `<sup class="badge-count">.</sup></span>`);
+//     }
+//
+//     private init(badge: IBadge) {
+//         // this._wrapper = d.createByHTML(`<sup class="badge-count"></sup>`);
+//         // this.container = badge.container;
+//         this.count = badge.count;
+//         this.isShowZero = badge.isShowZero;
+//         this.isDot = badge.isDot;
+//         this.color = badge.color;
+//         this.maxcount = badge.maxcount;
+//         this.position = badge.position;
+//     }
+//
+//     /*
+//     * 展示的数字，大于 maxcount 时显示为 ${maxcount}+，为 0 时隐藏
+//     * 类型number
+//     * */
+//     private _count: number;
+//     set count(count: number) {
+//         this._count = tools.isEmpty(count) ? 0 : count;
+//         let curCount = tools.isEmpty(count) ? 0 : count > this._maxcount ? this._maxcount + '+' : count;
+//         if (this._container) {
+//             let countWrapper = d.query(`.badge-count`, this._container);
+//             if (countWrapper) {
+//                 if (!this._isShowZero && curCount === 0) {
+//                     countWrapper.style.display = 'none';
+//                     return;
+//                 }
+//                 countWrapper.innerHTML = curCount + '';
+//             }
+//         }
+//     }
+//
+//     get count() {
+//         return this._count;
+//     }
+//
+//     /*
+//     *  展示封顶的数字值
+//     *  类型：number
+//     *  默认值：99
+//     * */
+//     private _maxcount;
+//     set maxcount(maxcount: number) {
+//         this._maxcount = tools.isEmpty(maxcount) ? 99 : maxcount;
+//         let countWrapper = d.query(`.badge-count`, this._container);
+//         if (countWrapper && this._maxcount) {
+//             if (this._count > this._maxcount) {
+//                 countWrapper.innerHTML = this.maxcount + '+';
+//             } else {
+//                 countWrapper.innerHTML = this._count + '';
+//             }
+//         }
+//     }
+//
+//     get maxcount() {
+//         return this._maxcount;
+//     }
+//
+//     /*
+//     * 当数值为 0 时，是否展示 Badge
+//     * 类型：boolean
+//     * 默认：false
+//     * */
+//     private _isShowZero: boolean;
+//     set isShowZero(isShowZero: boolean) {
+//         this._isShowZero = tools.isEmpty(isShowZero) ? false : isShowZero;
+//         let countWrapper = d.query('sup', this._container);
+//         if (countWrapper && this._isShowZero) {
+//             if (this._count === 0) {
+//                 countWrapper.style.display = 'inline-block';
+//             }
+//         } else if(countWrapper && this._count === 0){
+//             countWrapper.style.display = 'none';
+//         }
+//     }
+//
+//     get isShowZero() {
+//         return this._isShowZero;
+//     }
+//
+//     /*
+//     *  不展示数字，只有一个小红点
+//     *  类型：boolean
+//     *  默认值：false
+//     * */
+//     private _isDot: boolean;
+//     set isDot(isDot: boolean) {
+//         this._isDot = tools.isEmpty(isDot) ? false : isDot;
+//         let sup = d.query('sup', this._container);
+//         if (this._isDot && sup) {
+//             sup.classList.remove('badge-count');
+//             sup.classList.add('badge-dot');
+//         } else if (sup) {
+//             sup.classList.remove('badge-dot');
+//             sup.classList.add('badge-count');
+//         }
+//     }
+//
+//     get isDot() {
+//         return this._isDot;
+//     }
+//
+//     /*
+//     * 徽标背景颜色
+//     * 默认：green
+//     * green|red|gray|blue|yellow
+//     * */
+//     private _color;
+//     set color(color: string) {
+//         color = tools.isEmpty(color) ? 'red' : color;
+//         let sup = d.query('sup', this._container);
+//         if (!sup) {
+//             return;
+//         }
+//         if (this._color) {
+//             sup.classList.remove(this._color);
+//         }
+//         switch (color) {
+//             case 'green':
+//                 sup.classList.add('badge-green');
+//                 break;
+//             case 'red':
+//                 sup.classList.add('badge-red');
+//                 break;
+//             case 'gray':
+//                 sup.classList.add('badge-gray');
+//                 break;
+//             case 'yellow':
+//                 sup.classList.add('badge-yellow');
+//                 break;
+//             case 'blue':
+//                 sup.classList.add('badge-blue');
+//                 break;
+//         }
+//         this._color = color;
+//     }
+//
+//     get color() {
+//         return this._color;
+//     }
+//
+//     /*
+//     * 徽标出现位置
+//     * 默认值：rightTop:右上 | center: 居中
+//     * */
+//     private _position;
+//     set position(position: string) {
+//         position = tools.isEmpty(position) ? 'rightTop' : position;
+//         let sup = d.query('sup', this._container);
+//         switch (position) {
+//             case 'rightTop':
+//                 sup.classList.add('right-top');
+//                 break;
+//             case 'center':
+//                 sup.classList.add('center');
+//                 break;
+//         }
+//         this._position = position;
+//     }
+//
+//     get position() {
+//         return this._position;
+//     }
+//
+//
+//
+//     // set container(container) {
+//     //     //如果container存在，则将container装载到徽标容器
+//     //     if (container) {
+//     //
+//     //     }
+//     //     this._container = container;
+//     // }
+//     constructor(private badge?: IBadge) {
+//         super(badge);
+//         this.init(badge);
+//     }
+// }
 
 define("Modal", ["require", "exports", "ModalHeader", "ModalFooter", "Button", "Drag", "InputBox"], function (require, exports, ModalHeader_1, ModalFooter_1, Button_1, drag_1, InputBox_1) {
     "use strict";
@@ -16622,6 +16439,7 @@ define("Modal", ["require", "exports", "ModalHeader", "ModalFooter", "Button", "
                     _this.isShow = false;
                 }
             };
+            _this._isModal = false;
             _this._zIndex = 1001;
             _this._headWrapper = null;
             // private get header() {
@@ -16679,6 +16497,7 @@ define("Modal", ["require", "exports", "ModalHeader", "ModalFooter", "Button", "
             // this.container = modal.container;
             this.container.classList.add('modal-box');
             // this._wrapper = d.create(`<div class="modal-wrapper"></div>`);
+            this.isModal = modal.isModal;
             this._isAdaptiveCenter = tools.isEmpty(modal.isAdaptiveCenter) ? false : modal.isAdaptiveCenter;
             this._isAnimate = this.isAdaptiveCenter ? false : (tools.isEmpty(modal.isAnimate) ? true : modal.isAnimate);
             // this.className = modal.className;
@@ -16708,6 +16527,16 @@ define("Modal", ["require", "exports", "ModalHeader", "ModalFooter", "Button", "
             this.escKey = tools.isEmpty(modal.escKey) ? true : modal.escKey;
             allModalArr.push(this);
         };
+        Object.defineProperty(Modal.prototype, "isModal", {
+            get: function () {
+                return this._isModal;
+            },
+            set: function (isModal) {
+                this._isModal = isModal;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Modal.prototype, "zIndex", {
             get: function () {
                 return this._zIndex;
@@ -17003,9 +16832,17 @@ define("Modal", ["require", "exports", "ModalHeader", "ModalFooter", "Button", "
                         if (_this.modalScreen) {
                             _this.modalScreen.style.pointerEvents = 'auto';
                         }
+                        if (tools.isMb && _this.isModal) {
+                            _this.wrapper.classList.remove('modal-animate-up-mb');
+                        }
                     }, 300);
                     if (this._isAnimate) {
-                        d.classAdd(this.wrapper, "modal-animate-" + (this._position || 'default') + " animate-in");
+                        if (tools.isMb && this.isModal) {
+                            d.classAdd(this.wrapper, "modal-animate-up-mb");
+                        }
+                        else {
+                            d.classAdd(this.wrapper, "modal-animate-" + (this._position || 'default') + " animate-in");
+                        }
                         // this.wrapper.classList.add('modal-animate-full');
                         // switch (this._position) {
                         //     //设置浮动框出现动画
@@ -17047,17 +16884,38 @@ define("Modal", ["require", "exports", "ModalHeader", "ModalFooter", "Button", "
                     if (this._onClose) {
                         this._onClose();
                     }
+                    if (this.wrapper) {
+                        if (this._isAnimate) {
+                            if (tools.isMb && this.isModal) {
+                                this.wrapper.classList.add('modal-animate-down-mb');
+                            }
+                            else {
+                                this.wrapper.classList.remove('animate-in');
+                            }
+                        }
+                        if (tools.isMb && this.isModal) {
+                            setTimeout(function () {
+                                _this.wrapper.style.display = 'none';
+                                _this.wrapper.style['display'] = 'none';
+                            }, 300);
+                        }
+                        else {
+                            this.wrapper.style.display = 'none';
+                            this.wrapper.style['display'] = 'none';
+                        }
+                    }
                     //若_isOnceDestroy为真，即创建后立即销毁，则直接调用destroy()后返回；
                     if (this._isOnceDestroy) {
-                        this.destroy();
-                        return;
-                    }
-                    if (this.wrapper) {
-                        this.wrapper.style.display = 'none';
-                        if (this._isAnimate) {
-                            this.wrapper.classList.remove('animate-in');
+                        if (tools.isMb && this.isModal) {
+                            setTimeout(function () {
+                                _this.destroy();
+                                return;
+                            }, 300);
                         }
-                        this.wrapper.style['display'] = 'none';
+                        else {
+                            this.destroy();
+                            return;
+                        }
                     }
                     if (this._isBackground) {
                         this.modalScreen && (this.modalScreen.classList.remove('lock-active-in'),
@@ -17774,6 +17632,215 @@ define("ModalHeader", ["require", "exports", "Drag", "InputBox"], function (requ
         return ModalHeader;
     }(Component));
     exports.ModalHeader = ModalHeader;
+});
+
+define("Notify", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var d = G.d;
+    var Notify = /** @class */ (function () {
+        function Notify(para) {
+            this.para = para;
+            // super(para);
+            var defaultPara = {
+                title: "标题",
+                container: document.body,
+                // link : '#',
+                position: 'bottomRight',
+                content: '内容',
+                duration: 5000,
+                icon: '',
+                isNoHide: false,
+                background: 'white'
+            };
+            para = Object.assign(defaultPara, para);
+            this.init(para);
+        }
+        Notify.prototype.init = function (para) {
+            var _this = this;
+            var mainCon = d.query('.notify', this.para.container);
+            if (mainCon) {
+                this.mainContainter = mainCon;
+            }
+            else {
+                this.mainContainter = h("div", { className: "notify" });
+                para.container.appendChild(this.mainContainter);
+            }
+            this._wrapper = h("a", { className: "notifyItem" });
+            this.initClose();
+            this.icon = para.icon;
+            this.title = para.title;
+            this.content = para.content;
+            this.position = para.position;
+            this.isNoHide = para.isNoHide;
+            this.duration = para.duration;
+            this.background = para.background;
+            // this.link = para.link;
+            this.onClick = para.onClick;
+            this.mainContainter.appendChild(this._wrapper);
+            setTimeout(function () {
+                _this._wrapper.style.opacity = '1';
+            }, 50);
+        };
+        Object.defineProperty(Notify.prototype, "title", {
+            get: function () {
+                return this._title;
+            },
+            set: function (title) {
+                if (this._title) {
+                    var titleSpan = d.query('span', this._wrapper);
+                    titleSpan.innerHTML = title;
+                }
+                else {
+                    this._wrapper.appendChild(h("span", { className: "title" }, title));
+                }
+                this._title = title;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Notify.prototype, "position", {
+            get: function () {
+                return this._position;
+            },
+            set: function (position) {
+                this._position = position;
+                if (position === 'topLeft') {
+                    this.mainContainter.style.top = '20px';
+                    this.mainContainter.style.left = '40px';
+                }
+                else if (position === 'topRight') {
+                    this.mainContainter.style.top = '20px';
+                    this.mainContainter.style.right = '40px';
+                }
+                else if (position === 'bottomLeft') {
+                    this.mainContainter.style.bottom = '20px';
+                    this.mainContainter.style.left = '40px';
+                }
+                else {
+                    this.mainContainter.style.bottom = '20px';
+                    this.mainContainter.style.right = '40px';
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Notify.prototype, "content", {
+            get: function () {
+                return this._content;
+            },
+            set: function (content) {
+                if (this._content) {
+                    var contentP = d.query('p', this._wrapper);
+                    contentP.innerHTML = content;
+                }
+                else {
+                    this._wrapper.appendChild(h("p", { className: "content" }, content));
+                }
+                this._content = content;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Notify.prototype, "isNoHide", {
+            get: function () {
+                return this._isNoHide;
+            },
+            set: function (isNoHide) {
+                this._isNoHide = isNoHide;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Notify.prototype, "duration", {
+            get: function () {
+                return this._duration;
+            },
+            set: function (duration) {
+                var _this = this;
+                this._duration = duration;
+                setTimeout(function () {
+                    if (_this._wrapper && !_this.isNoHide) {
+                        _this._wrapper.style.opacity = '0';
+                        var par_1 = _this._wrapper.parentElement;
+                        setTimeout(function () {
+                            _this._wrapper && _this._wrapper.remove();
+                            if (par_1.children.length === 0) {
+                                par_1.remove();
+                            }
+                        }, 2000);
+                    }
+                }, duration);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Notify.prototype, "icon", {
+            get: function () {
+                return this._icon;
+            },
+            set: function (icon) {
+                if (this._icon) {
+                    var myIcon = d.query('.myIcon', this._wrapper);
+                    myIcon.classList.remove('icon-' + this._icon);
+                    myIcon.classList.add('icon-' + icon);
+                }
+                else {
+                    if (icon !== "") {
+                        this._wrapper.appendChild(h("i", { className: "iconfont icon-" + icon + " myIcon" }));
+                        this._wrapper.style.paddingLeft = "50px";
+                    }
+                }
+                this._icon = icon;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Notify.prototype, "background", {
+            get: function () {
+                return this._background;
+            },
+            set: function (background) {
+                this._background = background;
+                this._wrapper.style.background = background;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Notify.prototype, "onClick", {
+            get: function () {
+                return this._onClick;
+            },
+            set: function (onClick) {
+                if (this._onClick) {
+                    d.off(this._wrapper, 'click', this._onClick);
+                }
+                if (onClick) {
+                    d.on(this._wrapper, 'click', onClick);
+                    this._onClick = onClick;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Notify.prototype.initClose = function () {
+            var _this = this;
+            var i = h("i", { className: "iconfont icon-close close" });
+            this._wrapper.appendChild(i);
+            d.on(i, 'click', function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                var par = _this._wrapper.parentElement;
+                d.remove(_this._wrapper);
+                _this._wrapper = null;
+                if (par.children.length === 0) {
+                    par.remove();
+                }
+            });
+        };
+        return Notify;
+    }());
+    exports.Notify = Notify;
 });
 
 define("Toast", ["require", "exports"], function (require, exports) {
@@ -18893,6 +18960,101 @@ define("NewUploader", ["require", "exports", "FormCom", "Modal", "Loading"], fun
     };
 });
 
+define("NumInput", ["require", "exports", "TextInput"], function (require, exports, text_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var tools = G.tools;
+    var NumInput = /** @class */ (function (_super) {
+        __extends(NumInput, _super);
+        function NumInput(p) {
+            var _this = _super.call(this, Object.assign({}, {
+                step: 1,
+                max: null,
+                min: null
+            }, p, {
+                icons: ['iconfont icon-jiahao', 'iconfont icon-jianhao'],
+                iconHandle: function (index) {
+                    _this.iconHandle(index);
+                }
+            })) || this;
+            _this.iconHandle = function (index) {
+                var p = _this.para;
+                if (index === 0) {
+                    _this.num = p.step || 1;
+                }
+                else if (index === 1) {
+                    _this.num = -p.step || -1;
+                }
+                _this.set(_this.get() + _this.num);
+                /*溢出判断*/
+                _this.isOverflow(p.max, p.min, _this);
+                if (_this.para.callback && typeof _this.para.callback() === 'function') {
+                    _this.para.callback();
+                }
+            };
+            _this.keyHandle = function (e) {
+                var keyCode = e.keyCode || e.which || e.charCode;
+                switch (keyCode) {
+                    case 38: // Up
+                        _this.iconHandle(0);
+                        break;
+                    case 40: // Down
+                        _this.iconHandle(1);
+                        break;
+                }
+            };
+            var self = _this;
+            // 设置默认值
+            if (tools.isNotEmpty(p.defaultNum)) {
+                _this.set(p.defaultNum);
+            }
+            // 监听按键输入
+            self.on('keyup', function (e) {
+                this.value = this.value.replace(/\D+/, '');
+                self.isOverflow(p.max, p.min, self);
+                if (self.para.callback && typeof self.para.callback() === 'function') {
+                    self.para.callback();
+                }
+            });
+            return _this;
+            // let scrollFunc =  (e : WheelEvent) => {
+            //     if(e.deltaY > 0){ // 下滚
+            //         this.iconHandle(1);
+            //     }else{
+            //         this.iconHandle(0);
+            //     }
+            // };
+            // self.on('DOMMouseScroll', scrollFunc);
+            // this.input.onmousewheel = scrollFunc
+        }
+        NumInput.prototype.get = function () {
+            return parseInt(this.input.value);
+        };
+        NumInput.prototype.set = function (str) {
+            this.input.value = tools.str.toEmpty(str);
+            if (this.para.callback && typeof this.para.callback() === 'function') {
+                this.para.callback();
+            }
+        };
+        /**
+         *
+         * @param max
+         * @param min
+         * @param self
+         */
+        NumInput.prototype.isOverflow = function (max, min, self) {
+            if (typeof max === 'number' && self.get() > max) {
+                self.set(max);
+            }
+            if (typeof min === 'number' && self.get() < min) {
+                self.set(min);
+            }
+        };
+        return NumInput;
+    }(text_1.TextInput));
+    exports.NumInput = NumInput;
+});
+
 /// <amd-module name="RadioBox"/>
 define("RadioBox", ["require", "exports", "BasicCheckBox"], function (require, exports, basicCheckBox_1) {
     "use strict";
@@ -19343,141 +19505,6 @@ define("RichTextModal", ["require", "exports", "RichText", "Modal", "TextInput",
     exports.RichTextModal = RichTextModal;
 });
 
-define("SearchInput", ["require", "exports", "TextInput"], function (require, exports, text_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var d = G.d;
-    var SearchInput = /** @class */ (function (_super) {
-        __extends(SearchInput, _super);
-        function SearchInput(p) {
-            var _this = _super.call(this, Object.assign({}, p, {
-                icons: ['iconfont icon-sousuo'],
-                iconHandle: function () {
-                    _this.search();
-                }
-            })) || this;
-            return _this;
-        }
-        SearchInput.prototype.wrapperInit = function (para) {
-            var _this = this;
-            var wrapper = _super.prototype.wrapperInit.call(this, para);
-            d.classAdd(wrapper, 'search-input');
-            //回车搜索
-            d.on(this.input, 'keypress', function (e) {
-                if (e.charCode === 13) {
-                    _this.search();
-                }
-            });
-            return wrapper;
-        };
-        SearchInput.prototype.search = function () {
-            var recentValue = this.input.value, ajax = this.para.ajax;
-            if (ajax && ajax.url && ajax.fun) {
-                //用ajax获取数据
-                ajax.fun(ajax.url, ajax.data, recentValue, function (d) {
-                });
-            }
-        };
-        return SearchInput;
-    }(text_1.TextInput));
-    exports.SearchInput = SearchInput;
-});
-
-define("NumInput", ["require", "exports", "TextInput"], function (require, exports, text_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var tools = G.tools;
-    var NumInput = /** @class */ (function (_super) {
-        __extends(NumInput, _super);
-        function NumInput(p) {
-            var _this = _super.call(this, Object.assign({}, {
-                step: 1,
-                max: null,
-                min: null
-            }, p, {
-                icons: ['iconfont icon-jiahao', 'iconfont icon-jianhao'],
-                iconHandle: function (index) {
-                    _this.iconHandle(index);
-                }
-            })) || this;
-            _this.iconHandle = function (index) {
-                var p = _this.para;
-                if (index === 0) {
-                    _this.num = p.step || 1;
-                }
-                else if (index === 1) {
-                    _this.num = -p.step || -1;
-                }
-                _this.set(_this.get() + _this.num);
-                /*溢出判断*/
-                _this.isOverflow(p.max, p.min, _this);
-                if (_this.para.callback && typeof _this.para.callback() === 'function') {
-                    _this.para.callback();
-                }
-            };
-            _this.keyHandle = function (e) {
-                var keyCode = e.keyCode || e.which || e.charCode;
-                switch (keyCode) {
-                    case 38: // Up
-                        _this.iconHandle(0);
-                        break;
-                    case 40: // Down
-                        _this.iconHandle(1);
-                        break;
-                }
-            };
-            var self = _this;
-            // 设置默认值
-            if (tools.isNotEmpty(p.defaultNum)) {
-                _this.set(p.defaultNum);
-            }
-            // 监听按键输入
-            self.on('keyup', function (e) {
-                this.value = this.value.replace(/\D+/, '');
-                self.isOverflow(p.max, p.min, self);
-                if (self.para.callback && typeof self.para.callback() === 'function') {
-                    self.para.callback();
-                }
-            });
-            return _this;
-            // let scrollFunc =  (e : WheelEvent) => {
-            //     if(e.deltaY > 0){ // 下滚
-            //         this.iconHandle(1);
-            //     }else{
-            //         this.iconHandle(0);
-            //     }
-            // };
-            // self.on('DOMMouseScroll', scrollFunc);
-            // this.input.onmousewheel = scrollFunc
-        }
-        NumInput.prototype.get = function () {
-            return parseInt(this.input.value);
-        };
-        NumInput.prototype.set = function (str) {
-            this.input.value = tools.str.toEmpty(str);
-            if (this.para.callback && typeof this.para.callback() === 'function') {
-                this.para.callback();
-            }
-        };
-        /**
-         *
-         * @param max
-         * @param min
-         * @param self
-         */
-        NumInput.prototype.isOverflow = function (max, min, self) {
-            if (typeof max === 'number' && self.get() > max) {
-                self.set(max);
-            }
-            if (typeof min === 'number' && self.get() < min) {
-                self.set(min);
-            }
-        };
-        return NumInput;
-    }(text_1.TextInput));
-    exports.NumInput = NumInput;
-});
-
 /// <amd-module name="SelectBox"/>
 define("SelectBox", ["require", "exports", "CheckBox", "FormCom", "RadioBox", "BasicCheckBox"], function (require, exports, checkBox_1, basic_1, radioBox_1, basicCheckBox_1) {
     "use strict";
@@ -19811,6 +19838,46 @@ define("SelectBox", ["require", "exports", "CheckBox", "FormCom", "RadioBox", "B
     exports.SelectBox = SelectBox;
 });
 
+define("SearchInput", ["require", "exports", "TextInput"], function (require, exports, text_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var d = G.d;
+    var SearchInput = /** @class */ (function (_super) {
+        __extends(SearchInput, _super);
+        function SearchInput(p) {
+            var _this = _super.call(this, Object.assign({}, p, {
+                icons: ['iconfont icon-sousuo'],
+                iconHandle: function () {
+                    _this.search();
+                }
+            })) || this;
+            return _this;
+        }
+        SearchInput.prototype.wrapperInit = function (para) {
+            var _this = this;
+            var wrapper = _super.prototype.wrapperInit.call(this, para);
+            d.classAdd(wrapper, 'search-input');
+            //回车搜索
+            d.on(this.input, 'keypress', function (e) {
+                if (e.charCode === 13) {
+                    _this.search();
+                }
+            });
+            return wrapper;
+        };
+        SearchInput.prototype.search = function () {
+            var recentValue = this.input.value, ajax = this.para.ajax;
+            if (ajax && ajax.url && ajax.fun) {
+                //用ajax获取数据
+                ajax.fun(ajax.url, ajax.data, recentValue, function (d) {
+                });
+            }
+        };
+        return SearchInput;
+    }(text_1.TextInput));
+    exports.SearchInput = SearchInput;
+});
+
 /// <amd-module name="BasicBoxGroup"/>
 define("BasicBoxGroup", ["require", "exports", "ContainCom", "BasicCheckBox"], function (require, exports, ContainCom_1, basicCheckBox_1) {
     "use strict";
@@ -19999,159 +20066,6 @@ define("BasicBoxGroup", ["require", "exports", "ContainCom", "BasicCheckBox"], f
         return CheckBoxGroup;
     }(BasicBoxGroup));
     exports.CheckBoxGroup = CheckBoxGroup;
-});
-
-define("SQLEditor", ["require", "exports", "FormCom"], function (require, exports, basic_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var SQLEditor = /** @class */ (function (_super) {
-        __extends(SQLEditor, _super);
-        function SQLEditor(para) {
-            var _this = _super.call(this, para) || this;
-            _this.setSql = 'ace/mode/sql';
-            _this.editorInit();
-            _this.width = para.width;
-            _this.height = para.height;
-            return _this;
-        }
-        SQLEditor.prototype.wrapperInit = function () {
-            return h("div", { className: "sql-editor" });
-        };
-        SQLEditor.prototype.editorInit = function () {
-            var _this = this;
-            require(['AceEditor'], function () {
-                _this.sqlConfigInit();
-                _this.editor = ace.edit(_this.wrapper);
-                _this.editor.session.setMode(_this.setSql);
-                _this.set(_this._value);
-            });
-        };
-        Object.defineProperty(SQLEditor.prototype, "width", {
-            get: function () {
-                return this._width;
-            },
-            set: function (num) {
-                if ((typeof num === 'number' || typeof num === 'string') && this._width !== num) {
-                    this.wrapper.style.width = typeof num === 'number' ? num + "px" : num;
-                    this._width = num;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SQLEditor.prototype, "height", {
-            get: function () {
-                return this._height;
-            },
-            set: function (num) {
-                if ((typeof num === 'number' || typeof num === 'string') && this._height !== num) {
-                    this.wrapper.style.height = typeof num === 'number' ? num + "px" : num;
-                    this._height = num;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        SQLEditor.prototype.sqlConfigInit = function () {
-            ace.define("ace/mode/sql_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (require, exports, module) {
-                "use strict";
-                var oop = require("../lib/oop");
-                var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
-                var SqlHighlightRules = function () {
-                    var keywords = ("select|insert|update|delete|from|where|and|or|group|by|order|limit|offset|having|as|case|" +
-                        "when|else|end|type|left|right|join|on|outer|desc|asc|union|create|table|primary|key|if|" +
-                        "foreign|not|references|default|null|inner|cross|natural|database|drop|grant");
-                    var builtinConstants = ("true|false");
-                    var builtinFunctions = ("avg|count|first|last|max|min|sum|ucase|lcase|mid|len|round|rank|now|format|" +
-                        "coalesce|ifnull|isnull|nvl");
-                    var dataTypes = ("int|numeric|decimal|date|varchar|char|bigint|float|double|bit|binary|text|set|timestamp|" +
-                        "money|real|number|integer");
-                    var keywordMapper = this.createKeywordMapper({
-                        "support.function": builtinFunctions,
-                        "keyword": keywords,
-                        "constant.language": builtinConstants,
-                        "storage.type": dataTypes
-                    }, "identifier", true);
-                    this.$rules = {
-                        "start": [{
-                                token: "comment",
-                                regex: "--.*$"
-                            }, {
-                                token: "comment",
-                                start: "/\\*",
-                                end: "\\*/"
-                            }, {
-                                token: "string",
-                                regex: '".*?"'
-                            }, {
-                                token: "string",
-                                regex: "'.*?'"
-                            }, {
-                                token: "string",
-                                regex: "`.*?`"
-                            }, {
-                                token: "constant.numeric",
-                                regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
-                            }, {
-                                token: keywordMapper,
-                                regex: "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
-                            }, {
-                                token: "keyword.operator",
-                                regex: "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|="
-                            }, {
-                                token: "paren.lparen",
-                                regex: "[\\(]"
-                            }, {
-                                token: "paren.rparen",
-                                regex: "[\\)]"
-                            }, {
-                                token: "text",
-                                regex: "\\s+"
-                            }]
-                    };
-                    this.normalizeRules();
-                };
-                oop.inherits(SqlHighlightRules, TextHighlightRules);
-                exports.SqlHighlightRules = SqlHighlightRules;
-            });
-            ace.define(this.setSql, ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/sql_highlight_rules"], function (require, exports, module) {
-                "use strict";
-                var oop = require("../lib/oop");
-                var TextMode = require("./text").Mode;
-                var SqlHighlightRules = require("./sql_highlight_rules").SqlHighlightRules;
-                var Mode = function () {
-                    this.HighlightRules = SqlHighlightRules;
-                    this.$behaviour = this.$defaultBehaviour;
-                };
-                oop.inherits(Mode, TextMode);
-                (function () {
-                    this.lineCommentStart = "--";
-                    this.$id = "ace/mode/sql";
-                }).call(Mode.prototype);
-                exports.Mode = Mode;
-            });
-        };
-        SQLEditor.prototype.get = function () {
-            return this.editor ? this.editor.getValue() : this._value;
-        };
-        SQLEditor.prototype.set = function (sql) {
-            this.editor && this.editor.setValue(sql);
-            this._value = sql;
-        };
-        Object.defineProperty(SQLEditor.prototype, "value", {
-            get: function () {
-                return this.editor ? this.editor.getValue() : this._value;
-            },
-            set: function (sql) {
-                this.editor && this.editor.setValue(sql);
-                this._value = sql;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return SQLEditor;
-    }(basic_1.FormCom));
-    exports.SQLEditor = SQLEditor;
 });
 
 define("SelectInput", ["require", "exports", "TextInput", "DropDown"], function (require, exports, text_1, dropdown_1) {
@@ -20714,6 +20628,159 @@ define("SelectInputMb", ["require", "exports", "TextInput", "Spinner", "Picker"]
 //         }
 //     }
 // }
+
+define("SQLEditor", ["require", "exports", "FormCom"], function (require, exports, basic_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var SQLEditor = /** @class */ (function (_super) {
+        __extends(SQLEditor, _super);
+        function SQLEditor(para) {
+            var _this = _super.call(this, para) || this;
+            _this.setSql = 'ace/mode/sql';
+            _this.editorInit();
+            _this.width = para.width;
+            _this.height = para.height;
+            return _this;
+        }
+        SQLEditor.prototype.wrapperInit = function () {
+            return h("div", { className: "sql-editor" });
+        };
+        SQLEditor.prototype.editorInit = function () {
+            var _this = this;
+            require(['AceEditor'], function () {
+                _this.sqlConfigInit();
+                _this.editor = ace.edit(_this.wrapper);
+                _this.editor.session.setMode(_this.setSql);
+                _this.set(_this._value);
+            });
+        };
+        Object.defineProperty(SQLEditor.prototype, "width", {
+            get: function () {
+                return this._width;
+            },
+            set: function (num) {
+                if ((typeof num === 'number' || typeof num === 'string') && this._width !== num) {
+                    this.wrapper.style.width = typeof num === 'number' ? num + "px" : num;
+                    this._width = num;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SQLEditor.prototype, "height", {
+            get: function () {
+                return this._height;
+            },
+            set: function (num) {
+                if ((typeof num === 'number' || typeof num === 'string') && this._height !== num) {
+                    this.wrapper.style.height = typeof num === 'number' ? num + "px" : num;
+                    this._height = num;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        SQLEditor.prototype.sqlConfigInit = function () {
+            ace.define("ace/mode/sql_highlight_rules", ["require", "exports", "module", "ace/lib/oop", "ace/mode/text_highlight_rules"], function (require, exports, module) {
+                "use strict";
+                var oop = require("../lib/oop");
+                var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
+                var SqlHighlightRules = function () {
+                    var keywords = ("select|insert|update|delete|from|where|and|or|group|by|order|limit|offset|having|as|case|" +
+                        "when|else|end|type|left|right|join|on|outer|desc|asc|union|create|table|primary|key|if|" +
+                        "foreign|not|references|default|null|inner|cross|natural|database|drop|grant");
+                    var builtinConstants = ("true|false");
+                    var builtinFunctions = ("avg|count|first|last|max|min|sum|ucase|lcase|mid|len|round|rank|now|format|" +
+                        "coalesce|ifnull|isnull|nvl");
+                    var dataTypes = ("int|numeric|decimal|date|varchar|char|bigint|float|double|bit|binary|text|set|timestamp|" +
+                        "money|real|number|integer");
+                    var keywordMapper = this.createKeywordMapper({
+                        "support.function": builtinFunctions,
+                        "keyword": keywords,
+                        "constant.language": builtinConstants,
+                        "storage.type": dataTypes
+                    }, "identifier", true);
+                    this.$rules = {
+                        "start": [{
+                                token: "comment",
+                                regex: "--.*$"
+                            }, {
+                                token: "comment",
+                                start: "/\\*",
+                                end: "\\*/"
+                            }, {
+                                token: "string",
+                                regex: '".*?"'
+                            }, {
+                                token: "string",
+                                regex: "'.*?'"
+                            }, {
+                                token: "string",
+                                regex: "`.*?`"
+                            }, {
+                                token: "constant.numeric",
+                                regex: "[+-]?\\d+(?:(?:\\.\\d*)?(?:[eE][+-]?\\d+)?)?\\b"
+                            }, {
+                                token: keywordMapper,
+                                regex: "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
+                            }, {
+                                token: "keyword.operator",
+                                regex: "\\+|\\-|\\/|\\/\\/|%|<@>|@>|<@|&|\\^|~|<|>|<=|=>|==|!=|<>|="
+                            }, {
+                                token: "paren.lparen",
+                                regex: "[\\(]"
+                            }, {
+                                token: "paren.rparen",
+                                regex: "[\\)]"
+                            }, {
+                                token: "text",
+                                regex: "\\s+"
+                            }]
+                    };
+                    this.normalizeRules();
+                };
+                oop.inherits(SqlHighlightRules, TextHighlightRules);
+                exports.SqlHighlightRules = SqlHighlightRules;
+            });
+            ace.define(this.setSql, ["require", "exports", "module", "ace/lib/oop", "ace/mode/text", "ace/mode/sql_highlight_rules"], function (require, exports, module) {
+                "use strict";
+                var oop = require("../lib/oop");
+                var TextMode = require("./text").Mode;
+                var SqlHighlightRules = require("./sql_highlight_rules").SqlHighlightRules;
+                var Mode = function () {
+                    this.HighlightRules = SqlHighlightRules;
+                    this.$behaviour = this.$defaultBehaviour;
+                };
+                oop.inherits(Mode, TextMode);
+                (function () {
+                    this.lineCommentStart = "--";
+                    this.$id = "ace/mode/sql";
+                }).call(Mode.prototype);
+                exports.Mode = Mode;
+            });
+        };
+        SQLEditor.prototype.get = function () {
+            return this.editor ? this.editor.getValue() : this._value;
+        };
+        SQLEditor.prototype.set = function (sql) {
+            this.editor && this.editor.setValue(sql);
+            this._value = sql;
+        };
+        Object.defineProperty(SQLEditor.prototype, "value", {
+            get: function () {
+                return this.editor ? this.editor.getValue() : this._value;
+            },
+            set: function (sql) {
+                this.editor && this.editor.setValue(sql);
+                this._value = sql;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return SQLEditor;
+    }(basic_1.FormCom));
+    exports.SQLEditor = SQLEditor;
+});
 
 /// <amd-module name="NewTagsInput"/>
 define("NewTagsInput", ["require", "exports", "FormCom", "Modal"], function (require, exports, basic_1, Modal_1) {
@@ -21768,6 +21835,178 @@ define("Uploader", ["require", "exports", "FormCom", "User", "TextInput"], funct
     exports.Uploader = Uploader;
 });
 
+/// <amd-module name="Accessory"/>
+define("Accessory", ["require", "exports", "FormCom", "AccessoryItem"], function (require, exports, basic_1, accessoryItem_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var tools = G.tools;
+    var d = G.d;
+    var Accessory = /** @class */ (function (_super) {
+        __extends(Accessory, _super);
+        function Accessory(para) {
+            var _this = _super.call(this, para) || this;
+            _this.accessoryBodyWrapper = null;
+            _this._listItems = [];
+            _this.initEvent = (function () {
+                var uploadEt = function () {
+                    // let el = d.closest(<div/>,'.accessory-wrapper');
+                    // d.append(el,<div className="accessory-item">
+                    //     <div className="file-wrapper">
+                    //         <i className="appcommon app-wenjian"/>
+                    //         <div className="file-info">
+                    //             <div c-var="fileName" className="file-name">test.pdf</div>
+                    //             <div c-var="fileSize" className="file-size">89</div>
+                    //         </div>
+                    //     </div>
+                    //     <div className="deleteBtn">删除</div>
+                    // </div>);
+                };
+                var deleteEt = function (e) {
+                    var index = d.closest(e.target, '.accessory-item');
+                    // 删除
+                    index.remove();
+                };
+                return {
+                    on: function () {
+                        d.on(_this.wrapper, 'click', '.upload', uploadEt);
+                        d.on(_this.wrapper, 'click', '.deleteBtn', deleteEt);
+                    },
+                    off: function () {
+                        d.off(_this.wrapper, 'click', '.upload', uploadEt);
+                        d.off(_this.wrapper, 'click', '.deleteBtn', deleteEt);
+                    }
+                };
+            })();
+            tools.isNotEmpty(para.files) && (_this.value = para.files);
+            _this.initEvent.on();
+            return _this;
+        }
+        Accessory.prototype.get = function () {
+            return this.value;
+        };
+        Accessory.prototype.set = function (data) {
+            this.value = data;
+        };
+        Object.defineProperty(Accessory.prototype, "value", {
+            get: function () {
+                return this._value;
+            },
+            set: function (value) {
+                this._value = value;
+                this.render(value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Accessory.prototype.wrapperInit = function (para) {
+            return h("div", { className: "accessory-wrapper" },
+                h("div", { className: "accessory-title" }, para.caption || '附件'),
+                this.accessoryBodyWrapper = h("div", { className: "accessory-body" },
+                    h("div", { className: "upload" },
+                        h("i", { className: "appcommon app-jia" }),
+                        "\u6DFB\u52A0\u9644\u4EF6")));
+        };
+        Object.defineProperty(Accessory.prototype, "listItems", {
+            get: function () {
+                return this._listItems.slice();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // 渲染附件列表
+        Accessory.prototype.render = function (data) {
+            var _this = this;
+            d.diff(data, this.listItems, {
+                create: function (n) {
+                    _this._listItems.push(_this.createListItem({ data: n }));
+                },
+                replace: function (n, o) {
+                    o.data = n || {};
+                },
+                destroy: function (o) {
+                    o.destroy();
+                    var index = _this._listItems.indexOf(o);
+                    if (index > -1)
+                        delete _this._listItems[index];
+                }
+            });
+            this._listItems = this._listItems.filter(function (item) { return item; });
+            this.refreshIndex();
+        };
+        Accessory.prototype.refreshIndex = function () {
+            this._listItems.forEach(function (item, index) {
+                item.index = index;
+            });
+        };
+        // 实例化MvListItem
+        Accessory.prototype.createListItem = function (para) {
+            para = Object.assign({}, para, {
+                container: this.wrapper
+            });
+            return new accessoryItem_1.AccessoryItem(para);
+        };
+        Accessory.prototype.destroy = function () {
+            _super.prototype.destroy.call(this);
+            this.initEvent.off();
+        };
+        return Accessory;
+    }(basic_1.FormCom));
+    exports.Accessory = Accessory;
+});
+
+define("AccessoryItem", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="AccessoryItem"/>
+    var Component = G.Component;
+    var AccessoryItem = /** @class */ (function (_super) {
+        __extends(AccessoryItem, _super);
+        function AccessoryItem(para) {
+            var _this = _super.call(this, para) || this;
+            _this.para = para;
+            _this.list = para.list;
+            _this._index = para.index;
+            // para.file && this.render(para.file);
+            _this.render(para.data || {});
+            return _this;
+        }
+        AccessoryItem.prototype.wrapperInit = function (para) {
+            this.details = {};
+            return h("div", { className: "accessory-item", "data-index": para.index },
+                h("div", { className: "file-wrapper" },
+                    h("i", { className: "appcommon app-wenjian" }),
+                    h("div", { className: "file-info" },
+                        this.details['fileName'] = h("div", { "c-var": "fileName", className: "file-name" }),
+                        this.details['fileSize'] = h("div", { "c-var": "fileSize", className: "file-size" }))),
+                h("div", { className: "deleteBtn" }, "\u5220\u9664"));
+        };
+        AccessoryItem.prototype.render = function (data) {
+            for (var name_1 in this.details) {
+                var el = this.details[name_1], content = data[name_1];
+                el.innerHTML = content;
+            }
+        };
+        Object.defineProperty(AccessoryItem.prototype, "index", {
+            get: function () {
+                return this._index;
+            },
+            set: function (index) {
+                this._index = index;
+                this.wrapper && (this.wrapper.dataset['index'] = index + '');
+            },
+            enumerable: true,
+            configurable: true
+        });
+        AccessoryItem.prototype.destroy = function () {
+            this.list = null;
+            this.details = null;
+            _super.prototype.destroy.call(this);
+        };
+        return AccessoryItem;
+    }(Component));
+    exports.AccessoryItem = AccessoryItem;
+});
+
 define("Toggle", ["require", "exports", "FormCom"], function (require, exports, basic_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -22003,368 +22242,6 @@ define("Toggle", ["require", "exports", "FormCom"], function (require, exports, 
         return Toggle;
     }(basic_1.FormCom));
     exports.Toggle = Toggle;
-});
-
-define("InputBox", ["require", "exports", "Button", "DropDown"], function (require, exports, Button_1, dropdown_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="InputBox"/>
-    var d = G.d;
-    var tools = G.tools;
-    var Component = G.Component;
-    /**
-     * 组件集合对象
-     */
-    var InputBox = /** @class */ (function (_super) {
-        __extends(InputBox, _super);
-        function InputBox(inputBox) {
-            if (inputBox === void 0) { inputBox = {}; }
-            var _this = _super.call(this, inputBox) || this;
-            _this.init(inputBox);
-            return _this;
-        }
-        InputBox.prototype.wrapperInit = function () {
-            return d.create("<div class=\"input-box\"></div>");
-        };
-        InputBox.prototype.init = function (inputBox) {
-            // debugger;
-            this.isVertical = !!inputBox.isVertical;
-            this.wrapper.classList.add(this.isVertical ? 'input-box-vertical' : 'input-box-horizontal');
-            this.children = inputBox.children;
-            this._lastNotMoreIndex = -1;
-            this.size = inputBox.size;
-            this.compactWidth = inputBox.compactWidth;
-            this.isResponsive = inputBox.isResponsive;
-            this.moreBtn = inputBox.moreBtn;
-            this.shape = inputBox.shape;
-            // this.container = inputBox.container;
-            // this.container.appendChild(this.wrapper);
-            this.responsive();
-        };
-        Object.defineProperty(InputBox.prototype, "children", {
-            get: function () {
-                return this._children;
-            },
-            set: function (children) {
-                this._children = tools.isEmpty(children) ? [] : children;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputBox.prototype, "shape", {
-            get: function () {
-                return this._shape;
-            },
-            set: function (shape) {
-                if (tools.isEmpty(shape)) {
-                    return;
-                }
-                if (shape === 'circle') {
-                    this.wrapper.classList.add('input-box-circle');
-                }
-                else {
-                    this.wrapper.classList.remove('input-box-circle');
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputBox.prototype, "size", {
-            get: function () {
-                return this._size;
-            },
-            set: function (size) {
-                if (this._size) {
-                    this.wrapper.classList.remove("input-box-" + this._size);
-                }
-                size = tools.isEmpty(size) ? 'small' : size;
-                switch (size) {
-                    case 'small':
-                        this.wrapper.classList.add('input-box-small');
-                        break;
-                    case 'middle':
-                        this.wrapper.classList.add('input-box-middle');
-                        break;
-                    case 'large':
-                        this.wrapper.classList.add('input-box-large');
-                        break;
-                }
-                this._size = size;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputBox.prototype, "compactWidth", {
-            get: function () {
-                return this._compactWidth;
-            },
-            set: function (compactWidth) {
-                if (compactWidth > 0) {
-                    this.wrapper.classList.remove('compact');
-                }
-                else {
-                    this.wrapper.classList.add('compact');
-                }
-                this.responsive();
-                // compactWidth = tools.isEmpty(compactWidth) ? 0 : compactWidth;
-                //
-                // if (compactWidth > 0) {
-                //     this.wrapper.classList.remove('not-compact');
-                //     let count = 0;
-                //     for (let d of this.children) {
-                //         if (count === 0) {
-                //             count++;
-                //             continue;
-                //         }
-                //         if (count > this._lastNotMoreIndex && this._lastNotMoreIndex > 0) {
-                //             break;
-                //         }
-                //         let comKey = Object.keys(d)[0],
-                //             com = d[comKey],
-                //             marginWidth = 0;
-                //         if (com) {
-                //             marginWidth = parseInt(getComputedStyle(com._wrapper)['margin-left']) > 0 ? parseInt(getComputedStyle(com._wrapper)['margin-left']) : 0;
-                //             com._wrapper.style.marginLeft = compactWidth + 'px';
-                //         }
-                //         this.wrapper.style.width = parseInt(this.wrapper.style.width) + compactWidth - marginWidth + 'px';
-                //         if (parseInt(this.wrapper.style.width) > this._maxWidth) {
-                //             let guid = Object.keys(this.children[this._lastNotMoreIndex])[0],
-                //                 lastCom = this.children[this._lastNotMoreIndex][guid],
-                //                 lastMargin = 0;
-                //             if (lastCom) {
-                //                 lastMargin = parseInt(getComputedStyle(lastCom._wrapper)['margin-left']) > 0 ? parseInt(getComputedStyle(lastCom._wrapper)['margin-left']) : 0;
-                //                 if (this._compactWidth && this._lastNotMoreIndex > -1) {
-                //                     lastCom._wrapper.style.marginLeft = 0 + 'px';
-                //                 }
-                //                 //仅从dom结构上改变了组件，并未改变组件的container属性
-                //                 if (this._dropDown) {
-                //                     this._dropDown.getUlDom().insertBefore(lastCom._wrapper, this._dropDown.getUlDom().firstChild);
-                //                 }
-                //                 this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(lastCom._wrapper)['width']) + 5 + 'px';
-                //                 this._lastNotMoreIndex -= 1;
-                //             }
-                //         }
-                //         count++;
-                //     }
-                // }
-                // else {
-                //     this.wrapper.classList.add('not-compact');
-                //     // if(this._compactWidth > 0) { }
-                // }
-                this._compactWidth = compactWidth;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputBox.prototype, "moreBtn", {
-            get: function () {
-                return this._moreBtn;
-            },
-            set: function (moreBtn) {
-                if (this._isResponsive) {
-                    this._moreBtn = moreBtn;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(InputBox.prototype, "isResponsive", {
-            get: function () {
-                return this._isResponsive;
-            },
-            set: function (isResponsive) {
-                this._isResponsive = tools.isEmpty(isResponsive) ? false : isResponsive;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        // 【待改...】
-        InputBox.prototype.responsive = function () {
-            if (!this.isResponsive) {
-                return;
-            }
-            //如果获取不到父容器宽度，则无响应式
-            // let paWidth = parseInt(getComputedStyle(<HTMLElement>this._container)['width']);
-            // console.log('paWidth:',paWidth);
-            // if (paWidth < 1) {
-            //     return;
-            // }
-            //如果当前组件集合宽度 > 父容器宽度
-            // if (parseInt(this.wrapper.style.width) > paWidth && this.children.length > 0) {
-            if (this.children.length > 4) {
-                //判断是否有更多下拉列表
-                tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button_1.Button({
-                    content: '更多',
-                    size: this._size,
-                }));
-                //不存在更多下拉列表，则生成更多下拉列表
-                if (!this._moreBtn || !this._moreBtn.dropDown) {
-                    this.wrapper.appendChild(this.moreBtn.wrapper);
-                    // this.wrapper.style.width = parseInt(this.wrapper.style.width) + parseInt(getComputedStyle(this._moreBtn.wrapper)['width']) + 'px';
-                    // console.log('更多：',parseInt(getComputedStyle(this._moreBtn.wrapper)['width']));
-                    var self_1 = this;
-                    this.moreBtn.dropDown = new dropdown_1.DropDown({
-                        el: self_1.moreBtn.wrapper,
-                        inline: false,
-                        data: [],
-                        multi: null,
-                        className: "input-box-morebtn"
-                    });
-                }
-                //从组件集合末尾倒序调整
-                var len = this.children.length;
-                for (var i = len - 1; i >= 3; i--) {
-                    //当组件集合宽度超过限制的最大宽度时，将最后一个非更多下拉列表内的组件放置于更多下拉列表容器内（插入到其第一个子元素之前）
-                    // if (parseInt(this.wrapper.style.width) > paWidth) {
-                    var com = this.children[i];
-                    if (com) {
-                        if (this._compactWidth && i > -1) {
-                            com.wrapper.style.marginLeft = 0 + 'px';
-                        }
-                        // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
-                        //仅从dom结构上改变了组件，并未改变组件的container属性
-                        if (this.moreBtn.dropDown) {
-                            this.moreBtn.dropDown.getUlDom().appendChild(com.wrapper);
-                        }
-                        this._lastNotMoreIndex = i;
-                    }
-                    // }
-                }
-            }
-            // setTimeout(() => {
-            // debugger;
-            var width = 10;
-            for (var i = 0; i < 4; i++) {
-                var child = this.wrapper.children[i];
-                if (child) {
-                    width += child.offsetWidth;
-                }
-            }
-            this.wrapper.style.width = width + 'px';
-            // }, 500);
-        };
-        /*
-        *  将组件添加到组件集合
-        *  参数：com:组件
-        * */
-        InputBox.prototype.addItem = function (com, position) {
-            if (!com) {
-                return;
-            }
-            if (typeof position === 'number') {
-                position = Math.max(0, position);
-                position = position >= this.children.length ? void 0 : position;
-            }
-            com.size = this._size;
-            //将组件元素添加进组件集合容器（仅改变dom）,如果存在更多按钮下拉列表，则将组件插入到更多按钮之前。
-            if (this._moreBtn && this._moreBtn.dropDown) {
-                this.wrapper.insertBefore(com.wrapper, this.wrapper.lastChild);
-            }
-            else {
-                if (typeof position === 'number') {
-                    d.before(this.wrapper.children[position], com.wrapper);
-                }
-                else {
-                    this.wrapper.appendChild(com.wrapper);
-                }
-            }
-            //添加至组件集合children
-            if (typeof position === 'number') {
-                this.children.splice(position, 0, com);
-            }
-            else {
-                this.children.push(com);
-            }
-            //水平
-            // if (this.inputBox && !this.inputBox.isVertical && this.isResponsive) {
-            if (!this.isVertical && this.isResponsive) {
-                //第一个组件元素
-                if (this.wrapper.children.length < 2) {
-                    this.wrapper.style.width = com.wrapper.clientWidth + 2 + 'px';
-                }
-                else {
-                    this.wrapper.style.width = parseInt(this.wrapper.style.width) + com.wrapper.clientWidth + 2 + 'px';
-                }
-                this.responsive();
-            }
-        };
-        /*
-        * 获取组件集合
-        * 参数：number | string | void
-        * number：按照组件集合的下标获取组件（下标由添加时决定,从0起）  |  string： 根据组件集合的键获取组件
-        * */
-        InputBox.prototype.getItem = function (item) {
-            if (!this.children || !this.children[0]) {
-                return null;
-            }
-            if (typeof item === 'number') {
-                return this.children[item];
-            }
-            for (var _i = 0, _a = this.children; _i < _a.length; _i++) {
-                var d_1 = _a[_i];
-                if (d_1.key === item) {
-                    return d_1;
-                }
-            }
-            return null;
-        };
-        /*
-        * 删除组件集合
-        * 参数：number | string
-        * number：按照组件集合的下标删除组件（下标由添加时决定,从0起）  |  string： 根据组件集合的键删除组件
-        * 返回值：返回被删除的组件，若未找到要删除的组件则返回null
-        * */
-        InputBox.prototype.delItem = function (item) {
-            if (!this.children || !this.children[0]) {
-                return null;
-            }
-            if (typeof item === 'number') {
-                var curCom = this.children[item];
-                if (curCom) {
-                    this.children[item].remove();
-                    this.children.splice(item, 1);
-                }
-                return curCom;
-            }
-            var index = 0;
-            for (var _i = 0, _a = this.children; _i < _a.length; _i++) {
-                var d_2 = _a[_i];
-                if (d_2.key === item) {
-                    var curCom = d_2;
-                    if (d_2) {
-                        this.children.splice(index, 1);
-                        d_2.remove();
-                    }
-                    return curCom;
-                }
-                index++;
-            }
-            return null;
-        };
-        Object.defineProperty(InputBox.prototype, "isShow", {
-            /*
-            * 根据窗口变化改变限制的最大宽度
-            * */
-            // private resizeHandler() {
-            //     /**/let timer = null;
-            /*d.on(window, 'resize', () => {
-                if (timer === null) {
-                    timer = setTimeout(() => {
-                        this.responsive();
-                        timer = null;
-                    }, 1000);
-                }
-            });*/
-            // }
-            set: function (flag) {
-                d.hide(this.wrapper, !flag);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return InputBox;
-    }(Component));
-    exports.InputBox = InputBox;
 });
 
 define("Button", ["require", "exports"], function (require, exports) {
@@ -22607,638 +22484,588 @@ define("Button", ["require", "exports"], function (require, exports) {
     exports.Button = Button;
 });
 
-/// <amd-module name="ElementTreeNode"/>
-define("ElementTreeNode", ["require", "exports", "TreeNodeBase"], function (require, exports, TreeNodeBase_1) {
+define("InputBox", ["require", "exports", "Button", "DropDown"], function (require, exports, Button_1, dropdown_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="InputBox"/>
     var d = G.d;
     var tools = G.tools;
-    var ElementTreeNode = /** @class */ (function (_super) {
-        __extends(ElementTreeNode, _super);
-        function ElementTreeNode() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this._onSelect = null;
-            _this._onExpand = null;
+    var Component = G.Component;
+    /**
+     * 组件集合对象
+     */
+    var InputBox = /** @class */ (function (_super) {
+        __extends(InputBox, _super);
+        function InputBox(inputBox) {
+            if (inputBox === void 0) { inputBox = {}; }
+            var _this = _super.call(this, inputBox) || this;
+            _this.init(inputBox);
             return _this;
         }
-        ElementTreeNode.prototype.init = function (para) {
-            _super.prototype.init.call(this, para);
-            this.expandIconArr = para.expandIconArr;
-            this.expandIconPre = para.expandIconPre;
-            this.isVirtualSet(para.isVirtual === undefined ? !this.parent : para.isVirtual);
-            this.isLeaf = para.isLeaf === undefined ? tools.isEmpty(para.children) : para.isLeaf; // 默认判断是否有子节点
-            this.ajax = para.ajax;
-            this.expand = para.expand; //如果该节点为虚拟节点,则默认将该节点展开
+        InputBox.prototype.wrapperInit = function () {
+            return d.create("<div class=\"input-box\"></div>");
+        };
+        InputBox.prototype.init = function (inputBox) {
             // debugger;
-            this.text = para.text;
-            this.isAccordion = para.isAccordion;
-            this.multiSelect = para.multiSelect === undefined ? this.inherit('_multiSelect') : para.multiSelect;
-            this.selected = para.selected;
-            this.icon = para.icon;
-            this.disabled = para.disabled;
+            this.limitCount = inputBox.limitCount || 4;
+            this.isVertical = !!inputBox.isVertical;
+            this.wrapper.classList.add(this.isVertical ? 'input-box-vertical' : 'input-box-horizontal');
+            this.children = inputBox.children;
+            this._lastNotMoreIndex = -1;
+            this.size = inputBox.size;
+            this.compactWidth = inputBox.compactWidth;
+            this.isResponsive = inputBox.isResponsive;
+            this.moreBtn = inputBox.moreBtn;
+            this.shape = inputBox.shape;
+            // this.container = inputBox.container;
+            // this.container.appendChild(this.wrapper);
+            this.responsive();
         };
-        Object.defineProperty(ElementTreeNode.prototype, "expandIconArr", {
+        Object.defineProperty(InputBox.prototype, "children", {
             get: function () {
-                return this._expandIconArr;
+                return this._children;
             },
-            set: function (arr) {
-                this._expandIconArr = arr;
+            set: function (children) {
+                this._children = tools.isEmpty(children) ? [] : children;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ElementTreeNode.prototype, "expandIconPre", {
+        Object.defineProperty(InputBox.prototype, "shape", {
             get: function () {
-                return this._expandIconPre;
+                return this._shape;
             },
-            set: function (pre) {
-                this._expandIconPre = pre;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "ajax", {
-            get: function () {
-                return this.inherit('_ajax');
-            },
-            set: function (fun) {
-                this._ajax = fun;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "textWrapper", {
-            get: function () {
-                return this.textEl && this.textEl.parentElement;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "expandIconEl", {
-            get: function () {
-                if (!this._expandIconEl) {
-                    var pre = tools.isNotEmpty(this.expandIconPre) ? this.expandIconPre : 'iconfont';
-                    this._expandIconEl = d.create("<i class=\"" + pre + " " + this.getCurrentExpandIcon() + " tree-open-icon\"></i>");
-                    d.prepend(this.textWrapper, this._expandIconEl);
-                }
-                return this._expandIconEl;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ElementTreeNode.prototype.expandIconElShow = function () {
-            this.expandIconEl.classList.remove('invisible');
-        };
-        ElementTreeNode.prototype.expandIconElHide = function () {
-            this.expandIconEl.classList.add('invisible');
-        };
-        Object.defineProperty(ElementTreeNode.prototype, "isLeaf", {
-            get: function () {
-                return this._isLeaf || false;
-            },
-            set: function (flag) {
-                // if(flag === undefined) {
-                //     flag = tools.isEmpty(this.childrenGet());
-                // }
-                flag = !!flag;
-                if (this._isLeaf === flag) {
+            set: function (shape) {
+                if (tools.isEmpty(shape)) {
                     return;
                 }
-                this._isLeaf = flag;
-                if (flag) {
-                    this.expandIconElHide();
+                if (shape === 'circle') {
+                    this.wrapper.classList.add('input-box-circle');
                 }
                 else {
-                    this.expandIconElShow();
+                    this.wrapper.classList.remove('input-box-circle');
                 }
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ElementTreeNode.prototype, "childrenEl", {
+        Object.defineProperty(InputBox.prototype, "size", {
             get: function () {
-                if (!this._childrenEl) {
-                    this._childrenEl = d.query('[data-role="children"]', this.wrapper);
+                return this._size;
+            },
+            set: function (size) {
+                if (this._size) {
+                    this.wrapper.classList.remove("input-box-" + this._size);
                 }
-                return this._childrenEl;
+                size = tools.isEmpty(size) ? 'small' : size;
+                switch (size) {
+                    case 'small':
+                        this.wrapper.classList.add('input-box-small');
+                        break;
+                    case 'middle':
+                        this.wrapper.classList.add('input-box-middle');
+                        break;
+                    case 'large':
+                        this.wrapper.classList.add('input-box-large');
+                        break;
+                }
+                this._size = size;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ElementTreeNode.prototype, "textEl", {
+        Object.defineProperty(InputBox.prototype, "compactWidth", {
             get: function () {
-                if (!this._textEl) {
-                    this._textEl = d.query('[data-role="text"]', this.wrapper);
+                return this._compactWidth;
+            },
+            set: function (compactWidth) {
+                if (compactWidth > 0) {
+                    this.wrapper.classList.remove('compact');
                 }
-                return this._textEl;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "iconEl", {
-            get: function () {
-                if (!this._iconEl) {
-                    this._iconEl = d.create('<i class="tree-icon" data-role="icon"></i>');
-                    d.before(this.textEl, this._iconEl);
-                    // = d.query('[data-role="icon"]', this.wrapper);
+                else {
+                    this.wrapper.classList.add('compact');
                 }
-                return this._iconEl;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "isVirtual", {
-            get: function () {
-                // debugger;
-                // if (this._isVirtual === undefined) {
-                //     this.isVirtualSet(!this.parentGet());
-                // }
-                return this._isVirtual;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ElementTreeNode.prototype.isVirtualSet = function (flag) {
-            this.wrapper.classList.toggle('tree-virtual', flag);
-            this._isVirtual = flag;
-        };
-        Object.defineProperty(ElementTreeNode.prototype, "container", {
-            get: function () {
-                return this._container;
-            },
-            set: function (el) {
-                this._container = el;
-                d.append(el, this.wrapper);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "disabled", {
-            get: function () {
-                return this._disabled;
-            },
-            set: function (disabled) {
-                this._disabled = !!disabled;
-                this.wrapper.classList.toggle('disabled', this._disabled);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ElementTreeNode.prototype.childrenAdd = function (para) {
-            tools.toArray(para).forEach(function (p) {
-                if (!(p instanceof ElementTreeNode) && tools.isNotEmpty(p)) {
-                    p.isVirtual = false;
-                }
-            });
-            return _super.prototype.childrenAdd.call(this, para);
-        };
-        ElementTreeNode.prototype.childrenRemove = function (tnode) {
-            _super.prototype.childrenRemove.call(this, tnode);
-            tools.toArray(tnode).forEach(function (node) {
-                node.destroy();
-            });
-        };
-        Object.defineProperty(ElementTreeNode.prototype, "selected", {
-            get: function () {
-                return this._selected;
-            },
-            set: function (selected) {
-                if (selected === this._selected) {
-                    return;
-                }
-                if (!this.multiSelect && selected) {
-                    var selectedNodes = this.getSelectedNodes(true);
-                    Array.isArray(selectedNodes) && selectedNodes.forEach(function (node) {
-                        node.wrapper.classList.remove('selected');
-                        node._selected = false;
-                    });
-                }
-                this._selected = !!selected;
-                this.wrapper.classList.toggle('selected', this._selected);
-                this.onSelect && this.onSelect(this);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "onSelect", {
-            get: function () {
-                return this.inherit('_onSelect');
-            },
-            set: function (handler) {
-                this._onSelect = handler;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ElementTreeNode.prototype.expandIcon = function () {
-            var iconArr = tools.isNotEmpty(this.expandIconArr) ? this.expandIconArr : ['icon-zhankaishousuo-shousuo', 'icon-zhankaishousuo-zhankai'];
-            return iconArr;
-        };
-        Object.defineProperty(ElementTreeNode.prototype, "expand", {
-            get: function () {
-                return this._expand;
-            },
-            set: function (expand) {
-                var _this = this;
-                // console.trace();
-                if (this.isLeaf || expand == this._expand) {
-                    return;
-                }
-                //如果顶部菜单与子菜单的模式为纵向则需要修改当前打开按钮的样式 此处用expandIcon数量判断
-                var expandIcon = this.expandIcon();
-                if (expandIcon.length !== 1 && this.expandIconEl) {
-                    this.expandIconEl.classList.add(expand ? expandIcon[1] : expandIcon[0]);
-                    this.expandIconEl.classList.remove(expand ? expandIcon[0] : expandIcon[1]);
-                }
-                //如果为手风琴并且为打开状态，关闭同级节点,
-                if (this.parent && this.parent.isAccordion && expand) {
-                    var sibs = this.siblings;
-                    sibs && sibs.forEach(function (node) {
-                        node.expand && (node.expand = false);
-                    });
-                }
-                this._expand = expand;
-                setTimeout(function () {
-                    // 当满足树的状态为打开 并且没有disabled类是动态加载数据，判断是否包含disabled目的是为了防止在加载过程中再次触发
-                    var isAjax = _this.ajax && !_this.disabled && expand && tools.isEmpty(_this.children);
-                    Promise.resolve((function () {
-                        if (isAjax) {
-                            _this.childrenEl.classList.add('hide');
-                            return _this.doAjax().then(function () {
-                                // 动画效果,所以延时
-                                setTimeout(function () {
-                                    _this.childrenEl.classList.remove('hide');
-                                }, 50);
-                            });
-                        }
-                    })()).then(function () {
-                        _this.childrenEl.classList.toggle('hide', !_this._expand);
-                        _this.onExpand && _this.onExpand(_this, _this._expand);
-                    });
-                }, 10);
-                // this.childrenEl.classList.toggle('hide', !this._expand);
+                this.responsive();
+                // compactWidth = tools.isEmpty(compactWidth) ? 0 : compactWidth;
                 //
-                // setTimeout(() => {
-                //     //当满足树的状态为打开 并且没有disabled类是动态加载数据，判断是否包含disabled目的是为了防止在加载过程中再次触发
-                //     if (!this.disabled && expand && tools.isEmpty(this.children) && this.ajax) {
-                //         this.childrenEl.classList.add('hide');
-                //         this.doAjax().then(() => {
-                //
-                //             // 动画效果,所以延时
-                //             setTimeout(() => {
-                //                 this.childrenEl.classList.remove('hide');
-                //             }, 50);
-                //         }).catch(() => {
-                //             this.expand = false;
-                //         });
+                // if (compactWidth > 0) {
+                //     this.wrapper.classList.remove('not-compact');
+                //     let count = 0;
+                //     for (let d of this.children) {
+                //         if (count === 0) {
+                //             count++;
+                //             continue;
+                //         }
+                //         if (count > this._lastNotMoreIndex && this._lastNotMoreIndex > 0) {
+                //             break;
+                //         }
+                //         let comKey = Object.keys(d)[0],
+                //             com = d[comKey],
+                //             marginWidth = 0;
+                //         if (com) {
+                //             marginWidth = parseInt(getComputedStyle(com._wrapper)['margin-left']) > 0 ? parseInt(getComputedStyle(com._wrapper)['margin-left']) : 0;
+                //             com._wrapper.style.marginLeft = compactWidth + 'px';
+                //         }
+                //         this.wrapper.style.width = parseInt(this.wrapper.style.width) + compactWidth - marginWidth + 'px';
+                //         if (parseInt(this.wrapper.style.width) > this._maxWidth) {
+                //             let guid = Object.keys(this.children[this._lastNotMoreIndex])[0],
+                //                 lastCom = this.children[this._lastNotMoreIndex][guid],
+                //                 lastMargin = 0;
+                //             if (lastCom) {
+                //                 lastMargin = parseInt(getComputedStyle(lastCom._wrapper)['margin-left']) > 0 ? parseInt(getComputedStyle(lastCom._wrapper)['margin-left']) : 0;
+                //                 if (this._compactWidth && this._lastNotMoreIndex > -1) {
+                //                     lastCom._wrapper.style.marginLeft = 0 + 'px';
+                //                 }
+                //                 //仅从dom结构上改变了组件，并未改变组件的container属性
+                //                 if (this._dropDown) {
+                //                     this._dropDown.getUlDom().insertBefore(lastCom._wrapper, this._dropDown.getUlDom().firstChild);
+                //                 }
+                //                 this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(lastCom._wrapper)['width']) + 5 + 'px';
+                //                 this._lastNotMoreIndex -= 1;
+                //             }
+                //         }
+                //         count++;
                 //     }
-                // }, 10);
+                // }
+                // else {
+                //     this.wrapper.classList.add('not-compact');
+                //     // if(this._compactWidth > 0) { }
+                // }
+                this._compactWidth = compactWidth;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ElementTreeNode.prototype, "onExpand", {
+        Object.defineProperty(InputBox.prototype, "moreBtn", {
             get: function () {
-                return this.inherit('_onExpand');
+                return this._moreBtn;
             },
-            set: function (handler) {
-                this._onExpand = handler;
+            set: function (moreBtn) {
+                if (this._isResponsive) {
+                    this._moreBtn = moreBtn;
+                }
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ElementTreeNode.prototype, "text", {
+        Object.defineProperty(InputBox.prototype, "isResponsive", {
             get: function () {
-                return this._text;
+                return this._isResponsive;
             },
-            set: function (text) {
-                this._text = tools.str.toEmpty(text);
-                this.textEl.innerHTML = this._text;
-                this.textWrapper.title = this._text;
+            set: function (isResponsive) {
+                this._isResponsive = tools.isEmpty(isResponsive) ? false : isResponsive;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ElementTreeNode.prototype, "icon", {
-            get: function () {
-                return this._icon;
-            },
-            set: function (icon) {
-                var _a, _b;
-                if (icon) {
-                    if (typeof icon === 'string') {
-                        (_a = this.iconEl.classList).add.apply(_a, icon.split(' '));
-                        // !this._icon && this.iconEl.classList.add('tree-icon');
-                        this._icon = icon;
-                    }
-                }
-                else {
-                    this._icon && (_b = this.iconEl.classList).remove.apply(_b, this._icon.split(' '));
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "isAccordion", {
-            get: function () {
-                return this._isAccordion;
-            },
-            set: function (isAccordion) {
-                this._isAccordion = !!isAccordion;
-                if (this._isAccordion) {
-                    var children = this.children, firstExpand_1 = false;
-                    Array.isArray(children) && children.forEach(function (child) {
-                        if (child.expand) {
-                            if (!firstExpand_1) {
-                                firstExpand_1 = true;
-                            }
-                            else {
-                                child.expand = false;
-                            }
-                        }
-                    });
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "multiSelect", {
-            get: function () {
-                return this._multiSelect;
-            },
-            set: function (multi) {
-                this._multiSelect = !!multi;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ElementTreeNode.prototype, "onOpen", {
-            get: function () {
-                return this.inherit('_onOpen');
-            },
-            set: function (cb) {
-                this._onOpen = cb;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ElementTreeNode.prototype.doAjax = function () {
-            var _this = this;
-            var _a;
-            this.disabled = true;
-            var openIcon = this.expandIconEl, spinnerIconName = ['tree-rotate-icon', 'icon-shuaxin'], currentExpandIcon = this.getCurrentExpandIcon();
-            openIcon && openIcon.classList.remove(currentExpandIcon);
-            openIcon && (_a = openIcon.classList).add.apply(_a, spinnerIconName);
-            var callback = function (para) {
-                var _a;
-                // debugger;
-                if (tools.isNotEmpty(para)) {
-                    _this.childrenSet(para);
-                }
-                if (tools.isNotEmpty(_this.children)) {
-                    openIcon && openIcon.classList.add(currentExpandIcon);
-                }
-                openIcon && (_a = openIcon.classList).remove.apply(_a, spinnerIconName);
-                _this.disabled = false;
-            };
-            return new Promise(function (resolve, reject) {
-                if (_this.ajax) {
-                    _this.ajax(_this).then(function (para) {
-                        // debugger;
-                        callback(para);
-                        resolve();
-                    }).catch(function () {
-                        callback(null);
-                        reject();
-                    });
-                }
-                else {
-                    callback(null);
-                    reject();
-                }
-            });
-        };
-        ElementTreeNode.prototype.refresh = function () {
-            if (!this.ajax && this.isLeaf) {
+        // 【待改...】
+        InputBox.prototype.responsive = function () {
+            if (!this.isResponsive) {
                 return;
             }
-            this.expand = false;
-            this.childrenRemove(this.children);
-            this.expand = true;
-        };
-        Object.defineProperty(ElementTreeNode.prototype, "wrapper", {
-            get: function () {
-                if (!this._wrapper) {
-                    this._wrapper = this.wrapperCreate();
+            //如果获取不到父容器宽度，则无响应式
+            // let paWidth = parseInt(getComputedStyle(<HTMLElement>this._container)['width']);
+            // console.log('paWidth:',paWidth);
+            // if (paWidth < 1) {
+            //     return;
+            // }
+            //如果当前组件集合宽度 > 父容器宽度
+            // if (parseInt(this.wrapper.style.width) > paWidth && this.children.length > 0) {
+            if (this.children.length > this.limitCount) {
+                //判断是否有更多下拉列表
+                tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button_1.Button({
+                    content: '更多',
+                    size: this._size,
+                }));
+                //不存在更多下拉列表，则生成更多下拉列表
+                if (!this._moreBtn || !this._moreBtn.dropDown) {
+                    this.wrapper.appendChild(this.moreBtn.wrapper);
+                    // this.wrapper.style.width = parseInt(this.wrapper.style.width) + parseInt(getComputedStyle(this._moreBtn.wrapper)['width']) + 'px';
+                    // console.log('更多：',parseInt(getComputedStyle(this._moreBtn.wrapper)['width']));
+                    var self_1 = this;
+                    this.moreBtn.dropDown = new dropdown_1.DropDown({
+                        el: self_1.moreBtn.wrapper,
+                        inline: false,
+                        data: [],
+                        multi: null,
+                        className: "input-box-morebtn"
+                    });
                 }
-                return this._wrapper;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ElementTreeNode.prototype.wrapperCreate = function () {
-            return d.create("<div class=\"element-tree-node\">\n                <div class=\"tree-text-wrapper\">\n                    <span data-role=\"text\" class=\"tree-text\"></span>\n                </div>\n                <div data-role=\"children\" class=\"tree-child-wrapper hide\"></div>\n            </div>");
+                //从组件集合末尾倒序调整
+                var len = this.children.length;
+                for (var i = len - 1; i >= this.limitCount - 1; i--) {
+                    //当组件集合宽度超过限制的最大宽度时，将最后一个非更多下拉列表内的组件放置于更多下拉列表容器内（插入到其第一个子元素之前）
+                    // if (parseInt(this.wrapper.style.width) > paWidth) {
+                    var com = this.children[i];
+                    if (com) {
+                        if (this._compactWidth && i > -1) {
+                            com.wrapper.style.marginLeft = 0 + 'px';
+                        }
+                        // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
+                        //仅从dom结构上改变了组件，并未改变组件的container属性
+                        if (this.moreBtn.dropDown) {
+                            this.moreBtn.dropDown.getUlDom().appendChild(com.wrapper);
+                        }
+                        this._lastNotMoreIndex = i;
+                    }
+                    // }
+                }
+            }
+            // setTimeout(() => {
+            // debugger;
+            var width = 10;
+            for (var i = 0; i < this.limitCount; i++) {
+                var child = this.wrapper.children[i];
+                if (child) {
+                    width += child.offsetWidth;
+                }
+            }
+            this.wrapper.style.width = width + 'px';
+            // }, 500);
         };
-        ElementTreeNode.prototype.getSelectedNodes = function (fromRoot) {
-            if (fromRoot === void 0) { fromRoot = false; }
-            var root = fromRoot ? this.root : this;
-            return root.find(function (node) {
-                return node._selected;
-            });
-        };
-        Object.defineProperty(ElementTreeNode.prototype, "isOnTop", {
-            get: function () {
-                var parent = this.parent;
-                return (!!parent && parent.isVirtual) || !parent;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        ElementTreeNode.prototype.getCurrentExpandIcon = function () {
-            // if(this.isLeaf){
-            //     return '';
-            // } else {
-            var expandIcon = this.expandIcon();
-            if (expandIcon[1]) {
-                return expandIcon[this.expand ? 1 : 0];
+        /*
+        *  将组件添加到组件集合
+        *  参数：com:组件
+        * */
+        InputBox.prototype.addItem = function (com, position) {
+            if (!com) {
+                return;
+            }
+            if (typeof position === 'number') {
+                position = Math.max(0, position);
+                position = position >= this.children.length ? void 0 : position;
+            }
+            com.size = this._size;
+            //将组件元素添加进组件集合容器（仅改变dom）,如果存在更多按钮下拉列表，则将组件插入到更多按钮之前。
+            if (this._moreBtn && this._moreBtn.dropDown) {
+                this.wrapper.insertBefore(com.wrapper, this.wrapper.lastChild);
             }
             else {
-                return expandIcon[0];
+                if (typeof position === 'number') {
+                    d.before(this.wrapper.children[position], com.wrapper);
+                }
+                else {
+                    this.wrapper.appendChild(com.wrapper);
+                }
             }
+            //添加至组件集合children
+            if (typeof position === 'number') {
+                this.children.splice(position, 0, com);
+            }
+            else {
+                this.children.push(com);
+            }
+            //水平
+            // if (this.inputBox && !this.inputBox.isVertical && this.isResponsive) {
+            if (!this.isVertical && this.isResponsive) {
+                //第一个组件元素
+                if (this.wrapper.children.length < 2) {
+                    this.wrapper.style.width = com.wrapper.clientWidth + 2 + 'px';
+                }
+                else {
+                    this.wrapper.style.width = parseInt(this.wrapper.style.width) + com.wrapper.clientWidth + 2 + 'px';
+                }
+                this.responsive();
+            }
+        };
+        /*
+        * 获取组件集合
+        * 参数：number | string | void
+        * number：按照组件集合的下标获取组件（下标由添加时决定,从0起）  |  string： 根据组件集合的键获取组件
+        * */
+        InputBox.prototype.getItem = function (item) {
+            if (!this.children || !this.children[0]) {
+                return null;
+            }
+            if (typeof item === 'number') {
+                return this.children[item];
+            }
+            for (var _i = 0, _a = this.children; _i < _a.length; _i++) {
+                var d_1 = _a[_i];
+                if (d_1.key === item) {
+                    return d_1;
+                }
+            }
+            return null;
+        };
+        /*
+        * 删除组件集合
+        * 参数：number | string
+        * number：按照组件集合的下标删除组件（下标由添加时决定,从0起）  |  string： 根据组件集合的键删除组件
+        * 返回值：返回被删除的组件，若未找到要删除的组件则返回null
+        * */
+        InputBox.prototype.delItem = function (item) {
+            if (!this.children || !this.children[0]) {
+                return null;
+            }
+            if (typeof item === 'number') {
+                var curCom = this.children[item];
+                if (curCom) {
+                    this.children[item].remove();
+                    this.children.splice(item, 1);
+                }
+                return curCom;
+            }
+            var index = 0;
+            for (var _i = 0, _a = this.children; _i < _a.length; _i++) {
+                var d_2 = _a[_i];
+                if (d_2.key === item) {
+                    var curCom = d_2;
+                    if (d_2) {
+                        this.children.splice(index, 1);
+                        d_2.remove();
+                    }
+                    return curCom;
+                }
+                index++;
+            }
+            return null;
+        };
+        Object.defineProperty(InputBox.prototype, "isShow", {
+            /*
+            * 根据窗口变化改变限制的最大宽度
+            * */
+            // private resizeHandler() {
+            //     /**/let timer = null;
+            /*d.on(window, 'resize', () => {
+                if (timer === null) {
+                    timer = setTimeout(() => {
+                        this.responsive();
+                        timer = null;
+                    }, 1000);
+                }
+            });*/
             // }
-        };
-        ElementTreeNode.prototype.inherit = function (name) {
-            var node = this.backFind(function (node) {
-                return tools.isNotEmpty(node[name]);
-            });
-            return node ? node[name] : null;
-        };
-        ElementTreeNode.prototype.destroy = function () {
-            this.each(function (node) {
-                d.remove(node._wrapper);
-                node._wrapper = null;
-                node.ajax = null;
-                node.onOpen = null;
-                node._childrenEl = null;
-                node._container = null;
-                node._textEl = null;
-                node._expandIconEl = null;
-                node._children = null;
-                node._parent = null;
-            });
-        };
-        return ElementTreeNode;
-    }(TreeNodeBase_1.TreeNodeBase));
-    exports.ElementTreeNode = ElementTreeNode;
+            set: function (flag) {
+                d.hide(this.wrapper, !flag);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return InputBox;
+    }(Component));
+    exports.InputBox = InputBox;
 });
 
-define("Menu", ["require", "exports", "ElementTreeNode"], function (require, exports, ElementTreeNode_1) {
+define("Tree", ["require", "exports", "ElementTreeNode", "CheckBox"], function (require, exports, ElementTreeNode_1, checkBox_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="Menu"/>
+    /// <amd-module name="Tree"/>
     var d = G.d;
     var tools = G.tools;
     /**
-     * 菜单组件对象
+     * 树形组件对象
      */
-    var Menu = /** @class */ (function (_super) {
-        __extends(Menu, _super);
-        function Menu(para) {
-            return _super.call(this, para) || this;
+    var Tree = /** @class */ (function (_super) {
+        __extends(Tree, _super);
+        function Tree(para) {
+            var _this = _super.call(this, para) || this;
+            // 是否禁用checkBox
+            _this._disableCheckBox = false;
+            return _this;
         }
-        Menu.prototype.init = function (para) {
+        Tree.prototype.init = function (para) {
+            var _this = this;
             _super.prototype.init.call(this, para);
+            this.textWrapper.style.paddingLeft = ((this.deep - (this.root.isVirtual ? 1 : 0)) * 20) + 'px';
+            // this.theme = para.theme;
+            this.isShowCheckBox = para.isShowCheckBox === void 0 ? this.inherit('_isShowCheckBox') : para.isShowCheckBox;
+            this.checked = para.checked === void 0 ? this.inherit('checked') : para.checked;
+            this.toggleSelect = para.toggleSelect === void 0 ? this.inherit('toggleSelect') : para.toggleSelect;
+            // 为当前树节点添加单击事件
+            d.on(this.textWrapper, 'mousedown', function (e) {
+                e.stopPropagation();
+                _this.selected = _this.toggleSelect ? !_this.selected : true;
+            });
+            // 为当前树节点添加双击事件
+            d.on(this.textWrapper, para.dblclickOpen === false ? 'mousedown' : 'dblclick', function (e) {
+                e.stopPropagation();
+                if (!_this.isLeaf) {
+                    _this.expand = !_this.expand;
+                }
+                if (_this.isLeaf || _this.expand) {
+                    _this.onOpen && _this.onOpen(_this);
+                }
+            });
+            if (para.dblclickOpen !== false) {
+                d.on(this.textWrapper, 'mousedown', '.tree-open-icon', function (e) {
+                    // debugger;
+                    e.stopPropagation();
+                    _this.expand = !_this.expand;
+                    if (_this.expand) {
+                        _this.onOpen && _this.onOpen(_this);
+                    }
+                    // return false;
+                });
+            }
             if (para.container) {
                 this.container = para.container;
-                para.width && (this.wrapper.style.width = para.width + "px");
+                (para.width) && (this.wrapper.style.width = para.width + "px");
             }
-            // debugger;
-            this.isHoverExpand = tools.isUndefined(para.isHoverExpand) ? this.inherit('isHoverExpand') : para.isHoverExpand;
-            this.isOutline = tools.isUndefined(para.isOutline) ? this.inherit('_isOutline') : para.isOutline;
-            this.isHorizontal = tools.isUndefined(para.isHorizontal) ? this.inherit('_isHorizontal') : para.isHorizontal;
-            this.eventInit();
         };
-        Menu.prototype.eventInit = function () {
-            var _this = this;
-            if (this.isVirtual) {
-                return;
-            }
-            if (this.isHoverExpand) {
-                d.on(this.wrapper, 'mouseenter', function (event) {
-                    event.preventDefault();
-                    _this.expand = true;
-                });
-                d.on(this.wrapper, 'mouseleave', function (event) {
-                    event.stopPropagation();
-                    if (_this.parent) {
-                        _this.expand = false;
+        Object.defineProperty(Tree.prototype, "isShowCheckBox", {
+            get: function () {
+                return this._isShowCheckBox;
+            },
+            set: function (isShow) {
+                var _this = this;
+                // debugger;
+                if (isShow === this._isShowCheckBox) {
+                    return;
+                }
+                if (isShow) {
+                    if (!this._checkBox) {
+                        var container = document.createElement('span');
+                        container.classList.add('tree-check-box');
+                        d.after(this.expandIconEl, container);
+                        this._checkBox = new checkBox_1.CheckBox({
+                            container: container,
+                            status: this._checkBoxStatus,
+                            disabled: this._disableCheckBox,
+                            size: 16,
+                            onSet: function (isChecked) {
+                                // debugger;
+                                _this.checked = isChecked;
+                            }
+                        });
                     }
-                });
-                d.on(this.textWrapper, 'click', function (event) {
-                    event.stopPropagation();
-                    // this.expand = !this.expand;
-                    if (_this.isLeaf && !_this.isOnTop) {
-                        _this.parent.expand = !_this.parent.expand;
-                    }
-                    _this.selected = true;
-                    _this.onOpen && _this.onOpen(_this);
+                }
+                this._checkBox && this._checkBox.wrapper.classList.toggle('hide', !isShow);
+                this._isShowCheckBox = isShow;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 改变checkBox的状态
+         * @param {number} status - 0未选中 1选中 2半选中
+         * @param {string} relateType - 'parent' | 'children' 向上关联还是向下关联
+         */
+        Tree.prototype.checkBoxStatus = function (status, relateType) {
+            if (this._checkBox && this._checkBox.status !== status) {
+                this._checkBox.status = status;
+            }
+            this._checkBoxStatus = status;
+            // 改变是否选中需同时改变子节点
+            if (relateType === 'children' && (status === 0 || status === 1)) {
+                this.children && this.children.forEach(function (tree) {
+                    tree.checkBoxStatus(status, 'children');
                 });
             }
-            else {
-                d.on(this.textWrapper, 'click', function (event) {
-                    // console.log(d.data(this.wrapper));
-                    event.stopPropagation();
-                    _this.expand = !_this.expand;
-                    //   (!this.children) && (this.selected = !this.selected);
-                    _this.selected = true;
-                    _this.onOpen && _this.onOpen(_this);
-                });
-            }
-        };
-        Object.defineProperty(Menu.prototype, "isOutline", {
-            get: function () {
-                return this._isOutline;
-            },
-            set: function (flag) {
-                if (flag !== this._isOutline) {
-                    this.parent && this.wrapper.classList.toggle('menu-node-outline', flag);
-                    this._isOutline = !!flag;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Menu.prototype, "isHorizontal", {
-            get: function () {
-                return this._isHorizontal;
-            },
-            set: function (flag) {
-                if (flag !== this._isHorizontal) {
-                    this.wrapper.classList.toggle('menu-node-horizontal', flag);
-                    this._isHorizontal = !!flag;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Menu.prototype, "expandIconEl", {
-            get: function () {
-                if (!this._expandIconEl) {
-                    var pre = this.inherit('_expandIconPre'), p = tools.isNotEmpty(pre) ? pre : 'iconfont';
-                    this._expandIconEl = d.create("<i class=\"" + p + " " + this.getCurrentExpandIcon() + " tree-open-icon\"></i>");
-                    d.prepend(this.textWrapper, this._expandIconEl);
-                }
-                return this._expandIconEl;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        // 打开的按钮
-        Menu.prototype.expandIcon = function () {
-            var iconArr = this.inherit('_expandIconArr');
-            iconArr = tools.isNotEmpty(iconArr) ? iconArr : ['icon-arrow-up'];
-            return this.isHorizontal ? ['icon-arrow-up', 'icon-arrow-down'] : iconArr;
-        };
-        Menu.prototype.childrenAdd = function (tnode) {
-            var _this = this;
-            // debugger;
-            var tnodes = _super.prototype.childrenAdd.call(this, tnode);
-            tnodes.forEach(function (node) {
-                node.each(function (menu) {
-                    if (menu.isOutline) {
-                        menu.textWrapper.style.position = 'relative';
-                        var topDeep = 0;
-                        var leftDeep = 0;
-                        if (menu.deep - 2 > 0) {
-                            leftDeep = menu.deep - 2;
-                            topDeep = menu.deep - 2;
+            else if (relateType === 'parent') {
+                // debugger;
+                var parent_1 = this.parent, sibs = parent_1 ? parent_1.children : null, sibsLen_1 = Array.isArray(sibs) ? sibs.length : 0;
+                if (sibsLen_1) {
+                    var checkedLen_1 = 0, indeterminateLen_1 = 0;
+                    // debugger;
+                    sibs.forEach(function (tree) {
+                        if (tree._checkBoxStatus === 1) {
+                            checkedLen_1++;
                         }
-                        menu.textWrapper.style.left = leftDeep * 135 + 'px';
-                        menu.textWrapper.style.top = -topDeep * 33 + 'px';
-                    }
-                    else {
-                        if (!menu.isHorizontal) {
-                            menu.textWrapper.style.paddingLeft = (menu.deep * 12) + 'px'; //如果子菜单模式为纵向  则需要计算间隔
+                        else if (tree._checkBoxStatus === 2) {
+                            indeterminateLen_1++;
+                        }
+                    });
+                    // let status = indeterminateLen > 0 ? 2 : (checkedLen === sibsLen ? 1 : checkedLen > sibsLen);
+                    var status_1 = (function () {
+                        if (indeterminateLen_1 > 0) {
+                            return 2;
+                        }
+                        else if (checkedLen_1 === sibsLen_1) {
+                            return 1;
+                        }
+                        else if (checkedLen_1 === 0) {
+                            return 0;
+                        }
+                        else {
+                            return 2;
+                        }
+                    })();
+                    parent_1.checkBoxStatus(status_1, 'parent');
+                }
+            }
+        };
+        Object.defineProperty(Tree.prototype, "checked", {
+            get: function () {
+                return this._checkBoxStatus === 1;
+            },
+            set: function (isChecked) {
+                var status = isChecked ? 1 : 0;
+                if (this._checkBoxStatus === status) {
+                    return;
+                }
+                // 先关联子元素checkbox状态
+                this.checkBoxStatus(status, 'children');
+                // 再关联父元素checkbox状态
+                this.checkBoxStatus(status, 'parent');
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Tree.prototype, "disableCheckBox", {
+            get: function () {
+                return this._disableCheckBox;
+            },
+            set: function (disabled) {
+                this._checkBox && (this._checkBox.disabled = disabled);
+                this._disableCheckBox = disabled;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Tree.prototype.childrenAdd = function (para) {
+            var _this = this;
+            var paras = tools.toArray(para);
+            // isAllTree = false;
+            if (this.checked && tools.isNotEmpty(para)) {
+                paras.forEach(function (p) {
+                    if (!(p instanceof Tree)) {
+                        p = p || {};
+                        if (p.checked === undefined) {
+                            p.checked = true;
                         }
                     }
-                    node.container = _this.childrenEl;
                 });
+            }
+            var nodes = _super.prototype.childrenAdd.call(this, para);
+            Array.isArray(nodes) && nodes.forEach(function (node) {
+                node.container = _this.childrenEl;
             });
-            return tnodes;
+            // let isFinal = isAllTree || (nodes.length < paras.length)
+            // 改变父元素checkBox状态
+            // debugger;
+            // if(this.checked) {
+            //     let aNode = nodes[0];
+            //     aNode && aNode._checkBox && aNode.checkBoxStatus(aNode._checkBox.status, 'parent');
+            // }
+            return nodes;
         };
-        Menu.prototype.wrapperCreate = function () {
+        /**
+         * 设置tree主题 upDown(上下箭头) addMinus(加减号)
+         * 默认值 upDown
+         */
+        // private _theme : string;
+        // set theme(theme : string){
+        //     // this._theme = tools.isEmpty(theme) ? 'upDown' : theme;
+        //     // this._theme === 'upDown' ?
+        //     //     (this.expandIcon = ['icon-zhankaishousuo-zhankai','icon-zhankaishousuo-shousuo']) :
+        //     //     (this.expandIcon = ['icon-jianhao1','icon-jiahao1']);
+        //     Tree.treeUtil.addOpenIcon(this,this.expandIcon[0],this.expandIcon[1]);
+        // }
+        // get theme(){
+        //     return this._theme;
+        // }
+        Tree.prototype.wrapperCreate = function () {
             var wrapper = _super.prototype.wrapperCreate.call(this);
-            wrapper.classList.add('menu-node');
-            d.data(wrapper, this);
+            wrapper.classList.add('tree-node');
             return wrapper;
         };
-        Menu.prototype.setPosition = function (x, y) {
-            this.wrapper.style.top = y + 'px';
-            this.wrapper.style.left = x + 'px';
+        Tree.prototype.getCheckedNodes = function () {
+            return this.find(function (node) { return node.checked; });
         };
-        return Menu;
+        return Tree;
     }(ElementTreeNode_1.ElementTreeNode));
-    exports.Menu = Menu;
+    exports.Tree = Tree;
 });
 
 define("Pagination", ["require", "exports", "Spinner", "Button"], function (require, exports, spinner_1, Button_1) {
@@ -24160,225 +23987,638 @@ define("Pagination", ["require", "exports", "Spinner", "Button"], function (requ
     exports.Paging = Paging;
 });
 
-define("Tree", ["require", "exports", "ElementTreeNode", "CheckBox"], function (require, exports, ElementTreeNode_1, checkBox_1) {
+/// <amd-module name="ElementTreeNode"/>
+define("ElementTreeNode", ["require", "exports", "TreeNodeBase"], function (require, exports, TreeNodeBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="Tree"/>
+    var d = G.d;
+    var tools = G.tools;
+    var ElementTreeNode = /** @class */ (function (_super) {
+        __extends(ElementTreeNode, _super);
+        function ElementTreeNode() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._onSelect = null;
+            _this._onExpand = null;
+            return _this;
+        }
+        ElementTreeNode.prototype.init = function (para) {
+            _super.prototype.init.call(this, para);
+            this.expandIconArr = para.expandIconArr;
+            this.expandIconPre = para.expandIconPre;
+            this.isVirtualSet(para.isVirtual === undefined ? !this.parent : para.isVirtual);
+            this.isLeaf = para.isLeaf === undefined ? tools.isEmpty(para.children) : para.isLeaf; // 默认判断是否有子节点
+            this.ajax = para.ajax;
+            this.expand = para.expand; //如果该节点为虚拟节点,则默认将该节点展开
+            // debugger;
+            this.text = para.text;
+            this.isAccordion = para.isAccordion;
+            this.multiSelect = para.multiSelect === undefined ? this.inherit('_multiSelect') : para.multiSelect;
+            this.selected = para.selected;
+            this.icon = para.icon;
+            this.disabled = para.disabled;
+        };
+        Object.defineProperty(ElementTreeNode.prototype, "expandIconArr", {
+            get: function () {
+                return this._expandIconArr;
+            },
+            set: function (arr) {
+                this._expandIconArr = arr;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "expandIconPre", {
+            get: function () {
+                return this._expandIconPre;
+            },
+            set: function (pre) {
+                this._expandIconPre = pre;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "ajax", {
+            get: function () {
+                return this.inherit('_ajax');
+            },
+            set: function (fun) {
+                this._ajax = fun;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "textWrapper", {
+            get: function () {
+                return this.textEl && this.textEl.parentElement;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "expandIconEl", {
+            get: function () {
+                if (!this._expandIconEl) {
+                    var pre = tools.isNotEmpty(this.expandIconPre) ? this.expandIconPre : 'iconfont';
+                    this._expandIconEl = d.create("<i class=\"" + pre + " " + this.getCurrentExpandIcon() + " tree-open-icon\"></i>");
+                    d.prepend(this.textWrapper, this._expandIconEl);
+                }
+                return this._expandIconEl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ElementTreeNode.prototype.expandIconElShow = function () {
+            this.expandIconEl.classList.remove('invisible');
+        };
+        ElementTreeNode.prototype.expandIconElHide = function () {
+            this.expandIconEl.classList.add('invisible');
+        };
+        Object.defineProperty(ElementTreeNode.prototype, "isLeaf", {
+            get: function () {
+                return this._isLeaf || false;
+            },
+            set: function (flag) {
+                // if(flag === undefined) {
+                //     flag = tools.isEmpty(this.childrenGet());
+                // }
+                flag = !!flag;
+                if (this._isLeaf === flag) {
+                    return;
+                }
+                this._isLeaf = flag;
+                if (flag) {
+                    this.expandIconElHide();
+                }
+                else {
+                    this.expandIconElShow();
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "childrenEl", {
+            get: function () {
+                if (!this._childrenEl) {
+                    this._childrenEl = d.query('[data-role="children"]', this.wrapper);
+                }
+                return this._childrenEl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "textEl", {
+            get: function () {
+                if (!this._textEl) {
+                    this._textEl = d.query('[data-role="text"]', this.wrapper);
+                }
+                return this._textEl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "iconEl", {
+            get: function () {
+                if (!this._iconEl) {
+                    this._iconEl = d.create('<i class="tree-icon" data-role="icon"></i>');
+                    d.before(this.textEl, this._iconEl);
+                    // = d.query('[data-role="icon"]', this.wrapper);
+                }
+                return this._iconEl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "isVirtual", {
+            get: function () {
+                // debugger;
+                // if (this._isVirtual === undefined) {
+                //     this.isVirtualSet(!this.parentGet());
+                // }
+                return this._isVirtual;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ElementTreeNode.prototype.isVirtualSet = function (flag) {
+            this.wrapper.classList.toggle('tree-virtual', flag);
+            this._isVirtual = flag;
+        };
+        Object.defineProperty(ElementTreeNode.prototype, "container", {
+            get: function () {
+                return this._container;
+            },
+            set: function (el) {
+                this._container = el;
+                d.append(el, this.wrapper);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "disabled", {
+            get: function () {
+                return this._disabled;
+            },
+            set: function (disabled) {
+                this._disabled = !!disabled;
+                this.wrapper.classList.toggle('disabled', this._disabled);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ElementTreeNode.prototype.childrenAdd = function (para) {
+            tools.toArray(para).forEach(function (p) {
+                if (!(p instanceof ElementTreeNode) && tools.isNotEmpty(p)) {
+                    p.isVirtual = false;
+                }
+            });
+            return _super.prototype.childrenAdd.call(this, para);
+        };
+        ElementTreeNode.prototype.childrenRemove = function (tnode) {
+            _super.prototype.childrenRemove.call(this, tnode);
+            tools.toArray(tnode).forEach(function (node) {
+                node.destroy();
+            });
+        };
+        Object.defineProperty(ElementTreeNode.prototype, "selected", {
+            get: function () {
+                return this._selected;
+            },
+            set: function (selected) {
+                if (selected === this._selected) {
+                    return;
+                }
+                if (!this.multiSelect && selected) {
+                    var selectedNodes = this.getSelectedNodes(true);
+                    Array.isArray(selectedNodes) && selectedNodes.forEach(function (node) {
+                        node.wrapper.classList.remove('selected');
+                        node._selected = false;
+                    });
+                }
+                this._selected = !!selected;
+                this.wrapper.classList.toggle('selected', this._selected);
+                this.onSelect && this.onSelect(this);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "onSelect", {
+            get: function () {
+                return this.inherit('_onSelect');
+            },
+            set: function (handler) {
+                this._onSelect = handler;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ElementTreeNode.prototype.expandIcon = function () {
+            var iconArr = tools.isNotEmpty(this.expandIconArr) ? this.expandIconArr : ['icon-zhankaishousuo-shousuo', 'icon-zhankaishousuo-zhankai'];
+            return iconArr;
+        };
+        Object.defineProperty(ElementTreeNode.prototype, "expand", {
+            get: function () {
+                return this._expand;
+            },
+            set: function (expand) {
+                var _this = this;
+                // console.trace();
+                if (this.isLeaf || expand == this._expand) {
+                    return;
+                }
+                //如果顶部菜单与子菜单的模式为纵向则需要修改当前打开按钮的样式 此处用expandIcon数量判断
+                var expandIcon = this.expandIcon();
+                if (expandIcon.length !== 1 && this.expandIconEl) {
+                    this.expandIconEl.classList.add(expand ? expandIcon[1] : expandIcon[0]);
+                    this.expandIconEl.classList.remove(expand ? expandIcon[0] : expandIcon[1]);
+                }
+                //如果为手风琴并且为打开状态，关闭同级节点,
+                if (this.parent && this.parent.isAccordion && expand) {
+                    var sibs = this.siblings;
+                    sibs && sibs.forEach(function (node) {
+                        node.expand && (node.expand = false);
+                    });
+                }
+                this._expand = expand;
+                setTimeout(function () {
+                    // 当满足树的状态为打开 并且没有disabled类是动态加载数据，判断是否包含disabled目的是为了防止在加载过程中再次触发
+                    var isAjax = _this.ajax && !_this.disabled && expand && tools.isEmpty(_this.children);
+                    Promise.resolve((function () {
+                        if (isAjax) {
+                            _this.childrenEl.classList.add('hide');
+                            return _this.doAjax().then(function () {
+                                // 动画效果,所以延时
+                                setTimeout(function () {
+                                    _this.childrenEl.classList.remove('hide');
+                                }, 50);
+                            });
+                        }
+                    })()).then(function () {
+                        _this.childrenEl.classList.toggle('hide', !_this._expand);
+                        _this.onExpand && _this.onExpand(_this, _this._expand);
+                    });
+                }, 10);
+                // this.childrenEl.classList.toggle('hide', !this._expand);
+                //
+                // setTimeout(() => {
+                //     //当满足树的状态为打开 并且没有disabled类是动态加载数据，判断是否包含disabled目的是为了防止在加载过程中再次触发
+                //     if (!this.disabled && expand && tools.isEmpty(this.children) && this.ajax) {
+                //         this.childrenEl.classList.add('hide');
+                //         this.doAjax().then(() => {
+                //
+                //             // 动画效果,所以延时
+                //             setTimeout(() => {
+                //                 this.childrenEl.classList.remove('hide');
+                //             }, 50);
+                //         }).catch(() => {
+                //             this.expand = false;
+                //         });
+                //     }
+                // }, 10);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "onExpand", {
+            get: function () {
+                return this.inherit('_onExpand');
+            },
+            set: function (handler) {
+                this._onExpand = handler;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "text", {
+            get: function () {
+                return this._text;
+            },
+            set: function (text) {
+                this._text = tools.str.toEmpty(text);
+                this.textEl.innerHTML = this._text;
+                this.textWrapper.title = this._text;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "icon", {
+            get: function () {
+                return this._icon;
+            },
+            set: function (icon) {
+                var _a, _b;
+                if (icon) {
+                    if (typeof icon === 'string') {
+                        (_a = this.iconEl.classList).add.apply(_a, icon.split(' '));
+                        // !this._icon && this.iconEl.classList.add('tree-icon');
+                        this._icon = icon;
+                    }
+                }
+                else {
+                    this._icon && (_b = this.iconEl.classList).remove.apply(_b, this._icon.split(' '));
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "isAccordion", {
+            get: function () {
+                return this._isAccordion;
+            },
+            set: function (isAccordion) {
+                this._isAccordion = !!isAccordion;
+                if (this._isAccordion) {
+                    var children = this.children, firstExpand_1 = false;
+                    Array.isArray(children) && children.forEach(function (child) {
+                        if (child.expand) {
+                            if (!firstExpand_1) {
+                                firstExpand_1 = true;
+                            }
+                            else {
+                                child.expand = false;
+                            }
+                        }
+                    });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "multiSelect", {
+            get: function () {
+                return this._multiSelect;
+            },
+            set: function (multi) {
+                this._multiSelect = !!multi;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ElementTreeNode.prototype, "onOpen", {
+            get: function () {
+                return this.inherit('_onOpen');
+            },
+            set: function (cb) {
+                this._onOpen = cb;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ElementTreeNode.prototype.doAjax = function () {
+            var _this = this;
+            var _a;
+            this.disabled = true;
+            var openIcon = this.expandIconEl, spinnerIconName = ['tree-rotate-icon', 'icon-shuaxin'], currentExpandIcon = this.getCurrentExpandIcon();
+            openIcon && openIcon.classList.remove(currentExpandIcon);
+            openIcon && (_a = openIcon.classList).add.apply(_a, spinnerIconName);
+            var callback = function (para) {
+                var _a;
+                // debugger;
+                if (tools.isNotEmpty(para)) {
+                    _this.childrenSet(para);
+                }
+                if (tools.isNotEmpty(_this.children)) {
+                    openIcon && openIcon.classList.add(currentExpandIcon);
+                }
+                openIcon && (_a = openIcon.classList).remove.apply(_a, spinnerIconName);
+                _this.disabled = false;
+            };
+            return new Promise(function (resolve, reject) {
+                if (_this.ajax) {
+                    _this.ajax(_this).then(function (para) {
+                        // debugger;
+                        callback(para);
+                        resolve();
+                    }).catch(function () {
+                        callback(null);
+                        reject();
+                    });
+                }
+                else {
+                    callback(null);
+                    reject();
+                }
+            });
+        };
+        ElementTreeNode.prototype.refresh = function () {
+            if (!this.ajax && this.isLeaf) {
+                return;
+            }
+            this.expand = false;
+            this.childrenRemove(this.children);
+            this.expand = true;
+        };
+        Object.defineProperty(ElementTreeNode.prototype, "wrapper", {
+            get: function () {
+                if (!this._wrapper) {
+                    this._wrapper = this.wrapperCreate();
+                }
+                return this._wrapper;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ElementTreeNode.prototype.wrapperCreate = function () {
+            return d.create("<div class=\"element-tree-node\">\n                <div class=\"tree-text-wrapper\">\n                    <span data-role=\"text\" class=\"tree-text\"></span>\n                </div>\n                <div data-role=\"children\" class=\"tree-child-wrapper hide\"></div>\n            </div>");
+        };
+        ElementTreeNode.prototype.getSelectedNodes = function (fromRoot) {
+            if (fromRoot === void 0) { fromRoot = false; }
+            var root = fromRoot ? this.root : this;
+            return root.find(function (node) {
+                return node._selected;
+            });
+        };
+        Object.defineProperty(ElementTreeNode.prototype, "isOnTop", {
+            get: function () {
+                var parent = this.parent;
+                return (!!parent && parent.isVirtual) || !parent;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ElementTreeNode.prototype.getCurrentExpandIcon = function () {
+            // if(this.isLeaf){
+            //     return '';
+            // } else {
+            var expandIcon = this.expandIcon();
+            if (expandIcon[1]) {
+                return expandIcon[this.expand ? 1 : 0];
+            }
+            else {
+                return expandIcon[0];
+            }
+            // }
+        };
+        ElementTreeNode.prototype.inherit = function (name) {
+            var node = this.backFind(function (node) {
+                return tools.isNotEmpty(node[name]);
+            });
+            return node ? node[name] : null;
+        };
+        ElementTreeNode.prototype.destroy = function () {
+            this.each(function (node) {
+                d.remove(node._wrapper);
+                node._wrapper = null;
+                node.ajax = null;
+                node.onOpen = null;
+                node._childrenEl = null;
+                node._container = null;
+                node._textEl = null;
+                node._expandIconEl = null;
+                node._children = null;
+                node._parent = null;
+            });
+        };
+        return ElementTreeNode;
+    }(TreeNodeBase_1.TreeNodeBase));
+    exports.ElementTreeNode = ElementTreeNode;
+});
+
+define("Menu", ["require", "exports", "ElementTreeNode"], function (require, exports, ElementTreeNode_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="Menu"/>
     var d = G.d;
     var tools = G.tools;
     /**
-     * 树形组件对象
+     * 菜单组件对象
      */
-    var Tree = /** @class */ (function (_super) {
-        __extends(Tree, _super);
-        function Tree(para) {
-            var _this = _super.call(this, para) || this;
-            // 是否禁用checkBox
-            _this._disableCheckBox = false;
-            return _this;
+    var Menu = /** @class */ (function (_super) {
+        __extends(Menu, _super);
+        function Menu(para) {
+            return _super.call(this, para) || this;
         }
-        Tree.prototype.init = function (para) {
-            var _this = this;
+        Menu.prototype.init = function (para) {
             _super.prototype.init.call(this, para);
-            this.textWrapper.style.paddingLeft = ((this.deep - (this.root.isVirtual ? 1 : 0)) * 20) + 'px';
-            // this.theme = para.theme;
-            this.isShowCheckBox = para.isShowCheckBox === void 0 ? this.inherit('_isShowCheckBox') : para.isShowCheckBox;
-            this.checked = para.checked === void 0 ? this.inherit('checked') : para.checked;
-            this.toggleSelect = para.toggleSelect === void 0 ? this.inherit('toggleSelect') : para.toggleSelect;
-            // 为当前树节点添加单击事件
-            d.on(this.textWrapper, 'mousedown', function (e) {
-                e.stopPropagation();
-                _this.selected = _this.toggleSelect ? !_this.selected : true;
-            });
-            // 为当前树节点添加双击事件
-            d.on(this.textWrapper, para.dblclickOpen === false ? 'mousedown' : 'dblclick', function (e) {
-                e.stopPropagation();
-                if (!_this.isLeaf) {
-                    _this.expand = !_this.expand;
-                }
-                if (_this.isLeaf || _this.expand) {
-                    _this.onOpen && _this.onOpen(_this);
-                }
-            });
-            if (para.dblclickOpen !== false) {
-                d.on(this.textWrapper, 'mousedown', '.tree-open-icon', function (e) {
-                    // debugger;
-                    e.stopPropagation();
-                    _this.expand = !_this.expand;
-                    if (_this.expand) {
-                        _this.onOpen && _this.onOpen(_this);
-                    }
-                    // return false;
-                });
-            }
             if (para.container) {
                 this.container = para.container;
-                (para.width) && (this.wrapper.style.width = para.width + "px");
+                para.width && (this.wrapper.style.width = para.width + "px");
             }
-        };
-        Object.defineProperty(Tree.prototype, "isShowCheckBox", {
-            get: function () {
-                return this._isShowCheckBox;
-            },
-            set: function (isShow) {
-                var _this = this;
-                // debugger;
-                if (isShow === this._isShowCheckBox) {
-                    return;
-                }
-                if (isShow) {
-                    if (!this._checkBox) {
-                        var container = document.createElement('span');
-                        container.classList.add('tree-check-box');
-                        d.after(this.expandIconEl, container);
-                        this._checkBox = new checkBox_1.CheckBox({
-                            container: container,
-                            status: this._checkBoxStatus,
-                            disabled: this._disableCheckBox,
-                            size: 16,
-                            onSet: function (isChecked) {
-                                // debugger;
-                                _this.checked = isChecked;
-                            }
-                        });
-                    }
-                }
-                this._checkBox && this._checkBox.wrapper.classList.toggle('hide', !isShow);
-                this._isShowCheckBox = isShow;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * 改变checkBox的状态
-         * @param {number} status - 0未选中 1选中 2半选中
-         * @param {string} relateType - 'parent' | 'children' 向上关联还是向下关联
-         */
-        Tree.prototype.checkBoxStatus = function (status, relateType) {
-            if (this._checkBox && this._checkBox.status !== status) {
-                this._checkBox.status = status;
-            }
-            this._checkBoxStatus = status;
-            // 改变是否选中需同时改变子节点
-            if (relateType === 'children' && (status === 0 || status === 1)) {
-                this.children && this.children.forEach(function (tree) {
-                    tree.checkBoxStatus(status, 'children');
-                });
-            }
-            else if (relateType === 'parent') {
-                // debugger;
-                var parent_1 = this.parent, sibs = parent_1 ? parent_1.children : null, sibsLen_1 = Array.isArray(sibs) ? sibs.length : 0;
-                if (sibsLen_1) {
-                    var checkedLen_1 = 0, indeterminateLen_1 = 0;
-                    // debugger;
-                    sibs.forEach(function (tree) {
-                        if (tree._checkBoxStatus === 1) {
-                            checkedLen_1++;
-                        }
-                        else if (tree._checkBoxStatus === 2) {
-                            indeterminateLen_1++;
-                        }
-                    });
-                    // let status = indeterminateLen > 0 ? 2 : (checkedLen === sibsLen ? 1 : checkedLen > sibsLen);
-                    var status_1 = (function () {
-                        if (indeterminateLen_1 > 0) {
-                            return 2;
-                        }
-                        else if (checkedLen_1 === sibsLen_1) {
-                            return 1;
-                        }
-                        else if (checkedLen_1 === 0) {
-                            return 0;
-                        }
-                        else {
-                            return 2;
-                        }
-                    })();
-                    parent_1.checkBoxStatus(status_1, 'parent');
-                }
-            }
-        };
-        Object.defineProperty(Tree.prototype, "checked", {
-            get: function () {
-                return this._checkBoxStatus === 1;
-            },
-            set: function (isChecked) {
-                var status = isChecked ? 1 : 0;
-                if (this._checkBoxStatus === status) {
-                    return;
-                }
-                // 先关联子元素checkbox状态
-                this.checkBoxStatus(status, 'children');
-                // 再关联父元素checkbox状态
-                this.checkBoxStatus(status, 'parent');
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Tree.prototype, "disableCheckBox", {
-            get: function () {
-                return this._disableCheckBox;
-            },
-            set: function (disabled) {
-                this._checkBox && (this._checkBox.disabled = disabled);
-                this._disableCheckBox = disabled;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Tree.prototype.childrenAdd = function (para) {
-            var _this = this;
-            var paras = tools.toArray(para);
-            // isAllTree = false;
-            if (this.checked && tools.isNotEmpty(para)) {
-                paras.forEach(function (p) {
-                    if (!(p instanceof Tree)) {
-                        p = p || {};
-                        if (p.checked === undefined) {
-                            p.checked = true;
-                        }
-                    }
-                });
-            }
-            var nodes = _super.prototype.childrenAdd.call(this, para);
-            Array.isArray(nodes) && nodes.forEach(function (node) {
-                node.container = _this.childrenEl;
-            });
-            // let isFinal = isAllTree || (nodes.length < paras.length)
-            // 改变父元素checkBox状态
             // debugger;
-            // if(this.checked) {
-            //     let aNode = nodes[0];
-            //     aNode && aNode._checkBox && aNode.checkBoxStatus(aNode._checkBox.status, 'parent');
-            // }
-            return nodes;
+            this.isHoverExpand = tools.isUndefined(para.isHoverExpand) ? this.inherit('isHoverExpand') : para.isHoverExpand;
+            this.isOutline = tools.isUndefined(para.isOutline) ? this.inherit('_isOutline') : para.isOutline;
+            this.isHorizontal = tools.isUndefined(para.isHorizontal) ? this.inherit('_isHorizontal') : para.isHorizontal;
+            this.eventInit();
         };
-        /**
-         * 设置tree主题 upDown(上下箭头) addMinus(加减号)
-         * 默认值 upDown
-         */
-        // private _theme : string;
-        // set theme(theme : string){
-        //     // this._theme = tools.isEmpty(theme) ? 'upDown' : theme;
-        //     // this._theme === 'upDown' ?
-        //     //     (this.expandIcon = ['icon-zhankaishousuo-zhankai','icon-zhankaishousuo-shousuo']) :
-        //     //     (this.expandIcon = ['icon-jianhao1','icon-jiahao1']);
-        //     Tree.treeUtil.addOpenIcon(this,this.expandIcon[0],this.expandIcon[1]);
-        // }
-        // get theme(){
-        //     return this._theme;
-        // }
-        Tree.prototype.wrapperCreate = function () {
+        Menu.prototype.eventInit = function () {
+            var _this = this;
+            if (this.isVirtual) {
+                return;
+            }
+            if (this.isHoverExpand) {
+                d.on(this.wrapper, 'mouseenter', function (event) {
+                    event.preventDefault();
+                    _this.expand = true;
+                });
+                d.on(this.wrapper, 'mouseleave', function (event) {
+                    event.stopPropagation();
+                    if (_this.parent) {
+                        _this.expand = false;
+                    }
+                });
+                d.on(this.textWrapper, 'click', function (event) {
+                    event.stopPropagation();
+                    // this.expand = !this.expand;
+                    if (_this.isLeaf && !_this.isOnTop) {
+                        _this.parent.expand = !_this.parent.expand;
+                    }
+                    _this.selected = true;
+                    _this.onOpen && _this.onOpen(_this);
+                });
+            }
+            else {
+                d.on(this.textWrapper, 'click', function (event) {
+                    // console.log(d.data(this.wrapper));
+                    event.stopPropagation();
+                    _this.expand = !_this.expand;
+                    //   (!this.children) && (this.selected = !this.selected);
+                    _this.selected = true;
+                    _this.onOpen && _this.onOpen(_this);
+                });
+            }
+        };
+        Object.defineProperty(Menu.prototype, "isOutline", {
+            get: function () {
+                return this._isOutline;
+            },
+            set: function (flag) {
+                if (flag !== this._isOutline) {
+                    this.parent && this.wrapper.classList.toggle('menu-node-outline', flag);
+                    this._isOutline = !!flag;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Menu.prototype, "isHorizontal", {
+            get: function () {
+                return this._isHorizontal;
+            },
+            set: function (flag) {
+                if (flag !== this._isHorizontal) {
+                    this.wrapper.classList.toggle('menu-node-horizontal', flag);
+                    this._isHorizontal = !!flag;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Menu.prototype, "expandIconEl", {
+            get: function () {
+                if (!this._expandIconEl) {
+                    var pre = this.inherit('_expandIconPre'), p = tools.isNotEmpty(pre) ? pre : 'iconfont';
+                    this._expandIconEl = d.create("<i class=\"" + p + " " + this.getCurrentExpandIcon() + " tree-open-icon\"></i>");
+                    d.prepend(this.textWrapper, this._expandIconEl);
+                }
+                return this._expandIconEl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // 打开的按钮
+        Menu.prototype.expandIcon = function () {
+            var iconArr = this.inherit('_expandIconArr');
+            iconArr = tools.isNotEmpty(iconArr) ? iconArr : ['icon-arrow-up'];
+            return this.isHorizontal ? ['icon-arrow-up', 'icon-arrow-down'] : iconArr;
+        };
+        Menu.prototype.childrenAdd = function (tnode) {
+            var _this = this;
+            // debugger;
+            var tnodes = _super.prototype.childrenAdd.call(this, tnode);
+            tnodes.forEach(function (node) {
+                node.each(function (menu) {
+                    if (menu.isOutline) {
+                        menu.textWrapper.style.position = 'relative';
+                        var topDeep = 0;
+                        var leftDeep = 0;
+                        if (menu.deep - 2 > 0) {
+                            leftDeep = menu.deep - 2;
+                            topDeep = menu.deep - 2;
+                        }
+                        menu.textWrapper.style.left = leftDeep * 135 + 'px';
+                        menu.textWrapper.style.top = -topDeep * 33 + 'px';
+                    }
+                    else {
+                        if (!menu.isHorizontal) {
+                            menu.textWrapper.style.paddingLeft = (menu.deep * 12) + 'px'; //如果子菜单模式为纵向  则需要计算间隔
+                        }
+                    }
+                    node.container = _this.childrenEl;
+                });
+            });
+            return tnodes;
+        };
+        Menu.prototype.wrapperCreate = function () {
             var wrapper = _super.prototype.wrapperCreate.call(this);
-            wrapper.classList.add('tree-node');
+            wrapper.classList.add('menu-node');
+            d.data(wrapper, this);
             return wrapper;
         };
-        Tree.prototype.getCheckedNodes = function () {
-            return this.find(function (node) { return node.checked; });
+        Menu.prototype.setPosition = function (x, y) {
+            this.wrapper.style.top = y + 'px';
+            this.wrapper.style.left = x + 'px';
         };
-        return Tree;
+        return Menu;
     }(ElementTreeNode_1.ElementTreeNode));
-    exports.Tree = Tree;
+    exports.Menu = Menu;
 });
 
 define("TableColumn", ["require", "exports", "TableBase"], function (require, exports, TableBase_1) {
@@ -27400,6 +27640,35 @@ define("TableCell", ["require", "exports", "TextInput", "TableBase", "FormCom", 
     }
 });
 
+define("UserSelect", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="UserSelect"/>
+    var d = G.d;
+    var UserSelect = /** @class */ (function () {
+        function UserSelect(para) {
+            this.para = para;
+            para.target.classList.add('user-select-text');
+            para.className && para.target.classList.add(para.className);
+            this.handle = function (e) {
+                document.body.classList.add('user-select-none');
+                d.once(document, 'mouseup', function () {
+                    document.body.classList.remove('user-select-none');
+                });
+            };
+            this.on();
+        }
+        UserSelect.prototype.on = function () {
+            d.on(this.para.target, 'mousedown', this.handle);
+        };
+        UserSelect.prototype.off = function () {
+            d.off(this.para.target, 'mousedown', this.handle);
+        };
+        return UserSelect;
+    }());
+    exports.UserSelect = UserSelect;
+});
+
 ///<amd-module name="SwipeOut"/>
 define("SwipeOut", ["require", "exports", "Button"], function (require, exports, Button_1) {
     "use strict";
@@ -27972,33 +28241,66 @@ define("SwipeOut", ["require", "exports", "Button"], function (require, exports,
 //     }
 // }
 
-define("UserSelect", ["require", "exports"], function (require, exports) {
+///<amd-module name=""CalendarDate"/>
+define("\"CalendarDate", ["require", "exports", "ContainCom", "Datetime"], function (require, exports, ContainCom_1, datetime_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="UserSelect"/>
-    var d = G.d;
-    var UserSelect = /** @class */ (function () {
-        function UserSelect(para) {
-            this.para = para;
-            para.target.classList.add('user-select-text');
-            para.className && para.target.classList.add(para.className);
-            this.handle = function (e) {
-                document.body.classList.add('user-select-none');
-                d.once(document, 'mouseup', function () {
-                    document.body.classList.remove('user-select-none');
-                });
-            };
-            this.on();
+    var tools = G.tools;
+    // 用于创建多个时间选择器
+    var CalendarDate = /** @class */ (function (_super) {
+        __extends(CalendarDate, _super);
+        function CalendarDate(para) {
+            var _this = _super.call(this, para) || this;
+            _this.datetime = _this.childs.filter(function (child) { return child instanceof datetime_1.Datetime; });
+            _this.onSet = para.onSet;
+            _this.datetime.forEach(function (date) {
+                date.onSet = function () {
+                    typeof _this.onSet === 'function' && _this.onSet(_this.value);
+                };
+            });
+            return _this;
         }
-        UserSelect.prototype.on = function () {
-            d.on(this.para.target, 'mousedown', this.handle);
+        CalendarDate.prototype.wrapperInit = function (para) {
+            return this._body = h("div", { class: "calendar-date-wrapper" });
         };
-        UserSelect.prototype.off = function () {
-            d.off(this.para.target, 'mousedown', this.handle);
+        Object.defineProperty(CalendarDate.prototype, "format", {
+            get: function () {
+                return this._format;
+            },
+            set: function (format) {
+                if (tools.isNotEmpty(format)) {
+                    this._format = format;
+                    this.datetime.forEach(function (datetime) {
+                        datetime.format(format);
+                    });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        CalendarDate.prototype.get = function () {
+            return this.value;
         };
-        return UserSelect;
-    }());
-    exports.UserSelect = UserSelect;
+        CalendarDate.prototype.set = function (val, index) {
+            var datetime = this.datetime && this.datetime[index];
+            if (tools.isNotEmpty(datetime)) {
+                datetime.set(val);
+            }
+        };
+        Object.defineProperty(CalendarDate.prototype, "value", {
+            get: function () {
+                var result = [];
+                this.datetime.forEach(function (datetime) {
+                    result.push(datetime.value || null);
+                });
+                return result;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return CalendarDate;
+    }(ContainCom_1.ContainCom));
+    exports.CalendarDate = CalendarDate;
 });
 
 define("ButtonGroup", ["require", "exports", "DropDown"], function (require, exports, dropdown_1) {
@@ -28102,68 +28404,6 @@ define("ButtonGroup", ["require", "exports", "DropDown"], function (require, exp
         return ButtonGroup;
     }());
     exports.ButtonGroup = ButtonGroup;
-});
-
-///<amd-module name=""CalendarDate"/>
-define("\"CalendarDate", ["require", "exports", "ContainCom", "Datetime"], function (require, exports, ContainCom_1, datetime_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var tools = G.tools;
-    // 用于创建多个时间选择器
-    var CalendarDate = /** @class */ (function (_super) {
-        __extends(CalendarDate, _super);
-        function CalendarDate(para) {
-            var _this = _super.call(this, para) || this;
-            _this.datetime = _this.childs.filter(function (child) { return child instanceof datetime_1.Datetime; });
-            _this.onSet = para.onSet;
-            _this.datetime.forEach(function (date) {
-                date.onSet = function () {
-                    typeof _this.onSet === 'function' && _this.onSet(_this.value);
-                };
-            });
-            return _this;
-        }
-        CalendarDate.prototype.wrapperInit = function (para) {
-            return this._body = h("div", { class: "calendar-date-wrapper" });
-        };
-        Object.defineProperty(CalendarDate.prototype, "format", {
-            get: function () {
-                return this._format;
-            },
-            set: function (format) {
-                if (tools.isNotEmpty(format)) {
-                    this._format = format;
-                    this.datetime.forEach(function (datetime) {
-                        datetime.format(format);
-                    });
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        CalendarDate.prototype.get = function () {
-            return this.value;
-        };
-        CalendarDate.prototype.set = function (val, index) {
-            var datetime = this.datetime && this.datetime[index];
-            if (tools.isNotEmpty(datetime)) {
-                datetime.set(val);
-            }
-        };
-        Object.defineProperty(CalendarDate.prototype, "value", {
-            get: function () {
-                var result = [];
-                this.datetime.forEach(function (datetime) {
-                    result.push(datetime.value || null);
-                });
-                return result;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return CalendarDate;
-    }(ContainCom_1.ContainCom));
-    exports.CalendarDate = CalendarDate;
 });
 
 define("Drag", ["require", "exports"], function (require, exports) {
@@ -28898,6 +29138,96 @@ define("DropDown", ["require", "exports", "List", "Spinner"], function (require,
     exports.DropDown = DropDown;
 });
 
+/// <amd-module name="Fabs"/>
+// import tools = G.tools;
+// import d = G.d;
+// interface locPara{
+// 	top?:number,
+// 	bottom?:number,
+// 	left?:number,
+// 	right?:number
+// }
+//
+// interface FabsPara{
+// 	pos : locPara,
+// 	btns : Btn[],
+// 	container?: HTMLElement;
+// 	callback?(btn : Btn, i : number);
+// }
+// export class Fabs{
+// 	private container:HTMLElement = null;
+// 	private mainButton:HTMLElement = null;
+// 	private posData:locPara = null;
+// 	private isOpen:boolean = false;
+// 	constructor(private para:FabsPara){
+// 		this.posData = para.pos;
+// 		this.init();
+// 		this.getData(para);
+// 		if(para.callback) {
+// 			d.on(this.container, 'click', 'div.item', function (e) {
+// 				para.callback(para.btns[this.dataset.index], parseInt(this.dataset.index));
+// 			});
+// 		}
+// 	}
+// 	private getData(para:FabsPara){
+// 		let data = para.btns;
+// 		if(data.length==1){
+// 			this.mainButton.innerHTML = data[0].icon?data[0].icon:data[0].title;
+// 		}
+// 		else {
+// 			for (let i = 0; i < data.length; i++) {
+// 				let div = document.createElement("div");
+// 				div.className = "item";
+// 				div.dataset.index = i.toString();
+// 				div.style.transitionDelay = i / 3 + "";
+// 				let span = document.createElement("span");
+// 				span.innerHTML = data[i].icon ? data[i].icon : data[i].title;
+// 				div.appendChild(span);
+// 				this.container.appendChild(div);
+// 			}
+// 		}
+// 		para.container ? para.container.appendChild(this.container) :document.body.appendChild(this.container);
+// 	}
+// 	private init(){
+// 		this.container = document.createElement("div");
+// 		this.container.className = "fabs-wrapper";
+// 		this.mainButton = document.createElement("div");
+// 		this.mainButton.className = "mainButton";
+// 		this.mainButton.innerText = "按钮";
+// 		this.container.appendChild(this.mainButton);
+// 		if(this.posData){
+// 			for (let prop in this.posData){
+// 				this.container.style[prop] = this.posData[prop] + "px";
+// 			}
+// 		}
+// 		let that = this;
+// 		this.mainButton.addEventListener("click",function(){
+// 			if(!that.isOpen)
+// 				that.show();
+// 			else
+// 				that.hide();
+// 		})
+// 	}
+// 	show(){
+// 		let animateDiv = document.querySelectorAll(".item");
+// 		for(let i=0;i<animateDiv.length;i++){
+// 			animateDiv[i].setAttribute("style","top:-"+50*(i+1)+"px; opacity:1;");
+// 		}
+// 		this.isOpen = true;
+// 	}
+// 	hide(){
+// 		let animateDiv = document.querySelectorAll(".item");
+// 		for(let i=0;i<animateDiv.length;i++){
+// 			animateDiv[i].setAttribute("style","top:-40px; opacity:0;");
+// 		}
+// 		this.isOpen = false;
+// 	}
+// }
+//
+//
+//
+//
+
 define("ImgModal", ["require", "exports", "Modal"], function (require, exports, Modal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -29147,96 +29477,6 @@ define("List", ["require", "exports", "SelectBox"], function (require, exports, 
     exports.List = List;
 });
 
-/// <amd-module name="Fabs"/>
-// import tools = G.tools;
-// import d = G.d;
-// interface locPara{
-// 	top?:number,
-// 	bottom?:number,
-// 	left?:number,
-// 	right?:number
-// }
-//
-// interface FabsPara{
-// 	pos : locPara,
-// 	btns : Btn[],
-// 	container?: HTMLElement;
-// 	callback?(btn : Btn, i : number);
-// }
-// export class Fabs{
-// 	private container:HTMLElement = null;
-// 	private mainButton:HTMLElement = null;
-// 	private posData:locPara = null;
-// 	private isOpen:boolean = false;
-// 	constructor(private para:FabsPara){
-// 		this.posData = para.pos;
-// 		this.init();
-// 		this.getData(para);
-// 		if(para.callback) {
-// 			d.on(this.container, 'click', 'div.item', function (e) {
-// 				para.callback(para.btns[this.dataset.index], parseInt(this.dataset.index));
-// 			});
-// 		}
-// 	}
-// 	private getData(para:FabsPara){
-// 		let data = para.btns;
-// 		if(data.length==1){
-// 			this.mainButton.innerHTML = data[0].icon?data[0].icon:data[0].title;
-// 		}
-// 		else {
-// 			for (let i = 0; i < data.length; i++) {
-// 				let div = document.createElement("div");
-// 				div.className = "item";
-// 				div.dataset.index = i.toString();
-// 				div.style.transitionDelay = i / 3 + "";
-// 				let span = document.createElement("span");
-// 				span.innerHTML = data[i].icon ? data[i].icon : data[i].title;
-// 				div.appendChild(span);
-// 				this.container.appendChild(div);
-// 			}
-// 		}
-// 		para.container ? para.container.appendChild(this.container) :document.body.appendChild(this.container);
-// 	}
-// 	private init(){
-// 		this.container = document.createElement("div");
-// 		this.container.className = "fabs-wrapper";
-// 		this.mainButton = document.createElement("div");
-// 		this.mainButton.className = "mainButton";
-// 		this.mainButton.innerText = "按钮";
-// 		this.container.appendChild(this.mainButton);
-// 		if(this.posData){
-// 			for (let prop in this.posData){
-// 				this.container.style[prop] = this.posData[prop] + "px";
-// 			}
-// 		}
-// 		let that = this;
-// 		this.mainButton.addEventListener("click",function(){
-// 			if(!that.isOpen)
-// 				that.show();
-// 			else
-// 				that.hide();
-// 		})
-// 	}
-// 	show(){
-// 		let animateDiv = document.querySelectorAll(".item");
-// 		for(let i=0;i<animateDiv.length;i++){
-// 			animateDiv[i].setAttribute("style","top:-"+50*(i+1)+"px; opacity:1;");
-// 		}
-// 		this.isOpen = true;
-// 	}
-// 	hide(){
-// 		let animateDiv = document.querySelectorAll(".item");
-// 		for(let i=0;i<animateDiv.length;i++){
-// 			animateDiv[i].setAttribute("style","top:-40px; opacity:0;");
-// 		}
-// 		this.isOpen = false;
-// 	}
-// }
-//
-//
-//
-//
-
 define("Loading", ["require", "exports", "Modal"], function (require, exports, Modal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -29420,6 +29660,527 @@ define("Mask", ["require", "exports"], function (require, exports) {
         return Mask;
     }(Component));
     exports.Mask = Mask;
+});
+
+/// <amd-module name="Picker"/>
+define("Picker", ["require", "exports", "ContainCom", "Mask", "Button"], function (require, exports, ContainCom_1, mask_1, Button_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var d = G.d;
+    var tools = G.tools;
+    var Component = G.Component;
+    var PickerList = /** @class */ (function (_super) {
+        __extends(PickerList, _super);
+        function PickerList(para) {
+            var _this = _super.call(this, para) || this;
+            _this.pickers = {};
+            _this.event = (function () {
+                var handler;
+                return {
+                    on: function () { return d.on(_this.wrapper, 'touchmove', handler = function (ev) { return ev.preventDefault(); }); },
+                    off: function () { return d.off(_this.wrapper, 'touchmove', handler); }
+                };
+            })();
+            PickerList.PICKER_LISTS.push(_this);
+            _this.init(para);
+            _this.event.on();
+            para.className && _this.wrapper.classList.add(para.className);
+            return _this;
+        }
+        PickerList.prototype.wrapperInit = function () {
+            return h("div", { className: "picker-list-wrapper" },
+                h("div", { className: "picker-list-header" }),
+                this._body = h("div", { className: "picker-list-body" }));
+        };
+        PickerList.prototype.init = function (para) {
+            var _this = this;
+            this.onSet = para.onSet;
+            this.onChange = para.onChange;
+            this.isOnceDestroy = tools.isEmpty(para.isOnceDestroy) ? true : para.isOnceDestroy;
+            this.isBackground = tools.isEmpty(para.isBackground) ? true : para.isBackground;
+            this.header = d.query('.picker-list-header', this.wrapper);
+            this.initHeader();
+            var length = this.childs.filter(function (child) { return child instanceof Picker; }).length;
+            if (length > 0) {
+                var width_1 = 100 / length;
+                this.childs.forEach(function (child, index) {
+                    if (child instanceof Picker) {
+                        _this.pickers[child.name] = child;
+                        child.wrapper.style.width = width_1 + '%';
+                        child.on(Picker.EVT_PICK_CHANGE, function (val) {
+                            _this.isWatchMsg && _this.changeMsg();
+                            _this.onChange && _this.onChange({
+                                currentIndex: index,
+                                currentData: val,
+                            });
+                        });
+                    }
+                });
+            }
+            this.isWatchMsg = para.isWatchMsg;
+            var isShow = tools.isEmpty(para.isShow) ? true : para.isShow;
+            isShow && setTimeout(function () { return _this.show(); }, 100);
+        };
+        PickerList.prototype.changeMsg = function () {
+            if (this.msgEl) {
+                var str_1 = '';
+                this.childs.forEach(function (child) {
+                    if (child instanceof Picker) {
+                        var value = child.value;
+                        value = typeof value === 'object' ? value.text : value;
+                        str_1 += value + child.title + ' ';
+                    }
+                });
+                this.msgEl.innerText = str_1;
+            }
+        };
+        PickerList.prototype.initHeader = function () {
+            var _this = this;
+            new Button_1.Button({
+                container: this.header,
+                content: '取消',
+                onClick: function () {
+                    _this.hide();
+                }
+            });
+            new Button_1.Button({
+                container: this.header,
+                content: '完成',
+                type: 'primary',
+                // className: 'pull-right',
+                onClick: function () {
+                    var values = [], objOfValue = {};
+                    _this.childs.forEach(function (picker, index) {
+                        if (picker instanceof Picker) {
+                            values[index] = picker.value;
+                            objOfValue[picker.name] = picker.value;
+                        }
+                    });
+                    _this.onSet && _this.onSet(values, objOfValue);
+                    _this.hide();
+                }
+            });
+        };
+        Object.defineProperty(PickerList.prototype, "isWatchMsg", {
+            get: function () {
+                return this._isWatchMsg;
+            },
+            set: function (isWatchMsg) {
+                this._isWatchMsg = isWatchMsg || false;
+                if (this._isWatchMsg) {
+                    this.msgEl = h("div", { className: "picker-list-msg" });
+                    this.changeMsg();
+                    d.after(this.header, this.msgEl);
+                }
+                else {
+                    this.msgEl && d.remove(this.msgEl);
+                    this.msgEl = null;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PickerList.prototype, "isBackground", {
+            get: function () {
+                return this._isBackground;
+            },
+            set: function (isBackground) {
+                var _this = this;
+                if (this._isBackground !== isBackground) {
+                    this._isBackground = isBackground;
+                    this.mask = mask_1.Mask.getInstance();
+                    this.mask.background = isBackground;
+                    this.mask.addClick(this, function () {
+                        _this.hide();
+                    });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PickerList.prototype.show = function () {
+            var _this = this;
+            PickerList.PICKER_LISTS.forEach(function (pickList) { return pickList !== _this && pickList.hide(); });
+            this.mask && (this.mask.wrapper.style.zIndex = '1005');
+            this.mask && this.mask.show(this);
+            this.wrapper.classList.add(PickerList.PICKER_LIST_ACTIVE);
+        };
+        PickerList.prototype.hide = function (isDestroy) {
+            var _this = this;
+            if (isDestroy === void 0) { isDestroy = false; }
+            this.mask && this.mask.hide();
+            this.mask && this.mask.wrapper.style.removeProperty('z-index');
+            this.wrapper.classList.remove(PickerList.PICKER_LIST_ACTIVE);
+            (this.isOnceDestroy || isDestroy) && setTimeout(function () {
+                _this.destroy();
+            }, 350);
+        };
+        Object.defineProperty(PickerList.prototype, "onSet", {
+            get: function () {
+                return this._onSet;
+            },
+            set: function (handler) {
+                this._onSet = handler;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PickerList.prototype, "onChange", {
+            get: function () {
+                return this._onChange;
+            },
+            set: function (handler) {
+                if (typeof handler === 'function') {
+                    this._onChange = tools.pattern.debounce(handler, 200);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PickerList.prototype.destroy = function () {
+            var index = PickerList.PICKER_LISTS.indexOf(this);
+            index > -1 && PickerList.PICKER_LISTS.splice(index, 1);
+            this.childs.forEach(function (child) {
+                if (child instanceof Picker) {
+                    child.destroy();
+                }
+            });
+            this.event.off();
+            _super.prototype.destroy.call(this);
+        };
+        PickerList.PICKER_LIST_ACTIVE = 'picker-active';
+        PickerList.BODY_DTPICKER = 'dtpicker-active-for-page';
+        PickerList.PICKER_LISTS = [];
+        return PickerList;
+    }(ContainCom_1.ContainCom));
+    exports.PickerList = PickerList;
+    var Picker = /** @class */ (function (_super) {
+        __extends(Picker, _super);
+        function Picker(para) {
+            var _this = _super.call(this, para) || this;
+            // picker中的可选数据
+            _this._optionData = [];
+            // 可选项的dom 数组
+            _this._options = [];
+            // 设置标题名称
+            _this._title = '';
+            _this.selects = [];
+            _this.multiEvent = (function () {
+                var handler = function () {
+                    var selectedEl = _this.options[_this.current], index = parseInt(selectedEl.dataset['index']), isSelected = selectedEl.classList.contains(Picker.PICK_MULTI_SELECTED);
+                    if (isSelected) {
+                        _this.selects.splice(_this.selects.indexOf(index), 1);
+                    }
+                    else {
+                        _this.selects.push(index);
+                    }
+                    selectedEl.classList.toggle(Picker.PICK_MULTI_SELECTED, !isSelected);
+                    _this.onSet && _this.onSet(_this.value);
+                };
+                return {
+                    on: function () { return d.on(d.query('.pick-selected', _this.pickBody), 'click', handler); },
+                    off: function () { return d.off(d.query('.pick-selected', _this.pickBody), 'click'); },
+                };
+            })();
+            _this.oldCurrent = -1;
+            // 当前选中的位置
+            _this._current = -1;
+            // 动画管理
+            _this.animator = (function () {
+                return {
+                    change: function (angle) {
+                        angle = Math.max(-30, angle);
+                        angle = Math.min(_this._options.length * 20 + 10, angle);
+                        _this.listWrapper.style.webkitTransform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
+                        _this.listWrapper.style.transform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
+                    },
+                    ending: function (change) {
+                        var time = 100, length = _this.options.length, position = Math.round(change / 20);
+                        if (change < 0 || change > (length - 1) * 20) {
+                            time = 150;
+                        }
+                        position = Math.max(0, position);
+                        position = Math.min(length - 1, position);
+                        _this.listWrapper.style.webkitTransition = time + 'ms ease-out';
+                        _this.listWrapper.style.transition = time + 'ms ease-out';
+                        _this.current = position;
+                    }
+                };
+            })();
+            // 事件管理
+            _this.event = (function () {
+                var begin = 0;
+                var handler = function (ev) {
+                    begin = -_this._current * 20;
+                    _this.oldCurrent = _this.current;
+                    _this.listWrapper.style.removeProperty('transition');
+                    _this.listWrapper.style.removeProperty('-webkit-transition');
+                    var disY = ev.targetTouches[0].clientY;
+                    var moveHandler, endHandler;
+                    d.on(_this.pickBody, 'touchmove', moveHandler = function (ev) {
+                        var deltaY = ev.changedTouches[0].clientY - disY;
+                        disY = ev.changedTouches[0].clientY;
+                        begin += deltaY;
+                        _this.changePickItem(Math.round(-begin / 20));
+                        _this.animator.change(-begin);
+                        return false;
+                    });
+                    d.on(_this.pickBody, 'touchend', endHandler = function () {
+                        _this.animator.ending(-begin);
+                        begin = -_this._current * 20;
+                        d.off(_this.pickBody, 'touchmove', moveHandler);
+                        d.off(_this.pickBody, 'touchend', endHandler);
+                    });
+                };
+                return {
+                    on: function () {
+                        d.on(_this.pickBody, 'touchstart', handler);
+                    },
+                    off: function () {
+                        d.off(_this.pickBody, 'touchstart', handler);
+                    }
+                };
+            })();
+            // 初始化属性
+            _this.listWrapper = h("ul", { className: "picker-list pick-rule" });
+            _this._name = para.name || tools.getGuid();
+            _this.onChange = para.onChange;
+            _this.onSet = para.onSet;
+            _this.title = para.title;
+            _this.optionData = para.optionData;
+            _this.pickBody = h("div", { className: "pick-body" },
+                h("div", { className: "pick-selected pick-rule" }),
+                _this.listWrapper);
+            d.append(_this.wrapper, _this.pickBody);
+            _this.isMulti = para.isMulti;
+            // 添加class样式
+            if (tools.isNotEmpty(para.className)) {
+                var classList = para.className.split(/\s+/);
+                classList.forEach(function (className) {
+                    _this.wrapper.classList.add(className);
+                });
+            }
+            var platform = navigator.platform.toLowerCase();
+            var userAgent = navigator.userAgent.toLowerCase();
+            var isIos = (userAgent.indexOf('iphone') > -1 ||
+                userAgent.indexOf('ipad') > -1 ||
+                userAgent.indexOf('ipod') > -1) &&
+                (platform.indexOf('iphone') > -1 ||
+                    platform.indexOf('ipad') > -1 ||
+                    platform.indexOf('ipod') > -1);
+            if (isIos) {
+                _this.listWrapper.style.webkitTransformOrigin = 'center center 89.5px';
+                _this.listWrapper.style.transformOrigin = 'center center 89.5px';
+            }
+            // 定位到指定位置
+            _this.current = typeof para.default === 'number' ? para.default : 0;
+            if (_this.isMulti) {
+                _this.options[_this.current].classList.add(Picker.PICK_MULTI_SELECTED);
+            }
+            // 开启事件
+            _this.event.on();
+            return _this;
+        }
+        Picker.prototype.wrapperInit = function () {
+            return h("div", { className: "picker-wrapper" });
+        };
+        Object.defineProperty(Picker.prototype, "name", {
+            get: function () {
+                return this._name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Picker.prototype, "optionData", {
+            get: function () {
+                return this._optionData.slice();
+            },
+            set: function (optionData) {
+                if (optionData !== this._optionData) {
+                    this._optionData = optionData;
+                    this.initOption(optionData);
+                    this.current = this.current === -1 ? 0 : this.current;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Picker.prototype, "options", {
+            get: function () {
+                return this._options.slice();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Picker.prototype, "title", {
+            get: function () {
+                return this._title;
+            },
+            set: function (title) {
+                title = tools.str.removeHtmlTags(title);
+                this._title = title || '';
+                if (title) {
+                    this.titleWrapper = h("div", { className: "picker-title" });
+                    this.titleWrapper.innerText = title || '';
+                    d.prepend(this.wrapper, this.titleWrapper);
+                }
+                else {
+                    this.titleWrapper && d.remove(this.titleWrapper);
+                    this.titleWrapper = null;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Picker.prototype, "onChange", {
+            get: function () {
+                return this._onChange;
+            },
+            set: function (onChange) {
+                if (typeof onChange === 'function') {
+                    this._onChange = tools.pattern.debounce(onChange, 200);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Picker.prototype, "onSet", {
+            get: function () {
+                return this._onSet;
+            },
+            set: function (onSet) {
+                if (typeof onSet === 'function') {
+                    this._onSet = tools.pattern.debounce(onSet, 200);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // 初始化可选项dom
+        Picker.prototype.initOption = function (options) {
+            var _this = this;
+            var frag = document.createDocumentFragment(), deg = 20;
+            this._options = [];
+            options && options.forEach(function (itemData, index) {
+                var styles = {
+                    webkitTransformOrigin: 'center center -90px',
+                    transformOrigin: 'center center -90px',
+                    webkitTransform: 'translateZ(90px) rotateX(' + -index * deg + 'deg)',
+                    transform: 'translateZ(90px) rotateX(' + -index * deg + 'deg)',
+                };
+                var li = h("li", { className: "picker-item", "data-index": index, style: styles }, (typeof itemData === 'string' || typeof itemData === 'number') ? itemData : itemData.text);
+                _this._options.push(li);
+                d.append(frag, li);
+            });
+            this.listWrapper.innerHTML = '';
+            d.append(this.listWrapper, frag);
+        };
+        Object.defineProperty(Picker.prototype, "isMulti", {
+            get: function () {
+                return this._isMulti;
+            },
+            set: function (isMulti) {
+                this._isMulti = tools.isEmpty(isMulti) ? false : isMulti;
+                if (this._isMulti) {
+                    this.multiEvent.on();
+                }
+                else {
+                    this.multiEvent.off();
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Picker.prototype, "current", {
+            get: function () {
+                return this._current;
+            },
+            set: function (current) {
+                if (typeof current === 'number') {
+                    this.changePickItem(current);
+                    this.animator.change(current * 20);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Picker.prototype.setCurrentByValue = function (value) {
+            for (var i = 0, len = this.optionData.length; i < len; i++) {
+                var itemData = this.optionData[i];
+                var val = (typeof itemData === 'string' || typeof itemData === 'number') ? itemData : itemData.value;
+                if (value === val) {
+                    this.current = i;
+                    break;
+                }
+            }
+        };
+        Object.defineProperty(Picker.prototype, "value", {
+            // 获取选中的值
+            get: function () {
+                var _this = this;
+                var result;
+                if (Array.isArray(this._optionData)) {
+                    if (this.isMulti) {
+                        result = [];
+                        this.selects.forEach(function (index) {
+                            if (index in _this._optionData) {
+                                var data = _this._optionData[index];
+                                result.push(data);
+                            }
+                        });
+                    }
+                    else {
+                        if (this._current in this._optionData) {
+                            result = this._optionData[this._current];
+                        }
+                    }
+                }
+                return result || '';
+            },
+            enumerable: true,
+            configurable: true
+        });
+        // current改变时，可视区范围进行改变
+        Picker.prototype.changePickItem = function (change) {
+            var _this = this;
+            var step = 5, length = this._options.length, current = this._current;
+            change = Math.max(0, change);
+            change = Math.min(this._options.length - 1, change);
+            for (var i = 0; i < length; i++) {
+                this._options[i].classList.remove('visible');
+            }
+            this.options[current] && this.options[current].classList.remove(Picker.PICK_SELECTED);
+            this.options[change] && this.options[change].classList.add(Picker.PICK_SELECTED);
+            this._current = change;
+            var start = Math.max(0, change - step), end = Math.min(length, change + step);
+            for (var i = start; i < end; i++) {
+                this._options[i].classList.add('visible');
+            }
+            // 触发事件
+            if (this.oldCurrent !== this.current) {
+                !this.isMulti && this.onSet && this.onSet(this.value);
+                this.onChange && this.onChange(this.value);
+                var events = this.eventHandlers[Picker.EVT_PICK_CHANGE];
+                tools.isNotEmpty(events) && events.forEach(function (handler) {
+                    handler(_this.value, _this);
+                });
+            }
+        };
+        Picker.prototype.destroy = function () {
+            this.event.off();
+            this.listWrapper = null;
+            this.titleWrapper = null;
+            this.pickBody = null;
+            _super.prototype.destroy.call(this);
+        };
+        // 选中值发生改变是触发的事件
+        Picker.EVT_PICK_CHANGE = 'EVENT_PICKER_ITEM_SELECTED';
+        // 选中样式
+        Picker.PICK_SELECTED = 'picker-selected';
+        Picker.PICK_MULTI_SELECTED = 'picker-multi-selected';
+        return Picker;
+    }(Component));
+    exports.Picker = Picker;
 });
 
 define("paging", ["require", "exports"], function (require, exports) {
@@ -30165,922 +30926,6 @@ define("paging", ["require", "exports"], function (require, exports) {
     exports.Paging = Paging;
 });
 
-define("PopMenu", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="PopMenu"/>
-    var d = G.d;
-    var Component = G.Component;
-    var tools = G.tools;
-    var NewPopMenuItem = /** @class */ (function (_super) {
-        __extends(NewPopMenuItem, _super);
-        function NewPopMenuItem(para) {
-            var _this = _super.call(this, para) || this;
-            _this.text = tools.isEmpty(para.title) ? '' : para.title;
-            _this.icon = tools.isEmpty(para.icon) ? '' : para.icon;
-            _this.content = tools.obj.merge(para.content, {
-                click: tools.isEmpty(para.onClick) ? function () {
-                } : para.onClick,
-                children: tools.isEmpty(para.children) ? [] : para.children
-            });
-            return _this;
-        }
-        // 容器
-        NewPopMenuItem.prototype.wrapperInit = function (para) {
-            return h("div", { className: "pop-mbmenu-item fmbitem" },
-                h("div", { className: "pop-mbmenu-textwrapper" }));
-        };
-        Object.defineProperty(NewPopMenuItem.prototype, "disabled", {
-            get: function () {
-                return this._disabled;
-            },
-            // 是否可用
-            set: function (disabled) {
-                this._disabled = !!disabled;
-                this.wrapper.classList.toggle('nouse', this._disabled);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenuItem.prototype, "selected", {
-            get: function () {
-                return this._selected;
-            },
-            set: function (selected) {
-                if (selected === this._selected) {
-                    return;
-                }
-                this._selected = !!selected;
-                this.wrapper.classList.toggle('selected', this._selected);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenuItem.prototype, "text", {
-            get: function () {
-                return this._text;
-            },
-            set: function (text) {
-                this._text = text;
-                this.textEl && (this.textEl.innerText = text);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenuItem.prototype, "textEl", {
-            get: function () {
-                if (!this._textEl) {
-                    this._textEl = d.query('.pop-mbmenu-textwrapper', this.wrapper);
-                }
-                return this._textEl;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenuItem.prototype, "icon", {
-            get: function () {
-                return this._icon;
-            },
-            set: function (icon) {
-                var _a, _b;
-                if (icon) {
-                    if (typeof icon === 'string') {
-                        (_a = this.iconEl.classList).add.apply(_a, icon.split(' '));
-                        this._icon = icon;
-                    }
-                }
-                else {
-                    this._icon && (_b = this.iconEl.classList).remove.apply(_b, this._icon.split(' '));
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenuItem.prototype, "iconEl", {
-            get: function () {
-                if (!this._iconEl) {
-                    this._iconEl = h("i", { className: "pop-mbmenu-icon", "data-role": "icon" });
-                    d.before(this.textEl, this._iconEl);
-                }
-                return this._iconEl;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        NewPopMenuItem.prototype.destory = function () {
-            d.remove(this.wrapper);
-            this._textEl = null;
-            this._iconEl = null;
-        };
-        return NewPopMenuItem;
-    }(Component));
-    exports.NewPopMenuItem = NewPopMenuItem;
-    var NewPopMenu = /** @class */ (function (_super) {
-        __extends(NewPopMenu, _super);
-        function NewPopMenu(para) {
-            var _this = _super.call(this, {
-                title: '', icon: '', content: {}
-            }) || this;
-            _this.container = para.container;
-            _this.contextMenu = _this;
-            _this.originChildren = para.items;
-            _this.splitItems(para.items);
-            _this.setChildren();
-            _this.show = false;
-            d.on(_this.wrapper, 'click', '.next-item', function (event) {
-                event.stopPropagation();
-                var itemWrappers = d.queryAll('.pop-mbmenu-item', _this.wrapper), index = parseInt(_this.wrapper.dataset.index), nextIndex = index + 1 >= _this.wrapperItemsArr.length ? _this.wrapperItemsArr.length - 1 : index + 1;
-                if (index !== _this.wrapperItemsArr.length - 1) {
-                    _this.wrapper.dataset['index'] = nextIndex + '';
-                    _this.setChildren(nextIndex);
-                }
-            });
-            d.on(_this.wrapper, 'click', '.prev-item', function (e) {
-                e.stopPropagation();
-                var itemWrappers = d.queryAll('.pop-mbmenu-item', _this.wrapper), index = parseInt(_this.wrapper.dataset.index), prevIndex = index - 1 < 0 ? 0 : index - 1;
-                _this.wrapper.dataset['index'] = prevIndex + '';
-                _this.setChildren(prevIndex);
-            });
-            d.on(_this.wrapper, 'click', '.fmbitem', function (event) {
-                event.stopPropagation();
-                var fmbitem = d.closest(event.target, '.fmbitem'), index = parseInt(fmbitem.dataset.index), item = _this.children[index];
-                item.selected = true;
-                _this.onOpen && _this.onOpen(item);
-            });
-            return _this;
-        }
-        Object.defineProperty(NewPopMenu.prototype, "contextMenu", {
-            get: function () {
-                return this._contextMenu;
-            },
-            set: function (menu) {
-                this._contextMenu = menu;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        NewPopMenu.prototype.wrapperInit = function () {
-            return h("div", { className: "pop-mbmenu-wrapper", "data-index": "0" });
-        };
-        NewPopMenu.prototype.setChildren = function (index) {
-            var _this = this;
-            if (index === void 0) { index = 0; }
-            this.wrapper.innerHTML = '';
-            var items = this.wrapperItemsArr[index];
-            if (this.wrapperItemsArr.length === 1) {
-                items.forEach(function (item, i) {
-                    i === 0 && item.wrapper.classList.add('leftBorderRadius');
-                    i === items.length - 1 && item.wrapper.classList.add('rightBorderRadius');
-                    _this.wrapper.appendChild(item.wrapper);
-                });
-            }
-            else {
-                if (index !== 0) {
-                    var firstPrevBtn = this.prevBtn;
-                    this.wrapper.appendChild(this.prevBtn);
-                }
-                items.forEach(function (item, i) {
-                    (index === 0 && i === 0) && item.wrapper.classList.add('leftBorderRadius');
-                    _this.wrapper.appendChild(item.wrapper);
-                });
-                var lastNextBtn = this.nextBtn;
-                if (index === this.wrapperItemsArr.length - 1) {
-                    lastNextBtn.classList.add('nouse');
-                }
-                this.wrapper.appendChild(lastNextBtn);
-            }
-            this.wrapper.appendChild(h("div", { className: "arrow" }));
-            this.setArrowPostiton(this.x);
-        };
-        Object.defineProperty(NewPopMenu.prototype, "children", {
-            get: function () {
-                if (!this._children) {
-                    this._children = [];
-                }
-                return this._children;
-            },
-            set: function (items) {
-                this._children = items;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenu.prototype, "show", {
-            get: function () {
-                return this._show;
-            },
-            set: function (isShow) {
-                this._show = isShow;
-                if (isShow === true) {
-                    this.splitItems(this.originChildren);
-                    this.wrapper.dataset['index'] = '0';
-                    this.setChildren();
-                    this.wrapper.style.opacity = '1';
-                    this.wrapper.style.display = 'flex';
-                    this.wrapper.style.display = '-webkit-flex';
-                }
-                else {
-                    this.wrapper.style.opacity = '0';
-                    this.wrapper.style.display = 'none';
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        NewPopMenu.prototype.setPosition = function (x, y) {
-            this.x = x;
-            this.wrapper.style.top = (y - 45) + 'px';
-            var x1 = x, width = parseInt(window.getComputedStyle(this.wrapper).width);
-            this.wrapperItemsArr.length === 1 ? x1 -= width / 2 : x1 -= 120;
-            if (x + 120 > window.innerWidth) {
-                x1 = window.innerWidth - width;
-                d.query('.arrow', this.wrapper).style.left = (x - x1 - 5) + 'px';
-            }
-            else if (x1 < 0) {
-                x1 = 0;
-                d.query('.arrow', this.wrapper).style.left = (x - 5) + 'px';
-            }
-            else {
-                d.query('.arrow', this.wrapper).style.left = 'calc(50% - 5px)';
-            }
-            this.wrapper.style.left = x1 + 'px';
-        };
-        NewPopMenu.prototype.setArrowPostiton = function (x) {
-            var x1 = x;
-            this.wrapperItemsArr.length === 1 ? x1 -= 50 : x1 -= 120;
-            if (x + 120 > window.innerWidth) {
-                x1 = window.innerWidth - 240;
-                d.query('.arrow', this.wrapper).style.left = (x - x1 - 5) + 'px';
-            }
-            if (x1 < 0) {
-                x1 = 0;
-                d.query('.arrow', this.wrapper).style.left = (x - 5) + 'px';
-            }
-        };
-        Object.defineProperty(NewPopMenu.prototype, "prevBtn", {
-            get: function () {
-                this._prevBtn = h("div", { className: "pop-mbmenu-item prev-item" }, "<");
-                return this._prevBtn;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenu.prototype, "nextBtn", {
-            get: function () {
-                this._nextBtn = h("div", { className: "pop-mbmenu-item next-item" }, ">");
-                return this._nextBtn;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(NewPopMenu.prototype, "wrapperItemsArr", {
-            get: function () {
-                if (!this._wrapperItemsArr) {
-                    this._wrapperItemsArr = [];
-                }
-                return this._wrapperItemsArr;
-            },
-            set: function (itemArr) {
-                this._wrapperItemsArr = itemArr;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        NewPopMenu.prototype.splitItems = function (items) {
-            var _this = this;
-            this.children = [];
-            this.wrapperItemsArr = [];
-            items.forEach(function (item, index) {
-                item.container = _this.wrapper;
-                var mbItem = new NewPopMenuItem(item);
-                mbItem.wrapper.dataset['index'] = index + '';
-                _this.children.push(mbItem);
-            });
-            if (this.children.length <= 3) {
-                this.wrapperItemsArr.push(this.children);
-            }
-            else {
-                this.wrapper.style.width = '240px';
-                var arr = this.children.slice(3), frontArr = this.children.slice(0, 3), len = Math.ceil(arr.length / 3) + 1;
-                this.wrapperItemsArr.push(frontArr);
-                for (var i = 0; i < len - 1; i++) {
-                    var itemArr = arr.slice(i * 3, (i + 1) * 3);
-                    this.wrapperItemsArr.push(itemArr);
-                }
-            }
-        };
-        Object.defineProperty(NewPopMenu.prototype, "onOpen", {
-            get: function () {
-                return this._onOpen;
-            },
-            set: function (cb) {
-                this._onOpen = cb;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        NewPopMenu.prototype.destory = function () {
-            d.off(this.wrapper);
-            d.remove(this.wrapper);
-        };
-        return NewPopMenu;
-    }(NewPopMenuItem));
-    exports.NewPopMenu = NewPopMenu;
-    var PopMenu = /** @class */ (function () {
-        function PopMenu(para) {
-            var _this = this;
-            this.menuDom = null;
-            //添加遮罩层
-            var cover = h("div", { className: "showMenu-cover hide" });
-            d.on(cover, 'click', function (e) {
-                _this.destroy();
-                e.stopPropagation();
-            });
-            //遍历菜单栏
-            var div = h("div", { className: "showMenu" },
-                h("div", { className: "menus" }),
-                h("div", { className: "triangle-down" }));
-            d.append(cover, div);
-            document.body.appendChild(cover);
-            this.menuDom = cover;
-            var ulid = d.query('.menus', div);
-            para.arr.forEach(function (a) {
-                var cdiv = document.createElement("div");
-                cdiv.innerHTML = a;
-                ulid.appendChild(cdiv);
-            });
-            d.on(ulid, 'click', 'div', function (e) {
-                para.callback(e.target, _this.customData);
-            });
-        }
-        /**
-         * 显示菜单
-         * @param {number} top
-         * @param {number} left
-         * @param [custom]
-         */
-        PopMenu.prototype.show = function (top, left, custom) {
-            // let odiv = dom;
-            this.menuDom.classList.remove('hide');
-            this.customData = custom;
-            var ulid = d.query('.menus', this.menuDom);
-            //跟随元素的中间位置
-            var tran = d.query('.triangle-down', this.menuDom), menuWidth = ulid.offsetWidth, 
-            // position = odiv.getBoundingClientRect(),
-            // x1 = odiv.offsetWidth / 2,  写在外面
-            // x2 = position.left,
-            // y1 = position.top,
-            // y1 = top,
-            // x = left,
-            x3 = window.screen.width, t = x3 - left;
-            //防止元素超出左右边界
-            if (t <= menuWidth / 2) {
-                ulid.style.left = (x3 - menuWidth) + 'px';
-            }
-            else {
-                if (left <= menuWidth / 2) {
-                    ulid.style.left = 0 + 'px';
-                }
-                else {
-                    ulid.style.left = (left - menuWidth / 2) + 'px';
-                }
-            }
-            ulid.style.top = (top - 42) + 'px';
-            tran.style.left = (left - 8) + 'px';
-            tran.style.top = (top - 8) + 'px';
-        };
-        PopMenu.prototype.hide = function () {
-            this.menuDom.classList.add('hide');
-        };
-        PopMenu.prototype.destroy = function () {
-            d.remove(this.menuDom);
-        };
-        return PopMenu;
-    }());
-    exports.PopMenu = PopMenu;
-});
-
-/// <amd-module name="Picker"/>
-define("Picker", ["require", "exports", "ContainCom", "Mask", "Button"], function (require, exports, ContainCom_1, mask_1, Button_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var d = G.d;
-    var tools = G.tools;
-    var Component = G.Component;
-    var PickerList = /** @class */ (function (_super) {
-        __extends(PickerList, _super);
-        function PickerList(para) {
-            var _this = _super.call(this, para) || this;
-            _this.pickers = {};
-            _this.event = (function () {
-                var handler;
-                return {
-                    on: function () { return d.on(_this.wrapper, 'touchmove', handler = function (ev) { return ev.preventDefault(); }); },
-                    off: function () { return d.off(_this.wrapper, 'touchmove', handler); }
-                };
-            })();
-            PickerList.PICKER_LISTS.push(_this);
-            _this.init(para);
-            _this.event.on();
-            para.className && _this.wrapper.classList.add(para.className);
-            return _this;
-        }
-        PickerList.prototype.wrapperInit = function () {
-            return h("div", { className: "picker-list-wrapper" },
-                h("div", { className: "picker-list-header" }),
-                this._body = h("div", { className: "picker-list-body" }));
-        };
-        PickerList.prototype.init = function (para) {
-            var _this = this;
-            this.onSet = para.onSet;
-            this.onChange = para.onChange;
-            this.isOnceDestroy = tools.isEmpty(para.isOnceDestroy) ? true : para.isOnceDestroy;
-            this.isBackground = tools.isEmpty(para.isBackground) ? true : para.isBackground;
-            this.header = d.query('.picker-list-header', this.wrapper);
-            this.initHeader();
-            var length = this.childs.filter(function (child) { return child instanceof Picker; }).length;
-            if (length > 0) {
-                var width_1 = 100 / length;
-                this.childs.forEach(function (child, index) {
-                    if (child instanceof Picker) {
-                        _this.pickers[child.name] = child;
-                        child.wrapper.style.width = width_1 + '%';
-                        child.on(Picker.EVT_PICK_CHANGE, function (val) {
-                            _this.isWatchMsg && _this.changeMsg();
-                            _this.onChange && _this.onChange({
-                                currentIndex: index,
-                                currentData: val,
-                            });
-                        });
-                    }
-                });
-            }
-            this.isWatchMsg = para.isWatchMsg;
-            var isShow = tools.isEmpty(para.isShow) ? true : para.isShow;
-            isShow && setTimeout(function () { return _this.show(); }, 100);
-        };
-        PickerList.prototype.changeMsg = function () {
-            if (this.msgEl) {
-                var str_1 = '';
-                this.childs.forEach(function (child) {
-                    if (child instanceof Picker) {
-                        var value = child.value;
-                        value = typeof value === 'object' ? value.text : value;
-                        str_1 += value + child.title + ' ';
-                    }
-                });
-                this.msgEl.innerText = str_1;
-            }
-        };
-        PickerList.prototype.initHeader = function () {
-            var _this = this;
-            new Button_1.Button({
-                container: this.header,
-                content: '取消',
-                onClick: function () {
-                    _this.hide();
-                }
-            });
-            new Button_1.Button({
-                container: this.header,
-                content: '完成',
-                type: 'primary',
-                // className: 'pull-right',
-                onClick: function () {
-                    var values = [], objOfValue = {};
-                    _this.childs.forEach(function (picker, index) {
-                        if (picker instanceof Picker) {
-                            values[index] = picker.value;
-                            objOfValue[picker.name] = picker.value;
-                        }
-                    });
-                    _this.onSet && _this.onSet(values, objOfValue);
-                    _this.hide();
-                }
-            });
-        };
-        Object.defineProperty(PickerList.prototype, "isWatchMsg", {
-            get: function () {
-                return this._isWatchMsg;
-            },
-            set: function (isWatchMsg) {
-                this._isWatchMsg = isWatchMsg || false;
-                if (this._isWatchMsg) {
-                    this.msgEl = h("div", { className: "picker-list-msg" });
-                    this.changeMsg();
-                    d.after(this.header, this.msgEl);
-                }
-                else {
-                    this.msgEl && d.remove(this.msgEl);
-                    this.msgEl = null;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PickerList.prototype, "isBackground", {
-            get: function () {
-                return this._isBackground;
-            },
-            set: function (isBackground) {
-                var _this = this;
-                if (this._isBackground !== isBackground) {
-                    this._isBackground = isBackground;
-                    this.mask = mask_1.Mask.getInstance();
-                    this.mask.background = isBackground;
-                    this.mask.addClick(this, function () {
-                        _this.hide();
-                    });
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        PickerList.prototype.show = function () {
-            var _this = this;
-            PickerList.PICKER_LISTS.forEach(function (pickList) { return pickList !== _this && pickList.hide(); });
-            this.mask && (this.mask.wrapper.style.zIndex = '1005');
-            this.mask && this.mask.show(this);
-            this.wrapper.classList.add(PickerList.PICKER_LIST_ACTIVE);
-        };
-        PickerList.prototype.hide = function (isDestroy) {
-            var _this = this;
-            if (isDestroy === void 0) { isDestroy = false; }
-            this.mask && this.mask.hide();
-            this.mask && this.mask.wrapper.style.removeProperty('z-index');
-            this.wrapper.classList.remove(PickerList.PICKER_LIST_ACTIVE);
-            (this.isOnceDestroy || isDestroy) && setTimeout(function () {
-                _this.destroy();
-            }, 350);
-        };
-        Object.defineProperty(PickerList.prototype, "onSet", {
-            get: function () {
-                return this._onSet;
-            },
-            set: function (handler) {
-                this._onSet = handler;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PickerList.prototype, "onChange", {
-            get: function () {
-                return this._onChange;
-            },
-            set: function (handler) {
-                if (typeof handler === 'function') {
-                    this._onChange = tools.pattern.debounce(handler, 200);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        PickerList.prototype.destroy = function () {
-            var index = PickerList.PICKER_LISTS.indexOf(this);
-            index > -1 && PickerList.PICKER_LISTS.splice(index, 1);
-            this.childs.forEach(function (child) {
-                if (child instanceof Picker) {
-                    child.destroy();
-                }
-            });
-            this.event.off();
-            _super.prototype.destroy.call(this);
-        };
-        PickerList.PICKER_LIST_ACTIVE = 'picker-active';
-        PickerList.BODY_DTPICKER = 'dtpicker-active-for-page';
-        PickerList.PICKER_LISTS = [];
-        return PickerList;
-    }(ContainCom_1.ContainCom));
-    exports.PickerList = PickerList;
-    var Picker = /** @class */ (function (_super) {
-        __extends(Picker, _super);
-        function Picker(para) {
-            var _this = _super.call(this, para) || this;
-            // picker中的可选数据
-            _this._optionData = [];
-            // 可选项的dom 数组
-            _this._options = [];
-            // 设置标题名称
-            _this._title = '';
-            _this.selects = [];
-            _this.multiEvent = (function () {
-                var handler = function () {
-                    var selectedEl = _this.options[_this.current], index = parseInt(selectedEl.dataset['index']), isSelected = selectedEl.classList.contains(Picker.PICK_MULTI_SELECTED);
-                    if (isSelected) {
-                        _this.selects.splice(_this.selects.indexOf(index), 1);
-                    }
-                    else {
-                        _this.selects.push(index);
-                    }
-                    selectedEl.classList.toggle(Picker.PICK_MULTI_SELECTED, !isSelected);
-                    _this.onSet && _this.onSet(_this.value);
-                };
-                return {
-                    on: function () { return d.on(d.query('.pick-selected', _this.pickBody), 'click', handler); },
-                    off: function () { return d.off(d.query('.pick-selected', _this.pickBody), 'click'); },
-                };
-            })();
-            _this.oldCurrent = -1;
-            // 当前选中的位置
-            _this._current = -1;
-            // 动画管理
-            _this.animator = (function () {
-                return {
-                    change: function (angle) {
-                        angle = Math.max(-30, angle);
-                        angle = Math.min(_this._options.length * 20 + 10, angle);
-                        _this.listWrapper.style.webkitTransform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
-                        _this.listWrapper.style.transform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
-                    },
-                    ending: function (change) {
-                        var time = 100, length = _this.options.length, position = Math.round(change / 20);
-                        if (change < 0 || change > (length - 1) * 20) {
-                            time = 150;
-                        }
-                        position = Math.max(0, position);
-                        position = Math.min(length - 1, position);
-                        _this.listWrapper.style.webkitTransition = time + 'ms ease-out';
-                        _this.listWrapper.style.transition = time + 'ms ease-out';
-                        _this.current = position;
-                    }
-                };
-            })();
-            // 事件管理
-            _this.event = (function () {
-                var begin = 0;
-                var handler = function (ev) {
-                    begin = -_this._current * 20;
-                    _this.oldCurrent = _this.current;
-                    _this.listWrapper.style.removeProperty('transition');
-                    _this.listWrapper.style.removeProperty('-webkit-transition');
-                    var disY = ev.targetTouches[0].clientY;
-                    var moveHandler, endHandler;
-                    d.on(_this.pickBody, 'touchmove', moveHandler = function (ev) {
-                        var deltaY = ev.changedTouches[0].clientY - disY;
-                        disY = ev.changedTouches[0].clientY;
-                        begin += deltaY;
-                        _this.changePickItem(Math.round(-begin / 20));
-                        _this.animator.change(-begin);
-                        return false;
-                    });
-                    d.on(_this.pickBody, 'touchend', endHandler = function () {
-                        _this.animator.ending(-begin);
-                        begin = -_this._current * 20;
-                        d.off(_this.pickBody, 'touchmove', moveHandler);
-                        d.off(_this.pickBody, 'touchend', endHandler);
-                    });
-                };
-                return {
-                    on: function () {
-                        d.on(_this.pickBody, 'touchstart', handler);
-                    },
-                    off: function () {
-                        d.off(_this.pickBody, 'touchstart', handler);
-                    }
-                };
-            })();
-            // 初始化属性
-            _this.listWrapper = h("ul", { className: "picker-list pick-rule" });
-            _this._name = para.name || tools.getGuid();
-            _this.onChange = para.onChange;
-            _this.onSet = para.onSet;
-            _this.title = para.title;
-            _this.optionData = para.optionData;
-            _this.pickBody = h("div", { className: "pick-body" },
-                h("div", { className: "pick-selected pick-rule" }),
-                _this.listWrapper);
-            d.append(_this.wrapper, _this.pickBody);
-            _this.isMulti = para.isMulti;
-            // 添加class样式
-            if (tools.isNotEmpty(para.className)) {
-                var classList = para.className.split(/\s+/);
-                classList.forEach(function (className) {
-                    _this.wrapper.classList.add(className);
-                });
-            }
-            var platform = navigator.platform.toLowerCase();
-            var userAgent = navigator.userAgent.toLowerCase();
-            var isIos = (userAgent.indexOf('iphone') > -1 ||
-                userAgent.indexOf('ipad') > -1 ||
-                userAgent.indexOf('ipod') > -1) &&
-                (platform.indexOf('iphone') > -1 ||
-                    platform.indexOf('ipad') > -1 ||
-                    platform.indexOf('ipod') > -1);
-            if (isIos) {
-                _this.listWrapper.style.webkitTransformOrigin = 'center center 89.5px';
-                _this.listWrapper.style.transformOrigin = 'center center 89.5px';
-            }
-            // 定位到指定位置
-            _this.current = typeof para.default === 'number' ? para.default : 0;
-            if (_this.isMulti) {
-                _this.options[_this.current].classList.add(Picker.PICK_MULTI_SELECTED);
-            }
-            // 开启事件
-            _this.event.on();
-            return _this;
-        }
-        Picker.prototype.wrapperInit = function () {
-            return h("div", { className: "picker-wrapper" });
-        };
-        Object.defineProperty(Picker.prototype, "name", {
-            get: function () {
-                return this._name;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Picker.prototype, "optionData", {
-            get: function () {
-                return this._optionData.slice();
-            },
-            set: function (optionData) {
-                if (optionData !== this._optionData) {
-                    this._optionData = optionData;
-                    this.initOption(optionData);
-                    this.current = this.current === -1 ? 0 : this.current;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Picker.prototype, "options", {
-            get: function () {
-                return this._options.slice();
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Picker.prototype, "title", {
-            get: function () {
-                return this._title;
-            },
-            set: function (title) {
-                title = tools.str.removeHtmlTags(title);
-                this._title = title || '';
-                if (title) {
-                    this.titleWrapper = h("div", { className: "picker-title" });
-                    this.titleWrapper.innerText = title || '';
-                    d.prepend(this.wrapper, this.titleWrapper);
-                }
-                else {
-                    this.titleWrapper && d.remove(this.titleWrapper);
-                    this.titleWrapper = null;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Picker.prototype, "onChange", {
-            get: function () {
-                return this._onChange;
-            },
-            set: function (onChange) {
-                if (typeof onChange === 'function') {
-                    this._onChange = tools.pattern.debounce(onChange, 200);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Picker.prototype, "onSet", {
-            get: function () {
-                return this._onSet;
-            },
-            set: function (onSet) {
-                if (typeof onSet === 'function') {
-                    this._onSet = tools.pattern.debounce(onSet, 200);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        // 初始化可选项dom
-        Picker.prototype.initOption = function (options) {
-            var _this = this;
-            var frag = document.createDocumentFragment(), deg = 20;
-            this._options = [];
-            options && options.forEach(function (itemData, index) {
-                var styles = {
-                    webkitTransformOrigin: 'center center -90px',
-                    transformOrigin: 'center center -90px',
-                    webkitTransform: 'translateZ(90px) rotateX(' + -index * deg + 'deg)',
-                    transform: 'translateZ(90px) rotateX(' + -index * deg + 'deg)',
-                };
-                var li = h("li", { className: "picker-item", "data-index": index, style: styles }, (typeof itemData === 'string' || typeof itemData === 'number') ? itemData : itemData.text);
-                _this._options.push(li);
-                d.append(frag, li);
-            });
-            this.listWrapper.innerHTML = '';
-            d.append(this.listWrapper, frag);
-        };
-        Object.defineProperty(Picker.prototype, "isMulti", {
-            get: function () {
-                return this._isMulti;
-            },
-            set: function (isMulti) {
-                this._isMulti = tools.isEmpty(isMulti) ? false : isMulti;
-                if (this._isMulti) {
-                    this.multiEvent.on();
-                }
-                else {
-                    this.multiEvent.off();
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Picker.prototype, "current", {
-            get: function () {
-                return this._current;
-            },
-            set: function (current) {
-                if (typeof current === 'number') {
-                    this.changePickItem(current);
-                    this.animator.change(current * 20);
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Picker.prototype.setCurrentByValue = function (value) {
-            for (var i = 0, len = this.optionData.length; i < len; i++) {
-                var itemData = this.optionData[i];
-                var val = (typeof itemData === 'string' || typeof itemData === 'number') ? itemData : itemData.value;
-                if (value === val) {
-                    this.current = i;
-                    break;
-                }
-            }
-        };
-        Object.defineProperty(Picker.prototype, "value", {
-            // 获取选中的值
-            get: function () {
-                var _this = this;
-                var result;
-                if (Array.isArray(this._optionData)) {
-                    if (this.isMulti) {
-                        result = [];
-                        this.selects.forEach(function (index) {
-                            if (index in _this._optionData) {
-                                var data = _this._optionData[index];
-                                result.push(data);
-                            }
-                        });
-                    }
-                    else {
-                        if (this._current in this._optionData) {
-                            result = this._optionData[this._current];
-                        }
-                    }
-                }
-                return result || '';
-            },
-            enumerable: true,
-            configurable: true
-        });
-        // current改变时，可视区范围进行改变
-        Picker.prototype.changePickItem = function (change) {
-            var _this = this;
-            var step = 5, length = this._options.length, current = this._current;
-            change = Math.max(0, change);
-            change = Math.min(this._options.length - 1, change);
-            for (var i = 0; i < length; i++) {
-                this._options[i].classList.remove('visible');
-            }
-            this.options[current] && this.options[current].classList.remove(Picker.PICK_SELECTED);
-            this.options[change] && this.options[change].classList.add(Picker.PICK_SELECTED);
-            this._current = change;
-            var start = Math.max(0, change - step), end = Math.min(length, change + step);
-            for (var i = start; i < end; i++) {
-                this._options[i].classList.add('visible');
-            }
-            // 触发事件
-            if (this.oldCurrent !== this.current) {
-                !this.isMulti && this.onSet && this.onSet(this.value);
-                this.onChange && this.onChange(this.value);
-                var events = this.eventHandlers[Picker.EVT_PICK_CHANGE];
-                tools.isNotEmpty(events) && events.forEach(function (handler) {
-                    handler(_this.value, _this);
-                });
-            }
-        };
-        Picker.prototype.destroy = function () {
-            this.event.off();
-            this.listWrapper = null;
-            this.titleWrapper = null;
-            this.pickBody = null;
-            _super.prototype.destroy.call(this);
-        };
-        // 选中值发生改变是触发的事件
-        Picker.EVT_PICK_CHANGE = 'EVENT_PICKER_ITEM_SELECTED';
-        // 选中样式
-        Picker.PICK_SELECTED = 'picker-selected';
-        Picker.PICK_MULTI_SELECTED = 'picker-multi-selected';
-        return Picker;
-    }(Component));
-    exports.Picker = Picker;
-});
-
 define("Popover", ["require", "exports", "Mask"], function (require, exports, mask_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -31556,6 +31401,401 @@ define("Popover", ["require", "exports", "Mask"], function (require, exports, ma
     }(Component));
 });
 
+define("PopMenu", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="PopMenu"/>
+    var d = G.d;
+    var Component = G.Component;
+    var tools = G.tools;
+    var NewPopMenuItem = /** @class */ (function (_super) {
+        __extends(NewPopMenuItem, _super);
+        function NewPopMenuItem(para) {
+            var _this = _super.call(this, para) || this;
+            _this.text = tools.isEmpty(para.title) ? '' : para.title;
+            _this.icon = tools.isEmpty(para.icon) ? '' : para.icon;
+            _this.content = tools.obj.merge(para.content, {
+                click: tools.isEmpty(para.onClick) ? function () {
+                } : para.onClick,
+                children: tools.isEmpty(para.children) ? [] : para.children
+            });
+            return _this;
+        }
+        // 容器
+        NewPopMenuItem.prototype.wrapperInit = function (para) {
+            return h("div", { className: "pop-mbmenu-item fmbitem" },
+                h("div", { className: "pop-mbmenu-textwrapper" }));
+        };
+        Object.defineProperty(NewPopMenuItem.prototype, "disabled", {
+            get: function () {
+                return this._disabled;
+            },
+            // 是否可用
+            set: function (disabled) {
+                this._disabled = !!disabled;
+                this.wrapper.classList.toggle('nouse', this._disabled);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenuItem.prototype, "selected", {
+            get: function () {
+                return this._selected;
+            },
+            set: function (selected) {
+                if (selected === this._selected) {
+                    return;
+                }
+                this._selected = !!selected;
+                this.wrapper.classList.toggle('selected', this._selected);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenuItem.prototype, "text", {
+            get: function () {
+                return this._text;
+            },
+            set: function (text) {
+                this._text = text;
+                this.textEl && (this.textEl.innerText = text);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenuItem.prototype, "textEl", {
+            get: function () {
+                if (!this._textEl) {
+                    this._textEl = d.query('.pop-mbmenu-textwrapper', this.wrapper);
+                }
+                return this._textEl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenuItem.prototype, "icon", {
+            get: function () {
+                return this._icon;
+            },
+            set: function (icon) {
+                var _a, _b;
+                if (icon) {
+                    if (typeof icon === 'string') {
+                        (_a = this.iconEl.classList).add.apply(_a, icon.split(' '));
+                        this._icon = icon;
+                    }
+                }
+                else {
+                    this._icon && (_b = this.iconEl.classList).remove.apply(_b, this._icon.split(' '));
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenuItem.prototype, "iconEl", {
+            get: function () {
+                if (!this._iconEl) {
+                    this._iconEl = h("i", { className: "pop-mbmenu-icon", "data-role": "icon" });
+                    d.before(this.textEl, this._iconEl);
+                }
+                return this._iconEl;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NewPopMenuItem.prototype.destory = function () {
+            d.remove(this.wrapper);
+            this._textEl = null;
+            this._iconEl = null;
+        };
+        return NewPopMenuItem;
+    }(Component));
+    exports.NewPopMenuItem = NewPopMenuItem;
+    var NewPopMenu = /** @class */ (function (_super) {
+        __extends(NewPopMenu, _super);
+        function NewPopMenu(para) {
+            var _this = _super.call(this, {
+                title: '', icon: '', content: {}
+            }) || this;
+            _this.container = para.container;
+            _this.contextMenu = _this;
+            _this.originChildren = para.items;
+            _this.splitItems(para.items);
+            _this.setChildren();
+            _this.show = false;
+            d.on(_this.wrapper, 'click', '.next-item', function (event) {
+                event.stopPropagation();
+                var itemWrappers = d.queryAll('.pop-mbmenu-item', _this.wrapper), index = parseInt(_this.wrapper.dataset.index), nextIndex = index + 1 >= _this.wrapperItemsArr.length ? _this.wrapperItemsArr.length - 1 : index + 1;
+                if (index !== _this.wrapperItemsArr.length - 1) {
+                    _this.wrapper.dataset['index'] = nextIndex + '';
+                    _this.setChildren(nextIndex);
+                }
+            });
+            d.on(_this.wrapper, 'click', '.prev-item', function (e) {
+                e.stopPropagation();
+                var itemWrappers = d.queryAll('.pop-mbmenu-item', _this.wrapper), index = parseInt(_this.wrapper.dataset.index), prevIndex = index - 1 < 0 ? 0 : index - 1;
+                _this.wrapper.dataset['index'] = prevIndex + '';
+                _this.setChildren(prevIndex);
+            });
+            d.on(_this.wrapper, 'click', '.fmbitem', function (event) {
+                event.stopPropagation();
+                var fmbitem = d.closest(event.target, '.fmbitem'), index = parseInt(fmbitem.dataset.index), item = _this.children[index];
+                item.selected = true;
+                _this.onOpen && _this.onOpen(item);
+            });
+            return _this;
+        }
+        Object.defineProperty(NewPopMenu.prototype, "contextMenu", {
+            get: function () {
+                return this._contextMenu;
+            },
+            set: function (menu) {
+                this._contextMenu = menu;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NewPopMenu.prototype.wrapperInit = function () {
+            return h("div", { className: "pop-mbmenu-wrapper", "data-index": "0" });
+        };
+        NewPopMenu.prototype.setChildren = function (index) {
+            var _this = this;
+            if (index === void 0) { index = 0; }
+            this.wrapper.innerHTML = '';
+            var items = this.wrapperItemsArr[index];
+            if (this.wrapperItemsArr.length === 1) {
+                items.forEach(function (item, i) {
+                    i === 0 && item.wrapper.classList.add('leftBorderRadius');
+                    i === items.length - 1 && item.wrapper.classList.add('rightBorderRadius');
+                    _this.wrapper.appendChild(item.wrapper);
+                });
+            }
+            else {
+                if (index !== 0) {
+                    var firstPrevBtn = this.prevBtn;
+                    this.wrapper.appendChild(this.prevBtn);
+                }
+                items.forEach(function (item, i) {
+                    (index === 0 && i === 0) && item.wrapper.classList.add('leftBorderRadius');
+                    _this.wrapper.appendChild(item.wrapper);
+                });
+                var lastNextBtn = this.nextBtn;
+                if (index === this.wrapperItemsArr.length - 1) {
+                    lastNextBtn.classList.add('nouse');
+                }
+                this.wrapper.appendChild(lastNextBtn);
+            }
+            this.wrapper.appendChild(h("div", { className: "arrow" }));
+            this.setArrowPostiton(this.x);
+        };
+        Object.defineProperty(NewPopMenu.prototype, "children", {
+            get: function () {
+                if (!this._children) {
+                    this._children = [];
+                }
+                return this._children;
+            },
+            set: function (items) {
+                this._children = items;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenu.prototype, "show", {
+            get: function () {
+                return this._show;
+            },
+            set: function (isShow) {
+                this._show = isShow;
+                if (isShow === true) {
+                    this.splitItems(this.originChildren);
+                    this.wrapper.dataset['index'] = '0';
+                    this.setChildren();
+                    this.wrapper.style.opacity = '1';
+                    this.wrapper.style.display = 'flex';
+                    this.wrapper.style.display = '-webkit-flex';
+                }
+                else {
+                    this.wrapper.style.opacity = '0';
+                    this.wrapper.style.display = 'none';
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NewPopMenu.prototype.setPosition = function (x, y) {
+            this.x = x;
+            this.wrapper.style.top = (y - 45) + 'px';
+            var x1 = x, width = parseInt(window.getComputedStyle(this.wrapper).width);
+            this.wrapperItemsArr.length === 1 ? x1 -= width / 2 : x1 -= 120;
+            if (x + 120 > window.innerWidth) {
+                x1 = window.innerWidth - width;
+                d.query('.arrow', this.wrapper).style.left = (x - x1 - 5) + 'px';
+            }
+            else if (x1 < 0) {
+                x1 = 0;
+                d.query('.arrow', this.wrapper).style.left = (x - 5) + 'px';
+            }
+            else {
+                d.query('.arrow', this.wrapper).style.left = 'calc(50% - 5px)';
+            }
+            this.wrapper.style.left = x1 + 'px';
+        };
+        NewPopMenu.prototype.setArrowPostiton = function (x) {
+            var x1 = x;
+            this.wrapperItemsArr.length === 1 ? x1 -= 50 : x1 -= 120;
+            if (x + 120 > window.innerWidth) {
+                x1 = window.innerWidth - 240;
+                d.query('.arrow', this.wrapper).style.left = (x - x1 - 5) + 'px';
+            }
+            if (x1 < 0) {
+                x1 = 0;
+                d.query('.arrow', this.wrapper).style.left = (x - 5) + 'px';
+            }
+        };
+        Object.defineProperty(NewPopMenu.prototype, "prevBtn", {
+            get: function () {
+                this._prevBtn = h("div", { className: "pop-mbmenu-item prev-item" }, "<");
+                return this._prevBtn;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenu.prototype, "nextBtn", {
+            get: function () {
+                this._nextBtn = h("div", { className: "pop-mbmenu-item next-item" }, ">");
+                return this._nextBtn;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewPopMenu.prototype, "wrapperItemsArr", {
+            get: function () {
+                if (!this._wrapperItemsArr) {
+                    this._wrapperItemsArr = [];
+                }
+                return this._wrapperItemsArr;
+            },
+            set: function (itemArr) {
+                this._wrapperItemsArr = itemArr;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NewPopMenu.prototype.splitItems = function (items) {
+            var _this = this;
+            this.children = [];
+            this.wrapperItemsArr = [];
+            items.forEach(function (item, index) {
+                item.container = _this.wrapper;
+                var mbItem = new NewPopMenuItem(item);
+                mbItem.wrapper.dataset['index'] = index + '';
+                _this.children.push(mbItem);
+            });
+            if (this.children.length <= 3) {
+                this.wrapperItemsArr.push(this.children);
+            }
+            else {
+                this.wrapper.style.width = '240px';
+                var arr = this.children.slice(3), frontArr = this.children.slice(0, 3), len = Math.ceil(arr.length / 3) + 1;
+                this.wrapperItemsArr.push(frontArr);
+                for (var i = 0; i < len - 1; i++) {
+                    var itemArr = arr.slice(i * 3, (i + 1) * 3);
+                    this.wrapperItemsArr.push(itemArr);
+                }
+            }
+        };
+        Object.defineProperty(NewPopMenu.prototype, "onOpen", {
+            get: function () {
+                return this._onOpen;
+            },
+            set: function (cb) {
+                this._onOpen = cb;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NewPopMenu.prototype.destory = function () {
+            d.off(this.wrapper);
+            d.remove(this.wrapper);
+        };
+        return NewPopMenu;
+    }(NewPopMenuItem));
+    exports.NewPopMenu = NewPopMenu;
+    var PopMenu = /** @class */ (function () {
+        function PopMenu(para) {
+            var _this = this;
+            this.menuDom = null;
+            //添加遮罩层
+            var cover = h("div", { className: "showMenu-cover hide" });
+            d.on(cover, 'click', function (e) {
+                _this.destroy();
+                e.stopPropagation();
+            });
+            //遍历菜单栏
+            var div = h("div", { className: "showMenu" },
+                h("div", { className: "menus" }),
+                h("div", { className: "triangle-down" }));
+            d.append(cover, div);
+            document.body.appendChild(cover);
+            this.menuDom = cover;
+            var ulid = d.query('.menus', div);
+            para.arr.forEach(function (a) {
+                var cdiv = document.createElement("div");
+                cdiv.innerHTML = a;
+                ulid.appendChild(cdiv);
+            });
+            d.on(ulid, 'click', 'div', function (e) {
+                para.callback(e.target, _this.customData);
+            });
+        }
+        /**
+         * 显示菜单
+         * @param {number} top
+         * @param {number} left
+         * @param [custom]
+         */
+        PopMenu.prototype.show = function (top, left, custom) {
+            // let odiv = dom;
+            this.menuDom.classList.remove('hide');
+            this.customData = custom;
+            var ulid = d.query('.menus', this.menuDom);
+            //跟随元素的中间位置
+            var tran = d.query('.triangle-down', this.menuDom), menuWidth = ulid.offsetWidth, 
+            // position = odiv.getBoundingClientRect(),
+            // x1 = odiv.offsetWidth / 2,  写在外面
+            // x2 = position.left,
+            // y1 = position.top,
+            // y1 = top,
+            // x = left,
+            x3 = window.screen.width, t = x3 - left;
+            //防止元素超出左右边界
+            if (t <= menuWidth / 2) {
+                ulid.style.left = (x3 - menuWidth) + 'px';
+            }
+            else {
+                if (left <= menuWidth / 2) {
+                    ulid.style.left = 0 + 'px';
+                }
+                else {
+                    ulid.style.left = (left - menuWidth / 2) + 'px';
+                }
+            }
+            ulid.style.top = (top - 42) + 'px';
+            tran.style.left = (left - 8) + 'px';
+            tran.style.top = (top - 8) + 'px';
+        };
+        PopMenu.prototype.hide = function () {
+            this.menuDom.classList.add('hide');
+        };
+        PopMenu.prototype.destroy = function () {
+            d.remove(this.menuDom);
+        };
+        return PopMenu;
+    }());
+    exports.PopMenu = PopMenu;
+});
+
 define("Progress", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -31618,24 +31858,133 @@ define("Progress", ["require", "exports"], function (require, exports) {
 define("RingProgress", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var tools = G.tools;
+    var d = G.d;
     var Component = G.Component;
     var RingProgress = /** @class */ (function (_super) {
         __extends(RingProgress, _super);
         function RingProgress(para) {
             var _this = _super.call(this, para) || this;
+            _this.timer = null;
+            _this.drawRingProgress = function () {
+                _this.ctx.clearRect(0, 0, _this.wrapper.width, _this.wrapper.height);
+                // 绘制的顺序是外圆==>环==>內圆==>文本（在globalCompositeOperation=source-over的情况下）
+                // 绘制外圆
+                _this.ctx.beginPath();
+                _this.ctx.arc(_this.radius, _this.radius, _this.radius, 0, Math.PI * 2, false);
+                _this.ctx.fillStyle = _this.color.out;
+                _this.ctx.closePath();
+                _this.ctx.fill();
+                // 绘制环（实际是扇形，需要內圆遮盖为环形）
+                _this.ctx.beginPath();
+                _this.ctx.fillStyle = _this.color.ring;
+                _this.ctx.moveTo(_this.radius, _this.radius);
+                _this.ctx.arc(_this.radius, _this.radius, _this.radius, Math.PI / 2, Math.PI / 2 + _this.percent / 100 * 2 * Math.PI, false);
+                _this.ctx.closePath();
+                _this.ctx.fill();
+                // 绘制內圆
+                _this.ctx.beginPath();
+                _this.ctx.arc(_this.radius, _this.radius, _this.radius - _this.ringWidth, 0, Math.PI * 2, false);
+                _this.ctx.fillStyle = _this.color.inner;
+                _this.ctx.closePath();
+                _this.ctx.fill();
+                // 显示文本
+                var text = _this.percent + "%", top = parseInt(_this.ctx.font) / 2;
+                _this.showInfo && (tools.isNotEmpty(_this.font) && (_this.ctx.font = _this.font.style + " " + _this.font.variant + " " + _this.font.weight + " " + _this.font.size + "px " + _this.font.family,
+                    top = _this.font.size / 2),
+                    _this.ctx.fillStyle = _this.color.font,
+                    _this.ctx.fillText(text, _this.radius - _this.ctx.measureText(text).width / 2, _this.radius + top));
+                if (_this.isEnd) {
+                    clearInterval(_this.timer);
+                }
+                _this.percent += _this.step;
+            };
+            _this.reset = function () {
+                _this.percent = 0;
+                clearInterval(_this.timer);
+                _this.timer = setInterval(_this.drawRingProgress, _this.interval);
+            };
+            _this.clickHandler = function () {
+                if (_this.isRun && _this.timer) {
+                    clearInterval(_this.timer);
+                    _this.isRun = false;
+                }
+                else {
+                    _this.timer = setInterval(_this.drawRingProgress, _this.interval);
+                    _this.isRun = true;
+                }
+            };
+            _this.dblclickHandler = function () {
+                _this.reset();
+            };
             _this._percent = 0;
+            _this._showInfo = true;
             _this._isEnd = false;
+            _this._isRun = false;
+            _this.paraValidator(para);
+            _this.initCanvas();
+            _this.drawRingProgress();
+            _this.isRun = true;
+            !_this.isEnd && (_this.timer = setInterval(_this.drawRingProgress, _this.interval));
+            d.on(_this.wrapper, 'click', _this.clickHandler);
+            d.on(_this.wrapper, 'dblclick', _this.dblclickHandler);
             return _this;
         }
         RingProgress.prototype.wrapperInit = function () {
-            return null;
+            return h("canvas", { id: "ringProgress-" + tools.getGuid(), className: "ring-progress" });
+        };
+        RingProgress.prototype.paraValidator = function (para) {
+            // 设置各参数的默认值
+            this.percent = para.percent;
+            this.showInfo = para.showInfo;
+            this.x = para.position.x;
+            this.y = para.position.y;
+            this.radius = para.radius;
+            this.ringWidth = para.ringWidth;
+            this.color = {
+                ring: para.color.ring,
+                out: para.color.out || getComputedStyle(this.container).backgroundColor,
+                inner: para.color.inner || getComputedStyle(this.container).backgroundColor,
+                font: para.color.font || 'black'
+            };
+            tools.isNotEmpty(para.font) && (this.font = {
+                style: para.font.style || 'normal',
+                variant: para.font.variant || 'normal',
+                weight: para.font.weight || 'normal',
+                size: para.font.size || 10,
+                family: para.font.family || 'sans-serif'
+            });
+            this.interval = para.interval || 100;
+            this.step = para.step || 1;
+        };
+        RingProgress.prototype.initCanvas = function () {
+            // 初始化画布
+            this.wrapper.style.width = this.radius * 2 + 'px';
+            this.wrapper.style.height = this.radius * 2 + 'px';
+            this.wrapper.style.position = 'absolute';
+            this.wrapper.style.left = this.x - this.radius + 'px';
+            this.wrapper.style.top = this.y - this.radius + 'px';
+            this.wrapper.width = this.radius * 2;
+            this.wrapper.height = this.radius * 2;
+            this.ctx = this.wrapper.getContext('2d');
         };
         Object.defineProperty(RingProgress.prototype, "percent", {
             get: function () {
                 return this._percent;
             },
             set: function (len) {
-                this._percent = len;
+                this.isEnd = len > 100 ? true : false;
+                this._percent = len > 100 ? 100 : len;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RingProgress.prototype, "showInfo", {
+            get: function () {
+                return this._showInfo;
+            },
+            set: function (showInfo) {
+                this._showInfo = showInfo;
             },
             enumerable: true,
             configurable: true
@@ -31644,14 +31993,26 @@ define("RingProgress", ["require", "exports"], function (require, exports) {
             get: function () {
                 return this._isEnd;
             },
-            set: function (len) {
-                this._isEnd = len;
+            set: function (isEnd) {
+                this.isRun = this.isEnd ? false : true;
+                this._isEnd = isEnd;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RingProgress.prototype, "isRun", {
+            get: function () {
+                return this._isRun;
+            },
+            set: function (isRun) {
+                this._isRun = isRun;
             },
             enumerable: true,
             configurable: true
         });
         RingProgress.prototype.destroy = function () {
             //销毁
+            _super.prototype.destroy.call(this);
         };
         return RingProgress;
     }(Component));
@@ -31850,6 +32211,77 @@ define("SlideTab", ["require", "exports", "Tab", "DataManager"], function (requi
     exports.SlideTab = SlideTab;
 });
 
+define("SubPage", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="SubPage"/>
+    var d = G.d;
+    exports.SubPage = (function () {
+        var pageHtml = '<div class="sub-page">' +
+            '<div class="buttons"><span data-action="toggle" style="transform: rotate(90deg);" class="mui-icon fa fa-expand"></span>' +
+            '<span data-action="close" class="mui-icon ti-close mui-pull-right"></span></div>' +
+            '</div>';
+        var loading = document.createElement('div'), pageDom = null, contentDom = document.createElement('div'), body = document.body, isShow = false, onClose = function () { };
+        contentDom.classList.add('content');
+        loading.classList.add('mui-spinner', 'hide');
+        function close() {
+            if (isShow) {
+                d.remove(pageDom, false);
+                d.remove(contentDom, false);
+                isShow = false;
+                onClose();
+            }
+        }
+        return {
+            create: function () {
+                if (pageDom === null) {
+                    pageDom = G.d.create(pageHtml);
+                    G.d.on(pageDom.querySelector('div.buttons'), 'click', '[data-action]', function () {
+                        switch (this.dataset.action) {
+                            case 'toggle':
+                                if (pageDom.classList.toggle('full-page')) {
+                                    this.classList.remove('fa-expand');
+                                    this.classList.add('fa-compress');
+                                }
+                                else {
+                                    this.classList.remove('fa-compress');
+                                    this.classList.add('fa-expand');
+                                }
+                                break;
+                            case 'close':
+                                typeof close === 'function' && close();
+                                break;
+                        }
+                    });
+                }
+                contentDom.innerHTML = '';
+                contentDom.appendChild(loading);
+                return contentDom;
+            },
+            show: function (cb) {
+                cb = typeof cb !== 'function' ? function () { } : cb;
+                if (!isShow) {
+                    body.appendChild(pageDom);
+                    isShow = true;
+                    setTimeout(function () {
+                        pageDom.appendChild(contentDom);
+                        typeof cb === 'function' && cb();
+                    }, 30);
+                }
+                else {
+                    typeof cb === 'function' && cb();
+                }
+            },
+            onClose: function (cb) {
+                onClose = cb;
+            },
+            getLoading: function () {
+                return loading;
+            }
+        };
+    }());
+});
+
 define("Spinner", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -31973,76 +32405,57 @@ define("Spinner", ["require", "exports"], function (require, exports) {
     exports.Spinner = Spinner;
 });
 
-define("SubPage", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="SubPage"/>
-    var d = G.d;
-    exports.SubPage = (function () {
-        var pageHtml = '<div class="sub-page">' +
-            '<div class="buttons"><span data-action="toggle" style="transform: rotate(90deg);" class="mui-icon fa fa-expand"></span>' +
-            '<span data-action="close" class="mui-icon ti-close mui-pull-right"></span></div>' +
-            '</div>';
-        var loading = document.createElement('div'), pageDom = null, contentDom = document.createElement('div'), body = document.body, isShow = false, onClose = function () { };
-        contentDom.classList.add('content');
-        loading.classList.add('mui-spinner', 'hide');
-        function close() {
-            if (isShow) {
-                d.remove(pageDom, false);
-                d.remove(contentDom, false);
-                isShow = false;
-                onClose();
-            }
-        }
-        return {
-            create: function () {
-                if (pageDom === null) {
-                    pageDom = G.d.create(pageHtml);
-                    G.d.on(pageDom.querySelector('div.buttons'), 'click', '[data-action]', function () {
-                        switch (this.dataset.action) {
-                            case 'toggle':
-                                if (pageDom.classList.toggle('full-page')) {
-                                    this.classList.remove('fa-expand');
-                                    this.classList.add('fa-compress');
-                                }
-                                else {
-                                    this.classList.remove('fa-compress');
-                                    this.classList.add('fa-expand');
-                                }
-                                break;
-                            case 'close':
-                                typeof close === 'function' && close();
-                                break;
-                        }
-                    });
-                }
-                contentDom.innerHTML = '';
-                contentDom.appendChild(loading);
-                return contentDom;
-            },
-            show: function (cb) {
-                cb = typeof cb !== 'function' ? function () { } : cb;
-                if (!isShow) {
-                    body.appendChild(pageDom);
-                    isShow = true;
-                    setTimeout(function () {
-                        pageDom.appendChild(contentDom);
-                        typeof cb === 'function' && cb();
-                    }, 30);
-                }
-                else {
-                    typeof cb === 'function' && cb();
-                }
-            },
-            onClose: function (cb) {
-                onClose = cb;
-            },
-            getLoading: function () {
-                return loading;
-            }
-        };
-    }());
-});
+// /// <amd-module name="TableLite"/>
+// interface TableLitePara {
+//     cols:COL[];
+//     data:obj[];
+//     table:HTMLElement;
+// }
+// export class TableLite{
+//     private thead: HTMLTableSectionElement;
+//     private tbody: HTMLTableSectionElement;
+//     constructor(private para:TableLitePara){
+//         this.thead = document.createElement('thead');
+//         this.tbody = document.createElement('tbody');
+//         this.initThead();
+//         this.initTbody();
+//     }
+//     private initThead(){
+//         console.log('into initThead...');
+//         Array.isArray(this.para.cols) && this.para.cols.forEach((col) => {
+//             let th = document.createElement('th');
+//             th.innerHTML = col.title?col.title:'';
+//             this.thead.appendChild(th);
+//         });
+//         debugger;
+//         this.para.table.appendChild(this.thead);
+//     }
+//     private initTbody(){
+//         Array.isArray(this.para.data) && this.para.data.forEach((o)=>{
+//            this.row.addByData(o);
+//         });
+//         this.para.table.appendChild(this.tbody);
+//     }
+//     public row = (function (self) {
+//         let addByData = function(data:any){
+//             let tr = document.createElement('tr');
+//             Array.isArray(self.para.cols) && self.para.cols.forEach((col) => {
+//                 let td = document.createElement('td');
+//                 td.innerHTML = data[col.name];
+//                 tr.appendChild(td);
+//             });
+//             self.tbody.appendChild(tr);
+//         };
+//         let addByTr = function (tr:HTMLTableRowElement) {
+//             console.log(tr);
+//             self.tbody.appendChild(tr);
+//         }
+//         return {
+//             addByData: addByData,
+//             addByTr: addByTr
+//         }
+//     }(this));
+// }
 
 define("Tab", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -32217,58 +32630,6 @@ define("Tab", ["require", "exports"], function (require, exports) {
     exports.Tab = Tab;
 });
 
-// /// <amd-module name="TableLite"/>
-// interface TableLitePara {
-//     cols:COL[];
-//     data:obj[];
-//     table:HTMLElement;
-// }
-// export class TableLite{
-//     private thead: HTMLTableSectionElement;
-//     private tbody: HTMLTableSectionElement;
-//     constructor(private para:TableLitePara){
-//         this.thead = document.createElement('thead');
-//         this.tbody = document.createElement('tbody');
-//         this.initThead();
-//         this.initTbody();
-//     }
-//     private initThead(){
-//         console.log('into initThead...');
-//         Array.isArray(this.para.cols) && this.para.cols.forEach((col) => {
-//             let th = document.createElement('th');
-//             th.innerHTML = col.title?col.title:'';
-//             this.thead.appendChild(th);
-//         });
-//         debugger;
-//         this.para.table.appendChild(this.thead);
-//     }
-//     private initTbody(){
-//         Array.isArray(this.para.data) && this.para.data.forEach((o)=>{
-//            this.row.addByData(o);
-//         });
-//         this.para.table.appendChild(this.tbody);
-//     }
-//     public row = (function (self) {
-//         let addByData = function(data:any){
-//             let tr = document.createElement('tr');
-//             Array.isArray(self.para.cols) && self.para.cols.forEach((col) => {
-//                 let td = document.createElement('td');
-//                 td.innerHTML = data[col.name];
-//                 tr.appendChild(td);
-//             });
-//             self.tbody.appendChild(tr);
-//         };
-//         let addByTr = function (tr:HTMLTableRowElement) {
-//             console.log(tr);
-//             self.tbody.appendChild(tr);
-//         }
-//         return {
-//             addByData: addByData,
-//             addByTr: addByTr
-//         }
-//     }(this));
-// }
-
 /// <amd-module name="Transfer"/>
 define("Transfer", ["require", "exports", "DropDown"], function (require, exports, dropdown_1) {
     "use strict";
@@ -32351,110 +32712,6 @@ define("Transfer", ["require", "exports", "DropDown"], function (require, export
         return Transfer;
     }());
     exports.Transfer = Transfer;
-});
-
-define("Tooltip", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Tooltip = /** @class */ (function () {
-        function Tooltip(para) {
-            this.userPara = null;
-            this.userPara = Object.assign({}, Tooltip.defaultPara, para);
-            this.userPara.el.classList.add('tooltipiconfont');
-            for (var key in this.userPara) {
-                if (this.userPara.hasOwnProperty(key)) {
-                    if (key != 'el' && key != 'offset') {
-                        this.userPara.el.setAttribute(key != 'errorMsg' ? 'data-balloon-' + key : 'data-balloon', key != 'visible' ? this.userPara[key] : "");
-                    }
-                }
-            }
-            !this.userPara.visible && this.userPara.el.removeAttribute("data-balloon-visible");
-        }
-        Tooltip.prototype.show = function () {
-        };
-        ;
-        Tooltip.prototype.hide = function () {
-            for (var key in this.userPara) {
-                if (this.userPara.hasOwnProperty(key)) {
-                    if (key != 'el' && key != 'offset') {
-                        this.userPara.el.removeAttribute(key != 'errorMsg' ? 'data-balloon-' + key : 'data-balloon');
-                    }
-                }
-            }
-            this.userPara.visible && this.userPara.el.removeAttribute("data-balloon-visible");
-        };
-        ;
-        Tooltip.clear = function (el) {
-            for (var key in el.dataset) {
-                if (key.indexOf('balloon') === 0) {
-                    delete el.dataset[key];
-                }
-            }
-        };
-        Tooltip.defaultPara = {
-            pos: "up",
-            length: "fit",
-            visible: false,
-            errorMsg: "",
-            el: null
-        };
-        return Tooltip;
-    }());
-    exports.Tooltip = Tooltip;
-});
-
-define("LayoutImage", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Component = G.Component;
-    var d = G.d;
-    var LayoutImage = /** @class */ (function (_super) {
-        __extends(LayoutImage, _super);
-        function LayoutImage(para) {
-            var _this = _super.call(this, para) || this;
-            _this.max = 4;
-            _this._urls = [];
-            _this.urls = para.urls;
-            _this.size = para.size;
-            return _this;
-        }
-        LayoutImage.prototype.wrapperInit = function (para) {
-            return h("div", { className: "layout-img-wrapper" });
-        };
-        Object.defineProperty(LayoutImage.prototype, "urls", {
-            get: function () {
-                return this._urls;
-            },
-            set: function (urls) {
-                var _this = this;
-                Array.isArray(urls) && urls.forEach(function (url) {
-                    _this.add(url);
-                });
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(LayoutImage.prototype, "size", {
-            set: function (size) {
-                if (size) {
-                    this.wrapper.style.width = size;
-                    this.wrapper.style.height = size;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        LayoutImage.prototype.add = function (url) {
-            if (this._urls.length >= this.max) {
-                return;
-            }
-            d.append(this.wrapper, h("img", { src: url }));
-            this._urls.push(url);
-            this.wrapper.dataset.count = this._urls.length + '';
-        };
-        return LayoutImage;
-    }(Component));
-    exports.LayoutImage = LayoutImage;
 });
 
 define("MbPage", ["require", "exports", "Tab", "Button"], function (require, exports, tab_1, Button_1) {
@@ -32602,166 +32859,108 @@ define("MbPage", ["require", "exports", "Tab", "Button"], function (require, exp
     exports.MbPage = MbPage;
 });
 
-define("SlideUp", ["require", "exports", "Button"], function (require, exports, Button_1) {
+define("LayoutImage", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    /// <amd-module name="SlideUp"/>
-    var d = G.d;
-    var tools = G.tools;
     var Component = G.Component;
-    var SlideUp = /** @class */ (function (_super) {
-        __extends(SlideUp, _super);
-        function SlideUp(para) {
+    var d = G.d;
+    var LayoutImage = /** @class */ (function (_super) {
+        __extends(LayoutImage, _super);
+        function LayoutImage(para) {
             var _this = _super.call(this, para) || this;
-            var mergePara = G.tools.obj.merge(true, {
-                position: 'bottomRight',
-                width: 280,
-                // height : 200,
-                className: '',
-                text: '点击查看',
-                contentHasClose: false,
-                isShow: false,
-            }, para);
-            var classList = _this.wrapper.classList;
-            classList.add(mergePara.position);
-            classList.add(mergePara.className);
-            _this.init(mergePara);
+            _this.max = 4;
+            _this._urls = [];
+            _this.urls = para.urls;
+            _this.size = para.size;
             return _this;
         }
-        SlideUp.prototype.wrapperInit = function (para) {
-            var wrapper = d.create("<div class=\"slide-up\"></div>");
-            this._slideEl = d.create("<div class=\"slide-up-slideEl\"></div>");
-            this._fixedEl = d.create("<div class=\"slide-up-fixedEl\"></div>");
-            this._contentEl = d.create("<div class=\"slide-up-content\"></div>");
-            this._textEl = d.create("<div class=\"slide-up-text\"></div>");
-            this._iconEL = d.create("<div class=\"slide-up-icon\"></div>");
-            d.append(wrapper, this._slideEl);
-            d.append(wrapper, this._fixedEl);
-            d.append(this._slideEl, this._contentEl);
-            d.append(this._fixedEl, this._textEl);
-            d.append(this._fixedEl, this._iconEL);
-            // d.append(para.container,this.wrapper);
-            return wrapper;
+        LayoutImage.prototype.wrapperInit = function (para) {
+            return h("div", { className: "layout-img-wrapper" });
         };
-        SlideUp.prototype.init = function (para) {
-            // this.initTpl(para);
-            var _this = this;
-            this.width = para.width;
-            this.height = para.height;
-            this.text = para.text;
-            this.contentTitle = para.contentTitle;
-            this.contentEl = para.contentEl;
-            this.isShow = para.isShow;
-            this.button = new Button_1.Button({
-                container: this._iconEL,
-                type: 'link',
-                icon: 'expanse',
-                onClick: function () {
-                    _this.isShow = !_this._isShow;
+        Object.defineProperty(LayoutImage.prototype, "urls", {
+            get: function () {
+                return this._urls;
+            },
+            set: function (urls) {
+                var _this = this;
+                Array.isArray(urls) && urls.forEach(function (url) {
+                    _this.add(url);
+                });
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(LayoutImage.prototype, "size", {
+            set: function (size) {
+                if (size) {
+                    this.wrapper.style.width = size;
+                    this.wrapper.style.height = size;
                 }
-            });
-            d.on(this._fixedEl, 'click', function () {
-                _this.isShow = !_this._isShow;
-            });
+            },
+            enumerable: true,
+            configurable: true
+        });
+        LayoutImage.prototype.add = function (url) {
+            if (this._urls.length >= this.max) {
+                return;
+            }
+            d.append(this.wrapper, h("img", { src: url }));
+            this._urls.push(url);
+            this.wrapper.dataset.count = this._urls.length + '';
         };
-        Object.defineProperty(SlideUp.prototype, "width", {
-            get: function () {
-                return this._width;
-            },
-            set: function (width) {
-                if (tools.isEmpty(width)) {
-                    return;
-                }
-                this.wrapper.style.width = width + 'px';
-                this._width = width;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SlideUp.prototype, "height", {
-            get: function () {
-                return this._height ? this._height : this._contentEl.offsetHeight;
-            },
-            set: function (height) {
-                if (tools.isEmpty(height)) {
-                    return;
-                }
-                this._contentEl.style.height = height + 'px';
-                this._height = height;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SlideUp.prototype, "text", {
-            get: function () {
-                return this._text;
-            },
-            set: function (text) {
-                this._textEl.innerHTML = text;
-                this._text = text;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SlideUp.prototype, "contentTitle", {
-            get: function () {
-                return this._contentTitle;
-            },
-            set: function (title) {
-                if (!title) {
-                    return;
-                }
-                if (!this._contentTitleEl) {
-                    this._contentTitleEl = d.create("<div class=\"slide-up-title\"></div>");
-                    d.prepend(this._slideEl, this._contentTitleEl);
-                }
-                this._contentTitleEl.innerHTML = title;
-                this._contentTitle = title;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SlideUp.prototype, "contentEl", {
-            get: function () {
-                return this._contentEl;
-            },
-            set: function (contentEl) {
-                if (!contentEl) {
-                    return;
-                }
-                this._contentEl.innerHTML = null;
-                d.append(this._contentEl, contentEl);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SlideUp.prototype, "button", {
-            get: function () {
-                return this._button;
-            },
-            set: function (button) {
-                if (this._button) {
-                    this._button.destroy();
-                }
-                this._button = button;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SlideUp.prototype, "isShow", {
-            get: function () {
-                return this._isShow;
-            },
-            set: function (isShow) {
-                this._slideEl.style.height = isShow ? (this._contentTitleEl ? this.height + 30 : this.height) + 'px' : '0';
-                this._isShow = isShow;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return SlideUp;
+        return LayoutImage;
     }(Component));
-    exports.SlideUp = SlideUp;
+    exports.LayoutImage = LayoutImage;
+});
+
+define("Tooltip", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Tooltip = /** @class */ (function () {
+        function Tooltip(para) {
+            this.userPara = null;
+            this.userPara = Object.assign({}, Tooltip.defaultPara, para);
+            this.userPara.el.classList.add('tooltipiconfont');
+            for (var key in this.userPara) {
+                if (this.userPara.hasOwnProperty(key)) {
+                    if (key != 'el' && key != 'offset') {
+                        this.userPara.el.setAttribute(key != 'errorMsg' ? 'data-balloon-' + key : 'data-balloon', key != 'visible' ? this.userPara[key] : "");
+                    }
+                }
+            }
+            !this.userPara.visible && this.userPara.el.removeAttribute("data-balloon-visible");
+        }
+        Tooltip.prototype.show = function () {
+        };
+        ;
+        Tooltip.prototype.hide = function () {
+            for (var key in this.userPara) {
+                if (this.userPara.hasOwnProperty(key)) {
+                    if (key != 'el' && key != 'offset') {
+                        this.userPara.el.removeAttribute(key != 'errorMsg' ? 'data-balloon-' + key : 'data-balloon');
+                    }
+                }
+            }
+            this.userPara.visible && this.userPara.el.removeAttribute("data-balloon-visible");
+        };
+        ;
+        Tooltip.clear = function (el) {
+            for (var key in el.dataset) {
+                if (key.indexOf('balloon') === 0) {
+                    delete el.dataset[key];
+                }
+            }
+        };
+        Tooltip.defaultPara = {
+            pos: "up",
+            length: "fit",
+            visible: false,
+            errorMsg: "",
+            el: null
+        };
+        return Tooltip;
+    }());
+    exports.Tooltip = Tooltip;
 });
 
 /// <amd-module name="Panel"/>
@@ -32988,4 +33187,166 @@ define("Panel", ["require", "exports", "Button"], function (require, exports, Bu
         };
         return PanelItem;
     }());
+});
+
+define("SlideUp", ["require", "exports", "Button"], function (require, exports, Button_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    /// <amd-module name="SlideUp"/>
+    var d = G.d;
+    var tools = G.tools;
+    var Component = G.Component;
+    var SlideUp = /** @class */ (function (_super) {
+        __extends(SlideUp, _super);
+        function SlideUp(para) {
+            var _this = _super.call(this, para) || this;
+            var mergePara = G.tools.obj.merge(true, {
+                position: 'bottomRight',
+                width: 280,
+                // height : 200,
+                className: '',
+                text: '点击查看',
+                contentHasClose: false,
+                isShow: false,
+            }, para);
+            var classList = _this.wrapper.classList;
+            classList.add(mergePara.position);
+            classList.add(mergePara.className);
+            _this.init(mergePara);
+            return _this;
+        }
+        SlideUp.prototype.wrapperInit = function (para) {
+            var wrapper = d.create("<div class=\"slide-up\"></div>");
+            this._slideEl = d.create("<div class=\"slide-up-slideEl\"></div>");
+            this._fixedEl = d.create("<div class=\"slide-up-fixedEl\"></div>");
+            this._contentEl = d.create("<div class=\"slide-up-content\"></div>");
+            this._textEl = d.create("<div class=\"slide-up-text\"></div>");
+            this._iconEL = d.create("<div class=\"slide-up-icon\"></div>");
+            d.append(wrapper, this._slideEl);
+            d.append(wrapper, this._fixedEl);
+            d.append(this._slideEl, this._contentEl);
+            d.append(this._fixedEl, this._textEl);
+            d.append(this._fixedEl, this._iconEL);
+            // d.append(para.container,this.wrapper);
+            return wrapper;
+        };
+        SlideUp.prototype.init = function (para) {
+            // this.initTpl(para);
+            var _this = this;
+            this.width = para.width;
+            this.height = para.height;
+            this.text = para.text;
+            this.contentTitle = para.contentTitle;
+            this.contentEl = para.contentEl;
+            this.isShow = para.isShow;
+            this.button = new Button_1.Button({
+                container: this._iconEL,
+                type: 'link',
+                icon: 'expanse',
+                onClick: function () {
+                    _this.isShow = !_this._isShow;
+                }
+            });
+            d.on(this._fixedEl, 'click', function () {
+                _this.isShow = !_this._isShow;
+            });
+        };
+        Object.defineProperty(SlideUp.prototype, "width", {
+            get: function () {
+                return this._width;
+            },
+            set: function (width) {
+                if (tools.isEmpty(width)) {
+                    return;
+                }
+                this.wrapper.style.width = width + 'px';
+                this._width = width;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SlideUp.prototype, "height", {
+            get: function () {
+                return this._height ? this._height : this._contentEl.offsetHeight;
+            },
+            set: function (height) {
+                if (tools.isEmpty(height)) {
+                    return;
+                }
+                this._contentEl.style.height = height + 'px';
+                this._height = height;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SlideUp.prototype, "text", {
+            get: function () {
+                return this._text;
+            },
+            set: function (text) {
+                this._textEl.innerHTML = text;
+                this._text = text;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SlideUp.prototype, "contentTitle", {
+            get: function () {
+                return this._contentTitle;
+            },
+            set: function (title) {
+                if (!title) {
+                    return;
+                }
+                if (!this._contentTitleEl) {
+                    this._contentTitleEl = d.create("<div class=\"slide-up-title\"></div>");
+                    d.prepend(this._slideEl, this._contentTitleEl);
+                }
+                this._contentTitleEl.innerHTML = title;
+                this._contentTitle = title;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SlideUp.prototype, "contentEl", {
+            get: function () {
+                return this._contentEl;
+            },
+            set: function (contentEl) {
+                if (!contentEl) {
+                    return;
+                }
+                this._contentEl.innerHTML = null;
+                d.append(this._contentEl, contentEl);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SlideUp.prototype, "button", {
+            get: function () {
+                return this._button;
+            },
+            set: function (button) {
+                if (this._button) {
+                    this._button.destroy();
+                }
+                this._button = button;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SlideUp.prototype, "isShow", {
+            get: function () {
+                return this._isShow;
+            },
+            set: function (isShow) {
+                this._slideEl.style.height = isShow ? (this._contentTitleEl ? this.height + 30 : this.height) + 'px' : '0';
+                this._isShow = isShow;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return SlideUp;
+    }(Component));
+    exports.SlideUp = SlideUp;
 });

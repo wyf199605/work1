@@ -48,7 +48,7 @@ define(["require", "exports", "BwRule", "Modal", "User", "ShellAction"], functio
                         "\u5BC6\u7801\u4FEE\u6539"));
                 d.append(list, li);
             }
-            d.on(d.query('.myselfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
+            d.on(d.query('.selfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
                 var dataset = d.closest(e.target, '.mui-table-view-cell[data-page-name]').dataset.pageName;
                 var pageUrl = BW.CONF.url[dataset];
                 if (pageUrl) {

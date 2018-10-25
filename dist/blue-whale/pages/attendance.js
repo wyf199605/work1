@@ -10,6 +10,10 @@ define(["require", "exports", "BasicPage", "Modal", "BwRule", "NewFinger"], func
             // protected shell: any = null;
             _this.timer = null;
             _this.fingerNode = null;
+            /*
+            * 初始化页面
+            * */
+            _this.msgTimer = null;
             // this.shell = ShellAction.get();
             var parent = para.dom.parentNode;
             var height = parent.offsetHeight - parent.firstChild.offsetHeight;
@@ -17,11 +21,8 @@ define(["require", "exports", "BasicPage", "Modal", "BwRule", "NewFinger"], func
             _this.initPage();
             return _this;
         }
-        /*
-        * 初始化页面
-        * */
         AttendancePage.prototype.initPage = function () {
-            var self = this, para = self.para;
+            var self = this, para = self.para, text = '指纹机正在初始化，请稍后';
             var detail = h("div", { class: "attend-detail" });
             //创建左侧框
             var content = h("div", { class: "attend-content" },
@@ -29,7 +30,7 @@ define(["require", "exports", "BasicPage", "Modal", "BwRule", "NewFinger"], func
             //指纹考勤块
             self.fingerNode = h("div", { class: "finger-content" },
                 h("p", { class: "finger-title" }, "\u8003\u52E4\u4FE1\u606F"),
-                h("p", { class: "finger-msg" }, "\u6307\u7EB9\u673A\u51C6\u5907\u5C31\u7EEA\uFF0C\u8BF7\u6309\u4E0B\u624B\u6307..."));
+                h("p", { class: "finger-msg" }, text));
             //创建右侧考勤展示框
             var listMsg = h("div", { class: "attend-msg" },
                 h("ul", { class: "list-msg" }));
@@ -42,6 +43,21 @@ define(["require", "exports", "BasicPage", "Modal", "BwRule", "NewFinger"], func
             dateEl.innerHTML = getDate();
             self.timer = setInterval(function () {
                 dateEl.innerHTML = getDate();
+            }, 1000);
+            var i = 0, dots = '';
+            var fingerMsg = this.fingerNode.querySelector('.finger-msg');
+            self.msgTimer = setInterval(function () {
+                if (i >= 10) {
+                    Modal_1.Modal.alert('初始化指纹机失败，请重新刷新!');
+                    fingerMsg.innerHTML = '初始化指纹机失败！';
+                    clearInterval(self.msgTimer);
+                    return;
+                }
+                dots += '.';
+                fingerMsg.innerHTML = text + dots;
+                if (i++ % 3 === 0) {
+                    dots = '';
+                }
             }, 1000);
             /*
             * 获取时间
@@ -62,12 +78,12 @@ define(["require", "exports", "BasicPage", "Modal", "BwRule", "NewFinger"], func
             var self = this;
             var fingerMsg = this.fingerNode.querySelector('.finger-msg');
             var fingerTitle = this.fingerNode.querySelector('.finger-title');
-            var myDB = {
-                storeName: 'fingers',
-                version: 3
-            };
             var fingerObj = new NewFinger_1.NewFinger({
                 callFinger: function (text) {
+                    if (self.msgTimer !== null) {
+                        clearInterval(self.msgTimer);
+                        self.msgTimer = null;
+                    }
                     fingerMsg.innerHTML = '<span>' + text + '</span>';
                 },
                 fingerFinish: function (e) {
@@ -126,12 +142,12 @@ define(["require", "exports", "BasicPage", "Modal", "BwRule", "NewFinger"], func
         //右侧展示考勤成功信息
         AttendancePage.prototype.addList = function (result) {
             var list = this.dom.querySelector('.list-msg');
-            var li = d.create("<li class=\"animated\">\n                        <span class=\"arrow\">" + result.datetime + "</span>\n                        <span>" + (result.userName + result.result) + "</span></li>");
+            var li = d.create("<li>\n                        <span class=\"arrow\">" + result.datetime + "</span>\n                        <span>" + (result.userName + result.result) + "</span></li>");
             list.insertBefore(li, list.firstChild);
             var timer = setTimeout(function () {
-                li.className = '';
+                li.className = 'animated';
                 clearTimeout(timer);
-            }, 1000);
+            }, 1);
         };
         //销毁
         AttendancePage.prototype.destroy = function () {

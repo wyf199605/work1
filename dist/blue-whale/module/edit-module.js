@@ -68,11 +68,11 @@ define("EditModule", ["require", "exports", "AssignModule", "UploadModule", "Ass
                         onComplete: function (response) {
                             var _a;
                             var data = response.data;
-                            if (!_this.para.fields.some(function (f) { return f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase(); })) {
-                                Modal_1.Modal.alert('无法找到附件，附件是否进行过改造');
-                                com.com.text = '';
-                                return;
-                            }
+                            // if(!this.para.fields.some(f => f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase())) {
+                            //     Modal.alert('无法找到附件，附件是否进行过改造');
+                            //     com.com.text = '';
+                            //     return;
+                            // }
                             //fileId 值加入额外数据中
                             var upperKeyData = {};
                             for (var field in data) {

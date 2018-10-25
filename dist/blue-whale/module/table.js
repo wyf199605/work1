@@ -1,4 +1,4 @@
-define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTable", "TableBase", "InputBox", "Button", "Modal", "BwInventoryBtnFun", "UploadModule", "Loading", "LayoutImage", "ButtonAction", "Inputs", "FlowDesigner"], function (require, exports, BwRule_1, FastTable_1, FastBtnTable_1, TableBase_1, InputBox_1, Button_1, Modal_1, InventoryBtn_1, uploadModule_1, loading_1, LayoutImage_1, ButtonAction_1, inputs_1, FlowDesigner_1) {
+define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTable", "TableBase", "InputBox", "Button", "Modal", "BwInventoryBtnFun", "UploadModule", "Loading", "LayoutImage", "ButtonAction", "Inputs"], function (require, exports, BwRule_1, FastTable_1, FastBtnTable_1, TableBase_1, InputBox_1, Button_1, Modal_1, InventoryBtn_1, uploadModule_1, loading_1, LayoutImage_1, ButtonAction_1, inputs_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Component = G.Component;
@@ -152,12 +152,14 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
                 var getCols = function () {
                     var cols = [];
                     _this.ftable && _this.ftable.columns.forEach(function (col) {
-                        cols.push({
-                            name: col.name,
-                            title: col.title,
-                            isNumber: col.isNumber,
-                            content: col.content
-                        });
+                        if (col && col.show && !col.isVirtual) {
+                            cols.push({
+                                name: col.name,
+                                title: col.title,
+                                isNumber: col.isNumber,
+                                content: col.content
+                            });
+                        }
                     });
                     return cols;
                 };
@@ -463,7 +465,7 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
                                             }
                                         });
                                     }
-                                    new FlowDesigner_1.FlowDesigner(dataAddr_1);
+                                    // new FlowDesigner(dataAddr);
                                 }
                                 else {
                                     // 通用操作按钮
@@ -695,6 +697,7 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
             var _this = this;
             var ui = this.ui;
             this.ftable = new FastBtnTable_1.FastBtnTable(Object.assign(this.baseFtablePara, {
+                exportTitle: this.ui.caption,
                 cols: this.colParaGet(this._cols),
                 ajax: {
                     ajaxData: ajaxData,
@@ -834,6 +837,7 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
                     colspan: hasSubCol ? subCols.length : 1,
                     rowspan: isAbsField && !hasSubCol ? 2 : 1,
                     maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
+                    isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
                 });
                 if (hasSubCol) {
                     // 是否有子列
@@ -852,33 +856,45 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
             });
             return colsPara;
         };
+        BwTableModule.prototype.pivotRefresh = function (ajaxData) {
+            var _this = this;
+            if (ajaxData === void 0) { ajaxData = {}; }
+            return new Promise(function (resolve, reject) {
+                var loading = new loading_1.Loading({
+                    msg: '加载中...',
+                    container: _this.wrapper
+                });
+                _this.ajax.fetch(CONF.siteUrl + BwRule_1.BwRule.reqAddr(_this.ui.dataAddr), {
+                    data: Object.assign({}, ajaxData, { pageparams: "{\"index\"=1,\"size\"=3000,\"total\"=1}" }) //设置初始分页条件
+                }).then(function (_a) {
+                    var response = _a.response;
+                    resolve(response);
+                }).catch(function (e) {
+                    reject(e);
+                }).finally(function () {
+                    loading.destroy();
+                    loading = null;
+                });
+            });
+        };
         /**
          * 初始化交叉制表
          * @param ajaxData - 查询参数
          */
         BwTableModule.prototype.pivotInit = function (ajaxData) {
-            // let isFirst = tableDom.classList.contains('mobileTable');
             var _this = this;
             if (ajaxData === void 0) { ajaxData = {}; }
-            var loading = new loading_1.Loading({
-                msg: '加载中...',
-                container: this.wrapper
-            });
-            this.ajax.fetch(CONF.siteUrl + BwRule_1.BwRule.reqAddr(this.ui.dataAddr), {
-                data: Object.assign({}, ajaxData, { pageparams: "{\"index\"=1,\"size\"=3000,\"total\"=1}" }) //设置初始分页条件
-            }).then(function (_a) {
-                var response = _a.response;
+            // let isFirst = tableDom.classList.contains('mobileTable');
+            this.pivotRefresh(ajaxData).then(function (response) {
                 if (tools.isEmpty(response)) {
                     return;
                 }
                 _this.ftable = new FastBtnTable_1.FastBtnTable(Object.assign(_this.baseFtablePara, {
+                    exportTitle: _this.ui.caption,
                     cols: colsParaGet(response.meta),
                     data: response.data
                 }));
                 _this.ftableReady();
-            }).finally(function () {
-                loading.destroy();
-                loading = null;
             });
             /**
              * 把返回的数据与UI合并成交叉制表的列参数(具体规则要问下小路, 太久记不清了)
@@ -918,6 +934,7 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
                             isNumber: subName ? void 0 :
                                 BwRule_1.BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                             isVirtual: subName ? void 0 : field.noShow,
+                            isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
                         });
                         currentOriginField = {
                             name: nextMainName,
@@ -935,7 +952,8 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
                             isNumber: BwRule_1.BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                             isVirtual: field.noShow,
                             colspan: 1,
-                            rowspan: 1
+                            rowspan: 1,
+                            isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
                         });
                     }
                 });
@@ -1084,9 +1102,16 @@ define("BwTableModule", ["require", "exports", "BwRule", "FastTable", "FastBtnTa
         });
         BwTableModule.prototype.refresh = function (data) {
             var _this = this;
-            return this.ftable.tableData.refresh(data).then(function () {
-                _this.aggregate.get(data);
-            });
+            if (this.isPivot) {
+                return this.pivotRefresh(data).then(function (response) {
+                    _this.ftable && (_this.ftable.data = response.data || []);
+                });
+            }
+            else {
+                return this.ftable.tableData.refresh(data).then(function () {
+                    _this.aggregate.get(data);
+                });
+            }
         };
         Object.defineProperty(BwTableModule.prototype, "pageUrl", {
             get: function () {
@@ -2033,7 +2058,7 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
                     });
                     bwTable.ftable.editorInit({
                         defData: defData,
-                        isPivot: _this.bwEl.relateType === 'P',
+                        isPivot: bwTable.isPivot,
                         autoInsert: false,
                         inputInit: function (cell, col, data) {
                             var rowIndex = cell.row.index, row = bwTable.ftable.rowGet(rowIndex), field = col.content;
@@ -2074,6 +2099,23 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
                                                         });
                                                     }
                                                 });
+                                            }
+                                        }
+                                    }
+                                    else if (Array.isArray(field.assignSelectFields)) {
+                                        // 上传文件返回File_id，需要设置file_id值， 或者修改关联的assign的值
+                                        field.assignSelectFields.forEach(function (name) {
+                                            var cell = row.cellGet(name);
+                                            if (cell) {
+                                                cell.data = data[name] || '';
+                                            }
+                                        });
+                                    }
+                                    else if (Array.isArray(field.relateFields)) {
+                                        for (var key in data) {
+                                            var cell_3 = row.cellGet(key);
+                                            if (cell_3) {
+                                                cell_3.data = data[key] || '';
                                             }
                                         }
                                     }
@@ -2160,12 +2202,13 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
                         });
                     });
                 };
-                var editParamDataGet = function (tableData, varList) {
+                var editParamDataGet = function (tableData, varList, isPivot) {
+                    if (isPivot === void 0) { isPivot = false; }
                     var paramData = {};
                     varList && ['update', 'delete', 'insert'].forEach(function (key) {
                         var dataKey = varList[key + "Type"];
                         if (varList[key] && tableData[dataKey][0]) {
-                            var data = BwRule_1.BwRule.varList(varList[key], tableData[dataKey], true, _this.bwEl.relateType !== 'P');
+                            var data = BwRule_1.BwRule.varList(varList[key], tableData[dataKey], true, !isPivot);
                             if (data) {
                                 paramData[key] = data;
                             }
@@ -2184,7 +2227,8 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
                         if (!bwTable) {
                             return;
                         }
-                        var editData = bwTable.ftable.editedData;
+                        var editData = bwTable.ftable.editedData, isPivot = editData.isPivot;
+                        delete editData.isPivot;
                         if (i === 1) {
                             // 带上当前主表的字段
                             var mainData_1 = _this.main.ftable.edit;
@@ -2200,7 +2244,7 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
                             }
                         }
                         //
-                        var data = editParamDataGet(editData, bwTable.editParam);
+                        var data = editParamDataGet(editData, bwTable.editParam, isPivot);
                         // tm.table.edit.reshowEditing();
                         //
                         if (!tools.isEmpty(data)) {
@@ -2414,7 +2458,7 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
                                 }
                             });
                             if (!tools.isMb) {
-                                d.query('ul.nav-tabs').appendChild(h("i", { className: "fa fa-expand full-icon" }));
+                                d.query('ul.nav-tabs', _this.main.container).appendChild(h("i", { className: "fa fa-expand full-icon" }));
                             }
                         }
                         _this.tab.len <= 0 && _this.bwEl.subTableList.forEach(function (sub) {
@@ -2473,7 +2517,7 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
             configurable: true
         });
         NewTableModule.prototype.subRefresh = function (rowData) {
-            var bwEl = this.bwEl, subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex], main = this.main, mftable = main.ftable;
+            var bwEl = this.bwEl, subUi = bwEl.subTableList && bwEl.subTableList[0], main = this.main, mftable = main.ftable;
             if (tools.isEmpty(subUi)) {
                 return;
             }
@@ -2484,15 +2528,6 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
             Object.values(this.sub).forEach(function (subTable) {
                 subTable.refresh(ajaxData).catch();
             });
-            // if (!tools.isNotEmpty(this.sub[this.subTabActiveIndex])) {
-            //     let {subParam} = getMainSubVarList(bwEl.tableAddr);
-            //     this.subInit(subUi, subParam, ajaxData);
-            // } else {
-            //     this.mobileModal && (this.mobileModal.isShow = true);
-            //     this.sub.forEach((subTable) => {
-            //         subTable.refresh(ajaxData).catch();
-            //     });
-            // }
         };
         NewTableModule.prototype.subInit = function (ui, editParam, ajaxData, tabEl) {
             this.sub[this.subTabActiveIndex] = new BwSubTableModule_1.BwSubTableModule({
@@ -2563,7 +2598,6 @@ define("newTableModule", ["require", "exports", "BwRule", "BwMainTableModule", "
             this._btnWrapper = null;
             this.tab = null;
         };
-        NewTableModule.EVT_EXPORT_DATA = '__EVENT_EXPORT_TABLE_DATA__';
         NewTableModule.EVT_EDIT_SAVE = "__event_edit_save__";
         return NewTableModule;
     }());

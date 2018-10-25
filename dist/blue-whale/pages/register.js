@@ -1,4 +1,4 @@
-define("RegPage", ["require", "exports", "BwRule", "Modal", "ShellAction", "UnBinding"], function (require, exports, BwRule_1, Modal_1, ShellAction_1, UnBinding_1) {
+define("RegPage", ["require", "exports", "BwRule", "Modal", "ShellAction", "UnBinding", "FqaModal"], function (require, exports, BwRule_1, Modal_1, ShellAction_1, UnBinding_1, fqa_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /// <amd-module name="RegPage"/>
@@ -129,6 +129,11 @@ define("RegPage", ["require", "exports", "BwRule", "Modal", "ShellAction", "UnBi
             });
             if (sys.os !== 'pc') {
                 sys.window.close = double_back;
+            }
+            if (props.fqaBtn) {
+                props.fqaBtn.onClick = tools.pattern.throttling(function () {
+                    new fqa_1.FqaModal({});
+                }, 1000);
             }
         }
         RegPage.prototype.getDevice = function () {

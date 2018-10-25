@@ -613,6 +613,7 @@ define("LoginPage", ["require", "exports", "Modal", "User", "Device", "BwRule", 
                     callback(result).then(function () {
                         loginPage.loginBtnState(10);
                         var user = User_1.User.get();
+                        user.clearStorage();
                         response.dataArr.forEach(function (col, index) {
                             if (col.NAME === 'are_id') {
                                 user.are_id = col.VALUE;
@@ -747,7 +748,7 @@ define("LoginPage", ["require", "exports", "Modal", "User", "Device", "BwRule", 
          * 改变登录状态
          */
         LoginPage.prototype.loginBtnState = function (type) {
-            var btn = this.props.loginButton, login = btn instanceof Button_1.Button ? btn.wrapper : btn, loginText = sys.isMb ? login : login.querySelector('.text');
+            var btn = this.props.loginButton, login = btn instanceof Button_1.Button ? btn.wrapper : btn, loginText = login;
             switch (type) {
                 case 0:
                     login.classList.remove('disabled');

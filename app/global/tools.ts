@@ -523,6 +523,7 @@ namespace G {
                 win.dispatchEvent(e);
             }
         },
+
         date: {
             oneDay: 86400000,
             today: () => new Date(),

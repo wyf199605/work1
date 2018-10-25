@@ -908,7 +908,7 @@ define("FlowListPC", ["require", "exports", "BasicPage", "newTableModule", "Tab"
                         }
                         else {
                             // 表格存在 刷新并显示
-                            // this.subTables[index].refresh().catch();
+                            _this.subTables[index].refresh().catch();
                         }
                     }
                 });

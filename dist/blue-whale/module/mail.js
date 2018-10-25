@@ -125,7 +125,6 @@ define("Mail", ["require", "exports", "InputBox", "Button", "Loading", "UserSele
         };
         Mail.prototype.initSubBtns = function (btnsUi) {
             var _this = this;
-            this.btnWrapper = h("div", { className: "mail-btn-group" });
             var box = new InputBox_1.InputBox({
                 container: this.btnWrapper,
                 isResponsive: !tools.isMb,
@@ -196,10 +195,10 @@ define("Mail", ["require", "exports", "InputBox", "Button", "Loading", "UserSele
                         btnsUi.push(btn);
                     });
                 }
-                _this.initSubBtns(btnsUi);
                 if (_this.isOne) {
                     _this.btnEvent(elements.fields);
                 }
+                _this.initSubBtns(btnsUi);
                 return _this.ajax.fetch(CONF.siteUrl + elements.dataAddr.dataAddr, {
                     cache: true,
                 }).then(function (_a) {
@@ -249,7 +248,7 @@ define("Mail", ["require", "exports", "InputBox", "Button", "Loading", "UserSele
             }
             var contentEl = d.create("<div>\n            <div class=\"mail-head mail-hide\">\n                <div class=\"mail-title\">\n                    " + title + "\n                    <div class=\"btn-group-right\"></div>\n                    <div class=\"avatar-right\">\n                        <div class=\"mail-avatar\"></div>\n                        " + icon + "\n                    </div>\n                </div>\n                <div class=\"mail-three\">\n                    " + three + "\n                </div>\n                <div class=\"mail-more\">\n                    " + more + "\n                </div>\n            </div>\n            <div class=\"mail-body\">" + attachname + "</div>\n            <div class=\"mail-content\">\n                " + content + "\n            </div>\n        </div>");
             return h("div", { className: "mail-detail" },
-                this.btnWrapper,
+                this.btnWrapper = h("div", { className: "mail-btn-group" }),
                 contentEl);
         };
         return Mail;

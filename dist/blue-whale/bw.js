@@ -697,6 +697,7 @@ define("BwRule", ["require", "exports", "Modal", "ImgModal", "ImgModalMobile"], 
                     else if (col.atrrs && col.atrrs.dataType == '30') {
                         //富文本
                         col.comType = 'richText'; // --------------
+                        col.isCanSort = false;
                     }
                     else if (col.atrrs && col.atrrs.dataType == '17') {
                         //toggle
@@ -760,8 +761,8 @@ define("BwRule", ["require", "exports", "Modal", "ImgModal", "ImgModalMobile"], 
             1: Rule.reqAddrCommit[1],
             2: function (reqAddr, data) {
                 //参数构造
-                var newData = [], params;
-                if (data) {
+                var newData = [], params = data;
+                if (data && data[0]) {
                     data[0].forEach(function (s, i) {
                         newData.push({});
                         var _loop_1 = function (item) {
@@ -1396,7 +1397,7 @@ var BW;
                         }
                         localStorage.setItem('viewData', JSON.stringify(o.extras));
                     },
-                    close: function (event, data, url, destUrl) {
+                    close: function (event, data, url) {
                         if (event === void 0) { event = ''; }
                         if (data === void 0) { data = null; }
                         var lastUrl = BW.sysPcHistory.last();
@@ -1410,13 +1411,8 @@ var BW;
                             self.pages.close(url);
                             self.tabs.close(url);
                             // 如果关闭当前打开的页面，则关闭后打开历史倒数第二位置的页面
-                            if (tools.isNotEmpty(destUrl)) {
-                                self.window.open({ url: destUrl });
-                            }
-                            else {
-                                if (BW.sysPcHistory.len() > 0 && isLast) {
-                                    self.window.open({ url: BW.sysPcHistory.last() });
-                                }
+                            if (BW.sysPcHistory.len() > 0 && isLast) {
+                                self.window.open({ url: BW.sysPcHistory.last() });
                             }
                         }
                     },
@@ -2436,26 +2432,29 @@ define("ButtonAction", ["require", "exports", "InputBox", "Button", "Modal", "Se
         };
         ButtonAction.prototype.initBarCode = function (res, data, dataObj) {
             // console.log(res.body.elements)
-            var dataAddr = res.body.elements, codeStype, url, uniqueFlag, ajaxUrl;
+            var dataAddr = res.body.elements, codeStype, url, uniqueFlag, analysis, downUrl, uploadUrl;
             for (var i = 0; i < dataAddr.length; i++) {
                 url = dataAddr[i].downloadAddr.dataAddr;
                 codeStype = dataAddr[i].atvarparams[0].data; //可能需要做判断
                 uniqueFlag = dataAddr[i].uniqueFlag;
+                downUrl = dataAddr[i].downloadAddr.dataAddr;
+                uploadUrl = dataAddr[i].uploadAddr.dataAddr;
             }
             console.log(codeStype[0]["IMPORTDATAMODE"]);
-            BwRule_1.BwRule.Ajax.fetch(BW.CONF.siteUrl + url, {
-                data: data
-            }).then(function (_a) {
-                var response = _a.response;
-                console.log(response);
-                response.body && (ajaxUrl = response.body.bodyList[0].inventData);
-            });
+            // BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
+            //     data:data
+            // }).then(({response})=>{
+            //     console.log(response)
+            //     response.body && (analysis =  response.body.bodyList[0].inventData)
+            // })
             require(['RfidBarCode'], function (p) {
                 new p.RfidBarCode({
                     codeStype: codeStype,
                     SHO_ID: dataObj['SHO_ID'],
                     USERID: dataObj['USERID'],
-                    url: ajaxUrl,
+                    uploadUrl: uploadUrl,
+                    downUrl: downUrl,
+                    uniqueFlag: uniqueFlag
                 });
             });
         };
