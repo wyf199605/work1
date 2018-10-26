@@ -32,7 +32,6 @@ export class Uploader extends FormCom{
         }
     }
     constructor(private para: IUploaderPara){
-
         super(para);
         this.initDom();
         require(['webUpLoader', 'md5'], (WebUploader, md5) => {
@@ -83,7 +82,7 @@ export class Uploader extends FormCom{
             , "before-send": "beforeSend"
             , "after-send-file": "afterSendFile"
         }, {
-            beforeSendFile: function(file : File){
+            beforeSendFile: (file : File)=>{
                 //秒传验证
                 let task = $.Deferred();
                 let start = new Date().getTime();
@@ -121,7 +120,7 @@ export class Uploader extends FormCom{
                             self.com.skipFile(file);
                             // file.path = data.path;
                             self.fileName = file.name;
-                            self.para.onComplete(response, file,self.type);
+                            self.para.onComplete(response, file,Uploader.type);
                         } else {
                             task.resolve();
                             //拿到上传文件的唯一名称，用于断点续传
@@ -191,7 +190,7 @@ export class Uploader extends FormCom{
                         //todo 检查响应是否正常
                         task.resolve();
                         self.fileName = file.name;
-                        self.para.onComplete(response, file,self.type);
+                        self.para.onComplete(response, file, Uploader.type);
                     }).catch(() => {
                         task.reject();
                     });
@@ -242,15 +241,9 @@ export class Uploader extends FormCom{
             , accept: para.accept ? para.accept : null
         });
     }
-    private _type:number; // 1表示file,2表示img
-    set type(type:number){
-        this._type = type;
-    }
-    get type(){
-        return this._type;
-    }
+    static type:number; // 1表示file,2表示img
     upload(type?:number){
-        this.type = type || 0;
+        Uploader.type = type || 0;
         this.com.upload();
     }
 
