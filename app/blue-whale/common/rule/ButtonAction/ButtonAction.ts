@@ -297,7 +297,7 @@ export class ButtonAction {
     //         }
     //     });
     // }
-    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
+    checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
         let self = this,
             varType = btn.actionAddr.varType;
 

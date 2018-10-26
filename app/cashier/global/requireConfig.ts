@@ -14,6 +14,7 @@ namespace C{
             paths: tools.obj.merge({
                 JsBarcode: ['../plugin/qrcode/JsBarcode.all.min'],
                 QRCode: ['../plugin/qrcode/qrcode.min'],
+                reconnectingWebscoket : ['../plugin/reconnecting-websocket-1.0.1'],
             }, config.paths),
 
             bundles: tools.obj.merge({

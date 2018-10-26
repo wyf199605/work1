@@ -9,6 +9,7 @@ import {Hints} from "../hints/hints";
 import sys = BW.sys;
 import sysPcHistory = BW.sysPcHistory;
 import CONF = BW.CONF;
+import {BwRule} from "../../common/rule/BwRule";
 declare let ReconnectingWebSocket : any;
 
 export = class webscoket {
@@ -19,7 +20,8 @@ export = class webscoket {
         if(!user.userid)
             return ;
         if ('WebSocket' in window) {
-            self.ws = new ReconnectingWebSocket(props.wsUrl+'/websocket/'+user.userid+'/single',null,{ debug:true,reconnectInterval:1000});
+            // self.ws = new ReconnectingWebSocket(props.wsUrl+'/websocket/'+user.userid+'/single',null,{ debug:true,reconnectInterval:1000});
+            self.ws = new ReconnectingWebSocket(props.wsUrl+'/sql/websocket/' + BwRule.getSqlRandom(),null,{ debug:true,reconnectInterval:1000});
         } else {
             Modal.toast('您的浏览器不支持websocket.');
             return;
@@ -28,7 +30,10 @@ export = class webscoket {
         self.ws.onopen = () => {
             // console.info("websocket 连接打开.");
         };
-        self.ws.onmessage = (r) => self.onMessage(r);
+        self.ws.onmessage = (r) => {
+            heartCheck.reset().start();
+            self.onMessage(r);
+        };
         self.ws.onerror = function(e){
             // console.warn("websocket出现异常."+e);
         };
@@ -59,6 +64,25 @@ export = class webscoket {
                 }
             }
         });
+
+        var heartCheck = {
+            timeout: 55000,        // 55s发一次心跳，比server端设置的连接时间稍微小一点，在接近断开的情况下以通信的方式去重置连接时间。
+            serverTimeoutObj: null,
+            reset: function () {
+                clearTimeout(this.timeoutObj);
+                clearTimeout(this.serverTimeoutObj);
+                return this;
+            },
+            start: function () {
+                this.serverTimeoutObj = setInterval(function () {
+                    if ( self.ws.readyState == 1) {
+                        console.log("连接状态，发送消息保持连接");
+                        self.ws.send(JSON.stringify({reqType:"ping"}));
+                        heartCheck.reset().start();    // 如果获取到消息，说明连接是正常的，重置心跳检测
+                    }
+                }, this.timeout)
+            }
+        }
     }
 
     private onMessage(r){
@@ -134,6 +158,9 @@ export = class webscoket {
                 // this.hint = new Hints({
                 //     data : data.data
                 // });
+                break;
+            case "token":
+                window.localStorage.setItem("sqlToken", data.identification);
                 break;
             default :
                 console.info("后台返回未知的消息类型.");

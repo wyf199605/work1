@@ -38,6 +38,15 @@ export class BwRule extends Rule {
         {value: 10, text: '为空'} // isnull
     ];
 
+    static SQL_SF = null;
+    static getSqlRandom(){
+        if(!this.SQL_SF){
+            this.SQL_SF = 'SQL_SF_' + new Date().getTime() + Math.random();
+        }
+        return this.SQL_SF;
+    }
+
+
     static isTime(dataType: string) {
         return dataType === BwRule.DT_DATETIME || dataType === BwRule.DT_TIME
     }

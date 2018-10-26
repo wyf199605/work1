@@ -10,9 +10,14 @@ import {SelectInput} from "../../../global/components/form/selectInput/selectInp
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {User} from "../../../global/entity/User";
 
+
 export class SqlMonitor extends BasicPage{
     private container: HTMLElement;
     private btns : obj = {};//存放button节点
+    private sqlUrl = {
+        start : `${CONF.siteAppVerUrl}/monitor/log/start` + this.identification(),
+        stop : `${CONF.siteAppVerUrl}/monitor/log/stop` + this.identification(),
+    };
     private coms: objOf<FormCom> = {};//存放data-type节点
     constructor(private para){
         super(para);
@@ -278,53 +283,15 @@ export class SqlMonitor extends BasicPage{
                 });
                 self.coms[name].set('');
             });
-
-            // Rule.ajax(CONF.siteAppVerUrl + url,{
-            //     type : 'POST',
-            //     success : (res) => {
-            //         let data = [],
-            //             caption = res.meta[0];
-            //         res.data.forEach(obj => {
-            //             if(!obj[caption]){
-            //                 data.unshift({
-            //                     value : '',
-            //                     text : '--- ---'
-            //                 })
-            //             }else {
-            //                 data.push({
-            //                     value : obj[caption],
-            //                     text : obj[caption]
-            //                 })
-            //             }
-            //
-            //         });
-            //         self.coms[name] =  new SelectInput({
-            //             container: el,
-            //             data: data,
-            //             readonly : true,
-            //             placeholder: '默认',
-            //             onSet: function (item, index) {
-            //                 console.log(item)
-            //             },
-            //             className: 'selectInput',
-            //             clickType: 0
-            //         });
-            //         self.coms[name].set('');
-            //     }
-            // });
         }
     }
 
 
     private stopSqlMonitor(){
-         BwRule.Ajax.fetch(`${CONF.siteAppVerUrl}/monitor/log/stop`, {
+         BwRule.Ajax.fetch(this.sqlUrl.stop, {
                  defaultCallback: false,
              }
          );
-         // Rule.ajax(`${CONF.siteAppVerUrl}/monitor/log/stop`, {
-         //         defaultCallback: false,
-         //     }
-         // );
      }
     private startSqlMonitor(){
         let appid = this.coms['appid'] as TextInput,
@@ -338,7 +305,7 @@ export class SqlMonitor extends BasicPage{
             monitorType = this.coms['monitorType'] as SelectInput,
             sqlType = this.coms['sqlType'] as SelectInput,
             data = {
-                "appId":appid.get(),
+                "application":appid.get(),
                 // "appServer":appserver.get(),
                 "dataSource":clientIp.get(),
                 "clientUser":clientUser.get(),
@@ -356,18 +323,16 @@ export class SqlMonitor extends BasicPage{
                     delete data[key];
                 }
             }
-            BwRule.Ajax.fetch(`${CONF.siteAppVerUrl}/monitor/log/start`, {
+            BwRule.Ajax.fetch(this.sqlUrl.start, {
                 type: 'POST',
                 defaultCallback: false,
                 data: data
             });
-            //
-            // Rule.ajax(`${CONF.siteAppVerUrl}/monitor/log/start`, {
-            //     type: 'POST',
-            //     defaultCallback: false,
-            //     data: JSON.stringify(data)
-            // });
     }
     static deviceType = [{value: 0,text:'--- ---'},{value:1,text:'Android'},{value:2,text:'IOS'},{value:3,text:'PC'}];
 
+    private identification(){
+        // return '';
+        return '?identification=' + BwRule.getSqlRandom();
+    }
 }
