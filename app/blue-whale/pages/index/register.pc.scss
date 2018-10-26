@@ -118,7 +118,9 @@
 //  }
 //
 //}
-
+.regPage{
+  overflow-y: auto;
+}
 .reg-page-container {
   width: 100%;
   min-height: 100%;
@@ -162,6 +164,7 @@
           margin-top: 20px;
           width: 65.4%;
           input {
+            padding: 0 10px;
             width: 100%;
             height: 40px;
             background-color: #ffffff;
@@ -169,6 +172,7 @@
             border: solid 1px #e2e2e2;
             color: #b0b0b0;
             padding-left: 10px;
+            color: #3a3a3a;
             &:focus {
               border: solid 1px #005bac;
             }

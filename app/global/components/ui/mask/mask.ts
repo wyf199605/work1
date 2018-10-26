@@ -29,7 +29,7 @@ export class Mask extends Component {
         let type = 'click';
         d.on(this.wrapper, type, (e) => {
             if(this.background){
-                e.preventDefault && e.preventDefault();
+                e.preventDefault();
                 e.stopPropagation();
                 // typeof this.onClick === 'function' && this.onClick(e);
             }

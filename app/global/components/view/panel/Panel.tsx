@@ -49,7 +49,7 @@ export class Panel extends Component {
             };
         });
         let isOpenFirst = tools.isEmpty(para.isOpenFirst) ? true : para.isOpenFirst;
-        if(isOpenFirst){
+        if(isOpenFirst && this._panelItems[0]){
             this._panelItems[0].selected = true;
             this.selectedIndexes.push(0);
         }

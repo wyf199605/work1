@@ -379,7 +379,7 @@ export class BwTableModule extends Component {
                 colspan: hasSubCol ? subCols.length : 1, // 其他列有子列
                 rowspan: isAbsField && !hasSubCol ? 2 : 1,
                 maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
-                isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true, // 是否可排序
+                isCanSort: field.isCanSort, // 是否可排序
             } as IFastTableCol);
 
             if (hasSubCol) {
@@ -488,7 +488,7 @@ export class BwTableModule extends Component {
                         isNumber: subName ? void 0 :
                             BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: subName ? void 0 : field.noShow,
-                        isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
+                        isCanSort: field.isCanSort,
                     } as IFastTableCol);
 
                     currentOriginField = {
@@ -509,7 +509,7 @@ export class BwTableModule extends Component {
                         isVirtual: field.noShow,
                         colspan: 1,
                         rowspan: 1,
-                        isCanSort: field.atrrs ? field.atrrs.dataType != '30' : true,
+                        isCanSort: field.isCanSort,
                     } as IFastTableCol);
                 }
 
@@ -622,7 +622,7 @@ export class BwTableModule extends Component {
         let ftable = this.ftable,
             clickableSelector = '.section-inner-wrapper:not(.pseudo-table) tbody', // 可点击区域
             tdSelector = `${clickableSelector} td`,
-            trSelector = `${clickableSelector} tr`,
+            trSelector = `${clickableSelector} tr td:not(.cell-link)`,
             self = this;
 
         // 点击链接时
@@ -649,13 +649,13 @@ export class BwTableModule extends Component {
             return !col.noShow && [BwRule.DT_IMAGE, BwRule.DT_MUL_IMAGE].includes(dataType);
         });
 
-        let imgHandler = function (e: MouseEvent) {
+        let imgHandler = function (e: MouseEvent, isTd = true) {
             if (e.altKey || e.ctrlKey || e.shiftKey) {
                 return;
             }
-            let isTd = this.tagName === 'TD',
-                index = parseInt(isTd ? this.parentElement.dataset.index : this.dataset.index),
-                name = this.dataset.name;
+            let td = d.closest(e.target as HTMLElement, 'td'),
+                index = parseInt(td.parentElement.dataset.index),
+                name = td.dataset.name;
 
             if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
                 self.multiImgEdit.show(name, index);
@@ -665,9 +665,13 @@ export class BwTableModule extends Component {
         };
 
         if (hasThumbnail) {
-            d.on(ftable.wrapper, 'click', `${tdSelector}.cell-img:not(.disabled-cell)`, tools.pattern.throttling(imgHandler, 1000))
+            d.on(ftable.wrapper, 'click', `${tdSelector}.cell-img:not(.disabled-cell)`, tools.pattern.throttling((e) => {
+                imgHandler(e, true);
+            }, 1000))
         } else {
-            ftable.click.add(trSelector, tools.pattern.throttling(imgHandler, 1000));
+            ftable.click.add(trSelector, tools.pattern.throttling((e) => {
+                imgHandler(e, false);
+            }, 1000));
         }
 
     }
@@ -1321,7 +1325,6 @@ export class BwTableModule extends Component {
             color: string,                  // 文字颜色
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
-
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;

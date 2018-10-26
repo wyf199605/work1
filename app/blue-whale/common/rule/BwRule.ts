@@ -577,11 +577,12 @@ export class BwRule extends Rule {
                 col.displayFormat = tools.isEmpty(col.atrrs) ? "" : col.atrrs.displayFormat;
                 col.trueExpr = tools.isEmpty(col.atrrs) ? "" : col.atrrs.trueExpr;
                 col.displayWidth = tools.isEmpty(col.atrrs) ? "" : col.atrrs.displayWidth;
+                col.isCanSort = true;
 
                 if (col.elementType == 'lookup') {
                     //look up
                     col.comType = 'selectInput';// --------------
-
+                    col.isCanSort = false;
 
                 } else if ((col.elementType == 'treepick' || col.elementType == 'pick')) {
 

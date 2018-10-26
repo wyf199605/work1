@@ -173,6 +173,10 @@ export class ButtonAction {
         let {addr, data} = BwRule.reqAddrFull(btn.actionAddr, dataObj),
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
+
+        if(!Array.isArray(dataObj) || dataObj.length === 1){
+            addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
+        }
         switch (btn.openType) {
             case 'none' :
                 if (!ajaxType) {
@@ -181,7 +185,9 @@ export class ButtonAction {
                 }
                 self.checkAction(btn, dataObj, addr, ajaxType, data, url).then(response => {
                     callback(response);
-                }).catch(() => {
+                    self.btnRefresh(btn.refresh, url);
+                }).catch((e) => {
+                    console.log(e);
                 });
                 break;
             case 'popup':
@@ -230,12 +236,29 @@ export class ButtonAction {
             downUrl = dataAddr[i].downloadAddr.dataAddr;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
         }
+<<<<<<< HEAD
         console.log(codeStype[0]["IMPORTDATAMODE"])
         // BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
         //     data:data
         // }).then(({response})=>{
         //     console.log(response)
         //     response.body && (analysis =  response.body.bodyList[0].inventData)
+=======
+
+        BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
+            data:data
+        }).then(({response})=>{
+            console.log(response)
+            response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
+        })
+
+        // new RfidBarCode({
+        //      codeStype:codeStype,
+        //      SHO_ID:dataObj['SHO_ID'],
+        //      USERID:dataObj['USERID'],
+        //      url:ajaxUrl,
+        //     uniqueFlag
+>>>>>>> bf13058271c4318c4db6342d2957db0cbe84029a
         // })
 
 

@@ -150,7 +150,7 @@ let event = (function () {
         let events = {
             press: {
                 type: 'press',
-                time: 500,
+                time: 700,
                 longClick: 0,
                 handler: null,
                 on(el:Node, selector:string){

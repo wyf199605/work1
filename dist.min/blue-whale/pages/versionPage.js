@@ -1,1 +1,0 @@
-define(["require","exports","BasicPage"],function(e,r,n){"use strict";return function(i){function e(e){var r=i.call(this,e)||this,n=(r.para=e).version,o="";return n.version_memo.split("<br>").forEach(function(e){o+="<p>"+e+"</p>"}),r.dom.querySelector(".versionNo").innerHTML=n.version_no,r.dom.querySelector(".versionMemo").innerHTML=o,r}return __extends(e,i),e}(n.default)});

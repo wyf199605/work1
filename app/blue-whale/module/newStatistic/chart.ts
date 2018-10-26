@@ -2,7 +2,6 @@
 /// <amd-dependency path="echarts" name="echarts"/>
 import {Modal} from "global/components/feedback/modal/Modal";
 import tools = G.tools;
-import dom = G.d;
 import {FormCom} from "../../../global/components/form/basic";
 import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
@@ -10,7 +9,6 @@ import {Echart} from "../../../global/utils/echart";
 import {Button} from "../../../global/components/general/button/Button";
 import d = G.d;
 import sys = BW.sys;
-import CONF = BW.CONF;
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {BwRule} from "../../common/rule/BwRule";
 import {drillUrlGet} from "../table/BwTableModule";
@@ -104,7 +102,10 @@ export = class NewChartBasic{
                         if (isDrill) {
                             let wrapper = this.para.getWrapper(),
                                 wrapperParent = sys.isMb ? <HTMLElement>d.closest(wrapper,'li') : <HTMLElement>wrapper.parentNode,
-                                echartBody, tableBut, fullScreenBut;
+                                echartBody = d.query('.Echart_body', wrapper.parentElement),
+                                tableBut, fullScreenBut;
+                            echartBody && d.remove(echartBody);
+                            
                             wrapper.style.display = 'block';
                             echartBody = document.createElement('div');
                             echartBody.className = 'Echart_body';
@@ -128,7 +129,8 @@ export = class NewChartBasic{
                             d.on(tableBut, 'click', clickHandler = (ev) => {
                                 // ev.stopPropagation();
                                 wrapper.style.display = 'block';
-                                d.remove(echartBody);
+                                let charEl = d.query('.Echart_body', wrapperParent);
+                                charEl && d.remove(charEl);
                                 !tools.isMb && (tableBut.style.display = 'none');
                                 d.off(tableBut, 'click', clickHandler);
                             });
@@ -173,7 +175,7 @@ export = class NewChartBasic{
                         else {
                             let tempModal = new Modal({
                                 className: 'tempModal',
-                                body: dom.create(`<div class="Echart_body" style="height:450px; width: 700px;"></div>`),
+                                body: d.create(`<div class="Echart_body" style="height:450px; width: 700px;"></div>`),
                                 container: self.para.container,
                                 isOnceDestroy: true,
                                 isBackground: false,
@@ -334,7 +336,7 @@ export = class NewChartBasic{
         this.body = <HTMLElement>this.modal.bodyWrapper;
         let tpl = this.htmlTpl();
         this.body.innerHTML = tpl;
-        dom.queryAll('[data-name]',this.body).forEach(el => {
+        d.queryAll('[data-name]',this.body).forEach(el => {
             this.initHtmlTpl(el.dataset.name,el);
         });
         let row = <SelectInput>this.coms['row'];

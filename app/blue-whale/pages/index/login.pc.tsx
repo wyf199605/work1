@@ -10,7 +10,7 @@ export class LoginPcPage extends LoginPage {
     constructor(para) {
         // 初始化头部logo和注册按钮
         let logoWrapper = <div className="logo">
-            <img data-action="selectServer" src={G.requireBaseUrl + '../img/develop/login-logo.png'} alt="fastlion"/>
+            <img data-action="selectServer" src={G.requireBaseUrl + '../img/login-logo.png'} alt="fastlion"/>
         </div>;
 
         // 初始化表单内容（输入框、按钮等）
@@ -82,7 +82,7 @@ export class LoginPcPage extends LoginPage {
             {footer}
         </div>;
         d.append(para.dom, wrapper);
-        para.dom.style.backgroundImage = `url(${G.requireBaseUrl + '../img/develop/bg.png'})`;
+        para.dom.style.backgroundImage = `url(${G.requireBaseUrl + '../img/bg.png'})`;
         para.dom.style.backgroundRepeat = 'repeat-x';
         para.dom.style.backgroundPositionY = 'center';
 

@@ -124,6 +124,7 @@ interface R_Field extends COL {
         dataAddr: R_ReqAddr;
     }
     chkAddr?: R_ReqAddr;
+    isCanSort?: boolean;
 }
 
 interface winOpen {
