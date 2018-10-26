@@ -183,10 +183,19 @@ gulp.task('js', function () {
     gulpTsModule(['mail/mail'], 'mail.js');
 
     //upload模块
+
     gulpTsModule(['uploadModule/uploadModule'], 'uploadModule.js');
 
     //drawpoint模块
     gulpTsModule(['DrawPoint/DrawPoint'],'DrawPoint.js');
+
+    gulpTsModule([
+        'uploadModule/uploadModule',
+        'uploadModule/accessoryItem',
+        'uploadModule/accessory',
+        'uploadModule/uploadImages',
+        'uploadModule/uploadImagesItem',
+    ], 'uploadModule.js');
 
     //unBinding模块
     gulpTsModule(['unBinding/UnBinding'], 'unBinding.js');

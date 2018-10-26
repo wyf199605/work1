@@ -117,7 +117,7 @@ export class Uploader extends FormCom{
 
                     }).then(function ({response}) {
                         if (response.ifExist) {   //若存在，这返回失败给WebUploader，表明该文件不需要上传
-                            task.reject();
+                            task.reject('ifExist');
                             self.com.skipFile(file);
                             // file.path = data.path;
                             self.fileName = file.name;
@@ -153,7 +153,7 @@ export class Uploader extends FormCom{
                     , dataType: "json"
                 }).then(({response}) => {
                     if (response.ifExist) {   //若存在，返回失败给WebUploader，表明该分块不需要上传
-                        task.reject();
+                        task.reject('ifExist');
                     } else {
                         task.resolve();
                     }
