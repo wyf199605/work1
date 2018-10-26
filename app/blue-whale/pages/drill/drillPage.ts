@@ -1,5 +1,4 @@
 import BasicPage from "basicPage";
-import {TableModule} from "../../module/table/tableModule";
 import {BwSubTableModule} from "../../module/table/BwSubTableModule";
 declare const initDataTable : any;
 export = class drillPage extends BasicPage{
