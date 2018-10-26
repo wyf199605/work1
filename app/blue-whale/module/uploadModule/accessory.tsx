@@ -19,7 +19,7 @@ export interface IFileInfo {
 export interface IAccessory extends IUploaderPara {
     caption?: string;
     files?: IFileInfo[];
-
+    // fileInfoAddr?:
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
     onChange?: Function; // 上传成功回调

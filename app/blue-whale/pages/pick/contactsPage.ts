@@ -20,6 +20,7 @@ interface contactsPagePara {
     recursion : number, //0不是，1是TreeFields必须正好是三个字段：主键字段，父字段，标题字段。
     dom,
     dataAddr:R_ReqAddr;
+    isDev?:boolean;
 }
 let clickEvent = tools.isMb ? 'click' : 'click';
 
@@ -108,7 +109,6 @@ export = class contactsPage {
             d.on(list, clickEvent, '.mui-table-view-cell a.notLoad[data-query]', function (e) {
                 let tapThis = this;
                 // console.log(tapThis.text)
-
                 function getLevelQuery(dom: HTMLElement, query = '') {
 
                      let parent = d.closest(dom.parentElement, 'li.mui-table-view-cell', list),
@@ -122,8 +122,30 @@ export = class contactsPage {
                      }
                 }
 
-                // debugger;
-                let url = ajaxUrl + (~ajaxUrl.indexOf('?') ? '&' : '?') + getLevelQuery(tapThis.parentElement);
+                let url = '';
+                let parseQuery = function (query) {
+                    let reg = /([^=&\s]+)[=\s]*([^&\s]*)/g;
+                    let obj = {};
+                    while (reg.exec(query)) {
+                        obj[RegExp.$1] = RegExp.$2;
+                    }
+                    return obj;
+                };
+                if(self.para.isDev){
+                    let forwardurl = tools.url.getPara('forwardurl',ajaxUrl),
+                        addr = ajaxUrl.split('&forwardurl')[0],
+                        queryStr = getLevelQuery(tapThis.parentElement),
+                        queryObj = parseQuery(queryStr);
+                    url = tools.url.addObj(addr,{
+                        forwardurl:tools.url.addObj(forwardurl,Object.assign({},queryObj,{
+                            isMb:true,
+                            output:"json"
+                        }))
+                    })
+                }else{
+                    url = ajaxUrl + (~ajaxUrl.indexOf('?') ? '&' : '?') + getLevelQuery(tapThis.parentElement);
+                }
+                console.log(getLevelQuery(tapThis.parentElement));
 
                 //数据一次性加载时
                 if(self.para.levelField === ''){
