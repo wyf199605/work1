@@ -10,6 +10,7 @@ import UploadModule from "./uploadModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
 
 export interface IFileInfo {
+    fileId?: string;
     fileSize?: number;
     fileName?: string;
     addr?: string;
@@ -18,6 +19,7 @@ export interface IFileInfo {
 export interface IAccessory extends IUploaderPara {
     caption?: string;
     files?: IFileInfo[];
+
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
     onChange?: Function; // 上传成功回调
@@ -26,10 +28,6 @@ export interface IAccessory extends IUploaderPara {
 export class Accessory extends FormCom {
 
     public uploader: Uploader;
-
-    get(): any {
-        return this.value;
-    }
 
     set(data: IFileInfo[]): void {
         this.value = data;
@@ -43,6 +41,15 @@ export class Accessory extends FormCom {
 
     get value() {
         return this._value;
+    }
+
+    get() {
+        let value = this.value,
+            trueVal = [];
+        value.forEach(v => {
+            trueVal.push(v.fileId);
+        });
+        return trueVal;
     }
 
     private accessoryBodyWrapper: HTMLElement = null;
@@ -64,9 +71,11 @@ export class Accessory extends FormCom {
         this.createUploader();
         this.initEvent.on();
     }
-    private loading:Loading = null;
+
+    private loading: Loading = null;
+
     private createUploader() {
-        if (tools.isEmpty(this.para.uploadUrl)){
+        if (tools.isEmpty(this.para.uploadUrl)) {
             Modal.alert('附件上传地址不能为空!');
             return;
         }
@@ -76,43 +85,45 @@ export class Accessory extends FormCom {
             accept: this.para.accept,
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
-            onComplete: (data, file) => {
-                if (this.loading){
-                    this.loading.hide();
-                    this.loading.destroy();
-                    this.loading = null;
-                    document.body.classList.remove('up-disabled');
-                }
-                if (data.code == 200 || data.errorCode === 0) {
-                    Modal.toast('上传成功!');
-                    this.para.onComplete && this.para.onComplete.call(this, data, file);
-                } else {
-                    this.para.onError && this.para.onError.call(this,file);
-                    Modal.alert(data.msg || data.errorMsg);
+            onComplete: (data, file,type) => {
+                if (type === 1) {
+                    if (this.loading) {
+                        this.loading.hide();
+                        this.loading.destroy();
+                        this.loading = null;
+                        document.body.classList.remove('up-disabled');
+                    }
+                    if (data.code == 200 || data.errorCode === 0) {
+                        Modal.toast('上传成功!');
+                        this.para.onComplete && this.para.onComplete.call(this, data, file);
+                    } else {
+                        this.para.onError && this.para.onError.call(this, file);
+                        Modal.alert(data.msg || data.errorMsg);
+                    }
                 }
             }
         });
 
         // 有文件被选中时
-        this.uploader.on('fileQueued', (file: File) => {
+        this.uploader.on('filesQueued', (file: File) => {
             this.para.onChange && this.para.onChange();
             //开始上传
-            if(!this.loading){
+            if (!this.loading) {
                 this.loading = new Loading({
-                    msg:'上传中...',
-                    container:document.body
+                    msg: '上传中...',
+                    container: document.body
                 });
                 document.body.classList.add('up-disabled');
             }
-            this.uploader.upload();
+            this.uploader.upload(1);
         });
 
-        this.uploader.on("error", function (type) {
+        this.uploader.on("error", (type) => {
             const msg = {
                 'Q_TYPE_DENIED': '文件类型有误',
                 'F_EXCEED_SIZE': '文件大小不能超过4M',
             };
-            if (this.loading){
+            if (this.loading) {
                 this.loading.hide();
                 this.loading.destroy();
                 this.loading = null;
@@ -156,7 +167,7 @@ export class Accessory extends FormCom {
     protected createListItem(para: IAccessoryItem) {
         para = Object.assign({}, para, {
             container: this.accessoryBodyWrapper,
-            index:this._value.index
+            index: this._value.index
         });
         return new AccessoryItem(para);
     }

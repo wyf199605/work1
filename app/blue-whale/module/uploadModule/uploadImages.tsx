@@ -74,26 +74,28 @@ export class UploadImages extends FormCom {
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             // 上传成功
-            onComplete: (res, file) => {
-                let data = res,
-                    isError = false;
-                if (tools.isNotEmpty(data.ifExist)){
-                    isError = data.ifExist === '1' ? true : false;
+            onComplete: (res, file,type) => {
+                if (type === 2) {
+                    let data = res,
+                        isError = false;
+                    if (tools.isNotEmpty(data.ifExist)) {
+                        isError = data.ifExist === '1' ? true : false;
+                    }
+                    let imageId = res.data.blobField.value,
+                        imageObj: IImage = {
+                            fileId: imageId,
+                            fileName: file.name,
+                            isError: isError
+                        };
+                    this.addItem(imageObj);
+                    this.para.onComplete && this.para.onComplete.call(this, data, file);
                 }
-                let imageId = res.data.blobField.value,
-                    imageObj: IImage = {
-                        fileId: imageId,
-                        fileName: file.name,
-                        isError: isError
-                    };
-                this.addItem(imageObj);
-                this.para.onComplete && this.para.onComplete.call(this, data, file);
             },
             container: this.addImg,
-            text: '+'
+            text: ''
         });
         this.uploader = uploader;
-        // 文件加入上传队列时 检测改图片是否存在
+        // 文件加入上传队列时 检测改图片是否存在(iOS端无作用)
         uploader.on('beforeFileQueued', (file) => {
             if (file.type.split('/')[0] === 'image') {
                 let imgsArr = this.value || [],
@@ -117,7 +119,7 @@ export class UploadImages extends FormCom {
             }
         });
         // 文件加入到上传队列，开始上传
-        this.uploader.on('fileQueued', (file: File) => {
+        this.uploader.on('filesQueued', (file: File) => {
             this.para.onChange && this.para.onChange();
             //开始上传
             if (!this.loading) {
@@ -127,24 +129,24 @@ export class UploadImages extends FormCom {
                 });
                 document.body.classList.add('up-disabled');
             }
-            this.uploader.upload();
+            this.uploader.upload(2);
         });
         // 上传错误时调用
-        uploader.on("uploadError", (file,res) => {
+        uploader.on("uploadError", (file, res) => {
             if (this.loading) {
                 this.loading.hide();
                 this.loading.destroy();
                 this.loading = null;
                 document.body.classList.remove('up-disabled');
             }
-            if (res === 'ifExist'){
+            if (res === 'ifExist') {
 
-            }else{
+            } else {
                 let imageObj: IImage = {
                     fileId: '',
                     fileName: file.name,
                     isError: true,
-                    localUrl:(window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
+                    localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
                 };
                 this.addItem(imageObj);
             }
@@ -159,12 +161,12 @@ export class UploadImages extends FormCom {
                 document.body.classList.remove('up-disabled');
             }
         });
-        uploader.on("error", function (type) {
+        uploader.on("error",  (type)=> {
             const msg = {
                 'Q_TYPE_DENIED': '文件类型有误',
                 'F_EXCEED_SIZE': '文件大小不能超过4M',
             };
-            if (this.loading){
+            if (this.loading) {
                 this.loading.hide();
                 this.loading.destroy();
                 this.loading = null;
@@ -172,7 +174,6 @@ export class UploadImages extends FormCom {
             }
             Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
         });
-
     }
 
     protected _listItems: UploadImagesItem[] = [];
@@ -223,7 +224,7 @@ export class UploadImages extends FormCom {
         para = Object.assign({}, para, {
             container: this.imgWrapper,
             index: this._value.length,
-            nameField:this.para.nameField
+            nameField: this.para.nameField
         });
         return new UploadImagesItem(para);
     }
@@ -255,7 +256,7 @@ export class UploadImages extends FormCom {
         }
     })();
 
-    private deleteImageItem(index:number){
+    private deleteImageItem(index: number) {
         let i = index - 1;
         let item = this._listItems[i];
         if (item) {
