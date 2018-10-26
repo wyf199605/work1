@@ -7,6 +7,8 @@ html, body {
   margin: 0;
   height: 100%;
   -webkit-font-smoothing: antialiased !important;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 body.fl-pc{

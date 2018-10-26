@@ -622,7 +622,7 @@ export class BwTableModule extends Component {
         let ftable = this.ftable,
             clickableSelector = '.section-inner-wrapper:not(.pseudo-table) tbody', // 可点击区域
             tdSelector = `${clickableSelector} td`,
-            trSelector = `${clickableSelector} tr`,
+            trSelector = `${clickableSelector} tr td:not(.cell-link)`,
             self = this;
 
         // 点击链接时
@@ -649,13 +649,13 @@ export class BwTableModule extends Component {
             return !col.noShow && [BwRule.DT_IMAGE, BwRule.DT_MUL_IMAGE].includes(dataType);
         });
 
-        let imgHandler = function (e: MouseEvent) {
+        let imgHandler = function (e: MouseEvent, isTd = true) {
             if (e.altKey || e.ctrlKey || e.shiftKey) {
                 return;
             }
-            let isTd = this.tagName === 'TD',
-                index = parseInt(isTd ? this.parentElement.dataset.index : this.dataset.index),
-                name = this.dataset.name;
+            let td = d.closest(e.target as HTMLElement, 'td'),
+                index = parseInt(td.parentElement.dataset.index),
+                name = td.dataset.name;
 
             if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
                 self.multiImgEdit.show(name, index);
@@ -665,9 +665,13 @@ export class BwTableModule extends Component {
         };
 
         if (hasThumbnail) {
-            d.on(ftable.wrapper, 'click', `${tdSelector}.cell-img:not(.disabled-cell)`, tools.pattern.throttling(imgHandler, 1000))
+            d.on(ftable.wrapper, 'click', `${tdSelector}.cell-img:not(.disabled-cell)`, tools.pattern.throttling((e) => {
+                imgHandler(e, true);
+            }, 1000))
         } else {
-            ftable.click.add(trSelector, tools.pattern.throttling(imgHandler, 1000));
+            ftable.click.add(trSelector, tools.pattern.throttling((e) => {
+                imgHandler(e, false);
+            }, 1000));
         }
 
     }
