@@ -670,7 +670,7 @@ export class NewTableModule {
                         result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
                     }
                 } else {
-                    result = editModule.validate.start(name, Object.assign({}, cell.data || {}));
+                    result = editModule.validate.start(name, cell.data);
                 }
 
                 if (result && result[name]) {

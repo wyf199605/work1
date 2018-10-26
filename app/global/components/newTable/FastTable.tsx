@@ -1605,7 +1605,7 @@ export class FastTable extends Component {
             let rowObj = this.rowGet(row);
             if (rowObj) {
                 let cell = rowObj.cellGet(column);
-                if (cell && !cell.isVirtual)
+                if (!cell.isVirtual)
                     cell._selectedInnerSet(true);
             }
         };
@@ -2803,12 +2803,19 @@ export class FastTable extends Component {
                     let num = this.rowAdd(void 0, 0);
                 } else {
                     let index = this.data[ev.row][TableBase.GUID_INDEX];
-                    if (this.edit.addIndex.get().indexOf(index) === -1 && this.edit.changeIndex.get().indexOf(index) === -1) {
+                    let addIndexes = this.edit.addIndex.get(),
+                        changeIndexes = this.edit.changeIndex.get();
+                    if (addIndexes.indexOf(index) === -1 && changeIndexes.indexOf(index) === -1) {
                         this.edit.changeIndex.add(index);
                     }
                 }
             });
-            table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell, isChange) => {
+            table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell: TableDataCell) => {
+                let index = cell.row.index;
+                if(!this.rows[index]){
+                    return
+                }
+                let isChange = this.rows[index].cells.some((cell: TableDataCell) => cell.isEdited);
                 if(!isChange){
                     let index = this.data[cell.row.index][TableBase.GUID_INDEX];
                     if (this.edit.addIndex.get().indexOf(index) > -1) {
