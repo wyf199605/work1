@@ -367,8 +367,32 @@ export const Shell = ((window, document) => {
             return ShellBase.handler('getColumnCount',{when:when,time:time,turn:false,inventory:inventoryKey,once:true,out:true},back);
         },
         //条码扫码下载的
-        downloadbarcode(uniqueFlag:string,url:string,back:IShellEventHandler){
-           return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,url:url},back)
+        downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,back:IShellEventHandler){
+           return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl},back);
+        },
+        //注入监听事件
+        openRegistInventory(type:number,params:obj,back:IShellEventHandler){
+            return ShellBase.handler('registInventory',{type:type,params:params},back,null,false);
+        },
+        closeRegistInventory(type:number,params:obj,back:IShellEventHandler){
+            ShellBase.eventOff('registInventory');
+            return ShellBase.handler('registInventory',{type:type,params:params},back);
+        },
+        //删除条码数据
+        delInventoryData(nameId:string,where:object,back:IShellEventHandler){
+            return ShellBase.handler('delInventoryData',{nameId:nameId,where:where},back);
+        },
+        //上传条码数据
+        uploadcodedata(nameId:string,back:IShellEventHandler){
+            return ShellBase.handler('uploadcodedata',{nameId:nameId},back,null,false);
+        },
+        //获取盘点数据
+        getTableInfo(uniqueFlag:string){
+          return ShellBase.handler('getTableInfo',{uniqueFlag:uniqueFlag})
+        },
+        //输入条码扫码查询
+        inputcodedata(optionStype:number,uniqueFlag:string,value:string,category:string[],back:IShellEventHandler){
+           return ShellBase.handler('inputcodedata',{uniqueFlag:uniqueFlag,value:value,category:category,optionStype:optionStype},back)
         },
         scan2dOn(back: IShellEventHandler) {
             return ShellBase.handler('startScan2DResult', '', back, null, false);
@@ -490,6 +514,7 @@ const ShellBase = (() => {
                         d.on(window, eventBack, function (e: CustomEvent) {
                             let detail = e.detail;
                             if (isAutoOff) {
+
                                 d.off(window, eventInfor);
                                 d.off(window, eventBack);
                             }

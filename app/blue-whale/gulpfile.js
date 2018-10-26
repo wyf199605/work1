@@ -77,8 +77,7 @@ gulp.task('js', function () {
     compiler.ts(['*', 'common/**/*'], 'bw.js', path.global);
 
 
-    compiler.ts(['BwTableModule', 'BwMainTable', 'BwSubTableModule', 'newTableModule', 'InventoryBtn'].map(s => 'module/table/' + s), 'table.js', path.module
-    );
+    compiler.ts(['BwTableModule', 'BwMainTable', 'BwSubTableModule','newTableModule', 'InventoryBtn'].map(s => 'module/table/' + s), 'table.js', path.module);
 
     // pc 表格
     compiler.ts([
@@ -126,7 +125,7 @@ gulp.task('js', function () {
     // mb编辑模块
     gulpTsModule([
         'edit/**/*',
-        'edit/*'
+        'edit/*',
     ], 'edit-module.js');
 
     //privilege模块
@@ -136,7 +135,7 @@ gulp.task('js', function () {
         'privilege/privilegeQuery',
         'privilege/privilegeDefault',
         'privilege/privilegePersonal',
-        'privilege/privilegeDP'
+        'privilege/privilegeDP',
     ], 'privilegeControl.js');
 
     //process模块
@@ -169,7 +168,7 @@ gulp.task('js', function () {
     gulpTsModule([
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
-        'listDetail/DetailModal'
+        'listDetail/DetailModal',
     ], 'listDetail.js');
 
     //process模块
@@ -184,6 +183,12 @@ gulp.task('js', function () {
     gulpTsModule(['mail/mail'], 'mail.js');
 
     //upload模块
+
+    gulpTsModule(['uploadModule/uploadModule'], 'uploadModule.js');
+
+    //drawpoint模块
+    gulpTsModule(['DrawPoint/DrawPoint'],'DrawPoint.js');
+
     gulpTsModule([
         'uploadModule/uploadModule',
         'uploadModule/accessoryItem',
@@ -202,10 +207,10 @@ gulp.task('js', function () {
     gulpTsModule(['hints/hints'], 'hints.js');
 
     //turnPage模块
-    gulpTsModule(['turnPage/TurnPage'], 'turnPage.js');
+    gulpTsModule(['turnPage/TurnPage'],'turnPage.js');
 
     //help模块
-    gulpTsModule(['helpMsg/HelpMsg'], 'helpMsg.js');
+    gulpTsModule(['helpMsg/HelpMsg'],'helpMsg.js');
 
     //label模块
     gulpTsModule(['labelPrint/labelPrint'], 'labelPrint.js');
@@ -301,7 +306,8 @@ gulp.task('js', function () {
     gulpTsPage('basicPage', 'basicPage.js');
     gulpTsPage('rfid/RfidSetting/RfidSetting', 'RfidSetting.js');
 
-    gulpTsPage('rfid/RfidBarCode/RfidBarCode', 'RfidBarCode.js');
+    gulpTsPage('rfid/RfidBarCode/RfidBarCode','RfidBarCode.js');
+    gulpTsPage('plan/PlanPage','PlanPage.js');
 });
 
 /**
