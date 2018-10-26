@@ -132,6 +132,7 @@ namespace G {
         url: {
             /*
             * 替换url中的模板数据
+            * 例：http://www.test.cn/sf/{name}/a => http://www.test.cn/sf/name/a
             * @param {string} url - 要替换的路径地址
             * @param {obj} data - 根据数据替换url中花括号{}的数据
             * */

@@ -236,21 +236,19 @@ export class ButtonAction {
             downUrl = dataAddr[i].downloadAddr.dataAddr;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
         }
-<<<<<<< HEAD
         console.log(codeStype[0]["IMPORTDATAMODE"])
         // BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
         //     data:data
         // }).then(({response})=>{
         //     console.log(response)
         //     response.body && (analysis =  response.body.bodyList[0].inventData)
-=======
 
-        BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
-            data:data
-        }).then(({response})=>{
-            console.log(response)
-            response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
-        })
+        // BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
+        //     data:data
+        // }).then(({response})=>{
+        //     console.log(response)
+        //     response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
+        // })
 
         // new RfidBarCode({
         //      codeStype:codeStype,
@@ -258,7 +256,6 @@ export class ButtonAction {
         //      USERID:dataObj['USERID'],
         //      url:ajaxUrl,
         //     uniqueFlag
->>>>>>> bf13058271c4318c4db6342d2957db0cbe84029a
         // })
 
 
