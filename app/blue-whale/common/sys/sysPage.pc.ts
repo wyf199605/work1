@@ -59,7 +59,7 @@ namespace BW{
 
             // 打开内网
             if(o.url.indexOf(location.hostname) > -1) {
-                Ajax.fetch(o.url).then(({response}) => {
+                Ajax.fetch(o.url, {data: o.data}).then(({response}) => {
                     d.setHTML(page, response);
                     callback(page);
                     typeof o.callback === 'function' && o.callback();

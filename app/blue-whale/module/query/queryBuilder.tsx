@@ -831,7 +831,7 @@ export class AtVarBuilder{
                 return {isScan : hasScan, on2dScan: this.para.on2dScan};
 
             case 'select':
-                let keys = Object.keys(conf.data[0]),
+                let keys = Object.keys(conf.data[0] ? conf.data[0] : {}),
                     data : ListItem[] = conf.data.map(d => {
                         return { text : keys.map((k) => d[k]).join(','), value : tools.str.toEmpty(d[keys[0]])}
                     });
