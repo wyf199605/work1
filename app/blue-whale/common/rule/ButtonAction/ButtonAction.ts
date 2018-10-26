@@ -238,6 +238,7 @@ export class ButtonAction {
         //     response.body && (analysis =  response.body.bodyList[0].inventData)
         // })
 
+
         require(['RfidBarCode'], (p) => {
             new p.RfidBarCode({
                 codeStype:codeStype,
