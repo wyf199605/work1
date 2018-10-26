@@ -121,7 +121,7 @@ export class Uploader extends FormCom{
                             self.com.skipFile(file);
                             // file.path = data.path;
                             self.fileName = file.name;
-                            self.para.onComplete(response, file);
+                            self.para.onComplete(response, file,self.type);
                         } else {
                             task.resolve();
                             //拿到上传文件的唯一名称，用于断点续传
@@ -191,7 +191,7 @@ export class Uploader extends FormCom{
                         //todo 检查响应是否正常
                         task.resolve();
                         self.fileName = file.name;
-                        self.para.onComplete(response, file);
+                        self.para.onComplete(response, file,self.type);
                     }).catch(() => {
                         task.reject();
                     });
@@ -242,7 +242,15 @@ export class Uploader extends FormCom{
             , accept: para.accept ? para.accept : null
         });
     }
-    upload(){
+    private _type:number; // 1表示file,2表示img
+    set type(type:number){
+        this._type = type;
+    }
+    get type(){
+        return this._type;
+    }
+    upload(type?:number){
+        this.type = type || 0;
         this.com.upload();
     }
 
