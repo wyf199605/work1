@@ -44,7 +44,7 @@ export class BwTableModule extends Component {
     }
 
     protected readonly isDrill: boolean;   // 是否钻取
-    protected readonly isPivot: boolean;   // 是否是交叉表
+    readonly isPivot: boolean;   // 是否是交叉表
     protected readonly hasQuery: boolean;  // 是否有查询器
     public ui: IBW_Table;                  // 表格UI JSON
     public readonly editParam: IBW_TableAddrParam; // 表格编辑的JSON
@@ -220,6 +220,7 @@ export class BwTableModule extends Component {
         let ui = this.ui;
         this.ftable = new FastBtnTable(
             Object.assign(this.baseFtablePara, {
+                exportTitle: this.ui.caption,
                 cols: this.colParaGet(this._cols), // 把fields转为表格的参数
                 ajax: {
                     ajaxData,
@@ -378,6 +379,7 @@ export class BwTableModule extends Component {
                 colspan: hasSubCol ? subCols.length : 1, // 其他列有子列
                 rowspan: isAbsField && !hasSubCol ? 2 : 1,
                 maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
+                isCanSort: field.isCanSort, // 是否可排序
             } as IFastTableCol);
 
             if (hasSubCol) {
@@ -398,35 +400,43 @@ export class BwTableModule extends Component {
         return colsPara;
     }
 
+    private pivotRefresh(ajaxData: obj = {}): Promise<any>{
+        return new Promise((resolve, reject) => {
+            let loading = new Loading({
+                msg: '加载中...',
+                container: this.wrapper
+            });
+            this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(this.ui.dataAddr), {
+                data: Object.assign({}, ajaxData, {pageparams: `{"index"=1,"size"=3000,"total"=1}`})  //设置初始分页条件
+            }).then(({response}) => {
+                resolve(response);
+            }).catch((e) => {
+                reject(e);
+            }).finally(() => {
+                loading.destroy();
+                loading = null;
+            });
+        })
+
+    }
     /**
      * 初始化交叉制表
      * @param ajaxData - 查询参数
      */
     private pivotInit(ajaxData: obj = {}) {
         // let isFirst = tableDom.classList.contains('mobileTable');
-
-        let loading = new Loading({
-            msg: '加载中...',
-            container: this.wrapper
-        });
-        this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(this.ui.dataAddr), {
-            data: Object.assign({}, ajaxData, {pageparams: `{"index"=1,"size"=3000,"total"=1}`})  //设置初始分页条件
-        }).then(({response}) => {
-
+        this.pivotRefresh(ajaxData).then((response) => {
             if (tools.isEmpty(response)) {
                 return;
             }
-
             this.ftable = new FastBtnTable(
                 Object.assign(this.baseFtablePara, {
+                    exportTitle: this.ui.caption,
                     cols: colsParaGet(response.meta),
                     data: response.data
                 })
             );
             this.ftableReady();
-        }).finally(() => {
-            loading.destroy();
-            loading = null;
         });
 
         /**
@@ -478,6 +488,7 @@ export class BwTableModule extends Component {
                         isNumber: subName ? void 0 :
                             BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: subName ? void 0 : field.noShow,
+                        isCanSort: field.isCanSort,
                     } as IFastTableCol);
 
                     currentOriginField = {
@@ -497,7 +508,8 @@ export class BwTableModule extends Component {
                         isNumber: BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: field.noShow,
                         colspan: 1,
-                        rowspan: 1
+                        rowspan: 1,
+                        isCanSort: field.isCanSort,
                     } as IFastTableCol);
                 }
 
@@ -610,7 +622,7 @@ export class BwTableModule extends Component {
         let ftable = this.ftable,
             clickableSelector = '.section-inner-wrapper:not(.pseudo-table) tbody', // 可点击区域
             tdSelector = `${clickableSelector} td`,
-            trSelector = `${clickableSelector} tr`,
+            trSelector = `${clickableSelector} tr td:not(.cell-link)`,
             self = this;
 
         // 点击链接时
@@ -637,13 +649,13 @@ export class BwTableModule extends Component {
             return !col.noShow && [BwRule.DT_IMAGE, BwRule.DT_MUL_IMAGE].includes(dataType);
         });
 
-        let imgHandler = function (e: MouseEvent) {
+        let imgHandler = function (e: MouseEvent, isTd = true) {
             if (e.altKey || e.ctrlKey || e.shiftKey) {
                 return;
             }
-            let isTd = this.tagName === 'TD',
-                index = parseInt(isTd ? this.parentElement.dataset.index : this.dataset.index),
-                name = this.dataset.name;
+            let td = d.closest(e.target as HTMLElement, 'td'),
+                index = parseInt(td.parentElement.dataset.index),
+                name = td.dataset.name;
 
             if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
                 self.multiImgEdit.show(name, index);
@@ -653,9 +665,13 @@ export class BwTableModule extends Component {
         };
 
         if (hasThumbnail) {
-            d.on(ftable.wrapper, 'click', `${tdSelector}.cell-img:not(.disabled-cell)`, tools.pattern.throttling(imgHandler, 1000))
+            d.on(ftable.wrapper, 'click', `${tdSelector}.cell-img:not(.disabled-cell)`, tools.pattern.throttling((e) => {
+                imgHandler(e, true);
+            }, 1000))
         } else {
-            ftable.click.add(trSelector, tools.pattern.throttling(imgHandler, 1000));
+            ftable.click.add(trSelector, tools.pattern.throttling((e) => {
+                imgHandler(e, false);
+            }, 1000));
         }
 
     }
@@ -665,9 +681,16 @@ export class BwTableModule extends Component {
     }
 
     refresh(data?: obj) {
-        return this.ftable.tableData.refresh(data).then(() => {
-            this.aggregate.get(data);
-        });
+        if(this.isPivot){
+            return this.pivotRefresh(data).then((response) => {
+                this.ftable && (this.ftable.data = response.data || []);
+            });
+        }else{
+            return this.ftable.tableData.refresh(data).then(() => {
+                this.aggregate.get(data);
+            });
+        }
+
     }
 
     // protected fastTableInit
@@ -922,12 +945,15 @@ export class BwTableModule extends Component {
         let getCols = () => {
             let cols = [];
             this.ftable && this.ftable.columns.forEach((col) => {
-                cols.push({
-                    name: col.name,
-                    title: col.title,
-                    isNumber: col.isNumber,
-                    content: col.content
-                })
+                if(col && col.show && !col.isVirtual){
+                    cols.push({
+                        name: col.name,
+                        title: col.title,
+                        isNumber: col.isNumber,
+                        content: col.content
+                    })
+                }
+
             });
             return cols;
         };
@@ -1299,7 +1325,6 @@ export class BwTableModule extends Component {
             color: string,                  // 文字颜色
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
-
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;
@@ -1763,7 +1788,7 @@ export class BwTableModule extends Component {
                                     }
                                 })
                             }
-                            new FlowDesigner(dataAddr);
+                            // new FlowDesigner(dataAddr);
                         } else {
                             // 通用操作按钮
                             // if (multiselect === 2 && !selectedData[0]) {
@@ -1775,7 +1800,6 @@ export class BwTableModule extends Component {
                             //     Modal.alert('请选最多一条数据');
                             //     return;
                             // }
-
                             let btnUi = btn.data as R_Button,
                                 {multiselect, selectionFlag} = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?

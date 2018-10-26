@@ -122,20 +122,20 @@ export = class QueryModulePc extends QueryModule {
         return this.queryDom;
     }
 
-    protected queryParamTplGet(): string {
-        return '<div class="row"> ' +
-            '<div class="col-xs-3" data-type="field"></div> ' +
-            '<div class="col-xs-1" data-type="not"></div> ' +
-            '<div class="col-xs-2" data-type="operator"></div> ' +
-            '<div class="col-xs-3" data-type="input1"></div> ' +
-            '<div class="col-xs-3" data-type="input2"></div> ' +
-            '<span data-action="del" class="iconfont red icon-close"></span> ' +
-            '<span data-type="andOr"></span>' +
-            '</div>';
+    protected queryParamTplGet(): HTMLElement {
+        return <div class="row">
+            <div class="col-xs-3" data-type="field"></div>
+            <div class="col-xs-1" data-type="not"></div>
+            <div class="col-xs-2" data-type="operator"></div>
+            <div class="col-xs-3" data-type="input1"></div>
+            <div class="col-xs-3" data-type="input2"></div>
+            <span data-action="del" class="iconfont red icon-close"></span>
+            <span data-type="andOr"></span>
+            </div>;
     }
 
-    protected atVarTplGet(): string {
-        return `<div class="col-sm-5"><div data-type="title"></div><div data-type="input"></div></div>`;
+    protected atVarTplGet(): HTMLElement {
+        return <div class="col-sm-5"><div data-type="title"></div><div data-type="input"></div></div>;
     }
 
     public show() {

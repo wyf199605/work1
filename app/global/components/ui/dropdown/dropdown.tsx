@@ -256,7 +256,8 @@ export class DropDown {
     protected spinner: Spinner;
     protected isFirst: boolean = true;
     public showList(relEl?: HTMLElement) {
-        let data = this.para.data,
+        let self = this,
+            data = this.para.data,
             ajax = this.para.ajax;
 
         this.addShowClass(relEl);
@@ -274,11 +275,11 @@ export class DropDown {
                 // 用ajax获取数据
                 let selectedData = this.get();
                 ajax.fun(ajax.url, (selectedData && selectedData.value) ? selectedData.value.toString() : '', d => {
+                    self.spinner && self.spinner.hide();
+                    self.spinner = null;
                     if (Array.isArray(d)) {
                         this.initListData(d);
                     }
-                    this.spinner && this.spinner.hide();
-                    this.spinner = null;
                 });
             }
         } else {

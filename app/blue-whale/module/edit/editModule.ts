@@ -157,11 +157,11 @@ export class EditModule {
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 onComplete: (response) => {
                     let data = response.data;
-                    if(!this.para.fields.some(f => f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase())) {
-                        Modal.alert('无法找到附件，附件是否进行过改造');
-                        com.com.text = '';
-                        return;
-                    }
+                    // if(!this.para.fields.some(f => f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase())) {
+                    //     Modal.alert('无法找到附件，附件是否进行过改造');
+                    //     com.com.text = '';
+                    //     return;
+                    // }
 
                     //fileId 值加入额外数据中
                     let upperKeyData = {};

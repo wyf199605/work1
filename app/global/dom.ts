@@ -150,36 +150,42 @@ let event = (function () {
         let events = {
             press: {
                 type: 'press',
-                time: 500,
-                timer: null,
-                startTime: null,
+                time: 700,
+                longClick: 0,
                 handler: null,
                 on(el:Node, selector:string){
-                    let press = this,
+                    let press = events.press,
+                        timer: number = null,
+                        touchY = 0,
                         moveHandler, endHandler;
-                    press.startTime = new Date().getTime();
                     eventOn(el, EVENT_START, selector, press.handler = (ev) => {
-                        clearTimeout(press.timer);
-                        press.timer = setTimeout(() => {
+                        clearTimeout(timer);
+                        press.longClick = 0;
+                        let touch = ev.touches[0];
+                        touchY = touch.clientY;
+                        timer = setTimeout(() => {
+                            press.longClick = 1;
                             let dispatcher = dispatcherGet(el);
                             dispatcher && dispatcher.call(el, getCustomEvent(ev, 'press'));
-                            eventOff(el, EVENT_MOVE, moveHandler);
-                            eventOff(el, EVENT_END, endHandler);
                         }, press.time);
-
-                        eventOn(el, EVENT_MOVE, moveHandler = () => {
-                            clearTimeout(press.timer);
-                            eventOff(el, EVENT_MOVE, moveHandler);
-                            eventOff(el, EVENT_END, endHandler);
-                        });
-                        eventOn(el, EVENT_END, endHandler = () => {
-                            if(press.startTime !== null && (new Date().getTime() - press.startTime >= press.time + 10)){
-                                clearTimeout(press.timer);
-                                eventOff(el, EVENT_MOVE, moveHandler);
-                                eventOff(el, EVENT_END, endHandler);
-                            }
-                        })
                     });
+                    eventOn(document, EVENT_MOVE, moveHandler = (ev) => {
+                        let touch = ev.touches[0];
+                        if(Math.abs(touch.clientY - touchY) < 10) {
+                            clearTimeout(timer);
+                        }
+                    });
+                    eventOn(document, EVENT_END, endHandler = (ev) => {
+                        // if(press.startTime !== null && (new Date().getTime() - press.startTime >= press.time + 100)){
+                        clearTimeout(timer);
+                        if(press.longClick === 1){
+                            ev.preventDefault();
+                            // setTimeout(() => {
+                            press.longClick = 0;
+                            // }, 100);
+                        }
+                        // }
+                    })
                 },
                 off(el:Node, selector:string){
                     eventOff(el, EVENT_START, selector, this.handler);
@@ -994,12 +1000,16 @@ export const d = {
      * 往父元素最后附加一个元素
      */
     append(parent: Node, child: Node | Primitive) {
-        if(parent instanceof Node) {
+        if(parent instanceof Node && parent !== child) {
             if(tools.isPrimitive(child)) {
                 child = document.createTextNode(child + '');
             }
             if(child instanceof Node) {
-                parent.appendChild(child);
+                try {
+                    parent.appendChild(child);
+                }catch(e){
+                    console.log(e);
+                }
             }
         }
 

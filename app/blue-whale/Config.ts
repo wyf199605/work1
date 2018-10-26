@@ -44,6 +44,7 @@ namespace BW {
             flowDetail:`commonui/pageroute?page=flowDetail`
         },
         ajaxUrl: {
+            labelDefault: 'common/savelabel', // 标签打印默认值
             fileUpload: `rest/attachment/upload/file`, // 文件上传
             fileDownload: 'rest/attachment/download/file', // 文件下载 name_field=ATTACHNAME&md5_field=FILE_ID&app_id=app_sanfu_retail&sys_version_id=null&file_id=276260655F7E2FF824980FB4DACF78BB&attachname=adLogo.png
             imgDownload: 'rest/attachment/download/picture', // 文件下载 name_field=ATTACHNAME&md5_field=FILE_ID&app_id=app_sanfu_retail&sys_version_id=null&file_id=276260655F7E2FF824980FB4DACF78BB&attachname=adLogo.png

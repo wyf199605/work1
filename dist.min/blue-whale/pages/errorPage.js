@@ -1,1 +1,0 @@
-define(["require","exports"],function(o,e){"use strict";var t=G.sys,n=G.d;return function(){n.on(n.query(".buttons"),"click","[data-action]",function(){switch(this.dataset.action){case"goLogin":t.window.logout();break;case"refresh":window.location.reload();break;case"back":t.window.close()}})}});

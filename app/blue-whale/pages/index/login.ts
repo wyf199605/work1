@@ -670,6 +670,7 @@ export class LoginPage{
                 callback(result).then(() => {
                     loginPage.loginBtnState(10);
                     let user = User.get();
+                    user.clearStorage();
                     response.dataArr.forEach((col, index) => {
                         if (col.NAME === 'are_id') {
                             user.are_id = col.VALUE;
@@ -805,7 +806,7 @@ export class LoginPage{
     private loginBtnState(type:number){
         let btn = this.props.loginButton,
             login = btn instanceof Button ? btn.wrapper : btn,
-            loginText = sys.isMb ? login : login.querySelector('.text');
+            loginText = login;
         switch (type) {
             case 0:
                 login.classList.remove('disabled');

@@ -161,7 +161,6 @@ export class Mail{
 
     protected btnWrapper: HTMLElement;
     protected initSubBtns(btnsUi){
-        this.btnWrapper = <div className="mail-btn-group"/>;
         let box = new InputBox({
             container: this.btnWrapper,
             isResponsive: !tools.isMb,
@@ -242,10 +241,10 @@ export class Mail{
                     btnsUi.push(btn);
                 })
             }
-            this.initSubBtns(btnsUi);
             if (this.isOne) {
                 this.btnEvent(elements.fields);
             }
+            this.initSubBtns(btnsUi);
 
             return this.ajax.fetch(CONF.siteUrl + elements.dataAddr.dataAddr, {
                 cache: true,
@@ -325,7 +324,7 @@ export class Mail{
             </div>
         </div>`);
         return <div className="mail-detail">
-            {this.btnWrapper}
+            {this.btnWrapper = <div className="mail-btn-group"/>}
             {contentEl}
         </div>;
     }

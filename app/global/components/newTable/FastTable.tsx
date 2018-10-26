@@ -1798,14 +1798,8 @@ export class FastTable extends Component {
         this.pseudoTable && this.pseudoTable.render();
         this.noData.toggle(Object.keys(this.tableData.data).length === 0);
 
-        let handlers = this.eventHandlers[FastTable.EVT_RENDERED];
-        Array.isArray(handlers) && handlers.forEach(handler => {
-            handler();
-        });
-
-
-        this.isWrapLine && this.setRowsHeight();
         this.wrapper.style.display = 'block';
+        this.isWrapLine && this.setRowsHeight();
         //   监听滚动事件
 
         this.calcWidth();
@@ -1826,6 +1820,11 @@ export class FastTable extends Component {
             this.touchMoveEvent.on();
 
         }
+
+        let handlers = this.eventHandlers[FastTable.EVT_RENDERED];
+        Array.isArray(handlers) && handlers.forEach(handler => {
+            handler();
+        });
     }
 
 
@@ -1939,7 +1938,7 @@ export class FastTable extends Component {
                         topRow = this.rowGet(index - topIndex);
                     while (topRow && index - topIndex >= 0) {
                         let topCell = topRow.cellGet(columnIndex);
-                        if (!topCell.isVirtual && topCell.show) {
+                        if (topCell && !topCell.isVirtual && topCell.show) {
                             topCell.selected && cell.wrapper.classList.remove('topBorder');
                             break;
                         }
@@ -1957,7 +1956,7 @@ export class FastTable extends Component {
                         bottomRow = this.rowGet(index + bottomIndex);
                     while (bottomRow && index + bottomIndex < array.length) {
                         let bottomCell = bottomRow.cellGet(columnIndex);
-                        if (!bottomCell.isVirtual && bottomCell.show) {
+                        if (bottomCell && !bottomCell.isVirtual && bottomCell.show) {
                             bottomCell.selected && cell.wrapper.classList.remove('bottomBorder');
                             break;
                         }
@@ -1976,7 +1975,7 @@ export class FastTable extends Component {
                         leftRow = this.rowGet(index);
                     while (leftRow && columnIndex - leftIndex >= 0) {
                         let leftCell = leftRow.cellGet(columnIndex - leftIndex);
-                        if (!leftCell.isVirtual && leftCell.show) {
+                        if (leftRow && !leftCell.isVirtual && leftCell.show) {
                             leftCell.selected && cell.wrapper.classList.remove('leftBorder');
                             break;
                         }
@@ -1988,7 +1987,7 @@ export class FastTable extends Component {
                         rightRow = this.rowGet(index);
                     while (rightRow && columnIndex + rightIndex < this.columns.length) {
                         let rightCell = rightRow.cellGet(columnIndex + rightIndex);
-                        if (!rightCell.isVirtual && rightCell.show) {
+                        if (rightCell && !rightCell.isVirtual && rightCell.show) {
                             rightCell.selected && cell.wrapper.classList.remove('rightBorder');
                             break;
                         }
@@ -2603,6 +2602,7 @@ export class FastTable extends Component {
                 data[key] = obj[key];
             }
         }
+
         return {
             keys,
             data
@@ -2621,7 +2621,7 @@ export class FastTable extends Component {
         if (this.editing) {
             this.edit.destroyCellInput();
             let edit = this.edit,
-                result: objOf<Array<obj>> = {
+                result: objOf<any> = {
                     update: [],
                     insert: [],
                     delete: [],
@@ -2667,7 +2667,7 @@ export class FastTable extends Component {
                 let pivotResult = {
                     update: [],
                     insert: [],
-                    delete: []
+                    delete: [],
                 };
                 console.log(result);
                 for(let operation in result){
@@ -2717,12 +2717,13 @@ export class FastTable extends Component {
                         }
                     })
                 }
-
                 console.log(pivotResult);
 
+                pivotResult['isPivot'] = true;
                 return pivotResult;
             }
 
+            result['isPivot'] = false;
             return result;
         }
         return null;
@@ -2762,11 +2763,13 @@ export class FastTable extends Component {
                 this.rowDel(this.edit.addIndex.spaceRowIndex());
                 this.tablesEach(table => {
                     table.tableData.edit.close();
-                    table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
+                    if(table.body && table.body.rows)
+                        table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this.render(0, void 0);
                 this.tablesEach(table => {
-                    table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
+                    if(table.body && table.body.rows)
+                        table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this._rows = this.rows.filter(row => tools.isNotEmpty(row));
                 this.edit.addIndex.del();
@@ -2800,12 +2803,19 @@ export class FastTable extends Component {
                     let num = this.rowAdd(void 0, 0);
                 } else {
                     let index = this.data[ev.row][TableBase.GUID_INDEX];
-                    if (this.edit.addIndex.get().indexOf(index) === -1 && this.edit.changeIndex.get().indexOf(index) === -1) {
+                    let addIndexes = this.edit.addIndex.get(),
+                        changeIndexes = this.edit.changeIndex.get();
+                    if (addIndexes.indexOf(index) === -1 && changeIndexes.indexOf(index) === -1) {
                         this.edit.changeIndex.add(index);
                     }
                 }
             });
-            table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell, isChange) => {
+            table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell: TableDataCell) => {
+                let index = cell.row.index;
+                if(!this.rows[index]){
+                    return
+                }
+                let isChange = this.rows[index].cells.some((cell: TableDataCell) => cell.isEdited);
                 if(!isChange){
                     let index = this.data[cell.row.index][TableBase.GUID_INDEX];
                     if (this.edit.addIndex.get().indexOf(index) > -1) {

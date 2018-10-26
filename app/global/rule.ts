@@ -327,28 +327,29 @@ namespace G{
 
             let varData = (<obj[]>data).map(function (d) {
                 let tmpData = {};
-                if(isLimitField){
-                    varList.forEach(function (v) {
-                        let value = null,
-                            varName = v.varName;
+                varList.forEach(function (v) {
+                    let value = null,
+                        varName = v.varName;
 
-                        if (d[varName] !== null && d[varName] !== undefined) {
-                            //优先从用户给的data取值
-                            value = d[varName];
+                    if (d[varName] !== null && d[varName] !== undefined) {
+                        //优先从用户给的data取值
+                        value = d[varName];
 
-                        } else if (!tools.isEmpty(v.varValue)) {
-                            //再从服务器给的value
-                            value = v.varValue;
+                    } else if (!tools.isEmpty(v.varValue)) {
+                        //再从服务器给的value
+                        value = v.varValue;
+                    }
+
+                    // if (value !== null) {
+                    let key = isLowerKey ? varName.toLowerCase() : varName;
+                    tmpData[key] = value;
+                    // }
+                });
+                if(!isLimitField){
+                    for(let key in d){
+                        if(key.indexOf('.') > -1){
+                            tmpData[key] = d[key];
                         }
-
-                        // if (value !== null) {
-                        let key = isLowerKey ? varName.toLowerCase() : varName;
-                        tmpData[key] = value;
-                        // }
-                    });
-                }else{
-                    for(let field in d){
-                        tmpData[field] = d[field];
                     }
                 }
 

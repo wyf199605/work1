@@ -577,11 +577,12 @@ export class BwRule extends Rule {
                 col.displayFormat = tools.isEmpty(col.atrrs) ? "" : col.atrrs.displayFormat;
                 col.trueExpr = tools.isEmpty(col.atrrs) ? "" : col.atrrs.trueExpr;
                 col.displayWidth = tools.isEmpty(col.atrrs) ? "" : col.atrrs.displayWidth;
+                col.isCanSort = true;
 
                 if (col.elementType == 'lookup') {
                     //look up
                     col.comType = 'selectInput';// --------------
-
+                    col.isCanSort = false;
 
                 } else if ((col.elementType == 'treepick' || col.elementType == 'pick')) {
 
@@ -599,6 +600,7 @@ export class BwRule extends Rule {
 
                     //富文本
                     col.comType = 'richText';// --------------
+                    col.isCanSort = false;
 
                 } else if (col.atrrs && col.atrrs.dataType == '17') {
                     //toggle
@@ -667,8 +669,8 @@ export class BwRule extends Rule {
         2: function (reqAddr: R_ReqAddr, data?: obj | obj[]) {
             //参数构造
             let newData = [],
-                params;
-            if (data) {
+                params: any = data;
+            if (data && data[0]) {
                 data[0].forEach((s, i) => {
                     newData.push({});
                     for (let item in s) {

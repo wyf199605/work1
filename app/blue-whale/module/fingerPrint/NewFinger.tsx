@@ -118,12 +118,14 @@ export class NewFinger {
                     }
                 }).then((data) => {
                     if(typeof this.fingerFinish === 'function'){
-                        this.fingerFinish(data).finally(() => {
+                        this.fingerFinish(data).then(() => {
                             this.autoCache && this.addFinger(data).finally(() => {
                                 this.initFingerOpen();
                             }).catch((e) => {
                                 console.log(e);
                             });
+                        }).catch(() => {
+                            this.initFingerOpen();
                         });
                     }else{
                         this.autoCache && this.addFinger(data).finally(() => {
