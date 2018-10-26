@@ -11,9 +11,8 @@ import {SelectInput} from "../../../../global/components/form/selectInput/select
 import {Loading} from "../../../../global/components/ui/loading/loading";
 import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
-import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
+// import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
-
 
 
 /**
@@ -30,17 +29,23 @@ export class ButtonAction {
         let self = this;
         if (btn.subType === 'excel') {
 
-            let tableData;
+            let com;
             let uploderModal = new Modal({
                 header: '选择导入的文件',
                 body: d.create(`<div></div>`),
                 className: 'upload-modal',
                 isOnceDestroy: true,
+                onClose: () => {
+                    com = null;
+                    uploderModal.destroy();
+                },
                 footer: {
                     rightPanel: [
                         {
                             content: '取消',
                             onClick: () => {
+                                com && com.destroy();
+                                com = null;
                                 uploderModal.destroy();
                             }
                         }
@@ -66,7 +71,7 @@ export class ButtonAction {
             //TODO 将UploadModule过程效果整合到upload组件
             require(['UploadModule'], function (upload) {
                 let loadUrl = CONF.siteUrl + btn.actionAddr.dataAddr;
-                new upload.default({
+                com = new upload.default({
                     container: <HTMLElement>uploderModal.body,
                     uploadUrl: loadUrl + (loadUrl.indexOf('?') > -1 ? '&' : '?') + "item_id=" + itemId,
                     onChange: () => {
@@ -86,6 +91,8 @@ export class ButtonAction {
                         // });
                         uploderModal.destroy();
                         setTimeout(() => {
+                            com && com.destroy();
+                            com = null;
                             self.btnRefresh(btn.refresh, url);
                         }, 100)
                         // G.tools.event.fire(NewTableModule.EVT_EXPORT_DATA, data);
@@ -173,29 +180,15 @@ export class ButtonAction {
         let {addr, data} = BwRule.reqAddrFull(btn.actionAddr, dataObj),
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
-
-        if(!Array.isArray(dataObj) || dataObj.length === 1){
-            addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
-        }
-        let varType = btn.actionAddr.varType, res;
-        if (varType === 3 && typeof data !== 'string') {
-            // 如果varType === 3 则都转为数组传到后台
-            if (!Array.isArray(data)) {
-                data = [data];
-            }
-            res = JSON.stringify(data);
-        }
         switch (btn.openType) {
             case 'none' :
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
-                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                self.checkAction(btn, dataObj, addr, ajaxType, data, url).then(response => {
                     callback(response);
-                    self.btnRefresh(btn.refresh, url);
-                }).catch((e) => {
-                    console.log(e);
+                }).catch(() => {
                 });
                 break;
             case 'popup':
@@ -205,7 +198,7 @@ export class ButtonAction {
                 }
 
                 addr = tools.url.addObj(addr, {output: 'json'});
-                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                self.checkAction(btn, dataObj, addr, ajaxType, data, url).then(response => {
                     console.log(response);
                     //创建条码扫码页面
                     if(response.uiType === 'inventory' && tools.isMb){
@@ -222,8 +215,7 @@ export class ButtonAction {
             default:
                 BW.sys.window.open({
                     url: tools.url.addObj(BW.CONF.siteUrl + addr, data),
-                    gps: !!btn.actionAddr.needGps,
-                    data: res
+                    gps: !!btn.actionAddr.needGps
                 }, url);
                 self.btnRefresh(btn.refresh, url);
         }
@@ -235,29 +227,19 @@ export class ButtonAction {
             codeStype:object[],
             url:string,
             uniqueFlag:string,
-            analysis:string,
-            downUrl:string,
-            uploadUrl:string;
+            ajaxUrl:string;
         for(let i = 0;i < dataAddr.length;i++){
             url =   dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
-            downUrl = dataAddr[i].downloadAddr.dataAddr;
-            uploadUrl = dataAddr[i].uploadAddr.dataAddr;
         }
         console.log(codeStype[0]["IMPORTDATAMODE"])
-        // BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
-        //     data:data
-        // }).then(({response})=>{
-        //     console.log(response)
-        //     response.body && (analysis =  response.body.bodyList[0].inventData)
-
-        // BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
-        //     data:data
-        // }).then(({response})=>{
-        //     console.log(response)
-        //     response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
-        // })
+        BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
+            data:data
+        }).then(({response})=>{
+            console.log(response)
+            response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
+        })
 
         // new RfidBarCode({
         //      codeStype:codeStype,
@@ -266,18 +248,6 @@ export class ButtonAction {
         //      url:ajaxUrl,
         //     uniqueFlag
         // })
-
-
-        require(['RfidBarCode'], (p) => {
-            new p.RfidBarCode({
-                codeStype:codeStype,
-                SHO_ID:dataObj['SHO_ID'],
-                USERID:dataObj['USERID'],
-                uploadUrl:uploadUrl,
-                downUrl:downUrl,
-                uniqueFlag:uniqueFlag
-            })
-        });
     }
 
     /**
@@ -327,10 +297,19 @@ export class ButtonAction {
     //         }
     //     });
     // }
-    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
-        let varType = btn.actionAddr.varType, self = this;
+    checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
+        let self = this,
+            varType = btn.actionAddr.varType;
+
+        if (varType === 3 && typeof ajaxData !== 'string') {
+            // 如果varType === 3 则都转为数组传到后台
+            if (!Array.isArray(ajaxData)) {
+                ajaxData = [ajaxData];
+            }
+            ajaxData = JSON.stringify(ajaxData);
+        }
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
-            data2url: varType !== 3,
+            data2url: btn.actionAddr.varType !== 3,
             type: ajaxType,
             // defaultCallback : btn.openType !== 'popup',
             data: ajaxData,

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>收银sql监控</title>
-    <link href="../cashier/global.pc.css?v=0" rel="stylesheet">
+    <link href="global.pc.css?v=0" rel="stylesheet">
     <link href="sqlMonitor.css" rel="stylesheet">
 
 </head>
@@ -14,44 +14,52 @@
 <div id="sqlMonitorContent">
 
 </div>
-<script src="../cashier/plugin/requirejs/require.js"></script>
-<script src="../cashier/global.js?v=0"></script>
-<!--<script src="cashier/cashier.js?v=0"></script>-->
-
+<script src="plugin/requirejs/require.js"></script>
+<script src="global.js?v=0"></script>
 <script>
-    require(['SqlMonitor'], function (e) {
-        new e.SqlMonitor({
-            container : C.d.query('.sql')
-        })
-    });
+    __setRequireBase('./sql', '0');
+    function __setRequireBase(baseUrl, urlArg) {
+        C.setRequire({
+            baseUrl: baseUrl,
+        }, urlArg);
+    }
+    let identification = 'CASHIER_SQL_' + new Date().getTime() + Math.random();
     require(['BwWebsocket'], function(e){
-        console.log( 'ws://bwt.sanfu.com/cashier/websocket/cms3/single');
         new e.BwWebsocket({
-            url : 'ws://bwt.sanfu.com/cashier/websocket/CMS3/single',
+            url : 'wss://bwd.sanfu.com/cashier/sql/websocket/' + identification,
             onMessage : r => {
-                debugger
                 let data = JSON.parse(r && r.data);
                 switch (data.respType){
                     case 'sql':
                         let content = C.d.query('#sqlMonitorContent',document.body);
                         if(content) {
-                            let pageContainer = d.closest(content, '.page-container');
+                            // let pageContainer = C.d.closest(content, '.sql');
                             for (let i = 0, l = data.data.length; i < l; i++) {
                                 C.d.append(content,document.createElement('br'));
                                 C.d.append(content,data.data[i].replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0").replace(/\n/g, ""));
                             }
                             C.d.append(content,document.createElement('br'));
-                            pageContainer.scrollTop = content.scrollHeight;
+                            content.scrollTop = content.scrollHeight;
                         }
-                        break;
-                    case 'posdata':
                         break;
                 }
             },
             onOpen : r => {
-
+                console.log(r,'开启');
             },
+            onClose : r => {
+                console.log(r,'关闭')
+            },
+            onError : r => {
+                console.log(r,'error')
+            }
         });
+    });
+    require(['SqlMonitor'], function (e) {
+        new e.SqlMonitor({
+            container : C.d.query('.sql'),
+            identification : identification
+        })
     });
 </script>
 </body>

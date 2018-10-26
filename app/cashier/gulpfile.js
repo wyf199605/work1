@@ -44,7 +44,7 @@ gulp.task('js',function () {
 });
 
 gulp.task('sql',function () {
-    compiler.ts(['sqlMonitor/sqlMonitor'], 'SqlMonitor.js',path.sqlPath)
+    compiler.ts(['sqlMonitor/sqlMonitor'], 'SqlMonitor.js',path.sqlPath + 'sql/')
     compiler.scss(['sqlMonitor/sqlMonitor'], 'sqlMonitor.css',path.sqlPath)
 });
 /**
