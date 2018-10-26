@@ -93,7 +93,8 @@ export class DrawSvg{
         let svgimg = document.createElementNS('http://www.w3.org/2000/svg','image');
         svgimg.setAttributeNS(null,'height',`${loc.h}`);
         svgimg.setAttributeNS(null,'width',`${loc.w}`);
-        svgimg.setAttributeNS('http://www.w3.org/1999/xlink','href', `http://${location.host}/img/img/label/${iconKind}${DrawSvg.iconSuffix[iconKind]}`);
+        //TODO 图片位置错误
+        svgimg.setAttributeNS('http://www.w3.org/1999/xlink','href', G.requireBaseUrl + `../img/label/${iconKind}${DrawSvg.iconSuffix[iconKind]}`);
         svgimg.setAttributeNS(null,'x',`${loc.x}`);
         svgimg.setAttributeNS(null,'y',`${loc.y}`);
         svgimg.setAttributeNS(null, 'visibility', 'visible');
@@ -494,8 +495,9 @@ export class DrawSvg{
     }
     static  iconSuffix = {
         1 : '.bmp',
-        2 : '.bpm',
+        2 : '.bmp',
         3 : '.gif',
+        4 : '.bmp',
         50000 : '.bmp',
         50001 : '.bmp',
         90000 : '.jpeg',

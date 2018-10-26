@@ -1,5 +1,4 @@
 import d = G.d;
-import {TableModule} from "../../module/table/tableModule";
 import {BwSubTableModule} from "../../module/table/BwSubTableModule";
 import {IPanelItemPara, Panel} from "../../../global/components/view/panel/Panel";
 import {Spinner} from "../../../global/components/ui/spinner/spinner";

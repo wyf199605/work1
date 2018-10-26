@@ -578,7 +578,12 @@ export class NewTableModule {
                             }
                             //TODO 给row.data赋值会销毁当前cell的input
                             // row.data = Object.assign({}, row.data, data);
-
+                            for(let key in data){
+                                let cell = row.cellGet(key) as TableDataCell;
+                                if(cell){
+                                    cell.data = data[key] || '';
+                                }
+                            }
                             if (field.elementType === 'lookup') {
                                 let lookUpKeyField = field.lookUpKeyField,
                                     cell = row.cellGet(lookUpKeyField);
@@ -602,22 +607,16 @@ export class NewTableModule {
                                             });
                                     }
                                 }
-                            } else if(Array.isArray(field.assignSelectFields)){
-                                // 上传文件返回File_id，需要设置file_id值， 或者修改关联的assign的值
-                                field.assignSelectFields.forEach((name) => {
-                                    let cell = row.cellGet(name) as TableDataCell;
-                                    if(cell){
-                                        cell.data = data[name] || '';
-                                    }
-                                })
-                            } else if(Array.isArray(field.relateFields)){
-                                for(let key in data){
-                                    let cell = row.cellGet(key) as TableDataCell;
-                                    if(cell){
-                                        cell.data = data[key] || '';
-                                    }
-                                }
                             }
+                            // else if(Array.isArray(field.assignSelectFields)){
+                            //     // 上传文件返回File_id，需要设置file_id值， 或者修改关联的assign的值
+                            //     field.assignSelectFields.forEach((name) => {
+                            //         let cell = row.cellGet(name) as TableDataCell;
+                            //         if(cell){
+                            //             cell.data = data[name] || '';
+                            //         }
+                            //     })
+                            // }
                         }
                     }) : null;
 
@@ -745,9 +744,9 @@ export class NewTableModule {
                 let editData = bwTable.ftable.editedData,
                     isPivot = editData.isPivot;
                 delete editData.isPivot;
-                if (i === 1) {
+                if (i >= 1) {
                     // 带上当前主表的字段
-                    let mainData = this.main.ftable.edit;
+                    let mainData = this.main.ftable.data[this.subIndex];
                     for (let key in editData) {
                         if (tools.isNotEmpty(editData[key])) {
                             editData[key].forEach((obj, i) => {

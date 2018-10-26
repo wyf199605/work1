@@ -130,6 +130,17 @@ namespace G {
             return {r, g, b};
         },
         url: {
+            /*
+            * 替换url中的模板数据
+            * 例：http://www.test.cn/sf/{name}/a => http://www.test.cn/sf/name/a
+            * @param {string} url - 要替换的路径地址
+            * @param {obj} data - 根据数据替换url中花括号{}的数据
+            * */
+            replaceTmpUrl(url: string, data: obj){
+                return url.replace(/{([\w\W]+?)}/g, (str, name) => {
+                    return tools.isEmpty(data[name]) ? name : data[name];
+                })
+            },
             /**
              * 获取url中请求参数的值
              * @param {string} name - 参数名
@@ -146,19 +157,39 @@ namespace G {
              * @param {string} url
              * @param {object} obj
              * @param {boolean} [isLowCase=true]
+             * @param {boolean} [isReplace=false]
              * @return {string}
              */
-            addObj: function (url: string, obj: obj, isLowCase = true) {
-                for (let key in obj) {
-                    if (tools.url.getPara(key, url)) {
-                        delete obj[key];
+            addObj: function (url: string, obj: obj, isLowCase = true, isReplace = false) {
+                let paraObj = Object.assign({}, obj || {});
+                if(isReplace){
+                    let currentPara = tools.url.getObjPara(url);
+                    paraObj = Object.assign(currentPara, paraObj);
+                    url = url.split('?')[0];
+                }else{
+                    for (let key in paraObj) {
+                        if (tools.url.getPara(key, url)) {
+                            delete paraObj[key];
+                        }
                     }
                 }
-                if (!tools.isEmpty(obj)) {
-                    return url + (url.indexOf('?') === -1 ? '?' : '&') + tools.obj.toUri(obj, isLowCase);
+                if (!tools.isEmpty(paraObj)) {
+                    return url + (url.indexOf('?') === -1 ? '?' : '&') + tools.obj.toUri(paraObj, isLowCase);
                 } else {
                     return url;
                 }
+            },
+            getObjPara(url: string, isLowCase = true){
+                let theRequest = {};
+                if (url.indexOf("?") != -1) {
+                    let str = url.split('?')[1],
+                        strs = str.split("&");
+                    for(let i = 0; i < strs.length; i ++) {
+                        let map = strs[i].split("=");
+                        theRequest[isLowCase ? map[0].toLowerCase() : map[0]] = decodeURIComponent(map[1]);
+                    }
+                }
+                return theRequest;
             }
         },
         str: {

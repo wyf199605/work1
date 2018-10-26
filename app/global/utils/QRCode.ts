@@ -24,7 +24,7 @@ export class QrCode{
         let qrcode = new QRCode(this.g, {
             width : loc.w,
             height : loc.h,
-            useSVG: true
+            useSVG: true,
         });
         qrcode.makeCode(sty.codeData);
         let gSvg = <SVGSVGElement>this.g.firstChild;

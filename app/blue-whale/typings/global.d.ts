@@ -63,6 +63,7 @@ interface IBW_Table{
     scannableTime? : number // 获取配置时间扫到的数据
     rfidCols?:IBW_TableRfidCol;  // rfid配置
     rfidFlag?:number;
+    printSetting?: string;
 }
 
 interface IBW_TableRfidCol{

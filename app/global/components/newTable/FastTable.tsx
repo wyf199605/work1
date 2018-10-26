@@ -1798,14 +1798,8 @@ export class FastTable extends Component {
         this.pseudoTable && this.pseudoTable.render();
         this.noData.toggle(Object.keys(this.tableData.data).length === 0);
 
-        let handlers = this.eventHandlers[FastTable.EVT_RENDERED];
-        Array.isArray(handlers) && handlers.forEach(handler => {
-            handler();
-        });
-
-
-        this.isWrapLine && this.setRowsHeight();
         this.wrapper.style.display = 'block';
+        this.isWrapLine && this.setRowsHeight();
         //   监听滚动事件
 
         this.calcWidth();
@@ -1826,6 +1820,11 @@ export class FastTable extends Component {
             this.touchMoveEvent.on();
 
         }
+
+        let handlers = this.eventHandlers[FastTable.EVT_RENDERED];
+        Array.isArray(handlers) && handlers.forEach(handler => {
+            handler();
+        });
     }
 
 
@@ -2764,11 +2763,13 @@ export class FastTable extends Component {
                 this.rowDel(this.edit.addIndex.spaceRowIndex());
                 this.tablesEach(table => {
                     table.tableData.edit.close();
-                    table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
+                    if(table.body && table.body.rows)
+                        table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this.render(0, void 0);
                 this.tablesEach(table => {
-                    table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
+                    if(table.body && table.body.rows)
+                        table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this._rows = this.rows.filter(row => tools.isNotEmpty(row));
                 this.edit.addIndex.del();
@@ -2802,12 +2803,19 @@ export class FastTable extends Component {
                     let num = this.rowAdd(void 0, 0);
                 } else {
                     let index = this.data[ev.row][TableBase.GUID_INDEX];
-                    if (this.edit.addIndex.get().indexOf(index) === -1 && this.edit.changeIndex.get().indexOf(index) === -1) {
+                    let addIndexes = this.edit.addIndex.get(),
+                        changeIndexes = this.edit.changeIndex.get();
+                    if (addIndexes.indexOf(index) === -1 && changeIndexes.indexOf(index) === -1) {
                         this.edit.changeIndex.add(index);
                     }
                 }
             });
-            table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell, isChange) => {
+            table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell: TableDataCell) => {
+                let index = cell.row.index;
+                if(!this.rows[index]){
+                    return
+                }
+                let isChange = this.rows[index].cells.some((cell: TableDataCell) => cell.isEdited);
                 if(!isChange){
                     let index = this.data[cell.row.index][TableBase.GUID_INDEX];
                     if (this.edit.addIndex.get().indexOf(index) > -1) {

@@ -62,6 +62,10 @@ export class MailPage extends BasicPage{
             }
         });
 
+        this.on(BwRule.EVT_REFRESH, () => {
+            this.tableModule && this.tableModule.refresh();
+        });
+        
         // 初始化第一行的邮件详情页
         ftable.on(FastTable.EVT_RENDERED, () => {
             try {
@@ -73,7 +77,7 @@ export class MailPage extends BasicPage{
                 }
             }catch(e){
             }
-        })
+        });
         // setTimeout(() => {
         //     this.initMail(0);
         //

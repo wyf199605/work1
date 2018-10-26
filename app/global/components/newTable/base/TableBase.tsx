@@ -257,7 +257,7 @@ export class TableBase extends Component {
     cancelEditor() {
         this._editing = false;
         this._inputInit = null;
-        this.body.rows.forEach((row) => {
+        this.body && this.body.rows && this.body.rows.forEach((row) => {
             if (row && row.isEdited) {
                 row.cells.forEach((cell) => {
                     cell.isEdited = false;

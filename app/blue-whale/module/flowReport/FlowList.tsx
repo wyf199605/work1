@@ -212,6 +212,7 @@ export class FlowList {
             }
         }
 
+
         return <div className="item-wrapper" data-url={tools.url.addObj(BW.CONF.siteUrl + data.auditUrl, {page: 'flowReport'})} data-instance={data.instanceState}>
             <div className="item-title"><span>{data.processName}-{data.createUserName}</span><i
                 className="iconfont icon-arrow-right"/></div>
