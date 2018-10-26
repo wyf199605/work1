@@ -44,7 +44,7 @@ export default class BasicPage{
             //去除匹配的第一个下标的元素
             version = andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
         }
-        if(/*para.subButtons && */version > 4 && sys.isMb){
+        if(/*para.subButtons && */version > 4 && tools.isMb){
             let timeOut = null;
             d.on(document,'touchstart',()=>{
                 let gestureIcon = d.query('.blue-gesture',document.body);

@@ -4,6 +4,11 @@
 //  user-select: none;
 //  -webkit-user-select: none;
 //}
+body{
+  // 解决移动端iOS 委托事件不生效的bug
+  cursor: pointer;
+}
 @import "global";
 @import "../components/table/table.mb";
 @import "../components/mbList/mbList";
+@import "../../blue-whale/module/uploadModule/accessory";

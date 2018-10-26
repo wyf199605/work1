@@ -52,11 +52,11 @@ export class MbListItem extends Component {
             <div className="list-item-content">
                 {this.imgWrapper = isImg ? <div className="list-item-img"/> : null}
                 <div className="list-item-details">
-                    {this.details['title'] = <div className="list-item-title"/>}
-                    {this.details['body'] = <div className="list-item-body"/>}
-                    {this.details['label'] = <div className="list-item-labels"/>}
-                    {this.details['countDown'] = <div className="list-item-count-down"/>}
-                    {this.details['status'] = <div className="list-item-status"/>}
+                    {this.details['title'] = <div className="list-detail-item list-item-title"/>}
+                    {this.details['body'] = <div className="list-detail-item list-item-body"/>}
+                    {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
+                    {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
+                    {this.details['status'] = <div className="list-detail-item list-item-status"/>}
                 </div>
             </div>
         </div>;
@@ -192,7 +192,9 @@ export class MbListItem extends Component {
     // 初始化按钮配置
     initBtn(btns: string[]){
         this.btnWrapper = <div className="btn-group"/>
-        InputBox
+        let ibox = new InputBox();
+        
+
     }
 
     // 添加按钮，index插入位置

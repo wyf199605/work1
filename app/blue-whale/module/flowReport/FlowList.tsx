@@ -212,7 +212,7 @@ export class FlowList {
             }
         }
 
-        return <div className="item-wrapper" data-url={BW.CONF.siteUrl + data.auditUrl + '?page=flowReport'} data-instance={data.instanceState}>
+        return <div className="item-wrapper" data-url={tools.url.addObj(BW.CONF.siteUrl + data.auditUrl, {page: 'flowReport'})} data-instance={data.instanceState}>
             <div className="item-title"><span>{data.processName}-{data.createUserName}</span><i
                 className="iconfont icon-arrow-right"/></div>
             <div className="item-content">
@@ -225,6 +225,7 @@ export class FlowList {
     }
 
     private handlerTime(dateStr: string) {
+        dateStr = dateStr.replace(/\-/g, "/");
         let date = new Date(dateStr),
             year = date.getFullYear(),
             yearStr = year.toString().slice(2),

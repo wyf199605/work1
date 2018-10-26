@@ -448,7 +448,8 @@ $footer-height : 35px;
   .mui-bar-footer{
     @include iosxAdjustCalc(bottom, 0px, bottom);
   }
-  .bugListPage .tabParent .nav-tabs{
+  .bugListPage .tabParent .nav-tabs,
+  .flowList .tabParent .nav-tabs{
     @include iosxAdjustCalc(top, 54px);
   }
   .sub-page.full-page {
