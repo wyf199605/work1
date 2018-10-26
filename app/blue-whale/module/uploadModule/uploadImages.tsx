@@ -1,95 +1,114 @@
-/// <amd-module name="Accessory"/>
+/// <amd-module name="UploadImages"/>
 
-import Component = G.Component;
-import IComponentPara = G.IComponentPara;
-import UploadModule from "./uploadModule";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import d = G.d;
-import tools = G.tools;
 import {FormCom} from "../../../global/components/form/basic";
-interface FilePara {
-    fileId: string;
-    fileName: string;
+import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
+import {Loading} from "../../../global/components/ui/loading/loading";
+import {IUploadImagesItem, UploadImagesItem} from "./uploadImagesItem";
+import UploadModule from "./uploadModule";
+import tools = G.tools;
+
+export interface IImage {
+    fileId?: string;
+    fileName?: string;
+    isError?: boolean;
+    localUrl?: string;
 }
 
-export class Accessory extends FormCom {
-    set(val:FilePara[]): void {
-        let values = val || [];
-        this.fileArr = values;
-        values.forEach((file)=>{
-            d.before(this.addImg, this.createImg(this.getFileUrl(file.fileId)));
-        });
-        this.wrapper.scrollLeft = this.wrapper.scrollLeft + (100 * values.length);
+interface IUploadImages extends IUploaderPara {
+    caption?: string;
+    images?: IImage[];
+
+    onComplete?(this: UploadModule, ...any); // 上传完成回调
+    onError?(file: obj); // 上传失败回调
+    onChange?: Function; // 上传成功回调
+}
+
+export class UploadImages extends FormCom {
+    set(val: IImage[]): void {
+        this.value = val;
     }
 
-    get value(){
-        return this.get();
+    get value() {
+        return this._value;
     };
-    set value(val:FilePara[]) {
-        this.set(val);
+
+    set value(val: IImage[]) {
+        this._value = val;
+        this.render(val);
+        this.calcScrollLeft();
     }
-    private innerWrapper: HTMLElement;
+
     private addImg: HTMLElement;
+    private imgWrapper: HTMLElement;
 
-    protected wrapperInit(para: G.IComponentPara): HTMLElement {
-        return <div className="accessory-outer-wrapper">{this.innerWrapper =
-            <div className="accessory-inner-wrapper">{this.addImg = <div className="add-wrapper">
-                <div className="add-wrapper-inner">
-                    <div className="add-icon">+</div>
-                    <div className="add-text">添加附件</div>
-                </div>
-            </div>}</div>}</div>;
+    protected wrapperInit(para: IUploadImages): HTMLElement {
+        return <div className="accessory-wrapper">
+            <div className="accessory-title">{para.caption || '图片'}</div>
+            <div className="images-wrapper">
+                {this.imgWrapper = <div className="images-body"/>}
+                {this.addImg = <div className="add-wrapper"/>}
+            </div>
+        </div>;
     }
 
-    private _fileIdArr: FilePara[];
+    public uploader: Uploader = null;
+    private loading: Loading = null;
 
-    set fileArr(fileIdArr: FilePara[]) {
-        this._fileIdArr = fileIdArr;
-    }
-
-    get fileArr() {
-        return this._fileIdArr;
-    }
-
-    constructor(para: IComponentPara) {
+    constructor(private para: IUploadImages) {
         super(para);
+        tools.isNotEmpty(para.images) && (this.value = para.images);
+        this.createUploader();
+        this.initEvent.on();
+    }
 
-        let uploader = new UploadModule({
-            uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-            nameField: 'FILE_ID',
+    private createUploader() {
+        let uploader = new Uploader({
+            uploadUrl: this.para.uploadUrl || BW.CONF.ajaxUrl.fileUpload,
+            accept: this.para.accept || {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            },
+            nameField: this.para.nameField || 'FILE_ID',
+            thumbField: this.para.thumbField,
             // 上传成功
             onComplete: (res, file) => {
-                let fileId = res.data.blobField.value,
-                    fileObj:FilePara = {
-                        fileId: fileId,
-                        fileName: file.name
-                    },
-                    arr = this.fileArr || [];
-                this.fileArr = arr.concat(fileObj);
-                d.before(this.addImg, this.createImg(this.getFileUrl(fileId)));
-                this.wrapper.scrollLeft = this.wrapper.scrollLeft + 100;
+                let data = res,
+                    isError = false;
+                if (tools.isNotEmpty(data.ifExist)){
+                    isError = data.ifExist === '1' ? true : false;
+                }
+                let imageId = res.data.blobField.value,
+                    imageObj: IImage = {
+                        fileId: imageId,
+                        fileName: file.name,
+                        isError: isError
+                    };
+                this.addItem(imageObj);
+                this.para.onComplete && this.para.onComplete.call(this, data, file);
             },
             container: this.addImg,
-            text: '',
-            onError:()=>{
-                Modal.alert('上传图片失败');
-            }
+            text: '+'
         });
-        // 文件加入上传队列
-        uploader.com.on('beforeFileQueued', (file) => {
+        this.uploader = uploader;
+        // 文件加入上传队列时 检测改图片是否存在
+        uploader.on('beforeFileQueued', (file) => {
             if (file.type.split('/')[0] === 'image') {
-                let imgsArr = this.fileArr || [],
+                let imgsArr = this.value || [],
                     isExist = false;
                 for (let i = 0, len = imgsArr.length; i < len; i++) {
                     let pic = imgsArr[i];
                     if (pic.fileName === file.name) {
-                        Modal.alert('已经添加过该图片');
+                        Modal.alert('已经添加过图片' + file.name);
                         isExist = true;
                     }
                 }
-                if (!!!isExist){
-                    uploader.com.upload();
-                }else{
+                if (!isExist) {
+                    //开始上传
+                    return true;
+                } else {
                     return false;
                 }
             } else {
@@ -97,24 +116,160 @@ export class Accessory extends FormCom {
                 return false;
             }
         });
+        // 文件加入到上传队列，开始上传
+        this.uploader.on('fileQueued', (file: File) => {
+            this.para.onChange && this.para.onChange();
+            //开始上传
+            if (!this.loading) {
+                this.loading = new Loading({
+                    msg: '上传中...',
+                    container: document.body
+                });
+                document.body.classList.add('up-disabled');
+            }
+            this.uploader.upload();
+        });
+        // 上传错误时调用
+        uploader.on("uploadError", (file,res) => {
+            if (this.loading) {
+                this.loading.hide();
+                this.loading.destroy();
+                this.loading = null;
+                document.body.classList.remove('up-disabled');
+            }
+            if (res === 'ifExist'){
+
+            }else{
+                let imageObj: IImage = {
+                    fileId: '',
+                    fileName: file.name,
+                    isError: true,
+                    localUrl:(window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
+                };
+                this.addItem(imageObj);
+            }
+            this.para.onError && this.para.onError.call(this, file);
+        });
+        // 所有文件上传成功时调用
+        uploader.on('uploadFinished', () => {
+            if (this.loading) {
+                this.loading.hide();
+                this.loading.destroy();
+                this.loading = null;
+                document.body.classList.remove('up-disabled');
+            }
+        });
+        uploader.on("error", function (type) {
+            const msg = {
+                'Q_TYPE_DENIED': '文件类型有误',
+                'F_EXCEED_SIZE': '文件大小不能超过4M',
+            };
+            if (this.loading){
+                this.loading.hide();
+                this.loading.destroy();
+                this.loading = null;
+                document.body.classList.remove('up-disabled');
+            }
+            Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
+        });
+
     }
 
-    private createImg(url: string) {
-        let imgWrapper = <div className="upload-img">
-            <img src={url} alt="附件图片"/>
-        </div>;
-        return imgWrapper;
+    protected _listItems: UploadImagesItem[] = [];
+    get listItems() {
+        return this._listItems.slice();
     }
 
-    private getFileUrl(fileId) {
-        return tools.url.addObj(BW.CONF.ajaxUrl.fileDownload, {
-            md5_field: 'FILE_ID',
-            file_id: fileId,
-            down: 'allow'
-        })
+    private calcScrollLeft() {
+        let scrollWrapper = d.query('.images-wrapper', this.wrapper),
+            scrollLeft = this._value.length * 96 + 80 - scrollWrapper.offsetWidth;
+        scrollWrapper.scrollLeft = scrollLeft > 0 ? scrollLeft : 0;
     }
 
-    get(){
-        return this.fileArr || [];
+    // 渲染附件列表
+    render(data: IImage[]) {
+        d.diff(data, this.listItems, {
+            create: (n: IImage) => {
+                this._listItems.push(this.createListItem({image: n}));
+            },
+            replace: (n: IImage, o: UploadImagesItem) => {
+                o.render(n || {});
+            },
+            destroy: (o: UploadImagesItem) => {
+                o.destroy();
+                let index = this._listItems.indexOf(o);
+                if (index > -1)
+                    delete this._listItems[index]
+            }
+        });
+        this._listItems = this._listItems.filter((item) => item);
+        this.refreshIndex();
+    }
+
+    refreshIndex() {
+        this._listItems.forEach((item, index) => {
+            item.index = index + 1;
+        });
+    }
+
+    private addItem(imageObj: IImage) {
+        let arr = this._value || [];
+        this._value = arr.concat(imageObj);
+        this._listItems.push(this.createListItem({image: imageObj}));
+        this.calcScrollLeft();
+    }
+
+    protected createListItem(para: IUploadImagesItem) {
+        para = Object.assign({}, para, {
+            container: this.imgWrapper,
+            index: this._value.length,
+            nameField:this.para.nameField
+        });
+        return new UploadImagesItem(para);
+    }
+
+    get() {
+        let value = this.value,
+            trueVal = [];
+        value.forEach(v => {
+            !v.isError && trueVal.push(v.fileId);
+        });
+        return trueVal;
+    }
+
+    private initEvent = (() => {
+        let deleteEt = (e) => {
+            let indexEl = d.closest(e.target, '.upload-img'),
+                index = parseInt(indexEl.dataset.index);
+            // 删除
+            this.deleteImageItem(index);
+        };
+
+        return {
+            on: () => {
+                d.on(this.wrapper, 'click', '.close-ball', deleteEt);
+            },
+            off: () => {
+                d.off(this.wrapper, 'click', '.close-ball', deleteEt);
+            }
+        }
+    })();
+
+    private deleteImageItem(index:number){
+        let i = index - 1;
+        let item = this._listItems[i];
+        if (item) {
+            item.destroy();
+            this._listItems.splice(i, 1);
+            this._value.splice(i, 1);
+            this.refreshIndex();
+        }
+    }
+
+    destroy() {
+        this.initEvent.off();
+        this.uploader.destroy();
+        this.imgWrapper = null;
+        super.destroy();
     }
 }

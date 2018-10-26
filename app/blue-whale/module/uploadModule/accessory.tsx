@@ -64,7 +64,6 @@ export class Accessory extends FormCom {
         this.createUploader();
         this.initEvent.on();
     }
-    private uploadState: number = 0;
     private loading:Loading = null;
     private createUploader() {
         if (tools.isEmpty(this.para.uploadUrl)){
@@ -73,17 +72,17 @@ export class Accessory extends FormCom {
         }
         this.uploader = new Uploader({
             container: this.innerEl.uploader,
-            uploadUrl: this.para.uploadUrl,
+            uploadUrl: this.para.uploadUrl || BW.CONF.ajaxUrl.fileUpload,
             accept: this.para.accept,
-            nameField: this.para.nameField,
+            nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             onComplete: (data, file) => {
                 if (this.loading){
                     this.loading.hide();
                     this.loading.destroy();
                     this.loading = null;
+                    document.body.classList.remove('up-disabled');
                 }
-                document.body.classList.remove('up-disabled');
                 if (data.code == 200 || data.errorCode === 0) {
                     Modal.toast('上传成功!');
                     this.para.onComplete && this.para.onComplete.call(this, data, file);
@@ -98,11 +97,13 @@ export class Accessory extends FormCom {
         this.uploader.on('fileQueued', (file: File) => {
             this.para.onChange && this.para.onChange();
             //开始上传
-            this.loading = new Loading({
-                msg:'上传中...',
-                container:document.body
-            });
-            document.body.classList.add('up-disabled');
+            if(!this.loading){
+                this.loading = new Loading({
+                    msg:'上传中...',
+                    container:document.body
+                });
+                document.body.classList.add('up-disabled');
+            }
             this.uploader.upload();
         });
 
@@ -115,13 +116,9 @@ export class Accessory extends FormCom {
                 this.loading.hide();
                 this.loading.destroy();
                 this.loading = null;
+                document.body.classList.remove('up-disabled');
             }
-            document.body.classList.remove('up-disabled');
             Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
-        });
-
-        this.uploader.on('uploadProgress', function (file, percentage) {
-            // 上传过程中触发，携带上传进度
         });
     }
 
@@ -156,10 +153,10 @@ export class Accessory extends FormCom {
         });
     }
 
-    // 实例化MvListItem
     protected createListItem(para: IAccessoryItem) {
         para = Object.assign({}, para, {
-            container: this.wrapper
+            container: this.accessoryBodyWrapper,
+            index:this._value.index
         });
         return new AccessoryItem(para);
     }
@@ -183,11 +180,13 @@ export class Accessory extends FormCom {
     })();
 
     private deleteAccessoryItem(index) {
-        let item = this._listItems[index];
+        let i = index - 1;
+        let item = this._listItems[i];
         if (item) {
             item.destroy();
-            this._listItems.splice(index, 1);
-            this._value.splice(index, 1);
+            this._listItems.splice(i, 1);
+            this._value.splice(i, 1);
+            this.refreshIndex();
         }
     }
 

@@ -188,7 +188,8 @@ gulp.task('js', function () {
         'uploadModule/uploadModule',
         'uploadModule/accessoryItem',
         'uploadModule/accessory',
-        'uploadModule/uploadImages'
+        'uploadModule/uploadImages',
+        'uploadModule/uploadImagesItem',
     ], 'uploadModule.js');
 
     //unBinding模块
