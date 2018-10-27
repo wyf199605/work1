@@ -6,13 +6,14 @@ import {Button} from "../global/components/general/button/Button";
 import {TextInput} from "../global/components/form/text/text";
 import {SelectInput} from "../global/components/form/selectInput/selectInput";
 import d = C.d;
-const site = 'https://bwt.sanfu.com/';
+const site = 'https://bwd.sanfu.com/';
 const sqlUrl = {
     open : site +'cashier/pos/posmonitor/log/posstart',
     stop : site + 'cashier/pos/posmonitor/log/posstop'
 };
 interface ISqlMonitorPara {
     container : HTMLElement
+    identification : string
 }
 export class SqlMonitor extends Component{
     private btns : obj = {};//存放button节点
@@ -88,7 +89,6 @@ export class SqlMonitor extends Component{
                         content : '开始',
                         type : 'primary',
                         onClick : function(e){
-                            debugger;
                             let sqlInput = d.query('.sql-input', self.container);
                             self.startSqlMonitor();
                             sqlInput.classList.add('disabled');
@@ -121,9 +121,9 @@ export class SqlMonitor extends Component{
                         type : 'primary',
                         onClick : function(e){
                             let sqlMonitorContent = d.query('.content',self.container);
-                            let pageContainer = d.closest(self.container,'.page-container');
+                            // let pageContainer = d.closest(self.container,'.page-container');
                             sqlMonitorContent.innerHTML = "";
-                            pageContainer.scrollTop = 0;
+                            // pageContainer.scrollTop = 0;
                         }
                     });
                     break;
@@ -249,7 +249,11 @@ export class SqlMonitor extends Component{
 
 
     private stopSqlMonitor(){
-        C.Ajax.fetch(sqlUrl.stop);
+        C.Ajax.fetch(sqlUrl.stop,{
+            data : {
+                identification : this.para.identification
+            }
+        });
     }
     private startSqlMonitor(){
         let appid = this.coms['appid'] as TextInput,
@@ -263,7 +267,7 @@ export class SqlMonitor extends Component{
             monitorType = this.coms['monitorType'] as SelectInput,
             sqlType = this.coms['sqlType'] as SelectInput,
             data = {
-                "appId":appid.get(),
+                "application":appid.get(),
                 // "appServer":appserver.get(),
                 // "dataSource":clientIp.get(),
                 "clientUser":clientUser.get(),
@@ -281,7 +285,7 @@ export class SqlMonitor extends Component{
                 delete data[key];
             }
         }
-       C.Ajax.fetch(sqlUrl.open, {
+       C.Ajax.fetch(sqlUrl.open + '?identification=' + this.para.identification, {
             type: 'POST',
             data: data
         });

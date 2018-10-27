@@ -246,6 +246,11 @@ export class NewTableModule {
     private subWrapper: HTMLElement = null;
 
     subInit(ui: IBW_Table, editParam: IBW_TableAddrParam, ajaxData?: obj, tabEl?: HTMLElement) {
+        // 如果查询有带分段，那么从表不生成
+        // let section = JSON.parse(ajaxData.queryoptionsparam);
+        // if(section && section.section){
+        //     return;
+        // }
         this.sub[this.subTabActiveIndex] = new BwSubTableModule({
             ui,
             editParam,

@@ -170,7 +170,7 @@ export = class listPage extends BasicPage {
                     (checkbox.parentNode.parentNode as HTMLElement).dataset.index) {
                     lastCheckbox.checked = false;
                 }
-                if (lastCheckbox === null || !checkbox.checked) {
+                if (lastCheckbox === null || checkbox.checked) {
                     checkedNum = 1;
                 } else {
                     checkedNum = 0;

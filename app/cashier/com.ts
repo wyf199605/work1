@@ -431,10 +431,10 @@ export class Com{
     /**
      * 提示信息1.主界面底部提示信息2.f6提示信息。若f6开启状态默认提示信息在f6中显示
      * @param {string} str
-     * @param {boolean} isRead 字体是否红色
+     * @param {boolean} isRed 字体是否红色
      * @param {boolean} isOverLay true时候不清除原提示信息，如f6用券后提示已使用券
      */
-    static logTip(str: string, isRead = false, isOverLay = false) {
+    static logTip(str: string, isRed = false, isOverLay = false) {
         let modalTip = d.query('.modal-short-tip');
         if (modalTip) {
             if (!isOverLay) {
@@ -453,7 +453,7 @@ export class Com{
         }
 
         Com.tipEl.innerHTML = str;
-        if (isRead) {
+        if (isRed) {
             Com.tipEl.classList.add('color-red');
         } else {
             Com.tipEl.classList.remove('color-red');
