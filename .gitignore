@@ -6,3 +6,4 @@ app/package-lock.json
 .gulp-scss-cache/
 /dist.min/
 /dist/
+.gitignore
