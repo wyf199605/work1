@@ -54,29 +54,35 @@ export class AssignModuleBasic extends FormCom{
             return;
         }
 
-        let iframe = <iframe className="pageIframe" src={tools.url.addObj(href, {isMb:true}, false)}></iframe>;
+        let iframe: HTMLIFrameElement = <iframe className="pageIframe" src={tools.url.addObj(href, {isMb:true}, false)}></iframe>;
 
         this.contactModal = new Modal({
             body : iframe,
             className: 'contact-modal',
         });
 
+        // iframe.onload = () => {
+        //     let contactIframe = this.contactModal.body as HTMLIFrameElement,
+        //         iframeBody = contactIframe.contentDocument.body,
+        //         ulDom = iframeBody.querySelector('#list ul.mui-table-view'),
+        //         list = iframeBody.querySelector('#list'),
+        //         div = document.createElement('div'),
+        //         htmlDom = <style>{"header a.sys-action-back{display: none} .ulOverFlow{ height:448px; overflow-y : auto} #list{height: 100vh}"}</style>;
+        //
+        //     contactIframe.contentDocument.head.appendChild(htmlDom);
+        //     list.querySelector('.mui-scroll').remove();
+        //     let scrollbar = list.querySelector('.mui-scrollbar');
+        //     scrollbar && scrollbar.remove();
+        //     div.classList.add('ulOverFlow');
+        //     div.appendChild(ulDom);
+        //     list.appendChild(div);
+        // };
         iframe.onload = () => {
-            let contactIframe = this.contactModal.body as HTMLIFrameElement,
-                iframeBody = contactIframe.contentDocument.body,
-                ulDom = iframeBody.querySelector('#list ul.mui-table-view'),
-                list = iframeBody.querySelector('#list'),
-                div = document.createElement('div'),
-                htmlDom = <style>{"header a.sys-action-back{display: none} .ulOverFlow{ height:448px; overflow-y : auto} #list{height: 100vh}"}</style>;
+            let iframeBody = iframe.contentDocument.body,
+                a: HTMLElement = iframeBody.querySelector('header a.sys-action-back');
 
-            contactIframe.contentDocument.head.appendChild(htmlDom);
-            list.querySelector('.mui-scroll').remove();
-            let scrollbar = list.querySelector('.mui-scrollbar');
-            scrollbar && scrollbar.remove();
-            div.classList.add('ulOverFlow');
-            div.appendChild(ulDom);
-            list.appendChild(div);
-        };
+            a && (a.style.display = 'none');
+        }
     }
 
     public assignDataGet(data, resData){

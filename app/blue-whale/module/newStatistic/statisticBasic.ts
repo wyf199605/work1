@@ -67,6 +67,11 @@ export class NewStatisticBase {
             header: {
                 title :  '统计结果',
                 isFullScreen: true
+            },
+            onLarge: () => {
+                if(ftable) {
+                    ftable.recountWidth();
+                }
             }
         });
         let para: IFastBtnTablePara = {
@@ -87,7 +92,7 @@ export class NewStatisticBase {
             type: 'button',
         });
 
-        new FastBtnTable(para);
+        let ftable = new FastBtnTable(para);
         // loading.hide();
         // require([sys.isMb ? 'TableModuleMb': 'TableModulePc'], (table) => {
         //     let conf = {

@@ -184,13 +184,22 @@ export class ButtonAction {
         if(!Array.isArray(dataObj) || dataObj.length === 1){
             addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
         }
+        let varType = btn.actionAddr.varType, res;
+
+        if (varType === 3 && typeof data !== 'string') {
+            // 如果varType === 3 则都转为数组传到后台
+            if (!Array.isArray(data)) {
+                data = [data];
+            }
+            res = JSON.stringify(data);
+        }
         switch (btn.openType) {
             case 'none' :
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
-                self.checkAction(btn, dataObj, addr, ajaxType, data, url).then(response => {
+                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
                 }).catch((e) => {
@@ -204,7 +213,7 @@ export class ButtonAction {
                 }
 
                 addr = tools.url.addObj(addr, {output: 'json'});
-                self.checkAction(btn, dataObj, addr, ajaxType, data, url).then(response => {
+                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     console.log(response);
                     //创建条码扫码页面
                     if(response.uiType === 'inventory' && tools.isMb){
@@ -220,8 +229,8 @@ export class ButtonAction {
             case 'newwin':
             default:
                 BW.sys.window.open({
-                    url: tools.url.addObj(BW.CONF.siteUrl + addr, data),
-                    gps: !!btn.actionAddr.needGps
+                    url: tools.url.addObj(tools.url.addObj(BW.CONF.siteUrl + addr, data), {bodyParams: res}, false),
+                    gps: !!btn.actionAddr.needGps,
                 }, url);
                 self.btnRefresh(btn.refresh, url);
         }
@@ -304,16 +313,7 @@ export class ButtonAction {
     //     });
     // }
     private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
-        let self = this,
-            varType = btn.actionAddr.varType;
-
-        if (varType === 3 && typeof ajaxData !== 'string') {
-            // 如果varType === 3 则都转为数组传到后台
-            if (!Array.isArray(ajaxData)) {
-                ajaxData = [ajaxData];
-            }
-            ajaxData = JSON.stringify(ajaxData);
-        }
+        let self = this;
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
             data2url: btn.actionAddr.varType !== 3,
             type: ajaxType,
