@@ -147,6 +147,10 @@ export class NewTableModule {
                         return;
                     }
                     firstRow.selected = true;
+                    let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+                        ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
+                        section = JSON.parse(ajaxData.queryoptionsparam),
+                        noLoadSub = section && section.section;
                     if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
                             panelParent: tabWrapper,
@@ -154,8 +158,6 @@ export class NewTableModule {
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
-                                let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
-                                    ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[index].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
@@ -176,9 +178,15 @@ export class NewTableModule {
                             dom: null
                         }]);
                     });
+                    if(noLoadSub){
+                        this.subWrapper.classList.add('hide');
+                        return;
+                    }else {
+                        this.subWrapper.classList.remove('hide');
+                    }
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
-                        if (isFirst) {
+                        if (isFirst && !noLoadSub) {
                             this.tab.active(0);
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;

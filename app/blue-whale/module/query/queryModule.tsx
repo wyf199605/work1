@@ -293,8 +293,17 @@ export abstract class QueryModule {
             if (!this.queriesCpt.hasOwnProperty(queryName)) {
                 continue;
             }
-            let paramsData = this.queriesCpt[queryName].dataGet(-1, isSave);
-            if (paramsData !== null) {
+            let obj : any = this.queriesCpt[queryName],
+                queryConfigs = obj.queryConfigs,
+                paramsData = obj.dataGet(-1, isSave);
+
+            if(isSave && Array.isArray(queryConfigs)){
+                queryConfigs.forEach((q : QueryConf) => {
+                    if(q.nosave){
+                        delete paramsData[q.field_name]
+                    }
+                })
+            }            if (paramsData !== null) {
                 queryJson[queryName] = JSON.stringify(paramsData);
                 queryNum++;
             }
