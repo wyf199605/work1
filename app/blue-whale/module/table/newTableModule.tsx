@@ -195,8 +195,10 @@ export class NewTableModule {
                                     onClose: () => {
                                         this.sub[this.subTabActiveIndex].ftable.removeAllModal();
                                         d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
+                                        this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
                                     }
-                                })
+                                });
+                                this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
                             });
                         }
                     }, 200);

@@ -141,15 +141,20 @@ export class FastTable extends Component {
 
         if (tools.isMb) {
             d.on(window, 'resize', () => {
-                this.tablesEach(table => {
-                    table.adjustColWidth();
-                });
-                this.calcWidth();
-                this.setMainTableWidth();
+                this.recountWidth();
             });
         }
 
         window['f'] = this;
+    }
+
+    // 重新计算表格宽度
+    recountWidth (){
+        this.tablesEach(table => {
+            table.adjustColWidth();
+        });
+        this.calcWidth();
+        this.setMainTableWidth();
     }
 
     private mutiSelect: boolean;
@@ -351,7 +356,7 @@ export class FastTable extends Component {
     }
 
     // 改变滚动条宽度
-    private changeScrollWidth(width: number) {
+    changeScrollWidth(width: number = 0) {
         //     let mwidth = window.getComputedStyle(d.query('.main-table')).width,
         //         mwidth_num = parseInt(mwidth.slice(0,mwidth.length-2));
         if (!tools.isMb) {
@@ -2039,7 +2044,7 @@ export class FastTable extends Component {
                         moreWrapper = <div className="more-detail"/>;
                         moreWrapper.innerHTML = cell.text;
                         d.setPosition(moreWrapper, cell.wrapper, true);
-                        moreWrapper.style.zIndex = '9';
+                        moreWrapper.style.zIndex = '1009';
                         d.on(moreWrapper, 'mouseover', () => {
                             clearTimeout(timer);
                             d.off(moreWrapper, 'mouseover');

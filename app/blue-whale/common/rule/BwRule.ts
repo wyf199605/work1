@@ -82,7 +82,7 @@ export class BwRule extends Rule {
                         let {response, xhr} = result;
                         if (tools.isEmpty(response)) {
                             // TODO 严钰说不用的
-                            // alert('后台数据为空');
+                            alert('后台数据为空');
                             reject(Ajax.errRes(xhr, 'emptyData', ''));
                             return;
                         }

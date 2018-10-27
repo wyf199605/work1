@@ -153,7 +153,7 @@ export = class LabelPrintModule {
         });
         //初始化下拉框
         for (let num = 0; num < this.para.printList.length; num++) {
-            LabelPrintModule.selectInputJson.labelType.push({text: `${this.para.printList[num].caption}`, value: num});
+            this.selectInputJson.labelType.push({text: `${this.para.printList[num].caption}`, value: num});
         }
 
         let bodyHtml = LabelPrintModule.htmlTpl();
@@ -720,7 +720,7 @@ export = class LabelPrintModule {
             case 'printer':
                 this.coms['printer'] = new SelectInput({
                     container: el,
-                    data: LabelPrintModule.selectInputJson['printer'],
+                    data: this.selectInputJson['printer'],
                     placeholder: '默认',
                     onSet: function (item, index) {
                     },
@@ -731,7 +731,7 @@ export = class LabelPrintModule {
             case 'port':
                 this.coms['port'] = new SelectInput({
                     container: el,
-                    data: LabelPrintModule.selectInputJson['port'],
+                    data: this.selectInputJson['port'],
                     placeholder: '默认',
                     onSet: function (item, index) {
                     },
@@ -742,7 +742,7 @@ export = class LabelPrintModule {
             case 'paper':
                 this.coms['paper'] = new SelectInput({
                     container: el,
-                    data: LabelPrintModule.selectInputJson['paper'],
+                    data: this.selectInputJson['paper'],
                     placeholder: '默认',
                     onSet: function (item, index) {
                         if (item.value != 0) {
@@ -918,7 +918,7 @@ export = class LabelPrintModule {
             case 'labelType':
                 this.coms['labelType'] = new SelectInput({
                     container: el,
-                    data: LabelPrintModule.selectInputJson['labelType'],
+                    data: this.selectInputJson['labelType'],
                     placeholder: '默认',
                     onSet: function (item, index) {
                         self.labelType = index;
@@ -944,13 +944,13 @@ export = class LabelPrintModule {
                 let printerList = JSON.parse(printerListStr);
                 printerList.msg && (driveList = printerList.msg.driveList);
                 if (driveList) {
-                    LabelPrintModule.selectInputJson.printer = [];
-                    LabelPrintModule.selectInputJson.printer.push(
+                    this.selectInputJson.printer = [];
+                    this.selectInputJson.printer.push(
                         {text: "默认", value: driveList[0].driveCode}
                     );
                     if (driveList.length > 1) {
                         for (let i = 1, l = driveList.length; i < l; i++) {
-                            LabelPrintModule.selectInputJson.printer.push(
+                            this.selectInputJson.printer.push(
                                 {text: driveList[i].driveName, value: driveList[i].driveCode}
                             )
                         }
@@ -1298,7 +1298,7 @@ export = class LabelPrintModule {
      * 下拉框数据
      * @type {{printer: [{text: string; value: number}]; port: [{text: string; value: number} , {text: string; value: number}]; paper: [{value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: string; text: string} , {value: number; text: string}]; labelType: Array}}
      */
-    static selectInputJson = {
+    selectInputJson = {
         printer: [{text: '默认', value: 0}],
         port: [{text: '25', value: 25}, {text: '8080', value: 8080}],
         paper: [{value: '215.9*279.4', text: '信纸(215.9*279.4毫米)'},
