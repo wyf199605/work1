@@ -229,9 +229,8 @@ export class ButtonAction {
             case 'newwin':
             default:
                 BW.sys.window.open({
-                    url: tools.url.addObj(BW.CONF.siteUrl + addr, data),
+                    url: tools.url.addObj(tools.url.addObj(BW.CONF.siteUrl + addr, data), {bodyParams: res}, false),
                     gps: !!btn.actionAddr.needGps,
-                    data: res
                 }, url);
                 self.btnRefresh(btn.refresh, url);
         }
