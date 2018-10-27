@@ -24,8 +24,10 @@ export class ListItemDetail {
         this.wrapper = wrapper;
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.initDetailTpl(para.fm.fields);
-        this.changePage();
-        this.initDetailButtons();
+        this.initDetailData().then(data => {
+            this.render(data);
+            this.initDetailButtons();
+        });
     }
 
     // 初始化详情DOM
@@ -59,7 +61,9 @@ export class ListItemDetail {
                     for (let i = 0, len = meta.length; i < len; i++) {
                         res[meta[i]] = dataTab[i];
                     }
-                    this.totalNumber = response.head.totalNum;
+                    if(this.para.uiType === 'detail'){
+                        this.totalNumber = response.head.totalNum;
+                    }
                     this.defaultData = res;
                     if (tools.isNotEmpty(res)) {
                         let cells = this.cells;

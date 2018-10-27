@@ -182,22 +182,23 @@ export class NewTableModule {
                             this.tab.active(0);
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
-                        }
-                        if (!tools.isMb){
-                            d.on(this.tab.getTab(), 'click', '.full-icon', () => {
-                                let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
-                                new Modal({
-                                    body: tabEl,
-                                    className: 'full-screen sub-table-full',
-                                    header: {
-                                        title: this.bwEl.subTableList[this.subTabActiveIndex].caption
-                                    },
-                                    onClose: () => {
-                                        this.sub[this.subTabActiveIndex].ftable.removeAllModal();
-                                        d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
-                                    }
-                                })
-                            });
+                            if (!tools.isMb){
+                                d.on(this.tab.getTab(), 'click', '.full-icon', () => {
+                                    let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
+                                    new Modal({
+                                        body: tabEl,
+                                        className: 'full-screen sub-table-full',
+                                        header: {
+                                            title: this.bwEl.subTableList[this.subTabActiveIndex].caption
+                                        },
+                                        onClose: () => {
+                                            this.sub[this.subTabActiveIndex].ftable.removeAllModal();
+                                            d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
+                                        }
+                                    });
+                                    this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                                });
+                            }
                         }
                     }, 200);
                 });

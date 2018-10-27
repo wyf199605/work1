@@ -141,15 +141,20 @@ export class FastTable extends Component {
 
         if (tools.isMb) {
             d.on(window, 'resize', () => {
-                this.tablesEach(table => {
-                    table.adjustColWidth();
-                });
-                this.calcWidth();
-                this.setMainTableWidth();
+                this.recountWidth();
             });
         }
 
         window['f'] = this;
+    }
+
+    // 重新计算表格宽度
+    recountWidth (){
+        this.tablesEach(table => {
+            table.adjustColWidth();
+        });
+        this.calcWidth();
+        this.setMainTableWidth();
     }
 
     private mutiSelect: boolean;
