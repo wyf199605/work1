@@ -8,6 +8,7 @@ interface QueryConf {
     dynamic: number;
     link: string;
     type: string;
+    nosave? : boolean;
     value_list?: string[];
     atrrs? : obj;
     data? : obj[];

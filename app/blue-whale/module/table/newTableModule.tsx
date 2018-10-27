@@ -147,15 +147,19 @@ export class NewTableModule {
                         return;
                     }
                     firstRow.selected = true;
-                    if (tools.isEmpty(this.tab)){
+                    let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+                        ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
+                        section = JSON.parse(ajaxData.queryoptionsparam),
+                        noLoadSub = section && section.section;
+
+                    // 如果查询有带分段，那么从表不生成
+                    if (tools.isEmpty(this.tab) && !noLoadSub){
                         this.tab = new Tab({
                             panelParent: tabWrapper,
                             tabParent: tabWrapper,
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
-                                let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
-                                    ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[index].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
@@ -176,9 +180,16 @@ export class NewTableModule {
                             dom: null
                         }]);
                     });
+
+                    if(noLoadSub){
+                        this.subWrapper.classList.add('hide');
+                        return;
+                    }else {
+                        this.subWrapper.classList.remove('hide');
+                    }
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
-                        if (isFirst) {
+                        if (isFirst && !noLoadSub) {
                             this.tab.active(0);
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
@@ -247,11 +258,6 @@ export class NewTableModule {
     private subWrapper: HTMLElement = null;
 
     subInit(ui: IBW_Table, editParam: IBW_TableAddrParam, ajaxData?: obj, tabEl?: HTMLElement) {
-        // 如果查询有带分段，那么从表不生成
-        // let section = JSON.parse(ajaxData.queryoptionsparam);
-        // if(section && section.section){
-        //     return;
-        // }
         this.sub[this.subTabActiveIndex] = new BwSubTableModule({
             ui,
             editParam,
