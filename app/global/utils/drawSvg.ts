@@ -105,6 +105,7 @@ export class DrawSvg{
             let maxCount = Math.floor(allWidth / font),
                 index = 0,
                 result = [];
+
             while(index * maxCount < text.length){
                 result.push(text.slice(index * maxCount, (index + 1) * maxCount));
                 index ++;

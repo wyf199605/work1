@@ -28,7 +28,7 @@ export = class contactsPage {
     private response;
     constructor(private para: contactsPagePara) {
         let self = this,
-            list = d.query('#list', document);
+            list = d.query('#list');
             //传给后台参数
         list.style.height = '100%';
         list.style.overflow = 'auto';
