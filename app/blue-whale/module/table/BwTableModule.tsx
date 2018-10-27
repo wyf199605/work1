@@ -339,7 +339,7 @@ export class BwTableModule extends Component {
         this.reportCaptionInit();
 
         // inputs (wbf)
-        if (tools.isPc) {
+        // if (tools.isPc) {
             setTimeout(() => {
                 //monitorKey键盘输入
                 if (this.ui.inputs) {
@@ -350,7 +350,7 @@ export class BwTableModule extends Component {
                     })
                 }
             }, 200);
-        }
+        // }
 
         tools.isFunction(this._ftableReadyHandler) && this._ftableReadyHandler();
         this.isFtableReady = true;
