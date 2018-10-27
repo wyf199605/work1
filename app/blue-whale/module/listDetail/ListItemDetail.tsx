@@ -52,7 +52,7 @@ export class ListItemDetail {
             let data: obj = {};
             if (tools.isNotEmpty(this.ajaxUrl)) {
                 let url = tools.url.addObj(this.ajaxUrl, {
-                    pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=' + this.totalNumber + '}'
+                    pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
                 });
                 BwRule.Ajax.fetch(url).then(({response}) => {
                     let res: obj = {};
@@ -61,7 +61,7 @@ export class ListItemDetail {
                     for (let i = 0, len = meta.length; i < len; i++) {
                         res[meta[i]] = dataTab[i];
                     }
-                    if(this.para.uiType === 'detail'){
+                    if (this.para.uiType === 'detail') {
                         this.totalNumber = response.head.totalNum;
                     }
                     this.defaultData = res;
@@ -244,51 +244,43 @@ export class ListItemDetail {
     }
 
     handlerValue(text, format: R_Field): string | string[] {
-        let t: string = '',
-            v = text,
+        let v,
             type = tools.isNotEmpty(format) ? format.dataType || format.atrrs.dataType : '';
-        if (type === '18') {
-            t = 'textarea';
-        } else if (type === '20' || type === '27' || type === '28') {
-            t = 'img';
-        } else if (type === '43' || type === '44') {
-            t = 'file';
-        } else {
-            t = 'text';
-        }
         let types = ['10', '11', '12', '13', '14', '17', '30', '31'];
-        if (types.indexOf(type)) {
+        if (types.indexOf(type) >= 0) {
             v = G.Rule.formatTableText(text, format);
         } else {
             if (type === '18') {
                 // 多行文本
                 v = text;
-            } else if (type === '20') {
-                // BLOB类型
-                v = BW.CONF.siteUrl + text;
-            } else if (type === '27' || type === '28') {
+            } else if (type === '20' || type === '27' || type === '28') {
                 // 单图和多图（唯一值） 单文件和多文件(唯一值)
-                let addrArr = text.split(',');
+                let addrArr = text.split(','),
+                    arr = [];
                 addrArr.forEach(md5 => {
                     // 根据md5获取文件地址
-                    v.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
-                })
+                    arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
+                });
+                v = arr;
             } else if (type === '47' || type === '48' || type === '40') {
                 // 获取文件信息地址 （md5,unique）
                 let uniques = text.split(',');
                 uniques.forEach(uniq => {
 
                 })
-            }else if(type === '43'){
+            } else if (type === '43') {
                 // 附件名称
 
+            }else{
+                // dataType为空按照text类型处理
+                v = text;
             }
         }
         return v;
     }
 
     // 获取文件信息地址
-    private getFileInfoAddr(uniq?:string){
+    private getFileInfoAddr(uniq?: string) {
 
     }
 }

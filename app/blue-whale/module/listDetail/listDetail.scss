@@ -22,11 +22,18 @@
       background-color: #ffffff;
       padding-right: 16px;
       border-bottom: 1px solid #e2e2e2;
+      .detail-cell-content{
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;
+      }
       .detail-cell-content, .detail-cell-mutil-content {
         color: #666666;
       }
       .detail-cell-title {
         color: #333333;
+        flex: 0 0 auto;
+        margin-right: 20px;
       }
     }
     .detail-cell-imgs-title {
@@ -167,6 +174,16 @@
     color: #005bac;
     background-color: #ffffff;
     border-color: #005bac;
+  }
+  .app-zanwushuju{
+    width: 80px;
+    height: 80px;
+    font-size: 80px;
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 5px;
   }
 }
 

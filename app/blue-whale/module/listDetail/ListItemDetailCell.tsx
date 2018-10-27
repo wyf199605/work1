@@ -71,6 +71,7 @@ export class ListItemDetailCell extends Component {
     createImgs(value: string | string[], imgsWrapper: HTMLElement) {
         imgsWrapper.innerHTML = '';
         if (tools.isEmpty(value)) {
+            d.append(imgsWrapper, <i className="appcommon app-zanwushuju"/>);
             return;
         }
         if (Array.isArray(value)) {
@@ -84,17 +85,20 @@ export class ListItemDetailCell extends Component {
 
     createAllFiles(value: IFile[], fileWrapper: HTMLElement) {
         fileWrapper.innerHTML = '';
-        tools.isNotEmpty(value) && value.forEach(f => {
-            d.append(fileWrapper, <div className="detail-cell-file-item">
-                <div className="file-icon"><i className="appcommon app-wenjian"/></div>
-                <div className="file-info" data-file-url={BW.CONF.siteUrl + f.addr}>
-                    <div className="file-name">{f.fileName}</div>
-                    <div className="file-size">{this.calcFileSize(f.fileSize)}</div>
-                </div>
-                <i className="file-option appcommon app-gengduo1"/>
-            </div>);
-
-        })
+        if(tools.isNotEmpty(value)){
+            value.forEach(f => {
+                d.append(fileWrapper, <div className="detail-cell-file-item">
+                    <div className="file-icon"><i className="appcommon app-wenjian"/></div>
+                    <div className="file-info" data-file-url={BW.CONF.siteUrl + f.addr}>
+                        <div className="file-name">{f.fileName}</div>
+                        <div className="file-size">{this.calcFileSize(f.fileSize)}</div>
+                    </div>
+                    <i className="file-option appcommon app-gengduo1"/>
+                </div>);
+            })
+        }else{
+            d.append(fileWrapper, <i className="appcommon app-zanwushuju"/>);
+        }
     }
 
     render(data: string | string[]) {
