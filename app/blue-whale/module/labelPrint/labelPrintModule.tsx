@@ -272,7 +272,12 @@ export = class LabelPrintModule {
                                 tempResult = tempResult.replace(/^javascript:/i, '');
                                 tempResult = '(function(){' + tempResult;
                                 tempResult = tempResult + '}())';
-                                data[key][key2] = eval(tempResult);
+                                try{
+                                    data[key][key2] = eval(tempResult);
+                                }catch (e){
+                                    console.log(e);
+                                    data[key][key2] = '';
+                                }
                             }
                             else {
                                 data[key][key2] = tempResult;
