@@ -194,29 +194,12 @@ export class NewTableModule {
                                         onClose: () => {
                                             this.sub[this.subTabActiveIndex].ftable.removeAllModal();
                                             d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
+                                            this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
                                         }
                                     });
                                     this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
                                 });
                             }
-                        }
-                        if (!tools.isMb){
-                            d.on(this.tab.getTab(), 'click', '.full-icon', () => {
-                                let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
-                                new Modal({
-                                    body: tabEl,
-                                    className: 'full-screen sub-table-full',
-                                    header: {
-                                        title: '子表全屏'
-                                    },
-                                    onClose: () => {
-                                        this.sub[this.subTabActiveIndex].ftable.removeAllModal();
-                                        d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
-                                        this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                                    }
-                                });
-                                this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                            });
                         }
                     }, 200);
                 });
