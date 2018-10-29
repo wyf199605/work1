@@ -78,8 +78,6 @@ export class ListItemDetailCell extends Component {
             value.forEach((v) => {
                 d.append(imgsWrapper, <img src={v} alt={this.para.caption + '详情图片'}/>);
             })
-        } else {
-            d.append(imgsWrapper, <img src={value} alt={this.para.caption + '详情图片'}/>);
         }
     }
 

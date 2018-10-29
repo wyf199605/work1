@@ -4,9 +4,9 @@ import tools = G.tools;
 import d = G.d;
 import {Modal} from "../../feedback/modal/Modal";
 
-interface IActionSheetButton{
+export interface IActionSheetButton{
     content: string;        // 内容（必须）
-    icon: string;           // 图标（必须），例：zhiwen / weixin
+    icon?: string;           // 图标（必须），例：zhiwen / weixin
     iconColor?: string;      // 图标的颜色（默认#666666）
     bg?: string;            // 图标的背景颜色（默认#ffffff）
     onClick: EventListener; // 点击事件（必须）
@@ -51,7 +51,7 @@ export class ActionSheet extends Modal{
                 // 必须有的参数
                 if('content' in item && 'onClick' in item && 'icon' in item){
                     let btnWrapper = <div className="btn-wrapper">
-                        <a href="#" className={`${item.icon}`}><i className={`iconfont icon-${item.icon}`}></i></a>
+                        <i className={item.icon}></i>
                         <p class="btn-content">{item.content}</p>
                     </div>;
                     d.append(this.buttonsWrapper, btnWrapper);

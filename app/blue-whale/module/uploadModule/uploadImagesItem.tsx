@@ -40,7 +40,7 @@ export class UploadImagesItem extends Component {
     }
 
     render(data: IImage) {
-        (this.innerEl.img as HTMLImageElement).src = data.fileId ? BwRule.fileUrlGet(data.fileId, this.para.nameField || 'FILE_ID', true) : data.localUrl;
+        (this.innerEl.img as HTMLImageElement).setAttribute('src',data.fileId ? BwRule.fileUrlGet(data.fileId, this.para.nameField || 'FILE_ID', true) : data.localUrl);
     }
 
     // 获取当前索引
