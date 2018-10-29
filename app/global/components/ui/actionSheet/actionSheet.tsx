@@ -12,7 +12,7 @@ export interface IActionSheetButton extends IButton {
 }
 
 interface IActionSheet {
-    buttons?: IActionSheetButton[]; // 是否有按钮组
+    buttons: IActionSheetButton[]; // 按钮数组
 }
 
 export class ActionSheet extends Modal {
@@ -23,7 +23,7 @@ export class ActionSheet extends Modal {
         super(Object.assign({
             width: '100%',
             position: 'down',
-            // isBackground: true,
+            isBackground: true,
             isShow: false
         }, para));
         // 要给Modal.wrapper的的top属性设置important才能从下方弹出
@@ -33,10 +33,9 @@ export class ActionSheet extends Modal {
         this.initEvents.on();
     }
 
-    // 设置actionSheet的默认样式
+    //  创建ActionSheet
     private createActionSheet(para: IActionSheet) {
         this.actionSheetWrapper = <div className="action-sheet-wrapper"/>;
-        d.append(this.actionSheetWrapper, <div className="action-sheet-cancel">取消</div>);
         if (tools.isNotEmptyArray(para.buttons)) {
             let buttonsWrapper = <div className="action-sheet-buttons"/>;
             d.append(this.actionSheetWrapper, buttonsWrapper);
@@ -53,6 +52,7 @@ export class ActionSheet extends Modal {
                 d.append(buttonsWrapper, btnWrapper);
             });
         }
+        d.append(this.actionSheetWrapper, <div className="action-sheet-cancel">取消</div>);
         this.bodyWrapper.appendChild(this.actionSheetWrapper);
         this.wrapper.style.height = window.getComputedStyle(this.actionSheetWrapper).height;
     }

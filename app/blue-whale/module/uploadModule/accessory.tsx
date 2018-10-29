@@ -18,7 +18,7 @@ export interface IFileInfo {
 
 export interface IAccessory extends IUploaderPara {
     caption?: string;
-    files?: IFileInfo[];
+    unique?: string;
     // fileInfoAddr?:
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
@@ -29,27 +29,48 @@ export class Accessory extends FormCom {
 
     public uploader: Uploader;
 
-    set(data: IFileInfo[]): void {
-        this.value = data;
+    set(data: string): void {
+        this.value = data || '';
     }
 
-    set value(value: IFileInfo[]) {
-        this._value = value;
-        this.render(value);
-    }
+    set value(value: string) {
+        this._value = value || '';
+        if (tools.isNotEmpty(value)){
+            let uniques = value.split(','),
+                files:IFileInfo[] = [];
+            uniques.forEach(uniq => {
 
+            })
+        }else{
+            this.files = [];
+        }
+    }
 
     get value() {
-        return this._value;
-    }
-
-    get() {
-        let value = this.value,
+        let value = this.files || [],
             trueVal = [];
         value.forEach(v => {
             trueVal.push(v.fileId);
         });
-        return trueVal;
+        return trueVal.join(',');
+    }
+
+    private _files:IFileInfo[];
+    set files(files:IFileInfo[]){
+        this._files = files || [];
+        this.render(this._files);
+    }
+    get files(){
+        return this._files;
+    }
+
+    get() {
+        let value = this.files || [],
+            trueVal = [];
+        value.forEach(v => {
+            trueVal.push(v.fileId);
+        });
+        return trueVal.join(',');
     }
 
     private accessoryBodyWrapper: HTMLElement = null;
@@ -67,7 +88,7 @@ export class Accessory extends FormCom {
 
     constructor(private para: IAccessory) {
         super(para);
-        tools.isNotEmpty(para.files) && (this.value = para.files);
+        this.value = para.unique || '';
         this.createUploader();
         this.initEvent.on();
     }
@@ -140,6 +161,9 @@ export class Accessory extends FormCom {
 
     // 渲染附件列表
     render(data: IFileInfo[]) {
+        if (tools.isEmpty(data)){
+            return;
+        }
         d.diff(data, this.listItems, {
             create: (n: IFileInfo) => {
                 this._listItems.push(this.createListItem({file: n}));
@@ -167,7 +191,7 @@ export class Accessory extends FormCom {
     protected createListItem(para: IAccessoryItem) {
         para = Object.assign({}, para, {
             container: this.accessoryBodyWrapper,
-            index: this._value.index
+            index: this.files.length
         });
         return new AccessoryItem(para);
     }
@@ -196,7 +220,7 @@ export class Accessory extends FormCom {
         if (item) {
             item.destroy();
             this._listItems.splice(i, 1);
-            this._value.splice(i, 1);
+            this._files.splice(i, 1);
             this.refreshIndex();
         }
     }

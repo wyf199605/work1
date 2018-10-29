@@ -154,4 +154,9 @@ export class ListItemDetailCell extends Component {
         }
         return size;
     }
+
+    destroy(){
+        this.para = null;
+        super.destroy();
+    }
 }

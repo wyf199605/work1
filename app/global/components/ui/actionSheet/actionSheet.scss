@@ -7,12 +7,15 @@ $cancel-height: 44px;
   background-color: #f2f2f2;
   .action-sheet-buttons {
     width: 100%;
-    position: absolute;
-    bottom: $cancel-height;
     display: flex;
     align-items: center;
     padding: 10px 16px;
     background-color: #f2f2f2;
+    flex-wrap: wrap;
+    &.single-line{
+      overflow-x: auto;
+      flex-wrap: nowrap;
+    }
     .btn-wrapper {
       padding: 10px 0;
       flex: 0 0 33.33%;
@@ -24,7 +27,6 @@ $cancel-height: 44px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      flex-wrap: wrap;
       align-items: center;
       i {
         font-size: 30px !important;
@@ -48,8 +50,6 @@ $cancel-height: 44px;
   .action-sheet-cancel {
     width: 100%;
     height: $cancel-height;
-    position: absolute;
-    bottom: 0;
     background-color: #ffffff;
     display: flex;
     justify-content: center;
