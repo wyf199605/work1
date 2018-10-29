@@ -813,7 +813,7 @@ export class AtVarBuilder{
 
     private initSettings(){
         let setting = this.para.setting;
-        if (setting) {
+        if (tools.isNotEmpty(setting)) {
             this.queryConfigs.forEach( p => {
                 p.atrrs.defaultValue = setting[p.field_name];
             });
