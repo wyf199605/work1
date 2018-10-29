@@ -1,0 +1,1 @@
+/// <amd-module name="GlobalTestModule"/>
