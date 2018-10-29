@@ -9,12 +9,13 @@ interface IDrapPoint {
     wraperId?:string //父元素
     width:number | string
     height:number | string
+    image?:string
 }
 export  class DrawPoint {
     public svg;
     public g;
-    public index;
-    public points:Array<any>;
+    public index = 0;
+    public points = [];
     public map
     public selected
     public line;
@@ -28,106 +29,74 @@ export  class DrawPoint {
         this.r = D3.scale.linear()
             .domain([1,6])
             .range([5.5,1])
+        this.line = D3.svg.line();
         this.InitSvg(para)
-        this.test();
     }
-    private point = [2];
-
 
     public InitSvg(para) {
         this.svg = D3.select(para.wraperId).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
             .on('mousedown',()=>{
-                return this.mousedown()
+                this.mousedown();
+                this.redraw();
             })
         console.log(para.wraperId);
         console.log(D3.select(para.wraperId));
         this.g = this.svg.append('g');
-        this.g.append('image')//添加背景图
+        this.g.append('image').attr('href',para.image).attr('width',para.width).attr('height',para.height)//添加背景图
     }
 
     private mousedown() {
-        var svg = D3.select('svg').select('g')
-        console.log(D3.mouse(svg.node()));
-        console.log(this.point);
-        this.point.push(this.selected = D3.mouse(svg.node()))
+        let svg = D3.select('svg').select('g')
+        this.points.push(this.selected = D3.mouse(svg.node()))
         console.log(this.points)
         this.map.set(this.index, this.points)
         console.log(this.map);
-        this.redraw();
-
     }
-
-    private test(){
-        console.log(this.point);
-    }
-
 
     //绘图
-    private redraw() {
-        var svg = D3.select('svg').select('g')
-        svg.select("#path" + this.index)
-            .attr("d",  (d, i)=> {
+    private redraw(){
+        let svg = D3.select('svg').select('g');
+        svg.select("#path"+ this.index)
+            .attr("d", (d,i)=> {
                 return this.line(this.map.get(this.index))
             })
-            .style("stroke-dasharray", "10 5")
-        // .on("mouseover",function(d,i){
-        //     d3.select(this).style("stroke-width", 8)
-        //
-        //     lineSelect = true
-        // })
-        // .on("mouseout", function (d, i) {
-        //
-        //     d3.select(this).style("stroke-width", 4)
-        //
-        //     lineSelect = false
+            .style("stroke-dasharray", "10 5");
 
-        // });
-
-        var circle = svg.selectAll("circle").data(this.map.get(this.index), function (d, i) {
+        //绘制圆形
+        let circle = svg.selectAll("circle").data(this.map.get(this.index), (d,i)=> {
             return d;
         })
-
-        circle.enter().append("circle")
-            .attr("r", 1e-2)
+        circle.enter().append('circle')
+            .attr('r',1e-2)
             .transition()
             .duration(750)
             .ease("elastic")
-            .attr('r', this.r(2))
-
-
-        circle.classed("selected", function (d) {
-            return d === this.selected;
-        }).attr("cx", function (d) {
-            return d[0];
-        })
-            .attr("cy", function (d) {
-                return d[1];
+            .attr('r',5)
+            .attr('cx',function (d) {
+                return d[0]
             })
+            .attr('cy',function (d) {
+                return d[1]
+            })
+
+        circle.classed("selected",  (d)=> {
+            console.log(d + "this")
+            return d === this.selected;
+        })
 
 
         circle.exit().remove();
-
-
-        if (D3.event) {
-
-
-            //d3.event.stopPropagation();
-
-        }
-        //svg.selectAll("circle").call(drag);
-
     }
 
 
-
-    private createPath()
+    public createPath()
     {
         if(this.map.get(this.index) == undefined){
             this.map.set(this.index,[]);
         }
-        console.log("创建了" + this.map.get(this.index))
+        //！！每一次创建都会开辟一个新得path
         var svg = D3.select('svg').select('g')
 
         svg.append("path")
@@ -142,8 +111,5 @@ export  class DrawPoint {
                 alert("这是区域")
             })
     }
-    //开启描点
-    public Drawing(){
-        this.createPath();
-    }
+
 }

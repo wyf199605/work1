@@ -167,24 +167,26 @@ export class HorizontalQueryModule extends Component {
 
     // 获取数据
     get json() {
-        let json: obj = {};
+        let json: obj = {},str = [];
         this.forms.forEach(form => {
+            console.log(form);
             let cond: QueryConf = form.custom,
                 value = form.value;
-            json.params = json.params || [];
-            if (form instanceof BasicBoxGroup && Array.isArray(value)) {
-                value = value.join(',');
-            }
-            value = Array.isArray(value) ? value : [value];
-            if (!(value.length === 1 && tools.isEmpty(value[0]))) {
-                if (!(value.length === 2 && tools.isEmpty(value[0]) && tools.isEmpty(value[1]))) {
-                    json.params.push([cond.field_name, value])
-                }
-            }
+            json[cond.field_name] = value;
+            // json.params = json.params || [];
+            // if (form instanceof BasicBoxGroup && Array.isArray(value)) {
+            //     value = value.join(',');
+            // }
+            // value = Array.isArray(value) ? value : [value];
+            // if (!(value.length === 1 && tools.isEmpty(value[0]))) {
+            //     if (!(value.length === 2 && tools.isEmpty(value[0]) && tools.isEmpty(value[1]))) {
+            //         json.params.push([cond.field_name, value])
+            //     }
+            // }
         });
-        for (let key in json) {
-            json[key] = JSON.stringify(json[key]);
-        }
+        // for (let key in json) {
+        //     json[key] = JSON.stringify(json[key]);
+        // }
         return json;
     }
 
