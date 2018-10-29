@@ -1,6 +1,7 @@
 ///<amd-module name="Inputs"/>
 import d = G.d;
 import CONF = BW.CONF;
+import tools = G.tools;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Toast} from "../../../global/components/feedback/toast/Toast";
 import {BwRule} from "../../common/rule/BwRule";
@@ -121,6 +122,7 @@ export class Inputs {
               title : '提示'
             },
             isOnceDestroy : true,
+            isMb : tools.isMb,
             body : d.create('<div class="keystep"></div>') as HTMLElement,
             footer : {},
             onOk : () => {
