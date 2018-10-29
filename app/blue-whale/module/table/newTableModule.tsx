@@ -149,8 +149,7 @@ export class NewTableModule {
                     firstRow.selected = true;
                     let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
                         ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
-                        section = JSON.parse(ajaxData.queryoptionsparam),
-                        noLoadSub = section && section.section;
+                        noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
                             panelParent: tabWrapper,
@@ -218,7 +217,7 @@ export class NewTableModule {
                         row = mftable.rowGet(rowIndex);
                     self.subIndex = rowIndex;
                     if(row && row.selected){
-                        self.subRefresh(row.data);
+                        !self.noLoadSub(mftable, main) && self.subRefresh(row.data);
                         pseudoTable && pseudoTable.setPresentSelected(rowIndex);
                     }else{
                         self.mobileModal && (self.mobileModal.isShow = false);
@@ -226,6 +225,13 @@ export class NewTableModule {
                 });
             }
         };
+    }
+
+    private noLoadSub(mftable, main){
+        let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+            ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
+            section = JSON.parse(ajaxData.queryoptionsparam);
+        return section && section.section
     }
 
     protected subIndex = 0;
