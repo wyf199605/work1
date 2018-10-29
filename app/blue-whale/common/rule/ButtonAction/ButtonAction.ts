@@ -189,7 +189,9 @@ export class ButtonAction {
         if (varType === 3 && typeof data !== 'string') {
             // 如果varType === 3 则都转为数组传到后台
             let tmp = data;
-            if (!Array.isArray(tmp)) {
+            if(tools.isEmpty(data)){
+                tmp = [];
+            }else if (!Array.isArray(tmp)) {
                 tmp = [tmp];
             }
             res = JSON.stringify(tmp);

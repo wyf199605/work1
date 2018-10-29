@@ -346,7 +346,6 @@ namespace G{
                     tmpData[key] = value;
                     // }
                 });
-                tmpData = G.tools.isEmpty(tmpData) ? d : tmpData;
                 if(!isLimitField){
                     for(let key in d){
                         if(key.indexOf('.') > -1){
