@@ -107,23 +107,39 @@ export class ListItemDetail {
             let btnWrapper = <div className="list-item-detail-buttons"/>;
             this.wrapper.appendChild(btnWrapper);
             if (this.para.uiType === 'detail') {
+                let actionSheet:ActionSheet = null;
                 new Button({
                     content: '更多',
                     className: 'more',
                     container: btnWrapper,
                     onClick: () => {
                         // 点击更多
+                        actionSheet.isShow = true;
                     }
+                });
+                let actionBtns: IActionSheetButton[] = [];
+                buttons.forEach((b, index) => {
+                    actionBtns.push({
+                        content: b.caption,
+                        onClick: () => {
+                            subBtnEvent(index + 2);
+                        }
+                    })
+                });
+                actionSheet = new ActionSheet({
+                    buttons: actionBtns
                 });
                 this.createPageButton(btnWrapper);
             } else {
                 if (buttons.length > 2) {
+                    let actionSheet:ActionSheet = null;
                     new Button({
                         content: '更多',
                         className: 'more',
                         container: btnWrapper,
                         onClick: () => {
                             // 点击更多
+                            actionSheet.isShow = true;
                         }
                     });
                     let btns = buttons.slice(0, 2);
@@ -147,9 +163,9 @@ export class ListItemDetail {
                             }
                         })
                     });
-                    new ActionSheet({
+                    actionSheet = new ActionSheet({
                         buttons: actionBtns
-                    })
+                    });
                 } else {
                     buttons.forEach((button, index) => {
                         new Button({

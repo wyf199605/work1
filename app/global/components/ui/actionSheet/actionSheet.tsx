@@ -5,81 +5,83 @@ import d = G.d;
 import {Modal} from "../../feedback/modal/Modal";
 import {IButton} from "../../general/button/Button";
 
-interface IActionSheetButton extends IButton{
+export interface IActionSheetButton extends IButton {
     content: string;        // 内容（必须）
     icon?: string;           // 图标
-    onClick: EventListener; // 点击事件（必须）
+    onClick: () => void; // 点击事件（必须）
 }
 
-interface ActionSheetPara{
+interface IActionSheet {
     buttons?: IActionSheetButton[]; // 是否有按钮组
 }
 
-export class ActionSheet extends Modal{
+export class ActionSheet extends Modal {
+    private actionSheetWrapper: HTMLElement;
+    private buttons: IActionSheetButton[] = [];
 
-    private cancelWrapper: HTMLElement;
-    private buttonsWrapper: HTMLElement;
-
-    constructor(para: ActionSheetPara){
+    constructor(para: IActionSheet) {
         super(Object.assign({
             width: '100%',
-            height: '319px',
             position: 'down',
-            isBackground: true,
+            // isBackground: true,
+            isShow: false
         }, para));
-        this.hasButtons = !!tools.isNotEmptyArray(para.buttons);
-        this.setDefaultStyle(para);
+        // 要给Modal.wrapper的的top属性设置important才能从下方弹出
+        this.buttons = para.buttons;
+        this.wrapper.style.setProperty('top', 'auto', 'important');
+        this.createActionSheet(para);
+        this.initEvents.on();
     }
 
     // 设置actionSheet的默认样式
-    private setDefaultStyle(para){
-        this.body = <div className="action-sheet-wrapper"/>;
-
-        // 要给Modal.wrapper的的top属性设置important才能从下方弹出
-        this.wrapper.style.setProperty('top', 'auto', 'important');
-
-        let bodyHeight = 88;
-        if(this.hasButtons){
-            this.buttonsWrapper = <div className="action-sheet-buttons"/>;
-            d.append(this.body, this.buttonsWrapper);
-
+    private createActionSheet(para: IActionSheet) {
+        this.actionSheetWrapper = <div className="action-sheet-wrapper"/>;
+        d.append(this.actionSheetWrapper, <div className="action-sheet-cancel">取消</div>);
+        if (tools.isNotEmptyArray(para.buttons)) {
+            let buttonsWrapper = <div className="action-sheet-buttons"/>;
+            d.append(this.actionSheetWrapper, buttonsWrapper);
+            if (para.buttons.length > 9) {
+                // 如果按钮大于9个 则单行滑动显示
+                buttonsWrapper.classList.add('single-line');
+            }
             // 将各个按钮添加到action-sheet-buttons中
             para.buttons.forEach((item, index) => {
-                // 必须有的参数
-                if('content' in item && 'onClick' in item){
-                    let btnWrapper = <div className="btn-wrapper">
-                            <i className={item.icon || 'appcommon app-morenicon'}></i>
-                            <p class="btn-content">{item.content}</p>
-                        </div>;
-                    d.append(this.buttonsWrapper, btnWrapper);
-
-                    d.on(btnWrapper, 'click', item.onClick);
-                }
+                let btnWrapper = <div className="btn-wrapper" data-index={index}>
+                    <i className={item.icon || 'appcommon app-morenicon'}/>
+                    <div class="btn-content">{item.content || ''}</div>
+                </div>;
+                d.append(buttonsWrapper, btnWrapper);
             });
-
-            bodyHeight += 230;
         }
-        this.cancelWrapper = <div className="action-sheet-cancel">
-            <div class="cancel-wrapper">取消</div>
-        </div>;
-        d.append(this.body, this.cancelWrapper);
-        d.on(this.cancelWrapper, 'click', () => {
-            this.destroy();
-        });
-
-        this.body['style'].height = `${bodyHeight}px`;
-        this.wrapper.style.height = `${bodyHeight}px`;
+        this.bodyWrapper.appendChild(this.actionSheetWrapper);
+        this.wrapper.style.height = window.getComputedStyle(this.actionSheetWrapper).height;
     }
+    private initEvents = (() => {
+        let buttonClick = (e) => {
+            let index = parseInt(d.closest(e.target, '.btn-wrapper').dataset.index),
+                onClick = this.buttons[index].onClick;
+            if (onClick && typeof onClick === 'function') {
+                onClick();
+            }
+        };
+        let cancel = () => {
+            this.isShow = false;
+        };
+        return {
+            on: () => {
+                d.on(this.actionSheetWrapper, 'click', '.btn-wrapper', buttonClick);
+                d.on(this.actionSheetWrapper, 'click', '.action-sheet-cancel', cancel);
+            },
+            off: () => {
+                d.off(this.actionSheetWrapper, 'click', '.btn-wrapper', buttonClick);
+                d.off(this.actionSheetWrapper, 'click', '.action-sheet-cancel', cancel);
+            }
+        }
+    })();
 
-    private _hasButtons = true;
-    get hasButtons(){
-        return this._hasButtons;
-    }
-    set hasButtons(val){
-        this._hasButtons = val;
-    }
-
-    destroy(){
+    destroy() {
+        this.actionSheetWrapper = null;
+        this.initEvents.off();
         super.destroy();
     }
 }
