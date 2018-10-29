@@ -19,7 +19,9 @@ namespace BW{
         public window = (function(self) {
             let closeConfirmConfig: ICloseConfirmPara = null;
             return {
-                backHome: function (){},
+                backHome: function (){
+                    self.handle('backHome');
+                },
                 open: function (o: winOpen) {
                     if (typeof o.data === "string") {
                         o.data = JSON.parse(o.data);

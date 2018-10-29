@@ -592,17 +592,20 @@ export class NewTableModule {
                             //TODO 给row.data赋值会销毁当前cell的input
                             // row.data = Object.assign({}, row.data, data);
                             for(let key in data){
-                                let cell = row.cellGet(key) as TableDataCell;
-                                if(cell){
-                                    cell.data = data[key] || '';
+                                let hCell = row.cellGet(key) as TableDataCell;
+                                if(hCell && hCell !== cell){
+                                    let cellData = data[key];
+                                    if(hCell.data != cellData){
+                                        hCell.data = cellData || '';
+                                    }
                                 }
                             }
                             if (field.elementType === 'lookup') {
                                 let lookUpKeyField = field.lookUpKeyField,
-                                    cell = row.cellGet(lookUpKeyField);
-                                if (cell && cell.column) {
-                                    let filed = cell.column.content as R_Field;
-                                    cell.data = data[lookUpKeyField];
+                                    hCell = row.cellGet(lookUpKeyField);
+                                if (hCell && hCell.column) {
+                                    let filed = hCell.column.content as R_Field;
+                                    hCell !== cell && (hCell.data = data[lookUpKeyField]);
 
                                     if (filed.assignSelectFields && filed.assignAddr) {
                                         NewTableModule.initAssignData(filed.assignAddr, row ? row.data : {})
@@ -633,6 +636,7 @@ export class NewTableModule {
                         }
                     }) : null;
 
+                    // 设置默认值
                     if (com instanceof FormCom) {
                         com.set(value);
                     }

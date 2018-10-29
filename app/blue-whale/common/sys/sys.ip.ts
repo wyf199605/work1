@@ -8,7 +8,7 @@ namespace BW{
         public window = (function(self){
             return {
                 backHome: function (){
-
+                    self.handle('backHome');
                 },
                 open: function (o: winOpen) {
                     if(typeof o.data === "object"){
@@ -82,7 +82,7 @@ namespace BW{
                 opentab : function (userid = '', accessToken = '') {
                     let ja = [
                         {icon : "home", name : "首页", url : BW.CONF.url.home},
-                        {icon : "contacts", name : "通讯", url : BW.CONF.url.contact},
+                        {icon : "contacts", name : "通讯", url : BW.CONF.url.contact, show: 1},
                         {icon : "message", name : "消息", url : BW.CONF.url.message},
                         {icon : "myselfMenu", name : "我的", url : BW.CONF.url.myselfMenu}
                         ];
