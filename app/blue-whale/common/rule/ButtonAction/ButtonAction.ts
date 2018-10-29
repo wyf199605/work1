@@ -184,14 +184,15 @@ export class ButtonAction {
         if(!Array.isArray(dataObj) || dataObj.length === 1){
             addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
         }
-        let varType = btn.actionAddr.varType, res;
+        let varType = btn.actionAddr.varType, res: any = data;
 
         if (varType === 3 && typeof data !== 'string') {
             // 如果varType === 3 则都转为数组传到后台
-            if (!Array.isArray(data)) {
-                data = [data];
+            let tmp = data;
+            if (!Array.isArray(tmp)) {
+                tmp = [data];
             }
-            res = JSON.stringify(data);
+            res = JSON.stringify(tmp);
         }
         switch (btn.openType) {
             case 'none' :
@@ -311,17 +312,6 @@ export class ButtonAction {
     //     });
     // }
     checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
-        let self = this,
-            varType = btn.actionAddr.varType;
-
-        if (varType === 3 && typeof ajaxData !== 'string') {
-            // 如果varType === 3 则都转为数组传到后台
-            if (!Array.isArray(ajaxData)) {
-                ajaxData = [ajaxData];
-            }
-            ajaxData = JSON.stringify(ajaxData);
-        }
-    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
         let self = this;
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
             data2url: btn.actionAddr.varType !== 3,

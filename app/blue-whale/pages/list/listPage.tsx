@@ -259,7 +259,7 @@ export = class listPage extends BasicPage {
 
         function getList(page, len, query, success) {
             let ajaxData: obj = BwRule.varList(para.tableVarList, {});
-            ajaxData.pageparams = '{"index"=' + page + ', "size"=' + len + '}';
+            ajaxData.pageparams = '{"index"=' + page + ', "size"=' + len + ', "total"=1}';
             if (!tools.isEmpty(query)) {
                 ajaxData.queryparam = query;
             }
