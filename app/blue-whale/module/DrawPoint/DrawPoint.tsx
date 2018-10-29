@@ -15,7 +15,7 @@ export  class DrawPoint {
     public svg;
     public g;
     public index = 0;
-    public points = [];
+    public points = [];//存入当前的信息
     public map
     public selected
     public line;
@@ -52,7 +52,6 @@ export  class DrawPoint {
         this.points.push(this.selected = D3.mouse(svg.node()))
         console.log(this.points)
         this.map.set(this.index, this.points)
-        console.log(this.map);
     }
 
     //绘图
@@ -110,6 +109,13 @@ export  class DrawPoint {
                 this.points = this.map.get(this.index);
                 alert("这是区域")
             })
+    }
+
+    public getPoints(){
+        return this.points;
+    }
+    public  setPoint(para){
+        this.points = para;
     }
 
 }
