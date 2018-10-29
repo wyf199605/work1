@@ -303,7 +303,8 @@ export abstract class QueryModule {
                         delete paramsData[q.field_name]
                     }
                 })
-            }            if (paramsData !== null) {
+            }
+            if (paramsData !== null) {
                 queryJson[queryName] = JSON.stringify(paramsData);
                 queryNum++;
             }

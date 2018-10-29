@@ -125,12 +125,12 @@ function initShortData(com1:TextInput, com2 : TextInput){
     let shortDateEvent = sys.isMb ? 'longtap' : 'contextmenu';
     let handler = function (e) {
         if(sys.isMb){
-            <PickerList onSet={(option) => {
-                com1.set(option[0].value[0]);
-                com2.set(option[0].value[1]);
-            }}>
-                <Picker optionData={shortDateOpts}/>
-            </PickerList>
+            let pick = <PickerList onSet={(option) => {
+                    com1.set(option[0].value[0]);
+                    com2.set(option[0].value[1]);
+                }}>
+                    <Picker optionData={shortDateOpts}/>
+                </PickerList>
             // Picker.show(shortDateOpts, function (option) {
             //
             //     com1.set(option[0].value[0]);
@@ -251,7 +251,12 @@ export class QueryBuilder {
             lastCom.operator.set(p.op);
             lastCom.andOr.set(p.andOr);
             Array.isArray(p.values) && p.values.forEach((v, i) => {
-                lastCom[`input${i + 1}`].set(v);
+                switch (p.op){
+                    case 3 :case 4 :case 8 : case 9 :
+                        i ++;
+                        break;
+                }
+                lastCom[`input${i + 1}`] && lastCom[`input${i + 1}`].set(v);
             });
         });
     }

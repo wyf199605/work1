@@ -189,12 +189,15 @@ export class ButtonAction {
         if (varType === 3 && typeof data !== 'string') {
             // 如果varType === 3 则都转为数组传到后台
             let tmp = data;
-            if(tools.isEmpty(data)){
-                tmp = [];
-            }else if (!Array.isArray(tmp)) {
+            if (tools.isEmpty(data)){
+                // 不传任何数据
+
+            }else if(!Array.isArray(tmp)) {
                 tmp = [tmp];
+                res = JSON.stringify(tmp);
+            }else{
+                res = JSON.stringify(tmp);
             }
-            res = JSON.stringify(tmp);
         }
         switch (btn.openType) {
             case 'none' :
@@ -231,8 +234,12 @@ export class ButtonAction {
                 break;
             case 'newwin':
             default:
+                let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
+                if(res){
+                    openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
+                }
                 BW.sys.window.open({
-                    url: tools.url.addObj(tools.url.addObj(BW.CONF.siteUrl + addr, data), {bodyParams: res}, false),
+                    url: openUrl,
                     gps: !!btn.actionAddr.needGps,
                 }, url);
                 self.btnRefresh(btn.refresh, url);
@@ -255,7 +262,7 @@ export class ButtonAction {
         BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
             data:data
         }).then(({response})=>{
-            console.log(response)
+
             response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
         })
 
