@@ -10,10 +10,12 @@ export function popoverToggle(dom: HTMLElement, isActive = !dom.classList.contai
     if(!isActive){
         dom.classList.remove('mui-active');
         mask.hide();
+        d.closest(dom, 'body').scrollTop = 0;
     }else{
         mask.addClick(dom, () => {
             dom.classList.remove('mui-active');
             mask.hide();
+            d.closest(dom, 'body').scrollTop = 0;
         });
         dom.classList.add('mui-active');
         mask.show(dom);
