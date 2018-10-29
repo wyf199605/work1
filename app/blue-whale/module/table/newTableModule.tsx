@@ -230,7 +230,8 @@ export class NewTableModule {
     private noLoadSub(mftable, main){
         let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
             ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
-            section = JSON.parse(ajaxData.queryoptionsparam);
+            qm = ajaxData.queryoptionsparam,
+            section = (typeof qm === 'string') && JSON.parse(ajaxData.queryoptionsparam);
         return section && section.section
     }
 

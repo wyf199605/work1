@@ -314,6 +314,7 @@ namespace G{
          * @param {String} varList.varValue
          * @param {Object} data - 需要填充varList的数据, 一般是数据查询的数据
          * @param {boolean} [isLowerKey] 键值是否转为小写
+         * @param {boolean} [isLimitField]
          * @returns {object}
          */
         static varList(varList: R_VarList[] = [], data: obj | obj[], isLowerKey = false, isLimitField = true): obj | obj[] {
@@ -345,6 +346,7 @@ namespace G{
                     tmpData[key] = value;
                     // }
                 });
+                tmpData = G.tools.isEmpty(tmpData) ? d : tmpData;
                 if(!isLimitField){
                     for(let key in d){
                         if(key.indexOf('.') > -1){
