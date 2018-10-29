@@ -2,7 +2,7 @@
 
 import tools = G.tools;
 import d = G.d;
-import {Modal} from "../../feedback/modal/Modal";
+import {Modal, IModal} from "../../feedback/modal/Modal";
 import {IButton} from "../../general/button/Button";
 
 export interface IActionSheetButton extends IButton {
@@ -11,7 +11,7 @@ export interface IActionSheetButton extends IButton {
     onClick: () => void; // 点击事件（必须）
 }
 
-interface IActionSheet {
+interface IActionSheet extends IModal{
     buttons?: IActionSheetButton[]; // 是否有按钮组
 }
 
@@ -36,7 +36,7 @@ export class ActionSheet extends Modal {
     // 设置actionSheet的默认样式
     private createActionSheet(para: IActionSheet) {
         this.actionSheetWrapper = <div className="action-sheet-wrapper"/>;
-        d.append(this.actionSheetWrapper, <div className="action-sheet-cancel">取消</div>);
+
         if (tools.isNotEmptyArray(para.buttons)) {
             let buttonsWrapper = <div className="action-sheet-buttons"/>;
             d.append(this.actionSheetWrapper, buttonsWrapper);
@@ -53,6 +53,7 @@ export class ActionSheet extends Modal {
                 d.append(buttonsWrapper, btnWrapper);
             });
         }
+        d.append(this.actionSheetWrapper, <div className="action-sheet-cancel">取消</div>);
         this.bodyWrapper.appendChild(this.actionSheetWrapper);
         this.wrapper.style.height = window.getComputedStyle(this.actionSheetWrapper).height;
     }

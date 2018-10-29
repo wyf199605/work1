@@ -9,7 +9,7 @@ import {Button} from "../../general/button/Button";
 import {Drag} from "components/ui/drag/drag";
 import {InputBox} from "../../general/inputBox/InputBox";
 
-interface IModal extends IComponentPara {
+export interface IModal extends IComponentPara {
     header?: IModalHeaderPara | string;
     body?: Node | DocumentFragment;
     footer?: IModalFooterPara;
