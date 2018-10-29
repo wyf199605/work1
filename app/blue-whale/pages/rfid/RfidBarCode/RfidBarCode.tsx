@@ -241,21 +241,25 @@ export class RfidBarCode extends Component {
                                                 alert(JSON.stringify(res))
                                                 let num = d.query('.total-nums>span');
                                                 num.innerText = (parseInt(num.innerText) + 1) + '';
-                                                let data = res.data;
-                                                if (data.name) {
-                                                    let arr = data.array;
-                                                    for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
-                                                        this.domHash['barcode'].innerText = arr[i].barcode;
-                                                        this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                                                        this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
-                                                        this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                                                        this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                                                        this.domHash['Commodity'].innerText = arr[i].name;
-                                                    }
-
+                                               // let data = res.data;
+                                                if(res.success){
+                                                    this.domHash['scanamount'].innerText = res.data.scanNum;
                                                 }
+
+                                                // if (data.name) {
+                                                //     let arr = data.array;
+                                                //     for (let i = 0; i < arr.length; i++) {
+                                                //         alert(arr[i].classify1_value)
+                                                //         this.domHash['barcode'].innerText = arr[i].barcode;
+                                                //         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
+                                                //         this.domHash['scanamout'].innerText = arr[i].scanCount;
+                                                //         this.domHash['count'].innerText = arr[i].count;
+                                                //         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
+                                                //         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
+                                                //         this.domHash['Commodity'].innerText = arr[i].name;
+                                                //     }
+                                                //
+                                                // }
                                             })
                                             alert(s + '注册成功')
 
@@ -739,9 +743,8 @@ export class RfidBarCode extends Component {
                             footer: {
                                 rightPanel: [{
                                     content: "确认删除",
-                                    onClick: function () {
-                                        console.log(deleteEL.getText());
-                                        console.log(deleteEL.get())
+                                    onClick:  ()=> {
+
                                         let value = deleteEL.get(),
                                             where = {};
                                         where[uid] = value.barcode;
@@ -750,37 +753,7 @@ export class RfidBarCode extends Component {
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
                                             alert(JSON.stringify(res))
                                             if (res.success) {
-
-                                                let optionStype = 0;
-                                                let key = this.stepByone + this.accumulation;
-                                                if (this.mode[key] == '替换') {
-                                                    optionStype = 0;
-                                                } else if (this.mode[key] == '逐一') {
-                                                    optionStype = 2;
-                                                } else if (this.mode[key] == '累加') {
-                                                    optionStype = 1;
-                                                } else {
-                                                    optionStype = 0;
-                                                }
-                                                let val = d.query('.set-rfid-code')['value'] || 0;
-                                                // G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                                //     alert(JSON.stringify(res))
-                                                //     let data = res.data;
-                                                //     let arr = data.array;
-                                                //     for (let i = 0; i < arr.length; i++) {
-                                                //         if (arr[i].name) {
-                                                //             this.domHash['barcode'].innerText = arr[i].barcode;
-                                                //             this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                                                //             this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                //             this.domHash['count'].innerText = arr[i].count;
-                                                //             this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                                                //             this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                                                //             this.domHash['Commodity'].innerText = arr[i].name;
-                                                //         }
-                                                //
-                                                //     }
-                                                //
-                                                // })
+                                                this.domHash['scanamout'].innerText = res.data.scanNum;
                                             }
 
 
@@ -853,7 +826,9 @@ export class RfidBarCode extends Component {
                 }
                 alert(JSON.stringify(para.uniqueFlag) + '这' )
                 G.Shell.inventory.dealbarcode(2,params,(res)=>{
-
+                   if(res.success){
+                       this.domHash['scanamount'].innerText = res.data.scanNum;
+                   }
                 })
 
             } else if (this.mode[key] == "替换" && modeVal['value'] !== "") {
@@ -885,7 +860,9 @@ export class RfidBarCode extends Component {
                 alert('替换' + JSON.stringify(params))
                 // Modal.alert(G.Shell.inventory.dealbarcode)
                 G.Shell.inventory.dealbarcode(2,params,(res)=>{
-                    alert(res);
+                    if(res.success){
+                        this.domHash['scanamount'].innerText = res.data.scanNum;
+                    }
 
                 })
             }

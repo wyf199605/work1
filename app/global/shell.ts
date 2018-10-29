@@ -510,7 +510,6 @@ namespace G{
 
                     // 异步完成通知
                     if (eventBack) {
-                        alert('注册' + eventBack)
                         d.on(window, eventBack, function (e: CustomEvent) {
                             let detail = e.detail;
                             if (isAutoOff) {

@@ -119,9 +119,7 @@ export default class BasicPage{
                                 msg: '是否跳转到首页？',
                                 callback: (flag) => {
                                     if(flag){
-                                        sys.window.open({
-                                            url: CONF.url.main
-                                        });
+                                        sys.window.backHome();
                                     }
                                 }
                             });

@@ -268,7 +268,7 @@ export class Uploader extends FormCom{
     }
 
     destroy(){
-        this.webUpLoader.Uploader.unRegister(this.guid);
+        this.webUpLoader && this.webUpLoader.Uploader.unRegister(this.guid);
         this.com && this.com.destroy();
         super.destroy();
     }

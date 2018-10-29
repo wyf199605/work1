@@ -18,6 +18,7 @@ export class PlanPage extends BasicPage{
     private wrapper:HTMLElement;
     private draw;
     private imageUrl:string;
+    private isDrawLine:boolean = false;
     constructor(para: IPlanPagePara) {
         super(para);
         this.wrapper = para.dom;
@@ -55,14 +56,18 @@ export class PlanPage extends BasicPage{
                     </div>
                     <div class="finsh-point" onclick={
                         ()=>{
-                            console.log('完成')
+                            //完成编辑--------
+                            if(this.isDrawLine){
+                                //把point 清楚
+                                console.log(this.draw.getPoints());
+                            }
                             let btn = d.queryAll('.plan-opera>div');
                             btn.forEach((res)=>{
-                                console.log(res);
                                 d.classRemove(res,'custom-button');
                             })
                             let currBtn = d.query('.plan-opera>.finsh-point');
                             d.classAdd(currBtn,'custom-button');
+
                         }
                     }>
                         <i class="iconfont icon-wanchengbianji"><span>完成编辑</span></i>
@@ -78,7 +83,11 @@ export class PlanPage extends BasicPage{
                             let currBtn = d.query('.plan-opera>.miao-dian');
                             d.classAdd(currBtn,'custom-button');
                             //------------------开始绘图
-                            this.draw.createPath();
+                            if(!this.isDrawLine){
+                                this.draw.createPath();
+                                this.isDrawLine = true;
+                            }
+
                         }
                     }>
                         <i class="iconfont icon-maodian"><span>描点</span></i>

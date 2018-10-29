@@ -222,6 +222,9 @@ namespace BW {
                 },
                 getDevice: function (key?: string): obj{
                     let data = SYSPC.handle('getDevice');
+                    if('AppShell' in window){
+                        data = Shell.base.device
+                    }
                     return data && data.msg;
                     // let json = this.pcHandle('getDevice','');
                     // if(!tools.isEmpty(json)){
