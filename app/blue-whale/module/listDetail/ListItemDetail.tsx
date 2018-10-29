@@ -7,6 +7,7 @@ import {Button} from "../../../global/components/general/button/Button";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {DetailModal} from "./DetailModal";
+import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 
 export class ListItemDetail {
     // DOM容器
@@ -136,7 +137,19 @@ export class ListItemDetail {
                             }
                         })
                     });
-
+                    let moreBtns = buttons.slice(2),
+                        actionBtns: IActionSheetButton[] = [];
+                    moreBtns.forEach((b, index) => {
+                        actionBtns.push({
+                            content: b.caption,
+                            onClick: () => {
+                                subBtnEvent(index + 2);
+                            }
+                        })
+                    });
+                    new ActionSheet({
+                        buttons: actionBtns
+                    })
                 } else {
                     buttons.forEach((button, index) => {
                         new Button({
@@ -195,6 +208,7 @@ export class ListItemDetail {
                     checkPageButtonDisabled();
                     // 加载数据
                     this.changePage();
+                    this.scrollToTop();
                 }
             }),
             next = new Button({
@@ -204,6 +218,7 @@ export class ListItemDetail {
                     this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
                     checkPageButtonDisabled();
                     this.changePage();
+                    this.scrollToTop();
                 },
                 className: 'list-detail-btn'
             });
@@ -223,6 +238,16 @@ export class ListItemDetail {
             }
         };
         checkPageButtonDisabled();
+    }
+
+    private scrollToTop() {
+        (function smoothscroll() {
+            let currentScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            if (currentScroll > 0) {
+                window.requestAnimationFrame(smoothscroll);
+                window.scrollTo(0, currentScroll - (currentScroll / 5));
+            }
+        })();
     }
 
     getType(t: string): DetailCellType {
@@ -271,7 +296,7 @@ export class ListItemDetail {
             } else if (type === '43') {
                 // 附件名称
 
-            }else{
+            } else {
                 // dataType为空按照text类型处理
                 v = text;
             }

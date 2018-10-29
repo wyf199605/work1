@@ -149,6 +149,7 @@ interface R_Button extends Btn {
     linkName?: string;
     inventoryKey?:string;
     haveRoll? : boolean; // 是否有翻页
+    icon?:string; // 图标
 
     // 前端自己加的属性
     hintAfterAction?: boolean; //点击按钮后是否提示
