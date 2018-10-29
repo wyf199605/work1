@@ -22,6 +22,7 @@ import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import d = G.d;
 import {TableColumn} from "../../../global/components/newTable/base/TableColumn";
 import Rule = G.Rule;
+import Shell = G.Shell;
 
 interface IPagePara {
     paperWidth?: number,
@@ -75,6 +76,22 @@ export = class LabelPrintModule {
     protected defaultData: obj = {};
 
     constructor(private para: LabelPrintModulePara) {
+        try {
+            let printList = Shell.printer.get();
+            if(printList.data && Array.isArray(printList.data.driveList)){
+                let result = printList.data.driveList,
+                    printer = [];
+                for(let item of result){
+                    printer.push({
+                        text: item.driveName,
+                        value: item.driveCode,
+                    });
+                }
+                this.selectInputJson.printer = printer;
+            }
+        }catch (e){
+            console.log(e);
+        }
         this.defaultData = tools.isEmpty(para.defaultVal) ? LabelPrintModule.getDefaultData() : para.defaultVal;
         this.initModal();
         this.printUtil.getPrinterList();
@@ -428,12 +445,14 @@ export = class LabelPrintModule {
     private dealPrint() {
         let tRow = this.onePageRowAndCol.rowNum,
             tCol = this.onePageRowAndCol.colNum,
+            self = this,
             tPaData = this.pageData;
         for (let num = 0; num < this.totalPage; num++) {//循环生成每页的图像
             let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
             pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
             pageSvg.setAttribute('style', 'background-color:white;');
+            pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
             this.pageSvgArray.push(pageSvg);
             let curSize = num * tRow * tCol;
@@ -450,69 +469,33 @@ export = class LabelPrintModule {
                 }
             }
         }
-
-        let Base64 = {
-            _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-            encode: function (input) {
-                let output = "";
-                let chr1, chr2, chr3, enc1, enc2, enc3, enc4;
-                let i = 0;
-                input = Base64._utf8_encode(input);
-                while (i < input.length) {
-                    chr1 = input.charCodeAt(i++);
-                    chr2 = input.charCodeAt(i++);
-                    chr3 = input.charCodeAt(i++);
-                    enc1 = chr1 >> 2;
-                    enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
-                    enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
-                    enc4 = chr3 & 63;
-                    if (isNaN(chr2)) {
-                        enc3 = enc4 = 64;
-                    } else if (isNaN(chr3)) {
-                        enc4 = 64;
-                    }
-                    output = output +
-                        this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
-                        this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
-                }
-                return output;
-            },
-            _utf8_encode: function (string) {
-                string = string.replace(/\r\n/g, "\n");
-                let utftext = "";
-                for (let n = 0; n < string.length; n++) {
-                    let c = string.charCodeAt(n);
-                    if (c < 128) {
-                        utftext += String.fromCharCode(c);
-                    }
-                    else if ((c > 127) && (c < 2048)) {
-                        utftext += String.fromCharCode((c >> 6) | 192);
-                        utftext += String.fromCharCode((c & 63) | 128);
-                    }
-                    else {
-                        utftext += String.fromCharCode((c >> 12) | 224);
-                        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-                        utftext += String.fromCharCode((c & 63) | 128);
-                    }
-                }
-                return utftext;
-            }
-        };
         let dealPrintData = function (uri) {
             if ('BlueWhaleShell' in window) {
                 let result = BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + uri + '"}');
                 Modal.alert(result);
             } else if ('AppShell' in window) {
-                Shell.printer.labelPrint(1, 3, uri, () => {
+                let code = self.coms['printer'].get();
+                Shell.printer.labelPrint(1, code, uri, () => {
                     Modal.toast('打印成功');
                 })
             } else {
                 Modal.alert('无法连接到打印机')
             }
         };
-        let s = new XMLSerializer().serializeToString(this.pageSvgArray[0]);
-        let encodedData = Base64.encode(s);
-        dealPrintData(encodedData);
+        let innerHTML = this.pageSvgArray[0].innerHTML;
+        let image = new Image();
+        image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML)));
+        image.onload = () => {
+            let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
+            canvas.style.backgroundColor = '#fff';
+            canvas.width = image.width;
+            canvas.height = image.height;
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
+            let dataURL = canvas.toDataURL("image/png");  //返回的是一串Base64编码的URL并指定格式
+            canvas = null; //释放
+            dealPrintData(dataURL.replace('data:image/png;base64,', ''));
+        }
         /* for(let i = 0,l = this.pageSvgArray.length;i < l;i++){
              let s = new XMLSerializer().serializeToString(this.pageSvgArray[i]);
              let encodedData = Base64.encode(s);
@@ -628,6 +611,7 @@ export = class LabelPrintModule {
                             pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
                             pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
                             pageSvg.setAttribute('style', 'background-color:white;');
+                            pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
                             this.pageSvgArray.push(pageSvg);
 
@@ -704,6 +688,7 @@ export = class LabelPrintModule {
         pageSvg.setAttribute('width', `${userInp.paperWidth}`);
         pageSvg.setAttribute('height', `${userInp.paperHeight}`);
         pageSvg.setAttribute('style', 'background-color:white;');
+        pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         this.pageSvgArray.push(pageSvg);
         //执行ajax调用后台操作
         this.doAjax(CONF.siteUrl + this.para.printList[this.labelType].templateLink.dataAddr, 'preview', sp);
