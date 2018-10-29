@@ -184,14 +184,15 @@ export class ButtonAction {
         if(!Array.isArray(dataObj) || dataObj.length === 1){
             addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
         }
-        let varType = btn.actionAddr.varType, res;
+        let varType = btn.actionAddr.varType, res: any = data;
 
         if (varType === 3 && typeof data !== 'string') {
             // 如果varType === 3 则都转为数组传到后台
-            if (!Array.isArray(data)) {
-                data = [data];
+            let tmp = data;
+            if (!Array.isArray(tmp)) {
+                tmp = [tmp];
             }
-            res = JSON.stringify(data);
+            res = JSON.stringify(tmp);
         }
         switch (btn.openType) {
             case 'none' :
