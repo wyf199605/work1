@@ -155,7 +155,6 @@ export class NewTableModule {
                     // 如果查询有带分段，那么从表不生成
                     if (tools.isEmpty(this.tab) && !noLoadSub){
                         noLoadSub = this.noLoadSub(mftable, main);
-                    if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
                             panelParent: tabWrapper,
                             tabParent: tabWrapper,
