@@ -320,75 +320,79 @@ export class BwRule extends Rule {
         url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
         if (para.dataType === BwRule.DT_FILE) {
 
-            BwRule.Ajax.fetch(url)
-                .then(({response}) => {
-                    rData = response.data[0];
-                    //地址加上域名
-                    if (rData.IMGADDR) {
-                        rData.IMGADDR = CONF.siteUrl + rData.IMGADDR;
-                    }
-                    if (rData.DOWNADDR) {
-                        rData.DOWNADDR = CONF.siteUrl + rData.DOWNADDR;
-                    }
-                    //执行动作判断
-                    if (rData.IMGADDR) {
-                        action = _linkAct.SHOW_IMGS;
-                    } else {
-                        let fileExt = '';
-                        if (rData.FILENAME) {
-                            fileExt = rData.FILENAME.split('.').pop().toLowerCase();
+            if(para.type === 'download'){
+                sys.window.download(url);
+            }else{
+                BwRule.Ajax.fetch(url)
+                    .then(({response}) => {
+                        rData = response.data[0];
+                        //地址加上域名
+                        if (rData.IMGADDR) {
+                            rData.IMGADDR = CONF.siteUrl + rData.IMGADDR;
                         }
-                        if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ttif'].indexOf(fileExt) !== -1) {
-                            action = _linkAct.SHOW_IMG;
+                        if (rData.DOWNADDR) {
+                            rData.DOWNADDR = CONF.siteUrl + rData.DOWNADDR;
+                        }
+                        //执行动作判断
+                        if (rData.IMGADDR) {
+                            action = _linkAct.SHOW_IMGS;
                         } else {
-                            action = _linkAct.DOWNLOAD;
+                            let fileExt = '';
+                            if (rData.FILENAME) {
+                                fileExt = rData.FILENAME.split('.').pop().toLowerCase();
+                            }
+                            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ttif'].indexOf(fileExt) !== -1) {
+                                action = _linkAct.SHOW_IMG;
+                            } else {
+                                action = _linkAct.DOWNLOAD;
+                            }
                         }
-                    }
 
-                    // para.callback(action, rData, _linkAct);
-                    switch (action) {
-                        case _linkAct.OPEN_WIN :
-                            sys.window.open({url: rData.url}, para.openUrl);
-                            break;
-                        case _linkAct.SHOW_IMGS :
-                            let img = [],
-                                len = rData.PAGENUM,
-                                imgAddr = rData.IMGADDR;
-                            for (let i = 1, d, item; i <= len; i++) {
-                                d = {page: i};
-                                item = BwRule.parseURL(imgAddr, d);
-                                img.push(item)
-                            }
-                            let imgData: ImgModalPara = {
-                                downAddr: rData.DOWNADDR,
-                                title: rData.FILENAME,
-                                img: img,
-                                onDownload(url) {
-                                    sys.window.download(url);
+                        // para.callback(action, rData, _linkAct);
+                        switch (action) {
+                            case _linkAct.OPEN_WIN :
+                                sys.window.open({url: rData.url}, para.openUrl);
+                                break;
+                            case _linkAct.SHOW_IMGS :
+                                let img = [],
+                                    len = rData.PAGENUM,
+                                    imgAddr = rData.IMGADDR;
+                                for (let i = 1, d, item; i <= len; i++) {
+                                    d = {page: i};
+                                    item = BwRule.parseURL(imgAddr, d);
+                                    img.push(item)
                                 }
-                            };
-                            // ImgModalMb.show(imgData);
-                            if (tools.isMb) {
-                                ImgModalMobile.show(imgData);
-                            } else {
-                                ImgModal.show(imgData);
-                            }
-                            break;
-                        case _linkAct.SHOW_IMG :
-                            if (sys.os === 'ad' || sys.os === 'ip') {
-                                sys.window.openImg(rData.DOWNADDR);
-                            } else if (tools.isMb) {
+                                let imgData: ImgModalPara = {
+                                    downAddr: rData.DOWNADDR,
+                                    title: rData.FILENAME,
+                                    img: img,
+                                    onDownload(url) {
+                                        sys.window.download(url);
+                                    }
+                                };
+                                // ImgModalMb.show(imgData);
+                                if (tools.isMb) {
+                                    ImgModalMobile.show(imgData);
+                                } else {
+                                    ImgModal.show(imgData);
+                                }
+                                break;
+                            case _linkAct.SHOW_IMG :
+                                if (sys.os === 'ad' || sys.os === 'ip') {
+                                    sys.window.openImg(rData.DOWNADDR);
+                                } else if (tools.isMb) {
+                                    sys.window.download(rData.DOWNADDR);
+                                } else {
+                                    window.location.href = rData.DOWNADDR;
+                                }
+                                break;
+                            case _linkAct.DOWNLOAD :
                                 sys.window.download(rData.DOWNADDR);
-                            } else {
-                                window.location.href = rData.DOWNADDR;
-                            }
-                            break;
-                        case _linkAct.DOWNLOAD :
-                            sys.window.download(rData.DOWNADDR);
-                            break;
-                        default:
-                    }
-                });
+                                break;
+                            default:
+                        }
+                    });
+            }
         } else {
             // action = _linkAct.OPEN_WIN;
             sys.window.open({url, gps: para.needGps}, para.openUrl);

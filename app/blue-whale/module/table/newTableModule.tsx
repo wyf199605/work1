@@ -147,6 +147,9 @@ export class NewTableModule {
                         return;
                     }
                     firstRow.selected = true;
+                    let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+                        ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
+                        noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
                             panelParent: tabWrapper,
@@ -154,8 +157,6 @@ export class NewTableModule {
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
-                                let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
-                                    ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[index].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
@@ -176,9 +177,15 @@ export class NewTableModule {
                             dom: null
                         }]);
                     });
+                    if(noLoadSub){
+                        this.subWrapper.classList.add('hide');
+                        return;
+                    }else {
+                        this.subWrapper.classList.remove('hide');
+                    }
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
-                        if (isFirst) {
+                        if (isFirst && !noLoadSub) {
                             this.tab.active(0);
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
@@ -210,7 +217,7 @@ export class NewTableModule {
                         row = mftable.rowGet(rowIndex);
                     self.subIndex = rowIndex;
                     if(row && row.selected){
-                        self.subRefresh(row.data);
+                        !self.noLoadSub(mftable, main) && self.subRefresh(row.data);
                         pseudoTable && pseudoTable.setPresentSelected(rowIndex);
                     }else{
                         self.mobileModal && (self.mobileModal.isShow = false);
@@ -218,6 +225,14 @@ export class NewTableModule {
                 });
             }
         };
+    }
+
+    private noLoadSub(mftable, main){
+        let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+            ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
+            qm = ajaxData.queryoptionsparam,
+            section = (typeof qm === 'string') && JSON.parse(ajaxData.queryoptionsparam);
+        return section && section.section
     }
 
     protected subIndex = 0;
@@ -581,17 +596,17 @@ export class NewTableModule {
                             //TODO 给row.data赋值会销毁当前cell的input
                             // row.data = Object.assign({}, row.data, data);
                             for(let key in data){
-                                let cell = row.cellGet(key) as TableDataCell;
-                                if(cell){
-                                    cell.data = data[key] || '';
+                                let hCell = row.cellGet(key) as TableDataCell;
+                                if(hCell && hCell !== cell){
+                                    hCell.data = data[key] || '';
                                 }
                             }
                             if (field.elementType === 'lookup') {
                                 let lookUpKeyField = field.lookUpKeyField,
-                                    cell = row.cellGet(lookUpKeyField);
-                                if (cell && cell.column) {
-                                    let filed = cell.column.content as R_Field;
-                                    cell.data = data[lookUpKeyField];
+                                    hCell = row.cellGet(lookUpKeyField);
+                                if (hCell && hCell.column) {
+                                    let filed = hCell.column.content as R_Field;
+                                    hCell !== cell && (hCell.data = data[lookUpKeyField]);
 
                                     if (filed.assignSelectFields && filed.assignAddr) {
                                         NewTableModule.initAssignData(filed.assignAddr, row ? row.data : {})
