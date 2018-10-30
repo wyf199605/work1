@@ -607,7 +607,6 @@ export class NewTableModule {
                                     if(hCell.data != cellData){
                                         hCell.data = cellData || '';
                                     }
-                                    hCell.data = data[key] || '';
                                 }
                             }
                             if (field.elementType === 'lookup') {
