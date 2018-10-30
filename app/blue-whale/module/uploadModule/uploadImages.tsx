@@ -8,6 +8,7 @@ import {Loading} from "../../../global/components/ui/loading/loading";
 import {IUploadImagesItem, UploadImagesItem} from "./uploadImagesItem";
 import UploadModule from "./uploadModule";
 import tools = G.tools;
+import {BwRule} from "../../common/rule/BwRule";
 
 export interface IImage {
     fileId?: string;
@@ -18,7 +19,7 @@ export interface IImage {
 
 interface IUploadImages extends IUploaderPara {
     caption?: string;
-    images?: IImage[];
+    unique?:string;
 
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
@@ -26,18 +27,47 @@ interface IUploadImages extends IUploaderPara {
 }
 
 export class UploadImages extends FormCom {
-    set(val: IImage[]): void {
+    set(val:string): void {
         this.value = val;
     }
 
     get value() {
-        return this._value;
+        let value = this.imgs || [],
+            trueVal = [];
+        value.forEach(v => {
+            !v.isError && trueVal.push(v.fileId);
+        });
+        return trueVal.join(',');
     };
 
-    set value(val: IImage[]) {
-        this._value = val;
-        this.render(val);
+    set value(val: string) {
+        this._value = val || '';
+        if (tools.isNotEmpty(val)){
+            let addrArr = val.split(','),
+                arr = [];
+            addrArr.forEach(md5 => {
+                // 根据md5获取文件地址
+                arr.push({
+                    fileId:md5,
+                    fileName:this.para.nameField || 'FILE_ID',
+                    isError:false,
+                    localUrl:''
+                });
+            });
+            this.imgs = arr
+        }else{
+            this.imgs = [];
+        }
+    }
+
+    private _imgs:IImage[];
+    set imgs(imgs:IImage[]){
+        this._imgs = imgs || [];
+        this.render(this._imgs);
         this.calcScrollLeft();
+    }
+    get imgs(){
+        return this._imgs;
     }
 
     private addImg: HTMLElement;
@@ -52,13 +82,12 @@ export class UploadImages extends FormCom {
             </div>
         </div>;
     }
-
     public uploader: Uploader = null;
     private loading: Loading = null;
 
     constructor(private para: IUploadImages) {
         super(para);
-        tools.isNotEmpty(para.images) && (this.value = para.images);
+        this.value = para.unique;
         this.createUploader();
         this.initEvent.on();
     }
@@ -183,12 +212,15 @@ export class UploadImages extends FormCom {
 
     private calcScrollLeft() {
         let scrollWrapper = d.query('.images-wrapper', this.wrapper),
-            scrollLeft = this._value.length * 96 + 80 - scrollWrapper.offsetWidth;
+            scrollLeft = this._imgs.length * 96 + 80 - scrollWrapper.offsetWidth;
         scrollWrapper.scrollLeft = scrollLeft > 0 ? scrollLeft : 0;
     }
 
     // 渲染附件列表
     render(data: IImage[]) {
+        if (tools.isEmpty(data)){
+            return;
+        }
         d.diff(data, this.listItems, {
             create: (n: IImage) => {
                 this._listItems.push(this.createListItem({image: n}));
@@ -214,8 +246,8 @@ export class UploadImages extends FormCom {
     }
 
     private addItem(imageObj: IImage) {
-        let arr = this._value || [];
-        this._value = arr.concat(imageObj);
+        let arr = this._imgs || [];
+        this._imgs = arr.concat(imageObj);
         this._listItems.push(this.createListItem({image: imageObj}));
         this.calcScrollLeft();
     }
@@ -223,19 +255,19 @@ export class UploadImages extends FormCom {
     protected createListItem(para: IUploadImagesItem) {
         para = Object.assign({}, para, {
             container: this.imgWrapper,
-            index: this._value.length,
+            index: this._imgs.length,
             nameField: this.para.nameField
         });
         return new UploadImagesItem(para);
     }
 
     get() {
-        let value = this.value,
+        let value = this.imgs || [],
             trueVal = [];
         value.forEach(v => {
             !v.isError && trueVal.push(v.fileId);
         });
-        return trueVal;
+        return trueVal.join(',');
     }
 
     private initEvent = (() => {
@@ -262,7 +294,7 @@ export class UploadImages extends FormCom {
         if (item) {
             item.destroy();
             this._listItems.splice(i, 1);
-            this._value.splice(i, 1);
+            this._imgs.splice(i, 1);
             this.refreshIndex();
         }
     }

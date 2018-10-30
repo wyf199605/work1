@@ -30,8 +30,8 @@ export = class BugDetailPage {
             target && Modal.alert('请到我的标签页中点击进入详情页修改！');
         };
         return {
-            on: () => d.on(this.bugDetailWrapper, 'tap', statusTap),
-            off: () => d.off(this.bugDetailWrapper, 'tap', statusTap)
+            on: () => d.on(this.bugDetailWrapper, 'click', statusTap),
+            off: () => d.off(this.bugDetailWrapper, 'click', statusTap)
         }
     })();
     private tapEvent = (() => {
@@ -71,12 +71,12 @@ export = class BugDetailPage {
         };
         return {
             on: () => {
-                d.on(this.bugDetailWrapper, 'tap', '.close', closeTap);
-                d.on(this.bugDetailWrapper, 'tap', '.redo', redoTap);
+                d.on(this.bugDetailWrapper, 'click', '.close', closeTap);
+                d.on(this.bugDetailWrapper, 'click', '.redo', redoTap);
             },
             off: () => {
-                d.off(this.bugDetailWrapper, 'tap', '.close', closeTap);
-                d.off(this.bugDetailWrapper, 'tap', '.redo', redoTap);
+                d.off(this.bugDetailWrapper, 'click', '.close', closeTap);
+                d.off(this.bugDetailWrapper, 'click', '.redo', redoTap);
             }
         }
     })();

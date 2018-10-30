@@ -149,11 +149,8 @@ export class NewTableModule {
                     firstRow.selected = true;
                     let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
                         ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
-                        section = JSON.parse(ajaxData.queryoptionsparam),
-                        noLoadSub = section && section.section;
-
-                    // 如果查询有带分段，那么从表不生成
-                    if (tools.isEmpty(this.tab) && !noLoadSub){
+                        noLoadSub = this.noLoadSub(mftable, main);
+                    if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
                             panelParent: tabWrapper,
                             tabParent: tabWrapper,
@@ -171,7 +168,7 @@ export class NewTableModule {
                             }
                         });
                         if (!tools.isMb){
-                            d.query('ul.nav-tabs',this.main.container).appendChild(<i className="fa fa-expand full-icon"/>)
+                            d.query('ul.nav-tabs').appendChild(<i className="fa fa-expand full-icon"/>)
                         }
                     }
                     this.tab.len <= 0 && this.bwEl.subTableList.forEach((sub) => {
@@ -180,7 +177,6 @@ export class NewTableModule {
                             dom: null
                         }]);
                     });
-
                     if(noLoadSub){
                         this.subWrapper.classList.add('hide');
                         return;
@@ -193,24 +189,24 @@ export class NewTableModule {
                             this.tab.active(0);
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
-                            if (!tools.isMb){
-                                d.on(this.tab.getTab(), 'click', '.full-icon', () => {
-                                    let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
-                                    new Modal({
-                                        body: tabEl,
-                                        className: 'full-screen sub-table-full',
-                                        header: {
-                                            title: this.bwEl.subTableList[this.subTabActiveIndex].caption
-                                        },
-                                        onClose: () => {
-                                            this.sub[this.subTabActiveIndex].ftable.removeAllModal();
-                                            d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
-                                            this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                                        }
-                                    });
-                                    this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                        }
+                        if (!tools.isMb){
+                            d.on(this.tab.getTab(), 'click', '.full-icon', () => {
+                                let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
+                                new Modal({
+                                    body: tabEl,
+                                    className: 'full-screen sub-table-full',
+                                    header: {
+                                        title: '子表全屏'
+                                    },
+                                    onClose: () => {
+                                        this.sub[this.subTabActiveIndex].ftable.removeAllModal();
+                                        d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
+                                        this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                                    }
                                 });
-                            }
+                                this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                            });
                         }
                     }, 200);
                 });
@@ -221,7 +217,7 @@ export class NewTableModule {
                         row = mftable.rowGet(rowIndex);
                     self.subIndex = rowIndex;
                     if(row && row.selected){
-                        self.subRefresh(row.data);
+                        !self.noLoadSub(mftable, main) && self.subRefresh(row.data);
                         pseudoTable && pseudoTable.setPresentSelected(rowIndex);
                     }else{
                         self.mobileModal && (self.mobileModal.isShow = false);
@@ -229,6 +225,14 @@ export class NewTableModule {
                 });
             }
         };
+    }
+
+    private noLoadSub(mftable, main){
+        let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+            ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
+            qm = ajaxData.queryoptionsparam,
+            section = (typeof qm === 'string') && JSON.parse(ajaxData.queryoptionsparam);
+        return section && section.section
     }
 
     protected subIndex = 0;
@@ -592,17 +596,17 @@ export class NewTableModule {
                             //TODO 给row.data赋值会销毁当前cell的input
                             // row.data = Object.assign({}, row.data, data);
                             for(let key in data){
-                                let cell = row.cellGet(key) as TableDataCell;
-                                if(cell){
-                                    cell.data = data[key] || '';
+                                let hCell = row.cellGet(key) as TableDataCell;
+                                if(hCell && hCell !== cell){
+                                    hCell.data = data[key] || '';
                                 }
                             }
                             if (field.elementType === 'lookup') {
                                 let lookUpKeyField = field.lookUpKeyField,
-                                    cell = row.cellGet(lookUpKeyField);
-                                if (cell && cell.column) {
-                                    let filed = cell.column.content as R_Field;
-                                    cell.data = data[lookUpKeyField];
+                                    hCell = row.cellGet(lookUpKeyField);
+                                if (hCell && hCell.column) {
+                                    let filed = hCell.column.content as R_Field;
+                                    hCell !== cell && (hCell.data = data[lookUpKeyField]);
 
                                     if (filed.assignSelectFields && filed.assignAddr) {
                                         NewTableModule.initAssignData(filed.assignAddr, row ? row.data : {})

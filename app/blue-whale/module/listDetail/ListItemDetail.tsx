@@ -13,10 +13,11 @@ export class ListItemDetail {
     // DOM容器
     private wrapper: HTMLElement;
     private cells: objOf<ListItemDetailCell> = {};
-    private defaultData: obj = {};
+    public defaultData: obj = {};
     private currentPage: number = 1;
     private totalNumber: number = 1;
     private ajaxUrl: string = '';
+    private actionSheet: ActionSheet;
 
     constructor(private para: EditPagePara) {
         let wrapper = <div className="list-item-detail-wrapper"/>,
@@ -36,11 +37,12 @@ export class ListItemDetail {
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
         fields.forEach(field => {
-            if (!!!field.noShow) {
+            if (!field.noShow) {
                 this.cells[field.name] = new ListItemDetailCell({
                     caption: field.caption,
                     type: this.getType(field.dataType || field.atrrs.dataType || ''),
-                    container: cellsWrapper
+                    container: cellsWrapper,
+                    detailPage:this
                 });
             }
         })
@@ -102,69 +104,53 @@ export class ListItemDetail {
 
     // 初始化详情按钮
     initDetailButtons() {
-        let buttons: R_Button[] = this.para.fm.subButtons;
+        let buttons: R_Button[] = this.para.fm.subButtons,
+            self = this;
+        // 更多按钮
+        function createMoreBtn(buttons: R_Button[], wrapper) {
+            new Button({
+                content: '更多',
+                className: 'more',
+                container: wrapper,
+                onClick: () => {
+                    // 点击更多
+                    self.actionSheet.isShow = true;
+                }
+            });
+            let actionBtns: IActionSheetButton[] = [];
+            buttons.forEach((b, index) => {
+                actionBtns.push({
+                    content: b.caption,
+                    onClick: () => {
+                        self.actionSheet.isShow = false;
+                        subBtnEvent(index + 2);
+                    }
+                })
+            });
+            self.actionSheet = new ActionSheet({
+                buttons: actionBtns
+            });
+        }
         if (tools.isNotEmpty(buttons)) {
             let btnWrapper = <div className="list-item-detail-buttons"/>;
             this.wrapper.appendChild(btnWrapper);
             if (this.para.uiType === 'detail') {
-                let actionSheet:ActionSheet = null;
-                new Button({
-                    content: '更多',
-                    className: 'more',
-                    container: btnWrapper,
-                    onClick: () => {
-                        // 点击更多
-                        actionSheet.isShow = true;
-                    }
-                });
-                let actionBtns: IActionSheetButton[] = [];
-                buttons.forEach((b, index) => {
-                    actionBtns.push({
-                        content: b.caption,
-                        onClick: () => {
-                            subBtnEvent(index + 2);
-                        }
-                    })
-                });
-                actionSheet = new ActionSheet({
-                    buttons: actionBtns
-                });
+                createMoreBtn(buttons, btnWrapper);
                 this.createPageButton(btnWrapper);
             } else {
                 if (buttons.length > 2) {
-                    let actionSheet:ActionSheet = null;
-                    new Button({
-                        content: '更多',
-                        className: 'more',
-                        container: btnWrapper,
-                        onClick: () => {
-                            // 点击更多
-                            actionSheet.isShow = true;
-                        }
-                    });
-                    let btns = buttons.slice(0, 2);
+                    let btns = buttons.slice(0, 2), moreBtns = buttons.slice(2);
+                    createMoreBtn(moreBtns, btnWrapper);
                     btns.forEach((button, index) => {
                         new Button({
                             content: button.caption,
                             container: btnWrapper,
                             className: 'list-detail-btn',
                             onClick: () => {
+                                this.actionSheet.isShow = false;
                                 subBtnEvent(index);
                             }
                         })
-                    });
-                    let moreBtns = buttons.slice(2),
-                        actionBtns: IActionSheetButton[] = [];
-                    moreBtns.forEach((b, index) => {
-                        actionBtns.push({
-                            content: b.caption,
-                            onClick: () => {
-                                subBtnEvent(index + 2);
-                            }
-                        })
-                    });
-                    actionSheet = new ActionSheet({
-                        buttons: actionBtns
                     });
                 } else {
                     buttons.forEach((button, index) => {
@@ -190,29 +176,26 @@ export class ListItemDetail {
         }
 
         // 处理按钮触发
-        let self = this;
-
         function subBtnEvent(index) {
             let btn = self.para.fm.subButtons[index];
             switch (btn.subType) {
                 case 'save' :
                     btn.hintAfterAction = true;
-                    ButtonAction.get().clickHandle(btn, this.defaultData, () => {
+                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
                     });
                     break;
                 case 'action':
-                    ButtonAction.get().clickHandle(btn, this.defaultData, () => {
+                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
                     });
                     break;
                 default:
-                    new DetailModal(self.para);
+                    new DetailModal(Object.assign({},self.para,{defaultData:self.defaultData}));
                     break;
             }
         }
     }
 
     private createPageButton(btnWrapper: HTMLElement) {
-
         let prev = new Button({
                 content: '上一页',
                 className: 'list-detail-btn',
@@ -266,7 +249,7 @@ export class ListItemDetail {
         })();
     }
 
-    getType(t: string): DetailCellType {
+    private getType(t: string): DetailCellType {
         let type: DetailCellType;
         if (t === '18') {
             type = 'textarea';
@@ -323,5 +306,16 @@ export class ListItemDetail {
     // 获取文件信息地址
     private getFileInfoAddr(uniq?: string) {
 
+    }
+
+    destroy() {
+        this.actionSheet.destroy();
+        this.actionSheet = null;
+        for (let key in this.cells) {
+            this.cells[key].destroy();
+        }
+        this.cells = null;
+        this.wrapper = null;
+        this.defaultData = null;
     }
 }
