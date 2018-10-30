@@ -5,6 +5,7 @@ import d = G.d;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {BwRule} from "../../common/rule/BwRule";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {Inputs} from "../inputs/inputs";
 
 export class BwMainTableModule extends BwTableModule{
 
@@ -15,6 +16,7 @@ export class BwMainTableModule extends BwTableModule{
     }
     protected ftableReady(){
         super.ftableReady();
+        this.keyStep();
         this.tableHeightInit();
         if(!tools.isMb) {
             if (this.ui.printList && this.ui.printList.length > 0) {
@@ -22,6 +24,18 @@ export class BwMainTableModule extends BwTableModule{
                 this.initFormPrint();
             }
         }
+    }
+
+    private keyStep(){
+        setTimeout(() => {
+            if (this.ui.inputs) {
+                new Inputs({
+                    inputs: this.ui.inputs,
+                    container: this.wrapper,
+                    table: this.ftable,
+                })
+            }
+        }, 200);
     }
 
     protected tdClickHandler(field: R_Field, rowData: obj)  {
