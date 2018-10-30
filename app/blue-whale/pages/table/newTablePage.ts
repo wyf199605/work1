@@ -13,6 +13,7 @@ import {Loading} from "../../../global/components/ui/loading/loading";
 import IComponentPara = G.IComponentPara; import Component = G.Component;
 import {BwTableModule} from "../../module/table/BwTableModule";
 import {FastTable} from "global/components/newTable/FastTable";
+import {Inputs} from "../../module/inputs/inputs";
 
 interface ITablePagePara extends BasicPagePara{
     ui: IBW_UI<IBW_Table>
@@ -60,7 +61,7 @@ export class BwTableElement extends Component{
         super(para);
 
         // d.classAdd(this.dom.parentElement, 'table-page');
-
+debugger
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
             hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
@@ -218,11 +219,21 @@ export class BwTableElement extends Component{
 
         }
 
-        !isDynamic && this.mobileScanInit(bwTableEl); 
+        !isDynamic && this.mobileScanInit(bwTableEl);
+
 
         this.on(BwRule.EVT_REFRESH, () => {
             this.tableModule && this.tableModule.refresh();
         });
+    }
+
+
+    private keyStep(inputs, ftable : FastTable){
+        new Inputs({
+            inputs: inputs,
+            container: this.wrapper,
+            table: ftable,
+        })
     }
 
     private asynQuery(asynData){
