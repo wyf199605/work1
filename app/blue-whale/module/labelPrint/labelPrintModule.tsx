@@ -494,7 +494,7 @@ export = class LabelPrintModule {
             ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
             let dataURL = canvas.toDataURL("image/jpeg");  //返回的是一串Base64编码的URL并指定格式
             canvas = null; //释放
-            dealPrintData(dataURL.replace('data:jpeg/png;base64,', ''));
+            dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));
         }
         /* for(let i = 0,l = this.pageSvgArray.length;i < l;i++){
              let s = new XMLSerializer().serializeToString(this.pageSvgArray[i]);
