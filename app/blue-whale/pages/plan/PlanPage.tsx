@@ -52,7 +52,18 @@ export class PlanPage extends BasicPage{
             }
             />
                 <div class="plan-opera">
-                    <div>
+                    <div class="back-opera" onclick={
+                        ()=>{
+                            let btn = d.queryAll('.plan-opera>div');
+                            btn.forEach((res)=>{
+                                d.classRemove(res,'custom-button');
+                            })
+                            let currBtn = d.query('.plan-opera>.back-opera');
+                            d.classAdd(currBtn,'custom-button');
+
+                            this.draw.reback();
+                        }
+                    }>
                         <i className="iconfont icon-chexiao"></i><span>撤消(Backspace键)</span>
                     </div>
                     <div class="finsh-point" onclick={

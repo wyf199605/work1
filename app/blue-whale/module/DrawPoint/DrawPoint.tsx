@@ -22,6 +22,7 @@ export  class DrawPoint {
     public r;
     public isDrawLine:boolean = false;
     public indexStr;//保存当前选中的path 下标
+    public drag
 
 
     constructor(para: IDrapPoint) {
@@ -32,6 +33,8 @@ export  class DrawPoint {
             .domain([1,6])
             .range([5.5,1])
         this.line = D3.svg.line();
+        //拖动
+        this.InitDrag();
         this.InitSvg(para)
     }
 
@@ -93,6 +96,7 @@ export  class DrawPoint {
 
 
         circle.exit().remove();
+        svg.selectAll("circle").call(this.drag);
     }
 
 
@@ -158,6 +162,65 @@ export  class DrawPoint {
 
         })
 
+    }
+    private  InitDrag(){
+        let _this = this;
+        this.drag = D3.behavior.drag()
+            .origin(function (d,i) {
+
+                return {x:d[0],y:d[1]}
+            })
+            .on("dragstart", (d,i)=> {
+                console.log("拖拽开始")
+                this.selected  = d;
+                // debugger;
+                // if(clo && ( points.indexOf(d) == 0) && (points.length > 2) ) {
+                //     console.log("这是第一个")
+                //     points.push(d)
+                //     redraw();
+                //     clo = false;
+                // }
+                D3.event.sourceEvent.stopPropagation();
+            })
+            .on("dragend", (d,i)=>{
+                this.selected  = d;
+                this.redraw();
+                D3.event.sourceEvent.stopPropagation();
+                console.log("拖拽结束")
+            })
+            .on("drag", function(d,i) {
+                console.log(D3.event.x)
+                D3.select(this)
+                    .attr("cx",d[0] = D3.event.x)
+                    .attr("cy",d[1] = D3.event.y)
+                _this.redraw();
+
+            })
+    }
+
+    private reback(){
+        D3.select(window)
+            .on("keydown",()=> {
+
+                switch (D3.event.keyCode) {
+
+                    case 8: { // delete
+
+                        // var i = points.indexOf(selected);
+                        //
+                        // points.splice(i, 1);
+                        //
+                        // selected = points.length ? points[i > 0 ? i - 1 : 0] : null;
+                        //
+                        // redraw();
+                        //
+                        console.log('撤回')
+                        break;
+
+                    }
+
+                }
+            })
     }
 
 }
