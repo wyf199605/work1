@@ -161,6 +161,9 @@ namespace G {
              * @return {string}
              */
             addObj: function (url: string, obj: obj, isLowCase = true, isReplace = false) {
+                if(Array.isArray(obj)){
+                    return url;
+                }
                 let paraObj = Object.assign({}, obj || {});
                 if(isReplace){
                     let currentPara = tools.url.getObjPara(url);

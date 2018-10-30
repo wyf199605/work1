@@ -12,6 +12,7 @@ interface QueryConf {
     value_list?: string[];
     atrrs? : obj;
     data? : obj[];
+    nosave? : boolean
     endFieldName? : string;
     startFieldName? : string;
 }

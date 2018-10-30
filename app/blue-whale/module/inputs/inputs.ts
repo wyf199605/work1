@@ -129,6 +129,7 @@ export class Inputs {
             onOk : () => {
                 modal.isShow = false;
                 BwRule.Ajax.fetch(subButtons[0].actionAddr.dataAddr,{
+                BwRule.Ajax.fetch(CONF.siteUrl + subButtons[0].actionAddr.dataAddr,{
                     data : atv.dataGet(),
                     type : 'get',
                 }).then(({response}) => {

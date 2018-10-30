@@ -193,6 +193,15 @@ export class ButtonAction {
                 tmp = [data];
             }
             res = JSON.stringify(tmp);
+            if (tools.isEmpty(data)){
+                // 不传任何数据
+
+            }else if(!Array.isArray(tmp)) {
+                tmp = [tmp];
+                res = JSON.stringify(tmp);
+            }else{
+                res = JSON.stringify(tmp);
+            }
         }
         switch (btn.openType) {
             case 'none' :
@@ -227,8 +236,12 @@ export class ButtonAction {
                 break;
             case 'newwin':
             default:
+                let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
+                if(res){
+                    openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
+                }
                 BW.sys.window.open({
-                    url: tools.url.addObj(tools.url.addObj(BW.CONF.siteUrl + addr, data), {bodyParams: res}, false),
+                    url: openUrl,
                     gps: !!btn.actionAddr.needGps,
                 }, url);
                 self.btnRefresh(btn.refresh, url);

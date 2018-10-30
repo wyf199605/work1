@@ -154,6 +154,8 @@ export class NewTableModule {
 
                     // 如果查询有带分段，那么从表不生成
                     if (tools.isEmpty(this.tab) && !noLoadSub){
+                        noLoadSub = this.noLoadSub(mftable, main);
+                    if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
                             panelParent: tabWrapper,
                             tabParent: tabWrapper,
@@ -221,7 +223,7 @@ export class NewTableModule {
                         row = mftable.rowGet(rowIndex);
                     self.subIndex = rowIndex;
                     if(row && row.selected){
-                        self.subRefresh(row.data);
+                        !self.noLoadSub(mftable, main) && self.subRefresh(row.data);
                         pseudoTable && pseudoTable.setPresentSelected(rowIndex);
                     }else{
                         self.mobileModal && (self.mobileModal.isShow = false);
@@ -229,6 +231,14 @@ export class NewTableModule {
                 });
             }
         };
+    }
+
+    private noLoadSub(mftable, main){
+        let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+            ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
+            qm = ajaxData.queryoptionsparam,
+            section = (typeof qm === 'string') && JSON.parse(ajaxData.queryoptionsparam);
+        return section && section.section
     }
 
     protected subIndex = 0;
@@ -598,6 +608,7 @@ export class NewTableModule {
                                     if(hCell.data != cellData){
                                         hCell.data = cellData || '';
                                     }
+                                    hCell.data = data[key] || '';
                                 }
                             }
                             if (field.elementType === 'lookup') {
