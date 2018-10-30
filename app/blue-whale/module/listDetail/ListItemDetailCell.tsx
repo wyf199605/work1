@@ -5,6 +5,11 @@ import IComponentPara = G.IComponentPara;
 import {BwRule} from "../../common/rule/BwRule";
 import tools = G.tools;
 import d = G.d;
+import {ActionSheet} from "../../../global/components/ui/actionSheet/actionSheet";
+import sys = BW.sys;
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {ListItemDetail} from "./ListItemDetail";
+
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
 
 // 文件信息
@@ -15,6 +20,7 @@ interface IFile {
 }
 
 interface IDetailCell extends IComponentPara {
+    detailPage?: ListItemDetail;
     type?: DetailCellType;
     caption?: string;
     value?: string | string[];
@@ -22,6 +28,16 @@ interface IDetailCell extends IComponentPara {
 
 export class ListItemDetailCell extends Component {
     private para: IDetailCell;
+    private files: IFile[] = [];
+    private actionSheet: ActionSheet;
+    private _currentFile: IFile;
+    set currentFile(fileInfo: IFile) {
+        this._currentFile = fileInfo;
+    }
+
+    get currentFile() {
+        return this._currentFile;
+    }
 
     protected wrapperInit(para: IDetailCell): HTMLElement {
         let wrapper: HTMLElement = null;
@@ -83,21 +99,88 @@ export class ListItemDetailCell extends Component {
 
     createAllFiles(value: IFile[], fileWrapper: HTMLElement) {
         fileWrapper.innerHTML = '';
-        if(tools.isNotEmpty(value)){
-            value.forEach(f => {
-                d.append(fileWrapper, <div className="detail-cell-file-item">
+        if (tools.isNotEmpty(value)) {
+            this.initEvent.on();
+            if (!this.actionSheet) {
+                this.actionSheet = new ActionSheet({
+                    buttons: [
+                        // {
+                        //     content: '微信转发',
+                        //     icon: 'bg-weixin fg-white appcommon app-weixin',
+                        //     onClick: () => {
+                        //
+                        //     }
+                        // },
+                        {
+                            content: '邮件转发',
+                            icon: 'bg-mail fg-white appcommon app-youjian',
+                            onClick: () => {
+                                let button: R_Button = {
+                                    "actionAddr": {
+                                        "type": "panel",
+                                        "needGps": 0,
+                                        "dataAddr": "/app_sanfu_retail/null/ui/associate/n1092_data-3/associate-3",
+                                        "varList": [
+                                            {
+                                                "varName": "MAILID"
+                                            }
+                                        ],
+                                        "varType": 0,
+                                        "commitType": 1
+                                    },
+                                    "buttonType": 0,
+                                    "subType": "associate",
+                                    "openType": "newwin",
+                                    "hintBeforeAction": false,
+                                    "refresh": 0,
+                                    "multiselect": 1
+                                };
+                                ButtonAction.get().clickHandle(button,this.para.detailPage.defaultData);
+                            }
+                        },
+                        {
+                            content: '下载至本地',
+                            icon: 'bg-download fg-white appcommon app-xiazaidaobendi',
+                            onClick: () => {
+                                sys.window.open({
+                                    url: BW.CONF.siteUrl + this.currentFile.addr
+                                });
+                            }
+                        }
+                    ]
+                });
+            }
+            value.forEach((f, index) => {
+                d.append(fileWrapper, <div className="detail-cell-file-item" data-index={index}>
                     <div className="file-icon"><i className="appcommon app-wenjian"/></div>
-                    <div className="file-info" data-file-url={BW.CONF.siteUrl + f.addr}>
+                    <div className="file-info">
                         <div className="file-name">{f.fileName}</div>
                         <div className="file-size">{this.calcFileSize(f.fileSize)}</div>
                     </div>
                     <i className="file-option appcommon app-gengduo1"/>
                 </div>);
             })
-        }else{
+        } else {
             d.append(fileWrapper, <i className="appcommon app-zanwushuju"/>);
         }
     }
+
+    private initEvent = (() => {
+        let option = (e) => {
+            let index = parseInt(d.closest(e.target, '.detail-cell-file-item').dataset.index),
+                files = this.files || [];
+            this.currentFile = files[index];
+            this.actionSheet.isShow = true;
+        };
+        return {
+            on: () => {
+                d.on(this.wrapper, 'click', '.file-option', option);
+            },
+            off: () => {
+                d.off(this.wrapper, 'click', '.file-option', option);
+            }
+        }
+    })();
 
     render(data: string | string[]) {
         switch (this.para.type) {
@@ -117,9 +200,11 @@ export class ListItemDetailCell extends Component {
                 if (tools.isNotEmpty(data)) {
                     BwRule.Ajax.fetch(data).then(({response}) => {
                         let dataArr = response.dataArr;
+                        this.files = dataArr;
                         this.createAllFiles(dataArr, this.innerEl.files);
                     })
                 } else {
+                    this.files = [];
                     this.createAllFiles([], this.innerEl.files);
                 }
             }
@@ -155,8 +240,13 @@ export class ListItemDetailCell extends Component {
         return size;
     }
 
-    destroy(){
+    destroy() {
         this.para = null;
+        this.files && this.initEvent.off();
+        this.files = null;
+        this.actionSheet && this.actionSheet.destroy();
+        this.actionSheet = null;
+        this.currentFile = null;
         super.destroy();
     }
 }

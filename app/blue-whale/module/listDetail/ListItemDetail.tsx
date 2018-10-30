@@ -13,7 +13,7 @@ export class ListItemDetail {
     // DOM容器
     private wrapper: HTMLElement;
     private cells: objOf<ListItemDetailCell> = {};
-    private defaultData: obj = {};
+    public defaultData: obj = {};
     private currentPage: number = 1;
     private totalNumber: number = 1;
     private ajaxUrl: string = '';
@@ -37,11 +37,12 @@ export class ListItemDetail {
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
         fields.forEach(field => {
-            if (!!!field.noShow) {
+            if (!field.noShow) {
                 this.cells[field.name] = new ListItemDetailCell({
                     caption: field.caption,
                     type: this.getType(field.dataType || field.atrrs.dataType || ''),
-                    container: cellsWrapper
+                    container: cellsWrapper,
+                    detailPage:this
                 });
             }
         })
@@ -248,7 +249,7 @@ export class ListItemDetail {
         })();
     }
 
-    getType(t: string): DetailCellType {
+    private getType(t: string): DetailCellType {
         let type: DetailCellType;
         if (t === '18') {
             type = 'textarea';
