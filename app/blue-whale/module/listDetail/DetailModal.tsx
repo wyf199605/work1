@@ -31,6 +31,7 @@ interface ComInitFun {
 
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
+    button?:R_Button;
 }
 
 export class DetailModal {

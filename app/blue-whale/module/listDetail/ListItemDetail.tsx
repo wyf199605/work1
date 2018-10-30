@@ -179,17 +179,15 @@ export class ListItemDetail {
         function subBtnEvent(index) {
             let btn = self.para.fm.subButtons[index];
             switch (btn.subType) {
-                case 'save' :
-                    btn.hintAfterAction = true;
-                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
-                    });
+                case 'update_save' :
+                    new DetailModal(Object.assign({},self.para,{defaultData:self.defaultData,button:btn}));
                     break;
-                case 'action':
-                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
-                    });
+                case 'insert_save':
+                    new DetailModal(Object.assign({},self.para,{defaultData:self.defaultData,button:btn}));
                     break;
                 default:
-                    new DetailModal(Object.assign({},self.para,{defaultData:self.defaultData}));
+                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                    });
                     break;
             }
         }

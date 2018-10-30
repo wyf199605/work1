@@ -111,33 +111,33 @@ export class ListItemDetailCell extends Component {
                         //
                         //     }
                         // },
-                        {
-                            content: '邮件转发',
-                            icon: 'bg-mail fg-white appcommon app-youjian',
-                            onClick: () => {
-                                let button: R_Button = {
-                                    "actionAddr": {
-                                        "type": "panel",
-                                        "needGps": 0,
-                                        "dataAddr": "/app_sanfu_retail/null/ui/associate/n1092_data-3/associate-3",
-                                        "varList": [
-                                            {
-                                                "varName": "MAILID"
-                                            }
-                                        ],
-                                        "varType": 0,
-                                        "commitType": 1
-                                    },
-                                    "buttonType": 0,
-                                    "subType": "associate",
-                                    "openType": "newwin",
-                                    "hintBeforeAction": false,
-                                    "refresh": 0,
-                                    "multiselect": 1
-                                };
-                                ButtonAction.get().clickHandle(button,this.para.detailPage.defaultData);
-                            }
-                        },
+                        // {
+                        //     content: '邮件转发',
+                        //     icon: 'bg-mail fg-white appcommon app-youjian',
+                        //     onClick: () => {
+                        //         // let button: R_Button = {
+                        //         //     "actionAddr": {
+                        //         //         "type": "panel",
+                        //         //         "needGps": 0,
+                        //         //         "dataAddr": "/app_sanfu_retail/null/ui/associate/n1092_data-3/associate-3",
+                        //         //         "varList": [
+                        //         //             {
+                        //         //                 "varName": "MAILID"
+                        //         //             }
+                        //         //         ],
+                        //         //         "varType": 0,
+                        //         //         "commitType": 1
+                        //         //     },
+                        //         //     "buttonType": 0,
+                        //         //     "subType": "associate",
+                        //         //     "openType": "newwin",
+                        //         //     "hintBeforeAction": false,
+                        //         //     "refresh": 0,
+                        //         //     "multiselect": 1
+                        //         // };
+                        //         // ButtonAction.get().clickHandle(button,this.para.detailPage.defaultData);
+                        //     }
+                        // },
                         {
                             content: '下载至本地',
                             icon: 'bg-download fg-white appcommon app-xiazaidaobendi',
