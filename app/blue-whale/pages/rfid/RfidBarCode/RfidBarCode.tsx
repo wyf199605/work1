@@ -73,20 +73,21 @@ export class RfidBarCode extends Component {
         this.InitRfidBarCode(para);
         this.downData(para);
 
+
     }
 
     protected wrapperInit(para: IRfidBarCode): HTMLElement {
         return <div class="rfidBarCode-page">
             <div class="rfid-barCode-body">
                 <div class="rfid-barCode-title">
-                    <span class="barCode-title">盘点单 </span>
-                    <span class="barCode-title1">饰品</span>
+                    <span class="barCode-title"> </span>
+                    <span class="barCode-title1"></span>
                 </div>
                 <div class="rfid-barCode-inventory">
-                    511X16020400000
+
                 </div>
                 <div className="rfid-shelf-number"><span
-                    className="shelf-category">货架号:</span><span className="shelf-number">1002004</span>
+                    className="shelf-category"></span><span className="shelf-number"></span>
                     <i className="iconfont icon-shuxie" onclick={() => {
 
                         let mode = new Modal({
@@ -105,13 +106,34 @@ export class RfidBarCode extends Component {
                             onOk: () => {
                                 let val = d.query('.set-rfid-shelf')['value'];
                                 //console.log(d.query('.set-rfid-code').value);
-                                d.query('.rfid-shelf-number>.shelf-number').innerText = val;
-                                console.log("打印了")
+                                let optionStype,
+                                category = [];
+                                category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
 
+                                let key = this.stepByone + this.accumulation;
+                                if (this.mode[key] == '替换') {
+                                    optionStype = 0;
+                                } else if (this.mode[key] == '逐一') {
+                                    optionStype = 2;
+                                } else if (this.mode[key] == '累加') {
+                                    optionStype = 1;
+                                } else {
+                                    optionStype = 0;
+                                }
+                                let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
+                                    alert(JSON.stringify(res))
+                                    let data = res.data;
+                                    if(res.success){
+                                        d.query('.rfid-shelf-number>.shelf-number').innerText = val;
+                                    }else {
+                                         Modal.toast(res.msg);
+                                    }
+
+                                })
                                 mode.destroy();
                             },
                             onClose: () => {
-                                Modal.toast('输入成功');
+                               // Modal.toast('输入成功');
                             }
 
                         })
@@ -141,12 +163,34 @@ export class RfidBarCode extends Component {
                                     let val = d.query('.set-rfid-shelf')['value'];
                                     //console.log(d.query('.set-rfid-code').value);
                                     this.domHash['categoryVal1'].innerText = val;
-                                    console.log("打印了")
+                                    let optionStype,
+                                        category = [];
+                                    category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
+                                    let key = this.stepByone + this.accumulation;
+                                    if (this.mode[key] == '替换') {
+                                        optionStype = 0;
+                                    } else if (this.mode[key] == '逐一') {
+                                        optionStype = 2;
+                                    } else if (this.mode[key] == '累加') {
+                                        optionStype = 1;
+                                    } else {
+                                        optionStype = 0;
+                                    }
+                                    let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
+                                        alert(JSON.stringify(res))
+                                        let data = res.data;
+                                        if(res.success){
+                                            this.domHash['categoryVal1'].innerText = val;
+                                        }else {
+                                            Modal.toast(res.msg);
+                                        }
+
+                                    })
 
                                     mode.destroy();
                                 },
                                 onClose: () => {
-                                    Modal.toast('输入成功');
+
                                 }
 
                             })
@@ -154,7 +198,7 @@ export class RfidBarCode extends Component {
                         }
                     }></i>
                         <p class="value2" style="color:rgb(0, 122, 255)">100000</p>
-                        <span className="title3">分类-标题3 </span> <i className="iconfont icon-shuxie" onClick={() => {
+                        <span className="title3">分类-标题3 </span> <i className="iconfont icon-shuxie" onclick={() => {
 
                         let mode = new Modal({
                             isMb: false,
@@ -173,7 +217,30 @@ export class RfidBarCode extends Component {
                                 let val = d.query('.set-rfid-shelf')['value'];
                                 //console.log(d.query('.set-rfid-code').value);
                                 this.domHash['categoryVal2'].innerText = val;
-                                console.log("打印了")
+                                let optionStype,
+                                    category = [];
+                                category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
+                                let key = this.stepByone + this.accumulation;
+                                if (this.mode[key] == '替换') {
+                                    optionStype = 0;
+                                } else if (this.mode[key] == '逐一') {
+                                    optionStype = 2;
+                                } else if (this.mode[key] == '累加') {
+                                    optionStype = 1;
+                                } else {
+                                    optionStype = 0;
+                                }
+                                G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
+                                    alert(JSON.stringify(res))
+                                    let data = res.data;
+                                    if(res.success){
+                                        this.domHash['categoryVal2'].innerText = val;
+                                    }else {
+                                        Modal.toast(res.msg);
+                                    }
+
+                                })
+
 
                                 mode.destroy();
                             },
@@ -243,7 +310,7 @@ export class RfidBarCode extends Component {
                                                 num.innerText = (parseInt(num.innerText) + 1) + '';
                                                // let data = res.data;
                                                 if(res.success){
-                                                    this.domHash['scanamount'].innerText = res.data.scanNum;
+                                                    this.domHash['scanamout'].innerText = res.data.scanNum;
                                                 }
 
                                                 // if (data.name) {
@@ -497,20 +564,8 @@ export class RfidBarCode extends Component {
                                                 alert(JSON.stringify(res))
                                                 let num = d.query('.total-nums>span');
                                                 num.innerText = (parseInt(num.innerText) + 1) + '';
-                                                let data = res.data;
-                                                if (data.name) {
-                                                    let arr = data.array;
-                                                    for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
-                                                        this.domHash['barcode'].innerText = arr[i].barcode;
-                                                        this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                                                        this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
-                                                        this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                                                        this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                                                        this.domHash['Commodity'].innerText = arr[i].name;
-                                                    }
-
+                                                if(res.success){
+                                                    this.domHash['scanamout'].innerText = res.data.scanNum;
                                                 }
                                             })
                                         } else {
@@ -614,7 +669,6 @@ export class RfidBarCode extends Component {
                                 }
                                 alert("111111");
                                 let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                    alert('00000')
                                     alert(JSON.stringify(res))
                                     let data = res.data;
                                     let arr = data.array;
@@ -632,7 +686,7 @@ export class RfidBarCode extends Component {
                                     }
 
                                 })
-                                alert("22222222" + s)
+
 
                                 mode.destroy();
                             },
@@ -686,6 +740,7 @@ export class RfidBarCode extends Component {
                                             G.Shell.inventory.uploadcodedata(para.uniqueFlag, (res) => {
                                                 alert(JSON.stringify(res))
                                             })
+                                            mode.destroy();
                                         }
                                     }]
                                 },
@@ -790,6 +845,11 @@ export class RfidBarCode extends Component {
 
     private InitRfidBarCode(para) {
         //初始化监听输入框的值
+        let key = this.stepByone + this.accumulation;
+        if(this.mode[key] == '(可查询状态)'){
+            d.query('.shelf-nums>input')['disabled'] = true;
+        };
+
         let modeVal = d.query('.shelf-nums>input')
         console.log(modeVal);
         modeVal.onchange = () => {
@@ -824,12 +884,15 @@ export class RfidBarCode extends Component {
                     codeName: this.uid || '',
                     barcode: this.domHash['barcode'].innerText || ''
                 }
-                alert(JSON.stringify(para.uniqueFlag) + '这' )
-                G.Shell.inventory.dealbarcode(2,params,(res)=>{
+
+             let s =  G.Shell.inventory.dealbarcode(2,params,(res)=>{
+                    alert('zou 里层调用')
+                    alert(JSON.stringify(res))
                    if(res.success){
-                       this.domHash['scanamount'].innerText = res.data.scanNum;
+                       this.domHash['scanamout'].innerText = res.data.scanNum;
                    }
                 })
+                alert(s+"外层调用")
 
             } else if (this.mode[key] == "替换" && modeVal['value'] !== "") {
                 num.innerText = parseInt(modeVal['value']) + "";
@@ -857,14 +920,16 @@ export class RfidBarCode extends Component {
                     codeName: this.uid || '',
                     barcode: this.domHash['barcode'].innerText||''
                 }
-                alert('替换' + JSON.stringify(params))
                 // Modal.alert(G.Shell.inventory.dealbarcode)
-                G.Shell.inventory.dealbarcode(2,params,(res)=>{
+                let s = G.Shell.inventory.dealbarcode(2,params,(res)=>{
+                    alert('zou里层 ')
+                    alert(JSON.stringify(res))
                     if(res.success){
-                        this.domHash['scanamount'].innerText = res.data.scanNum;
+                        this.domHash['scanamout'].innerText = res.data.scanNum;
                     }
 
                 })
+                alert(s+"外层调用")
             }
         }
 
@@ -915,7 +980,9 @@ export class RfidBarCode extends Component {
         }
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
+            alert(JSON.stringify(res))
             let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
+            alert(JSON.stringify(data));
             let pageName = data.data;;
             this.uid = pageName.uid;
             this.domHash['inventory'].innerHTML = pageName.AffilTitle;
@@ -980,6 +1047,12 @@ export class RfidBarCode extends Component {
 
             }
 
+        })
+    }
+    public test (){
+        G.Shell.inventory.dealbarcode(2,{},(res)=>{
+            alert('1')
+            alert(JSON.stringify(res))
         })
     }
 }
