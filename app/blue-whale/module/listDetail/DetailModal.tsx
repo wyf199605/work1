@@ -29,20 +29,12 @@ interface ComInitFun {
     (para: ComInitP): FormCom
 }
 
-interface INewMBForm {
-    fields?: ComInitP[],
-    auto?: boolean; //是否自动初始化dom
-    type?: string;
-    dom: HTMLElement;
-}
-
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
 }
 
 export class DetailModal {
     private editModule: NewMBForm;
-
     constructor(private para: IDetailModal) {
         let emPara: EditModulePara = {fields: []};
         let formWrapper = <div className="form-wrapper"/>,
@@ -87,14 +79,16 @@ export class DetailModal {
                     content: '确定',
                     className: 'modal-btn eidt-confirm',
                     onClick: () => {
-                        let data = this.editModule.get();
-                        console.log(data);
+                        let data = this.dataGet();
+                        if (this.validate(data)){
+                            // 验证成功
+
+                        }
                     }
                 }]
             }
         });
         this.editModule = new NewMBForm(emPara);
-
         tools.isNotEmpty(para.defaultData) && this.editModule.set(para.defaultData);
     }
 
@@ -115,7 +109,30 @@ export class DetailModal {
             return formGroupWrapper
         }
     }
-
+    // 获取数据
+    private dataGet() {
+        let data = this.editModule.get();
+        this.para.fm.fields.forEach(field => {
+            let name = field.name,
+                val = field.atrrs.defaultValue;
+            if (field.noEdit && !tools.isEmpty(val)) {
+                data[name.toLowerCase()] = val;
+            }
+        });
+        return data;
+    }
+    // 验证
+    private validate(pageData?: obj) {
+        let result = this.editModule.validate.start();
+        if (tools.isNotEmpty(result)) {
+            for (let key in result) {
+                Modal.alert(result[key].errMsg);
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
     destroy() {
         this.para = null;
     }
