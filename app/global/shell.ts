@@ -370,6 +370,9 @@ namespace G{
             downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,back:IShellEventHandler){
                 return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl},back,null,false);
             },
+            dealbarcode(type:number,params:object,back:IShellEventHandler){
+                return ShellBase.handler('dealbarcode',{type:type,params:params},back ,null,false);
+            },
             //注入监听事件
             openRegistInventory(type:number,params:obj,back:IShellEventHandler){
                 return ShellBase.handler('registInventory',{type:type,params:params},back,null,false);
@@ -392,11 +395,7 @@ namespace G{
             },
             //输入条码扫码查询
             inputcodedata(optionStype:number,uniqueFlag:string,value:string,category:string[],back:IShellEventHandler){
-                alert('调用')
                 return ShellBase.handler('inputcodedata',{uniqueFlag:uniqueFlag,value:value,category:category,optionStype:optionStype},back)
-            },
-            dealbarcode(type:number,params:obj,back:IShellEventHandler){
-                return ShellBase.handler('dealbarcode',{type:type,params:params},back,null,false);
             },
             scan2dOn(back: IShellEventHandler) {
                 return ShellBase.handler('startScan2DResult', '', back, null, false);
@@ -533,7 +532,7 @@ namespace G{
 
                     // 过程通知
                     if(!flag) {
-                        console.log('Shell失败');
+                        alert('Shell失败');
                         d.off(window, eventInfor);
                         d.off(window, eventBack);
                     }

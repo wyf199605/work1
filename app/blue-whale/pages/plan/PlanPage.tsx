@@ -1,10 +1,11 @@
 /// <amd-module name="PlanPage"/>
 
 import BasicPage from "../basicPage";
-import d = G.d;
+
 import {HorizontalQueryModule} from "../../module/query/horizontalFormFactory";
 import {DrawPoint} from "../../module/DrawPoint/DrawPoint";
 import {BwRule} from "../../common/rule/BwRule";
+import d = G.d;
 
 interface IPlanPagePara extends BasicPagePara{
     ui: IBW_UI<IBW_Table>
@@ -57,10 +58,14 @@ export class PlanPage extends BasicPage{
                     <div class="finsh-point" onclick={
                         ()=>{
                             //完成编辑--------
-                            if(this.isDrawLine){
+
                                 //把point 清楚
+                                let paths = G.d.queryAll(".drawPage>svg>g>path");
+                                console.log(paths.length);
                                 console.log(this.draw.getPoints());
-                            }
+                                this.draw.setIsDrawLine(false);
+                                this.draw.fished(paths.length);
+
                             let btn = d.queryAll('.plan-opera>div');
                             btn.forEach((res)=>{
                                 d.classRemove(res,'custom-button');
@@ -83,16 +88,34 @@ export class PlanPage extends BasicPage{
                             let currBtn = d.query('.plan-opera>.miao-dian');
                             d.classAdd(currBtn,'custom-button');
                             //------------------开始绘图
-                            if(!this.isDrawLine){
-                                this.draw.createPath();
-                                this.isDrawLine = true;
-                            }
+                            let paths = G.d.queryAll(".drawPage>svg>g>path");
+                                this.draw.setIsDrawLine(true);
+                                this.draw.createPath(paths.length );
+
+
 
                         }
                     }>
                         <i class="iconfont icon-maodian"><span>描点</span></i>
                     </div>
-                    <div>
+                    <div class="edit-dian" onclick={
+                        ()=>{
+                            console.log('开始编辑')
+                            let btn = d.queryAll('.plan-opera>div');
+                            btn.forEach((res)=>{
+                                d.classRemove(res,'custom-button');
+                            })
+
+                            let currBtn = d.query('.plan-opera>.edit-dian');
+                            d.classAdd(currBtn,'custom-button');
+                            //------------------开始绘图
+
+                            this.draw.editPoint();
+
+
+
+                        }
+                    }>
                         <i className="iconfont icon-bianjimaodian"><span>编辑描点</span></i>
                     </div>
                     <div>

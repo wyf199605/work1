@@ -56,7 +56,7 @@ export class DetailModal {
         let modal = new Modal({
             isMb: true,
             header: {
-                title: para.fm.caption
+                title: '编辑'
             },
             className: 'detail-modal',
             isModal: true,
