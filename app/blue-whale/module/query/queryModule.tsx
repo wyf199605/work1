@@ -11,6 +11,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {BasicTable} from "global/components/table/basicTable";
 import {MobileScan} from "../mobileScan/MobileScan";
+import {Inputs} from "../inputs/inputs";
 
 export interface QueryModulePara{
     qm: IBw_Query,
@@ -121,6 +122,18 @@ export abstract class QueryModule {
                 this.search();
             },10);
         }
+
+        this.keyStep(this.para.qm.inputs)
+    }
+
+    private keyStep(inputs){
+        new Inputs({
+            inputs: inputs,
+            container: this.para.container,
+            queryModuel : () => {
+                return this;
+            },
+        })
     }
 
     get wrapper(){

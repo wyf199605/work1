@@ -24,6 +24,8 @@ import tools = G.tools;
 import CONF = BW.CONF;
 import {UploadImages} from "../uploadModule/uploadImages";
 import {Accessory} from "../uploadModule/accessory";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {ListItemDetail} from "./ListItemDetail";
 
 interface ComInitFun {
     (para: ComInitP): FormCom
@@ -31,6 +33,8 @@ interface ComInitFun {
 
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
+    button?:R_Button;
+    listDetail?:ListItemDetail;
 }
 
 export class DetailModal {
@@ -70,7 +74,7 @@ export class DetailModal {
                         Modal.confirm({
                             msg: '确定取消编辑吗?',
                             callback: (flag) => {
-                                flag && (modal.isShow = false);
+                                flag && (modal.isShow = false,this.destroy());
                             }
                         })
                     }
@@ -82,7 +86,22 @@ export class DetailModal {
                         let data = this.dataGet();
                         if (this.validate(data)){
                             // 验证成功
-
+                            let button = this.para.button;
+                            button.refresh = 1;
+                            ButtonAction.get().clickHandle(button,data,() => {
+                                switch (button.subType){
+                                    case 'insert_save':{
+                                        this.para.listDetail.changePage(this.para.listDetail.totalNumber + 1);
+                                    }
+                                    break;
+                                    case 'update_save':{
+                                        this.para.listDetail.changePage(this.para.listDetail.currentPage);
+                                    }
+                                    break;
+                                }
+                                modal.isShow = false;
+                                this.destroy();
+                            });
                         }
                     }
                 }]
@@ -134,7 +153,12 @@ export class DetailModal {
         }
     }
     destroy() {
+        this.para.fm.fields.forEach(f => {
+            this.editModule.destroy(f.name);
+        });
+        this.editModule = null;
         this.para = null;
+
     }
 }
 
