@@ -127,10 +127,15 @@ export abstract class QueryModule {
     }
 
     private keyStep(inputs){
+        if(!inputs){
+            return;
+        }
         new Inputs({
             inputs: inputs,
             container: this.para.container,
-            table : this.para.tableGet().ftable,
+            table : () => {
+                return this.para.tableGet() && this.para.tableGet().ftable
+            },
             queryModule : () => {
                 return this
             },
