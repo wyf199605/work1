@@ -5,17 +5,13 @@ import tools = G.tools;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Toast} from "../../../global/components/feedback/toast/Toast";
 import {BwRule} from "../../common/rule/BwRule";
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
-import {QueryModule} from "../query/queryModule";
-import {NewTableModule} from "../table/newTableModule";
-import {FastTable} from "../../../global/components/newTable/FastTable";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 
 interface InputsPara {
     inputs: R_Input[]
     container: HTMLElement
     keyField? : string
-    table? : FastTable
+    table? : Function
     afterScan? : Function
     tableModule? : Function
     queryModule? : Function
@@ -66,20 +62,27 @@ export class Inputs {
         let category = response.body && response.body.bodyList && response.body.bodyList[0].category || {},
             type = category.type,
             showText = category.showText,
-            ftable = this.p.table || this.p.tableModule && this.p.tableModule() && this.p.tableModule().main.ftable;
-        // ButtonAction.get().checkAction()
+            ftable = tools.isFunction(this.p.table) && this.p.table();
+
         this.url = category.url;
         switch (type) {
             case 0:
                 //数据覆盖
-                response.data && (ftable.data = response.data);
                 let queryModule = this.para.queryModule && this.para.queryModule();
                 queryModule && queryModule.hide();
+                if(queryModule && !ftable){
+                    queryModule.para.refresher({}, true).then(() => {
+                        response.data && (this.p.table().data = response.data);
+                    })
+                }else {
+                    response.data && ftable && (ftable.data = response.data);
+                }
                 this.logTip(showText);
                 break;
             case 1:
                 //标签打印
                 // debugger
+
                 ftable.labelPrint.show(ftable.labelBtn.wrapper, category.printList, () => {
                     this.keyStep(CONF.siteUrl + this.url);
                 });
@@ -120,6 +123,7 @@ export class Inputs {
             duration: 0,
             type: 'simple',
             isClose: true,
+            className : 'max-index',
             position: 'bottom',
             content: showText,
             container: this.para.container
