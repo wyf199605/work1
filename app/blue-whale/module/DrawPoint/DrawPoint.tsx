@@ -11,7 +11,8 @@ declare const D3;
 interface IDrapPoint extends IComponentPara{
     width:number | string
     height:number | string
-    image?:string
+    image?:string;
+    format?: (data: obj[]) => obj[];
 }
 export  class DrawPoint extends Component{
     public svg;

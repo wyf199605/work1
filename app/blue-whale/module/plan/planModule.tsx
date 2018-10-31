@@ -4,6 +4,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {DrawPoint} from "../DrawPoint/DrawPoint";
 import d = G.d;
+import {BwRule} from "../../common/rule/BwRule";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -16,7 +17,7 @@ export class PlanModule extends Component{
 
     protected draw: DrawPoint;
     protected ui: IBW_Plan_Table;
-
+    protected ajax = new BwRule.Ajax();
 
     constructor(para){
         super(para);
@@ -114,11 +115,43 @@ export class PlanModule extends Component{
         this.draw = new DrawPoint({
             height: 400,
             width: 700,
-            image: imageUrl + "&sho_id=20"
-        })
+            image: imageUrl + "&sho_id=20",
+            container: this.wrapper,
+            format: (data: obj[]) => {
+                data && data.forEach(() => {
+
+                });
+                return null;
+            }
+        });
+
+        this.draw.on(DrawPoint.EVT_AREA_CLICK, () => {
+
+        });
     }
 
-    refresh(){
+    protected bgPicture: string;
+    protected setBackground(obj: obj){
+        let backGround = this.ui.backGround;
+        if(backGround){
+            let url = BwRule.reqAddr(backGround, obj);
+            if(url != this.bgPicture){
+                this.bgPicture = url;
+                console.log(url);
+            }
+        }
+    }
+
+    refresh(ajaxData?: obj){
+        this.setBackground(ajaxData);
+    }
+
+    format(){
 
     }
+
+    edit = (() => {
+
+        return {};
+    })();
 }
