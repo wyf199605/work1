@@ -18,7 +18,7 @@ interface InputsPara {
     table? : FastTable
     afterScan? : Function
     tableModule? : Function
-    queryModuel? : Function
+    queryModule? : Function
 }
 
 /**
@@ -73,8 +73,8 @@ export class Inputs {
             case 0:
                 //数据覆盖
                 response.data && (ftable.data = response.data);
-                let queryModuel = this.para.queryModuel();
-                queryModuel && queryModuel.hide();
+                let queryModule = this.para.queryModule && this.para.queryModule();
+                queryModule && queryModule.hide();
                 this.logTip(showText);
                 break;
             case 1:
