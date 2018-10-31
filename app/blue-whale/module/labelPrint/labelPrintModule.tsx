@@ -472,7 +472,6 @@ export = class LabelPrintModule {
         let dealPrintData = function (uri) {
             if ('BlueWhaleShell' in window) {
                 let result = BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + uri + '"}');
-                Modal.alert(result);
             } else if ('AppShell' in window) {
                 let code = self.coms['printer'].get();
                 Shell.printer.labelPrint(1, code, uri, () => {
@@ -482,20 +481,42 @@ export = class LabelPrintModule {
                 Modal.alert('无法连接到打印机')
             }
         };
-        let innerHTML = this.pageSvgArray[0].innerHTML;
-        let image = new Image();
-        image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML)));
-        image.onload = () => {
-            let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
-            canvas.style.backgroundColor = '#fff';
-            canvas.width = image.width;
-            canvas.height = image.height;
-            let ctx = canvas.getContext("2d");
-            ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
-            let dataURL = canvas.toDataURL("image/png");  //返回的是一串Base64编码的URL并指定格式
-            canvas = null; //释放
-            dealPrintData(dataURL.replace('data:image/png;base64,', ''));
+        // Array.prototype.forEach.call(this.pageSvgArray[0] && this.pageSvgArray[0].children, () =)
+        if(this.pageSvgArray[0]){
+            for(let svg of this.pageSvgArray[0].children){
+                svg.style.backgroundColor = '#fff';
+                let innerHTML = svg.outerHTML;
+                let image = new Image();
+                image.onload = () => {
+                    let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
+                    canvas.style.backgroundColor = '#fff';
+                    canvas.width = image.width * 2;
+                    canvas.height = image.height * 2;
+                    let ctx = canvas.getContext("2d");
+
+                    console.time('one');
+                    console.time('three');
+                    ctx.drawImage(image, 0, 0, image.width * 2, image.height * 2); //使用画布画图
+                    console.timeEnd('one');
+                    ctx.drawImage(image, 0, 0, image.width * 2, image.height * 2); //使用画布画图
+                    ctx.drawImage(image, 0, 0, image.width * 2, image.height * 2); //使用画布画图
+                    console.timeEnd('three');
+                    let dataURL = canvas.toDataURL("image/jpeg");  //返回的是一串Base64编码的URL并指定格式
+                    let body = <div/>;
+                    body.appendChild(canvas);
+                    new Modal({
+                        body: body,
+                        header: '测试'
+                    });
+                    canvas = null; //释放
+                    console.log(dataURL);
+                    dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));
+                };
+                image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML)));
+            }
         }
+
+
         /* for(let i = 0,l = this.pageSvgArray.length;i < l;i++){
              let s = new XMLSerializer().serializeToString(this.pageSvgArray[i]);
              let encodedData = Base64.encode(s);

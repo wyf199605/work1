@@ -215,6 +215,9 @@ gulp.task('js', function () {
     //label模块
     gulpTsModule(['labelPrint/labelPrint'], 'labelPrint.js');
 
+    // plan 模块
+    gulpTsModule(['plan/planModule'], 'plan.js');
+
     //labelModule模块
     gulpTsModule(['labelPrint/labelPrintModule'], 'labelPrintModule.js');
 

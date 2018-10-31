@@ -12,7 +12,6 @@ interface QueryConf {
     value_list?: string[];
     atrrs? : obj;
     data? : obj[];
-    nosave? : boolean
     endFieldName? : string;
     startFieldName? : string;
 }
@@ -34,6 +33,7 @@ interface IBw_Query{
     queryparams0? : QueryConf;
     queryparams1? : QueryConf[];
     hasOption : boolean;
+    inputs : obj;
     scannableField? : string;
     scannableType? : number;
     scannableTime? : number

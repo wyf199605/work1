@@ -5,6 +5,7 @@ import {Modal} from "global/components/feedback/modal/Modal";
 import {MbPage} from "../../../global/components/view/mbPage/MbPage";
 import d = G.d;
 import {SwipeOut} from "../../../global/components/other/SwipeOut/SwipeOut";
+import {Inputs} from "../inputs/inputs";
 
 export = class QueryModuleMb extends QueryModule {
     // loadingShow() {
@@ -63,9 +64,9 @@ export = class QueryModuleMb extends QueryModule {
         // this.loading.addEventListener('tap', function () {
         //     this.classList.add('hide');
         // });
+
         this.mobileScan();
     }
-
 
     private mobileScan() {
         let field = this.para.qm && this.para.qm.scannableField;

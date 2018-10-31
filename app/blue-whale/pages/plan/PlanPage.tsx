@@ -6,29 +6,26 @@ import {HorizontalQueryModule} from "../../module/query/horizontalFormFactory";
 import {DrawPoint} from "../../module/DrawPoint/DrawPoint";
 import {BwRule} from "../../common/rule/BwRule";
 import d = G.d;
+import tools = G.tools;
+import {PlanModule} from "../../module/plan/planModule";
 
-interface IPlanPagePara extends BasicPagePara{
+interface IPlanPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Table>
-
-
 }
+
 interface IUiPagePara {
-    body:object;
+    body: object;
 }
-export class PlanPage extends BasicPage{
-    private wrapper:HTMLElement;
-    private draw;
-    private imageUrl:string;
-    private isDrawLine:boolean = false;
+
+export class PlanPage extends BasicPage {
+    private wrapper: HTMLElement;
+
     constructor(para: IPlanPagePara) {
         super(para);
-        this.wrapper = para.dom;
+        console.log(para);
         let qData = para.ui.body.elements[0];
-        console.log(qData)
-        this.InitGetUi(qData['uiPath'].dataAddr).then((res:IUiPagePara)=>{
-
-            //查询器初始化
-            let content = <div class="plan-Head"><HorizontalQueryModule qm={{
+        d.append(para.dom, this.wrapper = <div class="plan-wrapper">
+            <HorizontalQueryModule qm={{
                 autTag: qData['autTag'],
                 hasOption: qData['hasOption'],
                 queryType: qData['queryType'],
@@ -39,152 +36,24 @@ export class PlanPage extends BasicPage{
             }} search={
                 (data) => {
                     return new Promise((resolve) => {
-
                         //
                         console.log(data);
-
-
-                        let actionAddr = G.tools.url.addObj(qData['uiPath'].dataAddr,data)
+                        let actionAddr = G.tools.url.addObj(qData['uiPath'].dataAddr, data);
                         console.log(actionAddr);
                         resolve(data)
                     })
                 }
-            }
-            />
-                <div class="plan-opera">
-                    <div class="back-opera" onclick={
-                        ()=>{
-                            let btn = d.queryAll('.plan-opera>div');
-                            btn.forEach((res)=>{
-                                d.classRemove(res,'custom-button');
-                            })
-                            let currBtn = d.query('.plan-opera>.back-opera');
-                            d.classAdd(currBtn,'custom-button');
-
-                            this.draw.reback();
-                        }
-                    }>
-                        <i className="iconfont icon-chexiao"></i><span>撤消(Backspace键)</span>
-                    </div>
-                    <div class="finsh-point" onclick={
-                        ()=>{
-                            //完成编辑--------
-
-                                //把point 清楚
-                                let paths = G.d.queryAll(".drawPage>svg>g>path");
-                                console.log(paths.length);
-                                console.log(this.draw.getPoints());
-                                this.draw.setIsDrawLine(false);
-                                this.draw.fished(paths.length);
-
-                            let btn = d.queryAll('.plan-opera>div');
-                            btn.forEach((res)=>{
-                                d.classRemove(res,'custom-button');
-                            })
-                            let currBtn = d.query('.plan-opera>.finsh-point');
-                            d.classAdd(currBtn,'custom-button');
-
-                        }
-                    }>
-                        <i class="iconfont icon-wanchengbianji"><span>完成编辑</span></i>
-                    </div>
-                    <div class="miao-dian" onclick={
-                        ()=>{
-                            console.log('开始描点')
-                            let btn = d.queryAll('.plan-opera>div');
-                            btn.forEach((res)=>{
-                                d.classRemove(res,'custom-button');
-                            })
-
-                            let currBtn = d.query('.plan-opera>.miao-dian');
-                            d.classAdd(currBtn,'custom-button');
-                            //------------------开始绘图
-                            let paths = G.d.queryAll(".drawPage>svg>g>path");
-                                this.draw.setIsDrawLine(true);
-                                this.draw.createPath(paths.length );
-
-
-
-                        }
-                    }>
-                        <i class="iconfont icon-maodian"><span>描点</span></i>
-                    </div>
-                    <div class="edit-dian" onclick={
-                        ()=>{
-                            console.log('开始编辑')
-                            let btn = d.queryAll('.plan-opera>div');
-                            btn.forEach((res)=>{
-                                d.classRemove(res,'custom-button');
-                            })
-
-                            let currBtn = d.query('.plan-opera>.edit-dian');
-                            d.classAdd(currBtn,'custom-button');
-                            //------------------开始绘图
-
-                            this.draw.editPoint();
-
-
-
-                        }
-                    }>
-                        <i className="iconfont icon-bianjimaodian"><span>编辑描点</span></i>
-                    </div>
-                    <div>
-                        <i className="iconfont icon-tuodong"><span>拖动(空格键+左击)</span></i>
-                    </div>
-                    <div>
-                        <i className="iconfont icon-suofang"><span>缩放(滚轮)</span></i>
-                    </div>
-                </div>
-            </div>
-
-            this.imageUrl = BW.CONF.siteUrl + res['backGround']['dataAddr'];
-            d.append(this.wrapper, content)
-
-            console.log(res['backGround']['dataAddr'])
-            let drawContent = <div class="drawPage" id="drawPage">
-
-                }
-            </div>
-
-            d.append(this.wrapper, drawContent)
-            console.log(this.imageUrl);
-            this.draw = new DrawPoint({
-                wraperId: '#drawPage',
-                height: 400,
-                width: 700,
-                image: this.imageUrl + "&sho_id=20"
-
-            })
-        })
-
-
+            }/>
+        </div>);
 
         //下半部
-
-
-
-    }
-    private InitGetUi(url:string){
-        return new Promise((resolve)=>{
-            BwRule.Ajax.fetch(BW.CONF.siteUrl + G.tools.url.addObj(url,{output: 'json'}), {
-
-            }).then(({response})=>{
-                let JSON = response.body.elements[0]
-                console.log(JSON)
-                resolve(JSON)
-
-            })
-
+        BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
+            let JSON = response.body.elements[0];
+            let planModule = new PlanModule({
+                ui: JSON,
+                container: this.wrapper
+            });
         })
     }
-    private InitDrawPoint(){
-
-
-
-    }
-
-
-
 
 }
