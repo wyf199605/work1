@@ -99,7 +99,7 @@ export class PlanPage extends BasicPage{
                             let currBtn = d.query('.plan-opera>.miao-dian');
                             d.classAdd(currBtn,'custom-button');
                             //------------------开始绘图
-                            let paths = G.d.queryAll(".drawPage>svg>g>path");
+                            let paths = d.queryAll(".drawPage>svg>g>path");
                                 this.draw.setIsDrawLine(true);
                                 this.draw.createPath(paths.length );
 
@@ -150,7 +150,7 @@ export class PlanPage extends BasicPage{
             d.append(this.wrapper, drawContent)
             console.log(this.imageUrl);
             this.draw = new DrawPoint({
-                wraperId: '#drawPage',
+                wraperId: '.drawPage',
                 height: 400,
                 width: 700,
                 image: this.imageUrl + "&sho_id=20"

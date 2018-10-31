@@ -112,12 +112,12 @@ export  class DrawPoint {
         }
         //再做一层判断 如果已经有当前路径 就不创建
 
-       if(!(D3.select('path'+ index).empty()) && index !== 0){
-            return;
-       }
+
         //！！每一次创建都会开辟一个新得path
         var svg = D3.select('svg').select('g')
-
+       if((index - 1) == this.index && index !== 0){
+            return
+       }
         svg.append("path")
             .datum(this.map.get(this.index))
             .attr("class",'line')
@@ -174,12 +174,12 @@ export  class DrawPoint {
                 console.log("拖拽开始")
                 this.selected  = d;
                 // debugger;
-                // if(clo && ( points.indexOf(d) == 0) && (points.length > 2) ) {
-                //     console.log("这是第一个")
-                //     points.push(d)
-                //     redraw();
-                //     clo = false;
-                // }
+                if(  ( this.points.indexOf(d) == 0) && (this.points.length > 2) ) {
+                    console.log("这是第一个")
+                    this.points.push(d)
+                    this.redraw();
+                    //clo = false;
+                }
                 D3.event.sourceEvent.stopPropagation();
             })
             .on("dragend", (d,i)=>{
@@ -205,15 +205,17 @@ export  class DrawPoint {
                 switch (D3.event.keyCode) {
 
                     case 8: { // delete
+                        if (!this.selected){
+                            return
+                        }
 
-                        // var i = points.indexOf(selected);
-                        //
-                        // points.splice(i, 1);
-                        //
-                        // selected = points.length ? points[i > 0 ? i - 1 : 0] : null;
-                        //
-                        // redraw();
-                        //
+                        let i = this.points.indexOf(this.selected);
+
+                        this.points.splice(i, 1);
+
+                        this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
+
+                        this.redraw();
                         console.log('撤回')
                         break;
 
