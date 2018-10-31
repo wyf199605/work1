@@ -462,15 +462,15 @@ class PaginationScrollSpinner {
             on() {
                 d.on(self.scrollEl, 'pandown panstart panend', pan);
 
-                d.on(document.body, 'touchmove', (e) => {
+                // d.on(document.body, 'touchmove', (e) => {
                     // e.preventDefault();
-                });
+                // });
             },
             off() {
                 d.off(self.scrollEl, 'pandown panstart panend', pan);
 
                 d.off(document.body, 'touchmove', (e) => {
-                    // e.preventDefault();
+                    e.preventDefault();
                 });
             }
         }
