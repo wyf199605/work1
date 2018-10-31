@@ -2,7 +2,7 @@
 import tools = G.tools;
 import {InputBox} from "../../../../global/components/general/inputBox/InputBox";
 import {Button} from "../../../../global/components/general/button/Button";
-import {Modal} from "../../../../global/components/feedback/modal/Modal";
+import {IModal, Modal} from "../../../../global/components/feedback/modal/Modal";
 import {SelectBox} from "../../../../global/components/form/selectBox/selectBox";
 import CONF = BW.CONF;
 import d = G.d;
@@ -409,7 +409,7 @@ export class ButtonAction {
                 </div></div><div class="avatar-progress"><div class="progress-title">传输尚未开始</div></div></div>`)
         }
         let caption = response.caption;
-        let para = {
+        let para : IModal = {
             body: body,
             header: caption,
             isOnceDestroy: true,
@@ -417,6 +417,9 @@ export class ButtonAction {
             isAdaptiveCenter: true,
             isMb: false
         };
+        if(tools.isMb){
+            para.top = 30;
+        }
         if (type === 3 || type === 5) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
         }
