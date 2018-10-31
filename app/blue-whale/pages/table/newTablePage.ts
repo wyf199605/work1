@@ -140,7 +140,7 @@ export class BwTableElement extends Component{
                     cols: [],
                     url: null,
                     container: this.container,
-                    tableGet: () => null
+                    tableGet: () => this.tableModule.main
                 });
                 !sys.isMb && query.toggleCancle();
                 if(sys.isMb) {
