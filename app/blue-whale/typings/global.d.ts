@@ -54,6 +54,7 @@ interface IBW_Table{
     pictureAddrList: R_ReqAddr[]; // 图片地址
     printList: printListArr[];    // 报表打印, 标签打印
     querier: IBw_Query;           // 查询器
+    noQuery? : boolean           // 一开始不加载数据
     subButtons: R_Button[];       // 按钮
     tableAddr?: IBW_TableAddr;    // 表格编辑数据
     uiType: string;

@@ -22,6 +22,8 @@ export class PlanPage extends BasicPage {
 
     constructor(para: IPlanPagePara) {
         super(para);
+        let planModule: PlanModule;
+
         console.log(para);
         let qData = para.ui.body.elements[0];
         d.append(para.dom, this.wrapper = <div class="plan-wrapper">
@@ -33,24 +35,21 @@ export class PlanPage extends BasicPage {
                 scannableTime: 0,
                 uiPath: qData['uiPath'],
                 setting: null
-            }} search={
-                (data) => {
-                    return new Promise((resolve) => {
-                        //
-                        console.log(data);
-                        let actionAddr = G.tools.url.addObj(qData['uiPath'].dataAddr, data);
-                        console.log(actionAddr);
-                        resolve(data)
-                    })
-                }
-            }/>
+            }} search={(data) => {
+                    //
+                console.log(data);
+                let actionAddr = G.tools.url.addObj(qData['uiPath'].dataAddr, data);
+                console.log(actionAddr);
+                planModule && planModule.refresh(data);
+            }}/>
         </div>);
 
         //下半部
         BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
-            let JSON = response.body.elements[0];
-            let planModule = new PlanModule({
-                ui: JSON,
+            let ui = response.body.elements[0];
+            console.log(ui);
+            planModule = new PlanModule({
+                ui: ui,
                 container: this.wrapper
             });
         })
