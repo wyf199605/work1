@@ -4,6 +4,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {DrawPoint} from "../DrawPoint/DrawPoint";
 import d = G.d;
+import {BwRule} from "../../common/rule/BwRule";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -28,6 +29,8 @@ export class PlanModule extends Component{
 
     protected initDraw(imageUrl: string){
         d.append(this.wrapper, <div class="plan-opera">
+        return <div className="plan-content">
+            <div class="plan-opera">
                 <div class="back-opera" onclick={
                     ()=>{
                         let btn = d.queryAll('.plan-opera>div');
@@ -97,8 +100,6 @@ export class PlanModule extends Component{
                         //------------------开始绘图
 
                         this.draw.editPoint();
-
-
                     }
                 }>
                     <i className="iconfont icon-bianjimaodian"><span>编辑描点</span></i>
@@ -109,16 +110,78 @@ export class PlanModule extends Component{
                 <div>
                     <i className="iconfont icon-suofang"><span>缩放(滚轮)</span></i>
                 </div>
-            </div>);
+            </div>
+        </div>;
+    }
 
+    protected draw: DrawPoint;
+    protected ui: IBW_Plan_Table;
+    protected ajax = new BwRule.Ajax();
+
+    constructor(para){
+        super(para);
+        let ui = this.ui = para.ui;
+
+        this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+    }
+
+    protected initDraw(imageUrl: string){
+        let ui = this.ui,
+            cols = ui.cols;
 
         this.draw = new DrawPoint({
             height: 400,
             width: 700,
             image: imageUrl + "&sho_id=20",
+<<<<<<< HEAD
             container:this.wrapper
         })
 
         this.draw.render();
+=======
+            container: this.wrapper,
+            format: (data: obj) => {
+                let res: obj = {};
+                cols && cols.forEach((col) => {
+                    let name = col.name;
+                    if(data[name]){
+                        res[name] = this.format(col, data[name], data);
+                    }
+                });
+                return res;
+            }
+        });
+
+        this.draw.on(DrawPoint.EVT_AREA_CLICK, () => {
+
+        });
     }
+
+    protected bgPicture: string;
+    protected setBackground(obj: obj){
+        let backGround = this.ui.backGround;
+        if(backGround){
+            let url = BwRule.reqAddr(backGround, obj);
+            if(url != this.bgPicture){
+                this.bgPicture = url;
+                console.log(url);
+
+                // TODO 设置drawPoint图片
+            }
+        }
+    }
+
+    refresh(ajaxData?: obj){
+        this.setBackground(ajaxData);
+>>>>>>> a986a1d473bb4855ea557f0b8f51d89a82712c3a
+    }
+
+    format(field: R_Field, cellData: any, rowData: obj){
+
+    }
+
+    edit = (() => {
+
+        return {};
+    })();
 }

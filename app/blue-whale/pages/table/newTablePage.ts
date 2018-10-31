@@ -74,7 +74,7 @@ export class BwTableElement extends Component{
 
                 let query = new Query({
                     qm: bwTableEl,
-                    refresher: (ajaxData, after, before) => {
+                    refresher: (ajaxData, noQuery, after, before) => {
                         let uiPath = bwQueryEl.uiPath,
                             url = CONF.siteUrl + BwRule.reqAddr(uiPath);
 
@@ -98,6 +98,9 @@ export class BwTableElement extends Component{
                             this.tableModule && this.tableModule.destroy();
 
                             let tableEl =  response.body.elements[0];
+                            if(noQuery){
+                                tableEl.noQuery = noQuery;
+                            }
                             // this.para.tableDom = null;
                             this.tableModule = new NewTableModule({
                                 bwEl: tableEl,
@@ -110,6 +113,7 @@ export class BwTableElement extends Component{
                                     this.tableModule.main.ftable.locateToRow(locationLine,ajaxData.mobilescan);
                                 }
                             });
+
                             if (!sys.isMb) {
                                 isFirst && query.toggleCancle();
                                 this.tableModule.main.ftable.btnAdd('query', {
@@ -140,7 +144,7 @@ export class BwTableElement extends Component{
                     cols: [],
                     url: null,
                     container: this.container,
-                    tableGet: () => this.tableModule.main
+                    tableGet: () => this.tableModule && this.tableModule.main
                 });
                 !sys.isMb && query.toggleCancle();
                 if(sys.isMb) {
@@ -235,8 +239,11 @@ export class BwTableElement extends Component{
         new Inputs({
             inputs: inputs,
             container: this.wrapper,
-            tableModule : () => {
-                return this.tableModule;
+            table : () => {
+                return this.tableModule && this.tableModule.main.ftable
+            },
+            queryModule : () => {
+                return this.queryModule;
             }
         })
     }

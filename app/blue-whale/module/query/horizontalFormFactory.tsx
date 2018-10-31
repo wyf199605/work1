@@ -15,7 +15,7 @@ import {Button} from "../../../global/components/general/button/Button";
 
 export interface IHorizontalQueryModule extends IComponentPara {
     qm: IBw_Query;
-    search?: (data) => Promise<any>;
+    search?: (data) => any;
 }
 export class HorizontalQueryModule extends Component {
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
@@ -31,7 +31,7 @@ export class HorizontalQueryModule extends Component {
         }
         return this._extraWrapper;
     }
-    protected _search: (data) => Promise<any>;
+    protected _search: (data) => any;
     set search(flag) {
         this._search = flag;
     }
@@ -169,7 +169,6 @@ export class HorizontalQueryModule extends Component {
     get json() {
         let json: obj = {},str = [];
         this.forms.forEach(form => {
-            console.log(form);
             let cond: QueryConf = form.custom,
                 value = form.value;
             json[cond.field_name] = value;
