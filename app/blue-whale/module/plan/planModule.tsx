@@ -12,23 +12,6 @@ export interface IPlanModulePara extends IComponentPara{
 
 export class PlanModule extends Component{
     wrapperInit(){
-        return <div className="plan-content" />;
-    }
-
-    protected draw: DrawPoint;
-    protected ui: IBW_Plan_Table;
-
-
-    constructor(para){
-        super(para);
-        let ui = this.ui = para.ui;
-
-        this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
-
-    }
-
-    protected initDraw(imageUrl: string){
-        d.append(this.wrapper, <div class="plan-opera">
         return <div className="plan-content">
             <div class="plan-opera">
                 <div class="back-opera" onclick={
@@ -133,12 +116,6 @@ export class PlanModule extends Component{
             height: 400,
             width: 700,
             image: imageUrl + "&sho_id=20",
-<<<<<<< HEAD
-            container:this.wrapper
-        })
-
-        this.draw.render();
-=======
             container: this.wrapper,
             format: (data: obj) => {
                 let res: obj = {};
@@ -173,7 +150,6 @@ export class PlanModule extends Component{
 
     refresh(ajaxData?: obj){
         this.setBackground(ajaxData);
->>>>>>> a986a1d473bb4855ea557f0b8f51d89a82712c3a
     }
 
     format(field: R_Field, cellData: any, rowData: obj){
