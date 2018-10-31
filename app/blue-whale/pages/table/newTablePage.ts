@@ -61,7 +61,6 @@ export class BwTableElement extends Component{
         super(para);
 
         // d.classAdd(this.dom.parentElement, 'table-page');
-debugger
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
             hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
@@ -221,6 +220,10 @@ debugger
 
         !isDynamic && this.mobileScanInit(bwTableEl);
 
+        let inputs = para.tableEl.inputs;
+        if(!isDynamic && inputs){
+            this.keyStep(inputs)
+        }
 
         this.on(BwRule.EVT_REFRESH, () => {
             this.tableModule && this.tableModule.refresh();
@@ -228,11 +231,13 @@ debugger
     }
 
 
-    private keyStep(inputs, ftable : FastTable){
+    private keyStep(inputs){
         new Inputs({
             inputs: inputs,
             container: this.wrapper,
-            table: ftable,
+            tableModule : () => {
+                return this.tableModule;
+            }
         })
     }
 

@@ -15,6 +15,7 @@ interface InputsPara {
     table? : FastTable
     afterScan? : Function
     tableModule? : Function
+    queryModuel? : Function
 }
 
 /**
@@ -62,13 +63,15 @@ export class Inputs {
         let category = response.body && response.body.bodyList && response.body.bodyList[0].category || {},
             type = category.type,
             showText = category.showText,
-            ftable = this.p.table || this.p.tableModule && this.p.tableModule().main.ftable;
+            ftable = this.p.table || this.p.tableModule && this.p.tableModule() && this.p.tableModule().main.ftable;
         // ButtonAction.get().checkAction()
         this.url = category.url;
         switch (type) {
             case 0:
                 //数据覆盖
                 response.data && (ftable.data = response.data);
+                let queryModuel = this.para.queryModuel();
+                queryModuel && queryModuel.hide();
                 this.logTip(showText);
                 break;
             case 1:
@@ -132,8 +135,9 @@ export class Inputs {
             footer : {},
             onOk : () => {
                 modal.isShow = false;
-                BwRule.Ajax.fetch(CONF.siteUrl + subButtons[0].actionAddr.dataAddr,{
-                    data : atv.dataGet(),
+                let atvData = atv.dataGet();
+                let url = tools.url.addObj(CONF.siteUrl + subButtons[0].actionAddr.dataAddr, atvData ? {'atvarparams': JSON.stringify(atv.dataGet())} : null);
+                BwRule.Ajax.fetch(url,{
                     type : 'get',
                 }).then(({response}) => {
                     this.condition(response, aUrl);
@@ -159,7 +163,6 @@ export class Inputs {
 
     }
 
-
     /**
      * 初始化按键事件
      * @param para
@@ -184,11 +187,11 @@ export class Inputs {
             });
             return;
         }
-        let container = d.query('.tables', para.container) as HTMLElement;
-        container.tabIndex = parseInt(G.tools.getGuid());
+        // let container = d.query('.tables', para.container) as HTMLElement;
+        para.container.tabIndex = parseInt(G.tools.getGuid());
         para.inputs.forEach(obj => {
             let text = '', timer = null, timeInterval = obj.timeout;
-            d.on(container, 'keydown', (e: KeyboardEvent) => {
+            d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 text += e.key;
                 if (timer) {
                     clearTimeout(timer);

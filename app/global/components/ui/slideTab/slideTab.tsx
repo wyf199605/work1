@@ -62,7 +62,6 @@ export class SlideTab extends Tab{
                 }
 
                 if(direction === 'left' || direction === 'right'){
-                    panel && (panel.style.overflow = 'hidden');
                     let deltaX = currentX - disX;
                     disX = currentX;
                     if((this.current === 0 && e.direction === 'right')
@@ -82,7 +81,6 @@ export class SlideTab extends Tab{
                 this.current = Math.round(-translate / this.width);
                 d.off(document, 'touchend', endHandler);
                 d.off(this.panelContainer, 'touchmove', moveHandler);
-                panel && (panel.style.overflow = 'auto');
             })
         };
 
