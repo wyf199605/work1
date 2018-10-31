@@ -110,8 +110,8 @@ export class PlanModule extends Component{
                 </div>
             </div>);
 
+
         this.draw = new DrawPoint({
-            wraperId: '.plan-content',
             height: 400,
             width: 700,
             image: imageUrl + "&sho_id=20"
