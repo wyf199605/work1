@@ -32,6 +32,11 @@ interface IBW_UI<U>{
     caption: string; // 标题
     uiType: string;
 }
+
+interface IBW_Plan_Table extends IBW_Table{
+    backGround: R_ReqAddr;
+}
+
 interface IBW_Table{
     caption: string;
     settingId: string;  // 列顺序保存数据

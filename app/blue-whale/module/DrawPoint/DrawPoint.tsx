@@ -198,7 +198,7 @@ export  class DrawPoint {
             })
     }
 
-    private reback(){
+    reback(){
         D3.select(window)
             .on("keydown",()=> {
 
