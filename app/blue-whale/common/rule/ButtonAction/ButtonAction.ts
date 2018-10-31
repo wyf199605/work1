@@ -451,7 +451,6 @@ export class ButtonAction {
 
                         this.clickHandle(obj, data, (r) => {
                             onOk();
-                        }, url);
                         }, url, null, BwRule.atvar.dataGet());
                     }
                 }));
