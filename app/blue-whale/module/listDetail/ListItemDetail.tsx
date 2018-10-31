@@ -14,8 +14,8 @@ export class ListItemDetail {
     private wrapper: HTMLElement;
     private cells: objOf<ListItemDetailCell> = {};
     public defaultData: obj = {};
-    private currentPage: number = 1;
-    private totalNumber: number = 1;
+    public currentPage: number = 1;
+    public totalNumber: number = 1;
     private ajaxUrl: string = '';
     private actionSheet: ActionSheet;
 
@@ -42,7 +42,7 @@ export class ListItemDetail {
                     caption: field.caption,
                     type: this.getType(field.dataType || field.atrrs.dataType || ''),
                     container: cellsWrapper,
-                    detailPage:this
+                    detailPage: this
                 });
             }
         })
@@ -88,7 +88,14 @@ export class ListItemDetail {
     }
 
     // 上一页下一页加载数据
-    private changePage() {
+    changePage(page = -1) {
+        if (page > 0) {
+            if (page > this.totalNumber) {
+                this.currentPage = this.totalNumber;
+            } else {
+                this.currentPage = page;
+            }
+        }
         this.initDetailData().then(data => {
             this.render(data);
         });
@@ -106,8 +113,9 @@ export class ListItemDetail {
     initDetailButtons() {
         let buttons: R_Button[] = this.para.fm.subButtons,
             self = this;
+
         // 更多按钮
-        function createMoreBtn(buttons: R_Button[], wrapper) {
+        function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement, isPage: boolean) {
             new Button({
                 content: '更多',
                 className: 'more',
@@ -123,7 +131,7 @@ export class ListItemDetail {
                     content: b.caption,
                     onClick: () => {
                         self.actionSheet.isShow = false;
-                        subBtnEvent(index + 2);
+                        subBtnEvent(isPage ? index : index + 2);
                     }
                 })
             });
@@ -131,16 +139,17 @@ export class ListItemDetail {
                 buttons: actionBtns
             });
         }
+
         if (tools.isNotEmpty(buttons)) {
             let btnWrapper = <div className="list-item-detail-buttons"/>;
             this.wrapper.appendChild(btnWrapper);
             if (this.para.uiType === 'detail') {
-                createMoreBtn(buttons, btnWrapper);
+                createMoreBtn(buttons, btnWrapper, true);
                 this.createPageButton(btnWrapper);
             } else {
                 if (buttons.length > 2) {
                     let btns = buttons.slice(0, 2), moreBtns = buttons.slice(2);
-                    createMoreBtn(moreBtns, btnWrapper);
+                    createMoreBtn(moreBtns, btnWrapper, false);
                     btns.forEach((button, index) => {
                         new Button({
                             content: button.caption,
@@ -180,12 +189,25 @@ export class ListItemDetail {
             let btn = self.para.fm.subButtons[index];
             switch (btn.subType) {
                 case 'update_save' :
-                    new DetailModal(Object.assign({},self.para,{defaultData:self.defaultData,button:btn}));
-                    break;
                 case 'insert_save':
-                    new DetailModal(Object.assign({},self.para,{defaultData:self.defaultData,button:btn}));
+                    // 编辑
+                    new DetailModal(Object.assign({}, self.para, {
+                        defaultData: self.defaultData,
+                        button: btn,
+                        listDetail: self
+                    }));
+                    break;
+                case 'delete': {
+                    btn.refresh = 1;
+                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                        // 删除后显示下一页，如果已是最后一页，则显示上一页
+                        let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage - 1;
+                        self.changePage(currentPage);
+                    });
+                }
                     break;
                 default:
+                    // 其他按钮
                     ButtonAction.get().clickHandle(btn, self.defaultData, () => {
                     });
                     break;
@@ -286,13 +308,15 @@ export class ListItemDetail {
                 v = arr;
             } else if (type === '47' || type === '48' || type === '40') {
                 // 获取文件信息地址 （md5,unique）
-                let uniques = text.split(',');
+                let uniques = text.split(','),
+                    arr = [];
                 uniques.forEach(uniq => {
-
-                })
+                    arr.push(uniq);
+                });
+                v = arr;
             } else if (type === '43') {
-                // 附件名称
-
+                // 附件名称 TODO:???????
+                v = this.defaultData['file_id'];
             } else {
                 // dataType为空按照text类型处理
                 v = text;
