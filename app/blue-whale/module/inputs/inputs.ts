@@ -69,8 +69,8 @@ export class Inputs {
             case 0:
                 //数据覆盖
                 let queryModule = this.para.queryModule && this.para.queryModule();
+                queryModule && queryModule.hide();
                 if(queryModule && !ftable){
-                    queryModule.hide();
                     queryModule.para.refresher({}, true).then(() => {
                         response.data && (this.p.table().data = response.data);
                     })
