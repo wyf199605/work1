@@ -12,7 +12,7 @@ interface IDrapPoint extends IComponentPara{
     width:number | string
     height:number | string
     image?:string;
-    format?: (data: obj[]) => obj[];
+    format?: (data: obj) => obj;
 }
 export  class DrawPoint extends Component{
     public svg;

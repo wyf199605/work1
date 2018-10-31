@@ -207,6 +207,7 @@ export class ButtonAction {
                 }
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
+                    self.btnRefresh(btn.refresh, url);
                 }).catch(() => {
                 });
                 break;
@@ -222,11 +223,13 @@ export class ButtonAction {
                     //创建条码扫码页面
                     if(response.uiType === 'inventory' && tools.isMb){
                         this.initBarCode(response,data,dataObj);
+                        self.btnRefresh(btn.refresh, url);
                     }else{
                         self.btnPopup(response, () => {
                             self.btnRefresh(btn.refresh, url);
                         }, url);
                     }
+                    callback(response);
                 }).catch(() => {
                 });
                 break;
@@ -449,7 +452,7 @@ export class ButtonAction {
                         }
 
                         this.clickHandle(obj, data, (r) => {
-
+                            onOk();
                         }, url);
                     }
                 }));

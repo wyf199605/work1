@@ -12,22 +12,8 @@ export interface IPlanModulePara extends IComponentPara{
 
 export class PlanModule extends Component{
     wrapperInit(){
-        return <div className="plan-content" />;
-    }
-
-    protected draw: DrawPoint;
-    protected ui: IBW_Plan_Table;
-    protected ajax = new BwRule.Ajax();
-
-    constructor(para){
-        super(para);
-        let ui = this.ui = para.ui;
-
-        this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
-    }
-
-    protected initDraw(imageUrl: string){
-        d.append(this.wrapper, <div class="plan-opera">
+        return <div className="plan-content">
+            <div class="plan-opera">
                 <div class="back-opera" onclick={
                     ()=>{
                         let btn = d.queryAll('.plan-opera>div');
@@ -97,8 +83,6 @@ export class PlanModule extends Component{
                         //------------------开始绘图
 
                         this.draw.editPoint();
-
-
                     }
                 }>
                     <i className="iconfont icon-bianjimaodian"><span>编辑描点</span></i>
@@ -109,19 +93,39 @@ export class PlanModule extends Component{
                 <div>
                     <i className="iconfont icon-suofang"><span>缩放(滚轮)</span></i>
                 </div>
-            </div>);
+            </div>
+        </div>;
+    }
 
+    protected draw: DrawPoint;
+    protected ui: IBW_Plan_Table;
+    protected ajax = new BwRule.Ajax();
+
+    constructor(para){
+        super(para);
+        let ui = this.ui = para.ui;
+
+        this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+    }
+
+    protected initDraw(imageUrl: string){
+        let ui = this.ui,
+            cols = ui.cols;
 
         this.draw = new DrawPoint({
             height: 400,
             width: 700,
             image: imageUrl + "&sho_id=20",
             container: this.wrapper,
-            format: (data: obj[]) => {
-                data && data.forEach(() => {
-
+            format: (data: obj) => {
+                let res: obj = {};
+                cols && cols.forEach((col) => {
+                    let name = col.name;
+                    if(data[name]){
+                        res[name] = this.format(col, data[name], data);
+                    }
                 });
-                return null;
+                return res;
             }
         });
 
@@ -138,6 +142,8 @@ export class PlanModule extends Component{
             if(url != this.bgPicture){
                 this.bgPicture = url;
                 console.log(url);
+
+                // TODO 设置drawPoint图片
             }
         }
     }
@@ -146,7 +152,7 @@ export class PlanModule extends Component{
         this.setBackground(ajaxData);
     }
 
-    format(){
+    format(field: R_Field, cellData: any, rowData: obj){
 
     }
 
