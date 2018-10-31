@@ -23,6 +23,7 @@ export class PlanModule extends Component{
         let ui = this.ui = para.ui;
 
         this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+
     }
 
     protected initDraw(imageUrl: string){
@@ -47,7 +48,7 @@ export class PlanModule extends Component{
 
                         //把point 清楚
                         let paths = G.d.queryAll(".drawPage>svg>g>path");
-                        console.log(paths.length);
+
                         console.log(this.draw.getPoints());
                         this.draw.setIsDrawLine(false);
                         this.draw.fished(paths.length);
@@ -114,7 +115,10 @@ export class PlanModule extends Component{
         this.draw = new DrawPoint({
             height: 400,
             width: 700,
-            image: imageUrl + "&sho_id=20"
+            image: imageUrl + "&sho_id=20",
+            container:this.wrapper
         })
+
+        this.draw.render();
     }
 }

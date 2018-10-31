@@ -11,7 +11,7 @@ declare const D3;
 interface IDrapPoint extends IComponentPara{
     width:number | string
     height:number | string
-    image?:string
+    image?:string;
 }
 export  class DrawPoint extends Component{
     public svg;
@@ -29,7 +29,8 @@ export  class DrawPoint extends Component{
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
     static EVT_DELETE_DATA = '__event_delete_area_click__';
-    static EVT_EDIT_DATA = '__event_edit_area_click__'
+    static EVT_EDIT_DATA = '__event_edit_area_click__';
+    static EVT_IMG_INIT = '__event_image_area_click__';
 
     protected wrapperInit(){
         return <div className="draw-point-wrapper"/>;
@@ -80,8 +81,58 @@ export  class DrawPoint extends Component{
         this.map.set(this.index, this.points)
     }
 
-    public  render(data:obj[]){
+    public  render(data1?:obj[]){
         //
+     let   data = [
+           {'point':[[308, 41.33333206176758],[307, 147.3333282470703],[212, 148.3333282470703],[215, 42.33333206176758],[308, 41.33333206176758]],
+            'edit_one':'KFC',
+            'edit_two':'20000/月',
+            'index':'0'},
+           {'point':[[355, 97.3333358764648],[335, 206.3333282470703],[408, 170.3333282470703],[413, 97.33333587646484],[355, 97.33333587646484]],
+             'edit_one':'McDonload',
+             'edit_two':'10000/月',
+             'index':'1'}
+       ]
+        let svg = D3.select('svg').select('g');
+
+         svg.selectAll('path').data(data).enter().append('path')
+            .attr("class",'line')
+            .attr("id",function (d) {
+                return 'path'+d.index;
+            })
+            .attr("d", (d,i)=> {
+                return this.line(data[i]['point']);
+            })
+
+            let text =  svg.selectAll('text').data(data).enter().append('text')
+             .attr('fill','black')
+             .attr('font-size','14px')
+             .attr("text-anchor","middle")
+             .attr('x',function (d,i) {
+                 return d['point'][0][0];
+             })
+             .attr('y',function (d,i) {
+                 return d['point'][0][1];
+             })
+             .attr('dx',10)
+             .attr('dy',10)
+             .text(function (d) {
+                 console.log(d)
+                 return d.edit_one;
+
+             })
+
+                 text.append('tspan').data(data)
+                 .attr('x',function (d) {
+                     return d['point'][0][0];
+                 })
+                 .attr('dy','1em')
+                 .text(function (d) {
+                     return d.edit_two
+                 })
+
+
+
     }
 
     //绘图
@@ -111,7 +162,6 @@ export  class DrawPoint extends Component{
             })
 
         circle.classed("selected",  (d)=> {
-            console.log(d + "this")
             return d === this.selected;
         })
 
@@ -167,6 +217,8 @@ export  class DrawPoint extends Component{
         this.points = [];
         this.index = index;
         this.isDrawLine = false;
+        D3.selectAll('path').on('click',null);
+        console.log(this.map);
     }
 
     public editPoint(){
@@ -175,12 +227,16 @@ export  class DrawPoint extends Component{
         // 然后把ponit的点加进去
         let that = this;
         D3.selectAll('path').on('click',function(d,i){
-            that.indexStr = D3.select(this).attr('id');
-            console.log(that.indexStr);
-            that.index = parseInt(that.indexStr.slice(4,that.indexStr.length));
-            that.points = that.map.get(that.index);
-            that.isDrawLine = true;
-            that.redraw();
+           //点击完成后 不允许触发click事件
+
+                that.indexStr = D3.select(this).attr('id');
+                console.log(that.indexStr);
+                that.index = parseInt(that.indexStr.slice(4,that.indexStr.length));
+                that.points = that.map.get(that.index);
+                that.isDrawLine = true;
+                that.redraw();
+
+
 
         })
 
@@ -231,7 +287,7 @@ export  class DrawPoint extends Component{
                             return
                         }
 
-                        let i = this.points.indexOf(this.selected);
+                        let i = this.points.lastIndexOf(this.selected);
 
                         this.points.splice(i, 1);
 
