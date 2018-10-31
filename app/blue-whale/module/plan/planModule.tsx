@@ -117,4 +117,8 @@ export class PlanModule extends Component{
             image: imageUrl + "&sho_id=20"
         })
     }
+
+    refresh(){
+
+    }
 }

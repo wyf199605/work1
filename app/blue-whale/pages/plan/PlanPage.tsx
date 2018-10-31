@@ -48,9 +48,10 @@ export class PlanPage extends BasicPage {
 
         //下半部
         BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
-            let JSON = response.body.elements[0];
+            let ui = response.body.elements[0];
+            console.log(ui);
             let planModule = new PlanModule({
-                ui: JSON,
+                ui: ui,
                 container: this.wrapper
             });
         })

@@ -33,7 +33,7 @@ interface IBw_Query{
     queryparams0? : QueryConf;
     queryparams1? : QueryConf[];
     hasOption : boolean;
-    inputs : obj;
+    inputs?: obj;
     scannableField? : string;
     scannableType? : number;
     scannableTime? : number
