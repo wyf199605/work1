@@ -1,17 +1,19 @@
 /// <amd-dependency path="D3" name="D3"/>
 /// <amd-module name="DrawPoint"/>
+import Component = G.Component;
+import IComponentPara = G.IComponentPara;
+
 declare const D3;
 //开启描点连线功能
 //开启地图放大功能以及拖动功能
 //开启绘制区域功能 （） 设置区域的动画 样式 标旗 ！默认出现弹窗样式显示信息
 
-interface IDrapPoint {
-    wraperId?:string //父元素
+interface IDrapPoint extends IComponentPara{
     width:number | string
     height:number | string
     image?:string
 }
-export  class DrawPoint {
+export  class DrawPoint extends Component{
     public svg;
     public g;
     public index = 0;
@@ -24,8 +26,17 @@ export  class DrawPoint {
     public indexStr;//保存当前选中的path 下标
     public drag
 
+    static EVT_AREA_CLICK = '__event_draw_area_click__';
+    static EVT_INSERT_DATA = '__event_insert_area_click__';
+    static EVT_DELETE_DATA = '__event_delete_area_click__';
+    static EVT_EDIT_DATA = '__event_edit_area_click__'
+
+    protected wrapperInit(){
+        return <div className="draw-point-wrapper"/>;
+    }
 
     constructor(para: IDrapPoint) {
+        super(para);
         this.map = D3.map(this.points, function (d, i) {
             return i;
         })
@@ -35,11 +46,17 @@ export  class DrawPoint {
         this.line = D3.svg.line();
         //拖动
         this.InitDrag();
-        this.InitSvg(para)
+        this.InitSvg(para);
+
+
+        let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
+        events && events.forEach((f) => {
+            f && f();
+        });
     }
 
     public InitSvg(para) {
-        this.svg = D3.select(para.wraperId).append('svg')
+        this.svg = D3.select('.draw-point-wrapper').append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
             .on('mousedown',()=>{
@@ -61,6 +78,10 @@ export  class DrawPoint {
         this.points.push(this.selected = D3.mouse(svg.node()))
         console.log(this.points)
         this.map.set(this.index, this.points)
+    }
+
+    public  render(data:obj[]){
+        //
     }
 
     //绘图
@@ -145,6 +166,7 @@ export  class DrawPoint {
         D3.selectAll('path').style("stroke-dasharray",null);
         this.points = [];
         this.index = index;
+        this.isDrawLine = false;
     }
 
     public editPoint(){
