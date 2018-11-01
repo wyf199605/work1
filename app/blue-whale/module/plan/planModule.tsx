@@ -4,9 +4,11 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {DrawPoint} from "../DrawPoint/DrawPoint";
 import d = G.d;
+import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
 import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
 import CONF = BW.CONF;
+import {Button} from "../../../global/components/general/button/Button";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -16,85 +18,66 @@ export class PlanModule extends Component{
     wrapperInit(){
         return <div className="plan-content">
             <div class="plan-opera">
-                <div class="back-opera" onclick={
-                    ()=>{
-                        let btn = d.queryAll('.plan-opera>div');
-                        btn.forEach((res)=>{
-                            d.classRemove(res,'custom-button');
-                        });
-                        let currBtn = d.query('.plan-opera>.back-opera');
-                        d.classAdd(currBtn,'custom-button');
+                <Button color="error" tip="Backspace键" icon="chexiao" content="撤消" className="back-opera" onClick={() => {
 
-                        this.draw.reback();
-                    }
-                }>
-                    <i className="iconfont icon-chexiao"></i><span>撤消(Backspace键)</span>
-                </div>
-                <div class="finsh-point" onclick={
-                    () => {
-                        //完成编辑--------
+                    let btn = d.queryAll('.plan-opera>div');
+                    btn.forEach((res)=>{
+                        d.classRemove(res,'custom-button');
+                    });
+                    let currBtn = d.query('.plan-opera>.back-opera');
+                    d.classAdd(currBtn,'custom-button');
 
-                        //把point 清楚
-                        let paths = G.d.queryAll(".drawPage>svg>g>path");
+                    this.draw.reback();
+                }}/>
+                <Button color="success" icon="wanchengbianji" content="完成编辑" className="finsh-point" onClick={() => {
+                    //完成编辑--------
 
-                        console.log(this.draw.getPoints());
-                        this.draw.setIsDrawLine(false);
-                        this.draw.fished(paths.length);
+                    //把point 清楚
+                    let paths = G.d.queryAll(".drawPage>svg>g>path");
 
-                        let btn = d.queryAll('.plan-opera>div');
-                        btn.forEach((res) => {
-                            d.classRemove(res, 'custom-button');
-                        });
-                        let currBtn = d.query('.plan-opera>.finsh-point');
-                        d.classAdd(currBtn, 'custom-button');
+                    console.log(this.draw.getPoints());
+                    this.draw.setIsDrawLine(false);
+                    this.draw.fished(paths.length);
 
-                    }
-                }>
-                    <i class="iconfont icon-wanchengbianji"><span>完成编辑</span></i>
-                </div>
-                <div class="miao-dian" onclick={
-                    () => {
-                        console.log('开始描点')
-                        let btn = d.queryAll('.plan-opera>div');
-                        btn.forEach((res) => {
-                            d.classRemove(res, 'custom-button');
-                        });
+                    let btn = d.queryAll('.plan-opera>div');
+                    btn.forEach((res) => {
+                        d.classRemove(res, 'custom-button');
+                    });
+                    let currBtn = d.query('.plan-opera>.finsh-point');
+                    d.classAdd(currBtn, 'custom-button');
 
-                        let currBtn = d.query('.plan-opera>.miao-dian');
-                        d.classAdd(currBtn, 'custom-button');
-                        //------------------开始绘图
-                        let paths = G.d.queryAll(".drawPage>svg>g>path");
-                        this.draw.setIsDrawLine(true);
-                        this.draw.createPath(paths.length);
+                }}/>
+                <Button color="info" icon="maodian" content="描点" className="miao-dian" onClick={() => {
+                    console.log('开始描点')
+                    let btn = d.queryAll('.plan-opera>div');
+                    btn.forEach((res) => {
+                        d.classRemove(res, 'custom-button');
+                    });
 
+                    let currBtn = d.query('.plan-opera>.miao-dian');
+                    d.classAdd(currBtn, 'custom-button');
+                    //------------------开始绘图
+                    let paths = G.d.queryAll(".drawPage>svg>g>path");
+                    this.draw.setIsDrawLine(true);
+                    this.draw.createPath(paths.length);
+                }}/>
+                <Button color="info" icon="bianjimaodian" content="编辑描点" className="edit-dian" onClick={() => {
 
-                    }
-                }>
-                    <i class="iconfont icon-maodian"><span>描点</span></i>
-                </div>
-                <div class="edit-dian" onclick={
-                    () => {
-                        console.log('开始编辑')
-                        let btn = d.queryAll('.plan-opera>div');
-                        btn.forEach((res) => {
-                            d.classRemove(res, 'custom-button');
-                        });
+                    console.log('开始编辑')
+                    let btn = d.queryAll('.plan-opera>div');
+                    btn.forEach((res) => {
+                        d.classRemove(res, 'custom-button');
+                    });
 
-                        let currBtn = d.query('.plan-opera>.edit-dian');
-                        d.classAdd(currBtn, 'custom-button');
-                        //------------------开始绘图
+                    let currBtn = d.query('.plan-opera>.edit-dian');
+                    d.classAdd(currBtn, 'custom-button');
+                    //------------------开始绘图
 
-                        this.draw.editPoint();
-                    }
-                }>
-                    <i className="iconfont icon-bianjimaodian"><span>编辑描点</span></i>
-                </div>
-                <div>
-                    <i className="iconfont icon-tuodong"><span>拖动(空格键+左击)</span></i>
-                </div>
-                <div>
-                    <i className="iconfont icon-suofang"><span>缩放(滚轮)</span></i>
-                </div>
+                    this.draw.editPoint();
+                }}/>
+                <Button color="info" tip="空格键+左击"  icon="tuodong" content="拖动" className="" onClick={() => {}}/>
+                <Button color="info" tip="滚轮" icon="suofang" content="缩放" className="" onClick={() => {}}/>
+                <Button color="success" onClick={() => {}} content="保存" className="save-btn"/>
             </div>
         </div>;
     }
@@ -115,8 +98,8 @@ export class PlanModule extends Component{
             cols = ui.cols;
 
         this.draw = new DrawPoint({
-            height: 400,
-            width: 700,
+            height: 500,
+            width: 800,
             image: imageUrl + "&sho_id=20",
             container: this.wrapper,
             format: (data: obj) => {
@@ -150,13 +133,37 @@ export class PlanModule extends Component{
         }
     }
 
+    static initQueryParams(data: obj){
+        if(tools.isEmpty(data)){
+            return void 0;
+        }
+        let params = [];
+        for(let key in data){
+            params.push({
+                field: key.toUpperCase(),
+                values: [data[key]],
+                not: false,
+                op: 2
+            });
+        }
+        return JSON.stringify({
+            queryparams1: {"not":false, "op":0, "params": params}
+        });
+    }
+
     refresh(ajaxData?: obj){
         let ui = this.ui,
             url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
         this.setBackground(ajaxData);
-        this.ajax.fetch(url, {
+
+        this.ajax.fetch(tools.url.addObj(url, {nopage: true}), {
             needGps: ui.dataAddr.needGps,
             timeout: 30000,
+            data: PlanModule.initQueryParams(ajaxData)
+        }).then(({response}) => {
+            console.log(response);
+        }).catch(e => {
+            console.log(e);
         })
     }
 
@@ -233,6 +240,32 @@ export class PlanModule extends Component{
 
     edit = (() => {
 
-        return {};
+        let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
+            let paramData: obj = {};
+            varList && ['update', 'delete', 'insert'].forEach(key => {
+                let dataKey = varList[`${key}Type`];
+                if (varList[key] && tableData[dataKey][0]) {
+
+                    let data = BwRule.varList(varList[key], tableData[dataKey], true,
+                        !isPivot);
+                    if (data) {
+                        paramData[key] = data;
+                    }
+                }
+            });
+
+            if (!tools.isEmpty(paramData)) {
+                paramData.itemId = varList.itemId;
+            }
+            return paramData;
+        };
+
+        let save = () => {
+
+        }
+
+        return {
+            save
+        };
     })();
 }

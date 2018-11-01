@@ -18,6 +18,7 @@ export interface IButton extends IComponentPara{
     dropDown?: DropDown;
     key?: string;
     className?: string;
+    tip?: string;
 }
 /**
  * 按钮组件对象
@@ -43,6 +44,7 @@ export class Button extends Component implements IButton{
         this.color = button.color;
         this.size = button.size;
         this.dropDown = button.dropDown;
+        this.tip = button.tip;
     }
 
     public iconPre:string;
@@ -52,6 +54,17 @@ export class Button extends Component implements IButton{
     }
 
     public key: string;
+
+    protected _tip: string;
+    get tip(){
+        return this._tip;
+    }
+    set tip(tip: string){
+        tip = tip || '';
+        this._tip = tip;
+        this.wrapper.title = tip;
+    }
+
     /**
      * 按钮图标
      * 类型：string
