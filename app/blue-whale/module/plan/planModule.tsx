@@ -15,7 +15,7 @@ export interface IPlanModulePara extends IComponentPara{
 }
 
 export interface IDrawFormatData{
-    text: any; //
+    data: any; //
     name: string;
     isPoint?: boolean;
     isShow?: boolean;
@@ -154,13 +154,12 @@ export class PlanModule extends Component{
         this.draw = new DrawPoint({
             height: 500,
             width: 800,
-            image: imageUrl + "&sho_id=20",
             container: this.wrapper,
             format: (data: obj) => {
                 let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
-                    if(data[name]){
+                    if(name in data){
                         res.push(this.format(col, data[name], data));
                     }
                 });
@@ -188,7 +187,7 @@ export class PlanModule extends Component{
     protected setBackground(obj: obj){
         let backGround = this.ui.backGround;
         if(backGround){
-            let url = BwRule.reqAddr(backGround, obj);
+            let url = CONF.siteUrl + BwRule.reqAddr(backGround, obj);
             if(url != this.bgPicture){
                 this.bgPicture = url;
                 console.log(url);
@@ -216,7 +215,7 @@ export class PlanModule extends Component{
     }
 
     format(field: R_Field, cellData: any, rowData: obj): IDrawFormatData{
-        let text: string = cellData, // 文字 或 Node
+        let text: any = cellData, // 文字 或 Node
             name = field.name,
             isPoint = false,
             isShow = !field.noShow,
@@ -260,7 +259,7 @@ export class PlanModule extends Component{
             }
         }
 
-        return {text, classes, name, bgColor, color, isShow, isPoint};
+        return {data: text, classes, name, bgColor, color, isShow, isPoint};
     }
 
     edit = (() => {
