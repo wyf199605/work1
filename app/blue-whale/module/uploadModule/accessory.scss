@@ -36,6 +36,8 @@
     align-items: center;
     height: 80px;
     padding: 15px 0;
+    flex: 1 1 auto;
+    max-width: calc(100% - 40px);
     .file-icon {
       background-color: #48afe7;
       width: 50px;
@@ -44,6 +46,7 @@
       display: -webkit-flex;
       justify-content: center;
       align-items: center;
+      flex: 0 0 50px;
     }
     .app-wenjian {
       font-size: 30px;
@@ -56,8 +59,15 @@
       justify-content: space-around;
       align-items: flex-start;
       margin-left: 10px;
+      height: 100%;
+      max-width: calc(100% - 60px);
+      flex: 1 1 auto;
       .file-name {
         color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
       }
       .file-size {
         color: #b0b0b0;
@@ -71,12 +81,15 @@
     justify-content: space-between;
     align-items: center;
     .deleteBtn {
+      flex: 0 0 auto;
       color: #005bad;
       line-height: 50px;
+      min-width: 30px;
+      margin-left: 10px;
     }
   }
   // 图片上传样式
-  .images-wrapper{
+  .images-wrapper {
     display: flex;
     display: -webkit-flex;
     align-items: center;
@@ -98,13 +111,13 @@
       display: -webkit-flex;
       align-items: center;
       justify-content: center;
-      input{
+      input {
         display: none;
       }
       .text-input {
         display: none;
       }
-      .webuploader-pick{
+      .webuploader-pick {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -114,7 +127,7 @@
         display: -webkit-flex;
         align-items: center;
         justify-content: center;
-        &:after{
+        &:after {
           content: '+';
           color: #b0b0b0;
           font-weight: 200;
@@ -122,19 +135,19 @@
         }
       }
     }
-    .images-body{
+    .images-body {
       display: flex;
       display: -webkit-flex;
       align-items: center;
       justify-content: flex-start;
       flex: 0 0 auto;
-      .upload-img{
+      .upload-img {
         width: 80px;
         height: 80px;
         flex: 0 0 80px;
         position: relative;
         margin-right: 16px;
-        .close-ball{
+        .close-ball {
           position: absolute;
           right: -6px;
           top: -6px;
@@ -147,11 +160,11 @@
           align-items: center;
           color: #ffffff;
           border-radius: 50%;
-          i{
+          i {
             font-size: 8px !important;
           }
         }
-        .img-error{
+        .img-error {
           position: absolute;
           top: 0;
           left: 0;
@@ -159,10 +172,10 @@
           height: 100%;
           opacity: 0.6;
           background-color: #1b1410;
-          .error-text{
+          .error-text {
             position: absolute;
             bottom: 10px;
-            left:0;
+            left: 0;
             height: 40px;
             width: 100%;
             display: flex;
@@ -171,12 +184,12 @@
             justify-content: center;
             flex-direction: column;
             color: #ff4d6a;
-            i{
+            i {
               font-size: 20px;
             }
           }
         }
-        img{
+        img {
           width: 100%;
           height: 100%;
         }
@@ -185,6 +198,6 @@
   }
 }
 
-.up-disabled{
+.up-disabled {
   pointer-events: none !important;
 }

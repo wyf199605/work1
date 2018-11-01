@@ -47,7 +47,7 @@ interface NewFormEdit{
 export class DetailModal {
     private editModule: NewMBForm;
     constructor(private para: IDetailModal) {
-        debugger
+        document.body.classList.add('edit-overflow-hidden');
         let emPara: NewFormEdit = {fields: [],defaultData:this.para.listDetail.defaultData};
         let formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [];
@@ -67,9 +67,6 @@ export class DetailModal {
         }
         let modal = new Modal({
             isMb: true,
-            header: {
-                title: '编辑'
-            },
             className: 'detail-modal',
             isModal: true,
             isOnceDestroy: true,
@@ -162,6 +159,7 @@ export class DetailModal {
         }
     }
     destroy() {
+        document.body.classList.remove('edit-overflow-hidden')
         this.para.fm.fields.forEach(f => {
             this.editModule.destroy(f.name);
         });

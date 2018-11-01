@@ -14,8 +14,9 @@ export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' 
 
 // 文件信息
 interface IFile {
-    fileSize?: number;
-    fileName?: string;
+    unique?:string;
+    filesize?: number;
+    filename?: string;
     addr?: string;
 }
 
@@ -133,8 +134,8 @@ export class ListItemDetailCell extends Component {
                 d.append(fileWrapper, <div className="detail-cell-file-item" data-index={index}>
                     <div className="file-icon"><i className="appcommon app-wenjian"/></div>
                     <div className="file-info">
-                        <div className="file-name">{f.fileName}</div>
-                        <div className="file-size">{this.calcFileSize(f.fileSize)}</div>
+                        <div className="file-name">{f.filename}</div>
+                        <div className="file-size">{this.calcFileSize(f.filesize)}</div>
                     </div>
                     <i className="file-option appcommon app-gengduo1"/>
                 </div>);

@@ -32,8 +32,8 @@ export class AccessoryItem extends Component{
     }
 
     render(data:IFileInfo){
-        this.innerEl.fileName.innerText = data.fileName || '';
-        this.innerEl.fileSize.innerText = data.fileSize ? this.calcFileSize(data.fileSize) : '0B';
+        this.innerEl.fileName.innerText = data.filename || '';
+        this.innerEl.fileSize.innerText = data.filesize ? this.calcFileSize(data.filesize) : '0B';
     }
 
     // 获取当前索引

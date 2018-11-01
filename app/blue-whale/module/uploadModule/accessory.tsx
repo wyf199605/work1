@@ -9,19 +9,17 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import UploadModule from "./uploadModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {BwRule} from "../../common/rule/BwRule";
-import {IImage} from "./uploadImages";
 
 export interface IFileInfo {
     unique?: string;
-    fileSize?: number;
-    fileName?: string;
+    filesize?: number;
+    filename?: string;
     addr?: string;
 }
 
 export interface IAccessory extends IUploaderPara {
     caption?: string;
     uniques?: string;
-    fileInfoAddr?: R_ReqAddr;//文件信息获取地址
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
     onChange?: Function; // 上传成功回调
@@ -35,18 +33,33 @@ export class Accessory extends FormCom {
     public uploader: Uploader;
     private fileType: string = '';
     private typeUnique: string = '';
-
     set(data: string): void {
         this.value = data || '';
     }
-
+    get() {
+        let value = this.files || [],
+            trueVal = [];
+        if (this.fileType === '43') {
+            value.forEach(v => {
+                v.filename && trueVal.push(v.filename);
+            });
+        } else {
+            value.forEach(v => {
+                v.unique && trueVal.push(v.unique);
+            });
+        }
+        return trueVal.join(',');
+    }
     set value(value: string) {
         this._value = value || '';
         if (tools.isNotEmpty(value)) {
             switch (this.fileType) {
                 case '47':
                 case '48': {
-                    BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(this.para.fileInfoAddr, this.para.pageData)).then(({response}) => {
+                    let obj:obj ={};
+                    obj[this.para.nameField] = value;
+                    let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.fileInfo, Object.assign({},this.para.pageData,obj));
+                    BwRule.Ajax.fetch(fileInfoAddr).then(({response}) => {
                         this.files = response.dataArr || [];
                     })
                 }
@@ -55,8 +68,8 @@ export class Accessory extends FormCom {
                 case '43': {
                     this.files = [{
                         unique: value,
-                        fileName: this.para.pageData[this.para.nameField],
-                        fileSize: 0,
+                        filename: this.para.pageData[this.para.nameField],
+                        filesize: 0,
                         addr: ''
                     }];
                 }
@@ -86,22 +99,7 @@ export class Accessory extends FormCom {
         return this._files;
     }
 
-    get() {
-        let value = this.files || [],
-            trueVal = [];
-        if (this.fileType === '43') {
-            value.forEach(v => {
-                trueVal.push(v.fileName);
-            });
-        } else {
-            value.forEach(v => {
-                trueVal.push(v.unique);
-            });
-        }
-        return trueVal.join(',');
-    }
-
-    private accessoryBodyWrapper: HTMLElement = null;
+    private accessoryBodyWrapper: HTMLElement;
 
     protected wrapperInit(para: IAccessory): HTMLElement {
         return <div className="accessory-wrapper">
@@ -136,6 +134,7 @@ export class Accessory extends FormCom {
             accept: this.para.accept,
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
+            typeUnique:this.typeUnique,
             onComplete: (res, file, type) => {
                 if (type === this.typeUnique) {
                     if (this.loading) {
@@ -144,7 +143,7 @@ export class Accessory extends FormCom {
                         this.loading = null;
                         document.body.classList.remove('up-disabled');
                     }
-                    if (res === 'ifExist') {
+                    if (res.ifExist === '1') {
                         Modal.toast('附件已存在!');
                     }else{
                         if (res.code == 200 || res.errorCode === 0) {
@@ -153,15 +152,16 @@ export class Accessory extends FormCom {
                                 this.para.onComplete && this.para.onComplete.call(this, res, file);
                                 this.files = [{
                                     unique: res.data.blobField.value,
-                                    fileName: file.name,
-                                    fileSize: file.size,
+                                    filename: file.name,
+                                    filesize: file.size,
                                     addr: ''
                                 }];
                             } else if (this.fileType === '47') {
                                 this.value = res.data.unique;
                             } else {
-                                let v = this.get();
-                                this.value = tools.isNotEmpty(v) ? v + ',' + res.data.unique : res.data.unique;
+                                let v = this.get() || '',
+                                    unique = res.data.unique;
+                                this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
                             }
                         } else {
                             this.para.onError && this.para.onError.call(this, file);
@@ -177,16 +177,18 @@ export class Accessory extends FormCom {
             if ((this.fileType === '43' || this.fileType === '47') && files.length > 1) {
                 Modal.alert('一次只能上传一个附件!');
             } else {
-                this.para.onChange && this.para.onChange();
-                //开始上传
-                if (!this.loading) {
-                    this.loading = new Loading({
-                        msg: '上传中...',
-                        container: document.body
-                    });
-                    document.body.classList.add('up-disabled');
-                }
-                this.uploader.upload(this.typeUnique);
+               if(files.length > 0){
+                   this.para.onChange && this.para.onChange();
+                   //开始上传
+                   if (!this.loading) {
+                       this.loading = new Loading({
+                           msg: '上传中...',
+                           container: document.body
+                       });
+                       document.body.classList.add('up-disabled');
+                   }
+                   this.uploader.upload(this.typeUnique);
+               }
             }
         });
         this.uploader.on("uploadError", (file, res) => {
@@ -276,7 +278,7 @@ export class Accessory extends FormCom {
     })();
 
     private deleteAccessoryItem(index) {
-        let i = index - 1;
+        let i = index;
         let item = this._listItems[i];
         if (item) {
             item.destroy();
