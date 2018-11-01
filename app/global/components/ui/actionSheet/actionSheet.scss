@@ -39,6 +39,15 @@ $cancel-height: 44px;
         display: -webkit-flex;
         align-items: center;
         justify-content: center;
+        @import "colors";
+        @each $color in $colors{
+          &.fg-#{"" + $color}{
+            color: $color;
+          }
+          &.bg-#{"" + $color}{
+            background-color: $color;
+          }
+        }
       }
       .bg-mail{
         background-color: #3baffc;
