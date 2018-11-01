@@ -2,6 +2,7 @@
 /// <amd-module name="DrawPoint"/>
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import {IDrawFormatData} from "../plan/planModule";
 
 declare const D3;
 //开启描点连线功能
@@ -12,7 +13,7 @@ interface IDrapPoint extends IComponentPara{
     width:number | string
     height:number | string
     image?:string;
-    format?: (data: obj) => obj;
+    format?: (data: obj) => IDrawFormatData[];
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
 }
 

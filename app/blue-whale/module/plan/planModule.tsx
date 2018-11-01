@@ -15,7 +15,7 @@ export interface IPlanModulePara extends IComponentPara{
 }
 
 export interface IDrawFormatData{
-    text: any;
+    text: any; //
     name: string;
     isPoint?: boolean;
     isShow?: boolean;
@@ -157,7 +157,7 @@ export class PlanModule extends Component{
             image: imageUrl + "&sho_id=20",
             container: this.wrapper,
             format: (data: obj) => {
-                let res: obj[] = [];
+                let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
                     if(data[name]){
@@ -209,6 +209,7 @@ export class PlanModule extends Component{
             data: PlanModule.initQueryParams(ajaxData)
         }).then(({response}) => {
             console.log(response);
+            this.draw.render(response.data);
         }).catch(e => {
             console.log(e);
         })
@@ -257,10 +258,7 @@ export class PlanModule extends Component{
                     classes.push("cell-link");
                 }
             }
-
-
         }
-
 
         return {text, classes, name, bgColor, color, isShow, isPoint};
     }
