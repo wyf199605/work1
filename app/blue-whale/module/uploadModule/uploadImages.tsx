@@ -79,7 +79,7 @@ export class UploadImages extends FormCom {
     private addImg: HTMLElement;
     private imgWrapper: HTMLElement;
     private imgType: string = '';
-
+    private typeUnique: string = '';
     protected wrapperInit(para: IUploadImages): HTMLElement {
         return <div className="accessory-wrapper">
             <div className="accessory-title">{para.caption || '图片'}</div>
@@ -95,6 +95,7 @@ export class UploadImages extends FormCom {
 
     constructor(private para: IUploadImages) {
         super(para);
+        this.typeUnique = new Date().getTime() + para.field.name;
         this.imgType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.unique;
         this.createUploader();
@@ -113,7 +114,7 @@ export class UploadImages extends FormCom {
             thumbField: this.para.thumbField,
             // 上传成功
             onComplete: (res, file, type) => {
-                if (type === 2) {
+                if (type === this.typeUnique) {
                     let data = res,
                         isError = false;
                     if (tools.isNotEmpty(data.ifExist)) {
@@ -145,7 +146,7 @@ export class UploadImages extends FormCom {
                 });
                 document.body.classList.add('up-disabled');
             }
-            this.uploader.upload(2);
+            this.uploader.upload(this.typeUnique);
         });
         // 上传错误时调用
         uploader.on("uploadError", (file, res) => {

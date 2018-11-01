@@ -9,6 +9,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import UploadModule from "./uploadModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {BwRule} from "../../common/rule/BwRule";
+import {IImage} from "./uploadImages";
 
 export interface IFileInfo {
     unique?: string;
@@ -33,6 +34,7 @@ export class Accessory extends FormCom {
 
     public uploader: Uploader;
     private fileType: string = '';
+    private typeUnique: string = '';
 
     set(data: string): void {
         this.value = data || '';
@@ -114,6 +116,7 @@ export class Accessory extends FormCom {
 
     constructor(private para: IAccessory) {
         super(para);
+        this.typeUnique = new Date().getTime() + para.field.name;
         this.fileType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.uniques || '';
         this.createUploader();
@@ -134,32 +137,36 @@ export class Accessory extends FormCom {
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             onComplete: (res, file, type) => {
-                if (type === 1) {
+                if (type === this.typeUnique) {
                     if (this.loading) {
                         this.loading.hide();
                         this.loading.destroy();
                         this.loading = null;
                         document.body.classList.remove('up-disabled');
                     }
-                    if (res.code == 200 || res.errorCode === 0) {
-                        Modal.toast('上传成功!');
-                        if (this.fileType === '43'){
-                            this.para.onComplete && this.para.onComplete.call(this, res, file);
-                            this.files =[{
-                                unique:res.data.blobField.value,
-                                fileName:file.name,
-                                fileSize:file.size,
-                                addr: ''
-                            }] ;
-                        }else if(this.fileType === '47'){
-                            this.value = res.data.unique;
-                        }else{
-                            let v = this.get();
-                            this.value = tools.isNotEmpty(v) ? v + ',' + res.data.unique : res.data.unique;
+                    if (res === 'ifExist') {
+                        Modal.toast('附件已存在!');
+                    }else{
+                        if (res.code == 200 || res.errorCode === 0) {
+                            Modal.toast('上传成功!');
+                            if (this.fileType === '43') {
+                                this.para.onComplete && this.para.onComplete.call(this, res, file);
+                                this.files = [{
+                                    unique: res.data.blobField.value,
+                                    fileName: file.name,
+                                    fileSize: file.size,
+                                    addr: ''
+                                }];
+                            } else if (this.fileType === '47') {
+                                this.value = res.data.unique;
+                            } else {
+                                let v = this.get();
+                                this.value = tools.isNotEmpty(v) ? v + ',' + res.data.unique : res.data.unique;
+                            }
+                        } else {
+                            this.para.onError && this.para.onError.call(this, file);
+                            Modal.alert(res.msg || res.errorMsg);
                         }
-                    } else {
-                        this.para.onError && this.para.onError.call(this, file);
-                        Modal.alert(res.msg || res.errorMsg);
                     }
                 }
             }
@@ -179,10 +186,17 @@ export class Accessory extends FormCom {
                     });
                     document.body.classList.add('up-disabled');
                 }
-                this.uploader.upload(1);
+                this.uploader.upload(this.typeUnique);
             }
         });
-
+        this.uploader.on("uploadError", (file, res) => {
+            if (this.loading) {
+                this.loading.hide();
+                this.loading.destroy();
+                this.loading = null;
+                document.body.classList.remove('up-disabled');
+            }
+        });
         this.uploader.on("error", (type) => {
             const msg = {
                 'Q_TYPE_DENIED': '文件类型有误',
@@ -244,7 +258,7 @@ export class Accessory extends FormCom {
         let deleteEt = (e) => {
             let indexEl = d.closest(e.target, '.accessory-item'),
                 index = parseInt(indexEl.dataset.index);
-            if (this.fileType === '43'){
+            if (this.fileType === '43') {
                 this.para.onDelete && this.para.onDelete();
             }
             // 删除
