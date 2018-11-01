@@ -11,68 +11,75 @@ import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
 
 export interface IImage {
-    fileId?: string;
-    fileName?: string;
+    unique?: string;
     isError?: boolean;
     localUrl?: string;
+    extraUrl?: string;
 }
 
 interface IUploadImages extends IUploaderPara {
     caption?: string;
-    unique?:string;
+    unique?: string;
 
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
     onChange?: Function; // 上传成功回调
+    field?: R_Field; //字段
+    pageData?: obj;//页面数据
 }
 
 export class UploadImages extends FormCom {
-    set(val:string): void {
+    set(val: string): void {
         this.value = val;
     }
 
     get value() {
-        let value = this.imgs || [],
-            trueVal = [];
-        value.forEach(v => {
-            !v.isError && trueVal.push(v.fileId);
-        });
-        return trueVal.join(',');
+        return this.get();
     };
 
     set value(val: string) {
         this._value = val || '';
-        if (tools.isNotEmpty(val)){
-            let addrArr = val.split(','),
-                arr = [];
-            addrArr.forEach(md5 => {
-                // 根据md5获取文件地址
-                arr.push({
-                    fileId:md5,
-                    fileName:this.para.nameField || 'FILE_ID',
-                    isError:false,
-                    localUrl:''
+        if (tools.isNotEmpty(val)) {
+            if (this.imgType === '20') {
+                this.imgs = [{
+                    extraUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData),
+                    isError: false,
+                    localUrl: '',
+                    unique:val || ''
+                }];
+            } else {
+                let addrArr = val.split(','),
+                    arr = [];
+                addrArr.forEach(md5 => {
+                    // 根据md5获取文件地址
+                    arr.push({
+                        unique: md5,
+                        isError: false,
+                        localUrl: ''
+                    });
                 });
-            });
-            this.imgs = arr
-        }else{
+                this.imgs = arr;
+            }
+        } else {
             this.imgs = [];
         }
     }
 
-    private _imgs:IImage[];
-    set imgs(imgs:IImage[]){
+    private _imgs: IImage[];
+    set imgs(imgs: IImage[]) {
         this._imgs = imgs || [];
         this.render(this._imgs);
         this.calcScrollLeft();
     }
-    get imgs(){
+
+    get imgs() {
         return this._imgs;
     }
 
     private addImg: HTMLElement;
     private imgWrapper: HTMLElement;
-
+    private imgType: string = '';
+    private typeUnique: string = '';
     protected wrapperInit(para: IUploadImages): HTMLElement {
         return <div className="accessory-wrapper">
             <div className="accessory-title">{para.caption || '图片'}</div>
@@ -82,11 +89,14 @@ export class UploadImages extends FormCom {
             </div>
         </div>;
     }
+
     public uploader: Uploader = null;
     private loading: Loading = null;
 
     constructor(private para: IUploadImages) {
         super(para);
+        this.typeUnique = new Date().getTime() + para.field.name;
+        this.imgType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.unique;
         this.createUploader();
         this.initEvent.on();
@@ -103,50 +113,28 @@ export class UploadImages extends FormCom {
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             // 上传成功
-            onComplete: (res, file,type) => {
-                if (type === 2) {
+            onComplete: (res, file, type) => {
+                if (type === this.typeUnique) {
                     let data = res,
                         isError = false;
                     if (tools.isNotEmpty(data.ifExist)) {
                         isError = data.ifExist === '1' ? true : false;
                     }
-                    let imageId = res.data.blobField.value,
-                        imageObj: IImage = {
-                            fileId: imageId,
-                            fileName: file.name,
-                            isError: isError
-                        };
+                    let imageId = res.data.blobField.value,imageObj: IImage = {
+                        unique: imageId,
+                        isError: isError
+                    };
+                    if (this.imgType === '20'){
+                        imageObj.extraUrl =  BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData)
+                        this.para.onComplete && this.para.onComplete.call(this, data, file);
+                    }
                     this.addItem(imageObj);
-                    this.para.onComplete && this.para.onComplete.call(this, data, file);
                 }
             },
             container: this.addImg,
             text: ''
         });
         this.uploader = uploader;
-        // 文件加入上传队列时 检测改图片是否存在(iOS端无作用)
-        uploader.on('beforeFileQueued', (file) => {
-            if (file.type.split('/')[0] === 'image') {
-                let imgsArr = this.value || [],
-                    isExist = false;
-                for (let i = 0, len = imgsArr.length; i < len; i++) {
-                    let pic = imgsArr[i];
-                    if (pic.fileName === file.name) {
-                        Modal.alert('已经添加过图片' + file.name);
-                        isExist = true;
-                    }
-                }
-                if (!isExist) {
-                    //开始上传
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                Modal.alert('只支持图片格式!');
-                return false;
-            }
-        });
         // 文件加入到上传队列，开始上传
         this.uploader.on('filesQueued', (file: File) => {
             this.para.onChange && this.para.onChange();
@@ -158,7 +146,7 @@ export class UploadImages extends FormCom {
                 });
                 document.body.classList.add('up-disabled');
             }
-            this.uploader.upload(2);
+            this.uploader.upload(this.typeUnique);
         });
         // 上传错误时调用
         uploader.on("uploadError", (file, res) => {
@@ -172,8 +160,7 @@ export class UploadImages extends FormCom {
 
             } else {
                 let imageObj: IImage = {
-                    fileId: '',
-                    fileName: file.name,
+                    unique: '',
                     isError: true,
                     localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
                 };
@@ -190,7 +177,7 @@ export class UploadImages extends FormCom {
                 document.body.classList.remove('up-disabled');
             }
         });
-        uploader.on("error",  (type)=> {
+        uploader.on("error", (type) => {
             const msg = {
                 'Q_TYPE_DENIED': '文件类型有误',
                 'F_EXCEED_SIZE': '文件大小不能超过4M',
@@ -218,7 +205,7 @@ export class UploadImages extends FormCom {
 
     // 渲染附件列表
     render(data: IImage[]) {
-        if (tools.isEmpty(data)){
+        if (tools.isEmpty(data)) {
             return;
         }
         d.diff(data, this.listItems, {
@@ -256,18 +243,32 @@ export class UploadImages extends FormCom {
         para = Object.assign({}, para, {
             container: this.imgWrapper,
             index: this._imgs.length,
-            nameField: this.para.nameField
+            nameField: this.para.nameField,
+            type:this.imgType
         });
         return new UploadImagesItem(para);
     }
 
     get() {
         let value = this.imgs || [],
-            trueVal = [];
-        value.forEach(v => {
-            !v.isError && trueVal.push(v.fileId);
-        });
-        return trueVal.join(',');
+            finalVal = '';
+        switch (this.imgType){
+            case '20':
+            case '27':{
+                let uniArr = value.reverse().filter(v => v.isError === false);
+                finalVal = uniArr.filter(u => tools.isNotEmpty(u.unique))[0].unique;
+            }
+            break;
+            case '28':{
+                let trueVal = [];
+                value.forEach(v => {
+                    !v.isError && trueVal.push(v.unique);
+                });
+                finalVal = trueVal.join(',')
+            }
+            break;
+        }
+        return finalVal;
     }
 
     private initEvent = (() => {

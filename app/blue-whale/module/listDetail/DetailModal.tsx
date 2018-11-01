@@ -36,11 +36,19 @@ interface IDetailModal extends EditPagePara {
     button?:R_Button;
     listDetail?:ListItemDetail;
 }
+interface NewFormEdit{
+    fields? : ComInitP[],
+    auto? : boolean; //是否自动初始化dom
+    type? : string;
+    container?: HTMLElement;
+    defaultData?:obj;
+}
 
 export class DetailModal {
     private editModule: NewMBForm;
     constructor(private para: IDetailModal) {
-        let emPara: EditModulePara = {fields: []};
+        debugger
+        let emPara: NewFormEdit = {fields: [],defaultData:this.para.listDetail.defaultData};
         let formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [];
         for (let i = 0, len = fields.length; i < len; i++) {
@@ -84,24 +92,25 @@ export class DetailModal {
                     className: 'modal-btn eidt-confirm',
                     onClick: () => {
                         let data = this.dataGet();
+                        console.log(data);
                         if (this.validate(data)){
                             // 验证成功
-                            let button = this.para.button;
-                            button.refresh = 1;
-                            ButtonAction.get().clickHandle(button,data,() => {
-                                switch (button.subType){
-                                    case 'insert_save':{
-                                        this.para.listDetail.changePage(this.para.listDetail.totalNumber + 1);
-                                    }
-                                    break;
-                                    case 'update_save':{
-                                        this.para.listDetail.changePage(this.para.listDetail.currentPage);
-                                    }
-                                    break;
-                                }
-                                modal.isShow = false;
-                                this.destroy();
-                            });
+                            // let button = this.para.button;
+                            // button.refresh = 1;
+                            // ButtonAction.get().clickHandle(button,data,() => {
+                            //     switch (button.subType){
+                            //         case 'insert_save':{
+                            //             this.para.listDetail.changePage(this.para.listDetail.totalNumber + 1);
+                            //         }
+                            //         break;
+                            //         case 'update_save':{
+                            //             this.para.listDetail.changePage(this.para.listDetail.currentPage);
+                            //         }
+                            //         break;
+                            //     }
+                            //     modal.isShow = false;
+                            //     this.destroy();
+                            // });
                         }
                     }
                 }]
@@ -170,7 +179,7 @@ export class NewMBForm {
     get assignPromise() {
         return this.ajax.promise;
     }
-    constructor(private para: EditModulePara) {
+    constructor(private para: NewFormEdit) {
         if (Array.isArray(para.fields)) {
             para.fields.forEach((f) => {
                 this.nameFields[f.field.name] = f;
@@ -280,23 +289,31 @@ export class NewMBForm {
                 nameField: p.field.name,
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
+                field: p.field,
+                pageData:this.para.defaultData,
                 onComplete: (response) => {
-                    let data = response.data;
-                    //fileId 值加入额外数据中
-                    let upperKeyData = {};
-                    for (let field in data) {
-                        let {key, value} = data[field];
-                        upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
-                    }
-                    p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
-                    this.comsExtraData[p.field.name] = {};
-                    for (let name in upperKeyData) {
-                        if (this.coms[name]) {
-                            this.set({[name]: upperKeyData[name]});
-                        } else {
-                            this.comsExtraData[p.field.name][name] = data[name];
+                    let data = response.data,
+                        type = p.field.dataType || p.field.atrrs.dataType;
+                    // fileId 值加入额外数据中
+                    if (type === '43'){
+                        let upperKeyData = {};
+                        for (let field in data) {
+                            let {key, value} = data[field];
+                            upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
+                        }
+                        p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
+                        this.comsExtraData[p.field.name] = {};
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: upperKeyData[name]});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = data[name];
+                            }
                         }
                     }
+                },
+                onDelete(){
+                    this.comsExtraData[p.field.name] = {};
                 }
             });
             return com;
@@ -414,7 +431,8 @@ export class NewMBForm {
                 container: p.dom,
                 nameField: p.field.name,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-                unique: ''
+                pageData:this.para.defaultData,
+                field:p.field
             });
         }
 

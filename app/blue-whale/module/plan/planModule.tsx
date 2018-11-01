@@ -5,6 +5,8 @@ import IComponentPara = G.IComponentPara;
 import {DrawPoint} from "../DrawPoint/DrawPoint";
 import d = G.d;
 import {BwRule} from "../../common/rule/BwRule";
+import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
+import CONF = BW.CONF;
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -101,7 +103,7 @@ export class PlanModule extends Component{
     protected ui: IBW_Plan_Table;
     protected ajax = new BwRule.Ajax();
 
-    constructor(para){
+    constructor(para: IPlanModulePara){
         super(para);
         let ui = this.ui = para.ui;
 
@@ -118,11 +120,11 @@ export class PlanModule extends Component{
             image: imageUrl + "&sho_id=20",
             container: this.wrapper,
             format: (data: obj) => {
-                let res: obj = {};
+                let res: obj[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
                     if(data[name]){
-                        res[name] = this.format(col, data[name], data);
+                        res.push(this.format(col, data[name], data));
                     }
                 });
                 return res;
@@ -149,11 +151,84 @@ export class PlanModule extends Component{
     }
 
     refresh(ajaxData?: obj){
+        let ui = this.ui,
+            url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
         this.setBackground(ajaxData);
+        this.ajax.fetch(url, {
+            needGps: ui.dataAddr.needGps,
+            timeout: 30000,
+        })
     }
 
-    format(field: R_Field, cellData: any, rowData: obj){
+    format(field: R_Field, cellData: any, rowData: obj): obj{
+        let text: string | Node = cellData, // 文字 或 Node
+            name = field.name,
+            show = !field.noShow,
+            color: string,                  // 文字颜色
+            bgColor: string,                // 背景颜色
+            classes: string[] = [];         // 类名
+        if (field && !field.noShow && field.atrrs) {
+            let dataType = field.atrrs.dataType,
+                isImg = dataType === BwRule.DT_IMAGE;
 
+            if (isImg && field.link) {
+                // 缩略图
+                // let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData);
+                // text = <img src={url}/>;
+                // classes.push('cell-img');
+
+            } else if (dataType === BwRule.DT_MUL_IMAGE) {
+                // 多图缩略图
+                if (typeof cellData === 'string' && cellData[0]) {
+                    // url生成
+                    let urls = cellData.split(',')
+                        .map(md5 => BwRule.fileUrlGet(md5, field.name, true))
+                        .filter(url => url);
+
+                    // 多图缩略图控件
+                    if (tools.isNotEmptyArray(urls)) {
+                        text = new LayoutImage({urls}).wrapper;
+                    }
+                }
+
+                classes.push('cell-img');
+
+            } else if (dataType === '50') {
+                // 打钩打叉
+                text = <div
+                    className={`appcommon ${cellData === 1 ? 'app-xuanzhong' : 'app-guanbi1'}`}
+                    style={`color: ${cellData === 1 ? 'green' : 'red'}`}>
+                </div>;
+
+            } else if (field.name === 'STDCOLORVALUE') {
+                // 显示颜色
+                let {r, g, b} = tools.val2RGB(cellData);
+                text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
+
+            } else {
+                // 其他文字(金额,百分比,数字 等)
+                text = BwRule.formatTableText(cellData, field);
+            }
+
+            // 时间
+            if (cellData && BwRule.isTime(dataType)) {
+                text = BwRule.strDateFormat(cellData, field.atrrs.displayFormat);
+            }
+
+            // 可点击单元格样式
+            if (field.link && !isImg && (field.endField ? rowData[field.endField] === 1 : true)) {
+                color = 'blue';
+                classes.push("cell-link");
+            }
+
+            // if (this.btnsLinkName.includes(field.name)) {
+            //     classes.push("cell-link");
+            //     color = 'blue';
+            // }
+
+        }
+
+        return {text, classes, name, bgColor, color, show};
     }
 
     edit = (() => {

@@ -244,7 +244,7 @@ export class NewTableModule {
     protected subIndex = 0;
     subRefresh(rowData?:obj) {
         let bwEl = this.bwEl,
-            subUi = bwEl.subTableList && bwEl.subTableList[0],
+            subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex],
             main = this.main,
             mftable = main.ftable;
 

@@ -238,7 +238,7 @@ export class BwTableElement extends Component{
     private keyStep(inputs){
         new Inputs({
             inputs: inputs,
-            container: this.wrapper,
+            container: this.container,
             table : () => {
                 return this.tableModule && this.tableModule.main.ftable
             },

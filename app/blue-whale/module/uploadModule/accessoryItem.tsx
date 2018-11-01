@@ -48,6 +48,9 @@ export class AccessoryItem extends Component{
     }
 
     private calcFileSize(limit:number){
+        if (limit <= 0){
+            return '未知';
+        }
         let size: string = "";
         if (limit < 0.1 * 1024) { //如果小于0.1KB转化成B
             size = limit.toFixed(2) + "B";

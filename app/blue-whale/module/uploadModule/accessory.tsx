@@ -8,9 +8,11 @@ import {IUploaderPara, Uploader} from "../../../global/components/form/upload/up
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import UploadModule from "./uploadModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {BwRule} from "../../common/rule/BwRule";
+import {IImage} from "./uploadImages";
 
 export interface IFileInfo {
-    fileId?: string;
+    unique?: string;
     fileSize?: number;
     fileName?: string;
     addr?: string;
@@ -18,16 +20,21 @@ export interface IFileInfo {
 
 export interface IAccessory extends IUploaderPara {
     caption?: string;
-    unique?: string;
-    // fileInfoAddr?:
+    uniques?: string;
+    fileInfoAddr?: R_ReqAddr;//文件信息获取地址
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
     onChange?: Function; // 上传成功回调
+    field?: R_Field; //文件字段
+    onDelete?();// 删除回调
+    pageData?: obj; //页面默认数据
 }
 
 export class Accessory extends FormCom {
 
     public uploader: Uploader;
+    private fileType: string = '';
+    private typeUnique: string = '';
 
     set(data: string): void {
         this.value = data || '';
@@ -35,13 +42,27 @@ export class Accessory extends FormCom {
 
     set value(value: string) {
         this._value = value || '';
-        if (tools.isNotEmpty(value)){
-            let uniques = value.split(','),
-                files:IFileInfo[] = [];
-            uniques.forEach(uniq => {
-
-            })
-        }else{
+        if (tools.isNotEmpty(value)) {
+            switch (this.fileType) {
+                case '47':
+                case '48': {
+                    BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(this.para.fileInfoAddr, this.para.pageData)).then(({response}) => {
+                        this.files = response.dataArr || [];
+                    })
+                }
+                    break;
+                // case '40':
+                case '43': {
+                    this.files = [{
+                        unique: value,
+                        fileName: this.para.pageData[this.para.nameField],
+                        fileSize: 0,
+                        addr: ''
+                    }];
+                }
+                    break;
+            }
+        } else {
             this.files = [];
         }
     }
@@ -50,26 +71,33 @@ export class Accessory extends FormCom {
         let value = this.files || [],
             trueVal = [];
         value.forEach(v => {
-            trueVal.push(v.fileId);
+            trueVal.push(v.unique);
         });
         return trueVal.join(',');
     }
 
-    private _files:IFileInfo[];
-    set files(files:IFileInfo[]){
+    private _files: IFileInfo[];
+    set files(files: IFileInfo[]) {
         this._files = files || [];
         this.render(this._files);
     }
-    get files(){
+
+    get files() {
         return this._files;
     }
 
     get() {
         let value = this.files || [],
             trueVal = [];
-        value.forEach(v => {
-            trueVal.push(v.fileId);
-        });
+        if (this.fileType === '43') {
+            value.forEach(v => {
+                trueVal.push(v.fileName);
+            });
+        } else {
+            value.forEach(v => {
+                trueVal.push(v.unique);
+            });
+        }
         return trueVal.join(',');
     }
 
@@ -88,7 +116,9 @@ export class Accessory extends FormCom {
 
     constructor(private para: IAccessory) {
         super(para);
-        this.value = para.unique || '';
+        this.typeUnique = new Date().getTime() + para.field.name;
+        this.fileType = para.field.dataType || para.field.atrrs.dataType;
+        this.value = para.uniques || '';
         this.createUploader();
         this.initEvent.on();
     }
@@ -106,39 +136,67 @@ export class Accessory extends FormCom {
             accept: this.para.accept,
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
-            onComplete: (data, file,type) => {
-                if (type === 1) {
+            onComplete: (res, file, type) => {
+                if (type === this.typeUnique) {
                     if (this.loading) {
                         this.loading.hide();
                         this.loading.destroy();
                         this.loading = null;
                         document.body.classList.remove('up-disabled');
                     }
-                    if (data.code == 200 || data.errorCode === 0) {
-                        Modal.toast('上传成功!');
-                        this.para.onComplete && this.para.onComplete.call(this, data, file);
-                    } else {
-                        this.para.onError && this.para.onError.call(this, file);
-                        Modal.alert(data.msg || data.errorMsg);
+                    if (res === 'ifExist') {
+                        Modal.toast('附件已存在!');
+                    }else{
+                        if (res.code == 200 || res.errorCode === 0) {
+                            Modal.toast('上传成功!');
+                            if (this.fileType === '43') {
+                                this.para.onComplete && this.para.onComplete.call(this, res, file);
+                                this.files = [{
+                                    unique: res.data.blobField.value,
+                                    fileName: file.name,
+                                    fileSize: file.size,
+                                    addr: ''
+                                }];
+                            } else if (this.fileType === '47') {
+                                this.value = res.data.unique;
+                            } else {
+                                let v = this.get();
+                                this.value = tools.isNotEmpty(v) ? v + ',' + res.data.unique : res.data.unique;
+                            }
+                        } else {
+                            this.para.onError && this.para.onError.call(this, file);
+                            Modal.alert(res.msg || res.errorMsg);
+                        }
                     }
                 }
             }
         });
 
         // 有文件被选中时
-        this.uploader.on('filesQueued', (file: File) => {
-            this.para.onChange && this.para.onChange();
-            //开始上传
-            if (!this.loading) {
-                this.loading = new Loading({
-                    msg: '上传中...',
-                    container: document.body
-                });
-                document.body.classList.add('up-disabled');
+        this.uploader.on('filesQueued', (files: File[]) => {
+            if ((this.fileType === '43' || this.fileType === '47') && files.length > 1) {
+                Modal.alert('一次只能上传一个附件!');
+            } else {
+                this.para.onChange && this.para.onChange();
+                //开始上传
+                if (!this.loading) {
+                    this.loading = new Loading({
+                        msg: '上传中...',
+                        container: document.body
+                    });
+                    document.body.classList.add('up-disabled');
+                }
+                this.uploader.upload(this.typeUnique);
             }
-            this.uploader.upload(1);
         });
-
+        this.uploader.on("uploadError", (file, res) => {
+            if (this.loading) {
+                this.loading.hide();
+                this.loading.destroy();
+                this.loading = null;
+                document.body.classList.remove('up-disabled');
+            }
+        });
         this.uploader.on("error", (type) => {
             const msg = {
                 'Q_TYPE_DENIED': '文件类型有误',
@@ -161,7 +219,7 @@ export class Accessory extends FormCom {
 
     // 渲染附件列表
     render(data: IFileInfo[]) {
-        if (tools.isEmpty(data)){
+        if (tools.isEmpty(data)) {
             return;
         }
         d.diff(data, this.listItems, {
@@ -200,6 +258,9 @@ export class Accessory extends FormCom {
         let deleteEt = (e) => {
             let indexEl = d.closest(e.target, '.accessory-item'),
                 index = parseInt(indexEl.dataset.index);
+            if (this.fileType === '43') {
+                this.para.onDelete && this.para.onDelete();
+            }
             // 删除
             this.deleteAccessoryItem(index);
         };
