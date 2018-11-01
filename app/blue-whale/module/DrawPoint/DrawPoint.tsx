@@ -59,7 +59,10 @@ export  class DrawPoint extends Component{
         this.InitSvg(para);
 
 
+
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
+
+
         events && events.forEach((f) => {
             f && f();
         });
@@ -91,6 +94,9 @@ export  class DrawPoint extends Component{
     }
 
     public  render(data1?:obj[]){
+        if(tools.isEmpty(data1)){
+            return
+        }
         //
      let   data = [
            {'point':[[308, 41.33333206176758],[307, 147.3333282470703],[212, 148.3333282470703],[215, 42.33333206176758],[308, 41.33333206176758]],
@@ -223,6 +229,7 @@ export  class DrawPoint extends Component{
     public fished (index){
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray",null);
+        let currentIndex = this.index;
         // let dots = this.svg.select('g')
         //     .append('g')
         //     .attr('class',function (d,i) {
@@ -242,7 +249,10 @@ export  class DrawPoint extends Component{
         this.points = [];
         this.index = index ;
         this.isDrawLine = false;
-        D3.selectAll('path').on('click',null);
+        this.map.get(currentIndex);
+        D3.selectAll('path').on('click',()=>{
+            this.trigger('EVT_EDIT_DATA',)
+        });
         console.log(this.map);
     }
 

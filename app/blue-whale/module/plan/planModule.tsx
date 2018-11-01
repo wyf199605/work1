@@ -41,7 +41,7 @@ export class PlanModule extends Component{
                     //完成编辑--------
 
                     //把point 清楚
-                    let paths = G.d.queryAll(".drawPage>svg>g>path");
+                    let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
 
                     console.log(this.draw.getPoints());
                     this.draw.setIsDrawLine(false);
@@ -69,7 +69,7 @@ export class PlanModule extends Component{
                     let currBtn = d.query('.plan-opera>.miao-dian');
                     d.classAdd(currBtn, 'custom-button');
                     //------------------开始绘图
-                    let paths = G.d.queryAll(".drawPage>svg>g>path");
+                    let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
                     this.draw.setIsDrawLine(true);
                     this.draw.createPath(paths.length);
                 },
