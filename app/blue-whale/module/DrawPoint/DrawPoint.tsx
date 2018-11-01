@@ -13,7 +13,15 @@ interface IDrapPoint extends IComponentPara{
     height:number | string
     image?:string;
     format?: (data: obj) => obj;
+    onAreaClick?: (areaType: IAreaType) => Promise<any>;
 }
+
+interface IAreaType{
+    type: 'edit';
+    data: obj;
+    name: string;
+}
+
 export  class DrawPoint extends Component{
     public svg;
     public g;
