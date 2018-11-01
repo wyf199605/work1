@@ -14,6 +14,16 @@ export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
 }
 
+export interface IDrawFormatData{
+    text: any;
+    name: string;
+    isPoint?: boolean;
+    isShow?: boolean;
+    classes?: string[];
+    bgColor?: string;
+    color?: string;
+}
+
 export class PlanModule extends Component{
 
     wrapperInit(){
@@ -155,6 +165,17 @@ export class PlanModule extends Component{
                     }
                 });
                 return res;
+            },
+            onAreaClick: (areaType) => {
+                return new Promise<any>((resolve, reject) => {
+                    if(areaType.type === 'edit'){
+                        this.edit.editData(areaType.data).then(() => {
+                            resolve();
+                        }).catch(() => {
+                            reject();
+                        })
+                    }
+                })
             }
         });
 
@@ -171,7 +192,7 @@ export class PlanModule extends Component{
             if(url != this.bgPicture){
                 this.bgPicture = url;
                 console.log(url);
-
+                this.draw.imgUrl = url;
                 // TODO 设置drawPoint图片
             }
         }
@@ -193,10 +214,11 @@ export class PlanModule extends Component{
         })
     }
 
-    format(field: R_Field, cellData: any, rowData: obj): obj{
-        let text: string | Node = cellData, // 文字 或 Node
+    format(field: R_Field, cellData: any, rowData: obj): IDrawFormatData{
+        let text: string = cellData, // 文字 或 Node
             name = field.name,
-            show = !field.noShow,
+            isPoint = false,
+            isShow = !field.noShow,
             color: string,                  // 文字颜色
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
@@ -204,64 +226,43 @@ export class PlanModule extends Component{
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;
 
-            if (isImg && field.link) {
-                // 缩略图
-                // let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData);
-                // text = <img src={url}/>;
-                // classes.push('cell-img');
+            if(dataType === '77'){
+                isPoint = true;
+            }else{
+                if (dataType === '50') {
+                    // 打钩打叉
+                    text = <div
+                        className={`appcommon ${cellData === 1 ? 'app-xuanzhong' : 'app-guanbi1'}`}
+                        style={`color: ${cellData === 1 ? 'green' : 'red'}`}>
+                    </div>;
 
-            } else if (dataType === BwRule.DT_MUL_IMAGE) {
-                // 多图缩略图
-                if (typeof cellData === 'string' && cellData[0]) {
-                    // url生成
-                    let urls = cellData.split(',')
-                        .map(md5 => BwRule.fileUrlGet(md5, field.name, true))
-                        .filter(url => url);
+                } else if (field.name === 'STDCOLORVALUE') {
+                    // 显示颜色
+                    let {r, g, b} = tools.val2RGB(cellData);
+                    text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
 
-                    // 多图缩略图控件
-                    if (tools.isNotEmptyArray(urls)) {
-                        text = new LayoutImage({urls}).wrapper;
-                    }
+                } else {
+                    // 其他文字(金额,百分比,数字 等)
+                    text = BwRule.formatTableText(cellData, field);
                 }
 
-                classes.push('cell-img');
+                // 时间
+                if (cellData && BwRule.isTime(dataType)) {
+                    text = BwRule.strDateFormat(cellData, field.atrrs.displayFormat);
+                }
 
-            } else if (dataType === '50') {
-                // 打钩打叉
-                text = <div
-                    className={`appcommon ${cellData === 1 ? 'app-xuanzhong' : 'app-guanbi1'}`}
-                    style={`color: ${cellData === 1 ? 'green' : 'red'}`}>
-                </div>;
-
-            } else if (field.name === 'STDCOLORVALUE') {
-                // 显示颜色
-                let {r, g, b} = tools.val2RGB(cellData);
-                text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
-
-            } else {
-                // 其他文字(金额,百分比,数字 等)
-                text = BwRule.formatTableText(cellData, field);
+                // 可点击单元格样式
+                if (field.link && !isImg && (field.endField ? rowData[field.endField] === 1 : true)) {
+                    color = 'blue';
+                    classes.push("cell-link");
+                }
             }
 
-            // 时间
-            if (cellData && BwRule.isTime(dataType)) {
-                text = BwRule.strDateFormat(cellData, field.atrrs.displayFormat);
-            }
-
-            // 可点击单元格样式
-            if (field.link && !isImg && (field.endField ? rowData[field.endField] === 1 : true)) {
-                color = 'blue';
-                classes.push("cell-link");
-            }
-
-            // if (this.btnsLinkName.includes(field.name)) {
-            //     classes.push("cell-link");
-            //     color = 'blue';
-            // }
 
         }
 
-        return {text, classes, name, bgColor, color, show};
+
+        return {text, classes, name, bgColor, color, isShow, isPoint};
     }
 
     edit = (() => {
@@ -295,8 +296,10 @@ export class PlanModule extends Component{
 
         };
 
-        let editData = () => {
+        let editData = (data: obj) => {
+            return new Promise(() => {
 
+            })
         };
 
         return {
