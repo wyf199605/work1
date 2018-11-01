@@ -1,4 +1,4 @@
-/// <amd-module name="MobileScan"/>
+/// <amd-module name="KeyStep"/>
 import tools = G.tools;
 import d = G.d;
 import {Button} from "../../../global/components/general/button/Button";
@@ -13,7 +13,7 @@ interface IScanButtonPara{
     scannableTime? : number
     cols? : R_Field[]
 }
-export class MobileScan{
+export class KeyStep{ 
     private rfidFlag : boolean = true;
     private rfidArr : string[] = [];
     private p : IScanButtonPara;
@@ -29,7 +29,7 @@ export class MobileScan{
                 content: '扫码查询',
                 size: 'large',
                 container: para.container,
-                className: 'mobile-scan',
+                className: 'keystep',
                 icon:  'richscan_icon',
                 onClick: () => {
                     switch (type){

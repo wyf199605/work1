@@ -246,6 +246,7 @@ gulp.task('js', function () {
     gulpTsModule('menuMrg/menuMrg', 'menu.mrg.js');
 
 
+    // gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
 
     /*page*/
