@@ -198,12 +198,15 @@ export class ListItemDetail {
                         listDetail: self
                     }));
                     break;
-                case 'delete': {
-                    btn.refresh = 1;
+                case 'delete_save': {
                     ButtonAction.get().clickHandle(btn, self.defaultData, () => {
-                        // 删除后显示下一页，如果已是最后一页，则显示上一页
-                        let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage - 1;
-                        self.changePage(currentPage);
+                        if (self.para.uiType === 'detail') {
+                            // 删除后显示下一页，如果已是最后一页，则显示上一页
+                            let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
+                            self.changePage(currentPage);
+                            self.checkPageButtonDisabled();
+                            self.scrollToTop();
+                        }
                     });
                 }
                     break;
@@ -216,49 +219,53 @@ export class ListItemDetail {
         }
     }
 
+    private prev: Button = null;
+    private next: Button = null;
+
     private createPageButton(btnWrapper: HTMLElement) {
-        let prev = new Button({
-                content: '上一页',
-                className: 'list-detail-btn',
-                container: btnWrapper,
-                onClick: () => {
-                    // 更新页数
-                    this.currentPage !== 1 && (this.currentPage = this.currentPage - 1);
-                    // 检测按钮是否可用
-                    checkPageButtonDisabled();
-                    // 加载数据
-                    this.changePage();
-                    this.scrollToTop();
-                }
-            }),
-            next = new Button({
-                content: '下一页',
-                container: btnWrapper,
-                onClick: () => {
-                    this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
-                    checkPageButtonDisabled();
-                    this.changePage();
-                    this.scrollToTop();
-                },
-                className: 'list-detail-btn'
-            });
-        let checkPageButtonDisabled = () => {
-            if (this.totalNumber === 1) {
-                prev.disabled = true;
-                next.disabled = true;
-                return;
+        this.prev = new Button({
+            content: '上一页',
+            className: 'list-detail-btn',
+            container: btnWrapper,
+            onClick: () => {
+                // 更新页数
+                this.currentPage !== 1 && (this.currentPage = this.currentPage - 1);
+                // 检测按钮是否可用
+                this.checkPageButtonDisabled();
+                // 加载数据
+                this.changePage();
+                this.scrollToTop();
             }
-            if (this.currentPage === 1) {
-                prev.disabled = true;
-            } else if (this.currentPage === this.totalNumber) {
-                next.disabled = true;
-            } else {
-                prev.disabled = false;
-                next.disabled = false;
-            }
-        };
-        checkPageButtonDisabled();
+        });
+        this.next = new Button({
+            content: '下一页',
+            container: btnWrapper,
+            onClick: () => {
+                this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
+                this.checkPageButtonDisabled();
+                this.changePage();
+                this.scrollToTop();
+            },
+            className: 'list-detail-btn'
+        });
+        this.checkPageButtonDisabled();
     }
+
+    private checkPageButtonDisabled = () => {
+        if (this.totalNumber === 1) {
+            this.prev.disabled = true;
+            this.next.disabled = true;
+            return;
+        }
+        if (this.currentPage === 1) {
+            this.prev.disabled = true;
+        } else if (this.currentPage === this.totalNumber) {
+            this.next.disabled = true;
+        } else {
+            this.prev.disabled = false;
+            this.next.disabled = false;
+        }
+    };
 
     private scrollToTop() {
         (function smoothscroll() {
@@ -299,7 +306,7 @@ export class ListItemDetail {
                 // 多行文本
                 v = text;
             } else if (type === '20') {
-                v = [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)];
+                v = tools.isNotEmpty(text) ? [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)] : '';
             } else if (type === '27' || type === '28') {
                 // 单图和多图（唯一值） 单文件和多文件(唯一值)
                 let addrArr = text.split(','),
@@ -311,7 +318,7 @@ export class ListItemDetail {
                 v = arr;
             } else if (type === '47' || type === '48') {
                 // 获取文件信息地址 （md5,unique）
-                v = BW.CONF.siteUrl + BwRule.reqAddr(format.fileInfo, this.defaultData);
+                v = tools.isNotEmpty(format.fileInfo) ? BW.CONF.siteUrl + BwRule.reqAddr(format.fileInfo, this.defaultData) : '';
             } else if (type === '43') {
                 // 附件名称 , Blob类型
                 if (tools.isNotEmpty(text)) {
