@@ -2,7 +2,7 @@
 import tools = G.tools;
 import {InputBox} from "../../../../global/components/general/inputBox/InputBox";
 import {Button} from "../../../../global/components/general/button/Button";
-import {Modal} from "../../../../global/components/feedback/modal/Modal";
+import {IModal, Modal} from "../../../../global/components/feedback/modal/Modal";
 import {SelectBox} from "../../../../global/components/form/selectBox/selectBox";
 import CONF = BW.CONF;
 import d = G.d;
@@ -25,7 +25,7 @@ export class ButtonAction {
      * button点击后业务操作规则
      */
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
-    }, url?: string, itemId?: string) {
+    }, url?: string, itemId?: string, atvData? : obj) {
         let self = this;
         if (btn.subType === 'excel') {
 
@@ -117,7 +117,7 @@ export class ButtonAction {
                     }
                 });
             } else {
-                self.btnAction(btn, data, callback, url);
+                self.btnAction(btn, data, callback, url, atvData);
             }
         }
     }
@@ -176,13 +176,16 @@ export class ButtonAction {
      * 处理按钮规则buttonType=0:get,1:post,2put,3delete
      */
     private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
-    }, url?: string) {
+    }, url?: string, avtData? : obj) {
         let {addr, data} = BwRule.reqAddrFull(btn.actionAddr, dataObj),
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
         if(!Array.isArray(dataObj) || dataObj.length === 1){
             addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
+        }
+        if(avtData){
+            addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())});
         }
         let varType = btn.actionAddr.varType, res: any = data;
 
@@ -208,8 +211,7 @@ export class ButtonAction {
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
-                }).catch((e) => {
-                    console.log(e);
+                }).catch(() => {
                 });
                 break;
             case 'popup':
@@ -224,11 +226,13 @@ export class ButtonAction {
                     //创建条码扫码页面
                     if(response.uiType === 'inventory' && tools.isMb){
                         this.initBarCode(response,data,dataObj);
+                        self.btnRefresh(btn.refresh, url);
                     }else{
                         self.btnPopup(response, () => {
                             self.btnRefresh(btn.refresh, url);
                         }, url);
                     }
+                    callback(response);
                 }).catch(() => {
                 });
                 break;
@@ -406,7 +410,7 @@ export class ButtonAction {
                 </div></div><div class="avatar-progress"><div class="progress-title">传输尚未开始</div></div></div>`)
         }
         let caption = response.caption;
-        let para = {
+        let para : IModal = {
             body: body,
             header: caption,
             isOnceDestroy: true,
@@ -414,6 +418,9 @@ export class ButtonAction {
             isAdaptiveCenter: true,
             isMb: false
         };
+        if(tools.isMb){
+            para.top = 30;
+        }
         if (type === 3 || type === 5) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
         }
@@ -443,8 +450,8 @@ export class ButtonAction {
                         }
 
                         this.clickHandle(obj, data, (r) => {
-
-                        }, url);
+                            onOk();
+                        }, url, null, BwRule.atvar.dataGet());
                     }
                 }));
             });
@@ -665,6 +672,9 @@ export class ButtonAction {
                     offShellMonitor();
                 }
             });
+            if(type === 3){
+                BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
+            }
             return;
         };
 

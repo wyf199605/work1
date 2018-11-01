@@ -95,6 +95,7 @@ interface R_ReqAddr {
     needGps?:number; // 是否开启GPS：0 => false, 1 => true
     varList?: R_VarList[];
     type?: string;
+    addrType?:boolean;
 }
 
 interface R_Field extends COL {
@@ -125,6 +126,7 @@ interface R_Field extends COL {
     }
     chkAddr?: R_ReqAddr;
     isCanSort?: boolean;
+    fileInfo?:R_ReqAddr; // 文件信息地址
 }
 
 interface winOpen {
@@ -149,6 +151,7 @@ interface R_Button extends Btn {
     linkName?: string;
     inventoryKey?:string;
     haveRoll? : boolean; // 是否有翻页
+    icon?:string; // 图标
 
     // 前端自己加的属性
     hintAfterAction?: boolean; //点击按钮后是否提示

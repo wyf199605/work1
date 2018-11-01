@@ -1,4 +1,7 @@
 $scrren-width: 100%;
+.ios-top .flowList .tab-pane{
+  padding-top: 104px !important;
+}
 .mui-content {
   &.flowList {
     .tabParent .nav-tabs li:last-child {

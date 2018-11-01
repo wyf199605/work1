@@ -119,6 +119,7 @@ gulp.task('js', function () {
         'query/queryModule.pc',
         'query/queryConfig',
         'query/asynQuery',
+        'query/horizontalFormFactory'
     ], 'query.pc.js');
 
     // mb编辑模块
@@ -167,6 +168,7 @@ gulp.task('js', function () {
     gulpTsModule([
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
+        'listDetail/DetailModal',
     ], 'listDetail.js');
 
     //process模块
@@ -181,7 +183,19 @@ gulp.task('js', function () {
     gulpTsModule(['mail/mail'], 'mail.js');
 
     //upload模块
+
     gulpTsModule(['uploadModule/uploadModule'], 'uploadModule.js');
+
+    //drawpoint模块
+    gulpTsModule(['DrawPoint/DrawPoint'],'DrawPoint.js');
+
+    gulpTsModule([
+        'uploadModule/uploadModule',
+        'uploadModule/accessoryItem',
+        'uploadModule/accessory',
+        'uploadModule/uploadImages',
+        'uploadModule/uploadImagesItem',
+    ], 'uploadModule.js');
 
     //unBinding模块
     gulpTsModule(['unBinding/UnBinding'], 'unBinding.js');
@@ -200,6 +214,9 @@ gulp.task('js', function () {
 
     //label模块
     gulpTsModule(['labelPrint/labelPrint'], 'labelPrint.js');
+
+    // plan 模块
+    gulpTsModule(['plan/planModule'], 'plan.js');
 
     //labelModule模块
     gulpTsModule(['labelPrint/labelPrintModule'], 'labelPrintModule.js');
@@ -229,6 +246,7 @@ gulp.task('js', function () {
     gulpTsModule('menuMrg/menuMrg', 'menu.mrg.js');
 
 
+    // gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
 
     /*page*/
@@ -293,6 +311,7 @@ gulp.task('js', function () {
     gulpTsPage('rfid/RfidSetting/RfidSetting', 'RfidSetting.js');
 
     gulpTsPage('rfid/RfidBarCode/RfidBarCode','RfidBarCode.js');
+    gulpTsPage('plan/PlanPage','PlanPage.js');
 });
 
 /**

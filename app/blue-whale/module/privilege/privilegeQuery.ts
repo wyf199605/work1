@@ -380,7 +380,7 @@ export class PrivilegeQuery extends BasicPage {
                     scrollDom = iframeBody.querySelector('#list .mui-scroll'),
                     list = iframeBody.querySelector('#list'),
                     div = document.createElement('div'),
-                    htmlDom = <HTMLElement>G.d.create(`<style>header a.sys-action-back{display: none} .ulOverFlow{ height:424px; overflow-y : auto} #list{height: 100vh}</style>`);
+                    htmlDom = <HTMLElement>G.d.create(`<style>header a.sys-action-back{display: none} .ulOverFlow{ height:424px; overflow-y : auto;} #list{height: 100vh}</style>`);
 
                 contactIframe.contentDocument.head.appendChild(htmlDom);
 

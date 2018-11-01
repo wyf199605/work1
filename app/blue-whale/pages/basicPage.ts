@@ -44,7 +44,7 @@ export default class BasicPage{
             //去除匹配的第一个下标的元素
             version = andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
         }
-        if(/*para.subButtons && */version > 4 && sys.isMb){
+        if(/*para.subButtons && */version > 4 && tools.isMb){
             let timeOut = null;
             d.on(document,'touchstart',()=>{
                 let gestureIcon = d.query('.blue-gesture',document.body);
@@ -119,9 +119,7 @@ export default class BasicPage{
                                 msg: '是否跳转到首页？',
                                 callback: (flag) => {
                                     if(flag){
-                                        sys.window.open({
-                                            url: CONF.url.main
-                                        });
+                                        sys.window.backHome();
                                     }
                                 }
                             });

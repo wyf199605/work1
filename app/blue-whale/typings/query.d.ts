@@ -8,10 +8,10 @@ interface QueryConf {
     dynamic: number;
     link: string;
     type: string;
+    nosave? : boolean;
     value_list?: string[];
     atrrs? : obj;
     data? : obj[];
-    nosave? : boolean
     endFieldName? : string;
     startFieldName? : string;
 }
@@ -29,10 +29,11 @@ interface QueryParam {
 }
 interface IBw_Query{
     queryType: number;
-    atvarparams : QueryConf[]
+    atvarparams? : QueryConf[]
     queryparams0? : QueryConf;
     queryparams1? : QueryConf[];
     hasOption : boolean;
+    inputs?: obj;
     scannableField? : string;
     scannableType? : number;
     scannableTime? : number

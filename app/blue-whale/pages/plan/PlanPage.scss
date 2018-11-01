@@ -1,0 +1,82 @@
+.plan-page{
+  padding-left: 0px;
+  padding-right: 0px;
+  height: calc(100% - 23px);
+
+  .custom-button{
+    box-shadow: 0px 2px 3px #c8c8c8 inset !important;
+    border-radius: 4%;
+  }
+  .selected{
+    fill: #e60c0c;
+    stroke: #ca3025;
+  }
+  .plan-wrapper{
+    height: 100%;
+    .horizontalQueryModule{
+      position: relative;
+      height: 50px;
+      border-bottom: 1px solid #cccccc;
+    }
+    .plan-opera{
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-around;
+      height: 38px;
+      padding: 7px 0;
+      background-color: #ffffff;
+      //box-shadow: 0px 3px 4px 0px rgba(164, 164, 164, 0.14);
+      //div{
+      //  padding: 0px 8px;
+      //  &:hover{
+      //    cursor: pointer;
+      //    border: 0.5px solid #cccc;
+      //    border-radius: 5%;
+      //    text-align: center;
+      //    box-shadow: 0px 0px 1px #c8c8c8 inset;
+      //  }
+      //
+      //}
+    }
+  }
+  .plan-content{
+    height: calc(100% - 50px);
+    .draw-point-wrapper{
+      height: calc(100% - 38px);
+      overflow: auto;
+      svg{
+        background: #fff;
+        margin: 0 auto;
+        display: block;
+        g{
+          .selected{
+            fill: #e60c0c;
+            stroke: #ca3025;
+          }
+          .line{
+            fill: white;
+            stroke: steelblue;
+            fill-opacity: 0;
+          }
+          circle {
+
+            fill: #fff;
+
+            fill-opacity: .2;
+
+            cursor: move;
+
+            stroke: steelblue;
+
+            stroke-width:1.5px;
+
+          }
+        }
+      }
+    }
+
+  }
+
+}
+
+

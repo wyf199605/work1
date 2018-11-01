@@ -8,7 +8,7 @@ namespace BW{
         public window = (function(self){
             return {
                 backHome: function (){
-
+                    self.handle('backHome');
                 },
                 open: function (o: winOpen) {
                     if(typeof o.data === "object"){
@@ -79,14 +79,21 @@ namespace BW{
                     dict.event = event;
                     self.handle('wake', dict);
                 },
-                opentab : function (userid = '', accessToken = '') {
+                opentab : function (userid = '', accessToken = '', noShow?: string[]) {
                     let ja = [
-                        {icon : "home", name : "首页", url : BW.CONF.url.home},
-                        {icon : "contacts", name : "通讯", url : BW.CONF.url.contact},
-                        {icon : "message", name : "消息", url : BW.CONF.url.message},
-                        {icon : "myselfMenu", name : "我的", url : BW.CONF.url.myselfMenu}
+                        {icon : "home", name : "首页", url : BW.CONF.url.home, show: 0},
+                        {icon : "contacts", name : "通讯", url : BW.CONF.url.contact, show: 0},
+                        {icon : "message", name : "消息", url : BW.CONF.url.message, show: 0},
+                        {icon : "myselfMenu", name : "我的", url : BW.CONF.url.myselfMenu, show: 0}
                         ];
 
+                    noShow && noShow.forEach((name) => {
+                        for(let key in ja){
+                            if(ja[key].icon === name){
+                                ja[key].show = 1;
+                            }
+                        }
+                    });
                     let dict = {
                         data: JSON.stringify(ja),
                         userid,

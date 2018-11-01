@@ -13,6 +13,7 @@ import {Loading} from "../../../global/components/ui/loading/loading";
 import IComponentPara = G.IComponentPara; import Component = G.Component;
 import {BwTableModule} from "../../module/table/BwTableModule";
 import {FastTable} from "global/components/newTable/FastTable";
+import {Inputs} from "../../module/inputs/inputs";
 
 interface ITablePagePara extends BasicPagePara{
     ui: IBW_UI<IBW_Table>
@@ -60,7 +61,6 @@ export class BwTableElement extends Component{
         super(para);
 
         // d.classAdd(this.dom.parentElement, 'table-page');
-
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
             hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
@@ -74,7 +74,7 @@ export class BwTableElement extends Component{
 
                 let query = new Query({
                     qm: bwTableEl,
-                    refresher: (ajaxData, after, before) => {
+                    refresher: (ajaxData, noQuery, after, before) => {
                         let uiPath = bwQueryEl.uiPath,
                             url = CONF.siteUrl + BwRule.reqAddr(uiPath);
 
@@ -98,6 +98,9 @@ export class BwTableElement extends Component{
                             this.tableModule && this.tableModule.destroy();
 
                             let tableEl =  response.body.elements[0];
+                            if(noQuery){
+                                tableEl.noQuery = noQuery;
+                            }
                             // this.para.tableDom = null;
                             this.tableModule = new NewTableModule({
                                 bwEl: tableEl,
@@ -110,6 +113,7 @@ export class BwTableElement extends Component{
                                     this.tableModule.main.ftable.locateToRow(locationLine,ajaxData.mobilescan);
                                 }
                             });
+
                             if (!sys.isMb) {
                                 isFirst && query.toggleCancle();
                                 this.tableModule.main.ftable.btnAdd('query', {
@@ -140,7 +144,7 @@ export class BwTableElement extends Component{
                     cols: [],
                     url: null,
                     container: this.container,
-                    tableGet: () => null
+                    tableGet: () => this.tableModule && this.tableModule.main
                 });
                 !sys.isMb && query.toggleCancle();
                 if(sys.isMb) {
@@ -218,11 +222,30 @@ export class BwTableElement extends Component{
 
         }
 
-        !isDynamic && this.mobileScanInit(bwTableEl); 
+        !isDynamic && this.mobileScanInit(bwTableEl);
+
+        let inputs = para.tableEl.inputs;
+        if(!isDynamic && inputs){
+            this.keyStep(inputs)
+        }
 
         this.on(BwRule.EVT_REFRESH, () => {
             this.tableModule && this.tableModule.refresh();
         });
+    }
+
+
+    private keyStep(inputs){
+        new Inputs({
+            inputs: inputs,
+            container: this.container,
+            table : () => {
+                return this.tableModule && this.tableModule.main.ftable
+            },
+            queryModule : () => {
+                return this.queryModule;
+            }
+        })
     }
 
     private asynQuery(asynData){

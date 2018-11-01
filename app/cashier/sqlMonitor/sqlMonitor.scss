@@ -1,5 +1,7 @@
 .sqlPage{
   background-color: white;
+  overflow: hidden;
+
   .inputArea{
     width: 25%;
     float: left;
@@ -29,9 +31,11 @@
     user-select: text;
     position: relative;
     background-color: white;
-    margin-top: 15px;
+    margin-top: 205px;
     width: 100%;
+    overflow: auto;
     overflow-x: scroll;
+    max-height: calc(100vh - 205px);
   }
   .sqlTop{
     width: 100%;

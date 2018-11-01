@@ -226,6 +226,7 @@ export class FlowList {
     }
 
     private handlerTime(dateStr: string) {
+        dateStr = dateStr.replace(/\-/g, "/");
         let date = new Date(dateStr),
             year = date.getFullYear(),
             yearStr = year.toString().slice(2),

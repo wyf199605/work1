@@ -1,14 +1,15 @@
 /// <amd-module name="Modal"/>
 import d = G.d;
 import tools = G.tools;
-import IComponentPara = G.IComponentPara; import Component = G.Component;
+import IComponentPara = G.IComponentPara;
+import Component = G.Component;
 import {IModalHeaderPara, ModalHeader} from "global/components/feedback/modal/ModalHeader";
 import {IModalFooterPara, ModalFooter} from "global/components/feedback/modal/ModalFooter";
 import {Button} from "../../general/button/Button";
 import {Drag} from "components/ui/drag/drag";
 import {InputBox} from "../../general/inputBox/InputBox";
 
-interface IModal extends IComponentPara {
+export interface IModal extends IComponentPara {
     header?: IModalHeaderPara | string;
     body?: Node | DocumentFragment;
     footer?: IModalFooterPara;
@@ -21,7 +22,7 @@ interface IModal extends IComponentPara {
     isOnceDestroy?: boolean;    //是否创建完后立即销毁
     isAnimate?: boolean;    //是否加载动画，默认true，仅支持传参，不支持属性修改
     position?: string;
-    fullPosition? : string;
+    fullPosition?: string;
     isDrag?: boolean;
     top?: number;
     size?: string;
@@ -29,8 +30,10 @@ interface IModal extends IComponentPara {
     opacity?: number;
     onOk    ?: EventListener;
     onCancel?: EventListener;
-    escKey? : boolean;
+    escKey?: boolean;
     isMb?: boolean;
+    isModal?:boolean; //移动端是否模态弹出
+
     onClose  ?(): void;
 
     onLarge ?(): void;
@@ -53,7 +56,7 @@ interface IConfirm {
     callback?: (flag: boolean) => void;
 }
 
-let allModalArr:Modal[] = [];
+let allModalArr: Modal[] = [];
 
 /**
  * 模态框
@@ -62,13 +65,13 @@ export class Modal extends Component {
     private _isAnimate: boolean;    //是否加载动画，默认true，仅支持传参，不支持属性修改
     private modalScreen: HTMLElement;   //模态框背景层
     private drag: Drag; //控制拖拉开关
-    private _modalHeader : ModalHeader; // 模态框头部
-    get modalHeader(){
+    private _modalHeader: ModalHeader; // 模态框头部
+    get modalHeader() {
         return this._modalHeader
     }
 
-    private _modalFooter : ModalFooter; // 模态框脚部
-    get modalFooter(){
+    private _modalFooter: ModalFooter; // 模态框脚部
+    get modalFooter() {
         return this._modalFooter
     }
 
@@ -83,28 +86,30 @@ export class Modal extends Component {
 
         return <div tabIndex={parseInt(tools.getGuid(''))} className={className}></div>;
     }
-    private _isEsc : boolean;
-    private escKeyDown = (e : KeyboardEvent) => {
+
+    private _isEsc: boolean;
+    private escKeyDown = (e: KeyboardEvent) => {
         e.stopPropagation();
         let keyCode = e.keyCode || e.which || e.charCode;
 
-        if(keyCode === 27) {
+        if (keyCode === 27) {
             this.isShow = false;
         }
     };
 
-    set escKey(isEsc : boolean){
-        if(tools.isMb){
-           return;
+    set escKey(isEsc: boolean) {
+        if (tools.isMb) {
+            return;
         }
-        if(isEsc && !this._isEsc){
+        if (isEsc && !this._isEsc) {
             d.on(this.wrapper, 'keydown', this.escKeyDown)
-        }else if(!isEsc && this._isEsc){
+        } else if (!isEsc && this._isEsc) {
             d.off(this.wrapper, 'keydown', this.escKeyDown)
         }
         this._isEsc = isEsc;
     }
-    get escKey(){
+
+    get escKey() {
         return this._isEsc;
     }
 
@@ -112,7 +117,7 @@ export class Modal extends Component {
         // this.container = modal.container;
         this.container.classList.add('modal-box');
         // this._wrapper = d.create(`<div class="modal-wrapper"></div>`);
-
+        this.isModal = modal.isModal;
         this._isAdaptiveCenter = tools.isEmpty(modal.isAdaptiveCenter) ? false : modal.isAdaptiveCenter;
         this._isAnimate = this.isAdaptiveCenter ? false : (tools.isEmpty(modal.isAnimate) ? true : modal.isAnimate);
         // this.className = modal.className;
@@ -136,30 +141,39 @@ export class Modal extends Component {
         this.onLarge = modal.onLarge;
         this.top = modal.top;
         this.zIndex = modal.zIndex || 1001;
-        if(modal.keyDownHandle){
+        if (modal.keyDownHandle) {
             d.on(this.wrapper, 'keydown', modal.keyDownHandle)
         }
-        this.escKey = tools.isEmpty(modal.escKey)? true : modal.escKey;
+        this.escKey = tools.isEmpty(modal.escKey) ? true : modal.escKey;
 
         allModalArr.push(this);
 
     }
 
+    protected _isModal:boolean = false;
+    set isModal(isModal:boolean){
+        this._isModal = isModal;
+    }
+    get isModal(){
+        return this._isModal;
+    }
+
     protected _zIndex: number = 1001;
-    set zIndex(zIndex: number){
-        if(typeof zIndex === 'number'){
+    set zIndex(zIndex: number) {
+        if (typeof zIndex === 'number') {
             this._zIndex = zIndex;
             this.wrapper && (this.wrapper.style.zIndex = zIndex + '');
             this.modalScreen && (this.modalScreen.style.zIndex = zIndex - 1 + '');
         }
     }
-    get zIndex(){
+
+    get zIndex() {
         return this._zIndex;
     }
 
-    private _headWrapper : HTMLElement = null;
-    get headWrapper(){
-        if(this._headWrapper === null){
+    private _headWrapper: HTMLElement = null;
+    get headWrapper() {
+        if (this._headWrapper === null) {
             this._headWrapper = this._headWrapper ? this._headWrapper : <div className='head-wrapper'></div>;
             this.wrapper.appendChild(this._headWrapper);
         }
@@ -177,15 +191,15 @@ export class Modal extends Component {
         //     this._headWrapper.remove();
         //     this._headWrapper = null;
         // }
-        if(!header){
+        if (!header) {
             return;
         }
 
         this._modalHeader = new ModalHeader(Object.assign({
             container: this.headWrapper,
-            dragEl : this.wrapper,
-            isClose : true,
-        },typeof header === 'string' ? { title : header} : header));
+            dragEl: this.wrapper,
+            isClose: true,
+        }, typeof header === 'string' ? {title: header} : header));
 
         // 为头部关闭按钮绑定事件
         let close = this._modalHeader.modalCloseEl;
@@ -200,9 +214,9 @@ export class Modal extends Component {
     // }
 
     private _bodyWrapper: HTMLElement = null;
-    get bodyWrapper(){
-        if(!this._bodyWrapper){
-            this._bodyWrapper = <div className={`modal-body${tools.isMb ? ' modal-body-mobile' : ''}`} />;
+    get bodyWrapper() {
+        if (!this._bodyWrapper) {
+            this._bodyWrapper = <div className={`modal-body${tools.isMb ? ' modal-body-mobile' : ''}`}/>;
             tools.isNotEmpty(this.headWrapper) ? d.after(this.headWrapper, this._bodyWrapper) : d.prepend(this.wrapper, this._bodyWrapper);
         }
         return this._bodyWrapper;
@@ -215,7 +229,7 @@ export class Modal extends Component {
      */
     private _body: Node;
     set body(body: Node) {
-        if(!body) {
+        if (!body) {
             return;
         }
         //生成身体元素，仅一次
@@ -233,7 +247,7 @@ export class Modal extends Component {
         return this._body;
     }
 
-    private _footWrapper : HTMLElement;
+    private _footWrapper: HTMLElement;
 
     /**
      * 模态框尾部
@@ -254,11 +268,11 @@ export class Modal extends Component {
             d.remove(this._footWrapper);
         }
         // if (footer === undefined) {
-            this._modalFooter = new ModalFooter(footer);
+        this._modalFooter = new ModalFooter(footer);
         // }
         this._footer = footer;
         //挂载新的尾部
-        this._footWrapper.appendChild( this._modalFooter.wrapper);
+        this._footWrapper.appendChild(this._modalFooter.wrapper);
     }
 
     get footer() {
@@ -345,10 +359,10 @@ export class Modal extends Component {
         switch (this._position) {
             //左右居中，距离顶部40px;
             case 'default' :
-                if(isAdaptiveCenter){
+                if (isAdaptiveCenter) {
                     wrapper.style.left = '50%';
                     wrapper.style.transform = 'translateX(-50%)';
-                }else {
+                } else {
                     wrapper.style.left = (paWidth - elWidth) / 2 + 'px';
                 }
                 // wrapper.style.marginLeft = '-' + (elWidth / 2) + 'px';
@@ -357,11 +371,11 @@ export class Modal extends Component {
                 break;
             //左右上下居中
             case 'center':
-                if(isAdaptiveCenter){
+                if (isAdaptiveCenter) {
                     wrapper.style.left = '50%';
                     wrapper.style.top = '50%';
                     wrapper.style.transform = 'translateX(-50%) translateY(-50%)';
-                }else{
+                } else {
                     wrapper.style.left = (paWidth - elWidth) / 2 + 'px';
                     wrapper.style.top = (paHeight - elHeight) / 2 + 'px';
                 }
@@ -435,7 +449,7 @@ export class Modal extends Component {
     }
 
     private _isAdaptiveCenter: boolean;
-    get isAdaptiveCenter(){
+    get isAdaptiveCenter() {
         return this._isAdaptiveCenter
     }
 
@@ -464,9 +478,16 @@ export class Modal extends Component {
                 if (this.modalScreen) {
                     this.modalScreen.style.pointerEvents = 'auto';
                 }
+                if (tools.isMb && this.isModal){
+                    this.wrapper.classList.remove('modal-animate-up-mb');
+                }
             }, 300);
             if (this._isAnimate) {
-                d.classAdd(this.wrapper, `modal-animate-${this._position || 'default'} animate-in`);
+                if (tools.isMb && this.isModal) {
+                    d.classAdd(this.wrapper, `modal-animate-up-mb`);
+                } else {
+                    d.classAdd(this.wrapper, `modal-animate-${this._position || 'default'} animate-in`);
+                }
                 // this.wrapper.classList.add('modal-animate-full');
                 // switch (this._position) {
                 //     //设置浮动框出现动画
@@ -510,29 +531,47 @@ export class Modal extends Component {
             if (this._onClose) {
                 this._onClose();
             }
+            if (this.wrapper) {
+                if (this._isAnimate) {
+                    if (tools.isMb && this.isModal) {
+                        this.wrapper.classList.add('modal-animate-down-mb');
+                    } else {
+                        this.wrapper.classList.remove('animate-in');
+                    }
+                }
+                if (tools.isMb && this.isModal) {
+                    setTimeout(() => {
+                        this.wrapper.style.display = 'none';
+                        this.wrapper.style['display'] = 'none';
+                    }, 300);
+                } else {
+                    this.wrapper.style.display = 'none';
+                    this.wrapper.style['display'] = 'none';
+                }
+            }
             //若_isOnceDestroy为真，即创建后立即销毁，则直接调用destroy()后返回；
             if (this._isOnceDestroy) {
-                this.destroy();
-                return;
-            }
-            if(this.wrapper){
-                this.wrapper.style.display = 'none';
-                if (this._isAnimate) {
-                    this.wrapper.classList.remove('animate-in');
+                if (tools.isMb && this.isModal){
+                    setTimeout(()=>{
+                        this.destroy();
+                        return;
+                    },300)
+                }else{
+                    this.destroy();
+                    return;
                 }
-                this.wrapper.style['display'] = 'none';
             }
             if (this._isBackground) {
                 this.modalScreen && (
                     this.modalScreen.classList.remove('lock-active-in'),
-                this.modalScreen.classList.add('lock-active-out'),
-                //     d.once(this.modalScreen, 'animationend', () => {
-                //         this.modalScreen.style.display = 'none';
-                //         this.modalScreen.classList.remove('lock-screen');
+                        this.modalScreen.classList.add('lock-active-out'),
+                        //     d.once(this.modalScreen, 'animationend', () => {
+                        //         this.modalScreen.style.display = 'none';
+                        //         this.modalScreen.classList.remove('lock-screen');
 
-                this.modalScreen.style.display = 'none',
-                this.modalScreen.classList.remove('lock-screen')
-                )
+                        this.modalScreen.style.display = 'none',
+                        this.modalScreen.classList.remove('lock-screen')
+                );
 
                 this._container && this._container.classList.remove('overflow-hidden');
             }
@@ -762,14 +801,15 @@ export class Modal extends Component {
      * 放大模态框时触发事件
      */
     private _onLarge ?(): void;
-    fullPosition : string;
+
+    fullPosition: string;
 
     set onLarge(callback) {
         let modalEnlarge = d.query(`.modal-enlarge`, this.wrapper);
         if (modalEnlarge) {
             d.on(modalEnlarge, 'click', () => {
                 let className = 'full-screen';
-                if(this.fullPosition){
+                if (this.fullPosition) {
                     className = 'full-screen-fixed';
                 }
                 d.classToggle(this.wrapper, className);
@@ -789,7 +829,7 @@ export class Modal extends Component {
     /**
      *静态方式创建alert框，使用后立即销毁
      */
-    static alert(msg:any = '', title?: string, onClick?: Function) : Modal{
+    static alert(msg: any = '', title?: string, onClick?: Function): Modal {
         //将msg转为json字符串
         if (msg instanceof Object || Array.isArray(msg)) {
             msg = JSON.stringify(msg);
@@ -803,7 +843,7 @@ export class Modal extends Component {
         let inputBox = new InputBox({}),
             okBtn = new Button({content: '确定', type: 'default', key: 'okBtn'});
 
-        if(onClick){
+        if (onClick) {
             okBtn.onClick = () => onClick();
         }
 
@@ -856,8 +896,8 @@ export class Modal extends Component {
         }
         let inputBox = new InputBox();
         inputBox.addItem(new Button({
-            content : leftContent,
-            onClick : (index) => {
+            content: leftContent,
+            onClick: (index) => {
                 if (confirm && confirm.callback && typeof  confirm.callback === 'function') {
                     confirm.callback(false);
                 }
@@ -865,8 +905,8 @@ export class Modal extends Component {
             }
         }));
         inputBox.addItem(new Button({
-            content : rightContent,
-            onClick : (index) => {
+            content: rightContent,
+            onClick: (index) => {
                 if (confirm && confirm.callback && typeof  confirm.callback === 'function') {
                     confirm.callback(true);
                 }
@@ -882,7 +922,7 @@ export class Modal extends Component {
             className: 'modal-prompt',
             body: document.createTextNode(msg),
             footer: {
-                rightPanel : inputBox
+                rightPanel: inputBox
             }
         });
         m.modalScreen.style.zIndex = '1001';
@@ -946,7 +986,7 @@ export class Modal extends Component {
         }
         // this.remove();
 
-        if( typeof cb === 'function'){
+        if (typeof cb === 'function') {
             cb();
         }
         super.destroy();
@@ -971,7 +1011,7 @@ export class Modal extends Component {
     // }
 
 
-    constructor( para: IModal = {}) {
+    constructor(para: IModal = {}) {
 
         super(para);
         this.init(para);

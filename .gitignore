@@ -4,6 +4,6 @@ node_modules/
 test/
 app/package-lock.json
 .gulp-scss-cache/
-/dist.min/
 /dist/
+/dist.min/
 .gitignore

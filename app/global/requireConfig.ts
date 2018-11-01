@@ -29,7 +29,7 @@ namespace G{
                 flatpickr: ['../plugin/flatpickr/flatpickr.min.1'],
                 AceEditor: ['../plugin/aceEditor/ace'],
                 raphael:['../plugin/raphael/raphael.min'],
-                D3: ['../plugin/d3/d3.v4.min'],
+                D3: ['../plugin/d3/d3.v3.min'],
                 // picker: ['../web/plugin/mui/js/mui.picker.min']
             }, config.paths),
 

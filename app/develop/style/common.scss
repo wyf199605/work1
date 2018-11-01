@@ -1,0 +1,64 @@
+.priv-modal {
+  .modal-header {
+    display: none;
+  }
+  .modal-body {
+    padding: 0;
+    margin-bottom: 0;
+  }
+  .pageIframe {
+    transition: all 0.3s ease;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    width: 100%;
+    border: none;
+    height: 390px !important;
+    overflow: hidden !important;
+    body {
+      line-height: 60px;
+    }
+  }
+}
+.indexedPage{
+  overflow: hidden !important;
+  #done.mui-disabled{
+    color: gray;
+  }
+  .mui-table-view-cell{
+    padding: 11px 19px;
+  }
+  .mui-table-view-cell.mui-collapse .mui-table-view-cell>a:not(.mui-btn){
+    margin-left: -30px !important;
+    padding-left: 30px !important;
+  }
+  .mui-table-view-cell.mui-active > a{
+    background-color: #eee;
+  }
+  .mui-table-view-cell.mui-active{
+    background-color: transparent;
+  }
+  .mui-table-view-cell.mui-collapse.mui-active .mui-collapse-content, .mui-table-view-cell.mui-collapse.mui-active .mui-table-view {
+    display: none;
+  }
+  .mui-table-view-cell.mui-collapse.mui-active > .mui-collapse-content, .mui-table-view-cell.mui-collapse.mui-active > .mui-table-view{
+    display: block;
+  }
+  .mui-table-view .mui-table-view-cell.mui-checkbox{
+    padding-left: 55px !important;
+  }
+  .search .mui-table-view .mui-table-view-cell .text:first-line{
+    font-size: 15px;
+    color: #333;
+  }
+  .search .mui-table-view-cell .text {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #666;
+    width: 100%;
+  }
+  .mui-table-view-cell.mui-checkbox input[type=checkbox], .mui-table-view-cell.mui-radio input[type=radio] {
+    top: calc(50% - 16px);
+  }
+}

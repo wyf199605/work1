@@ -40,7 +40,7 @@ export class AuthoritySearchPage extends SPAPage {
                 }
                 dataAddr = tools.url.addObj('/app_sanfu_retail/v1/sso', {
                     userid: localStorage.getItem('userId'),
-                    forwardurl: tools.url.addObj(urlStrem, {isMb: true, output: 'json'})
+                    forwardurl: urlStrem
                 });
                 body.elements[0].dataAddr.dataAddr = dataAddr;
                 localStorage.setItem('authority_search_elements',JSON.stringify(response.body.elements[0]));

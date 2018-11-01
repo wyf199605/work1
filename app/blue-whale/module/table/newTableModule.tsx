@@ -231,14 +231,20 @@ export class NewTableModule {
         let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
             ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
             qm = ajaxData.queryoptionsparam,
-            section = (typeof qm === 'string') && JSON.parse(ajaxData.queryoptionsparam);
+            section;
+        try {
+            section = (typeof qm === 'string') && JSON.parse(ajaxData.queryoptionsparam)
+        }catch (e){
+
+        }
+
         return section && section.section
     }
 
     protected subIndex = 0;
     subRefresh(rowData?:obj) {
         let bwEl = this.bwEl,
-            subUi = bwEl.subTableList && bwEl.subTableList[0],
+            subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex],
             main = this.main,
             mftable = main.ftable;
 
@@ -598,7 +604,10 @@ export class NewTableModule {
                             for(let key in data){
                                 let hCell = row.cellGet(key) as TableDataCell;
                                 if(hCell && hCell !== cell){
-                                    hCell.data = data[key] || '';
+                                    let cellData = data[key];
+                                    if(hCell.data != cellData){
+                                        hCell.data = cellData || '';
+                                    }
                                 }
                             }
                             if (field.elementType === 'lookup') {
@@ -637,6 +646,7 @@ export class NewTableModule {
                         }
                     }) : null;
 
+                    // 设置默认值
                     if (com instanceof FormCom) {
                         com.set(value);
                     }

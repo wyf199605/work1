@@ -9,8 +9,9 @@ import d = G.d;
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {BasicTable} from "global/components/table/basicTable";
 import {MobileScan} from "../mobileScan/MobileScan";
+import {Inputs} from "../inputs/inputs";
+import {BwMainTableModule} from "../table/BwMainTable";
 
 export interface QueryModulePara{
     qm: IBw_Query,
@@ -19,7 +20,7 @@ export interface QueryModulePara{
     cols : R_Field[],
     url : string,
     // table?: BasicTable,
-    tableGet(): BasicTable;
+    tableGet(): BwMainTableModule;
 }
 
 
@@ -121,6 +122,24 @@ export abstract class QueryModule {
                 this.search();
             },10);
         }
+
+        this.keyStep(this.para.qm.inputs)
+    }
+
+    private keyStep(inputs){
+        if(!inputs){
+            return;
+        }
+        new Inputs({
+            inputs: inputs,
+            container: this.para.container,
+            table : () => {
+                return this.para.tableGet() && this.para.tableGet().ftable
+            },
+            queryModule : () => {
+                return this
+            },
+        })
     }
 
     get wrapper(){

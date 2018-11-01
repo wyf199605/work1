@@ -1,19 +1,20 @@
 ///<amd-module name="Inputs"/>
 import d = G.d;
 import CONF = BW.CONF;
+import tools = G.tools;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Toast} from "../../../global/components/feedback/toast/Toast";
 import {BwRule} from "../../common/rule/BwRule";
-import {FastTable} from "../../../global/components/newTable/FastTable";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 
 interface InputsPara {
     inputs: R_Input[]
     container: HTMLElement
     keyField? : string
-    table? : FastTable
+    table? : Function
     afterScan? : Function
     tableModule? : Function
+    queryModule? : Function
 }
 
 /**
@@ -48,59 +49,72 @@ export class Inputs {
     private keyStep(aUrl){
         BwRule.Ajax.fetch(aUrl)
             .then(({response}) => {
-                let elements = response.body && response.body.elements && response.body.elements[0] && response.body.elements[0];
-                if(elements){
-                    this.atvarParams(elements.atvarparams, elements.subButtons, aUrl);
-                    return;
-                }
-                let category = response.body && response.body.bodyList && response.body.bodyList[0].category || {},
-                    type = category.type,
-                    showText = category.showText,
-                    ftable = this.p.table || this.p.tableModule && this.p.tableModule().main.ftable;
-                // ButtonAction.get().checkAction()
-                this.url = category.url;
-                switch (type) {
-                    case 0:
-                        //数据覆盖
-                        response.data && (ftable.data = response.data);
-                        this.logTip(showText);
-                        break;
-                    case 1:
-                        //标签打印
-                        // debugger
-                        ftable.labelPrint.show(ftable.labelBtn.wrapper, category.printList, () => {
-                            this.keyStep(CONF.siteUrl + this.url);
-                        });
-                        this.logTip(showText);
-                        break;
-                    case 2:
-                        //提示错误信息
-                        Modal.alert(showText);
-                        break;
-                    case 3:
-                        //提示信息,确定(下一步)/取消
-                        Modal.confirm({
-                            msg: showText,
-                            btns: ['取消', '确定'],
-                            callback: (index) => {
-                                if (index === true) {
-                                    this.keyStep(CONF.siteUrl + this.url);
-                                } else {
-                                    this.url = null;
-                                }
-                            }
-                        });
-                        break;
-                    case 4:
-                        //提示信息,自动下一步
-                        this.keyStep(CONF.siteUrl + this.url);
-                        this.logTip(showText);
-                        break;
-                }
-                if (!type && type !== 0) {
-                    this.logTip(showText);
-                }
+                this.condition(response,aUrl)
             })
+    }
+
+    private condition(response, aUrl){
+        let elements = response.body && response.body.elements && response.body.elements[0] && response.body.elements[0];
+        if(elements){
+            this.atvarParams(elements.atvarparams, elements.subButtons, aUrl);
+            return;
+        }
+        let category = response.body && response.body.bodyList && response.body.bodyList[0].category || {},
+            type = category.type,
+            showText = category.showText,
+            ftable = tools.isFunction(this.p.table) && this.p.table();
+
+        this.url = category.url;
+        switch (type) {
+            case 0:
+                //数据覆盖
+                let queryModule = this.para.queryModule && this.para.queryModule();
+                queryModule && queryModule.hide();
+                if(queryModule && !ftable){
+                    queryModule.para.refresher({}, true).then(() => {
+                        response.data && (this.p.table().data = response.data);
+                    })
+                }else {
+                    response.data && ftable && (ftable.data = response.data);
+                }
+                this.logTip(showText);
+                break;
+            case 1:
+                //标签打印
+                // debugger
+
+                ftable.labelPrint.show(ftable.labelBtn.wrapper, category.printList, () => {
+                    this.keyStep(CONF.siteUrl + this.url);
+                });
+                this.logTip(showText);
+                break;
+            case 2:
+                //提示错误信息
+                Modal.alert(showText);
+                break;
+            case 3:
+                //提示信息,确定(下一步)/取消
+                Modal.confirm({
+                    msg: showText,
+                    btns: ['取消', '确定'],
+                    callback: (index) => {
+                        if (index === true) {
+                            this.keyStep(CONF.siteUrl + this.url);
+                        } else {
+                            this.url = null;
+                        }
+                    }
+                });
+                break;
+            case 4:
+                //提示信息,自动下一步
+                this.keyStep(CONF.siteUrl + this.url);
+                this.logTip(showText);
+                break;
+        }
+        if (!type && type !== 0) {
+            this.logTip(showText);
+        }
     }
 
     private logTip(showText){
@@ -109,6 +123,7 @@ export class Inputs {
             duration: 0,
             type: 'simple',
             isClose: true,
+            className : 'max-index',
             position: 'bottom',
             content: showText,
             container: this.para.container
@@ -121,15 +136,18 @@ export class Inputs {
               title : '提示'
             },
             isOnceDestroy : true,
+            isMb : false,
+            top : 50,
             body : d.create('<div class="keystep"></div>') as HTMLElement,
             footer : {},
             onOk : () => {
                 modal.isShow = false;
-                BwRule.Ajax.fetch(CONF.siteUrl + subButtons[0].actionAddr.dataAddr,{
-                    data : atv.dataGet(),
+                let atvData = atv.dataGet();
+                let url = tools.url.addObj(CONF.siteUrl + subButtons[0].actionAddr.dataAddr, atvData ? {'atvarparams': JSON.stringify(atv.dataGet())} : null);
+                BwRule.Ajax.fetch(url,{
                     type : 'get',
                 }).then(({response}) => {
-                    this.keyStep(aUrl)
+                    this.condition(response, aUrl);
                 })
             }
         });
@@ -151,7 +169,6 @@ export class Inputs {
         });
 
     }
-
 
     /**
      * 初始化按键事件
@@ -177,11 +194,11 @@ export class Inputs {
             });
             return;
         }
-        let container = d.query('.tables', para.container) as HTMLElement;
-        container.tabIndex = parseInt(G.tools.getGuid());
+        // let container = d.query('.tables', para.container) as HTMLElement;
+        para.container.tabIndex = parseInt(G.tools.getGuid());
         para.inputs.forEach(obj => {
             let text = '', timer = null, timeInterval = obj.timeout;
-            d.on(container, 'keydown', (e: KeyboardEvent) => {
+            d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 text += e.key;
                 if (timer) {
                     clearTimeout(timer);
@@ -200,6 +217,7 @@ export class Inputs {
         });
     }
 
+
     /**
      * 正则匹配按键
      * @param inputs
@@ -210,7 +228,7 @@ export class Inputs {
         let regArr,
             data;
         inputs.forEach(d => {
-            if (d.fieldRegex && d.inputType === '2') {
+            if (d.fieldRegex) {
                 regArr = d.fieldRegex.split(';');
                 regArr.forEach(r => {
                     let patt = inputContent.match(r);

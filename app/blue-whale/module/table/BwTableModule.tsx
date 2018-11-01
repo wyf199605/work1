@@ -75,7 +75,7 @@ export class BwTableModule extends Component {
             (Array.isArray(ui.subButtons) && ui.subButtons.some((btn) => btn.openType.indexOf('rfid') >= 0));
 
         // 是否有查询器
-        this.hasQuery = ui.querier && ([3, 13].includes(ui.querier.queryType));
+        this.hasQuery = ui.querier && ([3, 13].includes(ui.querier.queryType)) || ui.noQuery;
 
         // 初始化fields
         this.fieldsInit(ui.cols);
@@ -337,20 +337,6 @@ export class BwTableModule extends Component {
         // rfid初始化 (lyq)
         this.rfidColInit();
         this.reportCaptionInit();
-
-        // inputs (wbf)
-        if (tools.isPc) {
-            setTimeout(() => {
-                //monitorKey键盘输入
-                if (this.ui.inputs) {
-                    new Inputs({
-                        inputs: this.ui.inputs,
-                        container: this.wrapper,
-                        table: this.ftable,
-                    })
-                }
-            }, 200);
-        }
 
         tools.isFunction(this._ftableReadyHandler) && this._ftableReadyHandler();
         this.isFtableReady = true;
