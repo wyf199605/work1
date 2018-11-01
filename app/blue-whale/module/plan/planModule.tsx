@@ -113,6 +113,7 @@ export class PlanModule extends Component{
                 icon: 'baocun',
                 color: 'success',
                 onClick: () => {
+                    this.edit.save();
                 },
             }
         ];
@@ -174,24 +175,6 @@ export class PlanModule extends Component{
                 // TODO 设置drawPoint图片
             }
         }
-    }
-
-    static initQueryParams(data: obj){
-        if(tools.isEmpty(data)){
-            return void 0;
-        }
-        let params = [];
-        for(let key in data){
-            params.push({
-                field: key.toUpperCase(),
-                values: [data[key]],
-                not: false,
-                op: 2
-            });
-        }
-        return JSON.stringify({
-            queryparams1: {"not":false, "op":0, "params": params}
-        });
     }
 
     refresh(ajaxData?: obj){
@@ -282,6 +265,11 @@ export class PlanModule extends Component{
     }
 
     edit = (() => {
+        let editedData = {
+            insert: [],
+            delete: [],
+            update: []
+        };
 
         let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
             let paramData: obj = {};
@@ -305,10 +293,33 @@ export class PlanModule extends Component{
 
         let save = () => {
 
-        }
+        };
+
+        let editData = () => {
+
+        };
 
         return {
-            save
+            save,
+            editData,
         };
     })();
+
+    static initQueryParams(data: obj){
+        if(tools.isEmpty(data)){
+            return void 0;
+        }
+        let params = [];
+        for(let key in data){
+            params.push({
+                field: key.toUpperCase(),
+                values: [data[key]],
+                not: false,
+                op: 2
+            });
+        }
+        return JSON.stringify({
+            queryparams1: {"not":false, "op":0, "params": params}
+        });
+    }
 }
