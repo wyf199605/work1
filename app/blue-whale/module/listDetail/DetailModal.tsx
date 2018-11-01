@@ -89,25 +89,24 @@ export class DetailModal {
                     className: 'modal-btn eidt-confirm',
                     onClick: () => {
                         let data = this.dataGet();
-                        console.log(data);
                         if (this.validate(data)){
                             // 验证成功
-                            // let button = this.para.button;
-                            // button.refresh = 1;
-                            // ButtonAction.get().clickHandle(button,data,() => {
-                            //     switch (button.subType){
-                            //         case 'insert_save':{
-                            //             this.para.listDetail.changePage(this.para.listDetail.totalNumber + 1);
-                            //         }
-                            //         break;
-                            //         case 'update_save':{
-                            //             this.para.listDetail.changePage(this.para.listDetail.currentPage);
-                            //         }
-                            //         break;
-                            //     }
-                            //     modal.isShow = false;
-                            //     this.destroy();
-                            // });
+                            let button = this.para.button;
+                            button.refresh = 1;
+                            ButtonAction.get().clickHandle(button,data,() => {
+                                switch (button.subType){
+                                    case 'insert_save':{
+                                        this.para.listDetail.changePage(this.para.listDetail.totalNumber + 1);
+                                    }
+                                    break;
+                                    case 'update_save':{
+                                        this.para.listDetail.changePage(this.para.listDetail.currentPage);
+                                    }
+                                    break;
+                                }
+                                modal.isShow = false;
+                                this.destroy();
+                            });
                         }
                     }
                 }]
