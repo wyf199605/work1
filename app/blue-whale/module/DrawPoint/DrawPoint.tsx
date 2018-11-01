@@ -2,6 +2,7 @@
 /// <amd-module name="DrawPoint"/>
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import {IDrawFormatData} from "../plan/planModule";
 
 declare const D3;
 //开启描点连线功能
@@ -12,7 +13,7 @@ interface IDrapPoint extends IComponentPara{
     width:number | string
     height:number | string
     image?:string;
-    format?: (data: obj) => obj;
+    format?: (data: obj) => IDrawFormatData[];
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
 }
 
@@ -35,6 +36,7 @@ export  class DrawPoint extends Component{
     public indexStr;//保存当前选中的path 下标
     public drag;
     private onAreaClick: (areaType: IAreaType) => Promise<any>;
+    private format;
 
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -48,6 +50,7 @@ export  class DrawPoint extends Component{
     constructor(protected para: IDrapPoint) {
         super(para);
         this.onAreaClick = para.onAreaClick;
+        this.format = para.format;
         this.map = D3.map(this.points, function (d, i) {
             return i;
         })
@@ -103,6 +106,8 @@ export  class DrawPoint extends Component{
         if(tools.isEmpty(data1)){
             return
         }
+     let format = this.format(data1);
+        console.log(format);
         //
      let   data = [
            {'point':[[308, 41.33333206176758],[307, 147.3333282470703],[212, 148.3333282470703],[215, 42.33333206176758],[308, 41.33333206176758]],

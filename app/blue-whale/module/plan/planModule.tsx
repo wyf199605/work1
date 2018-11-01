@@ -157,7 +157,7 @@ export class PlanModule extends Component{
             image: imageUrl + "&sho_id=20",
             container: this.wrapper,
             format: (data: obj) => {
-                let res: obj[] = [];
+                let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
                     if(data[name]){
