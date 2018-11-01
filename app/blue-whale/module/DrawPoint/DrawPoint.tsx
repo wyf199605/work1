@@ -215,8 +215,24 @@ export  class DrawPoint extends Component{
     public fished (index){
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray",null);
+        // let dots = this.svg.select('g')
+        //     .append('g')
+        //     .attr('class',function (d,i) {
+        //         console.log(d)
+        //         return 'dot';
+        //     })
+        //    for(let i = 0;i<this.map.size();i++){
+        //       let dotsCi  =  dots.append('g').attr('class','ci'+i)
+        //        dotsCi.append("text").attr('class','iconfont icon-tuodong')
+        //            .attr('font-family','iconfont')
+        //            .attr('x',100).attr('y',100).attr('width',30).attr('height',30)
+        //            .attr('fill','firebrick')
+        //            .text("\ue63a")
+        //    }
+        //
+
         this.points = [];
-        this.index = index;
+        this.index = index ;
         this.isDrawLine = false;
         D3.selectAll('path').on('click',null);
         console.log(this.map);
