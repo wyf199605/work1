@@ -114,6 +114,7 @@ export  class DrawPoint extends Component{
              'edit_two':'10000/月',
              'index':'1'}
        ]
+
         let svg = D3.select('svg').select('g');
 
          svg.selectAll('path').data(data).enter().append('path')
@@ -151,7 +152,7 @@ export  class DrawPoint extends Component{
                  .text(function (d) {
                      return d.edit_two
                  })
-
+             //以及编辑小图标
 
 
     }

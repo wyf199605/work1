@@ -532,7 +532,7 @@ namespace G{
 
                     // 过程通知
                     if(!flag) {
-                        alert('Shell失败');
+                       // alert('Shell失败');
                         d.off(window, eventInfor);
                         d.off(window, eventBack);
                     }
