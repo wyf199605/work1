@@ -672,6 +672,9 @@ export class ButtonAction {
                     offShellMonitor();
                 }
             });
+            if(type === 3){
+                BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
+            }
             return;
         };
 

@@ -241,9 +241,9 @@ export class Uploader extends FormCom{
             , accept: para.accept ? para.accept : null
         });
     }
-    static type:number; // 1表示file,2表示img
-    upload(type?:number){
-        Uploader.type = type || 0;
+    static type:string; // 标识当前uploader
+    upload(type?:string){
+        Uploader.type = type || '';
         this.com.upload();
     }
 

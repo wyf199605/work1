@@ -126,6 +126,7 @@ interface R_Field extends COL {
     }
     chkAddr?: R_ReqAddr;
     isCanSort?: boolean;
+    fileInfo?:R_ReqAddr; // 文件信息地址
 }
 
 interface winOpen {

@@ -24,6 +24,7 @@ interface IDetailCell extends IComponentPara {
     type?: DetailCellType;
     caption?: string;
     value?: string | string[];
+    field?:R_Field;
 }
 
 export class ListItemDetailCell extends Component {
@@ -31,6 +32,7 @@ export class ListItemDetailCell extends Component {
     private files: IFile[] = [];
     private actionSheet: ActionSheet;
     private _currentFile: IFile;
+    private fileType: string = '';
     set currentFile(fileInfo: IFile) {
         this._currentFile = fileInfo;
     }
@@ -70,7 +72,7 @@ export class ListItemDetailCell extends Component {
             case 'file': {
                 wrapper = <div className="detail-cell-file-wrapper">
                     <div c-var="title" className="detail-cell-imgs-title">{para.caption || '附件'}</div>
-                    <div c-var="file" className="detail-cell-files"/>
+                    <div c-var="files" className="detail-cell-files"/>
                 </div>;
             }
                 break;
@@ -81,6 +83,7 @@ export class ListItemDetailCell extends Component {
     constructor(para: IDetailCell) {
         super(para);
         this.para = para;
+        this.fileType = para.field.dataType || para.field.atrrs.dataType;
         para.value && this.render(para.value);
     }
 
@@ -104,47 +107,23 @@ export class ListItemDetailCell extends Component {
             if (!this.actionSheet) {
                 this.actionSheet = new ActionSheet({
                     buttons: [
-                        // {
-                        //     content: '微信转发',
-                        //     icon: 'bg-weixin fg-white appcommon app-weixin',
-                        //     onClick: () => {
-                        //
-                        //     }
-                        // },
-                        // {
-                        //     content: '邮件转发',
-                        //     icon: 'bg-mail fg-white appcommon app-youjian',
-                        //     onClick: () => {
-                        //         // let button: R_Button = {
-                        //         //     "actionAddr": {
-                        //         //         "type": "panel",
-                        //         //         "needGps": 0,
-                        //         //         "dataAddr": "/app_sanfu_retail/null/ui/associate/n1092_data-3/associate-3",
-                        //         //         "varList": [
-                        //         //             {
-                        //         //                 "varName": "MAILID"
-                        //         //             }
-                        //         //         ],
-                        //         //         "varType": 0,
-                        //         //         "commitType": 1
-                        //         //     },
-                        //         //     "buttonType": 0,
-                        //         //     "subType": "associate",
-                        //         //     "openType": "newwin",
-                        //         //     "hintBeforeAction": false,
-                        //         //     "refresh": 0,
-                        //         //     "multiselect": 1
-                        //         // };
-                        //         // ButtonAction.get().clickHandle(button,this.para.detailPage.defaultData);
-                        //     }
-                        // },
                         {
                             content: '下载至本地',
                             icon: 'bg-download fg-white appcommon app-xiazaidaobendi',
                             onClick: () => {
-                                sys.window.open({
-                                    url: BW.CONF.siteUrl + this.currentFile.addr
-                                });
+                                if(this.fileType === '43'){
+                                    BwRule.link({
+                                        link:this.para.field.link.dataAddr,
+                                        varList:this.para.field.link.varList,
+                                        dataType:this.para.field.dataType || this.para.field.atrrs.dataType,
+                                        data:this.para.detailPage.defaultData,
+                                        type:this.para.field.link.type
+                                    });
+                                }else{
+                                    sys.window.open({
+                                        url: BW.CONF.siteUrl + this.currentFile.addr
+                                    });
+                                }
                             }
                         }
                     ]
@@ -198,11 +177,24 @@ export class ListItemDetailCell extends Component {
                 break;
             case 'file': {
                 if (tools.isNotEmpty(data)) {
-                    BwRule.Ajax.fetch(data).then(({response}) => {
-                        let dataArr = response.dataArr;
-                        this.files = dataArr;
-                        this.createAllFiles(dataArr, this.innerEl.files);
-                    })
+                    switch (this.fileType) {
+                        case '47':
+                        case '48': {
+                            BwRule.Ajax.fetch(data).then(({response}) => {
+                                let dataArr = response.dataArr;
+                                this.files = dataArr;
+                                this.createAllFiles(dataArr, this.innerEl.files);
+                            })
+                        }
+                        break;
+                        case '40':
+                        case '43':{
+                            let file:string = data as string,
+                                files = JSON.parse(file);
+                            this.createAllFiles(files, this.innerEl.files);
+                        }
+                        break;
+                    }
                 } else {
                     this.files = [];
                     this.createAllFiles([], this.innerEl.files);
@@ -222,6 +214,9 @@ export class ListItemDetailCell extends Component {
 
     // 计算文件大小
     private calcFileSize(limit: number): string {
+        if (limit <= 0){
+            return '未知';
+        }
         let size: string = "";
         if (limit < 0.1 * 1024) { //如果小于0.1KB转化成B
             size = limit.toFixed(2) + "B";

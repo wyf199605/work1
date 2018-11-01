@@ -42,7 +42,8 @@ export class ListItemDetail {
                     caption: field.caption,
                     type: this.getType(field.dataType || field.atrrs.dataType || ''),
                     container: cellsWrapper,
-                    detailPage: this
+                    detailPage: this,
+                    field: field
                 });
             }
         })
@@ -192,7 +193,7 @@ export class ListItemDetail {
                 case 'insert_save':
                     // 编辑
                     new DetailModal(Object.assign({}, self.para, {
-                        defaultData: self.defaultData,
+                        defaultData: btn.subType === 'update_save' ? self.defaultData : {},
                         button: btn,
                         listDetail: self
                     }));
@@ -275,7 +276,7 @@ export class ListItemDetail {
             type = 'textarea';
         } else if (t === '20' || t === '27' || t === '28') {
             type = 'img';
-        } else if (t === '43' || t === '47' || t === '48' || t === '40') {
+        } else if (t === '43' || t === '47' || t === '48') {
             type = 'file';
         } else if (t === '12') {
             type = 'date';
@@ -297,7 +298,9 @@ export class ListItemDetail {
             if (type === '18') {
                 // 多行文本
                 v = text;
-            } else if (type === '20' || type === '27' || type === '28') {
+            } else if (type === '20') {
+                v = [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)];
+            } else if (type === '27' || type === '28') {
                 // 单图和多图（唯一值） 单文件和多文件(唯一值)
                 let addrArr = text.split(','),
                     arr = [];
@@ -306,28 +309,27 @@ export class ListItemDetail {
                     arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
                 });
                 v = arr;
-            } else if (type === '47' || type === '48' || type === '40') {
+            } else if (type === '47' || type === '48') {
                 // 获取文件信息地址 （md5,unique）
-                let uniques = text.split(','),
-                    arr = [];
-                uniques.forEach(uniq => {
-                    arr.push(uniq);
-                });
-                v = arr;
+                v = BW.CONF.siteUrl + BwRule.reqAddr(format.fileInfo, this.defaultData);
             } else if (type === '43') {
-                // 附件名称 TODO:???????
-                v = this.defaultData['file_id'];
+                // 附件名称 , Blob类型
+                if (tools.isNotEmpty(text)) {
+                    let obj = {
+                        fileName: text,
+                        fileSize: 0,
+                        addr: ''
+                    };
+                    v = JSON.stringify(obj);
+                } else {
+                    v = '';
+                }
             } else {
                 // dataType为空按照text类型处理
                 v = text;
             }
         }
         return v;
-    }
-
-    // 获取文件信息地址
-    private getFileInfoAddr(uniq?: string) {
-
     }
 
     destroy() {

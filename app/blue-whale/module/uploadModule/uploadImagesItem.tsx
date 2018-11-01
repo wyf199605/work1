@@ -3,11 +3,12 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {BwRule} from "../../common/rule/BwRule";
 import {IImage} from "./uploadImages";
-import tools = G.tools;
+
 export interface IUploadImagesItem extends IComponentPara {
     image?: IImage;
     index?: number;
     nameField?: string;
+    type?:string;
 }
 
 export class UploadImagesItem extends Component {
@@ -40,7 +41,11 @@ export class UploadImagesItem extends Component {
     }
 
     render(data: IImage) {
-        (this.innerEl.img as HTMLImageElement).setAttribute('src',data.fileId ? BwRule.fileUrlGet(data.fileId, this.para.nameField || 'FILE_ID', true) : data.localUrl);
+        if (this.para.type === '20'){
+            (this.innerEl.img as HTMLImageElement).setAttribute('src',data.extraUrl);
+        }else{
+            (this.innerEl.img as HTMLImageElement).setAttribute('src',data.unique ? BwRule.fileUrlGet(data.unique, this.para.nameField || 'FILE_ID', true) : data.localUrl);
+        }
     }
 
     // 获取当前索引
