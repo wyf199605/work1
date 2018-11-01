@@ -18,8 +18,8 @@ interface IDrapPoint extends IComponentPara{
 
 interface IAreaType{
     type: 'edit';
-    data: obj;
-    name: string;
+    data?: obj;
+    name?: string;
 }
 
 export  class DrawPoint extends Component{
@@ -33,7 +33,8 @@ export  class DrawPoint extends Component{
     public r;
     public isDrawLine:boolean = false;
     public indexStr;//保存当前选中的path 下标
-    public drag
+    public drag;
+    private onAreaClick: (areaType: IAreaType) => Promise<any>;
 
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -46,6 +47,7 @@ export  class DrawPoint extends Component{
 
     constructor(para: IDrapPoint) {
         super(para);
+        this.onAreaClick = para.onAreaClick;
         this.map = D3.map(this.points, function (d, i) {
             return i;
         })
@@ -250,8 +252,11 @@ export  class DrawPoint extends Component{
         this.isDrawLine = false;
         this.map.get(currentIndex);
         D3.selectAll('path').on('click',()=>{
-            this.trigger('EVT_EDIT_DATA',)
-
+            console.log('编辑信息');
+            this.onAreaClick && this.onAreaClick({
+                type:'edit',
+                data:{}
+            }).then()
         });
         console.log(this.map);
     }
