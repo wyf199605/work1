@@ -45,7 +45,7 @@ export  class DrawPoint extends Component{
         return <div className="draw-point-wrapper"/>;
     }
 
-    constructor(para: IDrapPoint) {
+    constructor(protected para: IDrapPoint) {
         super(para);
         this.onAreaClick = para.onAreaClick;
         this.map = D3.map(this.points, function (d, i) {
@@ -84,6 +84,11 @@ export  class DrawPoint extends Component{
         console.log(D3.select(para.wraperId));
         this.g = this.svg.append('g');
         this.g.append('image').attr('href',para.image).attr('width',para.width).attr('height',para.height)//添加背景图
+    }
+
+    set imgUrl(url){
+
+        this.g.select('image').attr('href',url).attr('width',this.para.width).attr('height',this.para.height)//添加背景图
     }
 
     private mousedown() {
@@ -256,7 +261,9 @@ export  class DrawPoint extends Component{
             this.onAreaClick && this.onAreaClick({
                 type:'edit',
                 data:{}
-            }).then()
+            }).then((data) =>{
+                console.log(data);
+            })
         });
         console.log(this.map);
     }
