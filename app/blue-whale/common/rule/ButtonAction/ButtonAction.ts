@@ -419,7 +419,7 @@ export class ButtonAction {
             isMb: false
         };
         if(tools.isMb){
-            para.top = 30;
+            para.top = 80;
         }
         if (type === 3 || type === 5) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';

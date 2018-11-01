@@ -8,6 +8,7 @@ let gulp = require('gulp'),
 
 let path = {
     starPage : 'D:/bw/cashier/startPage/',
+    starPageHtml : 'D:/bw/cashier/',
     cashier :  'D:/bw/cashier/cashierwebfile/cashier/',  // 壳路径
     distMin : 'D:/bw/cashier/cashierwebfile/', // 压缩src
     // zipPath : 'D:/bw/cashier/cashierwebfile/', // 压缩到path
@@ -68,6 +69,7 @@ gulp.task('sqlHtml', function () {
 //启动页
 gulp.task('starPage',function () {
     compiler.ts(['startPage/StartPage'], 'startPage.js', path.starPage);
+    compiler.gulpTask('index.html', ['startPage/index.html'], null, 'index.html', path.starPageHtml, ['index.html']);
     compiler.scss(['startPage/startPage'], 'startPage.css', path.starPage);
 });
 
@@ -115,7 +117,7 @@ gulp.task('CC_G_Watch',['CC_G_Compressor'], function () {
 
 //启动页
 gulp.task('CC_G_StartPage',function () {
-    compiler.ts(['global/ajax','global/tools','global/shell', 'global/dom'], 'global.js','D:/bw/cashier/startPage')
+    compiler.ts(['global/ajax','global/tools','global/shell', 'global/dom'], 'global.js', para.starPage)
 });
 
 gulp.task('CC_G_Start', ['CC_G_Watch'], function () {
