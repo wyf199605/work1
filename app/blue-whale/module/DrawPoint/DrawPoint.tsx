@@ -30,7 +30,6 @@ export  class DrawPoint extends Component{
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
     static EVT_DELETE_DATA = '__event_delete_area_click__';
-    static EVT_EDIT_DATA = '__event_edit_area_click__';
     static EVT_IMG_INIT = '__event_image_area_click__';
 
     protected wrapperInit(){
@@ -244,6 +243,7 @@ export  class DrawPoint extends Component{
         this.map.get(currentIndex);
         D3.selectAll('path').on('click',()=>{
             this.trigger('EVT_EDIT_DATA',)
+
         });
         console.log(this.map);
     }
