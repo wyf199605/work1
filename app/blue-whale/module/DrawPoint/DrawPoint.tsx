@@ -108,7 +108,13 @@ export class DrawPoint extends Component {
         }
         data1.forEach((d) => {
             let format = this.format(d);
-            console.log(format);
+            console.log(format.sort((a) => {
+                if(a.isPoint){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            }));
         });
         //
         let data = [
@@ -119,7 +125,7 @@ export class DrawPoint extends Component {
                 'index': '0'
             },
             {
-                'point': [[355, 97.3333358764648], [335, 206.3333282470703], [408, 170.3333282470703], [413, 97.33333587646484], [355, 97.33333587646484]],
+                    'point': [[355, 97.3333358764648], [335, 206.3333282470703], [408, 170.3333282470703], [413, 97.33333587646484], [355, 97.33333587646484]],
                 'edit_one': 'McDonload',
                 'edit_two': '10000/月',
                 'index': '1'
