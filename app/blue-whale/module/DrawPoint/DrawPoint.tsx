@@ -106,9 +106,8 @@ export  class DrawPoint extends Component{
         if(tools.isEmpty(data1)){
             return
         }
-     let format = this.format(data1);
-        console.log(format);
-        //
+
+
      let   data = [
            {'point':[[308, 41.33333206176758],[307, 147.3333282470703],[212, 148.3333282470703],[215, 42.33333206176758],[308, 41.33333206176758]],
             'edit_one':'KFC',
@@ -160,6 +159,17 @@ export  class DrawPoint extends Component{
              //以及编辑小图标
 
 
+    }
+    //find图形中心点的位置
+    private findCenter(str){
+        let highIndex,lowIndex,leftIndex,rightIndex;
+
+         if (str.length>=0){
+             for(let i = 0;i<str.length;i++){
+               //先找最高点或者最低点
+
+             }
+         }
     }
 
     //绘图
