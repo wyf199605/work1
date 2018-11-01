@@ -8,18 +8,22 @@ import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
 import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
 import CONF = BW.CONF;
-import {Button} from "../../../global/components/general/button/Button";
+import {Button, IButton} from "../../../global/components/general/button/Button";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
 }
 
 export class PlanModule extends Component{
-    wrapperInit(){
-        return <div className="plan-content">
-            <div class="plan-opera">
-                <Button color="error" tip="Backspace键" icon="chexiao" content="撤消" className="back-opera" onClick={() => {
 
+    wrapperInit(){
+        let buttons: IButton[] = [
+            {
+                content: '撤销',
+                icon: 'chexiao',
+                color: 'error',
+                tip: 'Backspace键',
+                onClick: () => {
                     let btn = d.queryAll('.plan-opera>div');
                     btn.forEach((res)=>{
                         d.classRemove(res,'custom-button');
@@ -27,9 +31,13 @@ export class PlanModule extends Component{
                     let currBtn = d.query('.plan-opera>.back-opera');
                     d.classAdd(currBtn,'custom-button');
 
-                    this.draw.reback();
-                }}/>
-                <Button color="success" icon="wanchengbianji" content="完成编辑" className="finsh-point" onClick={() => {
+                    this.draw.reback();                },
+            },
+            {
+                content: '完成编辑',
+                icon: 'wanchengbianji',
+                color: 'success',
+                onClick: () => {
                     //完成编辑--------
 
                     //把point 清楚
@@ -45,9 +53,13 @@ export class PlanModule extends Component{
                     });
                     let currBtn = d.query('.plan-opera>.finsh-point');
                     d.classAdd(currBtn, 'custom-button');
-
-                }}/>
-                <Button color="info" icon="maodian" content="描点" className="miao-dian" onClick={() => {
+                },
+            },
+            {
+                content: '描点',
+                icon: 'maodian',
+                color: 'info',
+                onClick: () => {
                     console.log('开始描点')
                     let btn = d.queryAll('.plan-opera>div');
                     btn.forEach((res) => {
@@ -60,9 +72,13 @@ export class PlanModule extends Component{
                     let paths = G.d.queryAll(".drawPage>svg>g>path");
                     this.draw.setIsDrawLine(true);
                     this.draw.createPath(paths.length);
-                }}/>
-                <Button color="info" icon="bianjimaodian" content="编辑描点" className="edit-dian" onClick={() => {
-
+                },
+            },
+            {
+                content: '编辑描点',
+                icon: 'bianjimaodian',
+                color: 'info',
+                onClick: () => {
                     console.log('开始编辑')
                     let btn = d.queryAll('.plan-opera>div');
                     btn.forEach((res) => {
@@ -74,14 +90,41 @@ export class PlanModule extends Component{
                     //------------------开始绘图
 
                     this.draw.editPoint();
-                }}/>
-                <Button color="info" tip="空格键+左击"  icon="tuodong" content="拖动" className="" onClick={() => {}}/>
-                <Button color="info" tip="滚轮" icon="suofang" content="缩放" className="" onClick={() => {}}/>
-                <Button color="success" onClick={() => {}} content="保存" className="save-btn"/>
+                },
+            },
+            {
+                content: '拖动',
+                icon: 'tuodong',
+                color: 'info',
+                tip: "空格键+左击",
+                onClick: () => {
+                },
+            },
+            {
+                content: '缩放',
+                icon: 'suofang',
+                color: 'info',
+                tip: '滚轮',
+                onClick: () => {
+                },
+            },
+            {
+                content: '保存',
+                icon: 'baocun',
+                color: 'success',
+                onClick: () => {
+                },
+            }
+        ];
+
+        return <div className="plan-content">
+            <div class="plan-opera">
+                {this.buttons = buttons.map(btn => new Button(btn))}
             </div>
         </div>;
     }
 
+    protected buttons: Button[];
     protected draw: DrawPoint;
     protected ui: IBW_Plan_Table;
     protected ajax = new BwRule.Ajax();
