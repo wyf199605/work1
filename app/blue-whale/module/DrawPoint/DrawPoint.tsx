@@ -50,11 +50,6 @@ export  class DrawPoint extends Component{
         this.InitDrag();
         this.InitSvg(para);
 
-
-        let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
-        events && events.forEach((f) => {
-            f && f();
-        });
     }
 
     public InitSvg(para) {
