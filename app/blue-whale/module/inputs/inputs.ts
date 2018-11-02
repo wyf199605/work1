@@ -61,32 +61,31 @@ export class Inputs {
         }
         let body = response.body && response.body.bodyList && response.body.bodyList[0],
             category = body.category || {},
+            dataType = body.dataType,
             atvarObj = body.atvarObj,
-            type = category.type,
+            catType = category.type,
             showText = category.showText,
             ftable = tools.isFunction(this.p.table) && this.p.table();
 
         this.url = category.url;
-        switch (type) {
+        switch (catType) {
             case 0:
-                //数据覆盖
-                this.dataCover(ftable, response);
+                // 数据覆盖
                 this.logTip(showText);
                 break;
             case 1:
-                //标签打印
-                // debugger
+                // 标签打印
                 ftable.labelPrint.show(ftable.labelBtn.wrapper, category.printList, () => {
                     this.ajax(CONF.siteUrl + this.url);
                 });
                 this.logTip(showText);
                 break;
             case 2:
-                //提示错误信息
+                // 提示错误信息
                 Modal.alert(showText);
                 break;
             case 3:
-                //提示信息,确定(下一步)/取消
+                // 提示信息,确定(下一步)/取消
                 Modal.confirm({
                     msg: showText,
                     btns: ['取消', '确定'],
@@ -98,15 +97,17 @@ export class Inputs {
                         }
                     }
                 });
-                this.dataCover(ftable, response);
                 break;
             case 4:
-                //提示信息,自动下一步
+                // 提示信息,自动下一步
                 this.ajax(CONF.siteUrl + this.url);
                 this.logTip(showText);
                 break;
         }
-        if (!type && type !== 0) {
+        if(dataType === 0){
+            this.dataCover(ftable, response);
+        }
+        if (tools.isEmpty(catType)) {
             this.logTip(showText);
         }
         if(atvarObj){
