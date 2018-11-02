@@ -7,7 +7,6 @@ import {Toast} from "../../../global/components/feedback/toast/Toast";
 import {BwRule} from "../../common/rule/BwRule";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 
-
 interface InputsPara {
     inputs: R_Input[]
     container: HTMLElement
@@ -44,11 +43,11 @@ export class Inputs {
             newUrl += '?';
         }
         let ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
-        this.ajax(ajaxUrl);
+        this.keyStep(ajaxUrl);
     }
 
-    private ajax(aUrl){
-        return BwRule.Ajax.fetch(aUrl)
+    private keyStep(aUrl){
+        BwRule.Ajax.fetch(aUrl)
             .then(({response}) => {
                 this.condition(response,aUrl)
             })
@@ -83,8 +82,9 @@ export class Inputs {
             case 1:
                 //标签打印
                 // debugger
+
                 ftable.labelPrint.show(ftable.labelBtn.wrapper, category.printList, () => {
-                    this.ajax(CONF.siteUrl + this.url);
+                    this.keyStep(CONF.siteUrl + this.url);
                 });
                 this.logTip(showText);
                 break;
@@ -99,7 +99,7 @@ export class Inputs {
                     btns: ['取消', '确定'],
                     callback: (index) => {
                         if (index === true) {
-                            this.ajax(CONF.siteUrl + this.url);
+                            this.keyStep(CONF.siteUrl + this.url);
                         } else {
                             this.url = null;
                         }
@@ -108,7 +108,7 @@ export class Inputs {
                 break;
             case 4:
                 //提示信息,自动下一步
-                this.ajax(CONF.siteUrl + this.url);
+                this.keyStep(CONF.siteUrl + this.url);
                 this.logTip(showText);
                 break;
         }
@@ -176,11 +176,19 @@ export class Inputs {
      */
     private eventInit(para: InputsPara) {
         if(G.tools.isMb){
-            require(['KeyStep'], (e) => {
-                new e.KeyStep({
-                    inputs : para.inputs,
-                    callback : (ajaxData, input) => {
-                        this.matchPass(input, ajaxData.mobilescan);
+            require(['MobileScan'], (e) => {
+                new e.MobileScan({
+                    scannableType : 0,
+                    callback : (ajaxData) => {
+                        let text = ajaxData.mobilescan,
+                            len = text.length;
+                        para.inputs.forEach(obj => {
+                            if (obj.minLength <= len && len <= obj.maxLength) {
+                                let reg = this.regExpMatch(para.inputs, text);
+                                //匹配成功
+                                reg && this.matchPass(reg, text);
+                            }
+                        })
                     }
                 })
             });
