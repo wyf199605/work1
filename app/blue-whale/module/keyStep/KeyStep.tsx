@@ -17,7 +17,7 @@ export class KeyStep{
         let can2dScan = Shell.inventory.can2dScan,
             btn : Button;
 
-        if(!can2dScan){
+        if(!can2dScan && tools.isMb){
             btn = new Button({
                 type: 'link',
                 content: '扫码查询',

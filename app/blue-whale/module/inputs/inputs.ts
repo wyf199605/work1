@@ -7,7 +7,6 @@ import {Toast} from "../../../global/components/feedback/toast/Toast";
 import {BwRule} from "../../common/rule/BwRule";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 
-
 interface InputsPara {
     inputs: R_Input[]
     container: HTMLElement
@@ -60,40 +59,33 @@ export class Inputs {
             this.atvarParams(elements.atvarparams, elements.subButtons, aUrl);
             return;
         }
-        let category = response.body && response.body.bodyList && response.body.bodyList[0].category || {},
-            type = category.type,
+        let body = response.body && response.body.bodyList && response.body.bodyList[0],
+            category = body.category || {},
+            dataType = body.dataType,
+            atvarObj = body.atvarObj,
+            catType = category.type,
             showText = category.showText,
             ftable = tools.isFunction(this.p.table) && this.p.table();
 
         this.url = category.url;
-        switch (type) {
+        switch (catType) {
             case 0:
-                //数据覆盖
-                let queryModule = this.para.queryModule && this.para.queryModule();
-                queryModule && queryModule.hide();
-                if(queryModule && !ftable){
-                    queryModule.para.refresher({}, true).then(() => {
-                        response.data && (this.p.table().data = response.data);
-                    })
-                }else {
-                    response.data && ftable && (ftable.data = response.data);
-                }
+                // 数据覆盖
                 this.logTip(showText);
                 break;
             case 1:
-                //标签打印
-                // debugger
+                // 标签打印
                 ftable.labelPrint.show(ftable.labelBtn.wrapper, category.printList, () => {
                     this.ajax(CONF.siteUrl + this.url);
                 });
                 this.logTip(showText);
                 break;
             case 2:
-                //提示错误信息
+                // 提示错误信息
                 Modal.alert(showText);
                 break;
             case 3:
-                //提示信息,确定(下一步)/取消
+                // 提示信息,确定(下一步)/取消
                 Modal.confirm({
                     msg: showText,
                     btns: ['取消', '确定'],
@@ -107,22 +99,43 @@ export class Inputs {
                 });
                 break;
             case 4:
-                //提示信息,自动下一步
+                // 提示信息,自动下一步
                 this.ajax(CONF.siteUrl + this.url);
                 this.logTip(showText);
                 break;
         }
-        if (!type && type !== 0) {
+        if(dataType === 0){
+            this.dataCover(ftable, response);
+        }
+        if (tools.isEmpty(catType)) {
             this.logTip(showText);
+        }
+        if(atvarObj){
+            this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl);
+        }
+    }
+
+    private dataCover(ftable, response : obj){
+        let data = response.data,
+            queryModule = this.para.queryModule && this.para.queryModule();
+
+        if(tools.isEmpty(data)){
+            return;
+        }
+        queryModule && queryModule.hide();
+        if(queryModule && !ftable){
+            queryModule.para.refresher({}, true).then(() => {
+                this.p.table().data = data;
+            })
+        }else {
+            ftable && (ftable.data = data);
         }
     }
 
     private logTip(showText){
         this.m && this.m.destroy();
         this.m = new Toast({
-            duration: 0,
             type: 'simple',
-            isClose: true,
             className : 'max-index',
             position: 'bottom',
             content: showText,
@@ -138,7 +151,7 @@ export class Inputs {
             isOnceDestroy : true,
             isMb : false,
             top : 50,
-            body : d.create('<div class="keystep"></div>') as HTMLElement,
+            body : d.create('<div class="inputs-atv"></div>') as HTMLElement,
             footer : {},
             onOk : () => {
                 modal.isShow = false;
