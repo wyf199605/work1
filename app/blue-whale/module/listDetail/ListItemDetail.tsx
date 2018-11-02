@@ -98,6 +98,8 @@ export class ListItemDetail {
                 this.currentPage = page;
             }
         }
+        this.checkPageButtonDisabled();
+        this.scrollToTop();
         this.initDetailData().then(data => {
             this.render(data);
         });
@@ -191,21 +193,9 @@ export class ListItemDetail {
             let btn = self.para.fm.subButtons[index];
             switch (btn.subType) {
                 case 'update_save' :
-                    new DetailModal(Object.assign({}, self.para, {
-                        defaultData: self.defaultData,
-                        button: btn,
-                        listDetail: self
-                    }));
-                    break;
                 case 'insert_save':
-                    // 编辑
-                    let fields = self.para.fm.fields,
-                        data = self.defaultData;
-                    fields.forEach((f)=>{
-                        data[f.name] = self.handlerValue(f.atrrs.defaultValue || '',f);
-                    });
                     new DetailModal(Object.assign({}, self.para, {
-                        defaultData: data,
+                        defaultData: btn.subType === 'update_save' ? self.defaultData : {},
                         button: btn,
                         listDetail: self
                     }));
@@ -215,12 +205,10 @@ export class ListItemDetail {
                         if (self.para.uiType === 'detail') {
                             // 删除后显示下一页，如果已是最后一页，则显示上一页
                             let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
-                            if(currentPage === 0){
+                            if(currentPage <= 0){
                                 sys.window.close();
                             }else{
                                 self.changePage(currentPage);
-                                self.checkPageButtonDisabled();
-                                self.scrollToTop();
                             }
                         }
                     });
@@ -244,23 +232,20 @@ export class ListItemDetail {
             className: 'list-detail-btn',
             container: btnWrapper,
             onClick: () => {
-                // 更新页数
-                this.currentPage !== 1 && (this.currentPage = this.currentPage - 1);
-                // 检测按钮是否可用
-                this.checkPageButtonDisabled();
-                // 加载数据
-                this.changePage();
-                this.scrollToTop();
+                if (this.currentPage !== 1){
+                    let current = this.currentPage - 1;
+                    this.changePage(current);
+                }
             }
         });
         this.next = new Button({
             content: '下一页',
             container: btnWrapper,
             onClick: () => {
-                this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
-                this.checkPageButtonDisabled();
-                this.changePage();
-                this.scrollToTop();
+                if(this.currentPage !== this.totalNumber){
+                    let current = this.currentPage + 1;
+                    this.changePage(current);
+                }
             },
             className: 'list-detail-btn'
         });

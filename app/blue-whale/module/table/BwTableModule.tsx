@@ -60,6 +60,7 @@ export class BwTableModule extends Component {
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
         super(para);
+
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
