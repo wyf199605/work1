@@ -55,7 +55,7 @@ export class PlanModule extends Component{
 
                     console.log(this.draw.getPoints());
                     this.draw.setIsDrawLine(false);
-                    this.draw.fished(paths.length);
+                    this.draw.fished();
 
                     let btn = d.queryAll('.plan-opera>div');
                     btn.forEach((res) => {
@@ -81,7 +81,7 @@ export class PlanModule extends Component{
                     //------------------开始绘图
                     let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
                     this.draw.setIsDrawLine(true);
-                    this.draw.createPath(paths.length);
+                    this.draw.createPath();
                 },
             },
             {
@@ -227,6 +227,7 @@ export class PlanModule extends Component{
                 isImg = dataType === BwRule.DT_IMAGE;
 
             if(dataType === '77'){
+                text = JSON.parse(text);
                 isPoint = true;
             }else{
                 if (dataType === '50') {
