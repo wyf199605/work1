@@ -98,6 +98,8 @@ export class ListItemDetail {
                 this.currentPage = page;
             }
         }
+        this.checkPageButtonDisabled();
+        this.scrollToTop();
         this.initDetailData().then(data => {
             this.render(data);
         });
@@ -192,7 +194,6 @@ export class ListItemDetail {
             switch (btn.subType) {
                 case 'update_save' :
                 case 'insert_save':
-                    // 编辑
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: btn.subType === 'update_save' ? self.defaultData : {},
                         button: btn,
@@ -204,12 +205,10 @@ export class ListItemDetail {
                         if (self.para.uiType === 'detail') {
                             // 删除后显示下一页，如果已是最后一页，则显示上一页
                             let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
-                            if(currentPage === 0){
+                            if(currentPage <= 0){
                                 sys.window.close();
                             }else{
                                 self.changePage(currentPage);
-                                self.checkPageButtonDisabled();
-                                self.scrollToTop();
                             }
                         }
                     });
@@ -233,23 +232,20 @@ export class ListItemDetail {
             className: 'list-detail-btn',
             container: btnWrapper,
             onClick: () => {
-                // 更新页数
-                this.currentPage !== 1 && (this.currentPage = this.currentPage - 1);
-                // 检测按钮是否可用
-                this.checkPageButtonDisabled();
-                // 加载数据
-                this.changePage();
-                this.scrollToTop();
+                if (this.currentPage !== 1){
+                    let current = this.currentPage - 1;
+                    this.changePage(current);
+                }
             }
         });
         this.next = new Button({
             content: '下一页',
             container: btnWrapper,
             onClick: () => {
-                this.currentPage !== this.totalNumber && (this.currentPage = this.currentPage + 1);
-                this.checkPageButtonDisabled();
-                this.changePage();
-                this.scrollToTop();
+                if(this.currentPage !== this.totalNumber){
+                    let current = this.currentPage + 1;
+                    this.changePage(current);
+                }
             },
             className: 'list-detail-btn'
         });
@@ -311,16 +307,20 @@ export class ListItemDetail {
                 // 多行文本
                 v = text;
             } else if (type === '20') {
-                v = tools.isNotEmpty(text) ? [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)] : '';
+                v = tools.isNotEmpty(format.link) ? [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)] : '';
             } else if (type === '27' || type === '28') {
                 // 单图和多图（唯一值） 单文件和多文件(唯一值)
-                let addrArr = text.split(','),
-                    arr = [];
-                addrArr.forEach(md5 => {
-                    // 根据md5获取文件地址
-                    arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
-                });
-                v = arr;
+                if (tools.isNotEmpty(text)){
+                    let addrArr = text.split(','),
+                        arr = [];
+                    addrArr.forEach(md5 => {
+                        // 根据md5获取文件地址
+                        arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
+                    });
+                    v = arr;
+                }else{
+                    v = [];
+                }
             } else if (type === '47' || type === '48') {
                 // 获取文件信息地址 （md5,unique）
                 v = tools.isNotEmpty(format.fileInfo) ? BW.CONF.siteUrl + BwRule.reqAddr(format.fileInfo, this.defaultData) : '';

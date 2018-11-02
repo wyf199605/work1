@@ -56,12 +56,15 @@ export class Accessory extends FormCom {
             switch (this.fileType) {
                 case '47':
                 case '48': {
-                    let obj:obj ={};
-                    obj[this.para.nameField] = value;
-                    let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.fileInfo, Object.assign({},this.para.pageData,obj));
-                    BwRule.Ajax.fetch(fileInfoAddr).then(({response}) => {
-                        this.files = response.dataArr || [];
-                    })
+                    let fileInfo = this.para.field.fileInfo;
+                    if (tools.isNotEmpty(fileInfo)){
+                        let obj:obj ={};
+                        obj[this.para.nameField] = value;
+                        let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(fileInfo, Object.assign({},this.para.pageData,obj));
+                        BwRule.Ajax.fetch(fileInfoAddr).then(({response}) => {
+                            this.files = response.dataArr || [];
+                        })
+                    }
                 }
                     break;
                 // case '40':
