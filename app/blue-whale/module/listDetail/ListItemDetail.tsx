@@ -8,6 +8,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {DetailModal} from "./DetailModal";
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
+import sys = BW.sys;
 
 export class ListItemDetail {
     // DOM容器
@@ -203,9 +204,13 @@ export class ListItemDetail {
                         if (self.para.uiType === 'detail') {
                             // 删除后显示下一页，如果已是最后一页，则显示上一页
                             let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
-                            self.changePage(currentPage);
-                            self.checkPageButtonDisabled();
-                            self.scrollToTop();
+                            if(currentPage === 0){
+                                sys.window.close();
+                            }else{
+                                self.changePage(currentPage);
+                                self.checkPageButtonDisabled();
+                                self.scrollToTop();
+                            }
                         }
                     });
                 }
