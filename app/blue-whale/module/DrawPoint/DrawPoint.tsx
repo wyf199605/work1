@@ -2,6 +2,7 @@
 /// <amd-module name="DrawPoint"/>
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import {IDrawFormatData} from "../plan/planModule";
 
 declare const D3;
 //开启描点连线功能
@@ -12,8 +13,16 @@ interface IDrapPoint extends IComponentPara{
     width:number | string
     height:number | string
     image?:string;
-    format?: (data: obj) => obj;
+    format?: (data: obj) => IDrawFormatData[];
+    onAreaClick?: (areaType: IAreaType) => Promise<any>;
 }
+
+interface IAreaType{
+    type: 'edit';
+    data?: obj;
+    name?: string;
+}
+
 export  class DrawPoint extends Component{
     public svg;
     public g;
@@ -25,7 +34,9 @@ export  class DrawPoint extends Component{
     public r;
     public isDrawLine:boolean = false;
     public indexStr;//保存当前选中的path 下标
-    public drag
+    public drag;
+    private onAreaClick: (areaType: IAreaType) => Promise<any>;
+    private format;
 
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -37,8 +48,10 @@ export  class DrawPoint extends Component{
         return <div className="draw-point-wrapper"/>;
     }
 
-    constructor(para: IDrapPoint) {
+    constructor(protected para: IDrapPoint) {
         super(para);
+        this.onAreaClick = para.onAreaClick;
+        this.format = para.format;
         this.map = D3.map(this.points, function (d, i) {
             return i;
         })
@@ -50,11 +63,6 @@ export  class DrawPoint extends Component{
         this.InitDrag();
         this.InitSvg(para);
 
-
-        let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
-        events && events.forEach((f) => {
-            f && f();
-        });
     }
 
     public InitSvg(para) {
@@ -74,6 +82,11 @@ export  class DrawPoint extends Component{
         this.g.append('image').attr('href',para.image).attr('width',para.width).attr('height',para.height)//添加背景图
     }
 
+    set imgUrl(url){
+
+        this.g.select('image').attr('href',url).attr('width',this.para.width).attr('height',this.para.height)//添加背景图
+    }
+
     private mousedown() {
 
         let svg = D3.select('svg').select('g')
@@ -83,6 +96,11 @@ export  class DrawPoint extends Component{
     }
 
     public  render(data1?:obj[]){
+        if(tools.isEmpty(data1)){
+            return
+        }
+     let format = this.format(data1);
+        console.log(format);
         //
      let   data = [
            {'point':[[308, 41.33333206176758],[307, 147.3333282470703],[212, 148.3333282470703],[215, 42.33333206176758],[308, 41.33333206176758]],
@@ -94,6 +112,7 @@ export  class DrawPoint extends Component{
              'edit_two':'10000/月',
              'index':'1'}
        ]
+
         let svg = D3.select('svg').select('g');
 
          svg.selectAll('path').data(data).enter().append('path')
@@ -131,7 +150,7 @@ export  class DrawPoint extends Component{
                  .text(function (d) {
                      return d.edit_two
                  })
-
+             //以及编辑小图标
 
 
     }
@@ -215,6 +234,7 @@ export  class DrawPoint extends Component{
     public fished (index){
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray",null);
+        let currentIndex = this.index;
         // let dots = this.svg.select('g')
         //     .append('g')
         //     .attr('class',function (d,i) {
@@ -234,7 +254,16 @@ export  class DrawPoint extends Component{
         this.points = [];
         this.index = index ;
         this.isDrawLine = false;
-        D3.selectAll('path').on('click',null);
+        this.map.get(currentIndex);
+        D3.selectAll('path').on('click',()=>{
+            console.log('编辑信息');
+            this.onAreaClick && this.onAreaClick({
+                type:'edit',
+                data:{}
+            }).then((data) =>{
+                console.log(data);
+            })
+        });
         console.log(this.map);
     }
 

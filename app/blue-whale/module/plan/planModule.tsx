@@ -178,9 +178,6 @@ export class PlanModule extends Component{
             }
         });
 
-        this.draw.on(DrawPoint.EVT_AREA_CLICK, () => {
-
-        });
     }
 
     protected bgPicture: string;
