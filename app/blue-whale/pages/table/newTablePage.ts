@@ -59,7 +59,6 @@ export class BwTableElement extends Component{
 
     constructor(para: IBwTableElementPara) {
         super(para);
-
         // d.classAdd(this.dom.parentElement, 'table-page');
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),

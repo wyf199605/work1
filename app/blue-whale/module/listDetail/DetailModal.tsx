@@ -113,6 +113,9 @@ export class DetailModal {
             }
         });
         this.editModule = new NewMBForm(emPara);
+        // 字段默认值
+        this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+        // 修改时字段的值
         tools.isNotEmpty(para.defaultData) && this.editModule.set(para.defaultData);
     }
 
@@ -158,7 +161,7 @@ export class DetailModal {
         }
     }
     destroy() {
-        document.body.classList.remove('edit-overflow-hidden')
+        document.body.classList.remove('edit-overflow-hidden');
         this.para.fm.fields.forEach(f => {
             this.editModule.destroy(f.name);
         });
@@ -215,7 +218,6 @@ export class NewMBForm {
     private pickOnGet(cip: ComInitP, dataArr: obj[], otherField: string) {
         let name = cip.field.name,
             fieldNames = otherField ? otherField.split(',') : [];
-
         dataArr.forEach((data) => {
             for (let key in data) {
                 if (!this.comsExtraData[name]) {
@@ -374,7 +376,6 @@ export class NewMBForm {
                         cb();
                     });
                 };
-
                 let valueList = p.field.atrrs.valueLists ? p.field.atrrs.valueLists.split(/,|;/) : null,
                     comData = Array.isArray(valueList) ? valueList : null,
                     ajax = p.field.dataAddr ? {
