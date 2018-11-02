@@ -724,9 +724,10 @@ export class FastBtnTable extends FastTable{
                      names.push(col.name);
                  }
             });
-            let table = this.mainTable.body.tableEl.cloneNode(true),
+            let table: HTMLTableElement = this.mainTable.body.tableEl.cloneNode(true) as HTMLTableElement,
                 thead = d.query('thead', this.mainTable.head.tableEl).cloneNode(true);
             table.appendChild(thead);
+            table.border = '1';
             let div = <div style="overflow: auto; height: auto; width: 100%"></div>;
             d.append(document.body, div);
             d.append(div, table);

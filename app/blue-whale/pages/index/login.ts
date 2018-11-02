@@ -17,6 +17,7 @@ import {Loading} from "../../../global/components/ui/loading/loading";
 import {UnBinding} from "../../module/unBinding/UnBinding";
 import {NewFinger} from "../../module/fingerPrint/NewFinger";
 import Shell = G.Shell;
+import {FqaPcModal} from "../fqa/fqa.pc";
 
 interface IProps {
     drive?: string,
@@ -768,7 +769,12 @@ export class LoginPage{
 
         if(props.fqaBtn){
             props.fqaBtn.onClick = tools.pattern.throttling(() => {
-                new FqaModal({});
+                if(tools.isMb){
+                    new FqaModal({});
+                }
+                else{
+                    new FqaPcModal({});
+                }
             }, 1000);
         }
         let usertap = 0,maxtap = 5;
