@@ -10,21 +10,21 @@ declare const D3;
 //开启地图放大功能以及拖动功能
 //开启绘制区域功能 （） 设置区域的动画 样式 标旗 ！默认出现弹窗样式显示信息
 
-interface IDrapPoint extends IComponentPara{
-    width:number | string
-    height:number | string
-    image?:string;
+interface IDrapPoint extends IComponentPara {
+    width: number | string
+    height: number | string
+    image?: string;
     format?: (data: obj) => IDrawFormatData[];
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
 }
 
-interface IAreaType{
+interface IAreaType {
     type: 'edit';
     data?: obj;
     name?: string;
 }
 
-export  class DrawPoint extends Component{
+export class DrawPoint extends Component {
     public svg;
     public g;
     public index = 0;
@@ -33,19 +33,20 @@ export  class DrawPoint extends Component{
     public selected
     public line;
     public r;
-    public isDrawLine:boolean = false;
+    public isDrawLine: boolean = false;
     public indexStr;//保存当前选中的path 下标
     public drag;
     private onAreaClick: (areaType: IAreaType) => Promise<any>;
     private format;
+    private renderData;
+    private guid:string;
 
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
     static EVT_DELETE_DATA = '__event_delete_area_click__';
-    static EVT_EDIT_DATA = '__event_edit_area_click__';
     static EVT_IMG_INIT = '__event_image_area_click__';
 
-    protected wrapperInit(){
+    protected wrapperInit() {
         return <div className="draw-point-wrapper"/>;
     }
 
@@ -57,21 +58,27 @@ export  class DrawPoint extends Component{
             return i;
         })
         this.r = D3.scale.linear()
-            .domain([1,6])
-            .range([5.5,1])
+            .domain([1, 6])
+            .range([5.5, 1])
         this.line = D3.svg.line();
         //拖动
         this.InitDrag();
         this.InitSvg(para);
 
+        let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
+
+
+        events && events.forEach((f) => {
+            f && f();
+        });
     }
 
     public InitSvg(para) {
         this.svg = D3.select('.draw-point-wrapper').append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
-            .on('mousedown',()=>{
-                if(!this.isDrawLine){
+            .on('mousedown', () => {
+                if (!this.isDrawLine) {
                     return
                 }
                 this.mousedown();
@@ -79,110 +86,146 @@ export  class DrawPoint extends Component{
             })
         console.log(para.wraperId);
         console.log(D3.select(para.wraperId));
-        this.g = this.svg.append('g');
-        this.g.append('image').attr('href',para.image).attr('width',para.width).attr('height',para.height)//添加背景图
+        this.g = this.svg.append('g').attr('class','g-wrapper');
+        this.g.append('image').attr('href', para.image).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
-    set imgUrl(url){
+    set imgUrl(url) {
 
-        this.g.select('image').attr('href',url).attr('width',this.para.width).attr('height',this.para.height)//添加背景图
+        this.g.select('image').attr('href', url).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
     }
 
     private mousedown() {
 
-        let svg = D3.select('svg').select('g')
-        this.points.push(this.selected = D3.mouse(svg.node()))
+        this.points.push(this.selected = D3.mouse(this.g.node()))
         console.log(this.points)
         this.map.set(this.index, this.points)
     }
 
-    public  render(data1?:obj[]){
-        if(tools.isEmpty(data1)){
+
+
+    public render(data?: obj[]) {
+        this.renderData = data;
+        this.index = data.length + 1 || 0;//初始化index
+
+        let points = [],
+            svg = D3.select('svg').select('g');
+        if (tools.isEmpty(data)) {
             return
         }
-     let format = this.format(data1);
-        console.log(format);
-        //
-     let   data = [
-           {'point':[[308, 41.33333206176758],[307, 147.3333282470703],[212, 148.3333282470703],[215, 42.33333206176758],[308, 41.33333206176758]],
-            'edit_one':'KFC',
-            'edit_two':'20000/月',
-            'index':'0'},
-           {'point':[[355, 97.3333358764648],[335, 206.3333282470703],[408, 170.3333282470703],[413, 97.33333587646484],[355, 97.33333587646484]],
-             'edit_one':'McDonload',
-             'edit_two':'10000/月',
-             'index':'1'}
-       ]
+        data.forEach((d, index) => {
+            let group = this.g.append('g').datum(d);
+            let point =[];
+            this.format(d)
+                .sort((a) => {
+                if(a.isPoint){
+                    return -1;
+                }else{
+                    return 0;
+                }
+            }).forEach((data,I)=>{
+               //  需要用到有point的data
+                if(data.isPoint ){
+                    group.append('path').datum(data.name)
+                        .attr("class", 'line')
+                        .attr('fill','white')
+                        .attr('fill-opacity',0)
+                        .attr("id",  (d,i)=> {
+                            return  'path'+ index;
+                        })
+                        .attr("d", (d, i) => {
+                            point = data.data;
+                            this.map.set(index,data.data)
+                            console.log(this.map);
+                            return this.line(data.data)
+                        })
+                }else{
 
-        let svg = D3.select('svg').select('g');
+                    //绘字
 
-         svg.selectAll('path').data(data).enter().append('path')
-            .attr("class",'line')
-            .attr("id",function (d) {
-                return 'path'+d.index;
+                    let text = group.append('text').datum(data.name)
+                        .attr('fill', 'black')
+                        .attr('font-size', '14px')
+                        .attr("text-anchor", "middle")
+                        .attr('x',  (d, i)=> {
+                            console.log(this.findCenter(point)[0])
+                          return this.findCenter(point)[0]
+
+                        })
+                        .attr('y',  (d, i)=> {
+                            console.log(this.findCenter(point)[1])
+                            return this.findCenter(point)[1]
+                        })
+                        .attr('dx', 5)
+                        .attr('dy', 16*I )
+                        .text(function (d) {
+                            return data.data;
+
+                        })
+
+                    // text.append('tspan').data(data)
+                    //     .attr('x', function (d) {
+                    //         return d['point'][0][0];
+                    //     })
+                    //     .attr('dy', '1em')
+                    //     .text(function (d) {
+                    //         return d.edit_two
+                    //     })
+                }
             })
-            .attr("d", (d,i)=> {
-                return this.line(data[i]['point']);
-            })
 
-            let text =  svg.selectAll('text').data(data).enter().append('text')
-             .attr('fill','black')
-             .attr('font-size','14px')
-             .attr("text-anchor","middle")
-             .attr('x',function (d,i) {
-                 return d['point'][0][0];
-             })
-             .attr('y',function (d,i) {
-                 return d['point'][0][1];
-             })
-             .attr('dx',10)
-             .attr('dy',10)
-             .text(function (d) {
-                 console.log(d)
-                 return d.edit_one;
-
-             })
-
-                 text.append('tspan').data(data)
-                 .attr('x',function (d) {
-                     return d['point'][0][0];
-                 })
-                 .attr('dy','1em')
-                 .text(function (d) {
-                     return d.edit_two
-                 })
-             //以及编辑小图标
+        });
 
 
     }
+    //find图形中心点的位置
+    private findCenter(str){
+        let y,x;
+        let rightStr = [],leftStr = [];
+
+         if (str.length>=0){
+             for(let i = 0;i<str.length;i++){
+               //先找最高点或者最低点(右边 )
+                 rightStr.push(str[i][1])
+                 leftStr.push(str[i][0])
+             }
+
+         }
+
+        y =  (Math.max(...rightStr) +  Math.min(...rightStr))/2;
+
+        x = (Math.min(...leftStr) + Math.max(...leftStr))/2;
+
+        return [x,y]
+    }
 
     //绘图
-    private redraw(){
-        let svg = D3.select('svg').select('g');
-        svg.select("#path"+ this.index)
-            .attr("d", (d,i)=> {
+    private redraw() {
+        let svg = D3.select('svg').select('.g-wrapper');
+        svg.selectAll('g').select('#path'+ this.index)
+            .attr("d", (d, i) => {
                 return this.line(this.map.get(this.index))
             })
             .style("stroke-dasharray", "10 5");
 
         //绘制圆形
-        let circle = svg.selectAll("circle").data(this.map.get(this.index), (d,i)=> {
+        let circle = svg.selectAll("circle").data(this.map.get(this.index), (d, i) => {
             return d;
         })
         circle.enter().append('circle')
-            .attr('r',1e-2)
+            .attr('r', 1e-2)
             .transition()
             .duration(750)
             .ease("elastic")
-            .attr('r',5)
-            .attr('cx',function (d) {
+            .attr('r', 5)
+            .attr('cx', function (d) {
                 return d[0]
             })
-            .attr('cy',function (d) {
+            .attr('cy', function (d) {
                 return d[1]
             })
 
-        circle.classed("selected",  (d)=> {
+        circle.classed("selected", (d) => {
             return d === this.selected;
         })
 
@@ -192,49 +235,54 @@ export  class DrawPoint extends Component{
     }
 
 
-    public createPath(index)
-    {
-        let that = this;
-        if (!this.isDrawLine ){
+    public createPath() {
+        let that = this,
+        index = this.map.size();
+        if (!this.isDrawLine) {
             return;
         }
 
-        if(this.map.get(this.index) == undefined){
-            this.map.set(this.index,[]);
+        if (this.map.get(this.index) == undefined) {
+            this.map.set(this.index, []);
         }
         //再做一层判断 如果已经有当前路径 就不创建
 
 
         //！！每一次创建都会开辟一个新得path
-        var svg = D3.select('svg').select('g')
-       if((index - 1) == this.index && index !== 0){
+        var svg = D3.select('svg').select('.g-wrapper')
+        if ((index - 1) == this.index && index !== 0) {
             return
-       }
-        svg.append("path")
+        }
+        let group = svg.append('g');
+        group.append("path")
             .datum(this.map.get(this.index))
-            .attr("class",'line')
-            .attr("id","path" + this.index)
-            .attr('stroke-width',3)
-            // .on('click',function(d,i){
-            //      that.indexStr = D3.select(this).attr('id');
-            //
-            // })
+            .attr("class", 'line')
+            .attr('fill','white')
+            .attr('fill-opacity',0)
+            .attr("id",  'path' + this.index)
+            .attr('stroke-width', 3)
+        // .on('click',function(d,i){
+        //      that.indexStr = D3.select(this).attr('id');
+        //
+        // })
     }
 
-    public getPoints(){
+    public getPoints() {
         let points = this.points;
         return points;
     }
-    public  setPoint(para){
+
+    public setPoint(para) {
         this.points = para;
     }
 
-    public setIsDrawLine(para){
+    public setIsDrawLine(para) {
         this.isDrawLine = para;
     }
-    public fished (index){
+
+    public fished() {
         D3.selectAll('circle').remove();
-        D3.selectAll('path').style("stroke-dasharray",null);
+        D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
         // let dots = this.svg.select('g')
         //     .append('g')
@@ -253,53 +301,66 @@ export  class DrawPoint extends Component{
         //
 
         this.points = [];
-        this.index = index ;
+        this.index = this.map.size();
         this.isDrawLine = false;
         this.map.get(currentIndex);
-        D3.selectAll('path').on('click',()=>{
+        D3.selectAll('path').on('click', () => {
             console.log('编辑信息');
             this.onAreaClick && this.onAreaClick({
-                type:'edit',
-                data:{}
-            }).then((data) =>{
+                type: 'edit',
+                data: {}
+            }).then((data) => {
                 console.log(data);
             })
-        });
+        }).on('mouseover',function (d,i) {
+            D3.select(this).attr('fill','gold').attr('fill-opacity',0.7)
+        }).on('mouseout',function () {
+            D3.select(this).attr('fill-opacity',0)
+        })
         console.log(this.map);
     }
 
-    public editPoint(){
+    get editedData(){
+        return {
+            insert: [{},{}],
+            update: [{},{}],
+            delete: []
+        }
+    }
+
+    public editPoint() {
         //先把isdraline  打开
-       //获取到当前的编辑path的下标
+        //获取到当前的编辑path的下标
         // 然后把ponit的点加进去
         let that = this;
-        D3.selectAll('path').on('click',function(d,i){
-           //点击完成后 不允许触发click事件
+        this.g.selectAll('g').select('path').on('click', function (d, i) {
+            //点击完成后 不允许触发click事件
+             console.log('选中')
+            that.indexStr = D3.select(this).attr('id');
+            console.log(that.indexStr);
 
-                that.indexStr = D3.select(this).attr('id');
-                console.log(that.indexStr);
-                that.index = parseInt(that.indexStr.slice(4,that.indexStr.length));
-                that.points = that.map.get(that.index);
-                that.isDrawLine = true;
-                that.redraw();
-
+            that.index = parseInt(that.indexStr.slice(4, that.indexStr.length));
+            that.points = that.map.get(that.index);
+            that.isDrawLine = true;
+            that.redraw();
 
 
         })
 
     }
-    private  InitDrag(){
+
+    private InitDrag() {
         let _this = this;
         this.drag = D3.behavior.drag()
-            .origin(function (d,i) {
+            .origin(function (d, i) {
 
-                return {x:d[0],y:d[1]}
+                return {x: d[0], y: d[1]}
             })
-            .on("dragstart", (d,i)=> {
+            .on("dragstart", (d, i) => {
                 console.log("拖拽开始")
-                this.selected  = d;
+                this.selected = d;
                 // debugger;
-                if(  ( this.points.indexOf(d) == 0) && (this.points.length > 2) ) {
+                if ((this.points.indexOf(d) == 0) && (this.points.length > 2)) {
                     console.log("这是第一个")
                     this.points.push(d)
                     this.redraw();
@@ -307,30 +368,30 @@ export  class DrawPoint extends Component{
                 }
                 D3.event.sourceEvent.stopPropagation();
             })
-            .on("dragend", (d,i)=>{
-                this.selected  = d;
+            .on("dragend", (d, i) => {
+                this.selected = d;
                 this.redraw();
                 D3.event.sourceEvent.stopPropagation();
                 console.log("拖拽结束")
             })
-            .on("drag", function(d,i) {
+            .on("drag", function (d, i) {
                 console.log(D3.event.x)
                 D3.select(this)
-                    .attr("cx",d[0] = D3.event.x)
-                    .attr("cy",d[1] = D3.event.y)
+                    .attr("cx", d[0] = D3.event.x)
+                    .attr("cy", d[1] = D3.event.y)
                 _this.redraw();
 
             })
     }
 
-    reback(){
+    reback() {
         D3.select(window)
-            .on("keydown",()=> {
+            .on("keydown", () => {
 
                 switch (D3.event.keyCode) {
 
                     case 8: { // delete
-                        if (!this.selected){
+                        if (!this.selected) {
                             return
                         }
 
