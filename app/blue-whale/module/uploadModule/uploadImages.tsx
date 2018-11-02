@@ -18,7 +18,6 @@ export interface IImage {
 }
 
 interface IUploadImages extends IUploaderPara {
-    caption?: string;
     unique?: string;
 
     onComplete?(this: UploadModule, ...any); // 上传完成回调
@@ -105,7 +104,7 @@ export class UploadImages extends FormCom {
     protected wrapperInit(para: IUploadImages): HTMLElement {
         let type = para.field.dataType || para.field.atrrs.dataType;
         return <div className="accessory-wrapper">
-            <div className="accessory-title">{para.caption || '图片'}</div>
+            <div className="accessory-title">{para.field.caption || '图片'}</div>
             <div className="images-wrapper">
                 {this.imgWrapper = <div className="images-body"/>}
                 {this.addImg = <div className="add-wrapper"/>}
