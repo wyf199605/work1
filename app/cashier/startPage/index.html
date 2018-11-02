@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>收银启动页</title>
+    <link href="startPage/startPage.css?v=0" rel="stylesheet">
+</head>
+<body class="login">
+<div class="box">
+    <div class="start-page-tip">请先配置服务器(F2)</div>
+    <div class="server-select hide">
+        <div class="main-login">
+            <div class="box-login">
+                <div class="page-header">
+                    <h2><img src="startPage/logo.png" alt="" style="height: 40px;margin-right: 5px"><span>选择服务器</span></h2>
+                </div>
+                <form class="form-login"  id="login-form">
+                    <fieldset>
+                        <div class="form-group">
+                            <label>服务器：</label>
+                            <select id="sel" onchange="change()">
+                                <option value="">-select-</option>
+                                <option value="https://pos.sanfu.com/">三福生产环境</option>
+                                <option value="https://bwt.sanfu.com/">三福测试环境</option>
+                                <option value="https://bwd.sanfu.com/">三福开发环境</option>
+                            </select>
+                        </div>
+                        <div class="form-group form-actions">
+                            <textarea class="mui-input-clear" id="serverText"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <!--<button id="turnBack" class="btn btn-primary">返回</button>-->
+                            <button id="login" type="button" class="btn btn-primary">前往</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <!-- end: LOGIN BOX -->
+        </div>
+    </div>
+</div>
+<div class="logo2"><img width="500" height="500" src="startPage/logo2.png" alt="">
+</div>
+
+
+</body>
+
+<script src="startPage/global.js?v=0"></script>
+<script>
+
+    let val = null,
+        serverText = document.getElementById('serverText');
+    function change() {
+        val = document.all.sel.value;
+        serverText.value = val;
+    }
+</script>
+
+<script src="startPage/startPage.js?v=0"></script>
+</html>

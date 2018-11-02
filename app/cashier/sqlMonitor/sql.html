@@ -7,6 +7,7 @@
     <link href="sqlMonitor.css" rel="stylesheet">
 
 </head>
+
 <body class="sqlPage">
 <div class="sql">
 
@@ -23,42 +24,9 @@
             baseUrl: baseUrl,
         }, urlArg);
     }
-    let identification = 'CASHIER_SQL_' + new Date().getTime() + Math.random();
-    require(['BwWebsocket'], function(e){
-        new e.BwWebsocket({
-            url : 'wss://bwd.sanfu.com/cashier/sql/websocket/' + identification,
-            onMessage : r => {
-                let data = JSON.parse(r && r.data);
-                switch (data.respType){
-                    case 'sql':
-                        let content = C.d.query('#sqlMonitorContent',document.body);
-                        if(content) {
-                            // let pageContainer = C.d.closest(content, '.sql');
-                            for (let i = 0, l = data.data.length; i < l; i++) {
-                                C.d.append(content,document.createElement('br'));
-                                C.d.append(content,data.data[i].replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0").replace(/\n/g, ""));
-                            }
-                            C.d.append(content,document.createElement('br'));
-                            content.scrollTop = content.scrollHeight;
-                        }
-                        break;
-                }
-            },
-            onOpen : r => {
-                console.log(r,'开启');
-            },
-            onClose : r => {
-                console.log(r,'关闭')
-            },
-            onError : r => {
-                console.log(r,'error')
-            }
-        });
-    });
     require(['SqlMonitor'], function (e) {
         new e.SqlMonitor({
             container : C.d.query('.sql'),
-            identification : identification
         })
     });
 </script>

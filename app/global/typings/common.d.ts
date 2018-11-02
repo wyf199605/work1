@@ -167,7 +167,7 @@ interface R_Input {
     dataAddr?: R_ReqAddr,
     container?: HTMLElement, //按键绑定的dom
     uiType?: number,
-    inputType?: string, //1扫描枪；2键盘输入；3键盘选择
+    inputType?: string, // 0扫码（rfid设备为扫码枪，手机设备为二维码）1.rfid扫码（支持多个）2.多条码扫码（不支持手机扫二维码）
 }
 
 interface HTMLElementEventMap {

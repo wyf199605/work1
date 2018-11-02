@@ -6,6 +6,7 @@ import {Button} from "../global/components/general/button/Button";
 import {TextInput} from "../global/components/form/text/text";
 import {SelectInput} from "../global/components/form/selectInput/selectInput";
 import d = C.d;
+import Rule = C.Rule;
 const site = 'https://bwd.sanfu.com/';
 const sqlUrl = {
     open : site +'cashier/pos/posmonitor/log/posstart',
@@ -13,14 +14,37 @@ const sqlUrl = {
 };
 interface ISqlMonitorPara {
     container : HTMLElement
-    identification : string
 }
 export class SqlMonitor extends Component{
     private btns : obj = {};//存放button节点
     private coms: objOf<BasicCom> = {};//存放data-type节点
     constructor(private para : ISqlMonitorPara){
         super(para);
+        this.websocket();
         this.init();
+    }
+
+    websocket(){
+        require(['BwWebsocket'], function(e){
+            new e.BwWebsocket({
+                onMessage : r => {
+                    let data = JSON.parse(r && r.data);
+                    switch (data.respType){
+                        case 'sql':
+                            let content = C.d.query('#sqlMonitorContent',document.body);
+                            if(content) {
+                                for (let i = 0, l = data.data.length; i < l; i++) {
+                                    C.d.append(content,document.createElement('br'));
+                                    C.d.append(content,data.data[i].replace(/\t/g, "\u00A0\u00A0\u00A0\u00A0").replace(/\n/g, ""));
+                                }
+                                C.d.append(content,document.createElement('br'));
+                                content.scrollTop = content.scrollHeight;
+                            }
+                            break;
+                    }
+                },
+            });
+        });
     }
 
     init(){
@@ -251,7 +275,7 @@ export class SqlMonitor extends Component{
     private stopSqlMonitor(){
         C.Ajax.fetch(sqlUrl.stop,{
             data : {
-                identification : this.para.identification
+                identification : Rule.getSqlRandom()
             }
         });
     }
@@ -285,7 +309,7 @@ export class SqlMonitor extends Component{
                 delete data[key];
             }
         }
-       C.Ajax.fetch(sqlUrl.open + '?identification=' + this.para.identification, {
+       C.Ajax.fetch(sqlUrl.open + '?identification=' + Rule.getSqlRandom(), {
             type: 'POST',
             data: data
         });
