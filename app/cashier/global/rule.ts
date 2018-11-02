@@ -26,6 +26,14 @@ namespace C{
 
         static DT_FILE = '43'; // 文件
 
+        static SQL = null;
+        static getSqlRandom(){
+            if(!this.SQL){
+                this.SQL = 'SQL_' + new Date().getTime() + Math.random();
+            }
+            return this.SQL;
+        }
+
         static isNumber(dataType: string) {
             return [Rule.DT_NUMBER, Rule.DT_MONEY, Rule.DT_PERCENT].indexOf(dataType) >= 0
         }

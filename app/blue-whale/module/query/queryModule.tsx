@@ -130,6 +130,7 @@ export abstract class QueryModule {
         if(!inputs){
             return;
         }
+
         new Inputs({
             inputs: inputs,
             container: this.para.container,
