@@ -7,7 +7,6 @@ import {Toast} from "../../../global/components/feedback/toast/Toast";
 import {BwRule} from "../../common/rule/BwRule";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 
-
 interface InputsPara {
     inputs: R_Input[]
     container: HTMLElement
@@ -60,7 +59,9 @@ export class Inputs {
             this.atvarParams(elements.atvarparams, elements.subButtons, aUrl);
             return;
         }
-        let category = response.body && response.body.bodyList && response.body.bodyList[0].category || {},
+        let body = response.body && response.body.bodyList && response.body.bodyList[0],
+            category = body.category || {},
+            atvarObj = body.atvarObj,
             type = category.type,
             showText = category.showText,
             ftable = tools.isFunction(this.p.table) && this.p.table();
@@ -69,15 +70,7 @@ export class Inputs {
         switch (type) {
             case 0:
                 //数据覆盖
-                let queryModule = this.para.queryModule && this.para.queryModule();
-                queryModule && queryModule.hide();
-                if(queryModule && !ftable){
-                    queryModule.para.refresher({}, true).then(() => {
-                        response.data && (this.p.table().data = response.data);
-                    })
-                }else {
-                    response.data && ftable && (ftable.data = response.data);
-                }
+                this.dataCover(ftable, response);
                 this.logTip(showText);
                 break;
             case 1:
@@ -105,6 +98,7 @@ export class Inputs {
                         }
                     }
                 });
+                this.dataCover(ftable, response);
                 break;
             case 4:
                 //提示信息,自动下一步
@@ -115,14 +109,32 @@ export class Inputs {
         if (!type && type !== 0) {
             this.logTip(showText);
         }
+        if(atvarObj){
+            this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl);
+        }
+    }
+
+    private dataCover(ftable, response : obj){
+        let data = response.data,
+            queryModule = this.para.queryModule && this.para.queryModule();
+
+        if(tools.isEmpty(data)){
+            return;
+        }
+        queryModule && queryModule.hide();
+        if(queryModule && !ftable){
+            queryModule.para.refresher({}, true).then(() => {
+                this.p.table().data = data;
+            })
+        }else {
+            ftable && (ftable.data = data);
+        }
     }
 
     private logTip(showText){
         this.m && this.m.destroy();
         this.m = new Toast({
-            duration: 0,
             type: 'simple',
-            isClose: true,
             className : 'max-index',
             position: 'bottom',
             content: showText,
@@ -138,7 +150,7 @@ export class Inputs {
             isOnceDestroy : true,
             isMb : false,
             top : 50,
-            body : d.create('<div class="keystep"></div>') as HTMLElement,
+            body : d.create('<div class="inputs-atv"></div>') as HTMLElement,
             footer : {},
             onOk : () => {
                 modal.isShow = false;
