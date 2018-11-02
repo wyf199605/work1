@@ -3,6 +3,7 @@
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {IDrawFormatData} from "../plan/planModule";
+import tools = G.tools;
 
 declare const D3;
 //开启描点连线功能
