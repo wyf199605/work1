@@ -191,10 +191,21 @@ export class ListItemDetail {
             let btn = self.para.fm.subButtons[index];
             switch (btn.subType) {
                 case 'update_save' :
+                    new DetailModal(Object.assign({}, self.para, {
+                        defaultData: self.defaultData,
+                        button: btn,
+                        listDetail: self
+                    }));
+                    break;
                 case 'insert_save':
                     // 编辑
+                    let fields = self.para.fm.fields,
+                        data = self.defaultData;
+                    fields.forEach((f)=>{
+                        data[f.name] = self.handlerValue(f.atrrs.defaultValue || '',f);
+                    });
                     new DetailModal(Object.assign({}, self.para, {
-                        defaultData: btn.subType === 'update_save' ? self.defaultData : {},
+                        defaultData: data,
                         button: btn,
                         listDetail: self
                     }));
@@ -311,16 +322,20 @@ export class ListItemDetail {
                 // 多行文本
                 v = text;
             } else if (type === '20') {
-                v = tools.isNotEmpty(text) ? [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)] : '';
+                v = tools.isNotEmpty(format.link) ? [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)] : '';
             } else if (type === '27' || type === '28') {
                 // 单图和多图（唯一值） 单文件和多文件(唯一值)
-                let addrArr = text.split(','),
-                    arr = [];
-                addrArr.forEach(md5 => {
-                    // 根据md5获取文件地址
-                    arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
-                });
-                v = arr;
+                if (tools.isNotEmpty(text)){
+                    let addrArr = text.split(','),
+                        arr = [];
+                    addrArr.forEach(md5 => {
+                        // 根据md5获取文件地址
+                        arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
+                    });
+                    v = arr;
+                }else{
+                    v = [];
+                }
             } else if (type === '47' || type === '48') {
                 // 获取文件信息地址 （md5,unique）
                 v = tools.isNotEmpty(format.fileInfo) ? BW.CONF.siteUrl + BwRule.reqAddr(format.fileInfo, this.defaultData) : '';
