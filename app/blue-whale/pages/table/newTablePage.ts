@@ -59,7 +59,6 @@ export class BwTableElement extends Component{
 
     constructor(para: IBwTableElementPara) {
         super(para);
-
         // d.classAdd(this.dom.parentElement, 'table-page');
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
@@ -234,33 +233,32 @@ export class BwTableElement extends Component{
         });
     }
 
-
-    private keyStep(inputs){
-        new Inputs({
-            inputs: inputs,
-            container: this.container,
-            table : () => {
-                return this.tableModule && this.tableModule.main.ftable
-            },
-            queryModule : () => {
-                return this.queryModule;
-            }
-        })
-    }
-
     private asynQuery(asynData){
         require(['AsynQuery'], asyn => {
             new asyn.AsynQuery(asynData);
         })
     }
 
-    mobileScanInit(ui: IBW_Table) {
+    private keyStep(inputs){
+        require(['Inputs'], (i) => {
+            new i.Inputs({
+                inputs: inputs,
+                container: this.container,
+                table : () => {
+                    return this.tableModule && this.tableModule.main.ftable
+                },
+                queryModule : () => {
+                    return this.queryModule;
+                }
+            })
+        });
+    }
+
+    private mobileScanInit(ui: IBW_Table) {
         let field = ui.scannableField;
         if (tools.isPc || !field) {
             return;
         }
-
-// console.log(this.para)
         require(['MobileScan'],  (M) => {
             new M.MobileScan({
                 container: this.container,

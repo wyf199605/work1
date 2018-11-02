@@ -10,6 +10,7 @@ import Shell = G.Shell;
 import {UnBinding} from "../../module/unBinding/UnBinding";
 import {Button} from "../../../global/components/general/button/Button";
 import {FqaModal} from "../fqa/fqa";
+import {FqaPcModal} from "../fqa/fqa.pc";
 
 interface IProps {
     goLogin: HTMLElement,   // 返回登录
@@ -147,7 +148,7 @@ export class RegPage {
 
         if(props.fqaBtn){
             props.fqaBtn.onClick = tools.pattern.throttling(() => {
-                new FqaModal({});
+                tools.isMb ? new FqaModal({}) : new FqaPcModal({});
             }, 1000);
         }
     }

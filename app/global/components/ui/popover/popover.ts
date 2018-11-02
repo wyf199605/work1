@@ -1,6 +1,7 @@
 /// <amd-module name="Popover"/>
 import d = G.d;
-import IComponentPara = G.IComponentPara; import Component = G.Component;
+import IComponentPara = G.IComponentPara;
+import Component = G.Component;
 import tools = G.tools;
 import {Mask} from "../mask/mask";
 
@@ -38,7 +39,7 @@ export class Popover extends Component {
         this.init(para);
     }
 
-    protected wrapperInit(): HTMLElement{
+    protected wrapperInit(): HTMLElement {
         //创建popover框
         return d.create(`<div class="popover-wrapper"><div class="arrow"></div><ul class="popover-list"></ul></div>`);
     }
@@ -66,29 +67,29 @@ export class Popover extends Component {
         this.show = para.show;
         this.wrapper.style.display = 'none';
 
-        if(Popover.popView === null) {
+        if (Popover.popView === null) {
             d.on(document, 'click', (ev) => {
                 Popover.popView && (Popover.popView.show = false);
             });
         }
     }
 
-    static popView:Popover = null;
+    static popView: Popover = null;
     protected events = ((self) => {
         let click1, click2;
         return {
-            on(){
+            on() {
                 //点击show
                 d.on(self.target, 'click', click1 = (e) => {
                     e.stopPropagation();
-                    if(Popover.popView !== self){
+                    if (Popover.popView !== self) {
                         Popover.popView && (Popover.popView.show = false);
                     }
                     Popover.popView = self;
                     // e.stopPropagation();
                     // d.off(document, 'click', click);
                     self.show = !self.show;
-                    if(self.isWatch && self.show){
+                    if (self.isWatch && self.show) {
                         self.calcPosition();
                     }
                 });
@@ -99,9 +100,9 @@ export class Popover extends Component {
                     typeof self.onClick === 'function' && self.onClick.call(this, index);
                 });
             },
-            off(){
+            off() {
                 d.off(self.target, 'click', click1);
-                d.off(self.wrapper, 'click', '.popover-item', click2 );
+                d.off(self.wrapper, 'click', '.popover-item', click2);
             }
         }
     })(this);
@@ -127,14 +128,17 @@ export class Popover extends Component {
     //popover方向设置
     protected calcPosition() {
         let self = this, target = self.target;
+        if (tools.isEmpty(target)) {
+            return;
+        }
         let width = target.offsetWidth;
         let height = target.offsetHeight;
         let left = target.offsetLeft;
         let top = target.offsetTop;
-        if(target.offsetParent){
+        if (target.offsetParent) {
             let parent = <HTMLElement>target.offsetParent;
 
-            while(parent){
+            while (parent) {
                 left += parent.offsetLeft;
                 top += parent.offsetTop;
                 parent = <HTMLElement>parent.offsetParent
@@ -219,7 +223,7 @@ export class Popover extends Component {
         let self = this;
         this.mask = Mask.getInstance();
         this.mask.background = this.isBackground;
-        this.mask.addClick(this,  () => {
+        this.mask.addClick(this, () => {
             self.show = false;
         });
         this.mask.show(this);
@@ -232,11 +236,12 @@ export class Popover extends Component {
     }
 
     protected _isWatch: boolean = false;
-    get isWatch(){
+    get isWatch() {
         return this._isWatch;
     }
-    set isWatch(isWatch: boolean){
-        if(tools.isNotEmpty(isWatch)){
+
+    set isWatch(isWatch: boolean) {
+        if (tools.isNotEmpty(isWatch)) {
             this._isWatch = isWatch;
         }
     }
@@ -292,7 +297,7 @@ export class Popover extends Component {
     }
 
     //添加一项popover的item
-    addItem(e: IPopoverItemPara):void {
+    addItem(e: IPopoverItemPara): void {
         let item = e;
         let list: HTMLElement = this.wrapper.querySelector('.popover-list');
         let index = this.items.length;
@@ -306,16 +311,16 @@ export class Popover extends Component {
             index: item.index,
             icon: item.icon
         });
-        let popoverItem = new PopoverItem(this._items[this._items.length-1]);
+        let popoverItem = new PopoverItem(this._items[this._items.length - 1]);
         this._popoverItems.push(popoverItem);
         this.calcPosition();
     }
 
     //删除一项popover的item
-    itemRemove(index: number):boolean {
+    itemRemove(index: number): boolean {
         delete this.items[index];
-        let del:boolean = false;
-        if(!tools.isEmpty(this._popoverItems[index])){
+        let del: boolean = false;
+        if (!tools.isEmpty(this._popoverItems[index])) {
             this._popoverItems[index].destroy();
             this.calcPosition();
             del = true;
@@ -472,11 +477,12 @@ class PopoverItem extends Component {
     }
 
     protected _show: boolean = true;
-    get show(){
+    get show() {
         return this._show;
     }
-    set show(isShow: boolean){
-        if(tools.isNotEmpty(isShow)){
+
+    set show(isShow: boolean) {
+        if (tools.isNotEmpty(isShow)) {
             this._show = isShow;
             this.wrapper.classList.toggle('hide', !isShow);
         }
