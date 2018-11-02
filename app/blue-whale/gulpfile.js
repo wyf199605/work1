@@ -273,7 +273,7 @@ gulp.task('js', function () {
 
     gulpTsPage('pick/contactsPage', 'contactsPage.js');
 
-    gulpTsPage('fqa/fqa', 'fqa.js');
+    gulpTsPage('fqa/*', 'fqa.js');
 
     gulpTsPage('myself/myselfMbPage', 'myselfMbPage.js');
 

@@ -1,4 +1,5 @@
 .fqa-modal{
+
   .fqa-content{
     padding-bottom:50px;
     .panel-item-content{
@@ -22,4 +23,43 @@
     }
   }
 
+}
+.pc-fqa-content{
+  width: 60%;
+  margin:0 auto;
+  font-size: 14px;
+  .fqa-modal-item{
+    border-bottom: 1px solid #e2e2e2;
+    padding-bottom: 40px;
+  }
+  .fqa-modal-title{
+    margin: 40px 0 20px 0;
+    color: #3a3a3a;
+  }
+  .fqa-modal-content{
+    color: #666;
+  }
+  .fqa-modal-img{
+    text-align: center;
+  }
+  .fqa-font{
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 20px;
+    border-radius: 2px;
+    color: #fff;
+    font-style: normal;
+    text-align: center;
+  }
+  .question{
+    background-color: #005bac;
+  }
+  .answer{
+    background-color: #b0b0b0;
+  }
+}
+
+.modal-box .modal-wrapper:not(.modal-mobile) .modal-body{
+  max-height: calc(100% - 40px);
 }
