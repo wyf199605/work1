@@ -39,7 +39,7 @@ export class DrawPoint extends Component {
     private onAreaClick: (areaType: IAreaType) => Promise<any>;
     private format;
     private renderData;
-    private guid:string;
+    private guid: string;
     public zoom;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
@@ -89,7 +89,7 @@ export class DrawPoint extends Component {
             })
 
 
-        this.g = this.svg.append('g').attr('class','g-wrapper');
+        this.g = this.svg.append('g').attr('class', 'g-wrapper');
         this.g.append('image').attr('href', para.image).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
@@ -100,90 +100,108 @@ export class DrawPoint extends Component {
 
     private mousedown() {
         this.points.push(this.selected = D3.mouse(this.g.node()))
-        console.log(this.points)
         this.map.set(this.index, this.points)
     }
 
 
+    private editEvent = (() => {
+        let self = this;
+        return {
+            on: () => {
+                this.g.selectAll('g').on('click', function (d, i) {
+                    self.onAreaClick && self.onAreaClick({
+                        type: 'edit',
+                        data: d
+                    }).then((data) => {
+                        self.showData(data, D3.select(this))
+                    })
+                }).on('mouseover', function (d, i) {
+                    D3.select(this).select('path').attr('fill', 'gold').attr('fill-opacity', 0.7)
+                }).on('mouseout', function () {
+                    D3.select(this).select('path').attr('fill', 'white').attr('fill-opacity', 0)
+                });
+            },
+            off: () => {
+                this.g.selectAll('g').on('click', null).on('mouseover', null).on('mouseout', null)
+            }
+        }
+    })()
+
+    //点击取消
+   public editCancel(){
+        this.render(this._data);
+    }
+
+    //点击编辑
+    public editOpen(){
+        this.editEvent.on();
+    }
+
+    //点击删除整个
+    public delArea(){
+
+    }
+
+    private _data;
 
     public render(data?: obj[]) {
-
+        this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
-        if(!this.g.selectAll('g').empty()){
-            console.log(D3.select('.g-wrapper').selectAll('g'));
+        this.editEvent.off();
+        this.isDrawLine = false;
+        if (!this.g.selectAll('g').empty()) {
             D3.select('.g-wrapper').selectAll('g').remove();
             D3.select('.g-wrapper').selectAll('circle').remove();
         }
 
-        this.map.remove(4);
-
         this.renderData = data;
         this.index = data.length + 1 || 0;//初始化index
-        console.log(data)
+
         let points = [],
             svg = D3.select('svg').select('g');
         if (tools.isEmpty(data)) {
             return
         }
         data.forEach((d, index) => {
-            console.log(d);
-            let group = this.g.append('g').datum(d).on('click', () => {
-                this.onAreaClick && this.onAreaClick({
-                    type: 'edit',
-                    data: d
-                }).then((data) => {
-                    console.log(group.selectAll('text'))
-                    console.log(data);
-                    this.showData(data,group.selectAll('text'))
-                })
-            }).on('mouseover',function (d,i) {
-                D3.select(this).select('path').attr('fill','gold').attr('fill-opacity',0.7)
-            }).on('mouseout',function () {
-                D3.select(this).select('path').attr('fill','white').attr('fill-opacity',0)
-            });
-            let point =[];
+            let group = this.g.append('g').datum(d);
+            let point = [];
             this.format(d)
                 .sort((a) => {
-                if(a.isPoint){
-                    return -1;
-                }else{
-                    return 0;
-                }
-            }).forEach((data,I)=>{
-               //  需要用到有point的data
-                if(data.isPoint ){
+                    if (a.isPoint) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }).forEach((data, I) => {
+                //  需要用到有point的data
+                if (data.isPoint) {
                     group.append('path').datum(data.name)
                         .attr("class", 'line')
-                        .attr('fill','white')
-                        .attr('fill-opacity',0)
-                        .attr("id",  (d,i)=> {
-                            return  'path'+ index;
+                        .attr('fill', 'white')
+                        .attr('fill-opacity', 0)
+                        .attr("id", (d, i) => {
+                            return 'path' + index;
                         })
                         .attr("d", (d, i) => {
                             point = data.data;
-                            this.map.set(index,data.data)
-                            console.log(this.map);
+                            this.map.set(index, data.data)
                             return this.line(data.data)
                         })
-                }else{
-
+                } else {
                     //绘字
-
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
                         .attr('font-size', '14px')
                         .attr("text-anchor", "middle")
-                        .attr('x',  (d, i)=> {
-                            console.log(this.findCenter(point)[0])
-                          return this.findCenter(point)[0]
+                        .attr('x', (d, i) => {
+                            return this.findCenter(point)[0]
 
                         })
-                        .attr('y',  (d, i)=> {
-                            console.log(this.findCenter(point)[1])
+                        .attr('y', (d, i) => {
                             return this.findCenter(point)[1]
                         })
                         .attr('dx', 5)
-                        .attr('dy', 16*I )
+                        .attr('dy', 16 * I)
                         .text(function (d) {
                             return data.data;
 
@@ -192,34 +210,35 @@ export class DrawPoint extends Component {
             })
 
         });
-
+        //this.editEvent.on();
 
     }
+
     //find图形中心点的位置
-    private findCenter(str){
-        let y,x;
-        let rightStr = [],leftStr = [];
+    private findCenter(str) {
+        let y, x;
+        let rightStr = [], leftStr = [];
 
-         if (str.length>=0){
-             for(let i = 0;i<str.length;i++){
-               //先找最高点或者最低点(右边 )
-                 rightStr.push(str[i][1])
-                 leftStr.push(str[i][0])
-             }
+        if (str.length >= 0) {
+            for (let i = 0; i < str.length; i++) {
+                //先找最高点或者最低点(右边 )
+                rightStr.push(str[i][1])
+                leftStr.push(str[i][0])
+            }
 
-         }
+        }
 
-        y =  (Math.max(...rightStr) +  Math.min(...rightStr))/2;
+        y = (Math.max(...rightStr) + Math.min(...rightStr)) / 2;
 
-        x = (Math.min(...leftStr) + Math.max(...leftStr))/2;
+        x = (Math.min(...leftStr) + Math.max(...leftStr)) / 2;
 
-        return [x,y]
+        return [x, y]
     }
 
     //绘图
     private redraw() {
         let svg = D3.select('svg').select('.g-wrapper');
-        svg.selectAll('g').select('#path'+ this.index)
+        svg.selectAll('g').select('#path' + this.index)
             .attr("d", (d, i) => {
                 return this.line(this.map.get(this.index))
             })
@@ -254,29 +273,27 @@ export class DrawPoint extends Component {
 
     public createPath() {
         let that = this,
-        index = this.map.size();
+            index = this.map.size();
         if (!this.isDrawLine) {
             return;
         }
 
+        if (this.map.has(this.index)) {
+            return
+        }
         if (this.map.get(this.index) == undefined) {
             this.map.set(this.index, []);
         }
-        //再做一层判断 如果已经有当前路径 就不创建
-
-
+        this.editEvent.off();
         //！！每一次创建都会开辟一个新得path
         var svg = D3.select('svg').select('.g-wrapper')
-        if ((index - 1) == this.index && index !== 0) {
-            return
-        }
         let group = svg.append('g');
         group.append("path")
             .datum(this.map.get(this.index))
             .attr("class", 'line')
-            .attr('fill','white')
-            .attr('fill-opacity',0)
-            .attr("id",  'path' + this.index)
+            .attr('fill', 'white')
+            .attr('fill-opacity', 0)
+            .attr("id", 'path' + this.index)
             .attr('stroke-width', 2)
         // .on('click',function(d,i){
         //      that.indexStr = D3.select(this).attr('id');
@@ -317,65 +334,36 @@ export class DrawPoint extends Component {
         //            .text("\ue63a")
         //    }
         //
-
         this.points = [];
-        this.index = this.map.size() ;
+        this.index = this.map.size() + 1;
         this.isDrawLine = false;
         this.map.get(currentIndex);
-        this.g.selectAll('g').on('click', function(d) {
-            let g_this = this;
-            console.log(D3.select(this));
-            console.log('编辑信息');
-            that.onAreaClick && that.onAreaClick({
-                type: 'edit',
-                data: {}
-            }).then(function(data){
-                console.log(data);
-                //需要判断 如果里面有字段就更新，没有得话就需要实时创建
-               if(D3.select(g_this).selectAll('text').empty()){
-                   that.format(data).forEach((anl,I)=>{
-                       if(!anl.isPoint){
-                           let text = D3.select(g_this).append('text').datum(anl.name)
-                               .attr('fill', 'black')
-                               .attr('font-size', '14px')
-                               .attr("text-anchor", "middle")
-                               .attr('x',  (d, i)=> {
+        //this.editEvent.on();
 
-                                   return that.findCenter(that.map.get(that.index))[0]
-
-                               })
-                               .attr('y',  (d, i)=> {
-
-                                   return that.findCenter(that.map.get(that.index))[1]
-                               })
-                               .attr('dx', 5)
-                               .attr('dy', 16*I )
-                               .text(function (d) {
-                                   return anl.data;
-
-                               })
-                       }
-                   })
-
-               }else {
-                   that.showData(data,D3.select(this).selectAll('text'))
-               }
-
-
-            })
-        }).on('mouseover',function (d,i) {
-            D3.select(this).select('path').attr('fill','gold').attr('fill-opacity',0.7)
-        }).on('mouseout',function () {
-            D3.select(this).select('path').attr('fill','white').attr('fill-opacity',0)
-        });
-        console.log(this.map);
     }
 
-    get editedData(){
+    get editedData() {
+        let update = this.g.selectAll('.update'),
+            updateStr = [];
+        update.each(function (d) {
+            updateStr.push(d);
+        })
+        let insert = this.g.selectAll('.insert'),
+            insertStr = [];
+        insert.each(function (d) {
+            insertStr.push(d);
+        })
+
+        let del = this.g.selectAll('.delete'),
+            delStr = [];
+        del.each(function (d) {
+            delStr.push(d);
+        })
+
         return {
-            insert: [{},{}],
-            update: [{},{}],
-            delete: []
+            insert: insertStr,
+            update: updateStr,
+            delete: delStr
         }
     }
 
@@ -386,9 +374,7 @@ export class DrawPoint extends Component {
         let that = this;
         this.g.selectAll('g').on('click', function (d, i) {
             //点击完成后 不允许触发click事件
-             console.log('选中')
             that.indexStr = D3.select(this).select('path').attr('id');
-            console.log(that.indexStr);
 
             that.index = parseInt(that.indexStr.slice(4, that.indexStr.length));
             that.points = that.map.get(that.index);
@@ -396,7 +382,7 @@ export class DrawPoint extends Component {
             that.redraw();
 
 
-        }).on('mouseover',null).on('mouseout',null)
+        }).on('mouseover', null).on('mouseout', null)
 
     }
 
@@ -408,11 +394,9 @@ export class DrawPoint extends Component {
                 return {x: d[0], y: d[1]}
             })
             .on("dragstart", (d, i) => {
-                console.log("拖拽开始")
                 this.selected = d;
                 // debugger;
                 if ((this.points.indexOf(d) == 0) && (this.points.length > 2)) {
-                    console.log("这是第一个")
                     this.points.push(d)
                     this.redraw();
                     //clo = false;
@@ -423,10 +407,8 @@ export class DrawPoint extends Component {
                 this.selected = d;
                 this.redraw();
                 D3.event.sourceEvent.stopPropagation();
-                console.log("拖拽结束")
             })
             .on("drag", function (d, i) {
-                console.log(D3.event.x)
                 D3.select(this)
                     .attr("cx", d[0] = D3.event.x)
                     .attr("cy", d[1] = D3.event.y)
@@ -434,27 +416,95 @@ export class DrawPoint extends Component {
 
             })
     }
+
     //回显方法！已经字段编辑 以及无字段添加 显示
-    private showData(data,sl){
+    private showData(data, sl) {
         //这里要data放入更新区域
-        console.log(this.format(data));;
-        this.format(data)
-            .forEach((analysis)=>{
-                 if(!analysis.isPoint){
-                     sl.each(function (d) {
-                         console.log(d)
-                         if(d == analysis.name){
-                             D3.select(this).text(function () {
-                                 return analysis.data
-                             })
+        //整个方法判断空编辑 或者已有编辑
+        if (sl.selectAll('text').empty()) {
+            let newDelivery = {}
+            this.format(data).forEach((anl, I) => {
+                if (!anl.isPoint) {
+                    let text = sl.append('text').datum(anl.name)
+                        .attr('fill', 'black')
+                        .attr('font-size', '14px')
+                        .attr("text-anchor", "middle")
+                        .attr('x', (d, i) => {
+                            let idStr = sl.select('path').attr('id'),
+                                id = parseInt(idStr.slice(4, idStr.length))
+                            return this.findCenter(this.map.get(id))[0]
 
-                         }
-                     })
+                        })
+                        .attr('y', (d, i) => {
+                            let idStr = sl.select('path').attr('id'),
+                                id = parseInt(idStr.slice(4, idStr.length))
+                            return this.findCenter(this.map.get(id))[1]
+                        })
+                        .attr('dx', 5)
+                        .attr('dy', 16 * I)
+                        .text(function (d) {
+                            newDelivery[d] = anl.data;
+                            return anl.data;
 
-                 }
+                        })
+                }
+            })
+
+            //给新增的path绑定数据
+            let path = sl.select('path').attr('id'),
+                i = parseInt(path.slice(4, path.length));
+
+            newDelivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
+            sl.datum(newDelivery);
+
+            sl.attr('class', function (d) {
+                return 'insert'
+            })
+
+        } else {
+            //已经有文字的情况下
+            let delivery = {}
+            this.format(data)
+                .forEach((analysis) => {
+                    if (!analysis.isPoint) {
+                        sl.selectAll('text').each(function (d) {
+
+                            console.log(d)
+                            if (d == analysis.name) {
+                                D3.select(this).text(function () {
+                                    delivery[d] = analysis.data;
+                                    return analysis.data
+                                })
+
+                            }
+                        })
+
+                    }
+
+                })
+            let path = sl.select('path').attr('id'),
+                i = parseInt(path.slice(4, path.length));
+
+            delivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
+
+            sl.attr('class', function (d) {
+                debugger
+                let num = 0;
+                for (let des in delivery) {
+                    if (d[des] !== delivery[des]) {
+                        num++;
+                    }
+                }
+                if (num >= 1 && D3.select(this).attr('class') !== 'insert') {
+                    return 'update';
+                } else {
+                    return D3.select(this).attr('class');
+                }
+            }).datum(delivery)
+
+        }
 
 
-        })
     }
 
     reback() {
@@ -463,19 +513,22 @@ export class DrawPoint extends Component {
 
                 switch (D3.event.keyCode) {
 
-                    case 8: { // delete
-                        if (!this.selected) {
-                            return
+                    case 90: { // delete
+                        if(D3.event.ctrlKey){
+                            if (!this.selected) {
+                                return
+                            }
+
+                            let i = this.points.lastIndexOf(this.selected);
+
+                            this.points.splice(i, 1);
+
+                            this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
+
+                            this.redraw();
+                            console.log('撤回')
                         }
 
-                        let i = this.points.lastIndexOf(this.selected);
-
-                        this.points.splice(i, 1);
-
-                        this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
-
-                        this.redraw();
-                        console.log('撤回')
                         break;
 
                     }
@@ -483,26 +536,27 @@ export class DrawPoint extends Component {
                 }
             })
     }
-    public OnZoom(){
+
+    public OnZoom() {
         this.svg.call(this.zoom);
     }
 
-    public ZoomStart(para){
-        let X  = D3.scale.linear()
-            .domain([0,para.width])
-            .range([0,para.width]),
+    public ZoomStart(para) {
+        let X = D3.scale.linear()
+                .domain([0, para.width])
+                .range([0, para.width]),
             Y = D3.scale.linear()
-            .domain([0,para.height])
-            .range([0,para.height]);
+                .domain([0, para.height])
+                .range([0, para.height]);
 
         this.zoom = D3.behavior.zoom()
             .x(X)
             .y(Y)
-            .scaleExtent([1,10])
-            .on('zoomstart',function () {
+            .scaleExtent([1, 10])
+            .on('zoomstart', function () {
                 D3.select("svg").on("dblclick.zoom", null);
             })
-            .on('zoom',function (d) {
+            .on('zoom', function (d) {
                 // if(D3.event.scale > 6) {
                 //     rLate = 6;
                 //     lineLate = 6
@@ -516,12 +570,12 @@ export class DrawPoint extends Component {
                 //
                 // }
                 //if(dragged ){
-                    D3.select('svg').select('.g-wrapper').attr('transform',"translate("+D3.event.translate + ")" + "scale("+D3.event.scale + ")");
-                    console.log(D3.event.translate)
-               // }
+                D3.select('svg').select('.g-wrapper').attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
+
+                // }
 
 
-            }).on("zoomend",function (d) {
+            }).on("zoomend", function (d) {
 
                 console.log("结束")
             })

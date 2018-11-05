@@ -11,6 +11,8 @@ import CONF = BW.CONF;
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {DetailModal} from "../listDetail/DetailModal";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -58,6 +60,7 @@ export class PlanModule extends Component{
             width: 800,
             container: this.wrapper,
             format: (data: obj) => {
+                console.log(data);
                 let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
@@ -68,9 +71,14 @@ export class PlanModule extends Component{
                 return res;
             },
             onAreaClick: (areaType) => {
-                if(areaType.type === 'edit'){
-                    return this.edit.editData(areaType.data)
-                }
+                return new Promise((resolve, reject) => {
+                    if(areaType.type === 'edit'){
+                        return this.edit.editData(areaType.data, (data) => {
+                            resolve(data)
+                        });
+                    }
+                })
+
             }
         });
 
@@ -118,12 +126,18 @@ export class PlanModule extends Component{
             color: string,                  // 文字颜色
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
+
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;
 
             if(dataType === '77'){
-                text = JSON.parse(text);
+                if(DrawPoint.POINT_FIELD in rowData){
+                    text = rowData[DrawPoint.POINT_FIELD]
+                }
+                if(text && !Array.isArray(text)){
+                    text = JSON.parse(text);
+                }
                 isPoint = true;
             }else{
                 if (dataType === '50') {
@@ -161,13 +175,21 @@ export class PlanModule extends Component{
 
     protected plotBtn = (() => {
         let plotBox: InputBox, editBox: InputBox;
+
+        let editBtnToggle = (isEdit: boolean) => {
+            plotBox && (plotBox.disabled = isEdit);
+            editBox.getItem('edit').isDisabled = isEdit;
+            editBox.getItem('save').isDisabled = !isEdit;
+            editBox.getItem('cancel').isDisabled = !isEdit;
+        };
+
         let init = () => {
             let buttons: IButton[] = [
                 {
                     content: '撤销',
                     icon: 'chexiao',
                     color: 'error',
-                    tip: 'Backspace键',
+                    tip: 'ctrl + z 撤销',
                     onClick: () => {
                         let btn = d.queryAll('.plan-opera>div');
                         btn.forEach((res)=>{
@@ -268,6 +290,7 @@ export class PlanModule extends Component{
                     iconPre: 'appcommon',
                     icon: 'app-bianji',
                     onClick: () => {
+                        this.edit.start();
                     }
                 },
                 {
@@ -287,6 +310,7 @@ export class PlanModule extends Component{
                     iconPre: 'appcommon',
                     icon: 'app-quxiao',
                     onClick: () => {
+                        this.edit.cancel();
                     }
                 }
             ];
@@ -312,6 +336,7 @@ export class PlanModule extends Component{
 
         return {
             init,
+            editBtnToggle,
             set disabled(disabled: boolean){
                 plotBox && (plotBox.disabled = disabled);
                 editBox && (editBox.disabled = disabled);
@@ -321,14 +346,14 @@ export class PlanModule extends Component{
 
     edit = (() => {
 
-        let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
+        // 将获取到的编辑数据处理成传送给后台的数据
+        let editParamDataGet = (tableData, varList: IBW_TableAddrParam) => {
             let paramData: obj = {};
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
 
-                    let data = BwRule.varList(varList[key], tableData[dataKey], true,
-                        !isPivot);
+                    let data = BwRule.varList(varList[key], tableData[dataKey], true);
                     if (data) {
                         paramData[key] = data;
                     }
@@ -341,35 +366,106 @@ export class PlanModule extends Component{
             return paramData;
         };
 
-        let save = () => {
+        // 获取编辑的数据
+        let getEditData = () => {
+            let ui = this.ui,
+                pointField: string,
+                postData = {
+                param: [] as obj[]
+            };
+            for(let col of ui.cols){
+                if(col.dataType === '77' || (col.atrrs && col.atrrs.dataType === '77')){
+                    pointField = col.name;
+                    break;
+                }
+            }
+            let editedData = this.draw.editedData,
+                getPointData = (data: obj): obj => {
+                let res = Object.assign({}, data);
+                if(pointField && res[DrawPoint.POINT_FIELD]){
+                    res[pointField] = res[DrawPoint.POINT_FIELD];
+                    delete res[DrawPoint.POINT_FIELD];
+                }
+                return res;
+            };
 
+            let data = editParamDataGet({
+                insert: editedData.insert.map(getPointData),
+                update: editedData.update.map(getPointData),
+                delete: editedData.delete.map(getPointData),
+            }, ui.tableAddr.param[0]);
+            if (!tools.isEmpty(data)) {
+                postData.param.push(data);
+            }
+            return postData;
         };
 
-        let editData = (data: obj) => {
+        // 保存
+        let save = () => {
+            console.log(this.draw.editedData);
+            let saveData = getEditData();
+            if (tools.isEmpty(saveData.param)) {
+                Modal.toast('没有数据改变');
+                return
+            }
+            console.log(saveData);
+            let loading = new Loading({
+                msg: '保存中',
+                disableEl: this.wrapper
+            });
+
+            let ui= this.ui;
+
+            BwRule.Ajax.fetch(CONF.siteUrl + ui.tableAddr.dataAddr, {
+                type: 'POST',
+                data: saveData,
+            }).then(({response}) => {
+                BwRule.checkValue(response, saveData, () => {
+                    this.refresh(this._ajaxData);
+                    cancel();
+                });
+            }).finally(() => {
+                loading && loading.destroy();
+                loading = null;
+            });
+        };
+
+        // 编辑修改
+        let editData = (data: obj, callback: (data: obj) => void) => {
             console.log(data);
-            return new Promise((resolve, reject) => {
-
-                new DetailModal({
-                    uiType: this.ui.uiType,
-                    fm: {
-                        caption: this.ui.caption,
-                        fields: this.ui.cols,
-                        defDataAddrList: this.ui.defDataAddrList,
-                        dataAddr: this.ui.dataAddr
-                    },
-                    defaultData: data,
-                    confirm: () => {
-                        return new Promise<any>(() => {
-
-                        })
-                    }
-                })
+            new DetailModal({
+                uiType: this.ui.uiType,
+                fm: {
+                    caption: this.ui.caption,
+                    fields: this.ui.cols,
+                    defDataAddrList: this.ui.defDataAddrList,
+                    dataAddr: this.ui.dataAddr
+                },
+                defaultData: data,
+                confirm: (data) => {
+                    return new Promise<any>((resolve) => {
+                        callback && callback(data);
+                        resolve();
+                    })
+                }
             })
+        };
+
+        let start = () => {
+            this.draw && this.draw.editOpen();
+            this.plotBtn.editBtnToggle(true);
+        };
+
+        let cancel = () => {
+            this.draw && this.draw.editCancel();
+            this.plotBtn.editBtnToggle(false);
         };
 
         return {
             save,
             editData,
+            cancel,
+            start
         };
     })();
 
