@@ -245,7 +245,12 @@ namespace G{
         }
 
         static strDateFormat(dateStr: string, fmt?: string) {
-            let date = new Date(dateStr);
+            let date:Date = null;
+            if (dateStr === '%date%'){
+                date = new Date();
+            }else{
+                date = new Date(dateStr);
+            }
             if (!isNaN(date.getTime()) && fmt) {
                 return Rule.dateFormat(date, fmt);
             }

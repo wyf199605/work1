@@ -18,7 +18,6 @@ export interface IFileInfo {
 }
 
 export interface IAccessory extends IUploaderPara {
-    caption?: string;
     uniques?: string;
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
@@ -56,12 +55,15 @@ export class Accessory extends FormCom {
             switch (this.fileType) {
                 case '47':
                 case '48': {
-                    let obj:obj ={};
-                    obj[this.para.nameField] = value;
-                    let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.fileInfo, Object.assign({},this.para.pageData,obj));
-                    BwRule.Ajax.fetch(fileInfoAddr).then(({response}) => {
-                        this.files = response.dataArr || [];
-                    })
+                    let fileInfo = this.para.field.fileInfo;
+                    if (tools.isNotEmpty(fileInfo)){
+                        let obj:obj ={};
+                        obj[this.para.nameField] = value;
+                        let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(fileInfo, Object.assign({},this.para.pageData,obj));
+                        BwRule.Ajax.fetch(fileInfoAddr).then(({response}) => {
+                            this.files = response.dataArr || [];
+                        })
+                    }
                 }
                     break;
                 // case '40':
@@ -103,7 +105,7 @@ export class Accessory extends FormCom {
 
     protected wrapperInit(para: IAccessory): HTMLElement {
         return <div className="accessory-wrapper">
-            <div className="accessory-title">{para.caption || '附件'}</div>
+            <div className="accessory-title">{para.field.caption || '附件'}</div>
             {
                 this.accessoryBodyWrapper = <div className="accessory-body">
                     <div c-var="uploader" className="upload"><i className="appcommon app-jia"/>添加附件</div>

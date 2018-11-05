@@ -9,7 +9,8 @@ import tools = G.tools;
 import Shell = G.Shell;
 import {UnBinding} from "../../module/unBinding/UnBinding";
 import {Button} from "../../../global/components/general/button/Button";
-import {FqaModal} from "../fqa/fqa";
+import {Loading} from "../../../global/components/ui/loading/loading";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
 
 interface IProps {
     goLogin: HTMLElement,   // 返回登录
@@ -147,7 +148,30 @@ export class RegPage {
 
         if(props.fqaBtn){
             props.fqaBtn.onClick = tools.pattern.throttling(() => {
-                new FqaModal({});
+                // 使用异步加载fqa模块，防止一进入页面直接加载，堵塞
+                props.fqaBtn.disabled = true;
+                let spinner = new Spinner({
+                    type: Spinner.SHOW_TYPE.replace,
+                    el: props.fqaBtn.wrapper
+                });
+                spinner.show();
+                new Promise((resolve, reject) => {
+                    if(tools.isMb){
+                        require(['FqaModal'], (f) => {
+                            new f.FqaModal({});
+                            resolve();
+                        });
+                    }
+                    else{
+                        require(['FqaPcModal'], (f) => {
+                            new f.FqaPcModal({});
+                            resolve();
+                        });
+                    }
+                }).then(() => {
+                    spinner.hide();
+                    props.fqaBtn.disabled = false;
+                })
             }, 1000);
         }
     }

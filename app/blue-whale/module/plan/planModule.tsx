@@ -9,6 +9,10 @@ import {BwRule} from "../../common/rule/BwRule";
 import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
 import CONF = BW.CONF;
 import {Button, IButton} from "../../../global/components/general/button/Button";
+import {DetailModal} from "../listDetail/DetailModal";
+import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -27,114 +31,12 @@ export interface IDrawFormatData{
 export class PlanModule extends Component{
 
     wrapperInit(){
-        let buttons: IButton[] = [
-            {
-                content: '撤销',
-                icon: 'chexiao',
-                color: 'error',
-                tip: 'Backspace键',
-                onClick: () => {
-                    let btn = d.queryAll('.plan-opera>div');
-                    btn.forEach((res)=>{
-                        d.classRemove(res,'custom-button');
-                    });
-                    let currBtn = d.query('.plan-opera>.back-opera');
-                    d.classAdd(currBtn,'custom-button');
-
-                    this.draw.reback();                },
-            },
-            {
-                content: '完成编辑',
-                icon: 'wanchengbianji',
-                color: 'success',
-                onClick: () => {
-                    //完成编辑--------
-
-                    //把point 清楚
-                    let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
-
-                    console.log(this.draw.getPoints());
-                    this.draw.setIsDrawLine(false);
-                    this.draw.fished(paths.length);
-
-                    let btn = d.queryAll('.plan-opera>div');
-                    btn.forEach((res) => {
-                        d.classRemove(res, 'custom-button');
-                    });
-                    let currBtn = d.query('.plan-opera>.finsh-point');
-                    d.classAdd(currBtn, 'custom-button');
-                },
-            },
-            {
-                content: '描点',
-                icon: 'maodian',
-                color: 'info',
-                onClick: () => {
-                    console.log('开始描点')
-                    let btn = d.queryAll('.plan-opera>div');
-                    btn.forEach((res) => {
-                        d.classRemove(res, 'custom-button');
-                    });
-
-                    let currBtn = d.query('.plan-opera>.miao-dian');
-                    d.classAdd(currBtn, 'custom-button');
-                    //------------------开始绘图
-                    let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
-                    this.draw.setIsDrawLine(true);
-                    this.draw.createPath(paths.length);
-                },
-            },
-            {
-                content: '编辑描点',
-                icon: 'bianjimaodian',
-                color: 'info',
-                onClick: () => {
-                    console.log('开始编辑')
-                    let btn = d.queryAll('.plan-opera>div');
-                    btn.forEach((res) => {
-                        d.classRemove(res, 'custom-button');
-                    });
-
-                    let currBtn = d.query('.plan-opera>.edit-dian');
-                    d.classAdd(currBtn, 'custom-button');
-                    //------------------开始绘图
-
-                    this.draw.editPoint();
-                },
-            },
-            {
-                content: '拖动',
-                icon: 'tuodong',
-                color: 'info',
-                tip: "空格键+左击",
-                onClick: () => {
-                },
-            },
-            {
-                content: '缩放',
-                icon: 'suofang',
-                color: 'info',
-                tip: '滚轮',
-                onClick: () => {
-                },
-            },
-            {
-                content: '保存',
-                icon: 'baocun',
-                color: 'success',
-                onClick: () => {
-                    this.edit.save();
-                },
-            }
-        ];
-
         return <div className="plan-content">
-            <div class="plan-opera">
-                {this.buttons = buttons.map(btn => new Button(btn))}
-            </div>
+            {this.btnWrapper = <div class="plan-opera"/>}
         </div>;
     }
 
+    protected btnWrapper: HTMLElement;
     protected buttons: Button[];
     protected draw: DrawPoint;
     protected ui: IBW_Plan_Table;
@@ -144,6 +46,8 @@ export class PlanModule extends Component{
         super(para);
         let ui = this.ui = para.ui;
 
+        this.plotBtn.init();
+        this.plotBtn.disabled = true;
         this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
     }
 
@@ -156,6 +60,7 @@ export class PlanModule extends Component{
             width: 800,
             container: this.wrapper,
             format: (data: obj) => {
+                console.log(data);
                 let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
@@ -166,21 +71,17 @@ export class PlanModule extends Component{
                 return res;
             },
             onAreaClick: (areaType) => {
-                return new Promise<any>((resolve, reject) => {
+                return new Promise((resolve, reject) => {
                     if(areaType.type === 'edit'){
-                        this.edit.editData(areaType.data).then(() => {
-                            resolve();
-                        }).catch(() => {
-                            reject();
-                        })
+                        return this.edit.editData(areaType.data, (data) => {
+                            resolve(data)
+                        });
                     }
                 })
+
             }
         });
 
-        this.draw.on(DrawPoint.EVT_AREA_CLICK, () => {
-
-        });
     }
 
     protected bgPicture: string;
@@ -197,7 +98,9 @@ export class PlanModule extends Component{
         }
     }
 
+    protected _ajaxData;
     refresh(ajaxData?: obj){
+        this._ajaxData = ajaxData;
         let ui = this.ui,
             url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
         this.setBackground(ajaxData);
@@ -209,6 +112,7 @@ export class PlanModule extends Component{
         }).then(({response}) => {
             console.log(response);
             this.draw.render(response.data);
+            this.plotBtn.disabled = false;
         }).catch(e => {
             console.log(e);
         })
@@ -222,11 +126,18 @@ export class PlanModule extends Component{
             color: string,                  // 文字颜色
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
+
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;
 
             if(dataType === '77'){
+                if(DrawPoint.POINT_FIELD in rowData){
+                    text = rowData[DrawPoint.POINT_FIELD]
+                }
+                if(text && !Array.isArray(text)){
+                    text = JSON.parse(text);
+                }
                 isPoint = true;
             }else{
                 if (dataType === '50') {
@@ -262,21 +173,187 @@ export class PlanModule extends Component{
         return {data: text, classes, name, bgColor, color, isShow, isPoint};
     }
 
-    edit = (() => {
-        let editedData = {
-            insert: [],
-            delete: [],
-            update: []
+    protected plotBtn = (() => {
+        let plotBox: InputBox, editBox: InputBox;
+
+        let editBtnToggle = (isEdit: boolean) => {
+            plotBox && (plotBox.disabled = isEdit);
+            editBox.getItem('edit').isDisabled = isEdit;
+            editBox.getItem('save').isDisabled = !isEdit;
+            editBox.getItem('cancel').isDisabled = !isEdit;
         };
 
-        let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
+        let init = () => {
+            let buttons: IButton[] = [
+                {
+                    content: '撤销',
+                    icon: 'chexiao',
+                    color: 'error',
+                    tip: 'ctrl + z 撤销',
+                    onClick: () => {
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res)=>{
+                            d.classRemove(res,'custom-button');
+                        });
+                        let currBtn = d.query('.plan-opera>.back-opera');
+                        d.classAdd(currBtn,'custom-button');
+
+                        this.draw.reback();                },
+                },
+                {
+                    content: '完成编辑',
+                    icon: 'wanchengbianji',
+                    color: 'success',
+                    onClick: () => {
+                        //完成编辑--------
+
+                        //把point 清楚
+                        let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
+
+                        console.log(this.draw.getPoints());
+                        this.draw.setIsDrawLine(false);
+                        this.draw.fished();
+
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res) => {
+                            d.classRemove(res, 'custom-button');
+                        });
+                        let currBtn = d.query('.plan-opera>.finsh-point');
+                        d.classAdd(currBtn, 'custom-button');
+                    },
+                },
+                {
+                    content: '描点',
+                    icon: 'maodian',
+                    color: 'info',
+                    onClick: () => {
+                        console.log('开始描点')
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res) => {
+                            d.classRemove(res, 'custom-button');
+                        });
+
+                        let currBtn = d.query('.plan-opera>.miao-dian');
+                        d.classAdd(currBtn, 'custom-button');
+                        //------------------开始绘图
+                        let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
+                        this.draw.setIsDrawLine(true);
+                        this.draw.createPath();
+                    },
+                },
+                {
+                    content: '编辑描点',
+                    icon: 'bianjimaodian',
+                    color: 'info',
+                    onClick: () => {
+                        buttons.forEach((val)=>{
+                            if(val.content == '描点'){
+                                val.isDisabled = true;
+
+                            }
+                        })
+                        console.log('开始编辑')
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res) => {
+                            d.classRemove(res, 'custom-button');
+                        });
+
+                        let currBtn = d.query('.plan-opera>.edit-dian');
+                        d.classAdd(currBtn, 'custom-button');
+                        //------------------开始绘图
+
+                        this.draw.editPoint();
+                    },
+                },
+                {
+                    content: '拖动',
+                    icon: 'tuodong',
+                    color: 'info',
+                    tip: "空格键+左击",
+                    onClick: () => {
+                    },
+                },
+                {
+                    content: '缩放',
+                    icon: 'suofang',
+                    color: 'info',
+                    tip: '滚轮',
+                    onClick: () => {
+                        this.draw.OnZoom();
+                    },
+                }
+            ];
+            let editButtons: IButton[] = [
+                {
+                    key: 'edit',
+                    content: '编辑',
+                    iconPre: 'appcommon',
+                    icon: 'app-bianji',
+                    onClick: () => {
+                        this.edit.start();
+                    }
+                },
+                {
+                    key: 'save',
+                    content: '保存',
+                    iconPre: 'appcommon',
+                    icon: 'app-baocun',
+                    isDisabled: true,
+                    onClick: () => {
+                        this.edit.save();
+                    }
+                },
+                {
+                    key: 'cancel',
+                    content: '取消',
+                    isDisabled: true,
+                    iconPre: 'appcommon',
+                    icon: 'app-quxiao',
+                    onClick: () => {
+                        this.edit.cancel();
+                    }
+                }
+            ];
+
+            // 初始化绘图按钮
+            plotBox = new InputBox({
+                container: this.btnWrapper,
+                size: 'middle'
+            });
+            buttons.map((b) => new Button(b)).forEach((b) => {
+                plotBox.addItem(b)
+            });
+
+            // 初始化编辑按钮
+            editBox = new InputBox({
+                container: this.btnWrapper,
+                size: 'middle'
+            });
+            editButtons.map((b) => new Button(b)).forEach((b) => {
+                editBox.addItem(b)
+            });
+        };
+
+        return {
+            init,
+            editBtnToggle,
+            set disabled(disabled: boolean){
+                plotBox && (plotBox.disabled = disabled);
+                editBox && (editBox.disabled = disabled);
+            }
+        }
+    })();
+
+    edit = (() => {
+
+        // 将获取到的编辑数据处理成传送给后台的数据
+        let editParamDataGet = (tableData, varList: IBW_TableAddrParam) => {
             let paramData: obj = {};
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
 
-                    let data = BwRule.varList(varList[key], tableData[dataKey], true,
-                        !isPivot);
+                    let data = BwRule.varList(varList[key], tableData[dataKey], true);
                     if (data) {
                         paramData[key] = data;
                     }
@@ -289,19 +366,106 @@ export class PlanModule extends Component{
             return paramData;
         };
 
-        let save = () => {
+        // 获取编辑的数据
+        let getEditData = () => {
+            let ui = this.ui,
+                pointField: string,
+                postData = {
+                param: [] as obj[]
+            };
+            for(let col of ui.cols){
+                if(col.dataType === '77' || (col.atrrs && col.atrrs.dataType === '77')){
+                    pointField = col.name;
+                    break;
+                }
+            }
+            let editedData = this.draw.editedData,
+                getPointData = (data: obj): obj => {
+                let res = Object.assign({}, data);
+                if(pointField && res[DrawPoint.POINT_FIELD]){
+                    res[pointField] = res[DrawPoint.POINT_FIELD];
+                    delete res[DrawPoint.POINT_FIELD];
+                }
+                return res;
+            };
 
+            let data = editParamDataGet({
+                insert: editedData.insert.map(getPointData),
+                update: editedData.update.map(getPointData),
+                delete: editedData.delete.map(getPointData),
+            }, ui.tableAddr.param[0]);
+            if (!tools.isEmpty(data)) {
+                postData.param.push(data);
+            }
+            return postData;
         };
 
-        let editData = (data: obj) => {
-            return new Promise(() => {
+        // 保存
+        let save = () => {
+            console.log(this.draw.editedData);
+            let saveData = getEditData();
+            if (tools.isEmpty(saveData.param)) {
+                Modal.toast('没有数据改变');
+                return
+            }
+            console.log(saveData);
+            let loading = new Loading({
+                msg: '保存中',
+                disableEl: this.wrapper
+            });
 
+            let ui= this.ui;
+
+            BwRule.Ajax.fetch(CONF.siteUrl + ui.tableAddr.dataAddr, {
+                type: 'POST',
+                data: saveData,
+            }).then(({response}) => {
+                BwRule.checkValue(response, saveData, () => {
+                    this.refresh(this._ajaxData);
+                    cancel();
+                });
+            }).finally(() => {
+                loading && loading.destroy();
+                loading = null;
+            });
+        };
+
+        // 编辑修改
+        let editData = (data: obj, callback: (data: obj) => void) => {
+            console.log(data);
+            new DetailModal({
+                uiType: this.ui.uiType,
+                fm: {
+                    caption: this.ui.caption,
+                    fields: this.ui.cols,
+                    defDataAddrList: this.ui.defDataAddrList,
+                    dataAddr: this.ui.dataAddr
+                },
+                defaultData: data,
+                confirm: (data) => {
+                    return new Promise<any>((resolve) => {
+                        callback && callback(data);
+                        resolve();
+                    })
+                }
             })
+        };
+
+        let start = () => {
+            this.draw && this.draw.editOpen();
+            this.plotBtn.editBtnToggle(true);
+        };
+
+        let cancel = () => {
+            this.draw && this.draw.editCancel();
+            this.plotBtn.editBtnToggle(false);
         };
 
         return {
             save,
             editData,
+            cancel,
+            start
         };
     })();
 

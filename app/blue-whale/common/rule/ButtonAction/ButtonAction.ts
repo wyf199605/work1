@@ -419,7 +419,7 @@ export class ButtonAction {
             isMb: false
         };
         if(tools.isMb){
-            para.top = 30;
+            para.top = 80;
         }
         if (type === 3 || type === 5) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
@@ -440,13 +440,26 @@ export class ButtonAction {
                     onClick: () => {
                         let data = [];
                         if (!res.downloadAddr) {
-                            modal.destroy();
                             if (res.atvarparams) {
                                 data[0] = selectInput;
+
+                                let errTip = '',
+                                    atvData =  BwRule.atvar.dataGet(),
+                                    atvarparams = res.atvarparams;
+                                atvarparams.forEach(obj => {
+                                    if(obj.atrrs.requiredFlag === 1 && atvData[obj.field_name] === ''){
+                                        errTip += obj.caption + ',';
+                                    }
+                                });
+                                if(errTip !== ''){
+                                    Modal.alert(errTip.substring(0,errTip.length - 1) + '不能为空');
+                                    return;
+                                }
                             } else if (type === 5) {
                                 data[0] = table.main.ftable.selectedRowsData;
                             }
                             data[1] = res;
+                            modal.destroy();
                         }
 
                         this.clickHandle(obj, data, (r) => {
