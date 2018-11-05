@@ -9,6 +9,7 @@ import {BwRule} from "../../common/rule/BwRule";
 import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
 import CONF = BW.CONF;
 import {Button, IButton} from "../../../global/components/general/button/Button";
+import {DetailModal} from "../listDetail/DetailModal";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -89,6 +90,12 @@ export class PlanModule extends Component{
                 icon: 'bianjimaodian',
                 color: 'info',
                 onClick: () => {
+                    buttons.forEach((val)=>{
+                        if(val.content == '描点'){
+                            val.isDisabled = true;
+
+                        }
+                    })
                     console.log('开始编辑')
                     let btn = d.queryAll('.plan-opera>div');
                     btn.forEach((res) => {
@@ -116,6 +123,7 @@ export class PlanModule extends Component{
                 color: 'info',
                 tip: '滚轮',
                 onClick: () => {
+                    this.draw.OnZoom();
                 },
             },
             {
@@ -166,15 +174,9 @@ export class PlanModule extends Component{
                 return res;
             },
             onAreaClick: (areaType) => {
-                return new Promise<any>((resolve, reject) => {
-                    if(areaType.type === 'edit'){
-                        this.edit.editData(areaType.data).then(() => {
-                            resolve();
-                        }).catch(() => {
-                            reject();
-                        })
-                    }
-                })
+                if(areaType.type === 'edit'){
+                    return this.edit.editData(areaType.data)
+                }
             }
         });
 
@@ -194,7 +196,9 @@ export class PlanModule extends Component{
         }
     }
 
+    protected _ajaxData;
     refresh(ajaxData?: obj){
+        this._ajaxData = ajaxData;
         let ui = this.ui,
             url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
         this.setBackground(ajaxData);
@@ -292,8 +296,24 @@ export class PlanModule extends Component{
         };
 
         let editData = (data: obj) => {
-            return new Promise(() => {
+            console.log(data);
+            return new Promise((resolve, reject) => {
 
+                new DetailModal({
+                    uiType: this.ui.uiType,
+                    fm: {
+                        caption: this.ui.caption,
+                        fields: this.ui.cols,
+                        defDataAddrList: this.ui.defDataAddrList,
+                        dataAddr: this.ui.dataAddr
+                    },
+                    defaultData: data,
+                    confirm: () => {
+                        return new Promise<any>(() => {
+
+                        })
+                    }
+                })
             })
         };
 
