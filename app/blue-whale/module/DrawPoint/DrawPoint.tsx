@@ -462,16 +462,13 @@ export class DrawPoint extends Component {
 
         } else {
             //已经有文字的情况下
-            let delivery = {}
+            let map = Object.assign({}, data);
             this.format(data)
                 .forEach((analysis) => {
                     if (!analysis.isPoint) {
                         sl.selectAll('text').each(function (d) {
-
-                            console.log(d)
                             if (d == analysis.name) {
                                 D3.select(this).text(function () {
-                                    delivery[d] = analysis.data;
                                     return analysis.data
                                 })
 
@@ -484,13 +481,12 @@ export class DrawPoint extends Component {
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
 
-            delivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
+            map[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
 
             sl.attr('class', function (d) {
-                debugger
                 let num = 0;
-                for (let des in delivery) {
-                    if (d[des] !== delivery[des]) {
+                for (let des in map) {
+                    if (d[des] !== map[des]) {
                         num++;
                     }
                 }
@@ -499,7 +495,9 @@ export class DrawPoint extends Component {
                 } else {
                     return D3.select(this).attr('class');
                 }
-            }).datum(delivery)
+            }).datum((d) => {
+                return Object.assign({}, d, map);
+            })
 
         }
 
