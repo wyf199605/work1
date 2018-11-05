@@ -337,6 +337,7 @@ export class DrawPoint extends Component {
         update.each(function (d) {
             updateStr.push(d);
         })
+
         return {
             insert: [],
             update: updateStr,
@@ -431,7 +432,7 @@ export class DrawPoint extends Component {
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
 
-            newDelivery['point'] = this.map.get(i);
+            newDelivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
             sl.datum(newDelivery);
 
         } else {
@@ -458,7 +459,8 @@ export class DrawPoint extends Component {
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
 
-            delivery['point'] = this.map.get(i);
+            delivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
+
             sl.attr('class', function (d) {
                 debugger
                 let num = 0;
