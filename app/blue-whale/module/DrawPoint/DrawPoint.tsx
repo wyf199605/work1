@@ -127,6 +127,16 @@ export class DrawPoint extends Component {
         }
     })()
 
+    //点击取消
+   public editCancel(){
+        this.render(this._data);
+    }
+
+    //点击编辑
+    public editOpen(){
+        this.editEvent.on();
+    }
+
     private _data;
 
     public render(data?: obj[]) {
@@ -318,30 +328,36 @@ export class DrawPoint extends Component {
         //            .text("\ue63a")
         //    }
         //
-        this.g.selectAll('g').attr('class', function (d) {
-            if ('path' + currentIndex == D3.select(this).select('path').attr('id')) {
-                return 'insert';
-            }
-        })
         this.points = [];
         this.index = this.map.size() + 1;
         this.isDrawLine = false;
         this.map.get(currentIndex);
-        this.editEvent.on();
+        //this.editEvent.on();
 
     }
 
     get editedData() {
-    let update =  this.g.selectAll('.update'),
-        updateStr = [];
+        let update = this.g.selectAll('.update'),
+            updateStr = [];
         update.each(function (d) {
             updateStr.push(d);
         })
+        let insert = this.g.selectAll('.insert'),
+            insertStr = [];
+        insert.each(function (d) {
+            insertStr.push(d);
+        })
+
+        let del = this.g.selectAll('.delete'),
+            delStr = [];
+        del.each(function (d) {
+            delStr.push(d);
+        })
 
         return {
-            insert: [],
+            insert: insertStr,
             update: updateStr,
-            delete: []
+            delete: delStr
         }
     }
 
@@ -434,6 +450,10 @@ export class DrawPoint extends Component {
 
             newDelivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
             sl.datum(newDelivery);
+
+            sl.attr('class', function (d) {
+                return 'insert'
+            })
 
         } else {
             //已经有文字的情况下
