@@ -11,6 +11,8 @@ import CONF = BW.CONF;
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {DetailModal} from "../listDetail/DetailModal";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -336,14 +338,14 @@ export class PlanModule extends Component{
 
     edit = (() => {
 
-        let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
+        // 将获取到的编辑数据处理成传送给后台的数据
+        let editParamDataGet = (tableData, varList: IBW_TableAddrParam) => {
             let paramData: obj = {};
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
 
-                    let data = BwRule.varList(varList[key], tableData[dataKey], true,
-                        !isPivot);
+                    let data = BwRule.varList(varList[key], tableData[dataKey], true);
                     if (data) {
                         paramData[key] = data;
                     }
@@ -356,10 +358,70 @@ export class PlanModule extends Component{
             return paramData;
         };
 
-        let save = () => {
-            console.log(this.draw.editedData);
+        // 获取编辑的数据
+        let getEditData = () => {
+            let ui = this.ui,
+                pointField: string,
+                postData = {
+                param: [] as obj[]
+            };
+            for(let col of ui.cols){
+                if(col.dataType === '77' || (col.atrrs && col.atrrs.dataType === '77')){
+                    pointField = col.name;
+                    break;
+                }
+            }
+            let editedData = this.draw.editedData,
+                getPointData = (data: obj): obj => {
+                let res = Object.assign({}, data);
+                if(pointField && res[DrawPoint.POINT_FIELD]){
+                    res[pointField] = res[DrawPoint.POINT_FIELD];
+                    delete res[DrawPoint.POINT_FIELD];
+                }
+                return res;
+            };
+
+            let data = editParamDataGet({
+                insert: editedData.insert.map(getPointData),
+                update: editedData.update.map(getPointData),
+                delete: editedData.delete.map(getPointData),
+            }, ui.tableAddr.param[0]);
+            if (!tools.isEmpty(data)) {
+                postData.param.push(data);
+            }
+            return postData;
         };
 
+        // 保存
+        let save = () => {
+            console.log(this.draw.editedData);
+            let saveData = getEditData();
+            if (tools.isEmpty(saveData.param)) {
+                Modal.toast('没有数据改变');
+                return
+            }
+            console.log(saveData);
+            let loading = new Loading({
+                msg: '保存中',
+                disableEl: this.wrapper
+            });
+
+            let ui= this.ui;
+
+            BwRule.Ajax.fetch(CONF.siteUrl + ui.tableAddr.dataAddr, {
+                type: 'POST',
+                data: saveData,
+            }).then(({response}) => {
+                BwRule.checkValue(response, saveData, () => {
+                    this.refresh(this._ajaxData);
+                });
+            }).finally(() => {
+                loading && loading.destroy();
+                loading = null;
+            });
+        };
+
+        // 编辑修改
         let editData = (data: obj, callback: (data: obj) => void) => {
             console.log(data);
             new DetailModal({
