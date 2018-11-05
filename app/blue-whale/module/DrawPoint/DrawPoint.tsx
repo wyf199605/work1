@@ -100,7 +100,6 @@ export class DrawPoint extends Component {
 
     private mousedown() {
         this.points.push(this.selected = D3.mouse(this.g.node()))
-        console.log(this.points)
         this.map.set(this.index, this.points)
     }
 
@@ -110,12 +109,10 @@ export class DrawPoint extends Component {
         return {
             on: () => {
                 this.g.selectAll('g').on('click', function (d, i) {
-                    console.log('编辑信息');
                     self.onAreaClick && self.onAreaClick({
                         type: 'edit',
                         data: d
                     }).then((data) => {
-                        console.log(data);
                         self.showData(data, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
@@ -137,7 +134,6 @@ export class DrawPoint extends Component {
         //清空上一轮数据
         this.editEvent.off();
         if (!this.g.selectAll('g').empty()) {
-            console.log(D3.select('.g-wrapper').selectAll('g'));
             D3.select('.g-wrapper').selectAll('g').remove();
             D3.select('.g-wrapper').selectAll('circle').remove();
         }
@@ -173,7 +169,6 @@ export class DrawPoint extends Component {
                         .attr("d", (d, i) => {
                             point = data.data;
                             this.map.set(index, data.data)
-                            console.log(this.map);
                             return this.line(data.data)
                         })
                 } else {
@@ -183,12 +178,10 @@ export class DrawPoint extends Component {
                         .attr('font-size', '14px')
                         .attr("text-anchor", "middle")
                         .attr('x', (d, i) => {
-                            console.log(this.findCenter(point)[0])
                             return this.findCenter(point)[0]
 
                         })
                         .attr('y', (d, i) => {
-                            console.log(this.findCenter(point)[1])
                             return this.findCenter(point)[1]
                         })
                         .attr('dx', 5)
@@ -336,7 +329,6 @@ export class DrawPoint extends Component {
         this.map.get(currentIndex);
         this.editEvent.on();
 
-        console.log(this.map);
     }
 
     get editedData() {
@@ -346,7 +338,7 @@ export class DrawPoint extends Component {
             updateStr.push(d);
         })
         return {
-            insert: [{}, {}],
+            insert: [],
             update: updateStr,
             delete: []
         }
@@ -359,9 +351,7 @@ export class DrawPoint extends Component {
         let that = this;
         this.g.selectAll('g').on('click', function (d, i) {
             //点击完成后 不允许触发click事件
-            console.log('选中')
             that.indexStr = D3.select(this).select('path').attr('id');
-            console.log(that.indexStr);
 
             that.index = parseInt(that.indexStr.slice(4, that.indexStr.length));
             that.points = that.map.get(that.index);
@@ -381,11 +371,9 @@ export class DrawPoint extends Component {
                 return {x: d[0], y: d[1]}
             })
             .on("dragstart", (d, i) => {
-                console.log("拖拽开始")
                 this.selected = d;
                 // debugger;
                 if ((this.points.indexOf(d) == 0) && (this.points.length > 2)) {
-                    console.log("这是第一个")
                     this.points.push(d)
                     this.redraw();
                     //clo = false;
@@ -396,10 +384,8 @@ export class DrawPoint extends Component {
                 this.selected = d;
                 this.redraw();
                 D3.event.sourceEvent.stopPropagation();
-                console.log("拖拽结束")
             })
             .on("drag", function (d, i) {
-                console.log(D3.event.x)
                 D3.select(this)
                     .attr("cx", d[0] = D3.event.x)
                     .attr("cy", d[1] = D3.event.y)
@@ -554,7 +540,7 @@ export class DrawPoint extends Component {
                 // }
                 //if(dragged ){
                 D3.select('svg').select('.g-wrapper').attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
-                console.log(D3.event.translate)
+
                 // }
 
 

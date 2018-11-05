@@ -58,6 +58,7 @@ export class PlanModule extends Component{
             width: 800,
             container: this.wrapper,
             format: (data: obj) => {
+                console.log(data);
                 let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
@@ -68,9 +69,14 @@ export class PlanModule extends Component{
                 return res;
             },
             onAreaClick: (areaType) => {
-                if(areaType.type === 'edit'){
-                    return this.edit.editData(areaType.data)
-                }
+                return new Promise((resolve, reject) => {
+                    if(areaType.type === 'edit'){
+                        return this.edit.editData(areaType.data, (data) => {
+                            resolve(data)
+                        });
+                    }
+                })
+
             }
         });
 
@@ -118,12 +124,18 @@ export class PlanModule extends Component{
             color: string,                  // 文字颜色
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
+
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;
 
             if(dataType === '77'){
-                text = JSON.parse(text);
+                if(DrawPoint.POINT_FIELD in rowData){
+                    text = rowData[DrawPoint.POINT_FIELD]
+                }
+                if(text && !Array.isArray(text)){
+                    text = JSON.parse(text);
+                }
                 isPoint = true;
             }else{
                 if (dataType === '50') {
@@ -268,6 +280,9 @@ export class PlanModule extends Component{
                     iconPre: 'appcommon',
                     icon: 'app-bianji',
                     onClick: () => {
+                        editBox.getItem('edit').isDisabled = true;
+                        editBox.getItem('save').isDisabled = false;
+                        editBox.getItem('cancel').isDisabled = false;
                     }
                 },
                 {
@@ -342,28 +357,26 @@ export class PlanModule extends Component{
         };
 
         let save = () => {
-
+            console.log(this.draw.editedData);
         };
 
-        let editData = (data: obj) => {
+        let editData = (data: obj, callback: (data: obj) => void) => {
             console.log(data);
-            return new Promise((resolve, reject) => {
-
-                new DetailModal({
-                    uiType: this.ui.uiType,
-                    fm: {
-                        caption: this.ui.caption,
-                        fields: this.ui.cols,
-                        defDataAddrList: this.ui.defDataAddrList,
-                        dataAddr: this.ui.dataAddr
-                    },
-                    defaultData: data,
-                    confirm: () => {
-                        return new Promise<any>(() => {
-
-                        })
-                    }
-                })
+            new DetailModal({
+                uiType: this.ui.uiType,
+                fm: {
+                    caption: this.ui.caption,
+                    fields: this.ui.cols,
+                    defDataAddrList: this.ui.defDataAddrList,
+                    dataAddr: this.ui.dataAddr
+                },
+                defaultData: data,
+                confirm: (data) => {
+                    return new Promise<any>((resolve) => {
+                        callback && callback(data);
+                        resolve();
+                    })
+                }
             })
         };
 
