@@ -148,6 +148,7 @@ export class DrawPoint extends Component {
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
         this.editEvent.off();
+        this.isDrawLine = false;
         if (!this.g.selectAll('g').empty()) {
             D3.select('.g-wrapper').selectAll('g').remove();
             D3.select('.g-wrapper').selectAll('circle').remove();
