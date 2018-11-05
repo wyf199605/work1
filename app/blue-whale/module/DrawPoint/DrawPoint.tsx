@@ -148,7 +148,9 @@ export class DrawPoint extends Component {
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
         this.editEvent.off();
+        this.keyDownEvent.off();
         this.isDrawLine = false;
+        this.map.remove();
         if (!this.g.selectAll('g').empty()) {
             D3.select('.g-wrapper').selectAll('g').remove();
             D3.select('.g-wrapper').selectAll('circle').remove();
@@ -463,16 +465,13 @@ export class DrawPoint extends Component {
 
         } else {
             //已经有文字的情况下
-            let delivery = {}
+            let map = Object.assign({}, data);
             this.format(data)
                 .forEach((analysis) => {
                     if (!analysis.isPoint) {
                         sl.selectAll('text').each(function (d) {
-
-                            console.log(d)
                             if (d == analysis.name) {
                                 D3.select(this).text(function () {
-                                    delivery[d] = analysis.data;
                                     return analysis.data
                                 })
 
@@ -485,13 +484,12 @@ export class DrawPoint extends Component {
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
 
-            delivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
+            map[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
 
             sl.attr('class', function (d) {
-                debugger
                 let num = 0;
-                for (let des in delivery) {
-                    if (d[des] !== delivery[des]) {
+                for (let des in map) {
+                    if (d[des] !== map[des]) {
                         num++;
                     }
                 }
@@ -500,41 +498,58 @@ export class DrawPoint extends Component {
                 } else {
                     return D3.select(this).attr('class');
                 }
-            }).datum(delivery)
+            }).datum((d) => {
+                return Object.assign({}, d, map);
+            })
 
         }
 
 
     }
 
-    reback() {
-        D3.select(window)
-            .on("keydown", () => {
+    //键盘事件的关闭和开启
+    private  keyDownEvent= (() => {
+        let self = this;
+        return {
+            on: () => {
+                D3.select(window)
+                    .on("keydown", () => {
 
-                switch (D3.event.keyCode) {
+                        switch (D3.event.keyCode) {
 
-                    case 90: { // delete
-                        if(D3.event.ctrlKey){
-                            if (!this.selected) {
-                                return
+                            case 90: { // delete
+                                if(D3.event.ctrlKey){
+                                    if (!this.selected) {
+                                        return
+                                    }
+
+                                    let i = this.points.lastIndexOf(this.selected);
+
+                                    this.points.splice(i, 1);
+
+                                    this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
+
+                                    this.redraw();
+                                    console.log('撤回')
+                                }
+
+                                break;
+
                             }
 
-                            let i = this.points.lastIndexOf(this.selected);
-
-                            this.points.splice(i, 1);
-
-                            this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
-
-                            this.redraw();
-                            console.log('撤回')
                         }
+                    })
+            },
+            off: () => {
+                D3.select(window)
+                    .on("keydown", null)
+            }
+        }
+    })()
 
-                        break;
 
-                    }
-
-                }
-            })
+    reback() {
+        this.keyDownEvent.on()
     }
 
     public OnZoom() {

@@ -60,7 +60,6 @@ export class PlanModule extends Component{
             width: 800,
             container: this.wrapper,
             format: (data: obj) => {
-                console.log(data);
                 let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
                     let name = col.name;
@@ -111,7 +110,25 @@ export class PlanModule extends Component{
             data: PlanModule.initQueryParams(ajaxData)
         }).then(({response}) => {
             console.log(response);
-            this.draw.render(response.data);
+            let data = response.data;
+            if (data) {
+                let editParam = ui.tableAddr.param[0];
+                if (editParam) {
+                    let varList = [];
+                    ['insert', 'update', 'delete'].forEach(type => {
+                        let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                            typeVarList = editParam[type];
+
+                        if (canOld && Array.isArray(typeVarList)) {
+                            varList = varList.concat(typeVarList)
+                        }
+                    });
+                    // 加上OLD变量
+                    BwRule.addOldField(BwRule.getOldField(varList), data);
+                }
+            }
+            console.log(data);
+            this.draw.render(data);
             this.plotBtn.disabled = false;
         }).catch(e => {
             console.log(e);
@@ -406,6 +423,7 @@ export class PlanModule extends Component{
             let saveData = getEditData();
             if (tools.isEmpty(saveData.param)) {
                 Modal.toast('没有数据改变');
+                cancel();
                 return
             }
             console.log(saveData);
@@ -421,8 +439,8 @@ export class PlanModule extends Component{
                 data: saveData,
             }).then(({response}) => {
                 BwRule.checkValue(response, saveData, () => {
-                    this.refresh(this._ajaxData);
                     cancel();
+                    this.refresh(this._ajaxData);
                 });
             }).finally(() => {
                 loading && loading.destroy();
@@ -443,6 +461,7 @@ export class PlanModule extends Component{
                 },
                 defaultData: data,
                 confirm: (data) => {
+                    debugger;
                     return new Promise<any>((resolve) => {
                         callback && callback(data);
                         resolve();
