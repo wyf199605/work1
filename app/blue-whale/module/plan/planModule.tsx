@@ -51,6 +51,12 @@ export class PlanModule extends Component{
                     //完成编辑--------
 
                     //把point 清楚
+                    this.buttons.forEach((val)=>{
+                        if(val.content == '描点'){
+                            val.isDisabled = false;
+
+                        }
+                    })
                     let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
 
                     console.log(this.draw.getPoints());
@@ -70,7 +76,7 @@ export class PlanModule extends Component{
                 icon: 'maodian',
                 color: 'info',
                 onClick: () => {
-                    console.log('开始描点')
+
                     let btn = d.queryAll('.plan-opera>div');
                     btn.forEach((res) => {
                         d.classRemove(res, 'custom-button');
@@ -89,7 +95,7 @@ export class PlanModule extends Component{
                 icon: 'bianjimaodian',
                 color: 'info',
                 onClick: () => {
-                    buttons.forEach((val)=>{
+                    this.buttons.forEach((val)=>{
                         if(val.content == '描点'){
                             val.isDisabled = true;
 
