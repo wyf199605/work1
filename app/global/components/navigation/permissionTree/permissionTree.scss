@@ -25,9 +25,9 @@
   align-items: center;
   &.root-item {
     & > .permissionTreeItem-text-wrapper {
-      border-left: 1px solid red;
-      border-top: 1px solid red;
-      border-bottom: 1px solid red;
+      border-left: 1px solid #e2e2e2;
+      border-top: 1px solid #e2e2e2;
+      border-bottom: 1px solid #e2e2e2;
     }
   }
   .permissionTreeItem-text-wrapper {
@@ -37,9 +37,9 @@
     min-width: 120px;
     padding-left: 20px;
     height: 100%;
-    border-left: 1px solid red;
-    border-top: 1px solid red;
-    border-bottom: 1px solid red;
+    border-left: 1px solid #e2e2e2;
+    border-top: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e2e2e2;
   }
   &.permissionTreeItem.normal-item:nth-child(n+2){
     .permissionTreeItem-text-wrapper{
