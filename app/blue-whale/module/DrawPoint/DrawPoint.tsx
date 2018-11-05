@@ -512,19 +512,22 @@ export class DrawPoint extends Component {
 
                 switch (D3.event.keyCode) {
 
-                    case 8: { // delete
-                        if (!this.selected) {
-                            return
+                    case 90: { // delete
+                        if(D3.event.ctrlKey){
+                            if (!this.selected) {
+                                return
+                            }
+
+                            let i = this.points.lastIndexOf(this.selected);
+
+                            this.points.splice(i, 1);
+
+                            this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
+
+                            this.redraw();
+                            console.log('撤回')
                         }
 
-                        let i = this.points.lastIndexOf(this.selected);
-
-                        this.points.splice(i, 1);
-
-                        this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
-
-                        this.redraw();
-                        console.log('撤回')
                         break;
 
                     }
