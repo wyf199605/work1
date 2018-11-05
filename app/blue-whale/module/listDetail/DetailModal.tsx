@@ -33,6 +33,7 @@ interface ComInitFun {
 
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
+    isAdd?:boolean;
     cancel?(); // 取消回调
     confirm?(data:obj): Promise<any>; //确定回调
 }
@@ -67,57 +68,89 @@ export class DetailModal {
                 field.dom && field.dom.classList.add('disabled');
             }
         }
-        let modal = new Modal({
-            isMb: true,
-            className: 'detail-modal',
-            isModal: true,
-            isOnceDestroy: true,
-            body: formWrapper,
-            footer: {
-                leftPanel: [{
-                    content: '取消',
-                    className: 'modal-btn edit-cancel',
-                    onClick: () => {
-                        Modal.confirm({
-                            msg: '确定取消编辑吗?',
-                            callback: (flag) => {
-                                if (flag){
-                                    modal.isShow = false;
-                                    this.destroy();
-                                    tools.isFunction(para.cancel) && para.cancel();
-                                }
-                            }
-                        })
-                    }
-                }],
-                rightPanel: [{
-                    content: '确定',
-                    className: 'modal-btn eidt-confirm',
-                    onClick: () => {
-                        let data = this.dataGet();
-                        if (this.validate(data)) {
-                            // 验证成功
-                            tools.isFunction(para.confirm) && para.confirm(data).then(()=>{
+
+        let footButtons = {
+            leftPanel: {
+                content: '取消',
+                className: 'modal-btn edit-cancel',
+                onClick: () => {
+                    Modal.confirm({
+                        msg: '确定取消编辑吗?',
+                        callback: (flag) => {
+                            if (flag){
                                 modal.isShow = false;
                                 this.destroy();
-                            });
+                                tools.isFunction(para.cancel) && para.cancel();
+                            }
                         }
+                    })
+                }
+            },
+            rightPanel: {
+                content: '确定',
+                className: 'modal-btn eidt-confirm',
+                type: 'primary',
+                onClick: () => {
+                    let data = this.dataGet();
+                    if (this.validate(data)) {
+                        // 验证成功
+                        tools.isFunction(para.confirm) && para.confirm(data).then(()=>{
+                            modal.isShow = false;
+                            this.destroy();
+                        });
                     }
-                }]
+                }
+            }
+        };
+
+        let modal = new Modal({
+            header: tools.isMb ? void 0 : para.fm.caption + ' - 编辑',
+            width: tools.isMb ? void 0 : '600px',
+            height: tools.isMb ? void 0 : '500px',
+            isMb: tools.isMb,
+            className: 'detail-modal',
+            isModal: tools.isMb,
+            isOnceDestroy: true,
+            body: formWrapper,
+            footer: tools.isMb ? {
+                leftPanel: [footButtons.leftPanel],
+                rightPanel: [footButtons.rightPanel]
+            } : {
+                rightPanel:[
+                    {
+                        content: '取消',
+                        className: 'modal-btn edit-cancel',
+                        onClick: () => {
+                            modal.isShow = false;
+                        }
+                    },
+                    footButtons.rightPanel
+                ]
             }
         });
         this.editModule = new NewMBForm(emPara);
-        // 字段默认值
-        this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
-        // 修改时字段的值
-        tools.isNotEmpty(para.defaultData) && this.editModule.set(para.defaultData);
+        if (para.isAdd){
+            tools.isNotEmpty(para.fm.defDataAddrList) && BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response})=>{
+                // 字段默认值
+                this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+                // 新增时的默认值
+                let res: obj = {};
+                let meta = response.body.bodyList[0].meta,
+                    dataTab = response.body.bodyList[0].dataList[0];
+                for (let i = 0, len = meta.length; i < len; i++) {
+                    res[meta[i]] = dataTab[i];
+                }
+                this.editModule.set(res);
+            })
+        }else{
+            // 字段默认值
+            this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+            // 修改时字段的值
+            tools.isNotEmpty(para.defaultData) && this.editModule.set(para.defaultData);
+        }
     }
 
     private createFormWrapper(field: R_Field, wrapper: HTMLElement): HTMLElement {
-        let span = null;
-        if (field.comType == 'tagsInput') {
-            span = <span class="mui-icon mui-icon-plus" data-action="picker"/>;
-        }
         if (field.comType === 'file' || field.comType === 'img') {
             return wrapper;
         } else {
@@ -347,7 +380,7 @@ export class NewMBForm {
                                     [p.field.name]: item.text,
                                     [p.field.lookUpKeyField]: item.value
                                 };
-                                p.onExtra(data, [p.field.lookUpKeyField])
+                                p.onExtra && p.onExtra(data, [p.field.lookUpKeyField])
                             }, 100)
                         }
                     }
@@ -456,7 +489,17 @@ export class NewMBForm {
             if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
                 type = 'pickInput';
             } else if (field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
+                if(field.elementType === 'lookup'){
+                    initP.onExtra = (data:obj, relateCols: string[])=>{
+                        relateCols.forEach((relate,index) => {
+                            this.getDom(relate).set(data[relate]);
+                        })
+                    }
+                }
                 type = 'selectInput';
+            } else if(field.dataType === '77' || (field.atrrs && field.atrrs.dataType === '77')){
+                initP.dom && initP.dom.classList.add('hide');
+                type = 'virtual';
             }
         }
         if (!(type in this.comTnit)) {

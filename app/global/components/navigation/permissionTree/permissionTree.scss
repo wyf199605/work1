@@ -1,0 +1,52 @@
+//.permissionTreeItem {
+//  overflow: hidden;
+//  width: 100%;
+//  .permissionTreeItem-text-wrapper {
+//    min-width: 120px;
+//    padding-left: 20px;
+//    float: left;
+//    margin-bottom: -20000px;
+//    padding-bottom: 20000px;
+//    line-height: 40px;
+//  }
+//  .permissionTreeItem-children-wrapper{
+//    float: left;
+//    margin-bottom: -20000px;
+//    padding-bottom: 20000px;
+//  }
+//}
+
+* {
+  box-sizing: border-box !important;
+}
+
+.permissionTreeItem {
+  display: flex;
+  align-items: center;
+  &.root-item {
+    & > .permissionTreeItem-text-wrapper {
+      border-left: 1px solid red;
+      border-top: 1px solid red;
+      border-bottom: 1px solid red;
+    }
+  }
+  .permissionTreeItem-text-wrapper {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    min-width: 120px;
+    padding-left: 20px;
+    height: 100%;
+    border-left: 1px solid red;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+  }
+  &.permissionTreeItem.normal-item:nth-child(n+2){
+    .permissionTreeItem-text-wrapper{
+      border-top: none !important;
+    }
+  }
+  .permissionTreeItem-children-wrapper {
+    height: 100%;
+  }
+}

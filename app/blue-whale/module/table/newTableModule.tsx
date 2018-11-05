@@ -148,7 +148,6 @@ export class NewTableModule {
                     }
                     firstRow.selected = true;
                     let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
-                        ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
                         noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
@@ -157,6 +156,7 @@ export class NewTableModule {
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
+                                let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
