@@ -310,7 +310,7 @@ export class FlowDesigner {
             FlowDesigner.rootElement = xmlDoc.documentElement;
             Method.parseToXml.setAttr(FlowDesigner.rootElement, FlowDesigner.flowEditor.get());
 
-            // 然后创建所有的节点
+            // 然后创建所有的节点，并设置属性
             FlowDesigner.ALLITEMS.forEach(item => {
                 // 创建节点、设置属性、添加到xml节点树中
                 let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
@@ -319,6 +319,7 @@ export class FlowDesigner {
                 Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get()));
                 FlowDesigner.rootElement.appendChild(xmlNode);
             });
+            // 再创建所有的连接线，并设置属性和作为谁的子节点
             FlowDesigner.AllLineItems.forEach(line => {
                 let xmlNode = Method.parseToXml.createXmlElement(line.flowEditor.type),
                     toItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.to)[0];
@@ -364,6 +365,7 @@ export class FlowDesigner {
                 d.off(d.query('#design-canvas'), 'click', 'svg', clickSVG);
                 d.off(d.query('.add-flow'), 'click', addFlowHandler);
             },
+            // 关闭新增流程按钮的点击事件，从xml中读取时不能新增流程
             closeAddFlow: () => {
                 d.off(d.query('.add-flow'), 'click', addFlowHandler);
             },
@@ -376,6 +378,7 @@ export class FlowDesigner {
         FlowDesigner.PAPER = null;
         FlowDesigner.ALLITEMS = [];
         FlowDesigner.connections = [];
+        FlowEditor.EXIST_NAME = [];
         this.initEvents.off();
     }
 }

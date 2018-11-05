@@ -189,6 +189,7 @@ export class FlowItem extends Component {
                 this.rectNode.unclick(this.clickHandler());
                 this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
             },
+            // 关闭节点的移动事件，从xml中解析时，只能查看属性，所以要将移动事件关闭（或打开点击事件）
             closeDrag: () => {
                 this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
             },
