@@ -464,7 +464,6 @@ export class DrawPoint extends Component {
 
                     }
 
-
                 })
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
