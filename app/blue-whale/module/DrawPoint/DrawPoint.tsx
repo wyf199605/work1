@@ -126,8 +126,8 @@ export class DrawPoint extends Component {
             return
         }
         data.forEach((d, index) => {
+            console.log(d);
             let group = this.g.append('g').datum(d).on('click', () => {
-                console.log('编辑信息');
                 this.onAreaClick && this.onAreaClick({
                     type: 'edit',
                     data: d
