@@ -40,6 +40,7 @@
     border-left: 1px solid #e2e2e2;
     border-top: 1px solid #e2e2e2;
     border-bottom: 1px solid #e2e2e2;
+    flex: 1 1 auto;
   }
   &.permissionTreeItem.normal-item:nth-child(n+2){
     .permissionTreeItem-text-wrapper{
@@ -48,5 +49,6 @@
   }
   .permissionTreeItem-children-wrapper {
     height: 100%;
+    flex: 1 1 auto;
   }
 }

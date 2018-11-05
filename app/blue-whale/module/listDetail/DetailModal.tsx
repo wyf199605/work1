@@ -122,6 +122,7 @@ export class DetailModal {
                         className: 'modal-btn edit-cancel',
                         onClick: () => {
                             modal.isShow = false;
+                            this.destroy();
                         }
                     },
                     footButtons.rightPanel

@@ -9,7 +9,7 @@ G.Ajax.fetch(urlStr).then(({response}) => {
         container: document.body,
         treeData:res.data,
         textHeight:60,
-        textWidth:160
+        textWidth:0
     });
 });
 
