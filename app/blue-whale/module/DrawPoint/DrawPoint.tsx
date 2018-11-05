@@ -137,6 +137,11 @@ export class DrawPoint extends Component {
         this.editEvent.on();
     }
 
+    //点击删除整个
+    public delArea(){
+
+    }
+
     private _data;
 
     public render(data?: obj[]) {
@@ -204,7 +209,7 @@ export class DrawPoint extends Component {
             })
 
         });
-        this.editEvent.on();
+        //this.editEvent.on();
 
     }
 
