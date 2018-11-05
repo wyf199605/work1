@@ -148,7 +148,9 @@ export class DrawPoint extends Component {
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
         this.editEvent.off();
+        this.keyDownEvent.off();
         this.isDrawLine = false;
+        this.map.remove();
         if (!this.g.selectAll('g').empty()) {
             D3.select('.g-wrapper').selectAll('g').remove();
             D3.select('.g-wrapper').selectAll('circle').remove();
@@ -507,34 +509,49 @@ export class DrawPoint extends Component {
 
     }
 
-    reback() {
-        D3.select(window)
-            .on("keydown", () => {
+    //键盘事件的关闭和开启
+    private  keyDownEvent= (() => {
+        let self = this;
+        return {
+            on: () => {
+                D3.select(window)
+                    .on("keydown", () => {
 
-                switch (D3.event.keyCode) {
+                        switch (D3.event.keyCode) {
 
-                    case 90: { // delete
-                        if(D3.event.ctrlKey){
-                            if (!this.selected) {
-                                return
+                            case 90: { // delete
+                                if(D3.event.ctrlKey){
+                                    if (!this.selected) {
+                                        return
+                                    }
+
+                                    let i = this.points.lastIndexOf(this.selected);
+
+                                    this.points.splice(i, 1);
+
+                                    this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
+
+                                    this.redraw();
+                                    console.log('撤回')
+                                }
+
+                                break;
+
                             }
 
-                            let i = this.points.lastIndexOf(this.selected);
-
-                            this.points.splice(i, 1);
-
-                            this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
-
-                            this.redraw();
-                            console.log('撤回')
                         }
+                    })
+            },
+            off: () => {
+                D3.select(window)
+                    .on("keydown", null)
+            }
+        }
+    })()
 
-                        break;
 
-                    }
-
-                }
-            })
+    reback() {
+        this.keyDownEvent.on()
     }
 
     public OnZoom() {
