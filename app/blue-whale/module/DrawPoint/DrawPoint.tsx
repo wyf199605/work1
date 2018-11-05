@@ -480,6 +480,8 @@ export class DrawPoint extends Component {
                 }
                 if (num >= 1 && D3.select(this).attr('class') !== 'insert') {
                     return 'update';
+                } else {
+                    return D3.select(this).attr('class');
                 }
             }).datum(delivery)
 
