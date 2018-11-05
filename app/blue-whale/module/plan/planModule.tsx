@@ -89,6 +89,12 @@ export class PlanModule extends Component{
                 icon: 'bianjimaodian',
                 color: 'info',
                 onClick: () => {
+                    buttons.forEach((val)=>{
+                        if(val.content == '描点'){
+                            val.isDisabled = true;
+
+                        }
+                    })
                     console.log('开始编辑')
                     let btn = d.queryAll('.plan-opera>div');
                     btn.forEach((res) => {
@@ -116,6 +122,7 @@ export class PlanModule extends Component{
                 color: 'info',
                 tip: '滚轮',
                 onClick: () => {
+                    this.draw.OnZoom();
                 },
             },
             {
@@ -169,9 +176,14 @@ export class PlanModule extends Component{
                 return new Promise<any>((resolve, reject) => {
                     if(areaType.type === 'edit'){
                         this.edit.editData(areaType.data).then(() => {
-                            resolve();
+                            resolve({
+                                ARE_ID: "666",
+                                DRAW_POINT: " [[308, 41.33333206176758], [307, 147.3333282470703], [212, 148.3333282470703], [215, 42.33333206176758], [308, 41.33333206176758]]",
+                                SHO_ID: "GZZ1",
+                                SHO_NAME: "麦当劳"});
                         }).catch(() => {
                             reject();
+
                         })
                     }
                 })
@@ -292,8 +304,8 @@ export class PlanModule extends Component{
         };
 
         let editData = (data: obj) => {
-            return new Promise(() => {
-
+            return new Promise((resolve, reject) => {
+               resolve();
             })
         };
 
