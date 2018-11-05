@@ -340,7 +340,7 @@ export class DrawPoint extends Component {
     }
 
     get editedData() {
-    let update =  this.g.selectAll('g').selectAll('update'),
+    let update =  this.g.selectAll('.update'),
         updateStr = [];
         update.each(function (d) {
             updateStr.push(d);
