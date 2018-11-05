@@ -175,13 +175,21 @@ export class PlanModule extends Component{
 
     protected plotBtn = (() => {
         let plotBox: InputBox, editBox: InputBox;
+
+        let editBtnToggle = (isEdit: boolean) => {
+            plotBox && (plotBox.disabled = isEdit);
+            editBox.getItem('edit').isDisabled = isEdit;
+            editBox.getItem('save').isDisabled = !isEdit;
+            editBox.getItem('cancel').isDisabled = !isEdit;
+        };
+
         let init = () => {
             let buttons: IButton[] = [
                 {
                     content: '撤销',
                     icon: 'chexiao',
                     color: 'error',
-                    tip: 'Backspace键',
+                    tip: 'ctrl + z 撤销',
                     onClick: () => {
                         let btn = d.queryAll('.plan-opera>div');
                         btn.forEach((res)=>{
@@ -282,9 +290,7 @@ export class PlanModule extends Component{
                     iconPre: 'appcommon',
                     icon: 'app-bianji',
                     onClick: () => {
-                        editBox.getItem('edit').isDisabled = true;
-                        editBox.getItem('save').isDisabled = false;
-                        editBox.getItem('cancel').isDisabled = false;
+                        this.edit.start();
                     }
                 },
                 {
@@ -304,6 +310,7 @@ export class PlanModule extends Component{
                     iconPre: 'appcommon',
                     icon: 'app-quxiao',
                     onClick: () => {
+                        this.edit.cancel();
                     }
                 }
             ];
@@ -329,6 +336,7 @@ export class PlanModule extends Component{
 
         return {
             init,
+            editBtnToggle,
             set disabled(disabled: boolean){
                 plotBox && (plotBox.disabled = disabled);
                 editBox && (editBox.disabled = disabled);
@@ -414,6 +422,7 @@ export class PlanModule extends Component{
             }).then(({response}) => {
                 BwRule.checkValue(response, saveData, () => {
                     this.refresh(this._ajaxData);
+                    cancel();
                 });
             }).finally(() => {
                 loading && loading.destroy();
@@ -442,9 +451,21 @@ export class PlanModule extends Component{
             })
         };
 
+        let start = () => {
+            this.draw && this.draw.editOpen();
+            this.plotBtn.editBtnToggle(true);
+        };
+
+        let cancel = () => {
+            this.draw && this.draw.editCancel();
+            this.plotBtn.editBtnToggle(false);
+        };
+
         return {
             save,
             editData,
+            cancel,
+            start
         };
     })();
 
