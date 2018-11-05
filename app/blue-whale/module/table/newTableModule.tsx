@@ -214,7 +214,7 @@ export class NewTableModule {
                 let self = this;
                 mftable.click.add('.section-inner-wrapper.pseudo-table tbody tr[data-index]', function () {
                     let rowIndex = parseInt(this.dataset.index);
-                    this.subRefreshByIndex(rowIndex);
+                    self.subRefreshByIndex(rowIndex);
                 });
             }
         };

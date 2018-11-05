@@ -44,7 +44,8 @@ export class OffLine{
             sendData : JSON.stringify(this.confGet()),
             onMessage : r => {
                 let data = JSON.parse(r && r.data);
-                // console.log(r, 'msg')
+                // console.log(r, 'wmsg')
+
                 switch (data.respType){
                     case 'posver':
                         this.posVer(data);

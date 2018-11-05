@@ -221,11 +221,16 @@ export class BwTableElement extends Component{
 
         }
 
-        !isDynamic && this.mobileScanInit(bwTableEl);
+        let inputs = para.tableEl.inputs,
+            line = para.tableEl.keyField,
+            querier = para.tableEl.querier;
 
-        let inputs = para.tableEl.inputs;
-        if(!isDynamic && inputs && !bwTableEl.scannableField){
-            this.keyStep(inputs)
+        if(!isDynamic && bwTableEl.scannableField){
+            this.mobileScanInit(bwTableEl);
+        }else if(!isDynamic && inputs && !bwTableEl.scannableField){
+            this.inputs(inputs, line)
+        }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
+            this.locationLine(line, para);
         }
 
         this.on(BwRule.EVT_REFRESH, () => {
@@ -239,13 +244,17 @@ export class BwTableElement extends Component{
         })
     }
 
-    private keyStep(inputs){
+    private inputs(inputs,line){
         require(['Inputs'], (i) => {
             new i.Inputs({
                 inputs: inputs,
                 container: this.container,
+                locationLine : line,
                 table : () => {
                     return this.tableModule && this.tableModule.main.ftable
+                },
+                tableModule : () => {
+                    return this.tableModule
                 },
                 queryModule : () => {
                     return this.queryModule;
@@ -254,9 +263,48 @@ export class BwTableElement extends Component{
         });
     }
 
+    /**
+     * 扫码定位
+     * @param line
+     * @param para
+     */
+    private locationLine(line : string, para){
+        if(tools.isMb){
+            require(['KeyStep'], (e) => {
+                new e.KeyStep({
+                    locationLine : line,
+                    callback : (ajaxData) => {
+                        this.rowSelect(line, ajaxData);
+                    }
+                })
+            });
+        }else {
+            let text = '', timer = null;
+            d.on(para.container, 'keydown', (e: KeyboardEvent) => {
+                text += e.key;
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(() => {
+                    this.rowSelect(line, text);
+                    timer = null;
+                    text = '';
+                }, 1000);
+            });
+        }
+
+    }
+
+    private rowSelect(line, text){
+        let index = this.tableModule.main.ftable.locateToRow(line, text, true);
+        if(tools.isNotEmpty(index) && this.tableModule.bwEl.subTableList){
+            this.tableModule.subRefreshByIndex(index);
+        }
+    }
+
     private mobileScanInit(ui: IBW_Table) {
         let field = ui.scannableField;
-        if (tools.isPc || !field) {
+        if (tools.isPc) {
             return;
         }
         require(['MobileScan'],  (M) => {

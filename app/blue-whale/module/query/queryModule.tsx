@@ -124,25 +124,27 @@ export abstract class QueryModule {
         }
 
         if(!this.para.qm.scannableField){
-            this.keyStep(this.para.qm.inputs)
+            this.inputs(this.para.qm.inputs)
         }
     }
 
-    private keyStep(inputs){
+    private inputs(inputs){
         if(!inputs){
             return;
         }
-
-        new Inputs({
-            inputs: inputs,
-            container: this.para.container,
-            table : () => {
-                return this.para.tableGet() && this.para.tableGet().ftable
-            },
-            queryModule : () => {
-                return this
-            },
+        require(['Inputs'], (i) => {
+            new i.Inputs({
+                inputs: inputs,
+                container: this.para.container,
+                table : () => {
+                    return this.para.tableGet() && this.para.tableGet().ftable
+                },
+                queryModule : () => {
+                    return this
+                },
+            })
         })
+
     }
 
     get wrapper(){

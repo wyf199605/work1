@@ -2907,7 +2907,7 @@ export class FastTable extends Component {
     // 根据参数定位到行
     // colName 列名称， data 任意数据
     locateToRow(colName: string, data: any, isClear = false): number {
-        let index = 0;
+        let index = null;
         if(isClear){
             this.rows && this.rows.forEach((row) => {
                 row.selected = false;
@@ -2918,7 +2918,9 @@ export class FastTable extends Component {
             let cell = row.cellGet(colName);
             if(cell && cell.data == data){
                 row.selected = true;
-                index ++;
+                if(tools.isEmpty(index)){
+                    index = row.index;
+                }
             }
         });
         this._drawSelectedCells();

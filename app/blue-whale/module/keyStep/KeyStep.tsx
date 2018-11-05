@@ -8,6 +8,7 @@ interface IScanButtonPara{
     callback(text : string, input? : R_Input) : Promise<any>
     container? : HTMLElement
     inputs? : R_Input[]
+    locationLine? : string
 }
 export class KeyStep{
     private p : IScanButtonPara;
@@ -35,13 +36,19 @@ export class KeyStep{
         d.on(btn.wrapper, 'touchstart', function (e : TouchEvent) {
             let ev = e.touches[0],
                 wrapper = btn.wrapper,
-                distanceX = ev.clientX - wrapper.offsetLeft,
-                distanceY = ev.clientY - wrapper.offsetTop;
+                evX = ev.clientX,
+                evY = ev.clientY,
+                top = wrapper.offsetTop,
+                left = wrapper.offsetLeft;
 
-            let moveHandler = function (e : TouchEvent) {
-                let ev = e.touches[0];
-                wrapper.style.left = ev.clientX - distanceX + 'px';
-                wrapper.style.top = ev.clientY - distanceY + 'px';
+            let moveHandler = function (i : TouchEvent) {
+                let iv = i.touches[0],
+                    ivX = iv.clientX,
+                    ivY = iv.clientY,
+                    distanceX = evX - ivX,
+                    distanceY = evY - ivY;
+                wrapper.style.left = left - distanceX - 30 + 'px';
+                wrapper.style.top = top - distanceY + 'px';
             };
 
             let endHandler =  function () {
@@ -55,39 +62,54 @@ export class KeyStep{
     }
 
     evenHandle(para : IScanButtonPara, can2dScan : boolean){
-        para.inputs.forEach(input => {
-            switch (input.inputType) {
-                case '0':
-                    if(can2dScan){
-                        let open = () => {
-                            this.scanOpen().then((res : obj) => {
-                                if(res.success && res.data !== 'openSuponScan') {
-                                    this.afterReg(input, res.data);
-                                }
-                                open();
+        if(Array.isArray(para.inputs)){
+            para.inputs.forEach(input => {
+                switch (input.inputType) {
+                    case '0':
+                        if(can2dScan){
+                            let open = () => {
+                                this.scanOpen().then((res : obj) => {
+                                    if(res.success && res.data !== 'openSuponScan') {
+                                        this.afterReg(input, res.data);
+                                    }
+                                    open();
+                                });
+                            };
+                            open();
+                        }else {
+                            this.open(para).then((text : string) => {
+                                this.afterReg(input, text)
                             });
-                        };
-                       open();
-                    }else {
-                        this.open(para).then((text : string) => {
-                            this.afterReg(input, text)
-                        });
-                    }
-                    break;
-                case '1':
-                    if(can2dScan){
-                        this.startEpc(input);
-                    }
-                    break;
+                        }
+                        break;
+                    case '1':
+                        if(can2dScan){
+                            this.startEpc(input);
+                        }
+                        break;
+                }
+            })
+        }else if(para.locationLine){ // 定位功能
+            if(can2dScan){
+                let open = () => {
+                    this.scanOpen().then((res : obj) => {
+                        if(res.success && res.data !== 'openSuponScan') {
+                            this.p.callback(res.data)
+                        }
+                        open();
+                    });
+                };
+                open();
+            }else {
+                this.open(para).then((text : string) => {
+                    this.p.callback(text)
+                });
             }
-        })
+        }
     }
 
     afterReg(input : R_Input, text: string){
-        let regInput = this.regExpMatch(input, text);
-        if(regInput){
-            this.p.callback(text, input)
-        }
+        this.p.callback(text, this.regExpMatch(input, text))
     }
 
     /**
