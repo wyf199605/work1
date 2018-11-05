@@ -149,7 +149,7 @@ export class UploadImages extends FormCom {
                     };
                     switch (this.imgType){
                         case '20':{
-                            imageObj.extraUrl =  BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData)
+                            imageObj.extraUrl =  BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData);
                             this.para.onComplete && this.para.onComplete.call(this, data, file);
                         }
                         break;
@@ -213,7 +213,17 @@ export class UploadImages extends FormCom {
                     isError: true,
                     localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
                 };
-                this.addItem(imageObj);
+                switch (this.imgType){
+                    case '20':
+                    case '27':{
+                        this.imgs = [imageObj];
+                    }
+                        break;
+                    case '28':{
+                        this.addItem(imageObj);
+                    }
+                        break;
+                }
             }
             this.para.onError && this.para.onError.call(this, file);
         });

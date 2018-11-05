@@ -37,6 +37,14 @@
     min-width: 120px;
     padding-left: 20px;
     height: 100%;
+    border-left: 1px solid red;
+    border-top: 1px solid red;
+    border-bottom: 1px solid red;
+  }
+  &.permissionTreeItem.normal-item:nth-child(n+2){
+    .permissionTreeItem-text-wrapper{
+      border-top: none !important;
+    }
   }
   .permissionTreeItem-children-wrapper {
     height: 100%;

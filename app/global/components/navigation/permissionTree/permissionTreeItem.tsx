@@ -30,6 +30,8 @@ export class PermissionTreeItem extends Component {
         this.createChildren(para);
         if (tools.isNotEmptyArray(para.CHILDREN)){
             this.wrapper.style.height = this.setRootHeight(para.CHILDREN)*40 + 'px';
+        }else{
+            this.wrapper.style.borderRight = '1px solid red';
         }
     }
     private checkBox:CheckBox = null;
