@@ -43,7 +43,7 @@ export class Inputs {
             newUrl += '?';
         }
         let ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
-        this.ajax(ajaxUrl);
+        return this.ajax(ajaxUrl);
     }
 
     private ajax(aUrl){
@@ -154,9 +154,21 @@ export class Inputs {
             body : d.create('<div class="inputs-atv"></div>') as HTMLElement,
             footer : {},
             onOk : () => {
+                let atvData = atv.dataGet(),
+                    url = tools.url.addObj(CONF.siteUrl + subButtons[0].actionAddr.dataAddr, atvData ? {'atvarparams': JSON.stringify(atv.dataGet())} : null);
+
+                //必选判断
+                let errTip = '';
+                atvarparams.forEach(obj => {
+                    if(obj.atrrs.requiredFlag === 1 && atvData[obj.field_name] === ''){
+                        errTip += obj.caption + ',';
+                    }
+                });
+                if(errTip !== ''){
+                    Modal.alert(errTip.substring(0,errTip.length - 1) + '不能为空');
+                    return;
+                }
                 modal.isShow = false;
-                let atvData = atv.dataGet();
-                let url = tools.url.addObj(CONF.siteUrl + subButtons[0].actionAddr.dataAddr, atvData ? {'atvarparams': JSON.stringify(atv.dataGet())} : null);
                 BwRule.Ajax.fetch(url,{
                     type : 'get',
                 }).then(({response}) => {
@@ -169,7 +181,7 @@ export class Inputs {
         require(['QueryBuilder'], (q) => {
             atv = new q.AtVarBuilder({
                 queryConfigs: atvarparams,
-                resultDom: modal.bodyWrapper,
+                resultDom: modal.body,
                 tpl: () => d.create(`<div class="atvarDom"><div style="display: inline-block;" data-type="title"></div>
                 <span>：</span><div data-type="input"></div></div>`),
                 setting: null
@@ -193,7 +205,7 @@ export class Inputs {
                 new e.KeyStep({
                     inputs : para.inputs,
                     callback : (ajaxData, input) => {
-                        this.matchPass(input, ajaxData.mobilescan);
+                        return this.matchPass(input, ajaxData);
                     }
                 })
             });

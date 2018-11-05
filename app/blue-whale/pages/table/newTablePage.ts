@@ -224,7 +224,7 @@ export class BwTableElement extends Component{
         !isDynamic && this.mobileScanInit(bwTableEl);
 
         let inputs = para.tableEl.inputs;
-        if(!isDynamic && inputs){
+        if(!isDynamic && inputs && !bwTableEl.scannableField){
             this.keyStep(inputs)
         }
 

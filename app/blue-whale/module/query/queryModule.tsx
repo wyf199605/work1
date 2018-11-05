@@ -123,7 +123,9 @@ export abstract class QueryModule {
             },10);
         }
 
-        this.keyStep(this.para.qm.inputs)
+        if(!this.para.qm.scannableField){
+            this.keyStep(this.para.qm.inputs)
+        }
     }
 
     private keyStep(inputs){

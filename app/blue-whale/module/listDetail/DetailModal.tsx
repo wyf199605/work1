@@ -33,22 +33,24 @@ interface ComInitFun {
 
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
-    button?:R_Button;
-    listDetail?:ListItemDetail;
+    cancel?(); // 取消回调
+    confirm?(data:obj): Promise<any>; //确定回调
 }
-interface NewFormEdit{
-    fields? : ComInitP[],
-    auto? : boolean; //是否自动初始化dom
-    type? : string;
+
+interface NewFormEdit {
+    fields?: ComInitP[],
+    auto?: boolean; //是否自动初始化dom
+    type?: string;
     container?: HTMLElement;
-    defaultData?:obj;
+    defaultData?: obj;
 }
 
 export class DetailModal {
     private editModule: NewMBForm;
+
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
-        let emPara: NewFormEdit = {fields: [],defaultData:this.para.listDetail.defaultData};
+        let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData};
         let formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [];
         for (let i = 0, len = fields.length; i < len; i++) {
@@ -79,7 +81,11 @@ export class DetailModal {
                         Modal.confirm({
                             msg: '确定取消编辑吗?',
                             callback: (flag) => {
-                                flag && (modal.isShow = false,this.destroy());
+                                if (flag){
+                                    modal.isShow = false;
+                                    this.destroy();
+                                    tools.isFunction(para.cancel) && para.cancel();
+                                }
                             }
                         })
                     }
@@ -89,21 +95,9 @@ export class DetailModal {
                     className: 'modal-btn eidt-confirm',
                     onClick: () => {
                         let data = this.dataGet();
-                        if (this.validate(data)){
+                        if (this.validate(data)) {
                             // 验证成功
-                            let button = this.para.button;
-                            button.refresh = 1;
-                            ButtonAction.get().clickHandle(button,data,() => {
-                                switch (button.subType){
-                                    case 'insert_save':{
-                                        this.para.listDetail.changePage(this.para.listDetail.totalNumber + 1);
-                                    }
-                                    break;
-                                    case 'update_save':{
-                                        this.para.listDetail.changePage(this.para.listDetail.currentPage);
-                                    }
-                                    break;
-                                }
+                            tools.isFunction(para.confirm) && para.confirm(data).then(()=>{
                                 modal.isShow = false;
                                 this.destroy();
                             });
@@ -136,6 +130,7 @@ export class DetailModal {
             return formGroupWrapper
         }
     }
+
     // 获取数据
     private dataGet() {
         let data = this.editModule.get();
@@ -148,6 +143,7 @@ export class DetailModal {
         });
         return data;
     }
+
     // 验证
     private validate(pageData?: obj) {
         let result = this.editModule.validate.start();
@@ -160,6 +156,7 @@ export class DetailModal {
             return true;
         }
     }
+
     destroy() {
         document.body.classList.remove('edit-overflow-hidden');
         this.para.fm.fields.forEach(f => {
@@ -176,9 +173,11 @@ export class NewMBForm {
     private comsExtraData: objOf<obj> = {};
     private nameFields: objOf<ComInitP> = {};
     private ajax = new BwRule.Ajax();
+
     get assignPromise() {
         return this.ajax.promise;
     }
+
     constructor(private para: NewFormEdit) {
         if (Array.isArray(para.fields)) {
             para.fields.forEach((f) => {
@@ -191,9 +190,11 @@ export class NewMBForm {
             }
         }
     }
+
     getDom(name: string) {
         return this.coms[name];
     }
+
     /**
      * 外部初始化调用
      * @param name
@@ -215,6 +216,7 @@ export class NewMBForm {
 
         return this.coms[name];
     }
+
     private pickOnGet(cip: ComInitP, dataArr: obj[], otherField: string) {
         let name = cip.field.name,
             fieldNames = otherField ? otherField.split(',') : [];
@@ -236,6 +238,7 @@ export class NewMBForm {
 
         this.assign.checkAssign(this.comsExtraData[name], cip.onExtra);
     }
+
     private comTnit: objOf<ComInitFun> = {
         pickInput: (p) => {
             return new PickModule({
@@ -248,7 +251,6 @@ export class NewMBForm {
                 }
             });
         },
-
         tagsInput: (p) => {
             if (this.para.type === 'table') {
                 return this.comTnit['assignText'](p);
@@ -282,19 +284,18 @@ export class NewMBForm {
                 }
             });
         },
-
         file: (p): FormCom => {
-            let com = new Accessory({
+            return new Accessory({
                 nameField: p.field.name,
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 field: p.field,
-                pageData:this.para.defaultData,
+                pageData: this.para.defaultData,
                 onComplete: (response) => {
                     let data = response.data,
                         type = p.field.dataType || p.field.atrrs.dataType;
                     // fileId 值加入额外数据中
-                    if (type === '43'){
+                    if (type === '43') {
                         let upperKeyData = {};
                         for (let field in data) {
                             let {key, value} = data[field];
@@ -311,33 +312,29 @@ export class NewMBForm {
                         }
                     }
                 },
-                onDelete(){
+                onDelete() {
                     this.comsExtraData[p.field.name] = {};
                 }
             });
-            return com;
         },
-
         richText: (p) => {
             let Rich = tools.isMb ? RichTextMb : RichText;
             return new Rich({
                 container: p.dom
             });
         },
-
         richTextInput: (p) => {
             return new RichTextModal({
                 container: p.dom,
             });
         },
-
         text: (p) => {
             return new TextInput({
                 container: p.dom
             });
         },
-
         selectInput: (p) => {
+            let self = this;
             if (p.field.elementType === 'lookup') {
                 return new LookupModule({
                     container: p.dom,
@@ -357,6 +354,9 @@ export class NewMBForm {
                 })
             } else {
                 let ajaxFun = (url: string, value: string, cb: Function) => {
+                    if (tools.isNotEmpty(p.field.dataAddr.varList)) {
+                        url = CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, this.get());
+                    }
                     BwRule.Ajax.fetch(url, {
                         needGps: p.field.dataAddr.needGps
                     }).then(({response}) => {
@@ -364,25 +364,27 @@ export class NewMBForm {
                         if (response.data[0]) {
                             fields = Object.keys(response.data[0]);
                         }
-                        let options = response.data.map(data => {
+                        let options: obj[] = [];
+                        response.data.forEach(data => {
                             // id name 都添加到条件
-                            return {
-                                value: data[p.field.name],
-                                text: fields.map((key) => data[key]).join(','),
-                            };
+                            if (tools.isNotEmpty(data[p.field.name])) {
+                                options.push({
+                                    value: data[p.field.name],
+                                    text: fields.map((key) => data[key]).join(','),
+                                });
+                            }
                         });
                         cb(options);
                     }).finally(() => {
                         cb();
                     });
                 };
-                let valueList = p.field.atrrs.valueLists ? p.field.atrrs.valueLists.split(/,|;/) : null,
+                let valueList = p.field.valueLists ? p.field.valueLists.split(/,|;/) : null,
                     comData = Array.isArray(valueList) ? valueList : null,
                     ajax = p.field.dataAddr ? {
                         fun: ajaxFun,
-                        url: CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, p.data)
+                        url: CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, this.get())
                     } : null;
-
                 return new (tools.isMb ? SelectInputMb : SelectInput)({
                     container: p.dom,
                     data: comData,
@@ -393,11 +395,9 @@ export class NewMBForm {
                 });
             }
         },
-
         virtual: (p) => {
             return new Virtual();
         },
-
         toggle: (p) => {
             if (this.para.type === 'table') {
                 return new SelectInput({
@@ -415,26 +415,23 @@ export class NewMBForm {
                 }
             }
         },
-
         datetime: (p) => {
             return new (tools.isMb ? DatetimeMb : Datetime)({
                 container: p.dom,
                 format: p.field.displayFormat
             });
         },
-
-        // 流程引擎附件
         img: (p) => {
             return new UploadImages({
                 container: p.dom,
                 nameField: p.field.name,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-                pageData:this.para.defaultData,
-                field:p.field
+                pageData: this.para.defaultData,
+                field: p.field
             });
         }
-
     };
+
     static tableComTypeGet(type: string) {
         let map = {
             richText: 'richTextInput',
@@ -443,6 +440,7 @@ export class NewMBForm {
 
         return type in map ? map[type] : type;
     }
+
     /**
      * 初始化控件工厂
      * @param type - 类型
@@ -461,7 +459,6 @@ export class NewMBForm {
                 type = 'selectInput';
             }
         }
-
         if (!(type in this.comTnit)) {
             type = 'text';
         }
@@ -469,12 +466,11 @@ export class NewMBForm {
         if (!initP || !initP.dom) {
             type = 'virtual';
         }
-
         let com = this.comTnit[type](initP);
         this.assign.init(com, initP);
-
         return com;
     };
+
     protected assign = (() => {
 
         let init = (com: FormCom, p?: ComInitP) => {
@@ -485,7 +481,6 @@ export class NewMBForm {
             if (field && (p.field.comType === 'tagsinput')) {
                 return;
             }
-
             com.onSet = (val) => {
                 // debugger;
                 // setTimeout(() => {
@@ -570,6 +565,7 @@ export class NewMBForm {
         return {init, assign2extra, assignSend, checkAssign};
 
     })();
+
     private getAssignSetHandler(field: R_Field) {
         let sepValue = ';';
 
@@ -597,6 +593,7 @@ export class NewMBForm {
             });
         }
     }
+
     /**
      * 设置值
      * @param data
@@ -612,6 +609,7 @@ export class NewMBForm {
             coms[name].set(tools.str.toEmpty(data[name]));
         }
     }
+
     /**
      * 获取值
      * @param [name] - 指定返回某个控件的值
@@ -648,6 +646,7 @@ export class NewMBForm {
         }
         return pageData;
     }
+
     public validate = (() => {
         let v: Validate = null;
         let init = () => {
@@ -711,6 +710,7 @@ export class NewMBForm {
         };
         return {start};
     })();
+
     destroy(name: string) {
         if (this.coms[name]) {
             this.coms[name].destroy();

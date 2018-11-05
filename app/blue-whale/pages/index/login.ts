@@ -11,13 +11,11 @@ import {Finger} from "../../module/fingerPrint/finger";
 import {BwRule} from "../../common/rule/BwRule";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {Button} from "../../../global/components/general/button/Button";
-import {Spinner} from "../../../global/components/ui/spinner/spinner";
-import {FqaModal} from "../fqa/fqa";
-import {Loading} from "../../../global/components/ui/loading/loading";
 import {UnBinding} from "../../module/unBinding/UnBinding";
 import {NewFinger} from "../../module/fingerPrint/NewFinger";
 import Shell = G.Shell;
-import {FqaPcModal} from "../fqa/fqa.pc";
+import {Loading} from "../../../global/components/ui/loading/loading";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
 
 interface IProps {
     drive?: string,
@@ -769,12 +767,30 @@ export class LoginPage{
 
         if(props.fqaBtn){
             props.fqaBtn.onClick = tools.pattern.throttling(() => {
-                if(tools.isMb){
-                    new FqaModal({});
-                }
-                else{
-                    new FqaPcModal({});
-                }
+                // 使用异步加载fqa模块，防止一进入页面直接加载，堵塞
+                props.fqaBtn.disabled = true;
+                let spinner = new Spinner({
+                    type: Spinner.SHOW_TYPE.replace,
+                    el: props.fqaBtn.wrapper
+                });
+                spinner.show();
+                new Promise((resolve, reject) => {
+                    if(tools.isMb){
+                        require(['FqaModal'], (f) => {
+                            new f.FqaModal({});
+                            resolve();
+                        });
+                    }
+                    else{
+                        require(['FqaPcModal'], (f) => {
+                            new f.FqaPcModal({});
+                            resolve();
+                        });
+                    }
+                }).then(() => {
+                    spinner.hide();
+                    props.fqaBtn.disabled = false;
+                })
             }, 1000);
         }
         let usertap = 0,maxtap = 5;
