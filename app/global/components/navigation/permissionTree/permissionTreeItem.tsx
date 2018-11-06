@@ -16,7 +16,7 @@ export interface ITreeNode extends IComponentPara {
 interface IPermissionTreeItem extends ITreeNode {
     parentNode?: PermissionTreeItem;
     textHeight?: number;
-    textWidth?:number;
+    textWidth?: number;
 }
 
 export class PermissionTreeItem extends Component {
@@ -35,15 +35,36 @@ export class PermissionTreeItem extends Component {
         super(para);
         this.textHeight = tools.isNotEmpty(para.textHeight) ? para.textHeight : 40;
         this.parentNode = para.parentNode || null;
+        this.textWidth = para.textWidth;
+        if (para.PARENTID === 'root' && (tools.isEmpty(para.textWidth) || para.textWidth === 0)) {
+            let styleWidth = window.getComputedStyle(this.container).width,
+                width = parseFloat(styleWidth.slice(0, styleWidth.length - 2)) / this.getDeep();
+            if (width > 300) {
+                width = 300;
+            }
+            this.textWidth = width;
+        }
         this.createText(para);
         this.createChildren(para);
-        this.textWrapper.style.width = tools.isEmpty(para.textWidth) || para.textWidth < 120 ? '120px' : para.textWidth + 'px';
+        this.textWrapper.style.width = this.textWidth + 'px';
         if (tools.isNotEmptyArray(para.CHILDREN)) {
             this.wrapper.style.height = this.setHeight(para.CHILDREN) * this.textHeight + 'px';
         } else {
             this.textWrapper.style.height = this.textHeight + 'px';
             this.wrapper.style.borderRight = '1px solid #e2e2e2';
         }
+    }
+
+    private _textWidth: number;
+    set textWidth(tw: number) {
+        this._textWidth = tw;
+    }
+
+    get textWidth() {
+        if (this._textWidth < 120) {
+            this._textWidth = 120;
+        }
+        return this._textWidth;
     }
 
     // 文本高度
@@ -115,8 +136,8 @@ export class PermissionTreeItem extends Component {
                 this.children.push(new PermissionTreeItem(Object.assign({}, child, {
                     container: this.childrenWrapper,
                     parentNode: this,
-                    textHeight:this.textHeight,
-                    textWidth:this.para.textWidth
+                    textHeight: this.textHeight,
+                    textWidth: this.textWidth
                 })));
             })
         }
@@ -137,6 +158,23 @@ export class PermissionTreeItem extends Component {
             elementId: this.para.ELEMENTID,
             checked: this.checkBox.status
         }
+    }
+
+    private getDeep() {
+        if (tools.isEmpty(this.para.CHILDREN)) {
+            return 1;
+        }
+        let i = 1;
+        lookDeep(this.para.CHILDREN || []);
+
+        function lookDeep(children: ITreeNode[]) {
+            i += 1;
+            if (tools.isNotEmpty(children[0].CHILDREN)) {
+                lookDeep(children[0].CHILDREN);
+            }
+        }
+
+        return i;
     }
 
     get() {

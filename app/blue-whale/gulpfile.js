@@ -153,6 +153,10 @@ gulp.task('js', function () {
     // 流程设计
     gulpTsModule([
         'flowDesigner/FlowDesigner',
+        'flowDesigner/FlowItem',
+        'flowDesigner/LineItem',
+        'flowDesigner/FlowEditor',
+        'flowDesigner/Tips',
         'flowDesigner/FlowEngine',
         'flowDesigner/FlowListPC'
     ], 'flowEngine.js');

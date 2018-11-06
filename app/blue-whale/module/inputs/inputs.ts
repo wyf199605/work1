@@ -9,6 +9,7 @@ import {SelectInputMb} from "../../../global/components/form/selectInput/selectI
 
 interface InputsPara {
     inputs: R_Input[]
+    locationLine? : string
     container: HTMLElement
     keyField? : string
     table? : Function
@@ -26,8 +27,8 @@ export class Inputs {
     private url: string;  //记录当前请求的url步骤,每次请求从该步骤开始
     constructor(private para: InputsPara) {
         this.p = para;
+        para.container.tabIndex = parseInt(G.tools.getGuid());
         this.eventInit(para);
-
     }
 
     /**
@@ -127,8 +128,8 @@ export class Inputs {
             queryModule.para.refresher({}, true).then(() => {
                 this.p.table().data = data;
             })
-        }else {
-            ftable && (ftable.data = data);
+        }else if(ftable){
+            ftable.data = data;
         }
     }
 
@@ -201,32 +202,46 @@ export class Inputs {
      */
     private eventInit(para: InputsPara) {
         if(G.tools.isMb){
-            require(['KeyStep'], (e) => {
-                new e.KeyStep({
-                    inputs : para.inputs,
-                    callback : (ajaxData, input) => {
-                        return this.matchPass(input, ajaxData);
-                    }
-                })
-            });
+            let keyStep = null;
+            // para.inputs.forEach(input => {
+            //     if(!keyStep){
+                    require(['KeyStep'], (e) => {
+                        keyStep = new e.KeyStep({
+                            inputs : para.inputs,
+                            callback : (ajaxData, input) => {
+                                if(input){
+                                    return this.matchPass(input, ajaxData);
+                                }else if(para.locationLine){
+                                    this.rowSelect(para.locationLine, ajaxData);
+                                }
+                            }
+                        })
+                    });
+                // }else {
+                //
+                // }
+            // });
+
             return;
         }
-        // let container = d.query('.tables', para.container) as HTMLElement;
-        para.container.tabIndex = parseInt(G.tools.getGuid());
-        para.inputs.forEach(obj => {
-            let text = '', timer = null, timeInterval = obj.timeout;
+        para.inputs.forEach(input => {
+            let text = '', timer = null,
+                timeInterval = input.timeout,
+                line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 text += e.key;
                 if (timer) {
                     clearTimeout(timer);
                 }
                 timer = setTimeout(() => {
-                    let len = text.length;
-                    if (obj.minLength <= len && len <= obj.maxLength) {
-                        let reg = this.regExpMatch(para.inputs, text);
-                        //匹配成功
-                        reg && this.matchPass(reg, text);
+                    let reg = this.regExpMatch(input, text);
+                    //匹配成功
+                    if(reg){
+                        this.matchPass(reg, text);
+                    }else if(line){
+                        this.rowSelect(line, text);
                     }
+
                     timer = null;
                     text = '';
                 }, timeInterval);
@@ -234,27 +249,37 @@ export class Inputs {
         });
     }
 
+    private rowSelect(line, text){
+        let index = this.para.table().locateToRow(line, text, true),
+            tableModule = this.para.tableModule();
+
+        if(tools.isNotEmpty(index) && tableModule && tableModule.bwEl.subTableList) {
+            tableModule.subRefreshByIndex(index);
+        }
+    }
 
     /**
      * 正则匹配按键
-     * @param inputs
+     * @param input
      * @param inputContent
      * @returns {boolean}
      */
-    private regExpMatch(inputs, inputContent: string) {
-        let regArr,
-            data;
-        inputs.forEach(d => {
-            if (d.fieldRegex) {
-                regArr = d.fieldRegex.split(';');
-                regArr.forEach(r => {
-                    let patt = inputContent.match(r);
-                    if (patt && patt[0] === inputContent) {
-                        data = d;
-                    }
-                });
-            }
-        });
+    private regExpMatch(input, inputContent: string) {
+        let regArr = null,
+            data = null,
+            len = inputContent.length,
+            minLen = input.minLength,
+            maxLen = input.maxLength;
+
+        if (input.fieldRegex && minLen <= len && len <= maxLen) {
+            regArr = input.fieldRegex.split(';');
+            regArr.forEach(r => {
+                let patt = inputContent.match(r);
+                if (patt && patt[0] === inputContent) {
+                    data = input;
+                }
+            });
+        }
         return data;
     }
 
