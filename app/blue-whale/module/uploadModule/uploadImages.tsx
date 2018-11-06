@@ -14,7 +14,7 @@ export interface IImage {
     unique?: string;
     isError?: boolean;
     localUrl?: string;
-    extraUrl?: string;
+    isOnLine?:boolean;
 }
 
 interface IUploadImages extends IUploaderPara {
@@ -64,25 +64,32 @@ export class UploadImages extends FormCom {
     set value(val: string) {
         this._value = val || '';
         if (tools.isNotEmpty(val)) {
-            if (this.imgType === '20') {
-                this.imgs = [{
-                    extraUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData),
-                    isError: false,
-                    localUrl: '',
-                    unique: val || ''
-                }];
-            } else {
-                let addrArr = val.split(','),
-                    arr = [];
-                addrArr.forEach(md5 => {
-                    // 根据md5获取文件地址
-                    arr.push({
-                        unique: md5,
+            switch (this.imgType){
+                case '20':{
+                    this.imgs = [{
+                        localUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData),
                         isError: false,
-                        localUrl: ''
+                        unique: val || '',
+                    }];
+                }
+                break;
+                case  '27':
+                case  '28':{
+                    // 第一次设置值
+                    let addrArr = val.split(','),
+                        arr = [];
+                    addrArr.forEach(md5 => {
+                        // 根据md5获取文件地址
+                        arr.push({
+                            unique: md5,
+                            isError: false,
+                            localUrl: '',
+                            isOnLine:true
+                        });
                     });
-                });
-                this.imgs = arr;
+                    this.imgs = arr;
+                }
+                break;
             }
         } else {
             this.imgs = [];
@@ -145,7 +152,9 @@ export class UploadImages extends FormCom {
                     let data = res;
                     let imageObj: IImage = {
                         unique: '',
-                        isError: false
+                        isError: false,
+                        isOnLine:false,
+                        localUrl:(window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
                     };
                     if (tools.isNotEmpty(res.ifExist)){
                         Modal.toast('图片已存在!');
