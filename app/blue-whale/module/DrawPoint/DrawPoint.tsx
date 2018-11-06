@@ -147,18 +147,24 @@ export class DrawPoint extends Component {
     public render(data?: obj[]) {
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
+        this.selectedG = null;
         this.editEvent.off();
         this.keyDownEvent.off();
         this.isDrawLine = false;
-        this.map.remove();
+        this.points = [];
+
+        let size = this.map.size();
+        for(let i = 0; i < size; i++){
+            this.map.remove(i)
+        }
         if (!this.g.selectAll('g').empty()) {
             D3.select('.g-wrapper').selectAll('g').remove();
             D3.select('.g-wrapper').selectAll('circle').remove();
         }
 
         this.renderData = data;
-        this.index = data.length + 1 || 0;//初始化index
-
+        this.index = data.length || 0;//初始化index
+        this.keyDownEvent.on();
         let points = [],
             svg = D3.select('svg').select('g');
         if (tools.isEmpty(data)) {
@@ -318,6 +324,7 @@ export class DrawPoint extends Component {
 
     public fished() {
         let that = this;
+        that.selectedG = null;
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
@@ -337,7 +344,7 @@ export class DrawPoint extends Component {
         //    }
         //
         this.points = [];
-        this.index = this.map.size() + 1;
+        this.index = this.map.size();
         this.isDrawLine = false;
         this.map.get(currentIndex);
         //this.editEvent.on();
@@ -382,11 +389,13 @@ export class DrawPoint extends Component {
             that.points = that.map.get(that.index);
             that.isDrawLine = true;
             that.redraw();
-
+            that.selectedG = D3.select(this);
 
         }).on('mouseover', null).on('mouseout', null)
 
     }
+
+    protected selectedG;
 
     private InitDrag() {
         let _this = this;
@@ -508,7 +517,7 @@ export class DrawPoint extends Component {
     }
 
     //键盘事件的关闭和开启
-    private  keyDownEvent= (() => {
+    private  keyDownEvent = (() => {
         let self = this;
         return {
             on: () => {
@@ -535,6 +544,11 @@ export class DrawPoint extends Component {
 
                                 break;
 
+                            }
+                            case 8:{
+                                this.selectedG && this.selectedG.attr('class','delete').attr('display','none');
+                                D3.selectAll('circle').remove();
+                                break;
                             }
 
                         }
