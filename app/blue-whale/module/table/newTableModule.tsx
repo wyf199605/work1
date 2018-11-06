@@ -186,7 +186,13 @@ export class NewTableModule {
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
                         if (isFirst && !noLoadSub) {
-                            this.tab.active(0);
+                            if (tools.isNotEmpty(selectedData['SHOWSUBSEQ'])){
+                                let showSubSeq = selectedData['SHOWSUBSEQ'].split(',');
+                                this.tab.setTabsShow(showSubSeq);
+                                this.tab.active(parseInt(showSubSeq[0]) - 1);
+                            }else {
+                                this.tab.active(0);
+                            }
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
                         }
@@ -227,6 +233,12 @@ export class NewTableModule {
             row = this.main.ftable.rowGet(index);
         this.subIndex = index;
         if(row && row.selected){
+            if (tools.isNotEmpty(row.data['SHOWSUBSEQ'])){
+                let showSubSeq = row.data['SHOWSUBSEQ'].split(',');
+                this.tab.setTabsShow(showSubSeq);
+                this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+                this.tab.active(parseInt(showSubSeq[0]) - 1);
+            }
             !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
             pseudoTable && pseudoTable.setPresentSelected(index);
         }else{
