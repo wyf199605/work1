@@ -8,7 +8,6 @@ G.Ajax.fetch(urlStr).then(({response}) => {
     pt = new PermissionTree({
         container: document.body,
         treeData:res.data,
-        textHeight:60,
         textWidth:0
     });
 });

@@ -31,21 +31,22 @@ export class UploadImages extends FormCom {
     set(val: string): void {
         this.value = val;
     }
+
     get() {
         let value = this.imgs || [],
             finalVal = '';
-        switch (this.imgType){
+        switch (this.imgType) {
             case '20':
-            case '27':{
+            case '27': {
                 let uniArr = value.reverse().filter(v => v.isError === false),
-                    uni= uniArr.filter(u => tools.isNotEmpty(u.unique))[0];
+                    uni = uniArr.filter(u => tools.isNotEmpty(u.unique))[0];
                 finalVal = tools.isNotEmpty(uni) ? uni.unique : '';
             }
                 break;
-            case '28':{
+            case '28': {
                 let trueVal = [];
                 value.forEach(v => {
-                    if(!v.isError && tools.isNotEmpty(v.unique)){
+                    if (!v.isError && tools.isNotEmpty(v.unique)) {
                         trueVal.push(v.unique)
                     }
                 });
@@ -55,9 +56,11 @@ export class UploadImages extends FormCom {
         }
         return finalVal;
     }
+
     get value() {
         return this.get();
     };
+
     set value(val: string) {
         this._value = val || '';
         if (tools.isNotEmpty(val)) {
@@ -66,7 +69,7 @@ export class UploadImages extends FormCom {
                     extraUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData),
                     isError: false,
                     localUrl: '',
-                    unique:val || ''
+                    unique: val || ''
                 }];
             } else {
                 let addrArr = val.split(','),
@@ -101,6 +104,7 @@ export class UploadImages extends FormCom {
     private imgWrapper: HTMLElement;
     private imgType: string = '';
     private typeUnique: string = '';
+
     protected wrapperInit(para: IUploadImages): HTMLElement {
         let type = para.field.dataType || para.field.atrrs.dataType;
         return <div className="accessory-wrapper">
@@ -134,33 +138,45 @@ export class UploadImages extends FormCom {
             },
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
-            typeUnique:this.typeUnique,
+            typeUnique: this.typeUnique,
             // 上传成功
             onComplete: (res, file, type) => {
                 if (type === this.typeUnique) {
-                    let data = res,
-                        isError = false;
-                    if (tools.isNotEmpty(data.ifExist)) {
-                        isError = data.ifExist === '1' ? true : false;
-                    }
-                    let imageId = res.data.blobField.value,imageObj: IImage = {
-                        unique: imageId,
-                        isError: isError
+                    let data = res;
+                    let imageObj: IImage = {
+                        unique: '',
+                        isError: false
                     };
-                    switch (this.imgType){
-                        case '20':{
-                            imageObj.extraUrl =  BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData);
-                            this.para.onComplete && this.para.onComplete.call(this, data, file);
-                        }
-                        break;
-                        case '27':{
+                    if (tools.isNotEmpty(res.ifExist)){
+                        Modal.toast('图片已存在!');
+                    }else{
+                        Modal.toast('上传成功!');
+                    }
+                    switch (this.imgType) {
+                        case '20': {
+                            imageObj.unique = res.data.blobField.value;
                             this.imgs = [imageObj];
                         }
-                        break;
-                        case '28':{
-                            this.addItem(imageObj);
+                            break;
+                        case '27': {
+                            imageObj.unique = res.data.unique;
+                            this.imgs = [imageObj];
                         }
-                        break;
+                            break;
+                        case '28': {
+                            let imageId = res.data.unique;
+                            imageObj.unique = imageId;
+                            if (tools.isNotEmpty(data.ifExist)) {
+                                let imgs = this._imgs.filter(img => img.unique === imageId);
+                                if (tools.isEmpty(imgs)){
+                                    this.addItem(imageObj);
+                                }
+                            } else {
+                                this.addItem(imageObj);
+                            }
+
+                        }
+                            break;
                     }
                 }
             },
@@ -170,7 +186,7 @@ export class UploadImages extends FormCom {
         this.uploader = uploader;
         // 文件加入到上传队列，开始上传
         this.uploader.on('filesQueued', (files: File[]) => {
-            if (files.length > 0){
+            if (files.length > 0) {
                 this.para.onChange && this.para.onChange();
                 //开始上传
                 if (!this.loading) {
@@ -180,20 +196,20 @@ export class UploadImages extends FormCom {
                     });
                     document.body.classList.add('up-disabled');
                 }
-                switch (this.imgType){
+                switch (this.imgType) {
                     case '20':
-                    case '27':{
-                        if (files.length = 1){
+                    case '27': {
+                        if (files.length = 1) {
                             this.uploader.upload(this.typeUnique);
-                        }else{
+                        } else {
                             Modal.alert('请只上传一张图片!');
                         }
                     }
-                    break;
-                    case '28':{
+                        break;
+                    case '28': {
                         this.uploader.upload(this.typeUnique);
                     }
-                    break;
+                        break;
                 }
             }
         });
@@ -213,13 +229,13 @@ export class UploadImages extends FormCom {
                     isError: true,
                     localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
                 };
-                switch (this.imgType){
+                switch (this.imgType) {
                     case '20':
-                    case '27':{
+                    case '27': {
                         this.imgs = [imageObj];
                     }
                         break;
-                    case '28':{
+                    case '28': {
                         this.addItem(imageObj);
                     }
                         break;
@@ -303,7 +319,7 @@ export class UploadImages extends FormCom {
             container: this.imgWrapper,
             index: this._imgs.length,
             nameField: this.para.nameField,
-            type:this.imgType
+            type: this.imgType
         });
         return new UploadImagesItem(para);
     }

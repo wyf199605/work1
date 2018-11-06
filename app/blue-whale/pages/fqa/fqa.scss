@@ -41,6 +41,9 @@
   }
   .fqa-modal-img{
     text-align: center;
+    img{
+      max-width: 500px;
+    }
   }
   .fqa-font{
     display: inline-block;
@@ -59,7 +62,6 @@
     background-color: #b0b0b0;
   }
 }
-
 .modal-box .modal-wrapper:not(.modal-mobile) .modal-body{
   max-height: calc(100% - 40px);
 }
