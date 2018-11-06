@@ -231,6 +231,10 @@ export abstract class TableCell {
         return table;
     }
 
+    get isNotEdit(){
+        return this.column.isNotEdit;
+    }
+
     destroy(isClear: boolean = true){
         this._wrapper && d.remove(this._wrapper, isClear);
         let index = this.row.cells.indexOf(this);
@@ -314,6 +318,12 @@ export class TableDataCell extends TableCell {
         return tools.isEmpty(rowData) ? null : rowData[this.name];
     }
     set data(data: Primitive | Node){
+        // 在编辑状态下无法修改isNotEdit为true的cell的数据
+        if(this.table.editing){
+            if(this.isNotEdit){
+                return ;
+            }
+        }
         if(data != this.data) {
             if(this.column && this.column.isNumber && tools.isNotEmpty(data) && typeof data === 'string'){
                 data = parseFloat(data);
