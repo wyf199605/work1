@@ -59,8 +59,6 @@ export class ItemList{
         e.preventDefault();
         let code =  e.keyCode || e.which || e.charCode;
         if([37, 38, 39, 40, 98, 99, 104, 110].includes(code)){
-            // e.stopPropagation();
-
             let table = this.props.dom,
                 select = d.query('.tr-select', table);
             if(!select){
@@ -80,23 +78,16 @@ export class ItemList{
                 case 98: // 数字键盘2下一条
                 case 40: // ↓
                 case 39: // →
-                // case 50: // 数字字母键盘2
                 case 110: // 数字键盘'.'
                     nextIndex = index + 1;
                     if(minus <= table.offsetHeight){
                         selectHeight = 0;
                     }
                     break;
-                // case 99: // 数字键盘3下一页
-                    // nextIndex = index + 15;
-                    // selectHeight = 15 * selectHeight - 5;
-                    // break;
                 case 104: // 数字键盘8上一条
                 case 99: // 数字键盘3
                 case 38: // ↑
                 case 37:  // ←
-                // case 51: // 数字字母键盘3
-                // case 56: // 数字字母键盘8
                     nextIndex = index - 1;
                     if(minus < sum){
                         selectHeight = - selectHeight + 0.5;
@@ -104,16 +95,10 @@ export class ItemList{
                         selectHeight = 0;
                     }
                     break;
-                // case 105: // 数字键盘9上一页
-                // case 57:  // 数字字母键盘9
-                //     nextIndex = index - 15;
-                //     selectHeight = -15*selectHeight + 5;
-                //     break
                 default:
                     return;
             }
 
-            // debugger;
             next = d.query('tr[data-index ="' + nextIndex +'"]',table);
             table.scrollTop += selectHeight;
             head.style.transform = `translateY(${table.scrollTop}px)`;
@@ -177,7 +162,6 @@ export class ItemList{
             toFixed : (field : string | number, col : TableLiteColPara) => {
                 let toFixed = col && col.toFixed;
                 if(tools.isNotEmpty(toFixed)){
-                    // console.log(field,col);
                     if(typeof field === 'string'){
                         field = Number(field);
                     }
@@ -187,7 +171,6 @@ export class ItemList{
                 return <string>field;
             },
             showField : (showField : string | number, col : TableLiteColPara) => {
-                // if(col.dataType === Rule.DT_MONEY)
                 let format = col.displayFormat;
                 if(Rule.isNumber(col.dataType) && typeof showField === 'string' && format){
                     showField = Number(showField)
@@ -199,6 +182,7 @@ export class ItemList{
             }
         });
 
+        // 记录所有可以上下选择的表格，焦距当前表格，开启按键事件
         if(this.hasEvent){
             allTableLite.push(this.mainTable);
             this.mainTable.wrapper.focus();
@@ -247,7 +231,7 @@ export class ItemList{
                 }
                 newField && this.mainTable.resetData(field, newField, tr.dataset.index);
 
-                // 写死当实售价发生变化时候触发dataRule
+                // 写死，当实售价发生变化时候触发dataRule
                 if(field === 'REALPRICE'){
                     let name = this.wrapper.parentElement.dataset.name,
                         data = Com.data[name],
@@ -277,7 +261,7 @@ export class ItemList{
             cb([]);
             return;
         }
-        CashierRequest(addr).then(({response}) => {
+        return CashierRequest(addr).then(({response}) => {
             cb(response);
         });
 

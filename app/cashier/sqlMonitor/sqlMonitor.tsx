@@ -7,7 +7,7 @@ import {TextInput} from "../global/components/form/text/text";
 import {SelectInput} from "../global/components/form/selectInput/selectInput";
 import d = C.d;
 import Rule = C.Rule;
-const site = 'https://bwd.sanfu.com/';
+const site = 'https://bwt.sanfu.com/';
 const sqlUrl = {
     open : site +'cashier/pos/posmonitor/log/posstart',
     stop : site + 'cashier/pos/posmonitor/log/posstop'
