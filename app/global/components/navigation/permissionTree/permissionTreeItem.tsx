@@ -39,8 +39,8 @@ export class PermissionTreeItem extends Component {
         if (para.PARENTID === 'root' && (tools.isEmpty(para.textWidth) || para.textWidth === 0)) {
             let styleWidth = window.getComputedStyle(this.container).width,
                 width = parseFloat(styleWidth.slice(0, styleWidth.length - 2)) / this.getDeep();
-            if (width > 300) {
-                width = 300;
+            if (width > 240) {
+                width = 240;
             }
             this.textWidth = width;
         }
