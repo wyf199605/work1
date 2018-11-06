@@ -3,7 +3,10 @@
     .fast-table-btns {
       padding: 10px 0;
       height: 44px;
-      overflow: auto;
+      overflow: hidden;
+    }
+    .tables{
+      transition: height 0.6s ease 0s;
     }
   }
 }
@@ -32,6 +35,11 @@
   .fast-table-btns{
     width: 100%;
     position: relative;
+    transition: height .7s, padding .7s;
+    &.btn-hidden{
+      height: 0;
+      padding: 0;
+    }
     &::before{
       display: table;
       content: "";

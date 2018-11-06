@@ -35,7 +35,7 @@ export class FastBtnTable extends FastTable{
 
     wrapperInit(){
         let wrapper = super.wrapperInit();
-        this.btnWrapper = <div className='fast-table-btns'></div>;
+        this.btnWrapper = <div className='fast-table-btns'/>;
         d.prepend(wrapper, this.btnWrapper);
         return wrapper;
     }
@@ -85,6 +85,15 @@ export class FastBtnTable extends FastTable{
         }
 
         window['f'] = this;
+    }
+
+    set btnShow(isShow: boolean){
+        this.btnWrapper && this.btnWrapper.classList.toggle('btn-hidden', isShow);
+        let tables = d.query('.tables', this.wrapper);
+        if(tables){
+            isShow ? (tables.style.height = 'calc(100% - 36px)')
+                : tables.style.removeProperty('height');
+        }
     }
 
     static readonly names = ['search', 'statistic', 'export'];
