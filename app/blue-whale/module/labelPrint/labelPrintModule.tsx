@@ -1124,41 +1124,33 @@ export = class LabelPrintModule {
                 if (codeData) {
                     for (let k = 0; k < codeData.length; k++) {
                         if ((typeof codeData[k].condition) === 'undefined' || codeData[k].condition) {
-                            let x = codeData[k].leftPos * 3.78,
-                                w = codeData[k].width * 3.78;
-                            // switch (codeData[k].alignment) {
-                            //     case 0:
-                            //         break;
-                            //     case 1:
-                            //         x = svgWidth - w;
-                            //         break;
-                            //     case 2:
-                            //         x = x + (svgWidth - w - x) / 2;
-                            //         break;
-                            // }
+                            let x = codeData[k].leftPos * 3.78;
+
                             if (codeData[k].codeType === 99) {
 
                                 new QrCode(drawSvg.getSvg(), {
                                         x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: w,
+                                        w: codeData[k].width * 3.78,
                                         h: codeData[k].height * 3.78
                                     },
                                     {
-                                        codeData: codeData[k].codeData ? codeData[k].codeData : 'noData'
+                                        codeData: codeData[k].codeData ? codeData[k].codeData : 'noData',
+                                        alignment: codeData[k].alignment,
                                     });
                             }
                             else {
                                 new BarCode(drawSvg.getSvg(),
                                     {
-                                        x: x + 5,
+                                        x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: w,
+                                        w: codeData[k].width * 3.78,
                                         h: codeData[k].height * 3.78
                                     },
                                     {
                                         codeData: codeData[k].codeData ? codeData[k].codeData : 'noData',
-                                        codeType: codeData[k].codeType
+                                        codeType: codeData[k].codeType,
+                                        alignment: codeData[k].alignment,
                                     });
                             }
                         }

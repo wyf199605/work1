@@ -27,16 +27,31 @@ export class BarCode{
             JsBarcode("#tempSvg", sty.codeData,{
                 lineColor: "#000000",
                 //width: (loc.w-88)/68+1,
-                width: sty.codeType === 3? 2 : 1,
+                width: sty.codeType === 3 ? 2 : 1,
                 height: loc.h,
                 margin: 0,
                 displayValue: false,
                 format: BarCode.CodeType[sty.codeType]
             });
-            this.svg.setAttribute('x',`${loc.x}`);
-            this.svg.setAttribute('y',`${loc.y}`);
+            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width',`${loc.w}`);
+            svg.setAttribute('height',`${loc.h}`);
+            svg.setAttribute('x',`${loc.x}`);
+            svg.setAttribute('y',`${loc.y}`);
             document.body.removeChild(this.svg);
-            svgDom.appendChild(this.svg);
+            svg.appendChild(this.svg);
+            svgDom.appendChild(svg);
+            console.log(this.svg.width);
+            switch (sty.alignment) {
+                case 0:
+                    break;
+                case 1:
+                    svg.setAttribute('x',`${loc.x + (loc.w - this.svg.width.animVal.value)}`);
+                    break;
+                case 2:
+                    svg.setAttribute('x',`${loc.x + (loc.w - this.svg.width.animVal.value) / 2}`);
+                    break;
+            }
         }
         static CodeType = {
             0:'ITF',
