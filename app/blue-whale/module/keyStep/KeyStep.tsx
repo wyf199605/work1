@@ -4,6 +4,7 @@ import d = G.d;
 import {Button} from "../../../global/components/general/button/Button";
 import {ShellAction} from "../../../global/action/ShellAction";
 import Shell = G.Shell;
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 interface IScanButtonPara{
     callback(text : string, input? : R_Input) : Promise<any>
     container? : HTMLElement

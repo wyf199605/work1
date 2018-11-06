@@ -10,7 +10,6 @@ import {Loading} from "../../../global/components/ui/loading/loading";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {MobileScan} from "../mobileScan/MobileScan";
-import {Inputs} from "../inputs/inputs";
 import {BwMainTableModule} from "../table/BwMainTable";
 
 export interface QueryModulePara{
