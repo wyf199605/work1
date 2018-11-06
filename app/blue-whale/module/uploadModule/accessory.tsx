@@ -155,27 +155,34 @@ export class Accessory extends FormCom {
                         } else {
                             Modal.toast('上传成功!');
                         }
-                        if (this.fileType === '43') {
-                            this.para.onComplete && this.para.onComplete.call(this, res, file);
-                            this.files = [{
-                                unique: file.name,
-                                filename: file.name,
-                                filesize: file.size,
-                                addr: ''
-                            }];
-                        } else if (this.fileType === '47') {
-                            this.value = res.data.unique;
-                        } else {
-                            let v = this.get() || '',
-                                unique = res.data.unique;
-                            if (tools.isNotEmpty(res.ifExist)){
-                                let files = this._files.filter(file => file.unique === unique);
-                                if (tools.isEmpty(files)){
+                        switch (this.fileType){
+                            case '43':{
+                                this.para.onComplete && this.para.onComplete.call(this, res, file);
+                                this.files = [{
+                                    unique: file.name,
+                                    filename: file.name,
+                                    filesize: file.size,
+                                    addr: ''
+                                }];
+                            }
+                            break;
+                            case '47':{
+                                this.value = res.data.unique;
+                            }
+                            break;
+                            case '48':{
+                                let v = this.get() || '',
+                                    unique = res.data.unique;
+                                if (tools.isNotEmpty(res.ifExist)){
+                                    let files = this._files.filter(file => file.unique === unique);
+                                    if (tools.isEmpty(files)){
+                                        this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
+                                    }
+                                }else{
                                     this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
                                 }
-                            }else{
-                                this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
                             }
+                            break;
                         }
                     } else {
                         this.para.onError && this.para.onError.call(this, file);

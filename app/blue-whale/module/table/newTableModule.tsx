@@ -20,7 +20,7 @@ import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import {FormCom} from "../../../global/components/form/basic";
 import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 
-export interface ITableModulePara extends IComponentPara{
+export interface ITableModulePara extends IComponentPara {
     bwEl: IBW_Table;
     ajaxData?: obj;
     data?: obj[];
@@ -38,6 +38,7 @@ export class NewTableModule {
     private subTabActiveIndex: number;
     private rowData: obj;
     private tab: Tab;
+    private showSubField: string = '';
 
     get defaultData() {
         return this._defaultData
@@ -48,6 +49,7 @@ export class NewTableModule {
     constructor(para: ITableModulePara) {
         console.log(para);
         this.bwEl = para.bwEl;
+        this.showSubField = para.bwEl.showSubField;
         this._defaultData = para.data || null;
         this.subTabActiveIndex = 0;
         let subUi = this.bwEl.subTableList,
@@ -64,7 +66,7 @@ export class NewTableModule {
         });
 
         main.onFtableReady = () => {
-            if(tools.isNotEmpty(this.bwEl.subButtons)) {
+            if (tools.isNotEmpty(this.bwEl.subButtons)) {
                 main.subBtns.init(this.btnWrapper);
             }
 
@@ -80,7 +82,7 @@ export class NewTableModule {
                 let container = this.main.container,
                     modal: Modal = null;
                 d.classAdd(container, 'table-module-has-sub');
-                let tabWrapper:HTMLElement = null;
+                let tabWrapper: HTMLElement = null;
                 if (!tools.isMb) {
                     if (tools.isEmpty(this.dragLine)) {
                         this.dragLine = <div className="drag-line"/>;
@@ -142,14 +144,14 @@ export class NewTableModule {
 
                     !(this.subIndex in mftable.rows) && (this.subIndex = 0);
                     let firstRow = mftable.rowGet(this.subIndex);
-                    if(!firstRow) {
+                    if (!firstRow) {
                         this.mobileModal && (this.mobileModal.isShow = false);
                         return;
                     }
                     firstRow.selected = true;
                     let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
                         noLoadSub = this.noLoadSub(mftable, main);
-                    if (tools.isEmpty(this.tab)){
+                    if (tools.isEmpty(this.tab)) {
                         this.tab = new Tab({
                             panelParent: tabWrapper,
                             tabParent: tabWrapper,
@@ -167,7 +169,7 @@ export class NewTableModule {
                                 }
                             }
                         });
-                        if (!tools.isMb){
+                        if (!tools.isMb) {
                             d.query('ul.nav-tabs').appendChild(<i className="fa fa-expand full-icon"/>)
                         }
                     }
@@ -177,20 +179,26 @@ export class NewTableModule {
                             dom: null
                         }]);
                     });
-                    if(noLoadSub){
+                    if (noLoadSub) {
                         this.subWrapper.classList.add('hide');
                         return;
-                    }else {
+                    } else {
                         this.subWrapper.classList.remove('hide');
                     }
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
                         if (isFirst && !noLoadSub) {
-                            this.tab.active(0);
+                            if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
+                                let showSubSeq = selectedData[this.showSubField].split(',');
+                                this.tab.setTabsShow(showSubSeq);
+                                this.tab.active(parseInt(showSubSeq[0]) - 1);
+                            } else {
+                                this.tab.active(0);
+                            }
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
                         }
-                        if (!tools.isMb){
+                        if (!tools.isMb) {
                             d.on(this.tab.getTab(), 'click', '.full-icon', () => {
                                 let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
                                 new Modal({
@@ -220,28 +228,36 @@ export class NewTableModule {
         };
     }
 
-    subRefreshByIndex(index: number){
+    subRefreshByIndex(index: number) {
         let main = this.main,
             mftable = main.ftable,
             pseudoTable = main.ftable.pseudoTable,
             row = this.main.ftable.rowGet(index);
         this.subIndex = index;
-        if(row && row.selected){
-            !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
-            pseudoTable && pseudoTable.setPresentSelected(index);
-        }else{
+        if (row && row.selected) {
+            if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(row.data[this.showSubField])) {
+                let showSubSeq = row.data[this.showSubField].split(',');
+                this.tab.setTabsShow(showSubSeq);
+                this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+                this.tab.active(parseInt(showSubSeq[0]) - 1);
+                pseudoTable && pseudoTable.setPresentSelected(index);
+            }else{
+                !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
+                pseudoTable && pseudoTable.setPresentSelected(index);
+            }
+        } else {
             this.mobileModal && (this.mobileModal.isShow = false);
         }
     }
 
-    private noLoadSub(mftable, main){
+    private noLoadSub(mftable, main) {
         let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
             ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
             qm = ajaxData.queryoptionsparam,
             section;
         try {
             section = (typeof qm === 'string') && JSON.parse(ajaxData.queryoptionsparam)
-        }catch (e){
+        } catch (e) {
 
         }
 
@@ -249,13 +265,14 @@ export class NewTableModule {
     }
 
     protected subIndex = 0;
-    subRefresh(rowData?:obj) {
+
+    subRefresh(rowData?: obj) {
         let bwEl = this.bwEl,
             subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex],
             main = this.main,
             mftable = main.ftable;
 
-        if(tools.isEmpty(subUi)) {
+        if (tools.isEmpty(subUi)) {
             return;
         }
 
@@ -304,7 +321,7 @@ export class NewTableModule {
                     d.off(document, 'mouseup', mouseUpHandler);
                     d.on(document, 'mousemove', mouseMoveHandler = (ev) => {
                         let translate = ev.clientY - disY;
-                        if(mainHeight + translate > 200 && subHeight - translate > 200) {
+                        if (mainHeight + translate > 200 && subHeight - translate > 200) {
                             disY = ev.clientY;
                             mainHeight += translate;
                             subHeight -= translate;
@@ -362,7 +379,7 @@ export class NewTableModule {
         let editParamHas = (varNames: string[], isMain?: boolean) => {
             let params: IBW_TableAddrParam[] = [],
                 mainEditParam = this.main.editParam,
-                subEditParam = tools.isNotEmpty(this.sub) &&  tools.isNotEmpty(this.sub[this.subTabActiveIndex]) && this.sub[this.subTabActiveIndex].editParam;
+                subEditParam = tools.isNotEmpty(this.sub) && tools.isNotEmpty(this.sub[this.subTabActiveIndex]) && this.sub[this.subTabActiveIndex].editParam;
 
             if (typeof isMain === 'undefined') {
                 params = [mainEditParam, subEditParam];
@@ -515,13 +532,13 @@ export class NewTableModule {
 
         return {
             on, off,
-            get isMain(){
+            get isMain() {
                 return isMainActive;
             },
             set isMain(isMain: boolean) {
                 isMainActive = isMain;
             },
-            set onChange(hander: (iMain: boolean) => void){
+            set onChange(hander: (iMain: boolean) => void) {
                 onChange = hander;
             }
         }
@@ -532,7 +549,7 @@ export class NewTableModule {
         let self = this,
             editModule: EditModule = null;
 
-        let tableEach = (fun: (tm: BwTableModule, index:number) => void) => {
+        let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
             [this.main, ...Object.values(this.sub)].forEach((table, i) => {
                 fun(table, i)
             })
@@ -608,11 +625,11 @@ export class NewTableModule {
                             }
                             //TODO 给row.data赋值会销毁当前cell的input
                             // row.data = Object.assign({}, row.data, data);
-                            for(let key in data){
+                            for (let key in data) {
                                 let hCell = row.cellGet(key) as TableDataCell;
-                                if(hCell && hCell !== cell){
+                                if (hCell && hCell !== cell) {
                                     let cellData = data[key];
-                                    if(hCell.data != cellData){
+                                    if (hCell.data != cellData) {
                                         hCell.data = cellData || '';
                                     }
                                 }

@@ -91,7 +91,7 @@ export class Uploader extends FormCom {
         }, {
             beforeSendFile: (file: File) => {
                 //秒传验证
-                if(para.typeUnique === Uploader.type){
+                if (para.typeUnique === Uploader.type) {
                     let task = $.Deferred();
                     let start = new Date().getTime();
                     //拿到上传文件的唯一名称，用于断点续传
@@ -109,6 +109,7 @@ export class Uploader extends FormCom {
                             , md5: val.toUpperCase()
                             , nameField: para.nameField
                             , file_name: file.name
+                            , name: uniqueFileName
                         };
 
                         if (para.thumbField) {
@@ -145,7 +146,7 @@ export class Uploader extends FormCom {
             }
             , beforeSend: function (block) {
                 //分片验证是否已传过，用于断点续传
-                if(para.typeUnique === Uploader.type){
+                if (para.typeUnique === Uploader.type) {
                     let task = $.Deferred();
                     Ajax.fetch(backEndUrl, {
                         type: "POST"
@@ -173,7 +174,7 @@ export class Uploader extends FormCom {
                 }
             }
             , afterSendFile: function (file: File) {
-                if (para.typeUnique === Uploader.type){
+                if (para.typeUnique === Uploader.type) {
                     let chunksTotal = 0;
                     if ((chunksTotal = Math.ceil(file.size / chunkSize)) >= 1) {
                         //合并请求
