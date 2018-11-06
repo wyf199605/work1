@@ -251,7 +251,7 @@ export class Inputs {
                         clearTimeout(timer);
                     }
                 }
-                
+
                 timer = setTimeout(handle, timeInterval);
             });
         });
