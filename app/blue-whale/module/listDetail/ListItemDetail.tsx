@@ -194,10 +194,28 @@ export class ListItemDetail {
             switch (btn.subType) {
                 case 'update_save' :
                 case 'insert_save':
+                    let isAdd = btn.subType === 'update_save' ? false : true;
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: btn.subType === 'update_save' ? self.defaultData : {},
-                        button: btn,
-                        listDetail: self
+                        isAdd:isAdd,
+                        confirm(data){
+                            return new Promise((resolve,reject)=>{
+                                ButtonAction.get().clickHandle(btn, data, () => {
+                                    switch (btn.subType) {
+                                        case 'insert_save': {
+                                            self.changePage(self.totalNumber + 1);
+                                            resolve();
+                                        }
+                                            break;
+                                        case 'update_save': {
+                                            self.changePage();
+                                            resolve();
+                                        }
+                                            break;
+                                    }
+                                });
+                            })
+                        }
                     }));
                     break;
                 case 'delete_save': {

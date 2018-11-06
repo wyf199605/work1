@@ -152,12 +152,12 @@ export = class webscoket {
                 }
                 break;
             case "hint" :
-                // if(this.hint){
-                //     this.hint.destroy();
-                // }
-                // this.hint = new Hints({
-                //     data : data.data
-                // });
+                if(this.hint){
+                    this.hint.destroy();
+                }
+                this.hint = new Hints({
+                    data : data.data
+                });
                 break;
             case "token":
                 window.localStorage.setItem("sqlToken", data.identification);

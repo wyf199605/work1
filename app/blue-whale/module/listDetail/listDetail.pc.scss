@@ -1,0 +1,95 @@
+.fl-pc{
+  .detail-modal {
+    .modal-body {
+      height: calc(100% - 114px);
+      padding-left: 16px;
+    }
+    .form-wrapper {
+      background-color: #ffffff;
+      padding-left: 16px;
+      .detail-cell {
+        height: 50px;
+        width: 300px;
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ffffff;
+        padding-right: 16px;
+        //border-bottom: 1px solid #e2e2e2;
+        &.disabled{
+          .detail-cell-title[data-input-type="input"]~.text-input>input{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+        .text-input{
+          color: #666666;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          & > .btn-group .icon{
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+          }
+          &>input{
+            height: 100%;
+            margin-bottom: 0;
+            font-size: 14px;
+          }
+        }
+        .detail-cell-title {
+          color: #333333;
+          flex: 0 0 auto;
+          margin-right: 20px;
+          max-width: 180px;
+          font-size: 14px;
+        }
+        .detail-cell-title[data-input-type="datetime"]~.text-input>input{
+          pointer-events: none;
+        }
+      }
+    }
+    //.foot-wrapper > .modal-footer {
+    //  display: flex;
+    //  display: -webkit-flex;
+    //  align-items: center;
+    //  justify-content: center;
+    //  height: 70px !important;
+    //  .left-plane, .right-plane {
+    //    position: static;
+    //  }
+    //  .right-plane {
+    //    margin-left: 16px;
+    //  }
+    //}
+    //.modal-btn {
+    //  height: 40px !important;
+    //  border-radius: 20px !important;
+    //  padding-left: 25px !important;
+    //  padding-right: 25px !important;
+    //  border-color: #005bac;
+    //  color: #005bac;
+    //}
+    //.modal-btn.eidt-confirm {
+    //  color: #ffffff;
+    //  background-color: #005bac;
+    //}
+    //.btn.modal-btn:hover {
+    //  color: #005bac;
+    //  background-color: #ffffff;
+    //  border-color: #005bac;
+    //}
+    //.btn.modal-btn.eidt-confirm:active {
+    //  color: #ffffff !important;
+    //  background-color: #005bac !important;
+    //  border-color: #005bac !important;
+    //}
+    //.btn.modal-btn.eidt-confirm:hover {
+    //  color: #ffffff;
+    //  background-color: #005bac;
+    //  border-color: #005bac;
+    //}
+  }
+}

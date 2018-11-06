@@ -3,12 +3,13 @@ import tools = G.tools;
 import d = G.d;
 import {Button} from "../../../global/components/general/button/Button";
 import {ShellAction} from "../../../global/action/ShellAction";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
 import Shell = G.Shell;
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 interface IScanButtonPara{
-    callback(ajaxData : obj, input? : R_Input) : Promise<any>
+    callback(text : string, input? : R_Input) : Promise<any>
     container? : HTMLElement
     inputs? : R_Input[]
+    locationLine? : string
 }
 export class KeyStep{
     private p : IScanButtonPara;
@@ -36,14 +37,19 @@ export class KeyStep{
         d.on(btn.wrapper, 'touchstart', function (e : TouchEvent) {
             let ev = e.touches[0],
                 wrapper = btn.wrapper,
-                distanceX = ev.clientX - wrapper.offsetLeft,
-                distanceY = ev.clientY - wrapper.offsetTop;
+                evX = ev.clientX,
+                evY = ev.clientY,
+                top = wrapper.offsetTop,
+                left = wrapper.offsetLeft;
 
-            let moveHandler = function (e : TouchEvent) {
-                e.preventDefault();
-                let ev = e.touches[0];
-                wrapper.style.left = ev.clientX - distanceX + 'px';
-                wrapper.style.top = ev.clientY - distanceY + 'px';
+            let moveHandler = function (i : TouchEvent) {
+                let iv = i.touches[0],
+                    ivX = iv.clientX,
+                    ivY = iv.clientY,
+                    distanceX = evX - ivX,
+                    distanceY = evY - ivY;
+                wrapper.style.left = left - distanceX - 30 + 'px';
+                wrapper.style.top = top - distanceY + 'px';
             };
 
             let endHandler =  function () {
@@ -57,47 +63,54 @@ export class KeyStep{
     }
 
     evenHandle(para : IScanButtonPara, can2dScan : boolean){
-        para.inputs.forEach(input => {
-            switch (input.inputType) {
-                case '0':
-                    if(can2dScan){
-                        this.scanOpen().then((res : obj) => {
-                            if(res.success && res.data !== 'openSuponScan') {
-                                this.afterReg(input, res.data)
-                            }
-                        });
-                    }else {
-                        this.open(para).then((text : string) => {
-                            this.afterReg(input, text)
-                        });
-                    }
-                    break;
-                case '1':
-                    if(can2dScan){
-                        this.startEpc(input);
-                    }else {
-                        this.startEpcMb(input);
-                    }
-                    break;
-                case '2':
-                    can2dScan && Shell.inventory.scan2dOn( (res) => {
-                        let text = res && res.data;
-                        if( res && res.success && text !== 'openSuponScan') {
-                            this.afterReg(input, text);
+        if(Array.isArray(para.inputs)){
+            para.inputs.forEach(input => {
+                switch (input.inputType) {
+                    case '0':
+                        if(can2dScan){
+                            let open = () => {
+                                this.scanOpen().then((res : obj) => {
+                                    if(res.success && res.data !== 'openSuponScan') {
+                                        this.afterReg(input, res.data);
+                                    }
+                                    open();
+                                });
+                            };
+                            open();
+                        }else {
+                            this.open(para).then((text : string) => {
+                                this.afterReg(input, text)
+                            });
                         }
+                        break;
+                    case '1':
+                        if(can2dScan){
+                            this.startEpc(input);
+                        }
+                        break;
+                }
+            })
+        }else if(para.locationLine){ // 定位功能
+            if(can2dScan){
+                let open = () => {
+                    this.scanOpen().then((res : obj) => {
+                        if(res.success && res.data !== 'openSuponScan') {
+                            this.p.callback(res.data)
+                        }
+                        open();
                     });
-                    break;
+                };
+                open();
+            }else {
+                this.open(para).then((text : string) => {
+                    this.p.callback(text)
+                });
             }
-        })
+        }
     }
 
     afterReg(input : R_Input, text: string){
-        let regInput = this.regExpMatch(input, text);
-        if(regInput){
-            this.p.callback({
-                mobilescan : text
-            }, input)
-        }
+        this.p.callback(text, this.regExpMatch(input, text))
     }
 
     /**
@@ -111,7 +124,7 @@ export class KeyStep{
             data = null,
             len = inputContent.length,
             minLen = input.minLength,
-            maxLen = input.minLength;
+            maxLen = input.maxLength;
 
         if (input.fieldRegex && minLen <= len && len <= maxLen) {
             regArr = input.fieldRegex.split(';');
@@ -127,7 +140,7 @@ export class KeyStep{
 
     scanOpen(){
         return new Promise((resolve, reject) => {
-            Shell.inventory.openScan((res) => {
+            Shell.inventory.scan2dOn((res) => {
                 resolve(res)
             });
         })
@@ -152,43 +165,22 @@ export class KeyStep{
         let timer = null, isLoading = false, arr = [];
         Shell.inventory.startEpc(null, (result) => {
             if(result.success){
-                let text = result.data,
-                    reg = this.regExpMatch(input, text);
-                reg && arr.push(text);
+                result.data.forEach(obj => {
+                    let reg = this.regExpMatch(input, obj.epc);
+                    reg && arr.push(obj.epc);
+                });
 
                 if(!timer && !isLoading) {
                     timer = setTimeout(() => {
                         isLoading = true;
-                        this.p.callback({selection : arr.join(',')}, input)
-                            .then(() => isLoading = false);
+                        if(tools.isNotEmpty(arr)){
+                            this.p.callback(arr.join(','), input)
+                                .then(() => isLoading = false);
+                        }
                         arr = [];
                         timer = null;
                     },1000);
                 }
-            }
-        });
-    }
-
-    startEpcMb(input : R_Input){
-        Shell.inventory.clearEpc(null,  (res) => {
-            if(res.success){
-                Shell.inventory.startEpc(null, (result) => {
-                    if(result.success){
-                        let arr = [];
-                        Array.isArray(result.data) && result.data.forEach(obj => {
-                            let epc = obj.epc;
-                            if(this.regExpMatch(input, epc)){
-                                arr.push(epc);
-                            }
-                        });
-                        this.p.callback({
-                            selection : arr.join(',')
-                        });
-                        Shell.inventory.stopEpc(null, () => {});
-                    }else {
-                        Modal.alert(result.msg);
-                    }
-                });
             }
         });
     }

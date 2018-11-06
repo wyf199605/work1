@@ -9,6 +9,7 @@ import {SelectInputMb} from "../../../global/components/form/selectInput/selectI
 
 interface InputsPara {
     inputs: R_Input[]
+    locationLine? : string
     container: HTMLElement
     keyField? : string
     table? : Function
@@ -26,8 +27,8 @@ export class Inputs {
     private url: string;  //记录当前请求的url步骤,每次请求从该步骤开始
     constructor(private para: InputsPara) {
         this.p = para;
+        para.container.tabIndex = parseInt(G.tools.getGuid());
         this.eventInit(para);
-
     }
 
     /**
@@ -43,7 +44,7 @@ export class Inputs {
             newUrl += '?';
         }
         let ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
-        this.ajax(ajaxUrl);
+        return this.ajax(ajaxUrl);
     }
 
     private ajax(aUrl){
@@ -127,8 +128,8 @@ export class Inputs {
             queryModule.para.refresher({}, true).then(() => {
                 this.p.table().data = data;
             })
-        }else {
-            ftable && (ftable.data = data);
+        }else if(ftable){
+            ftable.data = data;
         }
     }
 
@@ -154,9 +155,21 @@ export class Inputs {
             body : d.create('<div class="inputs-atv"></div>') as HTMLElement,
             footer : {},
             onOk : () => {
+                let atvData = atv.dataGet(),
+                    url = tools.url.addObj(CONF.siteUrl + subButtons[0].actionAddr.dataAddr, atvData ? {'atvarparams': JSON.stringify(atv.dataGet())} : null);
+
+                //必选判断
+                let errTip = '';
+                atvarparams.forEach(obj => {
+                    if(obj.atrrs.requiredFlag === 1 && atvData[obj.field_name] === ''){
+                        errTip += obj.caption + ',';
+                    }
+                });
+                if(errTip !== ''){
+                    Modal.alert(errTip.substring(0,errTip.length - 1) + '不能为空');
+                    return;
+                }
                 modal.isShow = false;
-                let atvData = atv.dataGet();
-                let url = tools.url.addObj(CONF.siteUrl + subButtons[0].actionAddr.dataAddr, atvData ? {'atvarparams': JSON.stringify(atv.dataGet())} : null);
                 BwRule.Ajax.fetch(url,{
                     type : 'get',
                 }).then(({response}) => {
@@ -169,7 +182,7 @@ export class Inputs {
         require(['QueryBuilder'], (q) => {
             atv = new q.AtVarBuilder({
                 queryConfigs: atvarparams,
-                resultDom: modal.bodyWrapper,
+                resultDom: modal.body,
                 tpl: () => d.create(`<div class="atvarDom"><div style="display: inline-block;" data-type="title"></div>
                 <span>：</span><div data-type="input"></div></div>`),
                 setting: null
@@ -189,60 +202,92 @@ export class Inputs {
      */
     private eventInit(para: InputsPara) {
         if(G.tools.isMb){
-            require(['KeyStep'], (e) => {
-                new e.KeyStep({
-                    inputs : para.inputs,
-                    callback : (ajaxData, input) => {
-                        this.matchPass(input, ajaxData.mobilescan);
-                    }
-                })
-            });
+            let keyStep = null;
+            // para.inputs.forEach(input => {
+            //     if(!keyStep){
+                    require(['KeyStep'], (e) => {
+                        keyStep = new e.KeyStep({
+                            inputs : para.inputs,
+                            callback : (ajaxData, input) => {
+                                if(input){
+                                    return this.matchPass(input, ajaxData);
+                                }else if(para.locationLine){
+                                    this.rowSelect(para.locationLine, ajaxData);
+                                }
+                            }
+                        })
+                    });
+                // }else {
+                //
+                // }
+            // });
+
             return;
         }
-        // let container = d.query('.tables', para.container) as HTMLElement;
-        para.container.tabIndex = parseInt(G.tools.getGuid());
-        para.inputs.forEach(obj => {
-            let text = '', timer = null, timeInterval = obj.timeout;
+        para.inputs.forEach(input => {
+            let text = '', timer = null,
+                timeInterval = input.timeout,
+                line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
-                text += e.key;
-                if (timer) {
-                    clearTimeout(timer);
-                }
-                timer = setTimeout(() => {
-                    let len = text.length;
-                    if (obj.minLength <= len && len <= obj.maxLength) {
-                        let reg = this.regExpMatch(para.inputs, text);
-                        //匹配成功
-                        reg && this.matchPass(reg, text);
+                let handle = () => {
+                    let reg = this.regExpMatch(input, text);
+                    //匹配成功
+                    if(reg){
+                        this.matchPass(reg, text);
+                    }else if(line){
+                        this.rowSelect(line, text);
                     }
+
                     timer = null;
                     text = '';
-                }, timeInterval);
+                },
+                    code = e.keyCode || e.which || e.charCode;
+
+                if(code === 13){
+                    handle();
+                }else {
+                    text += e.key;
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                }
+                
+                timer = setTimeout(handle, timeInterval);
             });
         });
     }
 
+    private rowSelect(line, text){
+        let index = this.para.table().locateToRow(line, text, true),
+            tableModule = this.para.tableModule();
+
+        if(tools.isNotEmpty(index) && tableModule && tableModule.bwEl.subTableList) {
+            tableModule.subRefreshByIndex(index);
+        }
+    }
 
     /**
      * 正则匹配按键
-     * @param inputs
+     * @param input
      * @param inputContent
      * @returns {boolean}
      */
-    private regExpMatch(inputs, inputContent: string) {
-        let regArr,
-            data;
-        inputs.forEach(d => {
-            if (d.fieldRegex) {
-                regArr = d.fieldRegex.split(';');
-                regArr.forEach(r => {
-                    let patt = inputContent.match(r);
-                    if (patt && patt[0] === inputContent) {
-                        data = d;
-                    }
-                });
-            }
-        });
+    private regExpMatch(input, inputContent: string) {
+        let regArr = null,
+            data = null,
+            len = inputContent.length,
+            minLen = input.minLength,
+            maxLen = input.maxLength;
+
+        if (input.fieldRegex && minLen <= len && len <= maxLen) {
+            regArr = input.fieldRegex.split(';');
+            regArr.forEach(r => {
+                let patt = inputContent.match(r);
+                if (patt && patt[0] === inputContent) {
+                    data = input;
+                }
+            });
+        }
         return data;
     }
 

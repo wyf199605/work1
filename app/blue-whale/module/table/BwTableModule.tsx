@@ -1776,7 +1776,7 @@ export class BwTableModule extends Component {
                                     }
                                 })
                             }
-                            // new FlowDesigner(dataAddr);
+                            new FlowDesigner(dataAddr);
                         } else {
                             // 通用操作按钮
                             // if (multiselect === 2 && !selectedData[0]) {

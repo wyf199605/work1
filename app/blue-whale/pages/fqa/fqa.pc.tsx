@@ -18,7 +18,6 @@ export class FqaPcModal{
             className: 'pc-fqa-modal',
             isOnceDestroy: true,
             header:'常见问题',
-            
         });
         this.modal.className = 'full-screen-fixed';
     }

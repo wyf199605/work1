@@ -148,7 +148,6 @@ export class NewTableModule {
                     }
                     firstRow.selected = true;
                     let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
-                        ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
                         noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)){
                         this.tab = new Tab({
@@ -157,6 +156,7 @@ export class NewTableModule {
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
+                                let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
@@ -213,18 +213,25 @@ export class NewTableModule {
 
                 let self = this;
                 mftable.click.add('.section-inner-wrapper.pseudo-table tbody tr[data-index]', function () {
-                    let rowIndex = parseInt(this.dataset.index),
-                        row = mftable.rowGet(rowIndex);
-                    self.subIndex = rowIndex;
-                    if(row && row.selected){
-                        !self.noLoadSub(mftable, main) && self.subRefresh(row.data);
-                        pseudoTable && pseudoTable.setPresentSelected(rowIndex);
-                    }else{
-                        self.mobileModal && (self.mobileModal.isShow = false);
-                    }
+                    let rowIndex = parseInt(this.dataset.index);
+                    self.subRefreshByIndex(rowIndex);
                 });
             }
         };
+    }
+
+    subRefreshByIndex(index: number){
+        let main = this.main,
+            mftable = main.ftable,
+            pseudoTable = main.ftable.pseudoTable,
+            row = this.main.ftable.rowGet(index);
+        this.subIndex = index;
+        if(row && row.selected){
+            !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
+            pseudoTable && pseudoTable.setPresentSelected(index);
+        }else{
+            this.mobileModal && (this.mobileModal.isShow = false);
+        }
     }
 
     private noLoadSub(mftable, main){

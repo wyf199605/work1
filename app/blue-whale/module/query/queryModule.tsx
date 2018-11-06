@@ -10,7 +10,6 @@ import {Loading} from "../../../global/components/ui/loading/loading";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {MobileScan} from "../mobileScan/MobileScan";
-import {Inputs} from "../inputs/inputs";
 import {BwMainTableModule} from "../table/BwMainTable";
 
 export interface QueryModulePara{
@@ -123,24 +122,28 @@ export abstract class QueryModule {
             },10);
         }
 
-        this.keyStep(this.para.qm.inputs)
+        if(!this.para.qm.scannableField){
+            this.inputs(this.para.qm.inputs)
+        }
     }
 
-    private keyStep(inputs){
+    private inputs(inputs){
         if(!inputs){
             return;
         }
-
-        new Inputs({
-            inputs: inputs,
-            container: this.para.container,
-            table : () => {
-                return this.para.tableGet() && this.para.tableGet().ftable
-            },
-            queryModule : () => {
-                return this
-            },
+        require(['Inputs'], (i) => {
+            new i.Inputs({
+                inputs: inputs,
+                container: this.para.container,
+                table : () => {
+                    return this.para.tableGet() && this.para.tableGet().ftable
+                },
+                queryModule : () => {
+                    return this
+                },
+            })
         })
+
     }
 
     get wrapper(){
