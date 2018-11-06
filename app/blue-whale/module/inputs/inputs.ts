@@ -229,11 +229,7 @@ export class Inputs {
                 timeInterval = input.timeout,
                 line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
-                text += e.key;
-                if (timer) {
-                    clearTimeout(timer);
-                }
-                timer = setTimeout(() => {
+                let handle = () => {
                     let reg = this.regExpMatch(input, text);
                     //匹配成功
                     if(reg){
@@ -244,7 +240,19 @@ export class Inputs {
 
                     timer = null;
                     text = '';
-                }, timeInterval);
+                },
+                    code = e.keyCode || e.which || e.charCode;
+
+                if(code === 13){
+                    handle();
+                }else {
+                    text += e.key;
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                }
+                
+                timer = setTimeout(handle, timeInterval);
             });
         });
     }
