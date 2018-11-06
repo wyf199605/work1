@@ -37,15 +37,12 @@ export class OffLine{
      * 开启websocket
      */
     private websocket(){
-        console.log( 'wss:' + Com.urlSite.match(/\/\/(\S*)\//)[0] + 'cashier/pos/websocket/',JSON.stringify(this.confGet()))
+        // console.log( 'wss:' + Com.urlSite.match(/\/\/(\S*)\//)[0] + 'cashier/pos/websocket/',JSON.stringify(this.confGet()))
         new BwWebsocket({
-            // url : 'ws://192.168.1.245:8080/cashier/pos/websocket/',
             url : 'wss:' + Com.urlSite.match(/\/\/(\S*)\//)[0] + 'cashier/pos/websocket/',
             sendData : JSON.stringify(this.confGet()),
             onMessage : r => {
                 let data = JSON.parse(r && r.data);
-                // console.log(r, 'wmsg')
-
                 switch (data.respType){
                     case 'posver':
                         this.posVer(data);
@@ -54,13 +51,7 @@ export class OffLine{
                         this.posData(data);
                         break;
                 }
-            },
-            onClose : r => {
-                console.log(r, '关闭')
-            },
-            onOpen : r => {
-                console.log(r, '打开')
-            },
+            }
         });
     }
 
@@ -116,7 +107,7 @@ export class OffLine{
                 index = 0;
 
             let sqlLite = () => {
-                let data = dataArr && dataArr[index];
+                let data : ICreateTablePara = dataArr && dataArr[index];
                 if(!data){
                     Modal.alert('over');
                     this.endPosData = true;

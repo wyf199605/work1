@@ -154,7 +154,6 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
         let countData = Com.modalMainItemList.getData();
         param = countData && countData[0] || {};
     }
-    // console.log(param);
 
     let input: IInputPara = Object.assign({}, regInput),
         inputType = input.inputType;
@@ -279,7 +278,6 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
             padData(input.padDatas, fieldName, param, padDone, response, value);
         }
     })
-    // });
 }
 
 function getOutPutField(outPutField: string, field: obj, value: string) {

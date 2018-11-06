@@ -1,6 +1,5 @@
 namespace CA{
     export const Config = {
-        isDebug: true,
         // onLine : false,
         onLine : true,
         isProduct: false,

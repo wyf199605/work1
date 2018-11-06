@@ -1,6 +1,7 @@
 /// <amd-module name="BwWebsocket"/>
 /// <amd-dependency path="reconnectingWebscoket" name="ReconnectingWebSocket"/>
 import {Modal} from "../components/feedback/modal/Modal";
+import Rule = C.Rule;
 interface IBwWebsocketPara{
     onOpen? : (r?) => void
     onMessage? : (r) => void
@@ -10,7 +11,7 @@ interface IBwWebsocketPara{
     sendData? : string
 }
 declare let ReconnectingWebSocket : any;
-let url = 'wss://bwd.sanfu.com/cashier/sql/websocket/'+ 'CASHIER_SQL_'+ new Date().getTime() + Math.random();
+let url = 'wss://bwt.sanfu.com/cashier/sql/websocket/'+ Rule.getSqlRandom();
 export class BwWebsocket{
     ws : WebSocket;
     p : IBwWebsocketPara;
