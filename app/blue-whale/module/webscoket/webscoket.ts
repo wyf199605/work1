@@ -159,9 +159,6 @@ export = class webscoket {
                     data : data.data
                 });
                 break;
-            case "token":
-                window.localStorage.setItem("sqlToken", data.identification);
-                break;
             default :
                 console.info("后台返回未知的消息类型.");
                 break;

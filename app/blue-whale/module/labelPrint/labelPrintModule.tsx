@@ -490,13 +490,12 @@ export = class LabelPrintModule {
                 image.onload = () => {
                     let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
                     canvas.style.backgroundColor = '#fff';
-                    canvas.width = image.width * 10;
-                    canvas.height = image.height * 10;
+                    canvas.width = image.width * 30;
+                    canvas.height = image.height * 30;
                     let ctx = canvas.getContext("2d");
 
-                    ctx.drawImage(image, 0, 0, image.width * 10, image.height * 10); //使用画布画图
-                    ctx.drawImage(image, 0, 0, image.width * 10, image.height * 10); //使用画布画图
-                    let dataURL = canvas.toDataURL("image/jpeg");  //返回的是一串Base64编码的URL并指定格式
+                    ctx.drawImage(image, 0, 0, image.width * 30, image.height * 30); //使用画布画图
+                    let dataURL = canvas.toDataURL("image/jpeg", 1.0);  //返回的是一串Base64编码的URL并指定格式
                     canvas = null; //释放
                     console.log(dataURL);
                     dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));
@@ -1124,41 +1123,33 @@ export = class LabelPrintModule {
                 if (codeData) {
                     for (let k = 0; k < codeData.length; k++) {
                         if ((typeof codeData[k].condition) === 'undefined' || codeData[k].condition) {
-                            let x = codeData[k].leftPos * 3.78,
-                                w = codeData[k].width * 3.78;
-                            // switch (codeData[k].alignment) {
-                            //     case 0:
-                            //         break;
-                            //     case 1:
-                            //         x = svgWidth - w;
-                            //         break;
-                            //     case 2:
-                            //         x = x + (svgWidth - w - x) / 2;
-                            //         break;
-                            // }
+                            let x = codeData[k].leftPos * 3.78;
+
                             if (codeData[k].codeType === 99) {
 
                                 new QrCode(drawSvg.getSvg(), {
                                         x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: w,
+                                        w: codeData[k].width * 3.78,
                                         h: codeData[k].height * 3.78
                                     },
                                     {
-                                        codeData: codeData[k].codeData ? codeData[k].codeData : 'noData'
+                                        codeData: codeData[k].codeData ? codeData[k].codeData : 'noData',
+                                        alignment: codeData[k].alignment,
                                     });
                             }
                             else {
                                 new BarCode(drawSvg.getSvg(),
                                     {
-                                        x: x + 5,
+                                        x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: w,
+                                        w: codeData[k].width * 3.78,
                                         h: codeData[k].height * 3.78
                                     },
                                     {
                                         codeData: codeData[k].codeData ? codeData[k].codeData : 'noData',
-                                        codeType: codeData[k].codeType
+                                        codeType: codeData[k].codeType,
+                                        alignment: codeData[k].alignment,
                                     });
                             }
                         }

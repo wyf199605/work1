@@ -19,6 +19,7 @@ export interface IFileInfo {
 
 export interface IAccessory extends IUploaderPara {
     uniques?: string;
+
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
     onChange?: Function; // 上传成功回调
@@ -32,9 +33,11 @@ export class Accessory extends FormCom {
     public uploader: Uploader;
     private fileType: string = '';
     private typeUnique: string = '';
+
     set(data: string): void {
         this.value = data || '';
     }
+
     get() {
         let value = this.files || [],
             trueVal = [];
@@ -49,6 +52,7 @@ export class Accessory extends FormCom {
         }
         return trueVal.join(',');
     }
+
     set value(value: string) {
         this._value = value || '';
         if (tools.isNotEmpty(value)) {
@@ -56,10 +60,10 @@ export class Accessory extends FormCom {
                 case '47':
                 case '48': {
                     let fileInfo = this.para.field.fileInfo;
-                    if (tools.isNotEmpty(fileInfo)){
-                        let obj:obj ={};
+                    if (tools.isNotEmpty(fileInfo)) {
+                        let obj: obj = {};
                         obj[this.para.nameField] = value;
-                        let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(fileInfo, Object.assign({},this.para.pageData,obj));
+                        let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(fileInfo, Object.assign({}, this.para.pageData, obj));
                         BwRule.Ajax.fetch(fileInfoAddr).then(({response}) => {
                             this.files = response.dataArr || [];
                         })
@@ -136,7 +140,7 @@ export class Accessory extends FormCom {
             accept: this.para.accept,
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
-            typeUnique:this.typeUnique,
+            typeUnique: this.typeUnique,
             onComplete: (res, file, type) => {
                 if (type === this.typeUnique) {
                     if (this.loading) {
@@ -145,30 +149,44 @@ export class Accessory extends FormCom {
                         this.loading = null;
                         document.body.classList.remove('up-disabled');
                     }
-                    if (res.ifExist === '1') {
-                        Modal.toast('附件已存在!');
-                    }else{
-                        if (res.code == 200 || res.errorCode === 0) {
+                    if (res.code == 200 || res.errorCode === 0) {
+                        if (tools.isNotEmpty(res.ifExist)) {
+                            Modal.toast('附件已存在!');
+                        } else {
                             Modal.toast('上传成功!');
-                            if (this.fileType === '43') {
+                        }
+                        switch (this.fileType){
+                            case '43':{
                                 this.para.onComplete && this.para.onComplete.call(this, res, file);
                                 this.files = [{
-                                    unique: res.data.blobField.value,
+                                    unique: file.name,
                                     filename: file.name,
                                     filesize: file.size,
                                     addr: ''
                                 }];
-                            } else if (this.fileType === '47') {
+                            }
+                            break;
+                            case '47':{
                                 this.value = res.data.unique;
-                            } else {
+                            }
+                            break;
+                            case '48':{
                                 let v = this.get() || '',
                                     unique = res.data.unique;
-                                this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
+                                if (tools.isNotEmpty(res.ifExist)){
+                                    let files = this._files.filter(file => file.unique === unique);
+                                    if (tools.isEmpty(files)){
+                                        this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
+                                    }
+                                }else{
+                                    this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
+                                }
                             }
-                        } else {
-                            this.para.onError && this.para.onError.call(this, file);
-                            Modal.alert(res.msg || res.errorMsg);
+                            break;
                         }
+                    } else {
+                        this.para.onError && this.para.onError.call(this, file);
+                        Modal.alert(res.msg || res.errorMsg);
                     }
                 }
             }
@@ -179,18 +197,18 @@ export class Accessory extends FormCom {
             if ((this.fileType === '43' || this.fileType === '47') && files.length > 1) {
                 Modal.alert('一次只能上传一个附件!');
             } else {
-               if(files.length > 0){
-                   this.para.onChange && this.para.onChange();
-                   //开始上传
-                   if (!this.loading) {
-                       this.loading = new Loading({
-                           msg: '上传中...',
-                           container: document.body
-                       });
-                       document.body.classList.add('up-disabled');
-                   }
-                   this.uploader.upload(this.typeUnique);
-               }
+                if (files.length > 0) {
+                    this.para.onChange && this.para.onChange();
+                    //开始上传
+                    if (!this.loading) {
+                        this.loading = new Loading({
+                            msg: '上传中...',
+                            container: document.body
+                        });
+                        document.body.classList.add('up-disabled');
+                    }
+                    this.uploader.upload(this.typeUnique);
+                }
             }
         });
         this.uploader.on("uploadError", (file, res) => {

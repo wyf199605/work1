@@ -360,7 +360,7 @@ export class FastTable extends Component {
         //     let mwidth = window.getComputedStyle(d.query('.main-table')).width,
         //         mwidth_num = parseInt(mwidth.slice(0,mwidth.length-2));
         if (!tools.isMb) {
-            let minus = this.tableData.data.length * 30 > this.mainTable.maxHeight ? 0 : 11;
+            let minus = this.tableData.data.length * 40 > this.mainTable.body.wrapper.offsetHeight ? 0 : 10;
             width = (this.mainTable.width + this.calcMainTableLeftOffSet(width) - minus) + 7;
             d.query(".scroll-content", this.wrapper).style.width = width + "px";
         }
@@ -1190,7 +1190,8 @@ export class FastTable extends Component {
 
                 if (tools.isNotEmpty(editingCell) && !editingCell.editing &&
                     (this.editor.updatable || (isInsert && this.editor.insertble))) {
-                    if (this.editor.rowCanInit(this.rows[rowIndex]) &&
+                    if ( !editingCell.isNotEdit &&
+                        this.editor.rowCanInit(this.rows[rowIndex]) &&
                         this.editor.cellCanInit(editingCell.column as FastTableColumn,
                             isInsert ? 1 : 0)) {
                         editingCell.editing = true;
@@ -2722,7 +2723,6 @@ export class FastTable extends Component {
                         }
                     })
                 }
-                console.log(pivotResult);
 
                 pivotResult['isPivot'] = true;
                 return pivotResult;
@@ -2847,7 +2847,7 @@ export class FastTable extends Component {
     protected initDisabledEditorRow(row) {
         let editor = this.editor;
         row && row.cells.forEach((cell) => {
-            if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(cell.column as FastTableColumn, 1))) {
+            if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(cell.column as FastTableColumn, 1)) || cell.isNotEdit) {
                 cell.disabled = true;
             }
         });
@@ -2857,7 +2857,7 @@ export class FastTable extends Component {
         let editor = this.editor;
         this.rows.forEach((row) => {
             row && row.cells.forEach((cell) => {
-                if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(cell.column as FastTableColumn, 0))) {
+                if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(cell.column as FastTableColumn, 0)) || cell.isNotEdit) {
                     cell.disabled = true;
                 }
             })

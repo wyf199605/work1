@@ -9,6 +9,7 @@ import {FlowItem} from "./FlowItem";
 import {LineItem} from "./LineItem";
 import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {Tips} from "./Tips";
+import Component = G.Component;
 
 declare const Raphael;
 
@@ -314,8 +315,8 @@ export class FlowDesigner {
             FlowDesigner.ALLITEMS.forEach(item => {
                 // 创建节点、设置属性、添加到xml节点树中
                 let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
-                    layoutStr = [item.rectNode.attrs.cx || item.rectNode.attrs.x, item.rectNode.attrs.cy || item.rectNode.attrs.y,
-                            item.rectNode.attrs.r || item.rectNode.attrs.width, item.rectNode.attrs.r || item.rectNode.attrs.height].join();
+                    attrs = item.rectNode.attrs,
+                    layoutStr = [attrs.cx || attrs.x, attrs.cy || attrs.y, attrs.r || attrs.width, attrs.r || attrs.height].join();
                 Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get()));
                 FlowDesigner.rootElement.appendChild(xmlNode);
             });
@@ -336,6 +337,15 @@ export class FlowDesigner {
                 });
                 fromNode && fromNode.appendChild(xmlNode);
             });
+
+            if(tools.isEmpty(FlowDesigner.flowEditor.get().processTypeId)){
+                Modal.toast('流程类型不能为空!');
+                return;
+            }
+            if([].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems).some(item => tools.isEmpty(item.flowEditor.get().name))){
+                Modal.toast('名称不能为空!');
+                return;
+            }
 
             let xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
             BwRule.Ajax.fetch('https://bwd.sanfu.com/sf/app_sanfu_retail/null/process/save', {

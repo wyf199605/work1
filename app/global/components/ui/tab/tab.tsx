@@ -118,7 +118,7 @@ export class Tab {
         });
     }
 
-    setTabsShow(indexs: number[]) {
+    setTabsShow(indexs: string[]) {
         let lis = d.queryAll('li[data-index]', this.tabContainer),
             panels = d.queryAll('.tab-pane',this.panelContainer);
         if (tools.isEmpty(indexs)) {
@@ -130,11 +130,12 @@ export class Tab {
                 panel.classList.add('hide');
             })
         } else {
+            let indexArr = indexs.map(i => parseInt(i));
             lis.forEach((li, index) => {
-                li.classList.toggle('hide', !!(~indexs.indexOf(index + 1)));
+                li.classList.toggle('hide', !(~indexArr.indexOf(index + 1)));
             });
             panels.forEach((panel, index) => {
-                panel.classList.toggle('hide', !!(~indexs.indexOf(index + 1)));
+                panel.classList.toggle('hide', !(~indexArr.indexOf(index + 1)));
             })
         }
     }
