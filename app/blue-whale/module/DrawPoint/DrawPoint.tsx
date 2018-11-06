@@ -39,7 +39,8 @@ export class DrawPoint extends Component {
     private onAreaClick: (areaType: IAreaType) => Promise<any>;
     private format;
     private renderData;
-    private guid: string;
+    private LV;
+    private LR;
     public zoom;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
@@ -64,9 +65,15 @@ export class DrawPoint extends Component {
             .range([5.5, 1])
         this.line = D3.svg.line();
         //拖动
-        this.ZoomStart(para);
-        this.InitDrag();
-        this.InitSvg(para);
+         this.ZoomStart(para);
+         this.InitDrag();
+         this.InitSvg(para);
+         this.LV = D3.scale.linear()
+            .domain([1,6])
+            .range([3,0.5]);
+         this.LR = D3.scale.linear()
+            .domain([1,6])
+            .range([5,0.5])
 
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
@@ -116,7 +123,7 @@ export class DrawPoint extends Component {
                         self.showData(data, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
-                    D3.select(this).select('path').attr('fill', 'gold').attr('fill-opacity', 0.7)
+                    D3.select(this).select('path').attr('fill', 'gold').attr('fill-opacity', 0.5)
                 }).on('mouseout', function () {
                     D3.select(this).select('path').attr('fill', 'white').attr('fill-opacity', 0)
                 });
@@ -129,11 +136,13 @@ export class DrawPoint extends Component {
 
     //点击取消
    public editCancel(){
+       this.g.attr('cursor','default')
         this.render(this._data);
     }
 
     //点击编辑
     public editOpen(){
+        this.g.attr('cursor','pointer')
         this.editEvent.on();
     }
 
@@ -165,6 +174,7 @@ export class DrawPoint extends Component {
         this.renderData = data;
         this.index = data.length || 0;//初始化index
         this.keyDownEvent.on();
+        this.keyUpEvent.on();
         let points = [],
             svg = D3.select('svg').select('g');
         if (tools.isEmpty(data)) {
@@ -206,7 +216,7 @@ export class DrawPoint extends Component {
 
                         })
                         .attr('y', (d, i) => {
-                            return this.findCenter(point)[1]
+                            return this.findCenter(point)[1] - 10;
                         })
                         .attr('dx', 5)
                         .attr('dy', 16 * I)
@@ -261,7 +271,7 @@ export class DrawPoint extends Component {
             .transition()
             .duration(750)
             .ease("elastic")
-            .attr('r', 5)
+            .attr('r', this.LR(this.rLate))
             .attr('cx', function (d) {
                 return d[0]
             })
@@ -302,7 +312,7 @@ export class DrawPoint extends Component {
             .attr('fill', 'white')
             .attr('fill-opacity', 0)
             .attr("id", 'path' + this.index)
-            .attr('stroke-width', 2)
+            .attr('stroke-width', this.lineLate)
         // .on('click',function(d,i){
         //      that.indexStr = D3.select(this).attr('id');
         //
@@ -347,11 +357,12 @@ export class DrawPoint extends Component {
         this.index = this.map.size();
         this.isDrawLine = false;
         this.map.get(currentIndex);
-        //this.editEvent.on();
+        this.editEvent.off();
 
     }
 
     get editedData() {
+        this.g.attr('cursor','default')
         let update = this.g.selectAll('.update'),
             updateStr = [];
         update.each(function (d) {
@@ -449,7 +460,7 @@ export class DrawPoint extends Component {
                         .attr('y', (d, i) => {
                             let idStr = sl.select('path').attr('id'),
                                 id = parseInt(idStr.slice(4, idStr.length))
-                            return this.findCenter(this.map.get(id))[1]
+                            return this.findCenter(this.map.get(id))[1] - 10;
                         })
                         .attr('dx', 5)
                         .attr('dy', 16 * I)
@@ -517,6 +528,23 @@ export class DrawPoint extends Component {
     }
 
     //键盘事件的关闭和开启
+    private keyUpEvent = (()=>{
+        let self = this;
+        return {
+            on:()=>{
+                D3.select(window)
+                    .on("keyup", () => {
+                        switch (D3.event.keyCode) {
+                            case 18:{
+                                self.g.attr('cursor','defalut')
+                                D3.select('svg').on('.zoom',null)
+                            }
+                        }
+                    })
+            }
+        }
+    })()
+
     private  keyDownEvent = (() => {
         let self = this;
         return {
@@ -547,7 +575,16 @@ export class DrawPoint extends Component {
                             }
                             case 8:{
                                 this.selectedG && this.selectedG.attr('class','delete').attr('display','none');
+                                alert(this.index + '这是')
+                                this.map.set(this.index,[]);
+                                this.points = [];
+                                this.isDrawLine = false;
                                 D3.selectAll('circle').remove();
+                                break;
+                            }
+                            case 18:{
+                                self.g.attr('cursor','move')
+                                self.OnZoom();
                                 break;
                             }
 
@@ -570,7 +607,10 @@ export class DrawPoint extends Component {
         this.svg.call(this.zoom);
     }
 
+    private rLate = 1;
+    private lineLate = 3;
     public ZoomStart(para) {
+        let _this = this;
         let X = D3.scale.linear()
                 .domain([0, para.width])
                 .range([0, para.width]),
@@ -586,22 +626,19 @@ export class DrawPoint extends Component {
                 D3.select("svg").on("dblclick.zoom", null);
             })
             .on('zoom', function (d) {
-                // if(D3.event.scale > 6) {
-                //     rLate = 6;
-                //     lineLate = 6
-                //     d3.selectAll('circle').attr('r',r(rLate));
-                //     d3.selectAll('path').attr('stroke-width',l(lineLate))
-                // }else{
-                //     lineLate = rLate = d3.event.scale;
-                //
-                //     d3.selectAll('circle').attr('r',r(rLate));
-                //     d3.selectAll('path').attr('stroke-width',l(lineLate))
-                //
-                // }
-                //if(dragged ){
-                D3.select('svg').select('.g-wrapper').attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
+                if(D3.event.scale > 6) {
 
-                // }
+                    D3.selectAll('circle').attr('r',_this.LR(6));
+                    D3.selectAll('path').attr('stroke-width',_this.LV(6))
+                }else{
+                    _this.rLate = _this.lineLate = D3.event.scale;
+
+                    D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
+                    _this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
+
+                }
+                   console.log(D3.event.scale);
+                       D3.select('svg').select('.g-wrapper').attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
 
             }).on("zoomend", function (d) {
