@@ -87,12 +87,17 @@ export class FastBtnTable extends FastTable{
         window['f'] = this;
     }
 
+    protected _btnShow: boolean;
+    get btnShow(){
+        return this._btnShow;
+    }
     set btnShow(isShow: boolean){
-        this.btnWrapper && this.btnWrapper.classList.toggle('btn-hidden', isShow);
+        this._btnShow = isShow;
+        this.btnWrapper && this.btnWrapper.classList.toggle('btn-hidden', !isShow);
         let tables = d.query('.tables', this.wrapper);
         if(tables){
-            isShow ? (tables.style.height = 'calc(100% - 36px)')
-                : tables.style.removeProperty('height');
+            isShow ? tables.style.removeProperty('height')
+                : (tables.style.height = 'calc(100% - 36px)');
         }
     }
 

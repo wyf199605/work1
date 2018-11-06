@@ -490,13 +490,12 @@ export = class LabelPrintModule {
                 image.onload = () => {
                     let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
                     canvas.style.backgroundColor = '#fff';
-                    canvas.width = image.width * 10;
-                    canvas.height = image.height * 10;
+                    canvas.width = image.width * 30;
+                    canvas.height = image.height * 30;
                     let ctx = canvas.getContext("2d");
 
-                    ctx.drawImage(image, 0, 0, image.width * 10, image.height * 10); //使用画布画图
-                    ctx.drawImage(image, 0, 0, image.width * 10, image.height * 10); //使用画布画图
-                    let dataURL = canvas.toDataURL("image/jpeg");  //返回的是一串Base64编码的URL并指定格式
+                    ctx.drawImage(image, 0, 0, image.width * 30, image.height * 30); //使用画布画图
+                    let dataURL = canvas.toDataURL("image/jpeg", 1.0);  //返回的是一串Base64编码的URL并指定格式
                     canvas = null; //释放
                     console.log(dataURL);
                     dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));

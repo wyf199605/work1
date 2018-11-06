@@ -6,7 +6,7 @@
       overflow: hidden;
     }
     .tables{
-      transition: height 0.6s ease 0s;
+      transition: height 0.4s ease 0s;
     }
   }
 }
@@ -35,7 +35,7 @@
   .fast-table-btns{
     width: 100%;
     position: relative;
-    transition: height .7s, padding .7s;
+    transition: height .4s, padding .4s;
     &.btn-hidden{
       height: 0;
       padding: 0;
