@@ -8,8 +8,8 @@ import tools = G.tools;
 
 export interface IMbListPara extends IComponentPara{
     data?: MbListItemData[];
-    isImg?: boolean;
-    isMulti?: boolean;
+    isImg?: boolean; // 是否有图片
+    isMulti?: boolean;  // 是否多选
 }
 
 export class MbList extends Component{

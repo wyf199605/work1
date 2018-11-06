@@ -31,7 +31,7 @@ export class NewTableModule {
     static EVT_EDIT_SAVE = "__event_edit_save__";
 
     main: BwMainTableModule = null;
-    sub: obj = {};
+    sub: objOf<BwSubTableModule> = {};
     protected dragLine: HTMLElement;
     editable: boolean;
     protected _defaultData: obj[];
@@ -170,7 +170,16 @@ export class NewTableModule {
                             }
                         });
                         if (!tools.isMb) {
-                            d.query('ul.nav-tabs').appendChild(<i className="fa fa-expand full-icon"/>)
+                            d.query('ul.nav-tabs').appendChild(<i className="fa fa-expand full-icon"/>);
+                            let i = <i title="点击展开按钮" className="iconfont icon-arrow-up full-icon"/>;
+                            d.query('ul.nav-tabs').appendChild(i);
+                            d.on(i, 'click', () => {
+                                i.classList.toggle('icon-arrow-up');
+                                i.classList.toggle('icon-arrow-down');
+                                for(let sub of Object.values(this.sub)){
+                                    sub && (sub.ftable.btnShow = i.classList.contains('icon-arrow-up'));
+                                }
+                            });
                         }
                     }
                     this.tab.len <= 0 && this.bwEl.subTableList.forEach((sub) => {
@@ -199,8 +208,13 @@ export class NewTableModule {
                             isFirst = false;
                         }
                         if (!tools.isMb) {
-                            d.on(this.tab.getTab(), 'click', '.full-icon', () => {
+                            d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
                                 let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
+
+                                let sub = this.sub[this.subTabActiveIndex],
+                                    isShow = sub && sub.ftable.btnShow;
+                                sub && (sub.ftable.btnShow = true);
+
                                 new Modal({
                                     body: tabEl,
                                     className: 'full-screen sub-table-full',
@@ -208,6 +222,7 @@ export class NewTableModule {
                                         title: '子表全屏'
                                     },
                                     onClose: () => {
+                                        sub && (sub.ftable.btnShow = isShow);
                                         this.sub[this.subTabActiveIndex].ftable.removeAllModal();
                                         d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
                                         this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
