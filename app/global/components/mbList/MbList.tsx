@@ -37,7 +37,6 @@ export class MbList extends Component{
             },
             replace: (n, o) => {
                 o.data = n || {};
-                o.render(o.data);
             },
             destroy: (o) => {
                 o.destroy();
@@ -83,7 +82,7 @@ export class MbList extends Component{
         return this._multiple
     }
 
-    // 实例化MbListItem
+    // 实例化MvListItem
     protected createListItem(para: IMbListItemPara){
         para = Object.assign({}, para, {
             container: this.wrapper,

@@ -1,5 +1,6 @@
 /// <amd-module name="GlobalTestModule"/>
 
+
 import {MbList} from "./components/mbList/MbList";
 import tools = G.tools;
 import {MbListItemData} from "./components/mbList/MbListItem";

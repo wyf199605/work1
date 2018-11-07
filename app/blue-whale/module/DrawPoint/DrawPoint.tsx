@@ -183,6 +183,7 @@ export class DrawPoint extends Component {
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d);
             let point = [];
+            let I = 0;
             this.format(d)
                 .sort((a) => {
                     if (a.isPoint) {
@@ -190,7 +191,7 @@ export class DrawPoint extends Component {
                     } else {
                         return 0;
                     }
-                }).forEach((data, I) => {
+                }).forEach((data) => {
                 //  需要用到有point的data
                 if (data.isPoint) {
                     group.append('path').datum(data.name)
@@ -225,6 +226,7 @@ export class DrawPoint extends Component {
                             return data.data;
 
                         })
+                    I++;
                 }
             })
 
@@ -495,8 +497,9 @@ export class DrawPoint extends Component {
         //这里要data放入更新区域
         //整个方法判断空编辑 或者已有编辑
         if (sl.selectAll('text').empty()) {
-            this.format(data).forEach((anl, I) => {
-                if (!anl.isPoint && anl.isShow) {
+            let index = 0;
+            this.format(data).forEach((anl) => {
+                if (!anl.isPoint && anl.isShow && tools.isNotEmpty(anl.data)) {
                     let text = sl.append('text').datum(anl.name)
                         .attr('fill', 'black')
                         .attr('font-size', '14px')
@@ -513,11 +516,12 @@ export class DrawPoint extends Component {
                             return this.findCenter(this.map.get(id))[1] - 10;
                         })
                         .attr('dx', 5)
-                        .attr('dy', 16 * I)
+                        .attr('dy', 16 * index)
                         .text(function (d) {
                             return anl.data;
 
-                        })
+                        });
+                    index ++;
                 }
             })
 
@@ -540,10 +544,13 @@ export class DrawPoint extends Component {
                     if (!analysis.isPoint) {
                         sl.selectAll('text').each(function (d) {
                             if (d == analysis.name) {
-                                D3.select(this).text(function () {
-                                    return analysis.data
-                                })
-
+                                if(tools.isEmpty(analysis.data) || !analysis.isShow){
+                                    D3.select(this).remove();
+                                }else{
+                                    D3.select(this).text(function () {
+                                        return analysis.data
+                                    })
+                                }
                             }
                         })
 
