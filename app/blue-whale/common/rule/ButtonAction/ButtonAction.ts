@@ -416,7 +416,7 @@ export class ButtonAction {
             isOnceDestroy: true,
             width: width,
             isAdaptiveCenter: true,
-            isMb: false
+            isMb: false,
         };
         if(tools.isMb){
             para.top = 80;
@@ -784,6 +784,7 @@ export class ButtonAction {
                 if (keys && keys.length === 1 && coms[keys[0]] instanceof SelectInputMb) {
                     coms[keys[0]].showList();
                 }
+                tools.isMb && (modal.position = 'comCenter');
             });
         } else if (type === 5) {
             list();
