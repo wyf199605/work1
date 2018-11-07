@@ -120,6 +120,7 @@ export class DrawPoint extends Component {
                         type: 'edit',
                         data: d
                     }).then((data) => {
+                        debugger;
                         self.showData(data, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
@@ -182,7 +183,8 @@ export class DrawPoint extends Component {
         }
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d);
-            let point = [];
+            let point = [],
+                I = 0;
             this.format(d)
                 .sort((a) => {
                     if (a.isPoint) {
@@ -190,7 +192,7 @@ export class DrawPoint extends Component {
                     } else {
                         return 0;
                     }
-                }).forEach((data, I) => {
+                }).forEach((data) => {
                 //  需要用到有point的data
                 if (data.isPoint) {
                     group.append('path').datum(data.name)
@@ -205,9 +207,9 @@ export class DrawPoint extends Component {
                             this.map.set(index, data.data)
                             return this.line(data.data)
                         })
-                } else if(data.isShow){
+                } else if(data.isShow && tools.isNotEmpty(data.data)){
                     //绘字
-
+                         I++;
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
                         .attr('font-size', '14px')
@@ -230,6 +232,47 @@ export class DrawPoint extends Component {
 
         });
         //this.editEvent.on();
+
+    }
+    private OnDragText(){
+        debugger
+        this.selectedG.selectAll('text').remove();
+        this.selectedG.attr('id', (data)=>{
+                let point = this.map.get(this.index),
+                    I = 0;
+                this.format(data)
+                    .sort((a) => {
+                        if (a.isPoint) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }).forEach((data) => {
+                    //  需要用到有point的dataif (data.isPoint) {
+                    if(data.isShow && tools.isNotEmpty(data.data) && !data.isPoint){
+                        //绘字
+                        I++;
+                        let text = this.selectedG.append('text').datum(data.name)
+                            .attr('fill', 'black')
+                            .attr('font-size', '14px')
+                            .attr("text-anchor", "middle")
+                            .attr('x', (d, i) => {
+                                return this.findCenter(point)[0]
+
+                            })
+                            .attr('y', (d, i) => {
+                                return this.findCenter(point)[1] - 15;
+                            })
+                            .attr('dx', 5)
+                            .attr('dy', 16 * I)
+                            .text(function (d) {
+                                return data.data;
+
+                            })
+                    }
+                })
+
+            });
 
     }
 
@@ -309,6 +352,7 @@ export class DrawPoint extends Component {
         let group = svg.append('g').attr('class',function (d) {
             return 'insert'
         });
+
         group.append("path")
             .datum(this.map.get(this.index))
             .attr("class", 'line')
@@ -340,14 +384,13 @@ export class DrawPoint extends Component {
     public editFished(){
 
         let that = this;
-        that.selectedG = null;
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
-        this.g.selectAll('g').attr('id',function (d) {
-            let idStr = D3.select(this).select('path').attr('id'),
-                id = parseInt(idStr.slice(4, idStr.length));
-            d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(id));
+        console.log(that.selectedG);
+
+        that.selectedG && (that.selectedG.attr('class') !== 'insert') && that.selectedG.attr('id',function (d) {
+            d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(currentIndex));
         })
         // let dots = this.svg.select('g')
         //     .append('g')
@@ -370,6 +413,7 @@ export class DrawPoint extends Component {
         this.map.get(currentIndex);
         this.editEvent.off();
         this.fishe = true;
+        that.selectedG = null;
 
     }
 
@@ -435,6 +479,7 @@ export class DrawPoint extends Component {
         //获取到当前的编辑path的下标
         // 然后把ponit的点加进去
         let that = this;
+        this.fishe = false;
         this.g.selectAll('g').on('click', function (d, i) {
             //点击完成后 不允许触发click事件
             that.indexStr = D3.select(this).select('path').attr('id');
@@ -480,6 +525,8 @@ export class DrawPoint extends Component {
             .on("dragend", (d, i) => {
                 this.selected = d;
                 this.redraw();
+                //this.selectedG && (this.showData(this._data,this.selectedG));
+                _this.selectedG &&  _this.OnDragText();
                 D3.event.sourceEvent.stopPropagation();
             })
             .on("drag", function (d, i) {
@@ -495,9 +542,12 @@ export class DrawPoint extends Component {
     private showData(data, sl) {
         //这里要data放入更新区域
         //整个方法判断空编辑 或者已有编辑
-        if (sl.selectAll('text').empty()) {
+        sl.selectAll('text').remove();
+        let index = 0;
             this.format(data).forEach((anl, I) => {
-                if (!anl.isPoint) {
+                console.log(anl);
+                if (!anl.isPoint && tools.isNotEmpty(anl.data) && anl.isShow) {
+                    index++;
                     let text = sl.append('text').datum(anl.name)
                         .attr('fill', 'black')
                         .attr('font-size', '14px')
@@ -511,71 +561,35 @@ export class DrawPoint extends Component {
                         .attr('y', (d, i) => {
                             let idStr = sl.select('path').attr('id'),
                                 id = parseInt(idStr.slice(4, idStr.length))
-                            return this.findCenter(this.map.get(id))[1] - 10;
+                            return this.findCenter(this.map.get(id))[1] - 20;
                         })
                         .attr('dx', 5)
-                        .attr('dy', 16 * I)
+                        .attr('dy', 16 * index)
                         .text(function (d) {
                             return anl.data;
 
                         })
                 }
             })
-
+            debugger;
             //给新增的path绑定数据
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
 
             data[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
             sl.datum(data);
-
+            let cla = sl.attr('class');
             sl.attr('class', function (d) {
-                return 'insert'
-            })
-
-        } else {
-            //已经有文字的情况下
-            let map = Object.assign({}, data);
-            this.format(data)
-                .forEach((analysis) => {
-                    if (!analysis.isPoint) {
-                        sl.selectAll('text').each(function (d) {
-                            if (d == analysis.name) {
-                                D3.select(this).text(function () {
-                                    return analysis.data
-                                })
-
-                            }
-                        })
-
-                    }
-
-                })
-            let path = sl.select('path').attr('id'),
-                i = parseInt(path.slice(4, path.length));
-
-            map[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
-
-            sl.attr('class', function (d) {
-                let num = 0;
-                for (let des in map) {
-                    if (d[des] !== map[des]) {
-                        num++;
-                    }
+                if(cla == 'insert'){
+                    return 'insert'
+                }else {
+                    return 'update'
                 }
-                if (num >= 1 && D3.select(this).attr('class') !== 'insert') {
-                    return 'update';
-                } else {
-                    return D3.select(this).attr('class');
-                }
-            }).datum((d) => {
-                return Object.assign({}, d, map);
             })
 
         }
 
 
-    }
 
     //键盘事件的关闭和开启
     private keyUpEvent = (()=>{
@@ -632,7 +646,6 @@ export class DrawPoint extends Component {
                                 //关闭描点操作
                                 //如果是insert的状态就是真删，如果是其他的就是DISPLAY='NONE'
                                 this.selectedG && this.selectedG.attr('class','delete').attr('display','none');
-                                alert(this.index + '这是')
                                 this.map.set(this.index,[]);
                                 this.points = [];
                                 this.isDrawLine = false;
