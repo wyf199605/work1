@@ -163,6 +163,7 @@ export class MbListItem extends Component {
 
             if (targetTime.getTime() < date.getTime()) {
                 html = '活动已开始';
+                el.innerHTML = html;
                 clearInterval(this.timer);
                 this.timer = null;
                 return;
