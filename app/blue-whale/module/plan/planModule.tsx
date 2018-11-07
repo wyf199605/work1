@@ -280,7 +280,7 @@ export class PlanModule extends Component{
                             }
                         })
                         this.draw.setIsDrawLine(false);
-                        this.draw.fished();
+                        this.draw.editFished();
                     },
                 }
 
