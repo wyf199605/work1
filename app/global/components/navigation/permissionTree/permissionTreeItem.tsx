@@ -147,8 +147,8 @@ export class PermissionTreeItem extends Component {
 
     private getNode() {
         return {
-            elementId: this.para.ELEMENTID,
-            checked: this.checkBox.status
+            ELEMENTID: this.para.ELEMENTID,
+            CHECKED: this.checkBox.status
         }
     }
 

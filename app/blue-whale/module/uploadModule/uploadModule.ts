@@ -2,39 +2,42 @@
 import {Uploader, IUploaderPara} from "../../../global/components/form/upload/uploader";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {Modal} from "global/components/feedback/modal/Modal";
-interface IUploadModulePara extends IUploaderPara{
-    onComplete?(this:UploadModule, ...any);
-    onError?(file:obj);
+
+interface IUploadModulePara extends IUploaderPara {
+    onComplete?(this: UploadModule, ...any);
+    onError?(file: obj);
     onChange?: Function;
-    showNameOnComplete?:boolean;// 默认true
+    showNameOnComplete?: boolean;// 默认true
 }
 
 // TODO 使用完该控件需销毁，否则后续上传会多次
-export default class UploadModule extends FormCom{
+export default class UploadModule extends FormCom {
     onSet: (val) => void;
 
     private uploadState: number = 0;
-    public com:Uploader;
+    public com: Uploader;
+    private fileUnique: string = '';
 
     constructor(private para: IUploadModulePara) {
         super(para);
 
         let fileName = '',
             self = this;
-
+        this.fileUnique = new Date().getTime() + (para.nameField || 'FILE_ID');
         this.com = new Uploader({
             container: para.container,
             uploadUrl: para.uploadUrl,
             accept: para.accept,
             nameField: para.nameField,
             thumbField: para.thumbField,
+            typeUnique: this.fileUnique,
             onComplete: (data, file) => {
-                if(data.code == 200 || data.errorCode === 0) {
+                if (data.code == 200 || data.errorCode === 0) {
                     this.com.text = this.para.showNameOnComplete !== false ? fileName : '点击上传';
                     self.uploadState = 10; // 上传完成
                     this.para.onComplete && this.para.onComplete.call(this, data, file);
                 } else {
-                    this.para.onError && this.para.onError.call(this,file);
+                    this.para.onError && this.para.onError.call(this, file);
                     Modal.alert(data.msg || data.errorMsg);
                 }
             }
@@ -52,10 +55,11 @@ export default class UploadModule extends FormCom{
             fileName = file.name;
             // bodyMui.progressbar({progress: 0}).show();
             self.uploadState = 1; //上传中
-            this.com.upload();
+
+            this.com.upload(this.fileUnique);
         });
 
-        this.com.on("error", function (type){
+        this.com.on("error", function (type) {
             const msg = {
                 'Q_TYPE_DENIED': '文件类型有误',
                 'F_EXCEED_SIZE': '文件大小不能超过4M',
@@ -72,12 +76,13 @@ export default class UploadModule extends FormCom{
     get(): any {
         return this.value
     }
-    set(filename:string): void {
+
+    set(filename: string): void {
         this.com.text = filename;
         this.com.set(filename);
     }
 
-    destroy(){
+    destroy() {
         this.com && this.com.destroy();
         super.destroy();
     }
@@ -85,7 +90,8 @@ export default class UploadModule extends FormCom{
     get value() {
         return this.com.get();
     }
-    set value(filename:string){
+
+    set value(filename: string) {
         this.com.text = filename;
         this.com.set(filename);
     }

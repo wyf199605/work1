@@ -8,7 +8,7 @@ export interface TabPara {
     tabs?: ITab[];
     tabIndex?: boolean;
     tabIndexKey?: number;
-
+    className?:string;
     onClick?(index: number): void
 
     onChange?: (index: number) => void;
@@ -108,11 +108,11 @@ export class Tab {
     addTab(tabs: ITab[]) {
 
         Array.isArray(tabs) && tabs.forEach((p) => {
-            d.append(this.panelContainer, Tab.createPanel(p.dom, this.len));
+            d.append(this.panelContainer, Tab.createPanel(p.dom, this.len,this.para.className));
             d.append(this.tabContainer, Tab.createTab({
                 index: this.len,
-                title: p.titleDom ? p.titleDom : p.title
-            }));
+                title: p.titleDom ? p.titleDom : p.title,
+            }, this.para.className));
 
             this.len++;
         });
@@ -168,7 +168,7 @@ export class Tab {
     active(index: number) {
         let tab = d.query(`li[data-index="${index}"]`, this.tabContainer),
             panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer),
-            className = this.para.panelClass;
+            className = this.para.className;
         if (tools.isNotEmpty(className)) {
             tab = d.query(`li.${className}[data-index="${index}"]`, this.tabContainer);
             panel = d.query(`div.tab-pane.${className}[data-index="${index}"]`, this.panelContainer);
@@ -204,8 +204,8 @@ export class Tab {
      * @param index
      * @return {HTMLElement}
      */
-    protected static createPanel(dom: HTMLElement, index: number): HTMLElement {
-        return <div className="tab-pane" data-index={index}>{dom}</div>;
+    protected static createPanel(dom: HTMLElement, index: number,className?:string): HTMLElement {
+        return tools.isNotEmpty(className) ? <div className={"tab-pane " + className} data-index={index}>{dom}</div> : <div className="tab-pane" data-index={index}>{dom}</div>;
     }
 
     protected static createPanelContainer() {
