@@ -192,7 +192,7 @@ export class MbListItem extends Component {
 
     // 初始化按钮配置
     initBtn(btns: string[]){
-        this.btnWrapper = <div className="btn-group"/>
+        this.btnWrapper = <div className="btn-group"/>;
         let ibox = new InputBox();
     }
 
