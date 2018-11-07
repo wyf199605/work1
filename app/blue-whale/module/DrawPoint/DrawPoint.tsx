@@ -304,7 +304,9 @@ export class DrawPoint extends Component {
         this.editEvent.off();
         //！！每一次创建都会开辟一个新得path
         var svg = D3.select('svg').select('.g-wrapper')
-        let group = svg.append('g');
+        let group = svg.append('g').attr('class',function (d) {
+            return 'insert'
+        });
         group.append("path")
             .datum(this.map.get(this.index))
             .attr("class", 'line')
@@ -332,18 +334,50 @@ export class DrawPoint extends Component {
         this.isDrawLine = para;
     }
    private fishe:boolean;
-    public fished() {
+
+    public editFished(){
+
         let that = this;
         that.selectedG = null;
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
         this.g.selectAll('g').attr('id',function (d) {
-
             let idStr = D3.select(this).select('path').attr('id'),
                 id = parseInt(idStr.slice(4, idStr.length));
-                 d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(id));
+            d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(id));
         })
+        // let dots = this.svg.select('g')
+        //     .append('g')
+        //     .attr('class',function (d,i) {
+        //         console.log(d)
+        //         return 'dot';
+        //     })
+        //    for(let i = 0;i<this.map.size();i++){
+        //       let dotsCi  =  dots.append('g').attr('class','ci'+i)
+        //        dotsCi.append("text").attr('class','iconfont icon-tuodong')
+        //            .attr('font-family','iconfont')
+        //            .attr('x',100).attr('y',100).attr('width',30).attr('height',30)
+        //            .attr('fill','firebrick')
+        //            .text("\ue63a")
+        //    }
+        //
+        this.points = [];
+        this.index = this.map.size();
+        this.isDrawLine = false;
+        this.map.get(currentIndex);
+        this.editEvent.off();
+        this.fishe = true;
+
+    }
+
+
+    public fished() {
+        let that = this;
+        that.selectedG = null;
+        D3.selectAll('circle').remove();
+        D3.selectAll('path').style("stroke-dasharray", null);
+        let currentIndex = this.index;
         // let dots = this.svg.select('g')
         //     .append('g')
         //     .attr('class',function (d,i) {
@@ -410,9 +444,11 @@ export class DrawPoint extends Component {
             that.selectedG = D3.select(this);
             D3.select(this).attr('class',function (d) {
                // d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(that.index));
-
-                if(D3.select(this).attr('class') !== 'insert'){
+                let clas =  D3.select(this).attr('class');
+                if(clas !== 'insert' || clas == null){
                     return 'update';
+                }else {
+                    return clas;
                 }
             })
 
@@ -594,6 +630,7 @@ export class DrawPoint extends Component {
                             }
                             case 8:{
                                 //关闭描点操作
+                                //如果是insert的状态就是真删，如果是其他的就是DISPLAY='NONE'
                                 this.selectedG && this.selectedG.attr('class','delete').attr('display','none');
                                 this.map.set(this.index,[]);
                                 this.points = [];
