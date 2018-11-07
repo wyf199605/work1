@@ -42,11 +42,12 @@ export class FlowListPC extends BasicPage{
                 panelParent: tabWrapper,
                 tabParent: tabWrapper,
                 tabs: tabs,
+                className:'first',
                 onClick: (index) => {
-                    if (!tools.isNotEmpty(this.subTables[index])) {
+                    if (tools.isEmpty(this.subTables[index])) {
                         // 表格不存在
                         BwRule.Ajax.fetch(this.tableUIUrls[index]).then(({response}) => {
-                            let tabEl = d.query(`.tab-pane[data-index="${index}"]`, tab.getPanel());
+                            let tabEl = d.query(`.tab-pane.first[data-index="${index}"]`, tab.getPanel());
                             this.subTables[index] = new NewTableModule({
                                 bwEl:response.body.elements[0],
                                 container:tabEl

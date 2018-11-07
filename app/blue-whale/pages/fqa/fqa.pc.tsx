@@ -20,7 +20,6 @@ export class FqaPcModal{
             header:'常见问题',
         });
         this.modal.className = 'full-screen-fixed';
-        this.modal.className = 'fqa-contain-modal';
     }
     static initPanel(el: HTMLElement) {
         d.append(el,FqaPcModal.initDownloadTap());

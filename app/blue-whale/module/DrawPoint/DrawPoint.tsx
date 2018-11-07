@@ -205,26 +205,26 @@ export class DrawPoint extends Component {
                             this.map.set(index, data.data)
                             return this.line(data.data)
                         })
-                } else {
-                    this.showData(data,group)
+                } else if(data.isShow){
                     //绘字
-                    // let text = group.append('text').datum(data.name)
-                    //     .attr('fill', 'black')
-                    //     .attr('font-size', '14px')
-                    //     .attr("text-anchor", "middle")
-                    //     .attr('x', (d, i) => {
-                    //         return this.findCenter(point)[0]
-                    //
-                    //     })
-                    //     .attr('y', (d, i) => {
-                    //         return this.findCenter(point)[1] - 10;
-                    //     })
-                    //     .attr('dx', 5)
-                    //     .attr('dy', 16 * I)
-                    //     .text(function (d) {
-                    //         return data.data;
-                    //
-                    //     })
+
+                    let text = group.append('text').datum(data.name)
+                        .attr('fill', 'black')
+                        .attr('font-size', '14px')
+                        .attr("text-anchor", "middle")
+                        .attr('x', (d, i) => {
+                            return this.findCenter(point)[0]
+
+                        })
+                        .attr('y', (d, i) => {
+                            return this.findCenter(point)[1] - 10;
+                        })
+                        .attr('dx', 5)
+                        .attr('dy', 16 * I)
+                        .text(function (d) {
+                            return data.data;
+
+                        })
                 }
             })
 
@@ -283,6 +283,7 @@ export class DrawPoint extends Component {
         circle.classed("selected", (d) => {
             return d === this.selected;
         })
+
 
         circle.exit().remove();
         svg.selectAll("circle").call(this.drag);
@@ -588,7 +589,6 @@ export class DrawPoint extends Component {
                                 //继续开启描点操作
                                 //如果是已完成状态就不开启
                                 if(!self.fishe){
-
                                     self.isDrawLine = true;
                                 }
                                 self.g.attr('cursor','defalut')
@@ -632,6 +632,7 @@ export class DrawPoint extends Component {
                                 //关闭描点操作
                                 //如果是insert的状态就是真删，如果是其他的就是DISPLAY='NONE'
                                 this.selectedG && this.selectedG.attr('class','delete').attr('display','none');
+                                alert(this.index + '这是')
                                 this.map.set(this.index,[]);
                                 this.points = [];
                                 this.isDrawLine = false;

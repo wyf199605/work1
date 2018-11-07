@@ -368,7 +368,6 @@ namespace G{
                     varData = null;
                 }
             }
-
             return isMulti ? varData : varData[0];
         }
     }

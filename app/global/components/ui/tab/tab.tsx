@@ -8,7 +8,7 @@ export interface TabPara {
     tabs?: ITab[];
     tabIndex?: boolean;
     tabIndexKey?: number;
-
+    className?:string;
     onClick?(index: number): void
 
     onChange?: (index: number) => void;
@@ -108,11 +108,11 @@ export class Tab {
     addTab(tabs: ITab[]) {
 
         Array.isArray(tabs) && tabs.forEach((p) => {
-            d.append(this.panelContainer, Tab.createPanel(p.dom, this.len));
+            d.append(this.panelContainer, Tab.createPanel(p.dom, this.len,this.para.className));
             d.append(this.tabContainer, Tab.createTab({
                 index: this.len,
-                title: p.titleDom ? p.titleDom : p.title
-            }));
+                title: p.titleDom ? p.titleDom : p.title,
+            }, this.para.className));
 
             this.len++;
         });
@@ -120,7 +120,7 @@ export class Tab {
 
     setTabsShow(indexs: string[]) {
         let lis = d.queryAll('li[data-index]', this.tabContainer),
-            panels = d.queryAll('.tab-pane',this.panelContainer);
+            panels = d.queryAll('.tab-pane', this.panelContainer);
         if (tools.isEmpty(indexs)) {
             // 全部隐藏
             lis.forEach(li => {
@@ -142,7 +142,12 @@ export class Tab {
 
     deleteTab(index: number) {
         let tab = d.query(`li[data-index="${index}"]`, this.tabContainer),
-            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer);
+            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer),
+            className = this.para.className;
+        if (tools.isNotEmpty(className)) {
+            tab = d.query(`li.${className}[data-index="${index}"]`, this.tabContainer);
+            panel = d.query(`div.tab-pane.${className}[data-index="${index}"]`, this.panelContainer);
+        }
         tab && d.remove(tab);
         panel && d.remove(panel);
         this.len--;
@@ -167,8 +172,12 @@ export class Tab {
 
     active(index: number) {
         let tab = d.query(`li[data-index="${index}"]`, this.tabContainer),
-            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer);
-
+            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer),
+            className = this.para.className;
+        if (tools.isNotEmpty(className)) {
+            tab = d.query(`li.${className}[data-index="${index}"]`, this.tabContainer);
+            panel = d.query(`div.tab-pane.${className}[data-index="${index}"]`, this.panelContainer);
+        }
         let activeClass = 'active';
 
         this.activeList.forEach(a => d.classRemove(a, activeClass));
@@ -200,24 +209,26 @@ export class Tab {
      * @param index
      * @return {HTMLElement}
      */
-    protected static createPanel(dom: HTMLElement, index: number): HTMLElement {
-        return <div className="tab-pane" data-index={index}>{dom}</div>;
+
+    protected static createPanel(dom: HTMLElement, index: number, className?: string): HTMLElement {
+        return tools.isNotEmpty(className) ? <div className={"tab-pane " + className} data-index={index}>{dom}</div> :
+            <div className="tab-pane" data-index={index}>{dom}</div>;
     }
 
     protected static createPanelContainer() {
-        return <div className="tab-content"></div>;
+        return <div className="tab-content"/>;
     }
 
     protected static createTabContainer() {
         return <ul className="nav nav-tabs nav-tabs-line"></ul>;
     }
 
-    protected static createTab(obj: obj) {
+    protected static createTab(obj: obj,className?:string) {
         if (typeof obj.title === 'string') {
-            return <li data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
+            return <li className={className}  data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
         }
         else {
-            let tempLi = <li data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
+            let tempLi = <li className={className} data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
             d.append(tempLi, obj.title);
             return tempLi;
         }
