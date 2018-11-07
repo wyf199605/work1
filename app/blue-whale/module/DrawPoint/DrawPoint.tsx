@@ -205,8 +205,9 @@ export class DrawPoint extends Component {
                             this.map.set(index, data.data)
                             return this.line(data.data)
                         })
-                } else {
+                } else if(data.isShow){
                     //绘字
+
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
                         .attr('font-size', '14px')
@@ -495,7 +496,7 @@ export class DrawPoint extends Component {
         //整个方法判断空编辑 或者已有编辑
         if (sl.selectAll('text').empty()) {
             this.format(data).forEach((anl, I) => {
-                if (!anl.isPoint) {
+                if (!anl.isPoint && anl.isShow) {
                     let text = sl.append('text').datum(anl.name)
                         .attr('fill', 'black')
                         .attr('font-size', '14px')

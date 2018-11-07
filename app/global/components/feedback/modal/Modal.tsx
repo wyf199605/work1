@@ -436,6 +436,19 @@ export class Modal extends Component {
                 wrapper.style.top = '0';
                 wrapper.style.borderRadius = '0';
                 break;
+            // 兼容安卓低版本居中
+            case 'comCenter':
+                if (isAdaptiveCenter) {
+                    wrapper.style.left = '0';
+                    wrapper.style.right = '0';
+                    wrapper.style.transform = '';
+                    wrapper.style.maxWidth = '70%'
+                } else {
+                    wrapper.style.left = (paWidth - elWidth) / 2 + 'px';
+                }
+                wrapper.style.top = `80px`;
+                break;
+
         }
         //模态框的出现方式依赖于position，因而position改变必须置于isShow之前\
         if (!this.isShow) {
@@ -926,6 +939,7 @@ export class Modal extends Component {
             }
         });
         m.modalScreen.style.zIndex = '1001';
+        return m;
     }
 
     //记录上次创建的toast，在下一次构造新toast销毁之...(解决toast延迟销毁3s，下一次构造时未能及时销毁的问题)
