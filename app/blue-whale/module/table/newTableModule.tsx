@@ -160,7 +160,7 @@ export class NewTableModule {
                                 this.subTabActiveIndex = index;
                                 let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
-                                    let {subParam} = getMainSubVarList(this.bwEl.tableAddr),
+                                    let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
                                     this.subInit(this.bwEl.subTableList[index], subParam, ajaxData, tabEl);
                                 } else {
@@ -336,7 +336,7 @@ export class NewTableModule {
                     d.off(document, 'mouseup', mouseUpHandler);
                     d.on(document, 'mousemove', mouseMoveHandler = (ev) => {
                         let translate = ev.clientY - disY;
-                        if (mainHeight + translate > 200 && subHeight - translate > 200) {
+                        if (mainHeight + translate > 0 && subHeight - translate > 0) {
                             disY = ev.clientY;
                             mainHeight += translate;
                             subHeight -= translate;
@@ -423,7 +423,11 @@ export class NewTableModule {
                     }
                 }
 
-                dbclick.on();
+                if(status.edit){
+                    dbclick.on();
+                }else{
+                    dbclick.off();
+                }
             },
             start: (isMain?: boolean) => {
                 let status = {
@@ -995,14 +999,14 @@ export class NewTableModule {
     }
 }
 
-function getMainSubVarList(addr: IBW_TableAddr) {
+function getMainSubVarList(addr: IBW_TableAddr, subItemId?: string) {
     let varlist = {
         mainParam: null as IBW_TableAddrParam,
         subParam: null as IBW_TableAddrParam,
     };
 
     addr && Array.isArray(addr.param) && addr.param.forEach(p => {
-        if (p.type === 'sub') {
+        if (p.type === 'sub' && (tools.isEmpty(subItemId) || p.itemId === subItemId)) {
             varlist.subParam = p;
         } else if (p.type === 'main') {
             varlist.mainParam = p;
