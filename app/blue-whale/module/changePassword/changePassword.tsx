@@ -6,13 +6,15 @@ import {Button} from "../../../global/components/general/button/Button";
 
 export interface IChangePasswordPara{
     container?:HTMLElement;
-    confirm?: (obj) => void ;
+    confirm?: (obj) => Promise<any> ;
 }
 
 export class ChangePassword{
    protected modal:Modal;
    constructor(para:IChangePasswordPara){
-       let body=<div className="cpw-content"/>;
+       let body=<div className="cpw-content">
+           {ChangePassword.initInput()}
+       </div>;
        let confirm = new Button({
            content:'确定',
            className:'btn-confirm',
@@ -20,9 +22,10 @@ export class ChangePassword{
                if(this.validate(body)){
                    let data = this.dataGet(body);
                    if(tools.isFunction( para.confirm )){
-                       para.confirm(data);
-                       this.modal.isShow = false;
-                       this.destory();
+                       para.confirm(data).then(() => {
+                           this.modal.isShow = false;
+                           this.destory();
+                       });
                    }
                }
            }
@@ -38,7 +41,7 @@ export class ChangePassword{
        let footer = {
            rightPanel:[confirm,cancel]
        };
-       ChangePassword.initPanel(body);
+
        this.modal = new Modal({
            container: para.container,
            body,
@@ -77,10 +80,8 @@ export class ChangePassword{
        data['confirm'] = confirmPassword.value;
        return data;
    }
-   static initPanel(el: HTMLElement){
-       d.append(el,ChangePassword.initInput());
-   }
-   static initInput(){
+
+   static initInput(): HTMLElement{
        return <form action="#" class="password-form">
            <div class="form-group">
                <span>旧密码：</span><input id="old-password" type="password" placeholder="请输入旧密码"/>
@@ -96,6 +97,7 @@ export class ChangePassword{
    }
    destory(){
        document.body.classList.remove('cpw-content');
+       this.modal && this.modal.destroy();
        this.modal = null;
    }
 }
