@@ -186,6 +186,9 @@ export class PlanModule extends Component{
                 }
             }
         }
+        if(isShow && !isPoint && tools.isNotEmpty(text)){
+            text = field.caption + '：' + text;
+        }
 
         return {data: text, classes, name, bgColor, color, isShow, isPoint};
     }
