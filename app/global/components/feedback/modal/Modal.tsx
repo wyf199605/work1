@@ -442,7 +442,7 @@ export class Modal extends Component {
                     wrapper.style.left = '0';
                     wrapper.style.right = '0';
                     wrapper.style.transform = '';
-                    wrapper.style.maxWidth = '70%'
+                    wrapper.style.maxWidth = '75vw'
                 } else {
                     wrapper.style.left = (paWidth - elWidth) / 2 + 'px';
                 }

@@ -154,6 +154,9 @@ export = class webscoket {
                 }
                 break;
             case "hint" :
+                if(tools.isMb){
+                    return
+                }
                 if(this.hint){
                     this.hint.destroy();
                 }
