@@ -283,7 +283,9 @@ export class DrawPoint extends Component {
             return d === this.selected;
         })
 
-
+        if (D3.event) {
+            D3.event.sourceEvent.stopPropagation();
+        }
         circle.exit().remove();
         svg.selectAll("circle").call(this.drag);
     }
@@ -317,6 +319,7 @@ export class DrawPoint extends Component {
         //      that.indexStr = D3.select(this).attr('id');
         //
         // })
+        this.fishe = false;
     }
 
     public getPoints() {
@@ -331,7 +334,7 @@ export class DrawPoint extends Component {
     public setIsDrawLine(para) {
         this.isDrawLine = para;
     }
-
+   private fishe:boolean;
     public fished() {
         let that = this;
         that.selectedG = null;
@@ -358,6 +361,7 @@ export class DrawPoint extends Component {
         this.isDrawLine = false;
         this.map.get(currentIndex);
         this.editEvent.off();
+        this.fishe = true;
 
     }
 
@@ -435,7 +439,7 @@ export class DrawPoint extends Component {
                     .attr("cx", d[0] = D3.event.x)
                     .attr("cy", d[1] = D3.event.y)
                 _this.redraw();
-
+                D3.event.sourceEvent.stopPropagation();
             })
     }
 
@@ -536,6 +540,11 @@ export class DrawPoint extends Component {
                     .on("keyup", () => {
                         switch (D3.event.keyCode) {
                             case 18:{
+                                //继续开启描点操作
+                                //如果是已完成状态就不开启
+                                if(!self.fishe){
+                                    self.isDrawLine = true;
+                                }
                                 self.g.attr('cursor','defalut')
                                 D3.select('svg').on('.zoom',null)
                             }
@@ -574,8 +583,8 @@ export class DrawPoint extends Component {
 
                             }
                             case 8:{
+                                //关闭描点操作
                                 this.selectedG && this.selectedG.attr('class','delete').attr('display','none');
-                                alert(this.index + '这是')
                                 this.map.set(this.index,[]);
                                 this.points = [];
                                 this.isDrawLine = false;
@@ -583,6 +592,8 @@ export class DrawPoint extends Component {
                                 break;
                             }
                             case 18:{
+                                //暂停描点操作
+                                self.isDrawLine = false;
                                 self.g.attr('cursor','move')
                                 self.OnZoom();
                                 break;
