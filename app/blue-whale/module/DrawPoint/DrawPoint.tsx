@@ -494,7 +494,6 @@ export class DrawPoint extends Component {
         //这里要data放入更新区域
         //整个方法判断空编辑 或者已有编辑
         if (sl.selectAll('text').empty()) {
-            let newDelivery = {}
             this.format(data).forEach((anl, I) => {
                 if (!anl.isPoint) {
                     let text = sl.append('text').datum(anl.name)
@@ -515,7 +514,6 @@ export class DrawPoint extends Component {
                         .attr('dx', 5)
                         .attr('dy', 16 * I)
                         .text(function (d) {
-                            newDelivery[d] = anl.data;
                             return anl.data;
 
                         })
@@ -526,8 +524,8 @@ export class DrawPoint extends Component {
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
 
-            newDelivery[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
-            sl.datum(newDelivery);
+            data[DrawPoint.POINT_FIELD] = JSON.stringify(this.map.get(i));
+            sl.datum(data);
 
             sl.attr('class', function (d) {
                 return 'insert'
