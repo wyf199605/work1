@@ -24,11 +24,6 @@
   }
 
 }
-.fqa-contain-modal{
-  .modal-body{
-    max-height: calc(100% - 40px) !important;
-  }
-}
 .pc-fqa-content{
   width: 60%;
   margin:0 auto;
@@ -66,4 +61,7 @@
   .answer{
     background-color: #b0b0b0;
   }
+}
+.modal-box .modal-wrapper:not(.modal-mobile) .modal-body{
+  max-height: calc(100% - 40px);
 }

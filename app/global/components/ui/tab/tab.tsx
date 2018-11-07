@@ -120,7 +120,7 @@ export class Tab {
 
     setTabsShow(indexs: string[]) {
         let lis = d.queryAll('li[data-index]', this.tabContainer),
-            panels = d.queryAll('.tab-pane',this.panelContainer);
+            panels = d.queryAll('.tab-pane', this.panelContainer);
         if (tools.isEmpty(indexs)) {
             // 全部隐藏
             lis.forEach(li => {
@@ -142,7 +142,12 @@ export class Tab {
 
     deleteTab(index: number) {
         let tab = d.query(`li[data-index="${index}"]`, this.tabContainer),
-            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer);
+            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer),
+            className = this.para.className;
+        if (tools.isNotEmpty(className)) {
+            tab = d.query(`li.${className}[data-index="${index}"]`, this.tabContainer);
+            panel = d.query(`div.tab-pane.${className}[data-index="${index}"]`, this.panelContainer);
+        }
         tab && d.remove(tab);
         panel && d.remove(panel);
         this.len--;
@@ -204,22 +209,23 @@ export class Tab {
      * @param index
      * @return {HTMLElement}
      */
-    protected static createPanel(dom: HTMLElement, index: number,className?:string): HTMLElement {
-        return tools.isNotEmpty(className) ? <div className={"tab-pane " + className} data-index={index}>{dom}</div> : <div className="tab-pane" data-index={index}>{dom}</div>;
+
+    protected static createPanel(dom: HTMLElement, index: number, className?: string): HTMLElement {
+        return tools.isNotEmpty(className) ? <div className={"tab-pane " + className} data-index={index}>{dom}</div> :
+            <div className="tab-pane" data-index={index}>{dom}</div>;
     }
 
     protected static createPanelContainer() {
-        return <div className="tab-content"></div>;
+        return <div className="tab-content"/>;
     }
 
     protected static createTabContainer() {
         return <ul className="nav nav-tabs nav-tabs-line"></ul>;
     }
 
-    protected static createTab(obj: obj, className?: string) {
+    protected static createTab(obj: obj,className?:string) {
         if (typeof obj.title === 'string') {
-            return <li className={className} data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a>
-            </li>;
+            return <li className={className}  data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
         }
         else {
             let tempLi = <li className={className} data-index={obj.index} tabIndex={tools.getGuid('')}></li>;

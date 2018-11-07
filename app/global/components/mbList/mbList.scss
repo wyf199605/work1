@@ -111,13 +111,13 @@
           .list-item-body {
             margin-top: 0;
           }
-          .list-detail-item{
+          .list-detail-item {
             display: flex;
             align-items: flex-start;
-            p{
+            p {
               margin: 0;
             }
-            &.list-item-body{
+            &.list-item-body {
               flex-direction: column;
             }
           }

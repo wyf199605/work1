@@ -17,28 +17,30 @@ export = class webscoket {
     private hint : Hints;
     constructor(private props) {
         let network,user = User.get(),self = this;
-        if(!user.userid)
-            return ;
+        let single = tools.isMb ? '/single/' : '/pc/';
+        if(!user.userid){
+            user.userid = 'null';
+        }
         if ('WebSocket' in window) {
-            // self.ws = new ReconnectingWebSocket(props.wsUrl+'/websocket/'+user.userid+'/single',null,{ debug:true,reconnectInterval:1000});
-            self.ws = new ReconnectingWebSocket(props.wsUrl+'/sql/websocket/' + BwRule.getSqlRandom(),null,{ debug:true,reconnectInterval:1000});
+            self.ws = new ReconnectingWebSocket(props.wsUrl+'/websocket/'+ user.userid + single + BwRule.getSqlRandom(),null,{ debug:true,reconnectInterval:1000});
+            // self.ws = new ReconnectingWebSocket(props.wsUrl+'/sql/websocket/' + BwRule.getSqlRandom(),null,{ debug:true,reconnectInterval:1000});
         } else {
             Modal.toast('您的浏览器不支持websocket.');
             return;
         }
         // console.info("创建websocket对象成功.");
         self.ws.onopen = () => {
-            // console.info("websocket 连接打开.");
+            console.info("websocket 连接打开.");
         };
         self.ws.onmessage = (r) => {
             heartCheck.reset().start();
             self.onMessage(r);
         };
         self.ws.onerror = function(e){
-            // console.warn("websocket出现异常."+e);
+            console.warn("websocket出现异常."+e);
         };
         self.ws.onclose = function(e){
-            // console.info("websocket连接关闭.");
+            console.info("websocket连接关闭.");
         };
         document.addEventListener("netchange", () => {
             // console.log('检查网络变化.');

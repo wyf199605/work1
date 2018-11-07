@@ -22,8 +22,6 @@ export class PlanPage extends BasicPage {
         let planModule: PlanModule;
 
         console.log(para);
-
-
         //下半部
         this.getUi(para.ui).then(res => {
             let qData = res.query;
@@ -37,10 +35,6 @@ export class PlanPage extends BasicPage {
                     uiPath: qData['uiPath'],
                     setting: null
                 }} search={(data) => {
-                    //
-                    console.log(data);
-                    // let actionAddr = G.tools.url.addObj(qData['uiPath'].dataAddr, data);
-                    // console.log(actionAddr);
                     planModule && planModule.refresh(data);
                 }}/>
             </div>);
@@ -67,7 +61,6 @@ export class PlanPage extends BasicPage {
                 loading.show();
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
                     let ui = response.body.elements[0];
-                    console.log(ui);
                     resolve({
                         ui,
                         query: qData
