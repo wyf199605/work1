@@ -449,7 +449,6 @@ export class PlanModule extends Component{
                 },
                 defaultData: data,
                 confirm: (data) => {
-                    debugger;
                     return new Promise<any>((resolve) => {
                         callback && callback(data);
                         resolve();
