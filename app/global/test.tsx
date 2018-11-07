@@ -1,19 +1,20 @@
 /// <amd-module name="GlobalTestModule"/>
-import {PermissionTree} from "./components/navigation/permissionTree/permissionTree";
-import {Button} from "./components/general/button/Button";
-let pt:PermissionTree = null;
-let urlStr = 'https://bwd.sanfu.com/sf/app_sanfu_retail/null/treepick/n3019_data-3019/test-multipick-001?pageparams=%7B%22index%22%3D1%2C%22size%22%3D3000%2C%22total%22%3D1%7D';
-G.Ajax.fetch(urlStr).then(({response}) => {
-    let res = JSON.parse(response);
-    pt = new PermissionTree({
-        container: document.body,
-        treeData:res.data
-    });
-});
-
-new Button({
-    content:'点击获取变化的值',
-    onClick:()=>{
-        console.log(pt.get());
-    }
-})
+import f = G.d;
+let levelArr = ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级', '九级', '十级'],
+    wrapper = document.body;
+let titleHtml = [];
+let maxDeep = 4;
+console.time()
+for (let i = 0; i < maxDeep; i++) {
+  titleHtml.push(`<div class='level-title' style='width:${100 / maxDeep + "%"}'>${levelArr[i]}</div>`);
+}
+wrapper.innerHTML = titleHtml.join('');
+console.timeEnd()
+// let widthObj = {
+//     width:100 / maxDeep + "%"
+// };
+// console.time()
+// for (let i = 0; i < maxDeep; i++) {
+//     f.append(wrapper,<div className='level-title' style={widthObj}>{levelArr[i]}</div>);
+// }
+// console.timeEnd()
