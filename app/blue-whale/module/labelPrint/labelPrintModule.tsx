@@ -489,16 +489,17 @@ export = class LabelPrintModule {
         if(this.pageSvgArray[0]){
             for(let svg of this.pageSvgArray[0].children){
                 svg.style.backgroundColor = '#fff';
+                svg.innerHTML = `${new Array(4).join(svg.innerHTML)}`;
                 let innerHTML =svg.outerHTML;
                 let image = new Image();
                 image.onload = () => {
                     let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
                     canvas.style.backgroundColor = '#fff';
-                    canvas.width = image.width * 10;
-                    canvas.height = image.height * 10;
+                    canvas.width = image.width;
+                    canvas.height = image.height;
                     let ctx = canvas.getContext("2d");
 
-                    ctx.drawImage(image, 0, 0, image.width * 10, image.height * 10); //使用画布画图
+                    ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
 
                     let dataURL = canvas.toDataURL("image/jpeg");  //返回的是一串Base64编码的URL并指定格式
 

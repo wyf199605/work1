@@ -402,6 +402,5 @@ export class FlowItem extends Component {
 
     destroy() {
         super.destroy();
-        this.initEvents.off();
     }
 }

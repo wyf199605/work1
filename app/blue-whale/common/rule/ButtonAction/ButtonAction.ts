@@ -417,7 +417,7 @@ export class ButtonAction {
             width: width,
             position : res.atvarparams && tools.isMb ? 'comCenter' : null,
             isAdaptiveCenter: true,
-            isMb: false,
+            isMb: false
         };
         if(tools.isMb){
             para.top = 80;

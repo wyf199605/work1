@@ -1,55 +1,19 @@
 /// <amd-module name="GlobalTestModule"/>
-
-import {MbList} from "./components/mbList/MbList";
-import {MbListItem} from "./components/mbList/MbListItem";
-import tools = G.tools;
-
-let mbList = new MbList({
-    isImg: true,
-    isMulti: true,
-    data: [{
-        body: [['test1', 'test2']],
-        label: ['label1', 'label2', 'label3'],
-        title: 'test title',
-        // imgLabel: 'test imgLabel',
-        statusColor: 'red',
-        countDown: tools.date.add(tools.date.today(), 0.0001).getTime(),
-    }, {
-        body: [['test1', 'test2'], ['test3', 'test4']],
-        label: ['label1', 'label2', 'label3'],
-        // title: 'test title',
-        imgLabel: 'test imgLabel',
-        statusColor: 'red',
-        countDown: tools.date.add(tools.date.today(), 2).getTime(),
-    }, {
-        body: [['test1', 'test2'], ['test3', 'test4'], ['test5', 'test6']],
-        label: ['label1', 'label2', 'label3'],
-        title: 'test title',
-        imgLabel: 'test imgLabel',
-        statusColor: 'green',
-        // countDown: tools.date.add(tools.date.today(), 1).getTime(),
-    }]
+import {PermissionTree} from "./components/navigation/permissionTree/permissionTree";
+import {Button} from "./components/general/button/Button";
+let pt:PermissionTree = null;
+let urlStr = 'https://bwd.sanfu.com/sf/app_sanfu_retail/null/treepick/n3019_data-3019/test-multipick-001?pageparams=%7B%22index%22%3D1%2C%22size%22%3D3000%2C%22total%22%3D1%7D';
+G.Ajax.fetch(urlStr).then(({response}) => {
+    let res = JSON.parse(response);
+    pt = new PermissionTree({
+        container: document.body,
+        treeData:res.data
+    });
 });
 
-
-// mbList.render([{
-//     body: [['title1', 'body1'], ['title2', 'body2'], ['title3', 'body3']],
-//     label: ['label1', 'label1', 'label1'],
-//     title: 'test title111',
-//     imgLabel: 'test imgLabel',
-//     status: 2,
-//     statusColor: 'blue',
-//     countDown: tools.date.add(tools.date.today(), 10).getTime(),
-// }, {
-//     body: [['test2', 'test2'], ['test2', 'test2'], ['test2', 'test2']],
-//     label: ['label2', 'label2', 'label2'],
-//     title: 'test title222',
-//     imgLabel: 'test imgLabel',
-//     status: 2,
-//     statusColor: 'red',
-//     countDown: tools.date.add(tools.date.today(), 21).getTime(),
-// }]);
-
-console.log(mbList);
-
-
+new Button({
+    content:'点击获取变化的值',
+    onClick:()=>{
+        console.log(pt.get());
+    }
+})

@@ -3,6 +3,7 @@
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import tools = G.tools;
+import d = G.d;
 import {ITreeNode, PermissionTreeItem} from "./permissionTreeItem";
 
 export interface IPermissionTree extends IComponentPara {
@@ -32,11 +33,12 @@ export class PermissionTree extends Component {
             styleWidth = window.getComputedStyle(this.treeWrapper).width,
             width = parseFloat(styleWidth.slice(0, styleWidth.length - 2)) / maxDeep;
         let levelArr = ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级', '九级', '十级'];
-        let titleHtml = [];
+        let widthObj = {
+            width:100/maxDeep + '%'
+        };
         for (let i = 0; i < maxDeep; i++) {
-            titleHtml.push(`<div class='level-title' style='width:${100/maxDeep + "%"}'>${levelArr[i]}</div>`);
+            d.append(this.treeCaptionWrapper,<div className="level-title" style={widthObj}>{levelArr[i]}</div>);
         }
-        this.treeCaptionWrapper.innerHTML = titleHtml.join('');
         this.createTrees(para, width);
     }
 
