@@ -163,6 +163,7 @@ export class MbListItem extends Component {
 
             if (targetTime.getTime() < date.getTime()) {
                 html = '活动已开始';
+                el.innerHTML = html;
                 clearInterval(this.timer);
                 this.timer = null;
                 return;
@@ -191,7 +192,7 @@ export class MbListItem extends Component {
 
     // 初始化按钮配置
     initBtn(btns: string[]){
-        this.btnWrapper = <div className="btn-group"/>
+        this.btnWrapper = <div className="btn-group"/>;
         let ibox = new InputBox();
     }
 
