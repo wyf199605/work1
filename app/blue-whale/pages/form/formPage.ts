@@ -197,7 +197,7 @@ export = class FormPage extends BasicPage {
             if(data){
                 this.editModule.set(data);
             }
-            BwRule.checkValue(response, pageData, () => {});
+
             typeof callback === 'function' && callback(response);
         },this.url);
     }
