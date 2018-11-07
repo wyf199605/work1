@@ -63,7 +63,7 @@ interface ICashierPanel{   // 主面板
     inputs? : IInputPara[],
     dataRules? : IDataRulesPara[],
     printAddr ? : R_ReqAddr,
-    clearGlobal? : number,
+    clearGlobal? : number, // 清空全局变量
     inputType? : string[]
     tag ? : number //1.3.5.7可选中 4,5,6,7添加序号 0,1,4,5菜单
 }
@@ -244,8 +244,10 @@ interface IPosDataPara{
 interface ICreateTablePara{
     tableName : string;
     sql : string;
-    upType : number; // 0不删除表 1删除表
+    uptype : number; // 0不删除表 1删除表
     data : obj[]
+    meta : string[]
+    dataList : string[][]
 }
 interface ISceneVerPara{
     scene : string;

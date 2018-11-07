@@ -443,6 +443,10 @@ export = class LabelPrintModule {
      * 处理打印功能的函数
      */
     private dealPrint() {
+        if(!('BlueWhaleShell' in window || 'AppShell' in window)){
+            Modal.alert('无法连接到打印机');
+            return ;
+        }
         let tRow = this.onePageRowAndCol.rowNum,
             tCol = this.onePageRowAndCol.colNum,
             self = this,
@@ -478,28 +482,36 @@ export = class LabelPrintModule {
                     Modal.toast('打印成功');
                 })
             } else {
-                Modal.alert('无法连接到打印机')
+                Modal.alert('无法连接到打印机');
             }
         };
         // Array.prototype.forEach.call(this.pageSvgArray[0] && this.pageSvgArray[0].children, () =)
         if(this.pageSvgArray[0]){
             for(let svg of this.pageSvgArray[0].children){
                 svg.style.backgroundColor = '#fff';
-                let innerHTML = svg.outerHTML;
+                let innerHTML =svg.outerHTML;
                 let image = new Image();
                 image.onload = () => {
                     let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
                     canvas.style.backgroundColor = '#fff';
-                    canvas.width = image.width * 30;
-                    canvas.height = image.height * 30;
+                    canvas.width = image.width * 10;
+                    canvas.height = image.height * 10;
                     let ctx = canvas.getContext("2d");
 
-                    ctx.drawImage(image, 0, 0, image.width * 30, image.height * 30); //使用画布画图
-                    let dataURL = canvas.toDataURL("image/jpeg", 1.0);  //返回的是一串Base64编码的URL并指定格式
+                    ctx.drawImage(image, 0, 0, image.width * 10, image.height * 10); //使用画布画图
+
+                    let dataURL = canvas.toDataURL("image/jpeg");  //返回的是一串Base64编码的URL并指定格式
+
+                    // new Modal({
+                    //     body: canvas,
+                    //     header: '展示',
+                    // });
+
                     canvas = null; //释放
                     console.log(dataURL);
                     dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));
                 };
+                console.log('data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML))));
                 image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML)));
             }
         }

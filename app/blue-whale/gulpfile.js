@@ -201,6 +201,9 @@ gulp.task('js', function () {
         'uploadModule/uploadImagesItem',
     ], 'uploadModule.js');
 
+    //changePassword模块
+    gulpTsModule(['changePassword'], 'changePasswordMoudle.js');
+
     //unBinding模块
     gulpTsModule(['unBinding/UnBinding'], 'unBinding.js');
 
