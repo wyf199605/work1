@@ -17,6 +17,7 @@ export = class FormPage extends BasicPage {
         super(para);
         let emPara: EditModulePara = {fields : []};
         let nameFields : {[name : string] : R_Field} = {};
+
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
 
