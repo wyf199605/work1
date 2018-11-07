@@ -186,9 +186,6 @@ export class PlanModule extends Component{
                 }
             }
         }
-        if(isShow && !isPoint && tools.isNotEmpty(text)){
-            text = field.caption + '：' + text;
-        }
 
         return {data: text, classes, name, bgColor, color, isShow, isPoint};
     }
@@ -201,92 +198,107 @@ export class PlanModule extends Component{
             editBox.getItem('edit').isDisabled = isEdit;
             editBox.getItem('save').isDisabled = !isEdit;
             editBox.getItem('cancel').isDisabled = !isEdit;
-            // plotBox.getItem('end-drawing').isDisabled = !isEdit;
-            // plotBox.getItem('star-drawing').isDisabled = !isEdit;
-            // plotBox.getItem('star-edit').isDisabled = isEdit;
-            // plotBox.getItem('end-edit').isDisabled = isEdit;
         };
 
         let init = () => {
             let buttons: IButton[] = [
                 {
-                    key:'star-drawing',
-                    content: '开始描点',
+                    content: '撤销',
+                    icon: 'chexiao',
+                    color: 'error',
+                    tip: 'ctrl + z 撤销',
+                    onClick: () => {
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res)=>{
+                            d.classRemove(res,'custom-button');
+                        });
+                        let currBtn = d.query('.plan-opera>.back-opera');
+                        d.classAdd(currBtn,'custom-button');
+
+                        this.draw.reback();                },
+                },
+                {
+                    content: '完成编辑',
+                    icon: 'wanchengbianji',
+                    color: 'success',
+                    onClick: () => {
+                        //完成编辑--------
+
+                        //把point 清楚
+                        let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
+
+                        console.log(this.draw.getPoints());
+                        this.draw.setIsDrawLine(false);
+                        this.draw.fished();
+
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res) => {
+                            d.classRemove(res, 'custom-button');
+                        });
+                        let currBtn = d.query('.plan-opera>.finsh-point');
+                        d.classAdd(currBtn, 'custom-button');
+                    },
+                },
+                {
+                    content: '描点',
                     icon: 'maodian',
                     color: 'info',
                     onClick: () => {
-                        buttons.forEach((val)=>{
-                            if(val.content == '编辑描点' || val.content == '结束编辑'){
-                                plotBox.getItem('end-edit').isDisabled = true;
-                                plotBox.getItem('star-edit').isDisabled = true;
-
-                            }
-                        })
-
                         console.log('开始描点')
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res) => {
+                            d.classRemove(res, 'custom-button');
+                        });
 
+                        let currBtn = d.query('.plan-opera>.miao-dian');
+                        d.classAdd(currBtn, 'custom-button');
                         //------------------开始绘图
+                        let paths = G.d.queryAll(".draw-point-wrapper>svg>g>path");
                         this.draw.setIsDrawLine(true);
                         this.draw.createPath();
                     },
                 },
-                {   key:'end-drawing',
-                    content: '结束描点',
-                    icon: 'wanchengbianji',
-                    color: 'success',
-                    isDisabled:false,
-                    onClick: () => {
-                        //完成编辑--------
-                        buttons.forEach((val)=>{
-                            if(val.content == '编辑描点' || val.content == '结束编辑'){
-                                plotBox.getItem('end-edit').isDisabled = false;
-                                plotBox.getItem('star-edit').isDisabled = false;
-
-                            }
-                        })
-
-                        //把point 清楚
-
-                        this.draw.setIsDrawLine(false);
-                        this.draw.fished();
-
-                    },
-                },
                 {
-                    key:'star-edit',
                     content: '编辑描点',
                     icon: 'bianjimaodian',
                     color: 'info',
                     onClick: () => {
-                         buttons.forEach((val)=>{
-                            if(val.content == '开始描点' || val.content == '结束描点'){
-                                plotBox.getItem('end-drawing').isDisabled = true;
-                                plotBox.getItem('star-drawing').isDisabled = true;
+                        buttons.forEach((val)=>{
+                            if(val.content == '描点'){
+                                val.isDisabled = true;
+
                             }
                         })
                         console.log('开始编辑')
+                        let btn = d.queryAll('.plan-opera>div');
+                        btn.forEach((res) => {
+                            d.classRemove(res, 'custom-button');
+                        });
+
+                        let currBtn = d.query('.plan-opera>.edit-dian');
+                        d.classAdd(currBtn, 'custom-button');
                         //------------------开始绘图
 
                         this.draw.editPoint();
                     },
                 },
                 {
-                    key:'end-edit',
-                    content: '结束编辑',
+                    content: '拖动',
                     icon: 'tuodong',
-                    color: 'success',
+                    color: 'info',
+                    tip: "空格键+左击",
                     onClick: () => {
-                       buttons.forEach((val)=>{
-                            if(val.content == '开始描点' || val.content == '结束描点'){
-                                plotBox.getItem('end-drawing').isDisabled = false;
-                                plotBox.getItem('star-drawing').isDisabled = false;
-                            }
-                        })
-                        this.draw.setIsDrawLine(false);
-                        this.draw.editFished();
+                    },
+                },
+                {
+                    content: '缩放',
+                    icon: 'suofang',
+                    color: 'info',
+                    tip: '滚轮',
+                    onClick: () => {
+                        this.draw.OnZoom();
                     },
                 }
-
             ];
             let editButtons: IButton[] = [
                 {

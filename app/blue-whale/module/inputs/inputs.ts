@@ -24,7 +24,6 @@ interface InputsPara {
 export class Inputs {
     private p: InputsPara;
     private m: Toast;
-    private isProcess : boolean = false;
     private url: string;  //记录当前请求的url步骤,每次请求从该步骤开始
     constructor(private para: InputsPara) {
         this.p = para;
@@ -49,12 +48,9 @@ export class Inputs {
     }
 
     private ajax(aUrl){
-        this.isProcess = true;
         return BwRule.Ajax.fetch(aUrl)
             .then(({response}) => {
                 this.condition(response,aUrl)
-            }).catch(() => {
-                this.isProcess = false;
             })
     }
 
@@ -77,7 +73,6 @@ export class Inputs {
             case 0:
                 // 数据覆盖
                 this.logTip(showText);
-                this.isProcess = false;
                 break;
             case 1:
                 // 标签打印
@@ -88,16 +83,11 @@ export class Inputs {
                 break;
             case 2:
                 // 提示错误信息
-                let m = Modal.alert(showText, '提示', () => {
-                    this.isProcess = false;
-                });
-                m.onClose = () => {
-                    this.isProcess = false;
-                };
+                Modal.alert(showText);
                 break;
             case 3:
                 // 提示信息,确定(下一步)/取消
-                let c = Modal.confirm({
+                Modal.confirm({
                     msg: showText,
                     btns: ['取消', '确定'],
                     callback: (index) => {
@@ -106,20 +96,14 @@ export class Inputs {
                         } else {
                             this.url = null;
                         }
-                        this.isProcess = false;
                     }
                 });
-                c.onClose = () => {
-                    this.isProcess = false;
-                };
                 break;
             case 4:
                 // 提示信息,自动下一步
                 this.ajax(CONF.siteUrl + this.url);
                 this.logTip(showText);
                 break;
-            default :
-                this.isProcess = false;
         }
         if(dataType === 0){
             this.dataCover(ftable, response);
@@ -161,7 +145,6 @@ export class Inputs {
     }
 
     private atvarParams(atvarparams : obj, subButtons : obj[], aUrl){
-        this.isProcess = true;
         let atv, modal =  new Modal({
             header : {
               title : '提示'
@@ -186,19 +169,15 @@ export class Inputs {
                     Modal.alert(errTip.substring(0,errTip.length - 1) + '不能为空');
                     return;
                 }
-                modal.destroy();
+                modal.isShow = false;
                 BwRule.Ajax.fetch(url,{
                     type : 'get',
                 }).then(({response}) => {
                     this.condition(response, aUrl);
-                }).catch(() => {
-                    this.isProcess = false;
                 })
             }
         });
-        modal.onClose = () => {
-            this.isProcess = false;
-        };
+
 
         require(['QueryBuilder'], (q) => {
             atv = new q.AtVarBuilder({
@@ -230,7 +209,7 @@ export class Inputs {
                         keyStep = new e.KeyStep({
                             inputs : para.inputs,
                             callback : (ajaxData, input) => {
-                                if(input && !this.isProcess){
+                                if(input){
                                     return this.matchPass(input, ajaxData);
                                 }else if(para.locationLine){
                                     this.rowSelect(para.locationLine, ajaxData);
@@ -253,7 +232,6 @@ export class Inputs {
                 let handle = () => {
                     let reg = this.regExpMatch(input, text);
                     //匹配成功
-                    console.log(reg, text)
                     if(reg){
                         this.matchPass(reg, text);
                     }else if(line){
