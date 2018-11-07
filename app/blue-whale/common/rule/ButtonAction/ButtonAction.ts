@@ -415,7 +415,6 @@ export class ButtonAction {
             header: caption,
             isOnceDestroy: true,
             width: width,
-            position : res.atvarparams && tools.isMb ? 'comCenter' : null,
             isAdaptiveCenter: true,
             isMb: false
         };

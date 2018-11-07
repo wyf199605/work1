@@ -167,12 +167,8 @@ export class Tab {
 
     active(index: number) {
         let tab = d.query(`li[data-index="${index}"]`, this.tabContainer),
-            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer),
-            className = this.para.panelClass;
-        if (tools.isNotEmpty(className)) {
-            tab = d.query(`li.${className}[data-index="${index}"]`, this.tabContainer);
-            panel = d.query(`div.tab-pane.${className}[data-index="${index}"]`, this.panelContainer);
-        }
+            panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer);
+
         let activeClass = 'active';
 
         this.activeList.forEach(a => d.classRemove(a, activeClass));
@@ -216,13 +212,12 @@ export class Tab {
         return <ul className="nav nav-tabs nav-tabs-line"></ul>;
     }
 
-    protected static createTab(obj: obj, className?: string) {
+    protected static createTab(obj: obj) {
         if (typeof obj.title === 'string') {
-            return <li className={className} data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a>
-            </li>;
+            return <li data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
         }
         else {
-            let tempLi = <li className={className} data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
+            let tempLi = <li data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
             d.append(tempLi, obj.title);
             return tempLi;
         }
