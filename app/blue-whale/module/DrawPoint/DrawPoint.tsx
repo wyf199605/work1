@@ -283,9 +283,6 @@ export class DrawPoint extends Component {
             return d === this.selected;
         })
 
-        if (D3.event) {
-            D3.event.sourceEvent.stopPropagation();
-        }
         circle.exit().remove();
         svg.selectAll("circle").call(this.drag);
     }
@@ -341,6 +338,12 @@ export class DrawPoint extends Component {
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
+        this.g.selectAll('g').attr('id',function (d) {
+
+            let idStr = D3.select(this).select('path').attr('id'),
+                id = parseInt(idStr.slice(4, idStr.length));
+                 d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(id));
+        })
         // let dots = this.svg.select('g')
         //     .append('g')
         //     .attr('class',function (d,i) {
@@ -405,6 +408,13 @@ export class DrawPoint extends Component {
             that.isDrawLine = true;
             that.redraw();
             that.selectedG = D3.select(this);
+            D3.select(this).attr('class',function (d) {
+               // d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(that.index));
+
+                if(D3.select(this).attr('class') !== 'insert'){
+                    return 'update';
+                }
+            })
 
         }).on('mouseover', null).on('mouseout', null)
 
