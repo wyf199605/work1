@@ -19,7 +19,7 @@ export function CashierRequest(dataAddr : C_R_ReqAddr, error?){
         Com.sceneVersion = Com.local.getItem('sceneVersion');
     }
     let timeOut = 5000;
-    if(dataAddr && (dataAddr.type === 'wxpay')){
+    if(dataAddr && (dataAddr.type === 'wxpay')){ // 微信支付超时设置120s
         timeOut = 120000;
     }
 
@@ -29,7 +29,7 @@ export function CashierRequest(dataAddr : C_R_ReqAddr, error?){
     }
     if(method === 'GET'){
         ajaxUrl = Com.reqAddr(addr, data);
-    }else if(dataAddr.notVarList){
+    }else if(dataAddr.notVarList){ // 指纹请求post无varList
         // 无需匹配varList
         ajaxData = data;
         ajaxUrl = Com.addParam(dataAddr).dataAddr;
@@ -47,13 +47,13 @@ export function CashierRequest(dataAddr : C_R_ReqAddr, error?){
     return new Promise<IAjaxSuccess>(((resolve, reject) => {
         (() => {
             if(window.navigator.onLine && CA.Config.onLine &&
-                !(Com.sceneVersion && addr.type === 'panel')){ // ui取离线数据
+                !(Com.sceneVersion && addr.type === 'panel' && Com.isShell)){ // ui取离线数据
                 return Ajax.fetch(Com.urlSite + ajaxUrl,{
                     type: method,
                     timeout : timeOut,
                     dataType : 'json',
                     headers : {
-                        uuid :  CA.Config.isProduct ? Com.geTuuid() : CA.Config.UUID,
+                        uuid :  CA.Config.isProduct ? Com.getUuid() : CA.Config.UUID,
                         clientversion : CA.Config.isProduct ? Com.getVersion() : CA.Config.clientversion,
                     },
                     xhrFields: {

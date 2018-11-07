@@ -157,13 +157,13 @@ export class Accessory extends FormCom {
                         }
                         switch (this.fileType){
                             case '43':{
-                                this.para.onComplete && this.para.onComplete.call(this, res, file);
                                 this.files = [{
                                     unique: file.name,
                                     filename: file.name,
                                     filesize: file.size,
                                     addr: ''
                                 }];
+                                this.para.onComplete && this.para.onComplete.call(this, res, file);
                             }
                             break;
                             case '47':{

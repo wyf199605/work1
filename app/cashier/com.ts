@@ -507,7 +507,7 @@ export class Com{
      * 电脑uuid获取
      * @returns {any}
      */
-    static geTuuid(){
+    static getUuid(){
         let device = Shell.base.device,
             data = device && device.data;
 
@@ -552,8 +552,6 @@ export class Com{
         if(len && len > 5 && time/len < 10){  // 扫码枪
             type = Com.SCAN;
         }
-
-        // console.log(time/len,scanGunValue, type)
         return type;
     }
 

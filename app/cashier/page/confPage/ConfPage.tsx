@@ -62,8 +62,6 @@ export class ConfPage extends SPAPage{
 
         Com.urlSite = serverUrl + 'cashier';
 
-        // Modal.alert( Com.sql.selectData('users'))
-
         this.getConfig(cashierConf.scenes)
             .then(() => {
                 this.startAction();

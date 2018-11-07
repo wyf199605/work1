@@ -32,21 +32,6 @@ export class RegPage extends SPAPage{
         this.tpl.classList.add('hide');
     }
 
-    // private deviceCheck(msg?){
-    //     this.wrapper.classList.add('disabled');
-    //     new Modal({
-    //         header : {
-    //           title : '提示'
-    //         },
-    //         body : d.create(`<div class="font-size-16">${msg ? msg : '设备审核中'}</div>`),
-    //         isBackground : false
-    //     });
-    //     let inputs = d.queryAll('.msg-device .input-row [type="text"]', this.wrapper);
-    //     inputs.forEach(input => {
-    //         input.setAttribute('readonly', '');
-    //     })
-    // }
-
     protected wrapperInit() : Node{
         let device = Shell.base.device,
             data = device && device.data;
@@ -174,7 +159,7 @@ export class RegPage extends SPAPage{
                 type: 'get',
                 dataType : 'json',
                 headers : {
-                    uuid : Com.geTuuid()
+                    uuid : Com.getUuid()
                 },
                 xhrFields: {
                     withCredentials: true

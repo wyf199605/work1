@@ -58,10 +58,10 @@ export class UploadImagesItem extends Component {
     }
 
     render(data: IImage) {
-        if (this.para.type === '20' && tools.isNotEmpty(data.extraUrl)) {
-            (this.innerEl.img as HTMLImageElement).setAttribute('src', data.extraUrl);
-        } else {
-            (this.innerEl.img as HTMLImageElement).setAttribute('src', data.unique ? BwRule.fileUrlGet(data.unique, this.para.nameField || 'FILE_ID', true) : data.localUrl);
+        if(data.isOnLine){
+            (this.innerEl.img as HTMLImageElement).setAttribute('src', BwRule.fileUrlGet(data.unique, this.para.nameField || 'FILE_ID', true));
+        }else{
+            (this.innerEl.img as HTMLImageElement).setAttribute('src', data.localUrl);
         }
         this.toggleErrorWrapper(data.isError);
     }

@@ -201,6 +201,9 @@ gulp.task('js', function () {
         'uploadModule/uploadImagesItem',
     ], 'uploadModule.js');
 
+    //changePassword模块
+    gulpTsModule(['changePassword'], 'changePasswordMoudle.js');
+
     //unBinding模块
     gulpTsModule(['unBinding/UnBinding'], 'unBinding.js');
 
@@ -316,6 +319,7 @@ gulp.task('js', function () {
 
     gulpTsPage('rfid/RfidBarCode/RfidBarCode','RfidBarCode.js');
     gulpTsPage('plan/PlanPage','PlanPage.js');
+    gulpTsPage('permissionTree/permissionTreePage','permissionTree.js');
 });
 
 /**
