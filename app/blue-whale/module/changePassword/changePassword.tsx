@@ -51,7 +51,7 @@ export class ChangePassword{
        });
 
    }
-   static validate(el:HTMLElement){
+   private validate(el:HTMLElement){
        let oldPassword = d.query('#old-password', el) as HTMLInputElement;
        let newPassword = d.query('#new-password', el) as HTMLInputElement;
        let confirmPassword = d.query('#confirm-password', el) as HTMLInputElement;
@@ -67,7 +67,7 @@ export class ChangePassword{
        }
        return true;
    }
-   static dataGet(el:HTMLElement){
+   private dataGet(el:HTMLElement){
        let oldPassword = d.query('#old-password', el) as HTMLInputElement;
        let newPassword = d.query('#new-password', el) as HTMLInputElement;
        let confirmPassword = d.query('#confirm-password', el) as HTMLInputElement;
