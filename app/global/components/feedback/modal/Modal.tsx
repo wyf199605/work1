@@ -448,7 +448,6 @@ export class Modal extends Component {
                 }
                 wrapper.style.top = `80px`;
                 break;
-
         }
         //模态框的出现方式依赖于position，因而position改变必须置于isShow之前\
         if (!this.isShow) {
