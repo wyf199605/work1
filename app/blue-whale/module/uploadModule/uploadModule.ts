@@ -5,9 +5,7 @@ import {Modal} from "global/components/feedback/modal/Modal";
 
 interface IUploadModulePara extends IUploaderPara {
     onComplete?(this: UploadModule, ...any);
-
     onError?(file: obj);
-
     onChange?: Function;
     showNameOnComplete?: boolean;// 默认true
 }

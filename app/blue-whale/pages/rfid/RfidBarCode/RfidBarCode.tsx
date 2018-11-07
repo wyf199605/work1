@@ -121,7 +121,6 @@ export class RfidBarCode extends Component {
                                     optionStype = 0;
                                 }
                                 let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                    alert(JSON.stringify(res))
                                     let data = res.data;
                                     if(res.success){
                                         d.query('.rfid-shelf-number>.shelf-number').innerText = val;
@@ -177,7 +176,6 @@ export class RfidBarCode extends Component {
                                         optionStype = 0;
                                     }
                                     let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                        alert(JSON.stringify(res))
                                         let data = res.data;
                                         if(res.success){
                                             this.domHash['categoryVal1'].innerText = val;
@@ -197,6 +195,7 @@ export class RfidBarCode extends Component {
 
                         }
                     }></i>
+
                         <p class="value2" style="color:rgb(0, 122, 255)">100000</p>
                         <span className="title3">分类-标题3 </span> <i className="iconfont icon-shuxie" onclick={() => {
 
@@ -231,7 +230,6 @@ export class RfidBarCode extends Component {
                                     optionStype = 0;
                                 }
                                 G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                    alert(JSON.stringify(res))
                                     let data = res.data;
                                     if(res.success){
                                         this.domHash['categoryVal2'].innerText = val;
@@ -304,8 +302,6 @@ export class RfidBarCode extends Component {
                                             //先关闭之前的监听重新开启
 
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                alert('触发2')
-                                                alert(JSON.stringify(res))
                                                 let num = d.query('.total-nums>span');
                                                 num.innerText = (parseInt(num.innerText) + 1) + '';
                                                // let data = res.data;
@@ -328,7 +324,6 @@ export class RfidBarCode extends Component {
                                                 //
                                                 // }
                                             })
-                                            alert(s + '注册成功')
 
                                         } else if (this.mode[key] == '替换') {
                                             params['optionStype'] = 0;
@@ -367,7 +362,6 @@ export class RfidBarCode extends Component {
 
                                                     let arr = data.array;
                                                     for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
@@ -380,16 +374,13 @@ export class RfidBarCode extends Component {
                                                 }
 
                                             })
-                                            alert(s + '注册成功')
                                         } else if (this.mode[key] == '累加') {
                                             params['optionStype'] = 1;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                alert(JSON.stringify(res))
                                                 let data = res.data;
                                                 if (data.name) {
                                                     let arr = data.array;
                                                     for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
@@ -436,7 +427,6 @@ export class RfidBarCode extends Component {
 
                                                     let arr = data.array;
                                                     for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
@@ -490,12 +480,10 @@ export class RfidBarCode extends Component {
                                             //先关闭之前的监听重新开启
                                             //开启重新的
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                alert(JSON.stringify(res))
                                                 let data = res.data;
                                                 if (data.name) {
                                                     let arr = data.array;
                                                     for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
@@ -544,7 +532,6 @@ export class RfidBarCode extends Component {
 
                                                     let arr = data.array;
                                                     for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
@@ -560,8 +547,6 @@ export class RfidBarCode extends Component {
                                         } else if (this.mode[key] == '逐一') {
                                             params['optionStype'] = 2;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                alert('触发2')
-                                                alert(JSON.stringify(res))
                                                 let num = d.query('.total-nums>span');
                                                 num.innerText = (parseInt(num.innerText) + 1) + '';
                                                 if(res.success){
@@ -603,7 +588,6 @@ export class RfidBarCode extends Component {
 
                                                     let arr = data.array;
                                                     for (let i = 0; i < arr.length; i++) {
-                                                        alert(arr[i].classify1_value)
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
@@ -667,9 +651,7 @@ export class RfidBarCode extends Component {
                                 } else {
                                     optionStype = 0;
                                 }
-                                alert("111111");
                                 let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                    alert(JSON.stringify(res))
                                     let data = res.data;
                                     let arr = data.array;
                                     for (let i = 0; i < arr.length; i++) {
@@ -738,7 +720,6 @@ export class RfidBarCode extends Component {
                                             console.log(updataEl.getText());
                                             ;
                                             G.Shell.inventory.uploadcodedata(para.uniqueFlag, (res) => {
-                                                alert(JSON.stringify(res))
                                             })
                                             mode.destroy();
                                         }
@@ -806,7 +787,6 @@ export class RfidBarCode extends Component {
                                         where[category] = value.category
                                         let success = false;
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
-                                            alert(JSON.stringify(res))
                                             if (res.success) {
                                                 this.domHash['scanamout'].innerText = res.data.scanNum;
                                             }
@@ -858,7 +838,6 @@ export class RfidBarCode extends Component {
             let key = this.stepByone + this.accumulation;
             console.log(modeVal['value']);
             if (this.mode[key] == "累加" && modeVal['value'] !== "") {
-                alert('这是累加')
                 num.innerText = parseInt(num.innerText) + parseInt(modeVal['value']) + ""
                 //添加新的传值接口
 
@@ -886,20 +865,16 @@ export class RfidBarCode extends Component {
                 }
 
              let s =  G.Shell.inventory.dealbarcode(2,params,(res)=>{
-                    alert('zou 里层调用')
-                    alert(JSON.stringify(res))
                    if(res.success){
                        this.domHash['scanamout'].innerText = res.data.scanNum;
                    }
                 })
-                alert(s+"外层调用")
 
             } else if (this.mode[key] == "替换" && modeVal['value'] !== "") {
                 num.innerText = parseInt(modeVal['value']) + "";
                 //添加新的传值接口
 
                 let  Where = {};
-                alert(JSON.stringify(this.fields));
                 if (G.tools.isNotEmpty(this.fields)) {
 
                     for (let i = 0; i < this.fields.length; i++) {
@@ -922,14 +897,11 @@ export class RfidBarCode extends Component {
                 }
                 // Modal.alert(G.Shell.inventory.dealbarcode)
                 let s = G.Shell.inventory.dealbarcode(2,params,(res)=>{
-                    alert('zou里层 ')
-                    alert(JSON.stringify(res))
                     if(res.success){
                         this.domHash['scanamout'].innerText = res.data.scanNum;
                     }
 
                 })
-                alert(s+"外层调用")
             }
         }
 
@@ -980,9 +952,7 @@ export class RfidBarCode extends Component {
         }
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
-            alert(JSON.stringify(res))
             let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
-            alert(JSON.stringify(data));
             let pageName = data.data;;
             this.uid = pageName.uid;
             this.domHash['inventory'].innerHTML = pageName.AffilTitle;
@@ -1049,10 +1019,5 @@ export class RfidBarCode extends Component {
 
         })
     }
-    public test (){
-        G.Shell.inventory.dealbarcode(2,{},(res)=>{
-            alert('1')
-            alert(JSON.stringify(res))
-        })
-    }
+
 }

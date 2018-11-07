@@ -285,6 +285,7 @@ export class DrawPoint extends Component {
             return d === this.selected;
         })
 
+
         circle.exit().remove();
         svg.selectAll("circle").call(this.drag);
     }
@@ -497,7 +498,7 @@ export class DrawPoint extends Component {
         //整个方法判断空编辑 或者已有编辑
         if (sl.selectAll('text').empty()) {
             this.format(data).forEach((anl, I) => {
-                if (!anl.isPoint && anl.isShow) {
+                if (!anl.isPoint) {
                     let text = sl.append('text').datum(anl.name)
                         .attr('fill', 'black')
                         .attr('font-size', '14px')
@@ -632,6 +633,7 @@ export class DrawPoint extends Component {
                                 //关闭描点操作
                                 //如果是insert的状态就是真删，如果是其他的就是DISPLAY='NONE'
                                 this.selectedG && this.selectedG.attr('class','delete').attr('display','none');
+                                alert(this.index + '这是')
                                 this.map.set(this.index,[]);
                                 this.points = [];
                                 this.isDrawLine = false;

@@ -42,7 +42,7 @@ export class FlowListPC extends BasicPage{
                 panelParent: tabWrapper,
                 tabParent: tabWrapper,
                 tabs: tabs,
-                panelClass:'first',
+                className:'first',
                 onClick: (index) => {
                     if (tools.isEmpty(this.subTables[index])) {
                         // 表格不存在
