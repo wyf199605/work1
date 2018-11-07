@@ -71,7 +71,7 @@ namespace BW {
             menuHistory: `common/history`, //菜单历史
             menuFavor: `favorites`, //菜单收藏
             versionInfo: `list/n1679_data-95113`,
-            pcVersion: `commonsvc/version`,
+            pcVersion: `commonsvc/shellfile`,
 
             rmprivsSelect: 'rmprivs/privsget/select',
             rmprivsInsert: 'rmprivs/privsget/insert',

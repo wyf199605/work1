@@ -316,6 +316,7 @@ gulp.task('js', function () {
 
     gulpTsPage('rfid/RfidBarCode/RfidBarCode','RfidBarCode.js');
     gulpTsPage('plan/PlanPage','PlanPage.js');
+    gulpTsPage('permissionTree/permissionTreePage','permissionTree.js');
 });
 
 /**

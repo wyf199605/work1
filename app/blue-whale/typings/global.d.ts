@@ -70,6 +70,7 @@ interface IBW_Table{
     rfidCols?:IBW_TableRfidCol;  // rfid配置
     rfidFlag?:number;
     printSetting?: string;
+    showSubField?:string;
 }
 
 interface IBW_TableRfidCol{

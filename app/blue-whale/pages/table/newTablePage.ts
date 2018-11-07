@@ -15,7 +15,7 @@ import {BwTableModule} from "../../module/table/BwTableModule";
 import {FastTable} from "global/components/newTable/FastTable";
 import {Inputs} from "../../module/inputs/inputs";
 
-interface ITablePagePara extends BasicPagePara{
+export interface ITablePagePara extends BasicPagePara{
     ui: IBW_UI<IBW_Table>
 }
 
@@ -222,7 +222,7 @@ export class BwTableElement extends Component{
         }
 
         let inputs = para.tableEl.inputs,
-            line = para.tableEl.keyField,
+            line = para.tableEl.scannableLocationLine,
             querier = para.tableEl.querier;
 
         if(!isDynamic && bwTableEl.scannableField){
@@ -281,15 +281,22 @@ export class BwTableElement extends Component{
         }else {
             let text = '', timer = null;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
-                text += e.key;
-                if (timer) {
-                    clearTimeout(timer);
-                }
-                timer = setTimeout(() => {
+                let handle = () => {
                     this.rowSelect(line, text);
                     timer = null;
                     text = '';
-                }, 1000);
+                },
+                    code = e.keyCode || e.which || e.charCode;
+                if(code === 13){
+                    handle();
+                }else {
+                    text += e.key;
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                }
+
+                timer = setTimeout(handle, 1000);
             });
         }
 

@@ -367,6 +367,7 @@ export class BwTableModule extends Component {
                 rowspan: isAbsField && !hasSubCol ? 2 : 1,
                 maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
                 isCanSort: field.isCanSort, // 是否可排序
+                isNotEdit: !field.flag
             } as IFastTableCol);
 
             if (hasSubCol) {
@@ -476,6 +477,7 @@ export class BwTableModule extends Component {
                             BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: subName ? void 0 : field.noShow,
                         isCanSort: field.isCanSort,
+                        isNotEdit: !field.flag
                     } as IFastTableCol);
 
                     currentOriginField = {
@@ -497,6 +499,7 @@ export class BwTableModule extends Component {
                         colspan: 1,
                         rowspan: 1,
                         isCanSort: field.isCanSort,
+                        isNotEdit: !field.flag
                     } as IFastTableCol);
                 }
 
@@ -843,9 +846,9 @@ export class BwTableModule extends Component {
                         </div>
                     </div>
                     :
-                    <form className="filter-form" data-query-name="local">
+                    <div className="filter-form" data-query-name="local">
                         <span data-action="add" className="iconfont blue icon-jiahao"/>
-                    </form>;
+                    </div>;
 
                 modal = new Modal({
                     container: d.closest(this.wrapper, '.page-container'),
@@ -854,9 +857,10 @@ export class BwTableModule extends Component {
                     position: tools.isMb ? 'full' : '',
                     width: '730px',
                     isShow: true,
-                    className: 'local queryBuilder',
+                    className: 'local',
                     zIndex: 1003,
                 });
+                modal.className = 'queryBuilder';
                 // modal.wrapper.style.zIndex = '1002';
                 if (tools.isMb) {
 
@@ -917,9 +921,10 @@ export class BwTableModule extends Component {
                         })()
                     }
                 }
+                let queryCols = this.ui.querier.queryparams0 || this.ui.querier.queryparams1 || this.ui.querier.atvarparams;
                 require(['QueryBuilder'], (QueryBuilder) => {
                     builder = new QueryBuilder.QueryBuilder({
-                        queryConfigs: initQueryConfigs(getCols()), // 查询字段名、值等一些配置，后台数据直接传入
+                        queryConfigs: queryCols, // 查询字段名、值等一些配置，后台数据直接传入
                         resultDom: tools.isMb ? d.query('ul.mui-table-view', body) : body, // 查询条件容器
                         setting: null  // 默认值
                     });
@@ -938,7 +943,7 @@ export class BwTableModule extends Component {
                         name: col.name,
                         title: col.title,
                         isNumber: col.isNumber,
-                        content: col.content
+                        content: col.content,
                     })
                 }
 

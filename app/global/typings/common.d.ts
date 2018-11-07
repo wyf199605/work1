@@ -105,6 +105,7 @@ interface R_Field extends COL {
     noEdit?: boolean;  // 是否不可编辑，在编辑界面有效
     noShow?: boolean;  // 是否不可查看
     noAdd?: boolean;   // 新增时是否界面展示
+    flag?: boolean;    // 为false时编辑是无法编辑及修改数据，为true正常
     atrrs?: obj;       // 属性
     endField?: string; //
     elementType?: string;//元素类型  见  DbConst.RES_TYPE  VALUE、PICK、LOOKUP ,如果该字段为空，检查属性列表中是否有配数据类型 DATA_TYPE
