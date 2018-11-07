@@ -16,6 +16,7 @@ interface IDrapPoint extends IComponentPara {
     image?: string;
     format?: (data: obj) => IDrawFormatData[];
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
+    isShow?: boolean; // 默认false
 }
 
 interface IAreaType {
