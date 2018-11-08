@@ -71,6 +71,18 @@ interface IBW_Table{
     rfidFlag?:number;
     printSetting?: string;
     showSubField?:string;
+    layout?:IBW_Layout; // 移动化
+}
+
+interface IBW_Layout{
+    body?:string[];
+    countDown?:string;
+    img?:string;
+    imgLabel?:string;
+    label?:string[];
+    status?:string;
+    statusColor?:string;
+    title?:string[];
 }
 
 interface IBW_TableRfidCol{

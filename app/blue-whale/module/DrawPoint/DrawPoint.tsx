@@ -43,6 +43,7 @@ export class DrawPoint extends Component {
     private LV;
     private LR;
     public zoom;
+    private editStatus:boolean;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -156,6 +157,7 @@ export class DrawPoint extends Component {
     private _data;
 
     public render(data?: obj[]) {
+        let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
         this.selectedG = null;
@@ -163,6 +165,7 @@ export class DrawPoint extends Component {
         this.keyDownEvent.off();
         this.isDrawLine = false;
         this.points = [];
+        //如果为false 则为展示状态  （增加小图标，显示边框 ，区域颜色）
 
         let size = this.map.size();
         for(let i = 0; i < size; i++){
@@ -196,18 +199,42 @@ export class DrawPoint extends Component {
                 }).forEach((data) => {
                 //  需要用到有point的data
                 if (data.isPoint) {
-                    group.append('path').datum(data.name)
-                        .attr("class", 'line')
-                        .attr('fill', 'white')
-                        .attr('fill-opacity', 0)
-                        .attr("id", (d, i) => {
-                            return 'path' + index;
-                        })
-                        .attr("d", (d, i) => {
-                            point = data.data;
-                            this.map.set(index, data.data)
-                            return this.line(data.data)
-                        })
+                        group.append('path').datum(data.name)
+                            .attr("class", 'line')
+                            .attr('fill', 'white')
+                            .attr('style',function (d) {
+                                if(!data.isShow){
+                                    return 'stroke:none';
+                                }else {
+                                    return 'stroke:teeblue';
+                                }
+                            })
+                            .attr('fill-opacity', 0)
+                            .attr("id", (d, i) => {
+                                return 'path' + index;
+                            })
+                            .attr("d", (d, i) => {
+                                point = data.data;
+                                this.map.set(index, data.data)
+                                return this.line(data.data)
+                            })
+                        // 判断是否是编辑状态
+                        //显示边框 以及 背景颜色
+                        if(!this.editStatus){
+                            group.append("text").attr('class','iconfont icon-dianpubiaoji')
+                                .attr('font-family','iconfont')
+                                .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
+                                .attr('fill','firebrick')
+                                .text("\ue6e1").on('click',function (d) {
+                                alert('这是小图标');
+                            }).on('mouseover',function (d) {
+                                D3.select(this).transition().attr('y',80).ease("bounce");
+                            }).on('mouseout',function (d) {
+                                D3.select(this).transition().attr('y',84).ease("bounce");
+                            })
+
+                        }
+
                 } else if(data.isShow && tools.isNotEmpty(data.data)){
                     //绘字
                          I++;
@@ -234,6 +261,17 @@ export class DrawPoint extends Component {
         });
         //this.editEvent.on();
 
+    }
+    private InitIcon(group,points){
+        //找到小图标位置的方法
+
+        group.append("text").attr('class','iconfont icon-tuodong')
+            .attr('font-family','iconfont')
+            .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
+            .attr('fill','firebrick')
+            .text("\ue63a").on('click',function (d) {
+            alert('这是小图标');
+        })
     }
     private OnDragText(){
         debugger
@@ -600,7 +638,7 @@ export class DrawPoint extends Component {
                 D3.select(window)
                     .on("keyup", () => {
                         switch (D3.event.keyCode) {
-                            case 18:{
+                            case 16:{
                                 //继续开启描点操作
                                 //如果是已完成状态就不开启
                                 if(!self.fishe){
@@ -653,7 +691,7 @@ export class DrawPoint extends Component {
                                 D3.selectAll('circle').remove();
                                 break;
                             }
-                            case 18:{
+                            case 16:{
                                 //暂停描点操作
                                 self.isDrawLine = false;
                                 self.g.attr('cursor','move')
