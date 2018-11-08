@@ -346,8 +346,8 @@ export class ListItemDetail {
                 // 附件名称 , Blob类型
                 if (tools.isNotEmpty(text)) {
                     let obj = {
-                        fileName: text,
-                        fileSize: 0,
+                        filename: text,
+                        filesize: 0,
                         addr: ''
                     };
                     v = JSON.stringify([obj]);
