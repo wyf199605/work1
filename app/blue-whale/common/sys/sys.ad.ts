@@ -110,7 +110,7 @@ namespace BW{
                 opentab: function (userid = '', accessToken = '', noShow?: string[]) {
                     let ja = [
                         {icon: "home", name: "首页", url: CONF.url.home, show: 0},
-                        {icon: "contacts", name: "通讯", url: CONF.url.contact, show: 1},
+                        {icon: "contacts", name: "通讯", url: CONF.url.contact, show: 0},
                         {icon: "message", name: "消息", url: CONF.url.message, show: 0},
                         {icon: "myselfMenu", name: "我的", url: CONF.url.myselfMenu, show: 0}
                     ];

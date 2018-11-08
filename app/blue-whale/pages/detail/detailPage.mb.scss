@@ -9,6 +9,9 @@
     .mui-scroll{
       position: relative;
     }
+    .full-height{
+      min-height: 100%;
+    }
   }
   #content .mui-table-view-cell.title{
     font-weight: bold;
