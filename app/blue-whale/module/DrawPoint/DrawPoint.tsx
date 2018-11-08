@@ -180,6 +180,8 @@ export class DrawPoint extends Component {
         this.index = data.length || 0;//初始化index
         this.keyDownEvent.on();
         this.keyUpEvent.on();
+        this.fishe = true;
+
         let points = [],
             svg = D3.select('svg').select('g');
         if (tools.isEmpty(data)) {
@@ -221,21 +223,23 @@ export class DrawPoint extends Component {
                         // 判断是否是编辑状态
                         //显示边框 以及 背景颜色
                         if(!this.editStatus){
-                            group.append("text").attr('class','iconfont icon-dianpubiaoji')
-                                .attr('font-family','iconfont')
-                                .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
-                                .attr('fill','firebrick')
-                                .text("\ue6e1").on('click',function (d) {
-                                alert('这是小图标');
-                            }).on('mouseover',function (d) {
-                                D3.select(this).transition().attr('y',80).ease("bounce");
-                            }).on('mouseout',function (d) {
-                                D3.select(this).transition().attr('y',84).ease("bounce");
-                            })
+                            this.InitIcon(group,point);
+                            // group.append("text").attr('class','iconfont icon-dianpubiaoji')
+                            //     .attr('font-family','iconfont')
+                            //     .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
+                            //     .attr('fill','firebrick')
+                            //     .text("\ue6e1").on('click',function (d) {
+                            //     alert('这是小图标');
+                            // }).on('mouseover',function (d) {
+                            //     D3.select(this).transition().attr('y',80).ease("bounce");
+                            // }).on('mouseout',function (d) {
+                            //     D3.select(this).transition().attr('y',84).ease("bounce");
+                            // })
 
                         }
 
                 } else if(data.isShow && tools.isNotEmpty(data.data)){
+
                     //绘字
                          I++;
                     let text = group.append('text').datum(data.name)
@@ -255,6 +259,13 @@ export class DrawPoint extends Component {
                             return data.data;
 
                         })
+                }else if(tools.isNotEmpty(data.bgColor)){
+                    //并且是查看状态下
+                    group.select('path').attr('fill',function (d) {
+                        return data.bgColor;
+                    }).attr('fill-opacity',function (d) {
+                        return '0.56'
+                    })
                 }
             })
 
@@ -262,19 +273,44 @@ export class DrawPoint extends Component {
         //this.editEvent.on();
 
     }
-    private InitIcon(group,points){
-        //找到小图标位置的方法
+    private setIconPos(str){
+        let max = 0,maxStr = [];
+        if (str.length >= 0) {
+            for (let i = 0; i < str.length; i++) {
+                //先找最高点或者最低点(右边 )
+                 max =  str[i][0] + str[i][1];
+                 maxStr.push(max)
+            }
 
-        group.append("text").attr('class','iconfont icon-tuodong')
+           let val = Math.min(...maxStr),
+              index =  maxStr.indexOf(val)
+            return str[index];
+
+        }
+
+    }
+
+    private InitIcon(group,points){
+        let x = this.setIconPos(points)[0],
+            y = this.setIconPos(points)[1];
+        group.append("text").attr('class','iconfont icon-dianpubiaoji')
             .attr('font-family','iconfont')
-            .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
+            .attr('x',()=>{
+              return x;
+            }).attr('y',()=>{
+            return y;
+        }).attr('width',45).attr('height',45)
             .attr('fill','firebrick')
-            .text("\ue63a").on('click',function (d) {
-            alert('这是小图标');
+            .text("\ue6e1")
+            .on('mouseover',function (d) {
+               D3.select(this).transition().attr('y',y+4).ease("bounce");
+            }).on('mouseout',function (d) {
+            D3.select(this).transition().attr('y',y).ease("bounce");
+            }).on('click',function (d) {
+            alert('这是小图标')
         })
     }
     private OnDragText(){
-        debugger
         this.selectedG.selectAll('text').remove();
         this.selectedG.attr('id', (data)=>{
                 let point = this.map.get(this.index),
