@@ -6,7 +6,6 @@ import tools = G.tools;
 import {CheckBox} from "../form/checkbox/checkBox";
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
-import {InputBox} from "../general/inputBox/InputBox";
 
 export interface IMbListItemPara extends IComponentPara{
     list?: MbList;
@@ -15,6 +14,7 @@ export interface IMbListItemPara extends IComponentPara{
     isImg?: boolean;
     isCheckBox?: boolean;
     btns?: string[];
+    buttonClick?:(index)=>void;
 }
 
 export interface MbListItemData{
@@ -35,12 +35,16 @@ export class MbListItem extends Component {
     protected btnWrapper: HTMLElement;
     protected details: objOf<HTMLElement>;
 
-    constructor(para: IMbListItemPara) {
+    constructor(protected para: IMbListItemPara) {
         super(para);
         this.list = para.list;
         this._index = para.index;
         this.isShowCheckBox = para.isCheckBox || false;
         this.render(para.data || {});
+        if (tools.isNotEmptyArray(para.btns)){
+            this.initBtn(para.btns);
+            this.initEvents.on();
+        }
     }
 
     protected wrapperInit(para: IMbListItemPara) {
@@ -48,15 +52,20 @@ export class MbListItem extends Component {
         this._isImg = isImg;
         this.details = {};
         return <div className="list-item-wrapper" data-index={para.index}>
-            {this.checkBox = <CheckBox className="hide"/>}
-            <div className="list-item-content">
-                {this.imgWrapper = isImg ? <div className="list-item-img"/> : null}
-                <div className="list-item-details">
-                    {this.details['title'] = <div className="list-detail-item list-item-title"/>}
-                    {this.details['body'] = <div className="list-detail-item list-item-body"/>}
-                    {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
-                    {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
-                    {this.details['status'] = <div className="list-detail-item list-item-status"/>}
+            <div className="list-item-body-container">
+                {this.checkBox = <CheckBox className="hide" onClick={(isChecked)=>{
+                    para.list && para.list.setSelectStatus(isChecked);
+                }
+                }/>}
+                <div className="list-item-content">
+                    {this.imgWrapper = isImg ? <div className="list-item-img"/> : null}
+                    <div className="list-item-details">
+                        {this.details['title'] = <div className="list-detail-item list-item-title"/>}
+                        {this.details['body'] = <div className="list-detail-item list-item-body"/>}
+                        {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
+                        {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
+                        {this.details['status'] = <div className="list-detail-item list-item-status"/>}
+                    </div>
                 </div>
             </div>
         </div>;
@@ -105,10 +114,10 @@ export class MbListItem extends Component {
         // 渲染图片
         if(this.isImg && this.imgWrapper){
             this.imgWrapper.innerHTML = '';
-            let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
+            let img = data.img || G.requireBaseUrl + '/../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
             if(tools.isNotEmpty(data.imgLabel)){
-                d.append(this.imgWrapper, <div className='img-label'><span>{data.imgLabel}</span></div>)
+                d.append(this.imgWrapper, <div className='img-label'>{data.imgLabel}</div>);
             }
         }
 
@@ -192,20 +201,25 @@ export class MbListItem extends Component {
 
     // 初始化按钮配置
     initBtn(btns: string[]){
-        this.btnWrapper = <div className="btn-group"/>;
-        let ibox = new InputBox();
+        let btnWrapper = <div className="btn-group">{this.btnWrapper = <div className="buttons-wrapper"/>}</div>
+        let btnsArr = [];
+        btns.forEach((btn,index) => {
+            btnsArr.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${btn}</div>`);
+        });
+        this.btnWrapper.innerHTML = btnsArr.join('');
+        this.wrapper.appendChild(btnWrapper);
     }
 
-    // 添加按钮，index插入位置
-    addBtn(btn: string, index: number){
-
-    }
-
-    // 删除按钮
-    delBtn(index: number){
-
-    }
-
+    private initEvents = (()=>{
+        let clickEvent = (e)=>{
+            let index = parseInt(d.closest(e.target,'.item-button').dataset.index);
+            tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index);
+        };
+        return {
+            on:()=>d.on(this.wrapper,'click','.btn-group .item-button',clickEvent),
+            off:()=>d.off(this.wrapper,'click','.btn-group .item-button',clickEvent)
+        }
+    })();
     destroy(){
         clearInterval(this.timer);
         this.checkBox && this.checkBox.destroy();
@@ -213,6 +227,8 @@ export class MbListItem extends Component {
         this.details = null;
         this.list = null;
         this.imgWrapper = null;
+        this.para = null;
+        this.initEvents.off();
         super.destroy();
     }
 }
