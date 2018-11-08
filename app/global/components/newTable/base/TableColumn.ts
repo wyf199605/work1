@@ -15,7 +15,6 @@ export interface ITableColumnPara{
     isVirtual?: boolean;
     title: string;
     isCanSort?: boolean; // 是否可排序，默认true;
-    isNotEdit?: boolean; // 禁止编辑和修改，默认false
 }
 export class TableColumn{
     protected isCanSort: boolean;
@@ -24,7 +23,6 @@ export class TableColumn{
         this.content = para.content;
         this._isVirtual = tools.isEmpty(para.isVirtual) ? false : para.isVirtual;
         this.isCanSort = tools.isEmpty(para.isCanSort) ? true : para.isCanSort;
-        this._isNotEdit = para.isNotEdit || false;
         this._table = para.table;
         this._title = para.title;
         this._name = para.name;
@@ -34,12 +32,6 @@ export class TableColumn{
         // this._inputInit = para.inputInit;
         this._isNumber = tools.isEmpty(para.isNumber) ? false : para.isNumber;
 
-    }
-
-    // 是否不可编辑及修改数据
-    protected _isNotEdit: boolean;
-    get isNotEdit(){
-        return this._isNotEdit;
     }
 
     protected _isVirtual: boolean;

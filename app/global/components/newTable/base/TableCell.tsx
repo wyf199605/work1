@@ -231,10 +231,6 @@ export abstract class TableCell {
         return table;
     }
 
-    get isNotEdit(){
-        return this.column.isNotEdit;
-    }
-
     destroy(isClear: boolean = true){
         this._wrapper && d.remove(this._wrapper, isClear);
         let index = this.row.cells.indexOf(this);
@@ -313,14 +309,16 @@ export class TableDataCell extends TableCell {
         }
     }
 
+    // 在编辑状态下无法修改 不能编辑 且 isNotPassiveModify为true 的cell的数据
+    isNotPassiveModify: boolean = false;
+
     get data(){
         let rowData = this.table.tableData.get(this.row.index);
         return tools.isEmpty(rowData) ? null : rowData[this.name];
     }
     set data(data: Primitive | Node){
-        // 在编辑状态下无法修改isNotEdit为true的cell的数据
-        if(this.table.editing){
-            if(this.isNotEdit){
+        if(this.table.editing && !this.editing){
+            if(this.isNotPassiveModify){
                 return ;
             }
         }
