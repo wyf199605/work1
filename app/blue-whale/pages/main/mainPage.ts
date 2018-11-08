@@ -349,8 +349,6 @@ export = class MainPage {
                                 })
                             });
                             break;
-                        case 'account':
-                            break;
                         case 'check':
                             sys.window.update();
                             break;

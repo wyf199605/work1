@@ -33,25 +33,19 @@ export class BarCode{
                 displayValue: false,
                 format: BarCode.CodeType[sty.codeType]
             });
-            let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('width',`${loc.w}`);
-            svg.setAttribute('height',`${loc.h}`);
-            svg.setAttribute('x',`${loc.x}`);
-            svg.setAttribute('y',`${loc.y}`);
-            document.body.removeChild(this.svg);
-            svg.appendChild(this.svg);
-            svgDom.appendChild(svg);
-            console.log(this.svg.width);
-            switch (sty.alignment) {
-                case 0:
-                    break;
-                case 1:
-                    svg.setAttribute('x',`${loc.x + (loc.w - this.svg.width.animVal.value)}`);
-                    break;
-                case 2:
-                    svg.setAttribute('x',`${loc.x + (loc.w - this.svg.width.animVal.value) / 2}`);
-                    break;
-            }
+            let width = this.svg.width.animVal.value,
+                scale = (loc.w - 20) / width;
+            console.log(scale);
+            Array.prototype.forEach.call(this.svg.children, (el) => {
+                el.setAttribute('transform', `scale(${scale}, 1)`);
+            });
+            this.svg.setAttribute('width', `${loc.w}`);
+            // this.svg.setAttribute('height', `${loc.h}`);
+            this.svg.setAttribute('x', `${loc.x}`);
+            this.svg.setAttribute('y', `${loc.y}`);
+            this.svg.setAttribute("viewBox", `0 0 ${loc.w} ${loc.h}`);
+
+            svgDom.appendChild(this.svg);
         }
         static CodeType = {
             0:'ITF',
