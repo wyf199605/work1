@@ -160,7 +160,11 @@ export class PlanModule extends Component{
                     text = rowData[DrawPoint.POINT_FIELD]
                 }
                 if(text && !Array.isArray(text)){
-                    text = JSON.parse(text);
+                    try{
+                        text = JSON.parse(text);
+                    }catch (e){
+                        text = null;
+                    }
                 }
                 isPoint = true;
             }else{
