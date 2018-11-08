@@ -97,6 +97,7 @@ export class NewTableModule {
                         height: '60%',
                         width: '75%',
                         isMb: false,
+                        zIndex: 500,
                         position: 'right',
                         onClose: () => {
                             let pseudoTable = this.main.ftable.pseudoTable;

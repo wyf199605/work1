@@ -146,9 +146,9 @@ export class PlanModule extends Component{
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
 
-        if(name === 'GRIDBACKCOLOR' && text){
+        if((name === 'GRIDBACKCOLOR' || name === 'GRIDFORECOLOR') && text){
             let {r, g, b} = tools.val2RGB(text);
-            bgColor = `rgb(${r},${g},${b})`;
+            name === 'GRIDBACKCOLOR' ? bgColor = `rgb(${r},${g},${b})` : color = `rgb(${r},${g},${b})`;
         }
 
         if (field && field.atrrs) {
