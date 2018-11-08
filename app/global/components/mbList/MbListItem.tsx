@@ -15,6 +15,8 @@ export interface IMbListItemPara extends IComponentPara{
     isCheckBox?: boolean;
     btns?: string[];
     buttonClick?:(index)=>void;
+    imgLabelColor?:string;
+    statusColor?:string;
 }
 
 export interface MbListItemData{
@@ -24,7 +26,6 @@ export interface MbListItemData{
     img?: string;
     imgLabel?: string;
     status?: number;
-    statusColor?: string;
     countDown?: number;
 }
 
@@ -51,6 +52,9 @@ export class MbListItem extends Component {
         let isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
         this._isImg = isImg;
         this.details = {};
+        let statusColor = {
+            color:para.statusColor
+        };
         return <div className="list-item-wrapper" data-index={para.index}>
             <div className="list-item-body-container">
                 {this.checkBox = <CheckBox className="hide" onClick={(isChecked)=>{
@@ -64,7 +68,7 @@ export class MbListItem extends Component {
                         {this.details['body'] = <div className="list-detail-item list-item-body"/>}
                         {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
                         {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
-                        {this.details['status'] = <div className="list-detail-item list-item-status"/>}
+                        {this.details['status'] = <div className="list-detail-item list-item-status" style={statusColor} />}
                     </div>
                 </div>
             </div>
@@ -114,10 +118,13 @@ export class MbListItem extends Component {
         // 渲染图片
         if(this.isImg && this.imgWrapper){
             this.imgWrapper.innerHTML = '';
-            let img = data.img || G.requireBaseUrl + '/../img/fastlion_logo.png';
+            let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
             if(tools.isNotEmpty(data.imgLabel)){
-                d.append(this.imgWrapper, <div className='img-label'>{data.imgLabel}</div>);
+                let imgLabelColor={
+                    backgroundColor:this.para.imgLabelColor
+                };
+                d.append(this.imgWrapper, <div className='img-label' style={imgLabelColor}>{data.imgLabel}</div>);
             }
         }
 
@@ -143,7 +150,7 @@ export class MbListItem extends Component {
                     });
                     break;
                 case 'status':
-                    el.style.color = data.statusColor;
+                    // el.style.color = this.para.statusColor;
                     el.innerHTML = content || '';
                     break;
                 case 'countDown':
