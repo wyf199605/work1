@@ -144,7 +144,7 @@ export class PlanModule extends Component{
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
 
-        if (field && !field.noShow && field.atrrs) {
+        if (field && field.atrrs) {
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;
 
