@@ -350,7 +350,7 @@ export class ListItemDetail {
                         fileSize: 0,
                         addr: ''
                     };
-                    v = JSON.stringify(obj);
+                    v = JSON.stringify([obj]);
                 } else {
                     v = '';
                 }

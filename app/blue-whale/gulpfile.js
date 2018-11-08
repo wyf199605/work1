@@ -77,7 +77,7 @@ gulp.task('js', function () {
     compiler.ts(['*', 'common/**/*'], 'bw.js', path.global);
 
 
-    compiler.ts(['BwTableModule', 'BwMainTable', 'BwSubTableModule','newTableModule', 'InventoryBtn'].map(s => 'module/table/' + s), 'table.js', path.module);
+    compiler.ts(['BwTableModule', 'BwMainTable', 'BwSubTableModule', 'newTableModule', 'InventoryBtn'].map(s => 'module/table/' + s), 'table.js', path.module);
 
     // pc 表格
     compiler.ts([
@@ -191,7 +191,7 @@ gulp.task('js', function () {
     gulpTsModule(['uploadModule/uploadModule'], 'uploadModule.js');
 
     //drawpoint模块
-    gulpTsModule(['DrawPoint/DrawPoint'],'DrawPoint.js');
+    gulpTsModule(['DrawPoint/DrawPoint'], 'DrawPoint.js');
 
     gulpTsModule([
         'uploadModule/uploadModule',
@@ -214,10 +214,10 @@ gulp.task('js', function () {
     gulpTsModule(['hints/hints'], 'hints.js');
 
     //turnPage模块
-    gulpTsModule(['turnPage/TurnPage'],'turnPage.js');
+    gulpTsModule(['turnPage/TurnPage'], 'turnPage.js');
 
     //help模块
-    gulpTsModule(['helpMsg/HelpMsg'],'helpMsg.js');
+    gulpTsModule(['helpMsg/HelpMsg'], 'helpMsg.js');
 
     //label模块
     gulpTsModule(['labelPrint/labelPrint'], 'labelPrint.js');
@@ -255,6 +255,7 @@ gulp.task('js', function () {
 
     gulpTsModule('keyStep/KeyStep', 'KeyStep.js');
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
+    gulpTsModule('mbList/mbList', 'BwMbList.js');
 
     /*page*/
     gulpTsPage('form/formPage', 'form-page.js');
@@ -317,9 +318,9 @@ gulp.task('js', function () {
     gulpTsPage('basicPage', 'basicPage.js');
     gulpTsPage('rfid/RfidSetting/RfidSetting', 'RfidSetting.js');
 
-    gulpTsPage('rfid/RfidBarCode/RfidBarCode','RfidBarCode.js');
-    gulpTsPage('plan/PlanPage','PlanPage.js');
-    gulpTsPage('permissionTree/permissionTreePage','permissionTree.js');
+    gulpTsPage('rfid/RfidBarCode/RfidBarCode', 'RfidBarCode.js');
+    gulpTsPage('plan/PlanPage', 'PlanPage.js');
+    gulpTsPage('permissionTree/permissionTreePage', 'permissionTree.js');
 });
 
 /**
