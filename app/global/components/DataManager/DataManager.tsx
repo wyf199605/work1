@@ -10,6 +10,7 @@ export interface IDataManagerPara {
     data?: obj[];            //
     page?: IDataManagerPageConf;
     render(start: number, length: number, isRefresh?: boolean); // 渲染函数
+    isMb?: boolean;
 }
 export interface IDataManagerAjax {
     fun(status: IDataManagerAjaxStatus): Promise<{ data: obj[]; total: number; }>; // ajax函数
@@ -38,7 +39,7 @@ export class DataManager {
     private ajax: IDataManagerAjax;
 
     private pageConf: IDataManagerPageConf;
-
+    protected isMb: boolean;
 
     private render: (start: number, length: number, isRefresh?: boolean) => void;
 
@@ -49,6 +50,7 @@ export class DataManager {
 
     constructor(para: IDataManagerPara) {
         // debugger;
+        this.isMb = tools.isEmpty(para.isMb) ? tools.isMb : para.isMb;
         this.init(para);
         this.ajax = para.ajax;
         this._ajaxData = para.ajax ? para.ajax.ajaxData : null;
@@ -87,12 +89,12 @@ export class DataManager {
             once = ajax && ajax.once,
             fun = ajax && ajax.fun,
             pageSize = once ? -1 : this.pageSize,
-            isSetData = isRefresh || this._serverMode && !tools.isMb; // 是否重新设置本地数据
+            isSetData = isRefresh || this._serverMode && !this.isMb; // 是否重新设置本地数据
 
         let promise: Promise<number>;
         if(tools.isNotEmpty(ajax) && (isRefresh || (!once || tools.isEmpty(this.data)))) {
             // pc端和刷新时, 开启加载框, 或者没有分页时
-            // let hasLoading = tools.isNotEmpty(this.loadingConf) && (!tools.isMb || isRefresh || !this.pagination);
+            // let hasLoading = tools.isNotEmpty(this.loadingConf) && (!this.isMb || isRefresh || !this.pagination);
             // let loading = hasLoading ? new Loading(this.loadingConf) : null;
             this.loadingShow(isRefresh);
             let sort = this._serverMode ? this.sortState : null,
@@ -129,7 +131,7 @@ export class DataManager {
     private loadingConf: ILoadingPara;
     private _loading: Loading = null;
     loadingShow(isRefresh: boolean) {
-        if(tools.isNotEmpty(this.loadingConf) && (!tools.isMb || isRefresh || !this.pagination)){
+        if(tools.isNotEmpty(this.loadingConf) && (!this.isMb || isRefresh || !this.pagination)){
             if(this._loading === null){
                 this._loading = new Loading(this.loadingConf);
             }
@@ -153,7 +155,7 @@ export class DataManager {
                 container: mainWrapper,
                 pageSize: this.pageSize,
                 pageOptions: this.pageConf.options,
-                scroll: tools.isMb ? {
+                scroll: this.isMb ? {
                     scrollEl: mainWrapper,
                     isPulldownRefresh: isPulldownRefresh,
                     auto: true,
@@ -166,7 +168,7 @@ export class DataManager {
                             // console.log({current, pageSize, isRefresh, total});
                             let dataArr = this.data;
                             // 是否创建分页
-                            if (tools.isMb || this._serverMode) { // 移动端或者服务端模式, 都是全部渲染
+                            if (this.isMb || this._serverMode) { // 移动端或者服务端模式, 都是全部渲染
                                 this.pagination.total = total;
                                 this.render(0, (current + 1) * pageSize, isRefresh);
                             } else {
