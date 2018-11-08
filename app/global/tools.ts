@@ -255,9 +255,12 @@ namespace G {
                     param = param.slice(2, -2);
 
                     let [key, param1] = param.split(','),
-                        isEn = param1 ? param1 === '1' : isEncode;
+                        isEn = param1 ? param1 === '1' : isEncode,
+                        isRemove = param1 ? param1 === '2' : false;
 
-                    return tools.isEmpty(data[key]) ? '' : (isEn ? self.htmlEncode(data[key]) : data[key]);
+                    return tools.isEmpty(data[key]) ? '' :
+                        (isRemove ? self.removeHtmlTags(data[key]) :
+                            (isEn ? self.htmlEncode(data[key]) : data[key]));
                 });
             },
             removeEmpty: function (str: string) {

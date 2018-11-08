@@ -6,8 +6,8 @@ module.exports = {
     * */
     "btl":{
         //filename不需要改
-        "filename": "global.fn",
-        "dirs": ["../../../../../work/panda-parent/panda-web/src/main/webapp/func/srcfiles/"],
-        "src" : {'global': ["global.js", "global.mb.css", "global.pc.css"]}
+        // "filename": "global.fn",
+        // "dirs": ["../../../../../work/panda-parent/panda-web/src/main/webapp/func/srcfiles/"],
+        // "src" : {'global': ["global.js", "global.mb.css", "global.pc.css"]}
     }
 };

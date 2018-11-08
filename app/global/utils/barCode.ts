@@ -26,7 +26,7 @@ export class BarCode{
         private draw(svgDom:SVGSVGElement,loc:locPara,sty:codePara){
             JsBarcode("#tempSvg", sty.codeData,{
                 lineColor: "#000000",
-                //width: (loc.w-88)/68+1,
+                // width: (loc.w-88)/68+1,
                 width: sty.codeType === 3 ? 2 : 1,
                 height: loc.h,
                 margin: 0,
