@@ -122,7 +122,7 @@ function inputTransFactory(com: TextInput, para: obj, comType: string, container
 function initShortData(com1:TextInput, com2 : TextInput){
     // 触发快捷选择时间的事件名
 
-    let shortDateEvent = sys.isMb ? 'longtap' : 'contextmenu';
+    let shortDateEvent = sys.isMb ? 'press' : 'contextmenu';
     let handler = function (e) {
         if(sys.isMb){
             let pick = <PickerList onSet={(option) => {
