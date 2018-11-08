@@ -39,12 +39,14 @@ export class PlanModule extends Component{
     protected btnWrapper: HTMLElement;
     protected buttons: Button[];
     protected draw: DrawPoint;
+    protected isEditPlan: boolean;
     protected ui: IBW_Plan_Table;
     protected ajax = new BwRule.Ajax();
 
     constructor(para: IPlanModulePara){
         super(para);
         let ui = this.ui = para.ui;
+        this.isEditPlan = tools.isNotEmpty(ui.tableAddr.param);
 
         this.plotBtn.init();
         this.plotBtn.disabled = true;
@@ -144,7 +146,12 @@ export class PlanModule extends Component{
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
 
-        if (field && !field.noShow && field.atrrs) {
+        if(name === 'GRIDBACKCOLOR' && text){
+            let {r, g, b} = tools.val2RGB(text);
+            bgColor = `rgb(${r},${g},${b})`;
+        }
+
+        if (field && field.atrrs) {
             let dataType = field.atrrs.dataType,
                 isImg = dataType === BwRule.DT_IMAGE;
 
@@ -153,7 +160,11 @@ export class PlanModule extends Component{
                     text = rowData[DrawPoint.POINT_FIELD]
                 }
                 if(text && !Array.isArray(text)){
-                    text = JSON.parse(text);
+                    try{
+                        text = JSON.parse(text);
+                    }catch (e){
+                        text = null;
+                    }
                 }
                 isPoint = true;
             }else{

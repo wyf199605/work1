@@ -192,6 +192,7 @@ export = class contactsPage {
                         // pullScroll.pullRefresh().enablePullupToRefresh();
                         queryData.queryparam = inputValue.toUpperCase().replace(/'/g, '');
                         dataManager = new DataManager({
+                            isMb: true,
                             render: (e) => {
                                 console.log(e);
                             },

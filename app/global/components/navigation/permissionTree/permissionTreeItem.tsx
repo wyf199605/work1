@@ -3,6 +3,7 @@
 import IComponentPara = G.IComponentPara;
 import Component = G.Component;
 import tools = G.tools;
+import d = G.d;
 import {CheckBox} from "../../form/checkbox/checkBox";
 
 export interface ITreeNode extends IComponentPara {

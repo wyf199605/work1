@@ -1190,8 +1190,7 @@ export class FastTable extends Component {
 
                 if (tools.isNotEmpty(editingCell) && !editingCell.editing &&
                     (this.editor.updatable || (isInsert && this.editor.insertble))) {
-                    if ( !editingCell.isNotEdit &&
-                        this.editor.rowCanInit(this.rows[rowIndex]) &&
+                    if (this.editor.rowCanInit(this.rows[rowIndex]) &&
                         this.editor.cellCanInit(editingCell.column as FastTableColumn,
                             isInsert ? 1 : 0)) {
                         editingCell.editing = true;
@@ -2846,9 +2845,11 @@ export class FastTable extends Component {
 
     protected initDisabledEditorRow(row) {
         let editor = this.editor;
-        row && row.cells.forEach((cell) => {
-            if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(cell.column as FastTableColumn, 1)) || cell.isNotEdit) {
+        row && row.cells.forEach((cell: TableDataCell) => {
+            let column = cell.column;
+            if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(column as FastTableColumn, 1))) {
                 cell.disabled = true;
+                cell.isNotPassiveModify = tools.isEmpty(column.content.flag) ? false : !column.content.flag;
             }
         });
     }
@@ -2856,9 +2857,11 @@ export class FastTable extends Component {
     protected initDisabledEditor() {
         let editor = this.editor;
         this.rows.forEach((row) => {
-            row && row.cells.forEach((cell) => {
-                if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(cell.column as FastTableColumn, 0)) || cell.isNotEdit) {
+            row && row.cells.forEach((cell: TableDataCell) => {
+                let column = cell.column;
+                if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(column as FastTableColumn, 0))) {
                     cell.disabled = true;
+                    cell.isNotPassiveModify = tools.isEmpty(column.content.flag) ? false : !column.content.flag;
                 }
             })
         })
