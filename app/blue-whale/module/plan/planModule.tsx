@@ -63,6 +63,7 @@ export class PlanModule extends Component{
             height: 500,
             width: 800,
             container: this.wrapper,
+            isShow: !this.isEditPlan,
             format: (data: obj) => {
                 let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
