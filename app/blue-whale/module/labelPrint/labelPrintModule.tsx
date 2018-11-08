@@ -1122,14 +1122,25 @@ export = class LabelPrintModule {
                 if (codeData) {
                     for (let k = 0; k < codeData.length; k++) {
                         if ((typeof codeData[k].condition) === 'undefined' || codeData[k].condition) {
-                            let x = codeData[k].leftPos * 3.78;
-
+                            let x = codeData[k].leftPos * 3.78,
+                                w = codeData[k].width * 3.78;
+                            w = w + 20 > svgWidth ? w - 20 : w;
+                            switch (codeData[k].alignment) {
+                                case 0:
+                                    break;
+                                case 1:
+                                    x = svgWidth - w;
+                                    break;
+                                case 2:
+                                    x = (svgWidth - w) / 2;
+                                    break;
+                            }
                             if (codeData[k].codeType === 99) {
 
                                 new QrCode(drawSvg.getSvg(), {
                                         x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: codeData[k].width * 3.78,
+                                        w: w,
                                         h: codeData[k].height * 3.78
                                     },
                                     {
@@ -1142,7 +1153,7 @@ export = class LabelPrintModule {
                                     {
                                         x: x,
                                         y: codeData[k].topPos * 3.78,
-                                        w: codeData[k].width * 3.78,
+                                        w: w,
                                         h: codeData[k].height * 3.78
                                     },
                                     {

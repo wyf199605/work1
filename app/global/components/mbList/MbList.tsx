@@ -16,12 +16,14 @@ export interface IMbListPara extends IComponentPara {
     multiButtons?: string[];
     itemClick?: (index) => void;
     multiClick?: (index) => void;
+    statusColor?:string;
+    imgLabelColor?:string;
     dataManager?: {
         pageSize?: number;
         render: (start: number, length: number, data: obj[], isRefresh: boolean) => void;
         ajaxFun?: (status: IDataManagerAjaxStatus) => Promise<{ data: obj[]; total: number; }>,
         isPulldownRefresh?: boolean,
-        ajaxData?: obj[];
+        ajaxData?: obj;
     };
 }
 
@@ -74,31 +76,34 @@ export class MbList extends Component {
     // 底部按钮
     protected buttonsWrapper: HTMLElement;
     protected checkBoxWrapper: HTMLElement;
-    protected statisticWrapper:HTMLElement;
-    protected countWrapper:HTMLElement;
-    private checkBox:CheckBox;
-    setSelectStatus(status:boolean){
-        if(status) {
+    protected statisticWrapper: HTMLElement;
+    protected countWrapper: HTMLElement;
+    private checkBox: CheckBox;
+
+    setSelectStatus(status: boolean) {
+        if (status) {
             let result = this.listItems.filter(item => !item.selected);
             tools.isEmpty(result) && (this.checkBox.checked = true);
-        }else{
+        } else {
             this.checkBox && (this.checkBox.checked = false);
         }
         this.calcCount();
     }
+
     // 创建多选按钮
     protected createMultiButtons(multiButtons: string[]) {
         let btnWrapper = <div className="list-batch-wrapper">
             {this.statisticWrapper = <div className="statistic hide">共选择{this.countWrapper = <span>0</span>}条数据</div>}
             <div className="list-buttons">
-                {this.checkBoxWrapper = <div className="select-all hide">{this.checkBox = <CheckBox text="全选" onClick={(isChecked) => {
-                    let count = isChecked ? this.listItems.length : 0;
-                    this.countWrapper.innerText = count.toString();
-                    this._listItems.forEach(item => {
-                        item.selected = isChecked;
-                    })
-                }
-                }/>}</div>}
+                {this.checkBoxWrapper =
+                    <div className="select-all hide">{this.checkBox = <CheckBox text="全选" onClick={(isChecked) => {
+                        let count = isChecked ? this.listItems.length : 0;
+                        this.countWrapper.innerText = count.toString();
+                        this._listItems.forEach(item => {
+                            item.selected = isChecked;
+                        })
+                    }
+                    }/>}</div>}
                 {this.buttonsWrapper = <div className="buttons-wrapper"/>}
             </div>
         </div>;
@@ -111,7 +116,7 @@ export class MbList extends Component {
         this.buttonsWrapper.innerHTML = buttonHtml.join('');
     }
 
-    private calcCount(){
+    private calcCount() {
         let count = this.listItems.filter(item => item.selected).length;
         this.countWrapper.innerText = count.toString();
     }
@@ -129,7 +134,8 @@ export class MbList extends Component {
                 },
                 ajax: {
                     fun: page.ajaxFun,
-                    ajaxData: page.ajaxData
+                    ajaxData: page.ajaxData,
+                    auto: true
                 }
             });
     }
@@ -197,13 +203,15 @@ export class MbList extends Component {
     protected createListItem(para: IMbListItemPara) {
         para = Object.assign({}, para, {
             container: this.wrapper,
-            list:this,
+            list: this,
             isImg: this.isImg,
             isCheckBox: this.multiple,
             btns: this.para.itemButtons,
             buttonClick: (index) => {
                 tools.isFunction(this.para.itemClick) && this.para.itemClick(index);
-            }
+            },
+            imgLabelColor:this.para.imgLabelColor,
+            statusColor:this.para.statusColor
         });
         return new MbListItem(para);
     }

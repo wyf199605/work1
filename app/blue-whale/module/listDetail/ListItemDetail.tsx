@@ -60,21 +60,23 @@ export class ListItemDetail {
                     pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
                 });
                 BwRule.Ajax.fetch(url).then(({response}) => {
-                    let res: obj = {};
-                    let meta = response.body.bodyList[0].meta,
-                        dataTab = response.body.bodyList[0].dataList[0];
-                    for (let i = 0, len = meta.length; i < len; i++) {
-                        res[meta[i]] = dataTab[i];
-                    }
-                    if (this.para.uiType === 'detail') {
-                        this.totalNumber = response.head.totalNum;
-                    }
-                    this.defaultData = res;
-                    if (tools.isNotEmpty(res)) {
-                        let cells = this.cells;
-                        for (let key in cells) {
-                            let field = fields.filter((f) => f.name === key)[0];
-                            data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
+                    if(tools.isNotEmpty(response.body.bodyList[0])){
+                        let res: obj = {};
+                        let meta = response.body.bodyList[0].meta,
+                            dataTab = response.body.bodyList[0].dataList[0];
+                        for (let i = 0, len = meta.length; i < len; i++) {
+                            res[meta[i]] = dataTab[i];
+                        }
+                        if (this.para.uiType === 'detail') {
+                            this.totalNumber = response.head.totalNum;
+                        }
+                        this.defaultData = res;
+                        if (tools.isNotEmpty(res)) {
+                            let cells = this.cells;
+                            for (let key in cells) {
+                                let field = fields.filter((f) => f.name === key)[0];
+                                data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
+                            }
                         }
                     }
                     resolve(data);

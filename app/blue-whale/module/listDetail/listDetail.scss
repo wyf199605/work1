@@ -106,6 +106,7 @@
             display: -webkit-flex;
             align-items: center;
             justify-content: center;
+            flex: 0 0 auto;
             i {
               font-size: 36px;
             }
@@ -116,9 +117,14 @@
             flex-direction: column;
             justify-content: space-around;
             height: 100%;
+            width: calc(100% - 100px);
             .file-name {
               color: #333333;
               font-size: 16px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              width: 100%;
             }
             .file-size {
               color: #b0b0b0;
@@ -129,6 +135,7 @@
             color: #333333;
             font-size: 35px;
             position: absolute;
+            flex: 0 0 auto;
             right: 0;
           }
         }

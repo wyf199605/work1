@@ -4,9 +4,12 @@ import {MbListItemData} from "../../../global/components/mbList/MbListItem";
 import tools = G.tools;
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import {MbList} from "../../../global/components/mbList/MbList";
+import {BwRule} from "../../common/rule/BwRule";
 
 export interface IBwMbList extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
+    ajaxData?: obj;
 }
 
 export class BwMbList extends Component {
@@ -15,14 +18,61 @@ export class BwMbList extends Component {
     }
 
     private isImgTpl: boolean = false;
-    private layout: IBW_Layout = {};
+    private layout: obj = {};
     private captions: string[] = [];
+    private imgLabelColor: string = '';
+    private statusColor: string = '';
 
-    constructor(para: IBwMbList) {
+    constructor(private para: IBwMbList) {
         super(para);
         this.getButtons(para.ui.body.elements[0].subButtons);
         this.handlerLayout(para.ui.body.elements[0].layout, para.ui.body.elements[0].cols);
         tools.isNotEmpty(this.layout['body']) && this.getBodyCaption(this.layout, para.ui.body.elements[0].cols);
+        this.initMbList();
+    }
+
+    private mbList: MbList = null;
+
+    private initMbList() {
+        let multiButtons = [], itemButtons = [];
+        this.allButtons[1] && this.allButtons[1].forEach(btn => {
+            itemButtons.push(btn.caption);
+        });
+        this.allButtons[2] && this.allButtons[2].forEach(btn => {
+            multiButtons.push(btn.caption);
+        });
+        this.mbList = new MbList({
+            isImg: this.isImgTpl,
+            itemButtons: itemButtons,
+            multiButtons: multiButtons,
+            container: this.wrapper,
+            statusColor:this.statusColor,
+            imgLabelColor:this.imgLabelColor,
+            dataManager: {
+                pageSize: 20,
+                render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
+                    this.mbList.render(this.getListData(this.layout, data, this.captions));
+                },
+                ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
+                    return new Promise<{ data: obj[], total: number }>((resolve, reject) => {
+                        let dataAddr: R_ReqAddr = this.para.ui.body.elements[0].dataAddr,
+                            url = BW.CONF.siteUrl + BwRule.reqAddr(dataAddr, custom);
+                        url = tools.url.addObj(url, {
+                            pageparams: '{"index"=' + (current + 1) + ', "size"=' + pageSize + ',"total"=1}'
+                        });
+                        BwRule.Ajax.fetch(url).then(({response}) => {
+                            let body = response.body,
+                                head = response.head;
+                            resolve({
+                                total: head.totalNum,
+                                data: this.handlerResponseData(body)
+                            })
+                        })
+                    })
+                },
+                ajaxData: this.para.ajaxData || {}
+            }
+        })
     }
 
     // 处理按钮，数组一：无数据按钮，数组二：单选数据按钮，数组三：多选按钮
@@ -52,11 +102,19 @@ export class BwMbList extends Component {
         for (let key in layout) {
             tools.isNotEmpty(layout[key]) && (validLayout[key] = layout[key]);
         }
-        tools.isNotEmpty(layout['img']) && (this.isImgTpl = true);
-        return layout;
+        tools.isNotEmpty(validLayout['img']) && (this.isImgTpl = true);
+        if (tools.isNotEmpty(validLayout['imgLabel'])) {
+            let {r, g, b} = tools.val2RGB(validLayout['imgLabelColor']);
+            this.imgLabelColor ='#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
+        }
+        if (tools.isNotEmpty(validLayout['statusColor'])) {
+            let {r, g, b} = tools.val2RGB(validLayout['statusColor']);
+            this.statusColor = '#' +  parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
+        }
+        this.layout = validLayout;
     }
 
-    private handlerResponseData({body,head,errorCode}) {
+    private handlerResponseData(body: obj) {
         let dataList: [string][] = body.bodyList[0].dataList,
             meta: string[] = body.bodyList[0].meta,
             data: obj[] = [];
@@ -77,7 +135,7 @@ export class BwMbList extends Component {
                 captions.push(cols.filter((c) => c.name === field)[0].caption);
             })
         }
-        return captions;
+        this.captions = captions;
     }
 
     private getListData(layout: IBW_Layout, data: obj[], captions?: string[]): MbListItemData[] {
@@ -114,7 +172,9 @@ export class BwMbList extends Component {
                     }
                         break;
                     case 'img': {
-                        itemObj['img'] = item[layout['img']];
+                        let field = layout['img'],
+                            md5 = item[field];
+                        itemObj['img'] = tools.isNotEmpty(md5) ? BwRule.fileUrlGet(md5, field) : '';
                     }
                         break;
                     case 'imgLabel': {
@@ -134,5 +194,13 @@ export class BwMbList extends Component {
             listData.push(itemObj);
         });
         return listData;
+    }
+
+    destroy() {
+        this.layout = null;
+        this.allButtons = null;
+        this.mbList.destroy();
+        this.mbList = null;
+        super.destroy();
     }
 }

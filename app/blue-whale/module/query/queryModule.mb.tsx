@@ -131,6 +131,7 @@ export = class QueryModuleMb extends QueryModule {
             // body : <div></div>,
             className: 'modal-mbPage queryBuilder',
             isBackground: false,
+            zIndex : 500,
             isShow: this.para.qm.autTag !== 0
         });
         this.mbPage = new MbPage({
