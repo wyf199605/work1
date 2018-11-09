@@ -361,7 +361,13 @@ export class NewTableModule {
     bwEl: IBW_Table;
 
     refresh(data?: obj) {
-        return this.main.refresh(data)
+        // 刷新主表
+        let o = this.main.refresh(data);
+        // 刷新子表
+        !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
+        let row = this.main.ftable.rowGet(this.subIndex);
+        this.subRefresh(row.data);
+        return o;
     }
 
     editBtns = (() => {
@@ -871,10 +877,6 @@ export class NewTableModule {
                     BwRule.checkValue(response, saveData, () => {
                         // 刷新主表
                         this.refresh();
-                        // 刷新子表
-                        !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
-                        let row = this.main.ftable.rowGet(this.subIndex);
-                        this.subRefresh(row.data);
                         Modal.toast(response.msg);
                         this.editBtns.end();
                         // loading && loading.destroy();
