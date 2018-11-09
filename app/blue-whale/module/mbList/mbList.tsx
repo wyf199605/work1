@@ -2,10 +2,12 @@
 
 import {MbListItemData} from "../../../global/components/mbList/MbListItem";
 import tools = G.tools;
+import d = G.d;
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {MbList} from "../../../global/components/mbList/MbList";
 import {BwRule} from "../../common/rule/BwRule";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 
 export interface IBwMbList extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
@@ -22,15 +24,42 @@ export class BwMbList extends Component {
     private captions: string[] = [];
     private imgLabelColor: string = '';
     private statusColor: string = '';
+    private isMulti: boolean = false;
 
     constructor(private para: IBwMbList) {
         super(para);
         this.getButtons(para.ui.body.elements[0].subButtons);
+        this.initGlobalButtons();
         this.handlerLayout(para.ui.body.elements[0].layout, para.ui.body.elements[0].cols);
         tools.isNotEmpty(this.layout['body']) && this.getBodyCaption(this.layout, para.ui.body.elements[0].cols);
         this.initMbList();
+        this.initEvents.on();
     }
 
+    // 创建全局按钮
+    private initGlobalButtons() {
+        let globalButtons = this.allButtons[0] || [],
+            globalButtonWrapper = <div className="global-buttons-wrapper"/>,
+            btnArr = [];
+        globalButtons.forEach((btn, index) => {
+            let className = '';
+            switch (index) {
+                case 1: {
+                    className = 'clear-data';
+                }
+                    break;
+                case 2: {
+                    className = 'add-data';
+                }
+                    break;
+            }
+            btnArr.push(`<div class="global-btn-item ${className}" data-index="${index}">${btn.caption}</div>`);
+        });
+        globalButtonWrapper.innerHTML = btnArr.join('');
+        this.wrapper.appendChild(globalButtonWrapper);
+    }
+
+    // 创建列表
     private mbList: MbList = null;
 
     private initMbList() {
@@ -41,15 +70,19 @@ export class BwMbList extends Component {
         this.allButtons[2] && this.allButtons[2].forEach(btn => {
             multiButtons.push(btn.caption);
         });
+        let wrapper:HTMLElement;
+        d.append(this.wrapper,wrapper = <div className="mblist-page-mblist-wrapper"/>);
         this.mbList = new MbList({
             isImg: this.isImgTpl,
+            isMulti: this.isMulti,
             itemButtons: itemButtons,
             multiButtons: multiButtons,
-            container: this.wrapper,
+            container: wrapper,
             statusColor: this.statusColor,
             imgLabelColor: this.imgLabelColor,
             dataManager: {
-                pageSize: 20,
+                pageSize: 10,
+                isPulldownRefresh: true,
                 render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
@@ -94,6 +127,7 @@ export class BwMbList extends Component {
                     break;
             }
         });
+        buttons[2].length > 0 && (this.isMulti = true);
         this.allButtons = buttons;
     }
 
@@ -156,10 +190,10 @@ export class BwMbList extends Component {
                     case 'label': {
                         let labelField: string[] = layout['label'],
                             labelData = [];
-                        labelField.forEach((field, index) => {
-                            labelData.push(item[field]);
+                        labelField.forEach((field) => {
+                            item[field] && labelData.push(item[field]);
                         });
-                        itemObj['label'] = labelField;
+                        itemObj['label'] = labelData;
                     }
                         break;
                     case 'title': {
@@ -196,11 +230,29 @@ export class BwMbList extends Component {
         return listData;
     }
 
+    private initEvents = (() => {
+        let globalBtnClick = (e) => {
+            let index = parseInt(d.closest(e.target, '.global-btn-item').dataset.index),
+                buttons = this.allButtons[0] || [];
+            // 全局按钮不需要数据
+            // ButtonAction.get().clickHandle(buttons[index],{});
+        };
+        return {
+            on :()=>{
+                d.on(this.wrapper,'click','.global-buttons-wrapper .global-btn-item',globalBtnClick);
+            },
+            off:()=>{
+                d.off(this.wrapper,'click','.global-buttons-wrapper .global-btn-item',globalBtnClick);
+            }
+        }
+    })();
+
     destroy() {
         this.layout = null;
         this.allButtons = null;
         this.mbList.destroy();
         this.mbList = null;
+        this.initEvents.off();
         super.destroy();
     }
 }

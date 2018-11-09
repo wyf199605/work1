@@ -191,6 +191,7 @@ export class MbList extends Component {
             this._multiple = flag;
             this._listItems.forEach((item, index) => {
                 item.isShowCheckBox = flag;
+                item.isShowBtns = flag;
             });
         }
     }

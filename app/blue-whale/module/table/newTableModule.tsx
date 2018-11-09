@@ -171,9 +171,9 @@ export class NewTableModule {
                             }
                         });
                         if (!tools.isMb) {
-                            d.query('ul.nav-tabs').appendChild(<i className="fa fa-expand full-icon"/>);
+                            d.query('ul.nav-tabs',this.subWrapper).appendChild(<i className="fa fa-expand full-icon"/>);
                             let i = <i title="点击展开按钮" className="iconfont icon-arrow-up full-icon"/>;
-                            d.query('ul.nav-tabs').appendChild(i);
+                            d.query('ul.nav-tabs',this.subWrapper).appendChild(i);
                             d.on(i, 'click', () => {
                                 i.classList.toggle('icon-arrow-up');
                                 i.classList.toggle('icon-arrow-down');
