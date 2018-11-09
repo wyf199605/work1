@@ -31,9 +31,7 @@ export interface IDrawFormatData{
 export class PlanModule extends Component{
 
     wrapperInit(){
-        return <div className="plan-content">
-            {this.btnWrapper = <div class="plan-opera"/>}
-        </div>;
+        return <div className="plan-content"/>;
     }
 
     protected btnWrapper: HTMLElement;
@@ -46,10 +44,14 @@ export class PlanModule extends Component{
     constructor(para: IPlanModulePara){
         super(para);
         let ui = this.ui = para.ui;
-        this.isEditPlan = tools.isNotEmpty(ui.tableAddr.param);
+        this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
 
-        this.plotBtn.init();
-        this.plotBtn.disabled = true;
+        if(this.isEditPlan){
+            this.btnWrapper = <div class="plan-opera"/>;
+            d.append(this.wrapper, this.btnWrapper);
+            this.plotBtn.init();
+            this.plotBtn.disabled = true;
+        }
         this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
     }
 
@@ -61,6 +63,7 @@ export class PlanModule extends Component{
             height: 500,
             width: 800,
             container: this.wrapper,
+            isShow: !this.isEditPlan,
             format: (data: obj) => {
                 let res: IDrawFormatData[] = [];
                 cols && cols.forEach((col) => {
@@ -130,8 +133,8 @@ export class PlanModule extends Component{
                 }
             }
             console.log(data);
-            this.draw.render(data);
             this.plotBtn.disabled = false;
+            this.draw.render(data);
         }).catch(e => {
             console.log(e);
         })
@@ -209,9 +212,11 @@ export class PlanModule extends Component{
 
         let editBtnToggle = (isEdit: boolean) => {
             plotBox && (plotBox.disabled = isEdit);
-            editBox.getItem('edit').isDisabled = isEdit;
-            editBox.getItem('save').isDisabled = !isEdit;
-            editBox.getItem('cancel').isDisabled = !isEdit;
+            if(editBox){
+                editBox.getItem('edit').isDisabled = isEdit;
+                editBox.getItem('save').isDisabled = !isEdit;
+                editBox.getItem('cancel').isDisabled = !isEdit;
+            }
             // plotBox.getItem('end-drawing').isDisabled = !isEdit;
             // plotBox.getItem('star-drawing').isDisabled = !isEdit;
             // plotBox.getItem('star-edit').isDisabled = isEdit;

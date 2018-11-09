@@ -212,6 +212,7 @@ export = class LabelPrintModule {
      * @param {string} type
      * @param {Spinner} sp
      */
+    protected labelList = [];
     private doAjax(url: string, type: string, sp: Spinner) {
         let self = this,
             userInp = self.userInputValObj;
@@ -221,6 +222,7 @@ export = class LabelPrintModule {
         BwRule.Ajax.fetch(url)
             .then(({response}) => {
                 self.template = JSON.stringify(response);
+                self.labelList = response.body.bodyList[0].selectFields;
                 //设置页面分布数据
                 self.pageData = Object.assign({
                     labelWidth: response.body.bodyList[0].width * 3.78,
@@ -265,9 +267,9 @@ export = class LabelPrintModule {
         let self = this,
             printList = self.para.printList[self.labelType],
             tempTemplateData,
-            shouldLength = shouldData.length;
-            // selectFieldNames = printList.selectFields,
-            // isAjax: boolean = false; // 判断selectFieldNames中的所有字段在表格中是否存在  都存在直接使用表格数据，不存在则请求后台
+            shouldLength = shouldData.length,
+            selectFieldNames = this.labelList,
+            isAjax: boolean = false; // 判断selectFieldNames中的所有字段在表格中是否存在  都存在直接使用表格数据，不存在则请求后台
 
 
         // 循环替换模板数据
@@ -352,28 +354,41 @@ export = class LabelPrintModule {
             }
         }
 
-        let fileds = self.para.cols.map((col) => col.content);
-
-        BwRule.Ajax.fetch(CONF.siteUrl + tempUrl, {
-            data2url: ajaxObj.varType !== 3,
-            // type: 'GET',
-            data: ajaxObj.ajaxData,
-        }).then(({response}) => {
-            if ((response.data instanceof Array) && response.data.length > 0) {
-                dealData(formatData(response.data));
+        let colName = self.para.cols.map((col) => col.name);
+        //判断selectFieldNames中所有字段是否在表格字段中都存在
+        for (let j = 0; j < selectFieldNames.length; j++) {
+            if (selectFieldNames[j] && selectFieldNames[j].atrrs) {
+                if (colName.indexOf(selectFieldNames[j].atrrs.fieldName) === -1) {
+                    isAjax = true;
+                    break;
+                }
             }
-            else {
-                Modal.toast("暂无数据");
+        }
+        // isAjax = true;
+        if (isAjax) {
+            BwRule.Ajax.fetch(CONF.siteUrl + tempUrl, {
+                data2url: ajaxObj.varType !== 3,
+                // type: 'GET',
+                data: ajaxObj.ajaxData,
+            }).then(({response}) => {
+                if ((response.data instanceof Array) && response.data.length > 0) {
+                    dealData(formatData(response.data));
+                }
+                else {
+                    Modal.toast("暂无数据");
+                    sp.hide();//隐藏预览按钮loading
+                }
+            }).catch(() => {
                 sp.hide();//隐藏预览按钮loading
-            }
-        }).catch(() => {
-            sp.hide();//隐藏预览按钮loading
-        });
-
+            });
+        }
+        else {
+            dealData(formatData(shouldData));
+        }
 
         function formatData(data: obj[]) {
             let moneys = {};
-            fileds.forEach((field) => {
+            selectFieldNames.forEach((field) => {
                 if (field.atrrs && field.atrrs.dataType === '11') {
                     moneys[field.atrrs.fieldName] = field.atrrs.displayFormat || '';
                 }
