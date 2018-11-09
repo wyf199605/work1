@@ -205,32 +205,32 @@ export class NewTableModule {
                             } else {
                                 this.tab.active(0);
                             }
+                            if (!tools.isMb) {
+                                d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
+                                    let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
+
+                                    let sub = this.sub[this.subTabActiveIndex],
+                                        isShow = sub ? sub.ftable.btnShow : true;
+                                    sub && (sub.ftable.btnShow = true);
+
+                                    new Modal({
+                                        body: tabEl,
+                                        className: 'full-screen sub-table-full',
+                                        header: {
+                                            title: '子表全屏'
+                                        },
+                                        onClose: () => {
+                                            sub && (sub.ftable.btnShow = isShow);
+                                            this.sub[this.subTabActiveIndex].ftable.removeAllModal();
+                                            d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
+                                            this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                                        }
+                                    });
+                                    this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                                });
+                            }
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
-                        }
-                        if (!tools.isMb) {
-                            d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
-                                let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
-
-                                let sub = this.sub[this.subTabActiveIndex],
-                                    isShow = sub && sub.ftable.btnShow;
-                                sub && (sub.ftable.btnShow = true);
-
-                                new Modal({
-                                    body: tabEl,
-                                    className: 'full-screen sub-table-full',
-                                    header: {
-                                        title: '子表全屏'
-                                    },
-                                    onClose: () => {
-                                        sub && (sub.ftable.btnShow = isShow);
-                                        this.sub[this.subTabActiveIndex].ftable.removeAllModal();
-                                        d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
-                                        this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                                    }
-                                });
-                                this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                            });
                         }
                     }, 200);
                 });
