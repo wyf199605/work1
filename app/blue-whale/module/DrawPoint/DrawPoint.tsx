@@ -43,7 +43,7 @@ export class DrawPoint extends Component {
     private LV;
     private LR;
     public zoom;
-    private editStatus:boolean;
+    private isShowStatus:boolean;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -67,6 +67,7 @@ export class DrawPoint extends Component {
             .range([5.5, 1])
         this.line = D3.svg.line();
         //拖动
+        this.isShowStatus = para.isShow
          this.ZoomStart(para);
          this.InitDrag();
          this.InitSvg(para);
@@ -98,7 +99,7 @@ export class DrawPoint extends Component {
             })
 
 
-        this.g = this.svg.append('g').attr('class', 'g-wrapper');
+        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none");
         this.g.append('image').attr('href', para.image).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
@@ -168,7 +169,7 @@ export class DrawPoint extends Component {
         //如果为false 则为展示状态  （增加小图标，显示边框 ，区域颜色）
 
         let size = this.map.size();
-        for(let i = 0; i < size; i++){
+        for(let i = 0; i <= size; i++){
             this.map.remove(i)
         }
         if (!this.g.selectAll('g').empty()) {
@@ -180,11 +181,14 @@ export class DrawPoint extends Component {
         this.index = data.length || 0;//初始化index
         this.keyDownEvent.on();
         this.keyUpEvent.on();
+        this.fishe = true;
+
         let points = [],
             svg = D3.select('svg').select('g');
         if (tools.isEmpty(data)) {
             return
         }
+        //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d);
             let point = [],
@@ -198,12 +202,12 @@ export class DrawPoint extends Component {
                     }
                 }).forEach((data) => {
                 //  需要用到有point的data
-                if (data.isPoint) {
+                if (data.isPoint && data.data) {
                         group.append('path').datum(data.name)
                             .attr("class", 'line')
                             .attr('fill', 'white')
                             .attr('style',function (d) {
-                                if(!data.isShow){
+                                if(!data.isShow && that.isShowStatus){
                                     return 'stroke:none';
                                 }else {
                                     return 'stroke:teeblue';
@@ -216,45 +220,54 @@ export class DrawPoint extends Component {
                             .attr("d", (d, i) => {
                                 point = data.data;
                                 this.map.set(index, data.data)
-                                return this.line(data.data)
+                                return that.line(data.data)
                             })
                         // 判断是否是编辑状态
                         //显示边框 以及 背景颜色
-                        if(!this.editStatus){
-                            group.append("text").attr('class','iconfont icon-dianpubiaoji')
-                                .attr('font-family','iconfont')
-                                .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
-                                .attr('fill','firebrick')
-                                .text("\ue6e1").on('click',function (d) {
-                                alert('这是小图标');
-                            }).on('mouseover',function (d) {
-                                D3.select(this).transition().attr('y',80).ease("bounce");
-                            }).on('mouseout',function (d) {
-                                D3.select(this).transition().attr('y',84).ease("bounce");
-                            })
+                        if(this.isShowStatus){
+                            this.InitIcon(group,point);
+                            // group.append("text").attr('class','iconfont icon-dianpubiaoji')
+                            //     .attr('font-family','iconfont')
+                            //     .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
+                            //     .attr('fill','firebrick')
+                            //     .text("\ue6e1").on('click',function (d) {
+                            //     alert('这是小图标');
+                            // }).on('mouseover',function (d) {
+                            //     D3.select(this).transition().attr('y',80).ease("bounce");
+                            // }).on('mouseout',function (d) {
+                            //     D3.select(this).transition().attr('y',84).ease("bounce");
+                            // })
 
                         }
 
-                } else if(data.isShow && tools.isNotEmpty(data.data)){
+                } else if(data.isShow && tools.isNotEmpty(data.data) && tools.isNotEmpty(point)){
+
                     //绘字
                          I++;
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
-                        .attr('font-size', '14px')
+                        .attr('font-size', '8px')
                         .attr("text-anchor", "middle")
                         .attr('x', (d, i) => {
                             return this.findCenter(point)[0]
 
                         })
                         .attr('y', (d, i) => {
-                            return this.findCenter(point)[1] - 10;
+                            return this.findCenter(point)[1] - 30;
                         })
                         .attr('dx', 5)
                         .attr('dy', 16 * I)
                         .text(function (d) {
                             return data.data;
 
-                        })
+                        }).style("pointer-events","none");
+                }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
+                    //并且是查看状态下
+                    group.select('path').attr('fill',function (d) {
+                        return data.bgColor;
+                    }).attr('fill-opacity',function (d) {
+                        return '0.56'
+                    })
                 }
             })
 
@@ -262,19 +275,44 @@ export class DrawPoint extends Component {
         //this.editEvent.on();
 
     }
-    private InitIcon(group,points){
-        //找到小图标位置的方法
+    private setIconPos(str){
+        let max = 0,maxStr = [];
+        if (str.length >= 0) {
+            for (let i = 0; i < str.length; i++) {
+                //先找最高点或者最低点(右边 )
+                 max =  str[i][0] + str[i][1];
+                 maxStr.push(max)
+            }
 
-        group.append("text").attr('class','iconfont icon-tuodong')
+           let val = Math.min(...maxStr),
+              index =  maxStr.indexOf(val)
+            return str[index];
+
+        }
+
+    }
+
+    private InitIcon(group,points){
+        let x = this.setIconPos(points)[0],
+            y = this.setIconPos(points)[1];
+        group.append("text").attr('class','iconfont icon-dianpubiaoji')
             .attr('font-family','iconfont')
-            .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
-            .attr('fill','firebrick')
-            .text("\ue63a").on('click',function (d) {
-            alert('这是小图标');
+            .attr('x',()=>{
+              return x;
+            }).attr('y',()=>{
+            return y;
+        }).attr('width',45).attr('height',45)
+            .attr('fill','#666666')
+            .text("\ue6e1")
+            .on('mouseover',function (d) {
+               D3.select(this).transition().attr('y',y+4).ease("bounce");
+            }).on('mouseout',function (d) {
+            D3.select(this).transition().attr('y',y).ease("bounce");
+            }).on('click',function (d) {
+            alert('这是小图标')
         })
     }
     private OnDragText(){
-        debugger
         this.selectedG.selectAll('text').remove();
         this.selectedG.attr('id', (data)=>{
                 let point = this.map.get(this.index),
@@ -300,7 +338,7 @@ export class DrawPoint extends Component {
 
                             })
                             .attr('y', (d, i) => {
-                                return this.findCenter(point)[1] - 15;
+                                return this.findCenter(point)[1] - 35;
                             })
                             .attr('dx', 5)
                             .attr('dy', 16 * I)
@@ -373,8 +411,7 @@ export class DrawPoint extends Component {
 
 
     public createPath() {
-        let that = this,
-            index = this.map.size();
+        let that = this
         if (!this.isDrawLine) {
             return;
         }
@@ -447,7 +484,7 @@ export class DrawPoint extends Component {
         //    }
         //
         this.points = [];
-        this.index = this.map.size();
+        this.index = this.map.size() + 1;
         this.isDrawLine = false;
         this.map.get(currentIndex);
         this.editEvent.off();
@@ -479,9 +516,9 @@ export class DrawPoint extends Component {
         //    }
         //
         this.points = [];
-        this.index = this.map.size();
+        this.index = this.map.size() + 1;
         this.isDrawLine = false;
-        this.map.get(currentIndex);
+       // this.map.get(currentIndex);
         this.editEvent.off();
         this.fishe = true;
 
@@ -565,7 +602,12 @@ export class DrawPoint extends Component {
                 this.selected = d;
                 this.redraw();
                 //this.selectedG && (this.showData(this._data,this.selectedG));
-                _this.selectedG &&  _this.OnDragText();
+                if(_this.selectedG){
+                    let val = _this.selectedG.attr('class');
+                    if(val !== 'insert'){
+                        _this.OnDragText();
+                    }
+                }
                 D3.event.sourceEvent.stopPropagation();
             })
             .on("drag", function (d, i) {

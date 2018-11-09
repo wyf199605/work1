@@ -2,7 +2,6 @@
   padding-left: 0px;
   padding-right: 0px;
   height: calc(100% - 23px);
-
   .custom-button{
     box-shadow: 0px 2px 3px #c8c8c8 inset !important;
     border-radius: 4%;
@@ -50,6 +49,9 @@
         margin: 0 auto;
         display: block;
         g{
+          .iconfont{
+            font-size: 25px;
+          }
           .selected{
             fill: #e60c0c;
             stroke: #ca3025;
