@@ -79,8 +79,6 @@ export class DetailModal {
                         callback: (flag) => {
                             if (flag){
                                 modal.isShow = false;
-                                this.destroy();
-                                tools.isFunction(para.cancel) && para.cancel();
                             }
                         }
                     })
@@ -104,7 +102,7 @@ export class DetailModal {
         };
 
         let modal = new Modal({
-            header: tools.isMb ? void 0 : para.fm.caption + ' - 编辑',
+            header: para.fm.caption + ' - 编辑',
             width: tools.isMb ? void 0 : '600px',
             height: tools.isMb ? void 0 : '500px',
             isMb: tools.isMb,
@@ -112,6 +110,10 @@ export class DetailModal {
             isModal: tools.isMb,
             isOnceDestroy: true,
             body: formWrapper,
+            onClose:()=>{
+                this.destroy();
+                tools.isFunction(para.cancel) && para.cancel();
+            },
             footer: tools.isMb ? {
                 leftPanel: [footButtons.leftPanel],
                 rightPanel: [footButtons.rightPanel]
