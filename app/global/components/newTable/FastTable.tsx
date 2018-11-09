@@ -2822,9 +2822,12 @@ export class FastTable extends Component {
                 let isChange = this.rows[index].cells.some((cell: TableDataCell) => cell.isEdited);
                 if(!isChange){
                     let index = this.data[cell.row.index][TableBase.GUID_INDEX];
-                    if (this.edit.addIndex.get().indexOf(index) > -1) {
-                        this.edit.addIndex.del(index);
-                    }else if(this.edit.changeIndex.get().indexOf(index) > -1){
+                    // if (this.edit.addIndex.get().indexOf(index) > -1) {
+                    //     this.edit.addIndex.del(index);
+                    // }else if(this.edit.changeIndex.get().indexOf(index) > -1){
+                    //     this.edit.changeIndex.del(index);
+                    // }
+                    if(this.edit.changeIndex.get().indexOf(index) > -1){
                         this.edit.changeIndex.del(index);
                     }
                 }
