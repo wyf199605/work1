@@ -68,7 +68,7 @@ export class MbListItem extends Component {
                         {this.details['body'] = <div className="list-detail-item list-item-body"/>}
                         {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
                         {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
-                        {this.details['status'] = <div className="list-detail-item list-item-status" style={statusColor} />}
+                        {this.details['status'] = <div className="list-detail-item list-item-status" style={tools.isNotEmpty(para.statusColor) ? statusColor : {}} />}
                     </div>
                 </div>
             </div>
@@ -121,10 +121,10 @@ export class MbListItem extends Component {
             let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
             if(tools.isNotEmpty(data.imgLabel)){
-                let imgLabelColor={
+                let imgLabelColor= {
                     backgroundColor:this.para.imgLabelColor
                 };
-                d.append(this.imgWrapper, <div className='img-label' style={imgLabelColor}>{data.imgLabel}</div>);
+                d.append(this.imgWrapper, <div className='img-label' style={tools.isNotEmpty(this.para.imgLabelColor) ? imgLabelColor : {}}>{data.imgLabel}</div>);
             }
         }
 

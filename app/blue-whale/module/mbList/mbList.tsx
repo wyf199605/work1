@@ -46,8 +46,8 @@ export class BwMbList extends Component {
             itemButtons: itemButtons,
             multiButtons: multiButtons,
             container: this.wrapper,
-            statusColor:this.statusColor,
-            imgLabelColor:this.imgLabelColor,
+            statusColor: this.statusColor,
+            imgLabelColor: this.imgLabelColor,
             dataManager: {
                 pageSize: 20,
                 render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
@@ -103,13 +103,13 @@ export class BwMbList extends Component {
             tools.isNotEmpty(layout[key]) && (validLayout[key] = layout[key]);
         }
         tools.isNotEmpty(validLayout['img']) && (this.isImgTpl = true);
-        if (tools.isNotEmpty(validLayout['imgLabel'])) {
+        if (tools.isNotEmpty(validLayout['imgLabelColor'])) {
             let {r, g, b} = tools.val2RGB(validLayout['imgLabelColor']);
-            this.imgLabelColor ='#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
+            this.imgLabelColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
         }
         if (tools.isNotEmpty(validLayout['statusColor'])) {
             let {r, g, b} = tools.val2RGB(validLayout['statusColor']);
-            this.statusColor = '#' +  parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
+            this.statusColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
         }
         this.layout = validLayout;
     }
