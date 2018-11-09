@@ -171,7 +171,6 @@ export class Hints{
 
     private ajax = new BwRule.Ajax();
     private ajaxLoad(index : number){
-        debugger
         let data = this.dataMap[index];
         if(!data){
             return;
