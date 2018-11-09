@@ -362,6 +362,7 @@ export class Modal extends Component {
                 if (isAdaptiveCenter) {
                     wrapper.style.left = '50%';
                     wrapper.style.transform = 'translateX(-50%)';
+                    wrapper.style.webkitTransform = 'translateX(-50%)';
                 } else {
                     wrapper.style.left = (paWidth - elWidth) / 2 + 'px';
                 }
@@ -375,6 +376,7 @@ export class Modal extends Component {
                     wrapper.style.left = '50%';
                     wrapper.style.top = '50%';
                     wrapper.style.transform = 'translateX(-50%) translateY(-50%)';
+                    wrapper.style.webkitTransform = 'translateX(-50%) translateY(-50%)';
                 } else {
                     wrapper.style.left = (paWidth - elWidth) / 2 + 'px';
                     wrapper.style.top = (paHeight - elHeight) / 2 + 'px';
@@ -435,18 +437,6 @@ export class Modal extends Component {
                 wrapper.style.bottom = '0';
                 wrapper.style.top = '0';
                 wrapper.style.borderRadius = '0';
-                break;
-            // 兼容安卓低版本居中
-            case 'comCenter':
-                if (isAdaptiveCenter) {
-                    wrapper.style.left = '0';
-                    wrapper.style.right = '0';
-                    wrapper.style.transform = '';
-                    wrapper.style.maxWidth = '75vw'
-                } else {
-                    wrapper.style.left = (paWidth - elWidth) / 2 + 'px';
-                }
-                wrapper.style.top = `80px`;
                 break;
         }
         //模态框的出现方式依赖于position，因而position改变必须置于isShow之前\
