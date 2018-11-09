@@ -52,7 +52,6 @@ export class Hints{
             content : '上一条',
             type :  'primary',
             onClick : () => {
-                this.ajaxLoad(this.index - 1);
                 this.tab.active(this.index - 1);
             }
         });
@@ -60,7 +59,6 @@ export class Hints{
             content : '下一条',
             type :  'primary',
             onClick : () => {
-                this.ajaxLoad(this.index + 1);
                 this.tab.active(this.index + 1);
             }
         });
@@ -103,7 +101,6 @@ export class Hints{
         this.modal.onClose = () => {
             this.modal.destroy();
         };
-
         let tabs = [];
         para.data.dataMap.forEach(obj => {
            tabs.push({
@@ -119,7 +116,6 @@ export class Hints{
                 this.ajaxLoad(index);
             }
         });
-        this.ajaxLoad(this.index);
     }
 
     /**
@@ -175,6 +171,7 @@ export class Hints{
 
     private ajax = new BwRule.Ajax();
     private ajaxLoad(index : number){
+        debugger
         let data = this.dataMap[index];
         if(!data){
             return;
