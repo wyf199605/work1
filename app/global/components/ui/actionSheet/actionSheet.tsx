@@ -36,12 +36,15 @@ export class ActionSheet extends Modal {
     //  创建ActionSheet
     private createActionSheet(para: IActionSheet) {
         this.actionSheetWrapper = <div className="action-sheet-wrapper"/>;
+        let line = 1;
         if (tools.isNotEmptyArray(para.buttons)) {
             let buttonsWrapper = <div className="action-sheet-buttons"/>;
             d.append(this.actionSheetWrapper, buttonsWrapper);
             if (para.buttons.length > 9) {
                 // 如果按钮大于9个 则单行滑动显示
                 buttonsWrapper.classList.add('single-line');
+            }else{
+                line = Math.ceil(para.buttons.length/3);
             }
             // 将各个按钮添加到action-sheet-buttons中
             para.buttons.forEach((item, index) => {
@@ -54,7 +57,7 @@ export class ActionSheet extends Modal {
         }
         d.append(this.actionSheetWrapper, <div className="action-sheet-cancel">取消</div>);
         this.bodyWrapper.appendChild(this.actionSheetWrapper);
-        this.wrapper.style.height = window.getComputedStyle(this.actionSheetWrapper).height;
+        this.wrapper.style.setProperty('height',(line * 95 + 20 + 44) + 'px','important');
     }
     private initEvents = (() => {
         let buttonClick = (e) => {

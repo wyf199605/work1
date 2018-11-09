@@ -918,7 +918,8 @@ export class BwTableModule extends Component {
                         })()
                     }
                 }
-                let queryCols = this.ui.querier.queryparams0 || this.ui.querier.queryparams1 || this.ui.querier.atvarparams;
+                let queryCols = this.ui.querier.queryparams0 || this.ui.querier.queryparams1
+                    || this.ui.querier.atvarparams || initQueryConfigs(getCols());
                 require(['QueryBuilder'], (QueryBuilder) => {
                     builder = new QueryBuilder.QueryBuilder({
                         queryConfigs: queryCols, // 查询字段名、值等一些配置，后台数据直接传入

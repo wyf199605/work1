@@ -435,6 +435,9 @@ export class Com{
      * @param {boolean} isOverLay true时候不清除原提示信息，如f6用券后提示已使用券
      */
     static logTip(str: string, isRed = false, isOverLay = false) {
+        if(tools.isEmpty(str)){
+            return;
+        }
         let modalTip = d.query('.modal-short-tip');
         if (modalTip) {
             if (!isOverLay) {
@@ -529,14 +532,16 @@ export class Com{
      * 主界面右下方异步加载效果
      * @param {boolean} isShow
      */
+    static loadCount : number = 0;
     static loading(isShow = true){
+        isShow ? Com.loadCount ++ : Com.loadCount --;
         if(!Com.loadingEl){
             Com.loadingEl = d.query('.log-loading');
         }
         if(!Com.loadingEl){
             return
         }
-        d.classToggle(Com.loadingEl, 'loading', isShow);
+        d.classToggle(Com.loadingEl, 'loading', isShow && Com.loadCount !== 0);
     }
 
     /**
