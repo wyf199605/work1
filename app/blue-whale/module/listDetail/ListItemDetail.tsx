@@ -136,7 +136,6 @@ export class ListItemDetail {
                 actionBtns.push({
                     content: b.caption,
                     onClick: () => {
-                        self.actionSheet.isShow = false;
                         subBtnEvent(isPage ? index : index + 2);
                     }
                 })

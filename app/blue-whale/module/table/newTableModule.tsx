@@ -366,7 +366,7 @@ export class NewTableModule {
         // 刷新子表
         !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
         let row = this.main.ftable.rowGet(this.subIndex);
-        this.subRefresh(row.data);
+        row && this.subRefresh(row.data);
         return o;
     }
 

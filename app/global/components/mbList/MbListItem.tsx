@@ -6,6 +6,7 @@ import tools = G.tools;
 import {CheckBox} from "../form/checkbox/checkBox";
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import {ActionSheet} from "../ui/actionSheet/actionSheet";
 
 export interface IMbListItemPara extends IComponentPara{
     list?: MbList;
@@ -14,7 +15,7 @@ export interface IMbListItemPara extends IComponentPara{
     isImg?: boolean;
     isCheckBox?: boolean;
     btns?: string[];
-    buttonClick?:(index)=>void;
+    buttonClick?:(btnIndex:number,itemIndex:number)=>void;
     imgLabelColor?:string;
     statusColor?:string;
 }
@@ -25,7 +26,7 @@ export interface MbListItemData{
     title?: string;
     img?: string;
     imgLabel?: string;
-    status?: number;
+    status?: string;
     countDown?: number;
 }
 
@@ -207,24 +208,46 @@ export class MbListItem extends Component {
 
     // 初始化按钮配置
     initBtn(btns: string[]){
-        let btnWrapper:HTMLElement;
-        this.btnWrapper = <div className="btn-group">{btnWrapper = <div className="buttons-wrapper"/>}</div>
-        let btnsArr = [];
-        btns.forEach((btn,index) => {
-            btnsArr.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${btn}</div>`);
-        });
-        btnWrapper.innerHTML = btnsArr.join('');
-        this.wrapper.appendChild(this.btnWrapper);
+        if (tools.isNotEmptyArray(btns)){
+            let btnWrapper:HTMLElement;
+            this.btnWrapper = <div className="btn-group">{btnWrapper = <div className="buttons-wrapper"/>}</div>;
+            let btnsArr = [];
+            if (btns.length <= 2){
+                btns.forEach((btn,index) => {
+                    btnsArr.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${btn}</div>`);
+                });
+            }else{
+                let showButtons = btns.slice(0,2);
+                btnsArr.push(`<div class="more-btn">更多</div>`);
+                showButtons.forEach((item, index) => {
+                    btnsArr.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
+                });
+            }
+            btnWrapper.innerHTML = btnsArr.join('');
+            this.wrapper.appendChild(this.btnWrapper);
+        }
     }
 
     private initEvents = (()=>{
         let clickEvent = (e)=>{
             let index = parseInt(d.closest(e.target,'.item-button').dataset.index);
-            tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index);
+            tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index,this.index);
+        };
+        let clickMore = (e)=>{
+            if (this.para.list){
+                this.para.list.itemActionSheet.isShow = true;
+                this.para.list.currentSelectItemIndex = this.index;
+            }
         };
         return {
-            on:()=>d.on(this.wrapper,'click','.btn-group .item-button',clickEvent),
-            off:()=>d.off(this.wrapper,'click','.btn-group .item-button',clickEvent)
+            on:()=>{
+                d.on(this.wrapper,'click','.btn-group .item-button',clickEvent);
+                d.on(this.wrapper,'click','.btn-group .more-btn',clickMore);
+            },
+            off:()=>{
+                d.off(this.wrapper,'click','.btn-group .item-button',clickEvent);
+                d.off(this.wrapper,'click','.btn-group .more-btn',clickMore);
+            }
         }
     })();
     destroy(){
