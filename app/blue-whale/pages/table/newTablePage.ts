@@ -85,7 +85,7 @@ export class BwTableElement extends Component{
                         }
 
                         let loading = new Loading({
-                            msg: '查询中..'
+                            msg: '查询中...'
                         });
 
                         return BwRule.Ajax.fetch(G.tools.url.addObj(url, ajaxData), {

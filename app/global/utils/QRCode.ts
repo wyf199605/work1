@@ -16,10 +16,10 @@ interface codePara{
 }
 export class QrCode{
     private g:SVGElement;
-    constructor(svgDom:SVGSVGElement,loc:locPara,sty:codePara){
+    constructor(svgDom:SVGGElement | SVGSVGElement,loc:locPara,sty:codePara){
         this.init(svgDom,loc,sty);
     }
-    private init(svgDom:SVGSVGElement,loc:locPara,sty:codePara){
+    private init(svgDom:SVGGElement | SVGSVGElement,loc:locPara,sty:codePara){
         this.g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         let qrcode = new QRCode(this.g, {
             width : loc.w,
