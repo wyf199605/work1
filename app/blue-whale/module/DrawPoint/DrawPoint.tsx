@@ -253,7 +253,7 @@ export class DrawPoint extends Component {
 
                         })
                         .attr('y', (d, i) => {
-                            return this.findCenter(point)[1] - 10;
+                            return this.findCenter(point)[1] - 30;
                         })
                         .attr('dx', 5)
                         .attr('dy', 16 * I)
@@ -302,7 +302,7 @@ export class DrawPoint extends Component {
             }).attr('y',()=>{
             return y;
         }).attr('width',45).attr('height',45)
-            .attr('fill','firebrick')
+            .attr('fill','#666666')
             .text("\ue6e1")
             .on('mouseover',function (d) {
                D3.select(this).transition().attr('y',y+4).ease("bounce");
@@ -338,7 +338,7 @@ export class DrawPoint extends Component {
 
                             })
                             .attr('y', (d, i) => {
-                                return this.findCenter(point)[1] - 15;
+                                return this.findCenter(point)[1] - 35;
                             })
                             .attr('dx', 5)
                             .attr('dy', 16 * I)
