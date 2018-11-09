@@ -2,7 +2,7 @@ $cancel-height: 44px;
 .action-sheet-wrapper {
   width: 100%;
   position: absolute;
-  min-height: 160px;
+  height: auto;
   bottom: 0;
   background-color: #f2f2f2;
   .action-sheet-buttons {
