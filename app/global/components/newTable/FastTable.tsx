@@ -619,6 +619,7 @@ export class FastTable extends Component {
             this.render(0, 1, this.rows.length === 0 ? -1 : i);
             this.initDisabledEditorRow(this.rows[i]);
             this._drawSelectedCells();
+            // 新增行
             typeof len === 'number' && this.edit.addIndex.add(this.data[i][TableBase.GUID_INDEX]);
             return len;
         } else if (tools.isNotEmpty(obj)) {
@@ -671,11 +672,14 @@ export class FastTable extends Component {
                     let addIndexObj = this.edit.addIndex,
                         changeIndexObj = this.edit.changeIndex;
                     if (addIndexObj.get().indexOf(guidIndex) > -1) {
+                        // 删除行时，若是新增的行则从新增的行中去除
                         addIndexObj.del(guidIndex);
                     } else if (changeIndexObj.get().indexOf(guidIndex) > -1) {
+                        // 删除行时，若行已编辑过，则先清除编辑的行，再添加至删除的行中
                         changeIndexObj.del(guidIndex);
                         this.edit.delIndex.add(guidIndex, data);
                     } else {
+                        // 添加删除的行
                         this.edit.delIndex.add(guidIndex, data);
                     }
                 }
@@ -2809,6 +2813,8 @@ export class FastTable extends Component {
                     let index = this.data[ev.row][TableBase.GUID_INDEX];
                     let addIndexes = this.edit.addIndex.get(),
                         changeIndexes = this.edit.changeIndex.get();
+
+                    // 编辑数据时，若该条数据未加入新增或编辑中，则加入编辑行中
                     if (addIndexes.indexOf(index) === -1 && changeIndexes.indexOf(index) === -1) {
                         this.edit.changeIndex.add(index);
                     }
@@ -2827,6 +2833,8 @@ export class FastTable extends Component {
                     // }else if(this.edit.changeIndex.get().indexOf(index) > -1){
                     //     this.edit.changeIndex.del(index);
                     // }
+
+                    // 修改数据时，若数据无改变，则删除编辑的行
                     if(this.edit.changeIndex.get().indexOf(index) > -1){
                         this.edit.changeIndex.del(index);
                     }
