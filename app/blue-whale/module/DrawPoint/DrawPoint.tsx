@@ -43,7 +43,7 @@ export class DrawPoint extends Component {
     private LV;
     private LR;
     public zoom;
-    private editStatus:boolean;
+    private isShowStatus:boolean;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -67,6 +67,7 @@ export class DrawPoint extends Component {
             .range([5.5, 1])
         this.line = D3.svg.line();
         //拖动
+        this.isShowStatus = para.isShow
          this.ZoomStart(para);
          this.InitDrag();
          this.InitSvg(para);
@@ -98,7 +99,7 @@ export class DrawPoint extends Component {
             })
 
 
-        this.g = this.svg.append('g').attr('class', 'g-wrapper');
+        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none");
         this.g.append('image').attr('href', para.image).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
@@ -168,7 +169,7 @@ export class DrawPoint extends Component {
         //如果为false 则为展示状态  （增加小图标，显示边框 ，区域颜色）
 
         let size = this.map.size();
-        for(let i = 0; i < size; i++){
+        for(let i = 0; i <= size; i++){
             this.map.remove(i)
         }
         if (!this.g.selectAll('g').empty()) {
@@ -187,6 +188,7 @@ export class DrawPoint extends Component {
         if (tools.isEmpty(data)) {
             return
         }
+        //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d);
             let point = [],
@@ -200,12 +202,12 @@ export class DrawPoint extends Component {
                     }
                 }).forEach((data) => {
                 //  需要用到有point的data
-                if (data.isPoint) {
+                if (data.isPoint && data.data) {
                         group.append('path').datum(data.name)
                             .attr("class", 'line')
                             .attr('fill', 'white')
                             .attr('style',function (d) {
-                                if(!data.isShow){
+                                if(!data.isShow && that.isShowStatus){
                                     return 'stroke:none';
                                 }else {
                                     return 'stroke:teeblue';
@@ -218,11 +220,11 @@ export class DrawPoint extends Component {
                             .attr("d", (d, i) => {
                                 point = data.data;
                                 this.map.set(index, data.data)
-                                return this.line(data.data)
+                                return that.line(data.data)
                             })
                         // 判断是否是编辑状态
                         //显示边框 以及 背景颜色
-                        if(!this.editStatus){
+                        if(this.isShowStatus){
                             this.InitIcon(group,point);
                             // group.append("text").attr('class','iconfont icon-dianpubiaoji')
                             //     .attr('font-family','iconfont')
@@ -238,13 +240,13 @@ export class DrawPoint extends Component {
 
                         }
 
-                } else if(data.isShow && tools.isNotEmpty(data.data)){
+                } else if(data.isShow && tools.isNotEmpty(data.data) && tools.isNotEmpty(point)){
 
                     //绘字
                          I++;
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
-                        .attr('font-size', '14px')
+                        .attr('font-size', '8px')
                         .attr("text-anchor", "middle")
                         .attr('x', (d, i) => {
                             return this.findCenter(point)[0]
@@ -258,8 +260,8 @@ export class DrawPoint extends Component {
                         .text(function (d) {
                             return data.data;
 
-                        })
-                }else if(tools.isNotEmpty(data.bgColor)){
+                        }).style("pointer-events","none");
+                }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
                     //并且是查看状态下
                     group.select('path').attr('fill',function (d) {
                         return data.bgColor;
@@ -409,8 +411,7 @@ export class DrawPoint extends Component {
 
 
     public createPath() {
-        let that = this,
-            index = this.map.size();
+        let that = this
         if (!this.isDrawLine) {
             return;
         }
@@ -483,7 +484,7 @@ export class DrawPoint extends Component {
         //    }
         //
         this.points = [];
-        this.index = this.map.size();
+        this.index = this.map.size() + 1;
         this.isDrawLine = false;
         this.map.get(currentIndex);
         this.editEvent.off();
@@ -515,9 +516,9 @@ export class DrawPoint extends Component {
         //    }
         //
         this.points = [];
-        this.index = this.map.size();
+        this.index = this.map.size() + 1;
         this.isDrawLine = false;
-        this.map.get(currentIndex);
+       // this.map.get(currentIndex);
         this.editEvent.off();
         this.fishe = true;
 
@@ -601,7 +602,12 @@ export class DrawPoint extends Component {
                 this.selected = d;
                 this.redraw();
                 //this.selectedG && (this.showData(this._data,this.selectedG));
-                _this.selectedG &&  _this.OnDragText();
+                if(_this.selectedG){
+                    let val = _this.selectedG.attr('class');
+                    if(val !== 'insert'){
+                        _this.OnDragText();
+                    }
+                }
                 D3.event.sourceEvent.stopPropagation();
             })
             .on("drag", function (d, i) {
