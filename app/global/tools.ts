@@ -259,7 +259,7 @@ namespace G {
                         isRemove = param1 ? param1 === '2' : false;
 
                     return tools.isEmpty(data[key]) ? '' :
-                        (isRemove ? self.removeHtmlTags(data[key]) :
+                        (isRemove ? self.htmlEncode(self.removeHtmlTags(data[key])) :
                             (isEn ? self.htmlEncode(data[key]) : data[key]));
                 });
             },
