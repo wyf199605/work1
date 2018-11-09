@@ -362,12 +362,12 @@ export class NewTableModule {
 
     refresh(data?: obj) {
         // 刷新主表
-        let o = this.main.refresh(data);
-        // 刷新子表
-        !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
-        let row = this.main.ftable.rowGet(this.subIndex);
-        row && this.subRefresh(row.data);
-        return o;
+        return this.main.refresh(data).then(() => {
+            // 刷新子表
+            !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
+            let row = this.main.ftable.rowGet(this.subIndex);
+            row && this.subRefresh(row.data);
+        });
     }
 
     editBtns = (() => {
