@@ -366,8 +366,10 @@ export class NewTableModule {
         return this.main.refresh(data).then(() => {
             // 刷新子表
             !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
+            let ftable = this.main.ftable;
             let row = this.main.ftable.rowGet(this.subIndex);
             row && this.subRefresh(row.data);
+            this.subWrapper && this.subWrapper.classList.toggle('hide', !row);
         });
     }
 
