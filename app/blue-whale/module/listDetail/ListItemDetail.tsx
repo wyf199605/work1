@@ -60,7 +60,7 @@ export class ListItemDetail {
                     pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
                 });
                 BwRule.Ajax.fetch(url).then(({response}) => {
-                    if(tools.isNotEmpty(response.body.bodyList[0])){
+                    if(tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)){
                         let res: obj = {};
                         let meta = response.body.bodyList[0].meta,
                             dataTab = response.body.bodyList[0].dataList[0];
@@ -332,7 +332,7 @@ export class ListItemDetail {
                 if (tools.isNotEmpty(text)){
                     let addrArr = text.split(','),
                         arr = [];
-                    addrArr.forEach(md5 => {
+                    tools.isNotEmpty(addrArr) && addrArr.forEach(md5 => {
                         // 根据md5获取文件地址
                         arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
                     });

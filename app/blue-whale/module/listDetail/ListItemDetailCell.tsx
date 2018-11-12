@@ -93,7 +93,7 @@ export class ListItemDetailCell extends Component {
             d.append(imgsWrapper, <i className="appcommon app-zanwushuju"/>);
             return;
         }
-        if (Array.isArray(value)) {
+        if (Array.isArray(value) && tools.isNotEmpty(value)) {
             value.forEach((v) => {
                 d.append(imgsWrapper, <img src={v} alt={this.para.caption}/>);
             })
@@ -127,7 +127,7 @@ export class ListItemDetailCell extends Component {
                     ]
                 });
             }
-            value.forEach((f, index) => {
+            Array.isArray(value) && value.forEach((f, index) => {
                 d.append(fileWrapper, <div className="detail-cell-file-item" data-index={index}>
                     <div className="file-icon"><i className="appcommon app-wenjian"/></div>
                     <div className="file-info">

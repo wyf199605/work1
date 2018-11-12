@@ -23,7 +23,7 @@ export class BwMbList extends Component {
     private layout: obj = {};
     private captions: string[] = [];
     private imgLabelColor: string = '';
-    private statusColor: string = '';
+    // private statusColor: string = '';
     private isMulti: boolean = false;
 
     constructor(private para: IBwMbList) {
@@ -38,25 +38,27 @@ export class BwMbList extends Component {
 
     // 创建全局按钮
     private initGlobalButtons() {
-        let globalButtons = this.allButtons[0] || [],
-            globalButtonWrapper = <div className="global-buttons-wrapper"/>,
-            btnArr = [];
-        globalButtons.forEach((btn, index) => {
-            let className = '';
-            switch (index) {
-                case 1: {
-                    className = 'clear-data';
+        let globalButtons = this.allButtons[0] || [];
+        if (tools.isNotEmpty(globalButtons)) {
+            let globalButtonWrapper = <div className="global-buttons-wrapper"/>,
+                btnArr = [];
+            globalButtons.forEach((btn, index) => {
+                let className = '';
+                switch (index) {
+                    case 1: {
+                        className = 'clear-data';
+                    }
+                        break;
+                    case 2: {
+                        className = 'add-data';
+                    }
+                        break;
                 }
-                    break;
-                case 2: {
-                    className = 'add-data';
-                }
-                    break;
-            }
-            btnArr.push(`<div class="global-btn-item ${className}" data-index="${index}">${btn.caption}</div>`);
-        });
-        globalButtonWrapper.innerHTML = btnArr.join('');
-        this.wrapper.appendChild(globalButtonWrapper);
+                btnArr.push(`<div class="global-btn-item ${className}" data-index="${index}">${btn.caption}</div>`);
+            });
+            globalButtonWrapper.innerHTML = btnArr.join('');
+            this.wrapper.appendChild(globalButtonWrapper);
+        }
     }
 
     // 创建列表
@@ -70,16 +72,17 @@ export class BwMbList extends Component {
         this.allButtons[2] && this.allButtons[2].forEach(btn => {
             multiButtons.push(btn.caption);
         });
-        let wrapper:HTMLElement;
-        d.append(this.wrapper,wrapper = <div className="mblist-page-mblist-wrapper"/>);
+        let wrapper: HTMLElement;
+        d.append(this.wrapper, wrapper = <div className="mblist-page-mblist-wrapper"/>);
+        if (tools.isNotEmpty(this.allButtons[0])){
+            wrapper.classList.add('global-buttons-height');
+        }
         this.mbList = new MbList({
             isImg: this.isImgTpl,
             isMulti: this.isMulti,
             itemButtons: itemButtons,
             multiButtons: multiButtons,
             container: wrapper,
-            statusColor: this.statusColor,
-            imgLabelColor: this.imgLabelColor,
             dataManager: {
                 pageSize: 10,
                 isPulldownRefresh: true,
@@ -116,7 +119,7 @@ export class BwMbList extends Component {
         subButtons.forEach(btn => {
             buttons[btn.multiselect].push(btn);
         });
-        if (buttons[2].length > 0){
+        if (buttons[2].length > 0) {
             this.isMulti = true;
             buttons[1] = buttons[1].concat(buttons[2]);
         }
@@ -129,14 +132,6 @@ export class BwMbList extends Component {
             tools.isNotEmpty(layout[key]) && (validLayout[key] = layout[key]);
         }
         tools.isNotEmpty(validLayout['img']) && (this.isImgTpl = true);
-        if (tools.isNotEmpty(validLayout['imgLabelColor'])) {
-            let {r, g, b} = tools.val2RGB(validLayout['imgLabelColor']);
-            this.imgLabelColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
-        }
-        if (tools.isNotEmpty(validLayout['statusColor'])) {
-            let {r, g, b} = tools.val2RGB(validLayout['statusColor']);
-            this.statusColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
-        }
         this.layout = validLayout;
     }
 
@@ -208,13 +203,22 @@ export class BwMbList extends Component {
                     }
                         break;
                     case 'countDown': {
-                        itemObj['countDown'] = item[layout['countDown']];
+                        itemObj['countDown'] = new Date(item[layout['countDown']]).getTime();
                     }
                         break;
                     case 'status': {
-
+                        let field = layout['status'],md5 = item[field];
+                        itemObj['status'] = tools.isNotEmpty(md5) ? BwRule.fileUrlGet(md5, field) : '';
                     }
                         break;
+                    case  'imgLabelColor':{
+                        let imgLabelColor = layout['imgLabelColor'];
+                        if (tools.isNotEmpty(imgLabelColor)) {
+                            let {r, g, b} = tools.val2RGB(item[imgLabelColor]);
+                            this.imgLabelColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
+                        }
+                    }
+                    break;
                 }
             }
             listData.push(itemObj);
@@ -230,11 +234,11 @@ export class BwMbList extends Component {
             // ButtonAction.get().clickHandle(buttons[index],{});
         };
         return {
-            on :()=>{
-                d.on(this.wrapper,'click','.global-buttons-wrapper .global-btn-item',globalBtnClick);
+            on: () => {
+                d.on(this.wrapper, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
             },
-            off:()=>{
-                d.off(this.wrapper,'click','.global-buttons-wrapper .global-btn-item',globalBtnClick);
+            off: () => {
+                d.off(this.wrapper, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
             }
         }
     })();
