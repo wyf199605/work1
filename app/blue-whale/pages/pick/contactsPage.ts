@@ -30,6 +30,7 @@ export = class contactsPage {
         let self = this,
             list = d.query('#list');
             //传给后台参数
+        let tmpName = '__HIGHLIGHT_NAME__';
         list.style.height = '100%';
         list.style.overflow = 'auto';
         list.style.position = 'relative';
@@ -282,7 +283,7 @@ export = class contactsPage {
                                     str += ', ';
                                 }
                             });
-                            data[treeField[level]] = str;
+                            data[tmpName] = str;
                             tmpData.push(data);
                         });
                         res.data = tmpData;
@@ -327,6 +328,7 @@ export = class contactsPage {
                 let ul = dom.querySelector('ul.mui-table-view'),
                     idField = levelField[level],
                     nameField = treeField[level],
+                    highlightName = (data[0] && tmpName in data[0]) ? tmpName : nameField,
                     isLeaf = nameField === treeField[treeField.length - 1],
                     createHTML = (<HTMLScriptElement>d.query(isLeaf ? '#leaf' : '#notLeaf')).text,
                     subId, subName, parentId;
@@ -417,7 +419,7 @@ export = class contactsPage {
                     if(para.levelField === ''){
                         if(para.recursion === 1){
                             parseData = {
-                                name: data[subName],
+                                name: data[highlightName],
                                 level: level,
                                 id : data[subId],
                                 valueJson: JSON.stringify(data)
@@ -430,7 +432,7 @@ export = class contactsPage {
                                 id = data[parentField] + data[field];
                             }
                             parseData = {
-                                name: data[treeField[level]],
+                                name: data[highlightName],
                                 level: level,
                                 id : id,
                                 valueJson: JSON.stringify(data)
@@ -440,7 +442,7 @@ export = class contactsPage {
                     }else {
                         //数据每次点击后加载
                         parseData = {
-                            name: data[nameField],
+                            name: data[highlightName],
                             from: data[fromField],
                             level: level,
                             valueJson: JSON.stringify(data)
@@ -463,7 +465,7 @@ export = class contactsPage {
                     //颜色处理
                     if(~Object.keys(data).indexOf(BwRule.ColorField)){
                         let {r, g, b} = tools.val2RGB(data[BwRule.ColorField]);
-                        parseData.name = data[nameField]
+                        parseData.name = data[highlightName]
                             + `<span style="height: 14px;display: inline-block;margin-left: 10px;height: 14px; width:50px; background: rgb(${r},${g},${b})"></span>`;
                     }
                     // parseData.valueJson && (parseData.valueJson = tools.str.htmlEncode(parseData.valueJson));
