@@ -7,7 +7,6 @@ import tools = G.tools;
 import d = G.d;
 import {ActionSheet} from "../../../global/components/ui/actionSheet/actionSheet";
 import sys = BW.sys;
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {ListItemDetail} from "./ListItemDetail";
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
@@ -121,9 +120,7 @@ export class ListItemDetailCell extends Component {
                                         type:this.para.field.link.type
                                     });
                                 }else{
-                                    sys.window.open({
-                                        url: BW.CONF.siteUrl + this.currentFile.addr
-                                    });
+                                    sys.window.download(BW.CONF.siteUrl + this.currentFile.addr);
                                 }
                             }
                         }

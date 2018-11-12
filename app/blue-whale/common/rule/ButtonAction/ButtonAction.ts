@@ -416,7 +416,6 @@ export class ButtonAction {
             isOnceDestroy: true,
             width: width,
             isAdaptiveCenter: true,
-            position : tools.isMb ? 'comCenter' : null,
             isMb: false,
         };
         if(tools.isMb){

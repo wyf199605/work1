@@ -114,20 +114,12 @@ export class BwMbList extends Component {
     private getButtons(subButtons: R_Button[]) {
         let buttons: [R_Button[], R_Button[], R_Button[]] = [[], [], []];
         subButtons.forEach(btn => {
-            switch (btn.multiselect) {
-                case 0:
-                case 1: {
-                    buttons[btn.multiselect].push(btn);
-                }
-                    break;
-                case 2: {
-                    buttons[2].push(btn);
-                    buttons[1].push(btn);
-                }
-                    break;
-            }
+            buttons[btn.multiselect].push(btn);
         });
-        buttons[2].length > 0 && (this.isMulti = true);
+        if (buttons[2].length > 0){
+            this.isMulti = true;
+            buttons[1] = buttons[1].concat(buttons[2]);
+        }
         this.allButtons = buttons;
     }
 

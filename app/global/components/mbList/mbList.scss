@@ -1,22 +1,19 @@
 .mb-list-wrapper {
-  .select-box{
+  .select-box {
     font-size: 14px !important;
   }
-  .select-box .check-span.label-checkbox::before{
+  .select-box .check-span.label-checkbox::before {
     border-radius: 50%;
   }
-  .select-box input[type=checkbox]:checked + .check-span::after{
+  .select-box input[type=checkbox]:checked + .check-span::after {
     background-color: #ff9c00;
     color: #ffffff;
     border-radius: 50%;
   }
   &.button-wrapper {
-    padding-bottom: 70px;
-  }
-  &.button-wrapper.select {
     padding-bottom: 115px;
   }
-  .list-batch-wrapper{
+  .list-batch-wrapper {
     position: fixed;
     bottom: 0;
     z-index: 2;
@@ -26,7 +23,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    .statistic{
+    .statistic {
       height: 45px;
       display: flex;
       width: 100%;
@@ -35,8 +32,16 @@
       color: #666666;
       border-top: solid 1px #e2e2e2;
       padding-left: 16px;
-      span{
-        color: #ff9c00;
+      .count-wrapper {
+        span {
+          color: #ff9c00;
+        }
+      }
+      .select-all {
+        .check-text {
+          font-size: 14px;
+        }
+        margin-right: 10px;
       }
     }
     .list-buttons {
@@ -44,16 +49,10 @@
       width: 100%;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       padding: 0 16px;
       box-shadow: 0px 3px 7px 0px rgba(0, 0, 0, 0.13);
       border-top: solid 1px #e2e2e2;
-      .select-all {
-        flex: 0 0 auto;
-        .check-text {
-          font-size: 14px;
-        }
-      }
     }
   }
   .btn-group {
@@ -62,33 +61,31 @@
     width: 100%;
     .buttons-wrapper {
       border-top: 1px solid #e2e2e2;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      height: 100%;
+      flex: 1 1 auto;
     }
   }
-  .buttons-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    height: 100%;
-    flex: 1 1 auto;
-    .item-button {
-      height: 40px;
-      padding-left: 20px;
-      padding-right: 20px;
-      border-radius: 20px;
-      background-color: #ffffff;
-      border: solid 1px #005bac;
-      color: #005bac;
-      margin-left: 10px;
-      text-align: center;
-      line-height: 38px;
-      font-size: 14px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      &.first {
-        background-color: #005bac;
-        color: #ffffff;
-      }
+  .item-button {
+    height: 40px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    border: solid 1px #005bac;
+    color: #005bac;
+    margin-left: 10px;
+    text-align: center;
+    line-height: 38px;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    &.first {
+      background-color: #005bac;
+      color: #ffffff;
     }
   }
   .list-item-wrapper {

@@ -214,7 +214,7 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
         if (input.hintAddr) {
             CashierRequest(input.hintAddr).then(({response}) => {
                 let msg = response && response.req && response.req.dataList && response.req.dataList[0] && response.req.dataList[0][0];
-                msg && Com.logTip(msg);
+                Com.logTip(msg);
             })
         }
 
@@ -250,10 +250,10 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
             }else {
                 Com.closeLastModalPanel();
             }
-            input.hint && Com.logTip(input.hint);
+            Com.logTip(input.hint);
         }else {
             Com.keyFlag = true;
-            input.hint && Com.logTip(input.hint);
+            Com.logTip(input.hint);
         }
     };
 
@@ -483,7 +483,7 @@ function createPanel(shortcut: IShortcutsPara, field: obj, nextField?: obj) {
             ajaxLoad(uiAddr, getMainTableData(shortcut, uiAddr.method, field))
                 .then(({response, shortcuts, padDatas}) => {
                     let openPage = () => {
-                        shortcut && shortcut.hint && Com.logTip(shortcut.hint);
+                        Com.logTip(shortcut && shortcut.hint);
                         // 下岗
                         if (uiAddr.type === 'posloginout') {
                             Com.resetCom(false);
@@ -519,7 +519,7 @@ function createPanel(shortcut: IShortcutsPara, field: obj, nextField?: obj) {
 
                 });
         }else {
-            shortcut && shortcut.hint && Com.logTip(shortcut.hint);
+            Com.logTip(shortcut && shortcut.hint);
             Com.keyFlag = true;
         }
     };
@@ -865,10 +865,16 @@ function padData(padData: IInputPad[], fieldName : string, param : obj, cb : Fun
                     if(executeAddr){
                         executeAddr['data'] = newData[0] ? newData : param;
                     }
-                    CashierRequest(executeAddr || addr).then(({response}) => {
-                        tools.isNotEmpty(response.showText) && Com.logTip(response.showText);
-                        tableOperate(response.data);
-                    });
+                    if(res.data){
+                        Com.logTip(res.showText);
+                        tableOperate(res.data);
+                    }else {
+                        CashierRequest(executeAddr || addr).then(({response}) => {
+                            Com.logTip(response.showText);
+                            tableOperate(response.data);
+                        });
+                    }
+
                 } else {
                     tableOperate(dataList);
                 }
@@ -1072,7 +1078,7 @@ function ajaxLoad(addr: R_ReqAddr, field: obj): Promise<{ response: obj, shortcu
 
     tools.isNotEmpty(field) && (addr['data'] = field);
     return CashierRequest(addr).then(({response}) => {
-        tools.isNotEmpty(response.showText) && Com.logTip(response.showText);
+        Com.logTip(response.showText);
         let elem = response.elements,
             data = elem ? elem[0] : response;
         if (elem && elem[0]) {
