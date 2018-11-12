@@ -150,8 +150,7 @@ export class NewTableModule {
                         return;
                     }
                     firstRow.selected = true;
-                    let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
-                        noLoadSub = this.noLoadSub(mftable, main);
+                   let noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)) {
                         this.tab = new Tab({
                             panelParent: tabWrapper,
@@ -159,7 +158,8 @@ export class NewTableModule {
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
-                                let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
+                                let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+                                    ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
@@ -198,6 +198,7 @@ export class NewTableModule {
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
                         if (isFirst && !noLoadSub) {
+                            let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {});
                             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
                                 let showSubSeq = selectedData[this.showSubField].split(',');
                                 this.tab.setTabsShow(showSubSeq);
@@ -205,32 +206,32 @@ export class NewTableModule {
                             } else {
                                 this.tab.active(0);
                             }
+                            if (!tools.isMb) {
+                                d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
+                                    let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
+
+                                    let sub = this.sub[this.subTabActiveIndex],
+                                        isShow = sub ? sub.ftable.btnShow : true;
+                                    sub && (sub.ftable.btnShow = true);
+
+                                    new Modal({
+                                        body: tabEl,
+                                        className: 'full-screen sub-table-full',
+                                        header: {
+                                            title: '子表全屏'
+                                        },
+                                        onClose: () => {
+                                            sub && (sub.ftable.btnShow = isShow);
+                                            this.sub[this.subTabActiveIndex].ftable.removeAllModal();
+                                            d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
+                                            this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                                        }
+                                    });
+                                    this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                                });
+                            }
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
-                        }
-                        if (!tools.isMb) {
-                            d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
-                                let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
-
-                                let sub = this.sub[this.subTabActiveIndex],
-                                    isShow = sub && sub.ftable.btnShow;
-                                sub && (sub.ftable.btnShow = true);
-
-                                new Modal({
-                                    body: tabEl,
-                                    className: 'full-screen sub-table-full',
-                                    header: {
-                                        title: '子表全屏'
-                                    },
-                                    onClose: () => {
-                                        sub && (sub.ftable.btnShow = isShow);
-                                        this.sub[this.subTabActiveIndex].ftable.removeAllModal();
-                                        d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
-                                        this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                                    }
-                                });
-                                this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                            });
                         }
                     }, 200);
                 });
@@ -362,12 +363,14 @@ export class NewTableModule {
 
     refresh(data?: obj) {
         // 刷新主表
-        let o = this.main.refresh(data);
-        // 刷新子表
-        !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
-        let row = this.main.ftable.rowGet(this.subIndex);
-        row && this.subRefresh(row.data);
-        return o;
+        return this.main.refresh(data).then(() => {
+            // 刷新子表
+            !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
+            let ftable = this.main.ftable;
+            let row = this.main.ftable.rowGet(this.subIndex);
+            row && this.subRefresh(row.data);
+            this.subWrapper && this.subWrapper.classList.toggle('hide', !row);
+        });
     }
 
     editBtns = (() => {

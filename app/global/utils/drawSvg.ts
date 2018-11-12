@@ -8,7 +8,7 @@ interface locPara{
 }
 interface svgStyle{
     width:number,
-    height:number
+    height:number,
 }
 interface fontStyle{
     fontName?:string,
@@ -36,6 +36,7 @@ interface shapeCss{
 }
 export class DrawSvg{
     private svg : SVGSVGElement;
+    private g : SVGGElement;
     private defsColor : Array<any> = [];//填充类型颜色缓存
     constructor(para : svgStyle){
         this.init(para);
@@ -67,28 +68,33 @@ export class DrawSvg{
              back.setAttribute('fill',fillColor);
              this.svg.appendChild(back);*/
 
-            this.svg.appendChild(textDom);
+            this.g.appendChild(textDom);
         }
         else{
             let textDom = <SVGSVGElement>document.createElementNS(DrawSvg.svgUrl,'text');
             this.drawText.drawNotWHText(textDom,data,sty,loc);
             this.textStyleFun['font'].call(this,textDom,sty);
-            this.svg.appendChild(textDom);
+            this.g.appendChild(textDom);
         }
     }
     icon(iconKind : number,loc : locPara){
         this.drawIcon(iconKind,loc);
+    }
+    get group(){
+        return this.g;
     }
     getSvg(){
         return this.svg;
     }
     private init(can : svgStyle){
         this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        this.g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         this.svg.setAttribute('width',`${can.width}`);
         this.svg.setAttribute('height',`${can.height}`);
         this.svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         /*document.body.innerHTML = '';
         document.body.appendChild(this.svg);*/
+        this.svg.appendChild(this.g);
     }
     private drawIcon(iconKind : number,loc : locPara){
         let svgimg = document.createElementNS('http://www.w3.org/2000/svg','image');
@@ -99,7 +105,7 @@ export class DrawSvg{
         svgimg.setAttributeNS(null,'x',`${loc.x}`);
         svgimg.setAttributeNS(null,'y',`${loc.y}`);
         svgimg.setAttributeNS(null, 'visibility', 'visible');
-        this.svg.appendChild(svgimg);
+        this.g.appendChild(svgimg);
     };
     private drawText = (function(self){
         let wrapBreak = (text: string, allWidth: number, font: number) => {
@@ -396,7 +402,7 @@ export class DrawSvg{
         let fillColor = '#' + sty['brushColor'].toString(16);
         if(this.defsColor.indexOf(fillColor) === -1){
             this.defsColor.push(fillColor);
-            this.shapeFillStyle[sty.brushStyle].call(this,fillColor,this.svg);
+            this.shapeFillStyle[sty.brushStyle].call(this,fillColor,this.g);
         }
     }
     private shapeFillStyle = (function(){

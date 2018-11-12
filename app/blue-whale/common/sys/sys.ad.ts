@@ -142,16 +142,6 @@ namespace BW{
                     toast('复制成功');
                 },
                 getGps: function (callback: Function) {
-                    self.handle('getGps', '{type:1,event:"putGps"}');
-
-                    toast('gps获取中, 请稍等');
-
-                    let timer = setTimeout(() => {
-                        d.off(window, 'putGps', handler);
-                        callback({success: false, msg: '获取gps超时, 请重试...'});
-                    }, 5000);
-
-
                     let handler = function (e: CustomEvent) {
                         d.off(window, 'putGps', handler);
                         clearInterval(timer);
@@ -162,6 +152,14 @@ namespace BW{
                         callback(json);
                     };
                     d.on(window, 'putGps', handler);
+                    self.handle('getGps', '{type:1,event:"putGps"}');
+
+                    let timer = setTimeout(() => {
+                        d.off(window, 'putGps', handler);
+                        callback({success: false, msg: '获取gps超时, 请重试...'});
+                    }, 5000);
+
+
                 },
                 openGps: function() {
                     self.handle('openGps');

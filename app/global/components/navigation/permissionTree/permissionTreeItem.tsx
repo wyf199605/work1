@@ -82,33 +82,42 @@ export class PermissionTreeItem extends Component {
         return this._parentNode;
     }
 
-    private checkBox: CheckBox = null;
 
+    private _isChecked: boolean;
+    set isChecked(ic: boolean) {
+        this._isChecked = ic;
+        this.checkBox.checked = ic;
+    }
+
+    get isChecked() {
+        return this._isChecked;
+    }
+    private checkBox: CheckBox = null;
     createText(para: IPermissionTreeItem) {
         this.checkBox = new CheckBox({
             text: para.TEXT || '',
             name: para.TEXT || '',
             value: para.ELEMENTID || '',
             container: this.textWrapper,
-            status: parseInt(para.CHECKED),
             onClick: (isChecked) => {
                 if (isChecked) {
                     let parentNode = this.parentNode;
                     while (parentNode) {
-                        this.parentNode.checkBox.checked = true;
+                        parentNode.isChecked = true;
                         parentNode = parentNode.parentNode;
                     }
                 } else {
                     this.setCheck(this.children);
                 }
             }
-        })
+        });
+        this.isChecked = parseInt(para.CHECKED) === 0 ? false : true;
     }
 
     private setCheck(children: PermissionTreeItem[]) {
         children = children || [];
         children.forEach(child => {
-            child.checkBox.checked = false;
+            child.isChecked = false;
             if (tools.isNotEmptyArray(child.children)) {
                 this.setCheck(child.children);
             }

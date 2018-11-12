@@ -59,6 +59,7 @@ interface rowAndCol {
 }
 
 export = class LabelPrintModule {
+    protected scale = 1;
     public modal: Modal;//该实例化模态框
     private previewModal;
     private pageSvgArray: any[] = [];//一张纸大小canvas的预览缓存数组
@@ -137,6 +138,7 @@ export = class LabelPrintModule {
                 content: '打印',
                 type: 'primary',
                 onClick: () => {
+                    this.scale = 10;
                     this.printHandle(okBtn);
                 }
             }),
@@ -144,6 +146,7 @@ export = class LabelPrintModule {
                 content: '预览',
                 type: 'primary',
                 onClick: () => {
+                    this.scale = 1;
                     this.previewHanle(previewBtn);
                     return false;
                 }
@@ -225,8 +228,8 @@ export = class LabelPrintModule {
                 self.labelList = response.body.bodyList[0].selectFields;
                 //设置页面分布数据
                 self.pageData = Object.assign({
-                    labelWidth: response.body.bodyList[0].width * 3.78,
-                    labelHeight: response.body.bodyList[0].height * 3.78
+                    labelWidth: response.body.bodyList[0].width * 3.78 * self.scale,
+                    labelHeight: response.body.bodyList[0].height * 3.78 * self.scale
                 }, userInp);
                 self.onePageRowAndCol = self.printUtil.onePageSize(self.pageData);//获取一张纸排布的行和列的值
                 let totalLabel = self.allTableData.length,//一共多少个标签
@@ -445,10 +448,10 @@ export = class LabelPrintModule {
      * 处理打印功能的函数
      */
     private dealPrint() {
-        if(!('BlueWhaleShell' in window || 'AppShell' in window)){
-            Modal.alert('无法连接到打印机');
-            return ;
-        }
+        // if(!('BlueWhaleShell' in window || 'AppShell' in window)){
+        //     Modal.alert('无法连接到打印机');
+        //     return ;
+        // }
         let tRow = this.onePageRowAndCol.rowNum,
             tCol = this.onePageRowAndCol.colNum,
             self = this,
@@ -490,24 +493,26 @@ export = class LabelPrintModule {
         // Array.prototype.forEach.call(this.pageSvgArray[0] && this.pageSvgArray[0].children, () =)
         if(this.pageSvgArray[0]){
             for(let svg of this.pageSvgArray[0].children){
+                // svg.querySelector('g').setAttribute('transfrom', 'scale(10, 10)');
                 svg.style.backgroundColor = '#fff';
-                let innerHTML =svg.outerHTML;
+                svg.innerHTML = new Array(4).join(svg.innerHTML);
+                let innerHTML = svg.outerHTML;
                 let image = new Image();
                 image.onload = () => {
                     let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
                     canvas.style.backgroundColor = '#fff';
-                    canvas.width = image.width * 10;
-                    canvas.height = image.height * 10;
+                    canvas.width = image.width;
+                    canvas.height = image.height;
                     let ctx = canvas.getContext("2d");
 
-                    ctx.drawImage(image, 0, 0, image.width * 10, image.height * 10); //使用画布画图
+                    ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
 
-                    let dataURL = canvas.toDataURL("image/jpeg");  //返回的是一串Base64编码的URL并指定格式
+                    let dataURL = canvas.toDataURL("image/jpeg", 1);  //返回的是一串Base64编码的URL并指定格式
 
-                    // new Modal({
-                    //     body: canvas,
-                    //     header: '展示',
-                    // });
+                    new Modal({
+                        body: canvas,
+                        header: '展示',
+                    });
 
                     canvas = null; //释放
                     console.log(dataURL);
@@ -1036,14 +1041,14 @@ export = class LabelPrintModule {
          */
         let getUserInputVal = () => {
             let tempObj = {
-                paperWidth: self.coms['width'].get() * 3.78,
-                paperHeight: self.coms['height'].get() * 3.78,
-                up: self.coms['up'].get() * 3.78,
-                down: self.coms['down'].get() * 3.78,
-                left: self.coms['left'].get() * 3.78,
-                right: self.coms['right'].get() * 3.78,
-                rowSpace: self.coms['rowSpace'].get() * 3.78,
-                colSpace: self.coms['colSpace'].get() * 3.78,
+                paperWidth: self.coms['width'].get() * 3.78 * self.scale,
+                paperHeight: self.coms['height'].get() * 3.78 * self.scale,
+                up: self.coms['up'].get() * 3.78 * self.scale,
+                down: self.coms['down'].get() * 3.78 * self.scale,
+                left: self.coms['left'].get() * 3.78 * self.scale,
+                right: self.coms['right'].get() * 3.78 * self.scale,
+                rowSpace: self.coms['rowSpace'].get() * 3.78 * self.scale,
+                colSpace: self.coms['colSpace'].get() * 3.78 * self.scale,
                 copies: self.coms['copies'].get()
             };
             self.userInputValObj = tempObj;
@@ -1059,8 +1064,8 @@ export = class LabelPrintModule {
          */
         let printLabel = (data, x: number, y: number, currentPageCanvas: number) => {
             if (data.body !== undefined) {
-                let svgWidth = data.body.bodyList[0].width * 3.78,
-                    svgHeight = data.body.bodyList[0].height * 3.78;
+                let svgWidth = data.body.bodyList[0].width * 3.78 * self.scale,
+                    svgHeight = data.body.bodyList[0].height * 3.78 * self.scale;
                 let drawSvg = new DrawSvg({
                     width: svgWidth,
                     height: svgHeight
@@ -1079,10 +1084,10 @@ export = class LabelPrintModule {
                         if ((typeof lableGraphs[j].condition) === 'undefined' || lableGraphs[j].condition) {
                             drawSvg.icon(lableGraphs[j].lgraphId,
                                 {
-                                    x: lableGraphs[j].leftPos * 3.78,
-                                    y: lableGraphs[j].topPos * 3.78,
-                                    w: lableGraphs[j].width ? lableGraphs[j].width * 3.78 : 0,
-                                    h: lableGraphs[j].height ? lableGraphs[j].height * 3.78 : 0
+                                    x: lableGraphs[j].leftPos * 3.78 * self.scale,
+                                    y: lableGraphs[j].topPos * 3.78 * self.scale,
+                                    w: lableGraphs[j].width ? lableGraphs[j].width * 3.78 * self.scale : 0,
+                                    h: lableGraphs[j].height ? lableGraphs[j].height * 3.78 * self.scale : 0
                                 }
                             );
                         }
@@ -1093,10 +1098,10 @@ export = class LabelPrintModule {
                         if ((typeof shapeData[j].condition) === 'undefined' || shapeData[j].condition) {
                             drawSvg.graph(shapeData[j].shapeKind,
                                 {
-                                    x: shapeData[j].leftPos * 3.78,
-                                    y: shapeData[j].topPos * 3.78,
-                                    w: shapeData[j].width ? shapeData[j].width * 3.78 : 0,
-                                    h: shapeData[j].height ? shapeData[j].height * 3.78 : 0
+                                    x: shapeData[j].leftPos * 3.78 * self.scale,
+                                    y: shapeData[j].topPos * 3.78 * self.scale,
+                                    w: shapeData[j].width ? shapeData[j].width * 3.78 * self.scale : 0,
+                                    h: shapeData[j].height ? shapeData[j].height * 3.78 * self.scale : 0
                                 },
                                 {
                                     brushColor: shapeData[j].brushColor !== undefined ? shapeData[j].brushColor : 0,
@@ -1112,13 +1117,13 @@ export = class LabelPrintModule {
                     for (let i = 0; i < textData.length; i++) {
                         if ((typeof textData[i].condition) === 'undefined' || textData[i].condition) {
                             let tempFont = G.tools.obj.merge({}, textData[i].font ? textData[i].font : data.body.bodyList[0].defaultFont);
-                            tempFont.fontSize = tempFont.fontSize * 3.78;
+                            tempFont.fontSize = tempFont.fontSize * 3.78 * self.scale;
                             drawSvg.text(textData[i].dataName,
                                 {
-                                    x: textData[i].leftPos * 3.78,
-                                    y: textData[i].topPos * 3.78,
-                                    w: textData[i].width ? textData[i].width * 3.78 : 0,
-                                    h: textData[i].height ? textData[i].height * 3.78 : 0
+                                    x: textData[i].leftPos * 3.78 * self.scale,
+                                    y: textData[i].topPos * 3.78 * self.scale,
+                                    w: textData[i].width ? textData[i].width * 3.78 * self.scale : 0,
+                                    h: textData[i].height ? textData[i].height * 3.78 * self.scale : 0
                                 },
                                 {
                                     alignment: textData[i].alignment !== undefined ? textData[i].alignment : 0,
@@ -1137,8 +1142,8 @@ export = class LabelPrintModule {
                 if (codeData) {
                     for (let k = 0; k < codeData.length; k++) {
                         if ((typeof codeData[k].condition) === 'undefined' || codeData[k].condition) {
-                            let x = codeData[k].leftPos * 3.78,
-                                w = codeData[k].width * 3.78;
+                            let x = codeData[k].leftPos * 3.78 * self.scale,
+                                w = codeData[k].width * 3.78 * self.scale;
                             w = w + 20 > svgWidth ? w - 20 : w;
                             switch (codeData[k].alignment) {
                                 case 0:
@@ -1152,11 +1157,11 @@ export = class LabelPrintModule {
                             }
                             if (codeData[k].codeType === 99) {
 
-                                new QrCode(drawSvg.getSvg(), {
+                                new QrCode(drawSvg.group, {
                                         x: x,
-                                        y: codeData[k].topPos * 3.78,
+                                        y: codeData[k].topPos * 3.78 * self.scale,
                                         w: w,
-                                        h: codeData[k].height * 3.78
+                                        h: codeData[k].height * 3.78 * self.scale
                                     },
                                     {
                                         codeData: codeData[k].codeData ? codeData[k].codeData : 'noData',
@@ -1164,12 +1169,12 @@ export = class LabelPrintModule {
                                     });
                             }
                             else {
-                                new BarCode(drawSvg.getSvg(),
+                                new BarCode(drawSvg.group,
                                     {
                                         x: x,
-                                        y: codeData[k].topPos * 3.78,
+                                        y: codeData[k].topPos * 3.78 * self.scale,
                                         w: w,
-                                        h: codeData[k].height * 3.78
+                                        h: codeData[k].height * 3.78 * self.scale
                                     },
                                     {
                                         codeData: codeData[k].codeData ? codeData[k].codeData : 'noData',

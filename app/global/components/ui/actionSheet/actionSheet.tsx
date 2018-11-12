@@ -66,6 +66,7 @@ export class ActionSheet extends Modal {
             if (onClick && typeof onClick === 'function') {
                 onClick();
             }
+            this.isShow = false;
         };
         let cancel = () => {
             this.isShow = false;

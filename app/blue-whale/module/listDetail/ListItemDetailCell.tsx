@@ -7,7 +7,6 @@ import tools = G.tools;
 import d = G.d;
 import {ActionSheet} from "../../../global/components/ui/actionSheet/actionSheet";
 import sys = BW.sys;
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {ListItemDetail} from "./ListItemDetail";
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
@@ -94,7 +93,7 @@ export class ListItemDetailCell extends Component {
             d.append(imgsWrapper, <i className="appcommon app-zanwushuju"/>);
             return;
         }
-        if (Array.isArray(value)) {
+        if (Array.isArray(value) && tools.isNotEmpty(value)) {
             value.forEach((v) => {
                 d.append(imgsWrapper, <img src={v} alt={this.para.caption}/>);
             })
@@ -121,16 +120,14 @@ export class ListItemDetailCell extends Component {
                                         type:this.para.field.link.type
                                     });
                                 }else{
-                                    sys.window.open({
-                                        url: BW.CONF.siteUrl + this.currentFile.addr
-                                    });
+                                    sys.window.download(BW.CONF.siteUrl + this.currentFile.addr);
                                 }
                             }
                         }
                     ]
                 });
             }
-            value.forEach((f, index) => {
+            Array.isArray(value) && value.forEach((f, index) => {
                 d.append(fileWrapper, <div className="detail-cell-file-item" data-index={index}>
                     <div className="file-icon"><i className="appcommon app-wenjian"/></div>
                     <div className="file-info">

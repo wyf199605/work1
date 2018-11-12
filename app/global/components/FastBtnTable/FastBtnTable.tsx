@@ -87,7 +87,7 @@ export class FastBtnTable extends FastTable{
         window['f'] = this;
     }
 
-    protected _btnShow: boolean;
+    protected _btnShow: boolean = true;
     get btnShow(){
         return this._btnShow;
     }
