@@ -150,8 +150,7 @@ export class NewTableModule {
                         return;
                     }
                     firstRow.selected = true;
-                    let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
-                        noLoadSub = this.noLoadSub(mftable, main);
+                   let noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)) {
                         this.tab = new Tab({
                             panelParent: tabWrapper,
@@ -159,7 +158,8 @@ export class NewTableModule {
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
-                                let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
+                                let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+                                    ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
@@ -198,6 +198,7 @@ export class NewTableModule {
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
                         if (isFirst && !noLoadSub) {
+                            let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {});
                             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
                                 let showSubSeq = selectedData[this.showSubField].split(',');
                                 this.tab.setTabsShow(showSubSeq);
