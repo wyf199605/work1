@@ -1779,7 +1779,17 @@ export class BwTableModule extends Component {
                                     }
                                 })
                             }
-                            new FlowDesigner(dataAddr);
+                            let field = btn.data.openType.split('-')[1];
+                            switch (field){
+                                case 'look':{
+                                    new FlowDesigner(dataAddr);
+                                }
+                                break;
+                                case 'design':{
+                                    new FlowDesigner();
+                                }
+                                break;
+                            }
                         } else {
                             // 通用操作按钮
                             // if (multiselect === 2 && !selectedData[0]) {
