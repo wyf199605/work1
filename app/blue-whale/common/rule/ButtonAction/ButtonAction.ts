@@ -181,7 +181,7 @@ export class ButtonAction {
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
-        if(!Array.isArray(dataObj) || dataObj.length === 1){
+        if(dataObj && (!Array.isArray(dataObj) || dataObj.length === 1)){
             addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
         }
         if(avtData){

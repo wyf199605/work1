@@ -76,7 +76,7 @@ export class DrawPoint extends Component {
             .range([3,0.5]);
          this.LR = D3.scale.linear()
             .domain([1,6])
-            .range([5,0.5])
+            .range([5,0.3])
 
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
@@ -244,6 +244,7 @@ export class DrawPoint extends Component {
 
                     //绘字
                          I++;
+
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
                         .attr('font-size', '8px')
@@ -301,7 +302,7 @@ export class DrawPoint extends Component {
               return x;
             }).attr('y',()=>{
             return y;
-        }).attr('width',45).attr('height',45)
+        }).attr('width',35).attr('height',35)
             .attr('fill','#666666')
             .text("\ue6e1")
             .on('mouseover',function (d) {
@@ -331,7 +332,7 @@ export class DrawPoint extends Component {
                         I++;
                         let text = this.selectedG.append('text').datum(data.name)
                             .attr('fill', 'black')
-                            .attr('font-size', '14px')
+                            .attr('font-size', '8px')
                             .attr("text-anchor", "middle")
                             .attr('x', (d, i) => {
                                 return this.findCenter(point)[0]
@@ -555,7 +556,6 @@ export class DrawPoint extends Component {
         //获取到当前的编辑path的下标
         // 然后把ponit的点加进去
         let that = this;
-        this.fishe = false;
         this.g.selectAll('g').on('click', function (d, i) {
             //点击完成后 不允许触发click事件
             that.indexStr = D3.select(this).select('path').attr('id');
@@ -563,6 +563,7 @@ export class DrawPoint extends Component {
             that.index = parseInt(that.indexStr.slice(4, that.indexStr.length));
             that.points = that.map.get(that.index);
             that.isDrawLine = true;
+            this.fishe = false;
             that.redraw();
             that.selectedG = D3.select(this);
             D3.select(this).attr('class',function (d) {
@@ -631,7 +632,7 @@ export class DrawPoint extends Component {
                     index++;
                     let text = sl.append('text').datum(anl.name)
                         .attr('fill', 'black')
-                        .attr('font-size', '14px')
+                        .attr('font-size', '8px')
                         .attr("text-anchor", "middle")
                         .attr('x', (d, i) => {
                             let idStr = sl.select('path').attr('id'),

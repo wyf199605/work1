@@ -13,6 +13,7 @@ import {DetailModal} from "../listDetail/DetailModal";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -53,6 +54,23 @@ export class PlanModule extends Component{
             this.plotBtn.disabled = true;
         }
         this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+        this.initSubBtn();
+    }
+
+    protected initSubBtn(){
+        let btnWrapper = d.query('.query-form',this.wrapper),
+            ui = this.ui,
+            subButtons = ui.subButtons.filter((btn) => btn.multiselect === 0);
+
+        subButtons.forEach((btnUi) => {
+            d.append(btnWrapper, <div className="form-com-item">
+                <Button icon={btnUi.icon} content={btnUi.title} data={btnUi}
+                    onClick={() => {
+                        ButtonAction.get().clickHandle(btnUi, void 0, (res) => {
+                        }, void 0 , ui.itemId);
+                }}/>
+            </div>)
+        })
     }
 
     protected initDraw(imageUrl: string){

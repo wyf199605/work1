@@ -40,9 +40,9 @@ export default class BasicPage{
         //判断是否是安卓5及以上版本才开启手势
         let version = 5;
         if(/(Android)/i.test(navigator.userAgent)){
-            let andrVersionArr = navigator.userAgent.match(/Android (\d+)\.(\d+)\.?(\d+)?/);
+            let andrVersionArr = navigator.userAgent.match(/Android\s*(\d+)/);
             //去除匹配的第一个下标的元素
-            version = andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
+            version = andrVersionArr && andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
         }
         if(/*para.subButtons && */version > 4 && tools.isMb){
             let timeOut = null;
