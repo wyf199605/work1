@@ -44,6 +44,7 @@ export class DrawPoint extends Component {
     private LR;
     public zoom;
     private isShowStatus:boolean;
+    private tooltip ;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -77,7 +78,7 @@ export class DrawPoint extends Component {
          this.LR = D3.scale.linear()
             .domain([1,6])
             .range([5,0.3])
-
+        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').style('opacity',0.0)
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
 
@@ -192,7 +193,8 @@ export class DrawPoint extends Component {
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d);
             let point = [],
-                I = 0;
+                I = 0,
+                toolData = [];
             this.format(d)
                 .sort((a) => {
                     if (a.isPoint) {
@@ -244,24 +246,64 @@ export class DrawPoint extends Component {
 
                     //绘字
                          I++;
-
+                         // if(I > 1){
+                         //     return
+                         // }
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
-                        .attr('font-size', '8px')
                         .attr("text-anchor", "middle")
                         .attr('x', (d, i) => {
                             return this.findCenter(point)[0]
 
                         })
                         .attr('y', (d, i) => {
-                            return this.findCenter(point)[1] - 30;
+                            return this.findCenter(point)[1] - 15;
                         })
                         .attr('dx', 5)
-                        .attr('dy', 16 * I)
+                        .attr('dy', 15)
                         .text(function (d) {
+                            toolData.push(data.data)
                             return data.data;
 
-                        }).style("pointer-events","none");
+                        }) .attr('font-size', function (d) {
+                            let w = group.select('path').node().getBBox().width,g = group.select('path').node().getBBox().height;
+                            console.log(w,g)
+                            let size = parseInt(w)* parseInt(g)+ '',
+                                val = parseInt(w) * parseInt(g),
+                                font;
+                            if(val < 1000){
+                                font = 2;
+                            }else if(val > 10000){
+                               font = 16;
+                            }
+                            else{
+                                font = Math.floor(val/(Math.pow(10,size.length - 1)))
+                            }
+
+                            return font + "px"
+                        }).on('mouseover',function (d) {
+                            let str = '';
+                            for(let i = 0; i < I; i++){
+                                  str += (toolData[i] + "<br/>");
+                            }
+                            that.tooltip.html(str)
+                                .style('left',(D3.event.pageX) + 'px')
+                                .style('top',(D3.event.pageY)- 10 + 'px')
+                                .style('opacity',1.0)
+                        }).on('mouseout',function (d) {
+                            that.tooltip.style('opacity',0);
+                        })
+                        .style("pointer-events",()=>{
+                            if(this.isDrawLine){
+                              return 'none'
+                            }else {
+                                return 'auto'
+                            }
+                        }).attr('fill-opacity',function (d) {
+                            if(I > 1){
+                                return 0
+                            }
+                        });
                 }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
                     //并且是查看状态下
                     group.select('path').attr('fill',function (d) {
@@ -466,24 +508,19 @@ export class DrawPoint extends Component {
         let currentIndex = this.index;
         console.log(that.selectedG);
 
-        that.selectedG && (that.selectedG.attr('class') !== 'insert') && that.selectedG.attr('id',function (d) {
-            d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(currentIndex));
-        })
-        // let dots = this.svg.select('g')
-        //     .append('g')
-        //     .attr('class',function (d,i) {
-        //         console.log(d)
-        //         return 'dot';
-        //     })
-        //    for(let i = 0;i<this.map.size();i++){
-        //       let dotsCi  =  dots.append('g').attr('class','ci'+i)
-        //        dotsCi.append("text").attr('class','iconfont icon-tuodong')
-        //            .attr('font-family','iconfont')
-        //            .attr('x',100).attr('y',100).attr('width',30).attr('height',30)
-        //            .attr('fill','firebrick')
-        //            .text("\ue63a")
-        //    }
-        //
+        // that.selectedG && (that.selectedG.attr('class') !== 'insert') && that.selectedG.attr('id',function (d) {
+        //     d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(currentIndex));
+        // })
+        if(that.selectedG){
+            if(that.selectedG.attr('class') !== 'insert'){
+                that.selectedG.attr('id',function (d) {
+                    if(d){
+                        d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(currentIndex));
+                    }
+                })
+            }
+        }
+
         this.points = [];
         this.index = this.map.size() + 1;
         this.isDrawLine = false;
@@ -624,6 +661,7 @@ export class DrawPoint extends Component {
     private showData(data, sl) {
         //这里要data放入更新区域
         //整个方法判断空编辑 或者已有编辑
+        let w = sl.node().getBBox().width,g = sl.node().getBBox().height;
         sl.selectAll('text').remove();
         let index = 0;
             this.format(data).forEach((anl, I) => {
@@ -632,7 +670,21 @@ export class DrawPoint extends Component {
                     index++;
                     let text = sl.append('text').datum(anl.name)
                         .attr('fill', 'black')
-                        .attr('font-size', '8px')
+                        .attr('font-size', function (d) {
+                            let size = parseInt(w)* parseInt(g)+ '',
+                                val = parseInt(w) * parseInt(g),
+                                font;
+                            if(val < 1000){
+                                font = 2;
+                            }else if(val > 10000){
+                                font = 16;
+                            }
+                            else{
+                                font = Math.floor(val/(Math.pow(10,size.length - 1)))
+                            }
+                                 return font + "px"
+
+                        })
                         .attr("text-anchor", "middle")
                         .attr('x', (d, i) => {
                             let idStr = sl.select('path').attr('id'),
