@@ -120,9 +120,7 @@ export class ListItemDetailCell extends Component {
                                         type:this.para.field.link.type
                                     });
                                 }else{
-                                    sys.window.open({
-                                        url: BW.CONF.siteUrl + this.currentFile.addr
-                                    });
+                                    sys.window.download(BW.CONF.siteUrl + this.currentFile.addr);
                                 }
                             }
                         }

@@ -133,18 +133,22 @@ export class DetailModal {
         });
         this.editModule = new NewMBForm(emPara);
         if (para.isAdd){
-            tools.isNotEmpty(para.fm.defDataAddrList) && BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response})=>{
-                // 字段默认值
+            if(tools.isNotEmpty(para.fm.defDataAddrList)){
+                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response})=>{
+                    // 字段默认值
+                    this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+                    // 新增时的默认值
+                    let res: obj = {};
+                    let meta = response.body.bodyList[0].meta,
+                        dataTab = response.body.bodyList[0].dataList[0];
+                    for (let i = 0, len = meta.length; i < len; i++) {
+                        res[meta[i]] = dataTab[i];
+                    }
+                    this.editModule.set(res);
+                })
+            }else{
                 this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
-                // 新增时的默认值
-                let res: obj = {};
-                let meta = response.body.bodyList[0].meta,
-                    dataTab = response.body.bodyList[0].dataList[0];
-                for (let i = 0, len = meta.length; i < len; i++) {
-                    res[meta[i]] = dataTab[i];
-                }
-                this.editModule.set(res);
-            })
+            }
         }else{
             // 字段默认值
             this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));

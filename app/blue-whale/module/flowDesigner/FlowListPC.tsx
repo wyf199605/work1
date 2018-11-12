@@ -26,8 +26,13 @@ interface FlowListPara extends BasicPagePara{
 export class FlowListPC extends BasicPage{
     private tableUIUrls:string[] = [];
     private subTables:obj = {};
+    private currentIndex:number = 0;
     constructor(para:FlowListPara){
         super(para);
+        // Shell触发的刷新事件
+        this.on(BwRule.EVT_REFRESH, () => {
+            this.subTables[this.currentIndex].refresh().catch();
+        });
         if (tools.isNotEmpty(para.elements)){
             let elements = para.elements,
                 tabsTitle = [];
@@ -44,6 +49,7 @@ export class FlowListPC extends BasicPage{
                 tabs: tabs,
                 className:'first',
                 onClick: (index) => {
+                    this.currentIndex = index;
                     if (tools.isEmpty(this.subTables[index])) {
                         // 表格不存在
                         BwRule.Ajax.fetch(this.tableUIUrls[index]).then(({response}) => {
