@@ -8,19 +8,18 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {ActionSheet} from "../ui/actionSheet/actionSheet";
 
-export interface IMbListItemPara extends IComponentPara{
+export interface IMbListItemPara extends IComponentPara {
     list?: MbList;
     index?: number;
     data?: MbListItemData;
     isImg?: boolean;
     isCheckBox?: boolean;
     btns?: string[];
-    buttonClick?:(btnIndex:number,itemIndex:number)=>void;
-    imgLabelColor?:string;
-    statusColor?:string;
+    buttonClick?: (btnIndex: number, itemIndex: number) => void;
+    // statusColor?: string;
 }
 
-export interface MbListItemData{
+export interface MbListItemData {
     body?: [string, string][];
     label?: string[];
     title?: string;
@@ -28,6 +27,7 @@ export interface MbListItemData{
     imgLabel?: string;
     status?: string;
     countDown?: number;
+    imgLabelColor?: string;
 }
 
 export class MbListItem extends Component {
@@ -43,7 +43,7 @@ export class MbListItem extends Component {
         this._index = para.index;
         this.isShowCheckBox = para.isCheckBox || false;
         this.render(para.data || {});
-        if (tools.isNotEmptyArray(para.btns)){
+        if (tools.isNotEmptyArray(para.btns)) {
             this.initBtn(para.btns);
             this.initEvents.on();
         }
@@ -53,24 +53,38 @@ export class MbListItem extends Component {
         let isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
         this._isImg = isImg;
         this.details = {};
-        let statusColor = {
-            color:para.statusColor
-        };
-        return <div className="list-item-wrapper" data-index={para.index}>
+        // let statusColor = {
+        //         color: para.statusColor
+        //     },
+        let details: HTMLElement = para.isImg ? <div className="list-item-details">
+            {this.details['title'] = <div className="list-detail-item list-item-title"/>}
+            {this.details['body'] = <div className="list-detail-item list-item-body"/>}
+            {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
+            {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
+            {/*{this.details['status'] = <div className="list-detail-item list-item-status"*/}
+                                           {/*style={tools.isNotEmpty(para.statusColor) ? statusColor : {}}/>}*/}
+            {this.details['status'] = <div className="list-detail-item list-item-status"/>}
+        </div> : <div className="list-item-details">
+            {this.details['title'] = <div className="list-detail-item list-item-title"/>}
+            <div className="list-item-details-status-wrapper">
+                <div className="list-item-details-status-content">
+                    {this.details['body'] = <div className="list-detail-item list-item-body"/>}
+                    {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
+                    {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
+                </div>
+                {this.details['status'] = <div className="list-detail-item list-item-status"/>}
+            </div>
+        </div>;
+        return <div className={para.isImg ? 'list-item-wrapper' : 'list-item-wrapper status-tpl'}
+                    data-index={para.index}>
             <div className="list-item-body-container">
-                {this.checkBox = <CheckBox className="hide" onClick={(isChecked)=>{
+                {this.checkBox = <CheckBox className="hide" onClick={(isChecked) => {
                     para.list && para.list.setSelectStatus(isChecked);
                 }
                 }/>}
                 <div className="list-item-content">
                     {this.imgWrapper = isImg ? <div className="list-item-img"/> : null}
-                    <div className="list-item-details">
-                        {this.details['title'] = <div className="list-detail-item list-item-title"/>}
-                        {this.details['body'] = <div className="list-detail-item list-item-body"/>}
-                        {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
-                        {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
-                        {this.details['status'] = <div className="list-detail-item list-item-status" style={tools.isNotEmpty(para.statusColor) ? statusColor : {}} />}
-                    </div>
+                    {details}
                 </div>
             </div>
         </div>;
@@ -78,7 +92,7 @@ export class MbListItem extends Component {
 
     // 获取当前listItem是否有图片
     protected _isImg: boolean;
-    get isImg(){
+    get isImg() {
         return this._isImg;
     }
 
@@ -117,30 +131,32 @@ export class MbListItem extends Component {
     // 渲染数据
     render(data: MbListItemData) {
         // 渲染图片
-        if(this.isImg && this.imgWrapper){
+        if (this.isImg && this.imgWrapper) {
             this.imgWrapper.innerHTML = '';
             let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
-            if(tools.isNotEmpty(data.imgLabel)){
-                let imgLabelColor= {
-                    backgroundColor:this.para.imgLabelColor
+            if (tools.isNotEmpty(data.imgLabel)) {
+                let imgLabelColor = {
+                    backgroundColor: data.imgLabelColor
                 };
-                d.append(this.imgWrapper, <div className='img-label' style={tools.isNotEmpty(this.para.imgLabelColor) ? imgLabelColor : {}}>{data.imgLabel}</div>);
+                d.append(this.imgWrapper, <div className='img-label'
+                                               style={tools.isNotEmpty(data.imgLabelColor) ? imgLabelColor : {}}>{data.imgLabel}</div>);
             }
         }
 
         // 渲染内容
-        for(let name in this.details){
+        for (let name in this.details) {
             let el = this.details[name],
                 content = data[name];
             el.classList.toggle('hide', tools.isEmpty(content));
 
-            switch (name){
+            switch (name) {
                 case 'body':
                     el.innerHTML = '';
                     content && content.forEach((arr) => {
                         d.append(el, <p>
-                            <span className="body-title">{arr[0] + '：'}</span><span className="body-value">{arr[1]}</span>
+                            <span className="body-title">{arr[0] + '：'}</span><span
+                            className="body-value">{arr[1]}</span>
                         </p>)
                     });
                     break;
@@ -151,7 +167,8 @@ export class MbListItem extends Component {
                     });
                     break;
                 case 'status':
-                    el.innerHTML = content || '';
+                    let status = data.status || G.requireBaseUrl + '../img/fastlion_logo.png';
+                    el.innerHTML = `<img src=${status} alt=""/>`;
                     break;
                 case 'countDown':
                     this.initCountDown(el, content);
@@ -166,7 +183,8 @@ export class MbListItem extends Component {
 
     // 设置倒计时定时器
     protected timer: number;
-    protected initCountDown(el: HTMLElement, countDown: number){
+
+    protected initCountDown(el: HTMLElement, countDown: number) {
         let toTwo = (num) => {
             return num < 10 ? '0' + num : num + '';
         };
@@ -196,28 +214,30 @@ export class MbListItem extends Component {
                 toTwo(hour) + ':' + toTwo(min) + ':' + toTwo(sec);
         }, 1000));
     }
+
     //是否显示按钮
     protected _isShowBtns: boolean = false;
-    set isShowBtns(flag: boolean){
+    set isShowBtns(flag: boolean) {
         this._isShowBtns = flag;
         this.btnWrapper && this.btnWrapper.classList.toggle('hide', flag);
     }
-    get isShowBtns(){
+
+    get isShowBtns() {
         return this.btnWrapper ? this._isShowBtns : false;
     }
 
     // 初始化按钮配置
-    initBtn(btns: string[]){
-        if (tools.isNotEmptyArray(btns)){
-            let btnWrapper:HTMLElement;
+    initBtn(btns: string[]) {
+        if (tools.isNotEmptyArray(btns)) {
+            let btnWrapper: HTMLElement;
             this.btnWrapper = <div className="btn-group">{btnWrapper = <div className="buttons-wrapper"/>}</div>;
             let btnsArr = [];
-            if (btns.length <= 2){
-                btns.forEach((btn,index) => {
+            if (btns.length <= 2) {
+                btns.forEach((btn, index) => {
                     btnsArr.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${btn}</div>`);
                 });
-            }else{
-                let showButtons = btns.slice(0,2);
+            } else {
+                let showButtons = btns.slice(0, 2);
                 btnsArr.push(`<div class="more-btn">更多</div>`);
                 showButtons.forEach((item, index) => {
                     btnsArr.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
@@ -228,29 +248,30 @@ export class MbListItem extends Component {
         }
     }
 
-    private initEvents = (()=>{
-        let clickEvent = (e)=>{
-            let index = parseInt(d.closest(e.target,'.item-button').dataset.index);
-            tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index,this.index);
+    private initEvents = (() => {
+        let clickEvent = (e) => {
+            let index = parseInt(d.closest(e.target, '.item-button').dataset.index);
+            tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index, this.index);
         };
-        let clickMore = (e)=>{
-            if (this.para.list){
+        let clickMore = (e) => {
+            if (this.para.list) {
                 this.para.list.itemActionSheet.isShow = true;
                 this.para.list.currentSelectItemIndex = this.index;
             }
         };
         return {
-            on:()=>{
-                d.on(this.wrapper,'click','.btn-group .item-button',clickEvent);
-                d.on(this.wrapper,'click','.btn-group .more-btn',clickMore);
+            on: () => {
+                d.on(this.wrapper, 'click', '.btn-group .item-button', clickEvent);
+                d.on(this.wrapper, 'click', '.btn-group .more-btn', clickMore);
             },
-            off:()=>{
-                d.off(this.wrapper,'click','.btn-group .item-button',clickEvent);
-                d.off(this.wrapper,'click','.btn-group .more-btn',clickMore);
+            off: () => {
+                d.off(this.wrapper, 'click', '.btn-group .item-button', clickEvent);
+                d.off(this.wrapper, 'click', '.btn-group .more-btn', clickMore);
             }
         }
     })();
-    destroy(){
+
+    destroy() {
         clearInterval(this.timer);
         this.checkBox && this.checkBox.destroy();
         this.checkBox = null;

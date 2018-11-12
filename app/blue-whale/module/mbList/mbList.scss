@@ -27,20 +27,23 @@
       border-radius: 15px;
       border: solid 1px #b0b0b0;
       color: #666666;
-      &.clear-data{
-        border-color:  #17a0f8;
+      &.clear-data {
+        border-color: #17a0f8;
         color: #17a0f8;
       }
-      &.add-data{
+      &.add-data {
         border-color: #005bac;
         color: #005bac;
       }
     }
   }
-  .mblist-page-mblist-wrapper{
-    height: calc(100% - 50px);
+  .mblist-page-mblist-wrapper {
+    height: 100%;
     width: 100%;
     flex: 0 0 auto;
     overflow-y: auto;
+    &.global-buttons-height{
+      height: calc(100% - 50px) !important;
+    }
   }
 }

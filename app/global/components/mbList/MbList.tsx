@@ -17,8 +17,7 @@ export interface IMbListPara extends IComponentPara {
     multiButtons?: string[];
     itemClick?: (btnIndex: number, itemIndex: number) => void;
     multiClick?: (btnIndex:number,itemsIndexes:number[]) => void;
-    statusColor?: string;
-    imgLabelColor?: string;
+    // statusColor?: string;
     dataManager?: {
         pageSize?: number;
         render: (start: number, length: number, data: obj[], isRefresh: boolean) => void;
@@ -278,9 +277,8 @@ export class MbList extends Component {
             btns: this.para.itemButtons,
             buttonClick: (btnIndex, itemIndex) => {
                 tools.isFunction(this.para.itemClick) && this.para.itemClick(btnIndex, itemIndex);
-            },
-            imgLabelColor: this.para.imgLabelColor,
-            statusColor: this.para.statusColor
+            }
+            // statusColor: this.para.statusColor
         });
         return new MbListItem(para);
     }
