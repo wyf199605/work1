@@ -54,6 +54,7 @@ export class PlanModule extends Component{
             this.plotBtn.disabled = true;
         }
         this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+        this.initSubBtn();
     }
 
     protected initSubBtn(){
