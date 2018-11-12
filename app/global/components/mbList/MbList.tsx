@@ -193,8 +193,8 @@ export class MbList extends Component {
             dataManager = new DataManager({
                 page: {
                     size: page.pageSize || 10,
-                    container: this.wrapper,
-                    isPulldownRefresh: page.isPulldownRefresh || false,
+                    container: this.wrapper.parentElement,
+                    isPulldownRefresh: page.isPulldownRefresh || false
                 },
                 render: (start, length, isRefresh) => {
                     typeof page.render === 'function' && page.render(start, length, dataManager.data, isRefresh);
