@@ -289,50 +289,6 @@ export class ButtonAction {
     /**
      * 后台有配置actionHandle情况下的处理
      */
-    // private checkAction(btn: R_Button, dataObj: obj|obj[], callback = (r) => {}, url?:string, addr?:string, ajaxType?:string, ajaxData?:any) {
-    //     let varType = btn.actionAddr.varType, self = this;
-    //     if (varType === 3 && typeof ajaxData !== 'string') {
-    //         // 如果varType === 3 则都转为数组传到后台
-    //         if (!Array.isArray(ajaxData)) {
-    //             ajaxData = [ajaxData];
-    //         }
-    //         ajaxData = JSON.stringify(ajaxData);
-    //     }
-    //     BwRule.ajax(BW.CONF.siteUrl + addr, {
-    //         urlData: varType !== 3,
-    //         type: ajaxType,
-    //         defaultCallback : btn.openType !== 'popup',
-    //         data: ajaxData,
-    //         success: function (r) {
-    //             let data = tools.keysVal(r, ['body', 'bodyList', 0]);
-    //             if (data && (data.type || data.type === 0)) {
-    //                 if (data.type === 0) {
-    //                     Modal.alert(data.showText);
-    //                 } else {
-    //                     Modal.confirm({
-    //                         msg: data.showText,
-    //                         callback: (index) => {
-    //                             if (index == true) {
-    //                                 self.checkAction(btn, dataObj, callback, url, data.url, ajaxType, ajaxData);
-    //                             }
-    //                         }
-    //                     });
-    //                 }
-    //             }else{
-    //                 // 默认提示
-    //                 if (!('hintAfterAction' in btn) || btn.hintAfterAction) {
-    //                     if (data && data.showText) {
-    //                         Modal.alert(data.showText);
-    //                     } else if(btn.openType !== 'popup'){
-    //                         Modal.toast(`${btn.title}成功`);
-    //                         self.btnRefresh(btn.refresh, url);
-    //                     }
-    //                 }
-    //                 callback(r);
-    //             }
-    //         }
-    //     });
-    // }
     private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
         let self = this;
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
@@ -424,15 +380,22 @@ export class ButtonAction {
             width: width,
             isAdaptiveCenter: true,
             isMb: false,
+            top : tools.isMb ? 80 : null,
+            onClose : () => {
+                modal.destroy(() => {
+                    if (res.downloadAddr) {
+                        offShellMonitor();
+                    }
+                });
+                if(type === 3){
+                    BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
+                }
+            }
         };
-        if(tools.isMb){
-            para.top = 80;
-        }
+
         if (type === 3 || type === 5) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
-        }
-
-        if (type === 4) {
+        }else if (type === 4) {
             para['className'] = 'action-type-4';
         }
 
@@ -603,19 +566,8 @@ export class ButtonAction {
         modal = new Modal(para);
         tipDom = d.query('.progress-title', modal.bodyWrapper); //盘点机提示
 
-        modal.onClose = () => {
-            modal.destroy(() => {
-                if (res.downloadAddr) {
-                    offShellMonitor();
-                }
-            });
-            if(type === 3){
-                BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
-            }
-            return;
-        };
 
-        if (type === 3) {
+        if (type === 3 || type === 5) {
             list();
         } else if (res.atvarparams) {
             //type4 or handle or
@@ -710,8 +662,6 @@ export class ButtonAction {
                 }
                 tools.isMb && (modal.position = 'comCenter');
             });
-        } else if (type === 5) {
-            list();
         }
 
         function list() {

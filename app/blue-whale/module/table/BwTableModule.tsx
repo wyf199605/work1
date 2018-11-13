@@ -417,22 +417,6 @@ export class BwTableModule extends Component {
      * @param ajaxData - 查询参数
      */
     private pivotInit(ajaxData: obj = {}) {
-        // let isFirst = tableDom.classList.contains('mobileTable');
-        this.pivotRefresh(ajaxData).then((response) => {
-            if (tools.isEmpty(response)) {
-                return;
-            }
-            response.data = this.addOldData(response.data);
-            this.ftable = new FastBtnTable(
-                Object.assign(this.baseFtablePara, {
-                    exportTitle: this.ui.caption,
-                    cols: colsParaGet(response.meta),
-                    data: response.data
-                })
-            );
-            this.ftableReady();
-        });
-
         /**
          * 把返回的数据与UI合并成交叉制表的列参数(具体规则要问下小路, 太久记不清了)
          * @param meta
@@ -510,7 +494,23 @@ export class BwTableModule extends Component {
             });
 
             return colsPara;
-        }
+        };
+
+        // let isFirst = tableDom.classList.contains('mobileTable');
+        return this.pivotRefresh(ajaxData).then((response) => {
+            if (tools.isEmpty(response)) {
+                return;
+            }
+            response.data = this.addOldData(response.data);
+            this.ftable = new FastBtnTable(
+                Object.assign(this.baseFtablePara, {
+                    exportTitle: this.ui.caption,
+                    cols: colsParaGet(response.meta),
+                    data: response.data
+                })
+            );
+            this.ftableReady();
+        });
     }
 
     protected _sectionField: string; // 分组字段
@@ -677,9 +677,8 @@ export class BwTableModule extends Component {
 
     refresh(data?: obj) {
         if(this.isPivot){
-            return this.pivotRefresh(data).then((response) => {
-                this.ftable && (this.ftable.data = response.data || []);
-            });
+            this.ftable && this.ftable.destroy();
+            return this.pivotInit(data);
         }else{
             return this.ftable.tableData.refresh(data).then(() => {
                 this.aggregate.get(data);
