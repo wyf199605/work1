@@ -3,22 +3,19 @@
 import {MbListItemData} from "../../../global/components/mbList/MbListItem";
 import tools = G.tools;
 import d = G.d;
-import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {MbList} from "../../../global/components/mbList/MbList";
 import {BwRule} from "../../common/rule/BwRule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import BasicPage from "../basicPage";
 
 export interface IBwMbList extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
     ajaxData?: obj;
+    dom:HTMLElement;
 }
 
-export class BwMbList extends Component {
-    protected wrapperInit(para: IBwMbList): HTMLElement {
-        return <div className="mb-list-page"/>;
-    }
-
+export class BwMbList extends BasicPage {
     private isImgTpl: boolean = false;
     private layout: obj = {};
     private captions: string[] = [];
@@ -57,7 +54,7 @@ export class BwMbList extends Component {
                 btnArr.push(`<div class="global-btn-item ${className}" data-index="${index}">${btn.caption}</div>`);
             });
             globalButtonWrapper.innerHTML = btnArr.join('');
-            this.wrapper.appendChild(globalButtonWrapper);
+            this.para.dom.appendChild(globalButtonWrapper);
         }
     }
 
@@ -73,7 +70,7 @@ export class BwMbList extends Component {
             multiButtons.push(btn.caption);
         });
         let wrapper: HTMLElement;
-        d.append(this.wrapper, wrapper = <div className="mblist-page-mblist-wrapper"/>);
+        d.append(this.para.dom, wrapper = <div className="mblist-page-mblist-wrapper"/>);
         if (tools.isNotEmpty(this.allButtons[0])) {
             wrapper.classList.add('global-buttons-height');
         }
@@ -106,6 +103,7 @@ export class BwMbList extends Component {
                 pageSize: 10,
                 isPulldownRefresh: true,
                 render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
+                    this.defaultData = data;
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
                 ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
@@ -165,7 +163,6 @@ export class BwMbList extends Component {
             });
             data.push(rowObj);
         });
-        this.defaultData = data;
         return data;
     }
 
@@ -255,10 +252,10 @@ export class BwMbList extends Component {
         };
         return {
             on: () => {
-                d.on(this.wrapper, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
+                d.on(this.para.dom, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
+                d.off(this.para.dom, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
             }
         }
     })();
