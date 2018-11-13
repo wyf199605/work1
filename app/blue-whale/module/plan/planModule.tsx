@@ -14,6 +14,7 @@ import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {PickModule} from "../edit/pickModule";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -102,14 +103,24 @@ export class PlanModule extends Component{
                                 resolve(data)
                             });
                         case 'pick':
-                            let pickCol;
-                            for(let col of cols){
-                                if(col.elementType === 'pick'){
-
-                                    break;
+                            return new Promise((resolve, reject) => {
+                                for(let col of cols){
+                                    if(col.elementType === 'pick'){
+                                        let pick = new PickModule({
+                                            container: document.body,
+                                            field: col,
+                                            data: areaType.data,
+                                            dataGet: () => areaType.data,
+                                            onGetData: (dataArr: obj[], otherField: string) => {
+                                                resolve(dataArr[0] ? dataArr[0] : null);
+                                                pick.destroy();
+                                            }
+                                        });
+                                        pick.wrapper.classList.add('hide');
+                                        pick.pickInit();
+                                    }
                                 }
-                            }
-                            break;
+                            })
                     }
                 })
 
