@@ -124,7 +124,6 @@ export class DrawPoint extends Component {
                         type: 'edit',
                         data: d
                     }).then((data) => {
-                        debugger;
                         self.showData(data, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
@@ -628,7 +627,6 @@ export class DrawPoint extends Component {
             })
             .on("dragstart", (d, i) => {
                 this.selected = d;
-                // debugger;
                 if ((this.points.indexOf(d) == 0) && (this.points.length > 2)) {
                     this.points.push(d)
                     this.redraw();
@@ -705,7 +703,7 @@ export class DrawPoint extends Component {
                         })
                 }
             })
-            debugger;
+
             //给新增的path绑定数据
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));
