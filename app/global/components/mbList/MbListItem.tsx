@@ -41,12 +41,13 @@ export class MbListItem extends Component {
         super(para);
         this.list = para.list;
         this._index = para.index;
-        this.isShowCheckBox = para.isCheckBox || false;
-        this.render(para.data || {});
         if (tools.isNotEmptyArray(para.btns)) {
             this.initBtn(para.btns);
             this.initEvents.on();
         }
+        this.isShowCheckBox = para.isCheckBox || false;
+        this.isShowBtns = para.isCheckBox || false;
+        this.render(para.data || {});
     }
 
     protected wrapperInit(para: IMbListItemPara) {
