@@ -15,8 +15,9 @@ export interface IMbListPara extends IComponentPara {
     isMulti?: boolean;  // 是否多选
     itemButtons?: string[];
     multiButtons?: string[];
-    itemClick?: (btnIndex: number, itemIndex: number) => void;
+    buttonsClick?: (btnIndex: number, itemIndex: number) => void;
     multiClick?: (btnIndex:number,itemsIndexes:number[]) => void;
+    itemClick?: (index: number) => void;
     // statusColor?: string;
     dataManager?: {
         pageSize?: number;
@@ -63,7 +64,7 @@ export class MbList extends Component {
                 buttons.push({
                     content: btn,
                     onClick: () => {
-                        tools.isFunction(this.para.itemClick) && this.para.itemClick(index + 2, this.currentSelectItemIndex);
+                        tools.isFunction(this.para.buttonsClick) && this.para.buttonsClick(index + 2, this.currentSelectItemIndex);
                     }
                 })
             });
@@ -276,7 +277,10 @@ export class MbList extends Component {
             isCheckBox: this.multiple,
             btns: this.para.itemButtons,
             buttonClick: (btnIndex, itemIndex) => {
-                tools.isFunction(this.para.itemClick) && this.para.itemClick(btnIndex, itemIndex);
+                tools.isFunction(this.para.buttonsClick) && this.para.buttonsClick(btnIndex, itemIndex);
+            },
+            itemClick:(index) => {
+                tools.isFunction(this.para.itemClick) && this.para.itemClick(index);
             }
             // statusColor: this.para.statusColor
         });
