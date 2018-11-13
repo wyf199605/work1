@@ -217,6 +217,28 @@ export class BwTableModule extends Component {
         }
     }
 
+    private addOldData(data: obj[]): obj[]{
+        let res = data;
+        if (data) {
+
+            let editParam = this.editParam;
+            if (editParam) {
+                let varList = [];
+                ['insert', 'update', 'delete'].forEach(type => {
+                    let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                        typeVarList = editParam[type];
+
+                    if (canOld && Array.isArray(typeVarList)) {
+                        varList = varList.concat(typeVarList)
+                    }
+                });
+                // 加上OLD变量
+                BwRule.addOldField(BwRule.getOldField(varList), data);
+            }
+        }
+        return res;
+    }
+
     private ftableInit(ajaxData?: obj) {
         let ui = this.ui;
         this.ftable = new FastBtnTable(
@@ -252,23 +274,7 @@ export class BwTableModule extends Component {
                             let {data, head} = response;
                             // 选项查询处理(wbf)
                             this.sectionField(response);
-                            if (data) {
-
-                                let editParam = this.editParam;
-                                if (editParam) {
-                                    let varList = [];
-                                    ['insert', 'update', 'delete'].forEach(type => {
-                                        let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
-                                            typeVarList = editParam[type];
-
-                                        if (canOld && Array.isArray(typeVarList)) {
-                                            varList = varList.concat(typeVarList)
-                                        }
-                                    });
-                                    // 加上OLD变量
-                                    BwRule.addOldField(BwRule.getOldField(varList), data);
-                                }
-                            }
+                            data = this.addOldData(data);
                             return {
                                 data,
                                 total: head ? head.totalNum : 0,
@@ -416,6 +422,7 @@ export class BwTableModule extends Component {
             if (tools.isEmpty(response)) {
                 return;
             }
+            response.data = this.addOldData(response.data);
             this.ftable = new FastBtnTable(
                 Object.assign(this.baseFtablePara, {
                     exportTitle: this.ui.caption,
