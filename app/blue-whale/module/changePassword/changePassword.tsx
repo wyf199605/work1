@@ -6,12 +6,13 @@ import {Button} from "../../../global/components/general/button/Button";
 export interface IChangePasswordPara{
     container:HTMLElement;
     confirm?: (obj) => Promise<any> ;
+    userID?:string;
 }
 
 export class ChangePassword{
    constructor(para:IChangePasswordPara){
        let body=<div className="cpw-content">
-           {ChangePassword.initInput()}
+           {ChangePassword.initInput(para.userID)}
        </div>;
        let btnGroup = d.query('.btn-group', body);
        let confirm = new Button({
@@ -56,8 +57,9 @@ export class ChangePassword{
        return data;
    }
 
-   static initInput(): HTMLElement{
+   static initInput(para:string): HTMLElement{
        return <form action="#" class="password-form">
+           {para?<div class="form-group"><span>用户ID：</span><input id="user_id" type="text" readonly value="para"/></div>:null}
            <div class="form-group">
                <span>旧密码：</span><input id="old-password" type="password" placeholder="请输入旧密码"/>
            </div>

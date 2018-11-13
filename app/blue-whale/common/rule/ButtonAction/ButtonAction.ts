@@ -254,7 +254,9 @@ export class ButtonAction {
     }
 
     private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
-
+        require(['ChangePassword', 'Modal'],  (d, m) => {
+            
+        })
     }
 
     initBarCode(res,data,dataObj){
