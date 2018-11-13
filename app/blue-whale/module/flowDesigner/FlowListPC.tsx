@@ -54,6 +54,8 @@ export class FlowListPC extends BasicPage{
                         // 表格不存在
                         BwRule.Ajax.fetch(this.tableUIUrls[index]).then(({response}) => {
                             let tabEl = d.query(`.tab-pane.first[data-index="${index}"]`, tab.getPanel());
+                            let bwTableEl = response.body.elements[0];
+                            bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(response.body.subButtons || []);
                             this.subTables[index] = new NewTableModule({
                                 bwEl:response.body.elements[0],
                                 container:tabEl

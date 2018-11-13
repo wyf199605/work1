@@ -182,10 +182,10 @@ export class ButtonAction {
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
         if(dataObj && (!Array.isArray(dataObj) || dataObj.length === 1)){
-            addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
+            addr && (addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj));
         }
         if(avtData){
-            addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())});
+            addr && (addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())}));
         }
         let varType = btn.actionAddr.varType, res: any = data;
 
