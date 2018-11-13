@@ -137,9 +137,9 @@ namespace G {
             * @param {obj} data - 根据数据替换url中花括号{}的数据
             * */
             replaceTmpUrl(url: string, data: obj){
-                return url.replace(/{([\w\W]+?)}/g, (str, name) => {
+                return url ? url.replace(/{([\w\W]+?)}/g, (str, name) => {
                     return tools.isEmpty(data[name]) ? name : data[name];
-                })
+                }): '';
             },
             /**
              * 获取url中请求参数的值
