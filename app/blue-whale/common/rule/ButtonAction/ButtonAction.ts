@@ -236,6 +236,9 @@ export class ButtonAction {
                 }).catch(() => {
                 });
                 break;
+            case 'passwd':
+                this.changPasswd(btn, data, callback);
+                break;
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
@@ -248,6 +251,10 @@ export class ButtonAction {
                 }, url);
                 self.btnRefresh(btn.refresh, url);
         }
+    }
+
+    private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
+
     }
 
     initBarCode(res,data,dataObj){
