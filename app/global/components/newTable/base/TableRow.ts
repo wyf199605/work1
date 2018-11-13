@@ -328,10 +328,6 @@ export class TableHeaderRow extends TableRow {
             cells: objOf<ITableHeaderCellPara> = obj,
             num = 0;
         if (tools.isNotEmpty(cells)) {
-            console.log(Object.values(cells).sort((itemA, itemB) => {
-                let a = itemA.index, b = itemB.index;
-                return a > b ? 1 : (a < b ? -1 : 0);
-            }));
             for (let item of Object.values(cells).sort((itemA, itemB) => {
                 let a = itemA.index, b = itemB.index;
                 return a > b ? 1: (a < b ? -1 : 0);
@@ -387,7 +383,11 @@ export class TableFooterRow extends TableRow {
         //     }
         // }
         if (tools.isNotEmpty(cells)) {
-            for (let key in cells) {
+            for (let item of Object.values(cells).sort((itemA, itemB) => {
+                let a = itemA.index, b = itemB.index;
+                return a > b ? 1: (a < b ? -1 : 0);
+            })) {
+                let key = item.name;
                 let cell = this.cellGet(key);
                 if (tools.isEmpty(cell)) {
                     if (!cells[key]) {

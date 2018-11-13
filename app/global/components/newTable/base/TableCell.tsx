@@ -532,6 +532,7 @@ export class TableHeaderCell extends TableCell{
 export interface ITableFooterCellPara extends ITableCellPara{
     options?: string[];
     colCount?: boolean;
+    index?: number;
 }
 export class TableFooterCell extends TableCell{
 
