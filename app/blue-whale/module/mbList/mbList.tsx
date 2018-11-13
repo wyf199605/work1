@@ -25,7 +25,7 @@ export class BwMbList extends Component {
     private imgLabelColor: string = '';
     // private statusColor: string = '';
     private isMulti: boolean = false;
-
+    private defaultData:obj[] = [];
     constructor(private para: IBwMbList) {
         super(para);
         this.getButtons(para.ui.body.elements[0].subButtons);
@@ -74,7 +74,7 @@ export class BwMbList extends Component {
         });
         let wrapper: HTMLElement;
         d.append(this.wrapper, wrapper = <div className="mblist-page-mblist-wrapper"/>);
-        if (tools.isNotEmpty(this.allButtons[0])){
+        if (tools.isNotEmpty(this.allButtons[0])) {
             wrapper.classList.add('global-buttons-height');
         }
         this.mbList = new MbList({
@@ -82,6 +82,25 @@ export class BwMbList extends Component {
             isMulti: this.isMulti,
             itemButtons: itemButtons,
             multiButtons: multiButtons,
+            buttonsClick: (btnIndex, itemIndex) => {
+                let buttons = this.allButtons[1] || [],
+                    btn = buttons[btnIndex],
+                    data = this.defaultData[itemIndex];
+                console.log(data);
+            },
+            itemClick: (index) => {
+                let data = this.defaultData[index];
+                console.log(data);
+            },
+            multiClick:(btnIndex, itemsIndexes) => {
+                let buttons = this.allButtons[1] || [],
+                    btn = buttons[btnIndex],
+                    data = [];
+                this.defaultData.forEach((da,index) => {
+                    itemsIndexes.indexOf(index) > -1 && data.push(da);
+                });
+                console.log(data);
+            },
             container: wrapper,
             dataManager: {
                 pageSize: 10,
@@ -146,6 +165,7 @@ export class BwMbList extends Component {
             });
             data.push(rowObj);
         });
+        this.defaultData = data;
         return data;
     }
 
@@ -207,18 +227,18 @@ export class BwMbList extends Component {
                     }
                         break;
                     case 'status': {
-                        let field = layout['status'],md5 = item[field];
+                        let field = layout['status'], md5 = item[field];
                         itemObj['status'] = tools.isNotEmpty(md5) ? BwRule.fileUrlGet(md5, field) : '';
                     }
                         break;
-                    case  'imgLabelColor':{
+                    case  'imgLabelColor': {
                         let imgLabelColor = layout['imgLabelColor'];
                         if (tools.isNotEmpty(imgLabelColor)) {
                             let {r, g, b} = tools.val2RGB(item[imgLabelColor]);
                             this.imgLabelColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
                         }
                     }
-                    break;
+                        break;
                 }
             }
             listData.push(itemObj);

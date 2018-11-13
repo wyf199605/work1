@@ -12,7 +12,9 @@
     align-items: center;
     justify-content: flex-end;
     padding: 0 16px;
+    overflow-x: auto;
     .global-btn-item {
+      flex: 0 0 auto;
       height: 30px;
       padding-left: 18px;
       padding-right: 18px;

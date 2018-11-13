@@ -44,7 +44,7 @@ export abstract class TablePage extends BasicPage{
                             let cb = () => {
                                 if (!sys.isMb) {
                                     isFirst && query.toggleCancle();
-                                    this.tableModule.rightBtns.add(new Button({
+                                    (this.tableModule as any).rightBtns.add(new Button({
                                         content: '查询器',
                                         type: 'default',
                                         icon: 'shaixuan',
