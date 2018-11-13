@@ -20,7 +20,7 @@ interface IDrapPoint extends IComponentPara {
 }
 
 interface IAreaType {
-    type: 'edit';
+    type: 'edit'| 'pick';
     data?: obj;
     name?: string;
 }
@@ -227,17 +227,6 @@ export class DrawPoint extends Component {
                         //显示边框 以及 背景颜色
                         if(this.isShowStatus){
                             this.InitIcon(group,point);
-                            // group.append("text").attr('class','iconfont icon-dianpubiaoji')
-                            //     .attr('font-family','iconfont')
-                            //     .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
-                            //     .attr('fill','firebrick')
-                            //     .text("\ue6e1").on('click',function (d) {
-                            //     alert('这是小图标');
-                            // }).on('mouseover',function (d) {
-                            //     D3.select(this).transition().attr('y',80).ease("bounce");
-                            // }).on('mouseout',function (d) {
-                            //     D3.select(this).transition().attr('y',84).ease("bounce");
-                            // })
 
                         }
 
@@ -350,8 +339,14 @@ export class DrawPoint extends Component {
                D3.select(this).transition().attr('y',y+4).ease("bounce");
             }).on('mouseout',function (d) {
             D3.select(this).transition().attr('y',y).ease("bounce");
-            }).on('click',function (d) {
-            alert('这是小图标')
+            }).on('click', (d)=> {
+             this.onAreaClick({
+                 type:'pick',
+                 data:this._data
+
+             }).then((data)=>{
+                 alert(data)
+             })
         })
     }
     private OnDragText(){
