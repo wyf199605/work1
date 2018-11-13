@@ -298,9 +298,9 @@ export class DrawPoint extends Component {
                             }else {
                                 return 'auto'
                             }
-                        }).attr('fill-opacity',function (d) {
+                        }).attr('display',function (d) {
                             if(I > 1){
-                                return 0
+                                return 'none'
                             }
                         });
                 }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
@@ -356,6 +356,7 @@ export class DrawPoint extends Component {
     }
     private OnDragText(){
         this.selectedG.selectAll('text').remove();
+        let w = this.selectedG.node().getBBox().width,g = this.selectedG.node().getBBox().height;
         this.selectedG.attr('id', (data)=>{
                 let point = this.map.get(this.index),
                     I = 0;
@@ -371,19 +372,35 @@ export class DrawPoint extends Component {
                     if(data.isShow && tools.isNotEmpty(data.data) && !data.isPoint){
                         //绘字
                         I++;
+                        if(I > 1){
+                            return
+                        }
                         let text = this.selectedG.append('text').datum(data.name)
                             .attr('fill', 'black')
-                            .attr('font-size', '8px')
+                            .attr('font-size', function () {
+                                let size = parseInt(w)* parseInt(g)+ '',
+                                    val = parseInt(w) * parseInt(g),
+                                    font;
+                                if(val < 1000){
+                                    font = 2;
+                                }else if(val > 10000){
+                                    font = 16;
+                                }
+                                else{
+                                    font = Math.floor(val/(Math.pow(10,size.length - 1)))
+                                }
+                                return font + "px"
+                            })
                             .attr("text-anchor", "middle")
                             .attr('x', (d, i) => {
                                 return this.findCenter(point)[0]
 
                             })
                             .attr('y', (d, i) => {
-                                return this.findCenter(point)[1] - 35;
+                                return this.findCenter(point)[1] - 15;
                             })
                             .attr('dx', 5)
-                            .attr('dy', 16 * I)
+                            .attr('dy', 15)
                             .text(function (d) {
                                 return data.data;
 
