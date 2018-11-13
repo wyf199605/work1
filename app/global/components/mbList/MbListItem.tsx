@@ -15,7 +15,8 @@ export interface IMbListItemPara extends IComponentPara {
     isImg?: boolean;
     isCheckBox?: boolean;
     btns?: string[];
-    buttonClick?: (btnIndex: number, itemIndex: number) => void;
+    buttonClick?: (btnIndex: number, itemIndex: number) => void; // 按钮点击处理
+    itemClick?: (index: number) => void; // 点击当前项
     // statusColor?: string;
 }
 
@@ -41,12 +42,13 @@ export class MbListItem extends Component {
         super(para);
         this.list = para.list;
         this._index = para.index;
-        this.isShowCheckBox = para.isCheckBox || false;
-        this.render(para.data || {});
         if (tools.isNotEmptyArray(para.btns)) {
             this.initBtn(para.btns);
             this.initEvents.on();
         }
+        this.isShowCheckBox = para.isCheckBox || false;
+        this.isShowBtns = para.isCheckBox || false;
+        this.render(para.data || {});
     }
 
     protected wrapperInit(para: IMbListItemPara) {
@@ -62,7 +64,7 @@ export class MbListItem extends Component {
             {this.details['label'] = <div className="list-detail-item list-item-labels"/>}
             {this.details['countDown'] = <div className="list-detail-item list-item-count-down"/>}
             {/*{this.details['status'] = <div className="list-detail-item list-item-status"*/}
-                                           {/*style={tools.isNotEmpty(para.statusColor) ? statusColor : {}}/>}*/}
+            {/*style={tools.isNotEmpty(para.statusColor) ? statusColor : {}}/>}*/}
             {this.details['status'] = <div className="list-detail-item list-item-status"/>}
         </div> : <div className="list-item-details">
             {this.details['title'] = <div className="list-detail-item list-item-title"/>}
@@ -249,9 +251,12 @@ export class MbListItem extends Component {
     }
 
     private initEvents = (() => {
-        let clickEvent = (e) => {
+        let buttonsEvent = (e) => {
             let index = parseInt(d.closest(e.target, '.item-button').dataset.index);
             tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index, this.index);
+        };
+        let itemClick = () => {
+            tools.isFunction(this.para.itemClick) && this.para.itemClick(this.index);
         };
         let clickMore = (e) => {
             if (this.para.list) {
@@ -261,12 +266,14 @@ export class MbListItem extends Component {
         };
         return {
             on: () => {
-                d.on(this.wrapper, 'click', '.btn-group .item-button', clickEvent);
+                d.on(this.wrapper, 'click', '.btn-group .item-button', buttonsEvent);
                 d.on(this.wrapper, 'click', '.btn-group .more-btn', clickMore);
+                d.on(this.wrapper, 'click', '.list-item-details', itemClick);
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.btn-group .item-button', clickEvent);
+                d.off(this.wrapper, 'click', '.btn-group .item-button', buttonsEvent);
                 d.off(this.wrapper, 'click', '.btn-group .more-btn', clickMore);
+                d.off(this.wrapper, 'click', '.list-item-details', itemClick);
             }
         }
     })();
