@@ -218,7 +218,7 @@ export class FlowList {
                 className="iconfont icon-arrow-right"/></div>
             <div className="item-content">
                 <div class="item-info">
-                    <div className="item-time">{this.handlerTime(data.lastUpdateTime)}</div>
+                    <div className="item-time">{tools.isEmpty(data.lastUpdateTime) ? '' : this.handlerTime(data.lastUpdateTime)}</div>
                     <div className={"item-state " + stateClass}>{state}</div>
                 </div>
             </div>

@@ -206,7 +206,7 @@ export class FlowReport extends BasicPage {
                     btn.hintBeforeAction = true;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
                         sys.window.open({
-                            url: BW.CONF.siteUrl + '/' + response.body.bodyList[0].dataList[0] + '?page=flowReport'
+                            url: BW.CONF.siteUrl + '/' + response.body.bodyList[0].dataList[0] + '&page=flowReport'
                         });
                     }, self.url);
                     break;
