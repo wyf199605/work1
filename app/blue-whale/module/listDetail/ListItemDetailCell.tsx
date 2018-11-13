@@ -122,7 +122,16 @@ export class ListItemDetailCell extends Component {
                                     });
                                 } else {
                                     // this.downloadFile(BW.CONF.siteUrl + this.currentFile.addr);
-                                    sys.window.download(BW.CONF.siteUrl + this.currentFile.addr);
+                                    let fileName = this.currentFile.filename,
+                                        fileAddr = this.currentFile.addr,
+                                        nameArr = fileName.split('.'),
+                                        extensionName = nameArr[nameArr.length - 1],
+                                        imgs = ['jpg','png','jpeg','gif'];
+                                    if (~imgs.indexOf(extensionName)){
+                                        sys.window.openImg(BW.CONF.siteUrl + fileAddr);
+                                    }else{
+                                        sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                    }
                                 }
                             }
                         }
@@ -144,13 +153,13 @@ export class ListItemDetailCell extends Component {
         }
     }
 
-    private downloadFile(src: string) {
-        let iframe = document.createElement('iframe'),
-            body = document.getElementsByTagName('body')[0];
-        iframe.style.display = 'none';
-        iframe.src = "javascript: '<script>location.href=\"" + src + "\"<\/script>'";
-        body.appendChild(iframe);
-    }
+    // private downloadFile(src: string) {
+    //     let iframe = document.createElement('iframe'),
+    //         body = document.getElementsByTagName('body')[0];
+    //     iframe.style.display = 'none';
+    //     iframe.src = "javascript: '<script>location.href=\"" + src + "\"<\/script>'";
+    //     body.appendChild(iframe);
+    // }
 
     private initEvent = (() => {
         let option = (e) => {
