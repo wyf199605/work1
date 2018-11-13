@@ -500,6 +500,7 @@ export class TableDataCell extends TableCell {
  * 表头单元格 th
  */
 export interface ITableHeaderCellPara extends ITableCellPara{
+    index?: number;
 }
 export class TableHeaderCell extends TableCell{
     constructor(para: ITableHeaderCellPara) {
