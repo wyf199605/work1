@@ -96,10 +96,13 @@ export class PlanModule extends Component{
             },
             onAreaClick: (areaType) => {
                 return new Promise((resolve, reject) => {
-                    if(areaType.type === 'edit'){
-                        return this.edit.editData(areaType.data, (data) => {
-                            resolve(data)
-                        });
+                    switch (areaType.type){
+                        case 'edit':
+                            return this.edit.editData(areaType.data, (data) => {
+                                resolve(data)
+                            });
+                        case 'pick':
+                            break;
                     }
                 })
 
