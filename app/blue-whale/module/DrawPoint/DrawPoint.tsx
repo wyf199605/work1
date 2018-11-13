@@ -20,7 +20,7 @@ interface IDrapPoint extends IComponentPara {
 }
 
 interface IAreaType {
-    type: 'edit';
+    type: 'edit' | 'pick';
     data?: obj;
     name?: string;
 }
@@ -124,7 +124,6 @@ export class DrawPoint extends Component {
                         type: 'edit',
                         data: d
                     }).then((data) => {
-                        debugger;
                         self.showData(data, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
@@ -228,17 +227,6 @@ export class DrawPoint extends Component {
                         //显示边框 以及 背景颜色
                         if(this.isShowStatus){
                             this.InitIcon(group,point);
-                            // group.append("text").attr('class','iconfont icon-dianpubiaoji')
-                            //     .attr('font-family','iconfont')
-                            //     .attr('x',588).attr('y',84).attr('width',30).attr('height',30)
-                            //     .attr('fill','firebrick')
-                            //     .text("\ue6e1").on('click',function (d) {
-                            //     alert('这是小图标');
-                            // }).on('mouseover',function (d) {
-                            //     D3.select(this).transition().attr('y',80).ease("bounce");
-                            // }).on('mouseout',function (d) {
-                            //     D3.select(this).transition().attr('y',84).ease("bounce");
-                            // })
 
                         }
 
@@ -299,9 +287,9 @@ export class DrawPoint extends Component {
                             }else {
                                 return 'auto'
                             }
-                        }).attr('fill-opacity',function (d) {
+                        }).attr('display',function (d) {
                             if(I > 1){
-                                return 0
+                                return 'none'
                             }
                         });
                 }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
@@ -351,12 +339,19 @@ export class DrawPoint extends Component {
                D3.select(this).transition().attr('y',y+4).ease("bounce");
             }).on('mouseout',function (d) {
             D3.select(this).transition().attr('y',y).ease("bounce");
-            }).on('click',function (d) {
-            alert('这是小图标')
+            }).on('click', (d)=> {
+             this.onAreaClick({
+                 type:'pick',
+                 data:this._data
+
+             }).then((data)=>{
+                 alert(data)
+             })
         })
     }
     private OnDragText(){
         this.selectedG.selectAll('text').remove();
+        let w = this.selectedG.node().getBBox().width,g = this.selectedG.node().getBBox().height;
         this.selectedG.attr('id', (data)=>{
                 let point = this.map.get(this.index),
                     I = 0;
@@ -372,19 +367,35 @@ export class DrawPoint extends Component {
                     if(data.isShow && tools.isNotEmpty(data.data) && !data.isPoint){
                         //绘字
                         I++;
+                        if(I > 1){
+                            return
+                        }
                         let text = this.selectedG.append('text').datum(data.name)
                             .attr('fill', 'black')
-                            .attr('font-size', '8px')
+                            .attr('font-size', function () {
+                                let size = parseInt(w)* parseInt(g)+ '',
+                                    val = parseInt(w) * parseInt(g),
+                                    font;
+                                if(val < 1000){
+                                    font = 2;
+                                }else if(val > 10000){
+                                    font = 16;
+                                }
+                                else{
+                                    font = Math.floor(val/(Math.pow(10,size.length - 1)))
+                                }
+                                return font + "px"
+                            })
                             .attr("text-anchor", "middle")
                             .attr('x', (d, i) => {
                                 return this.findCenter(point)[0]
 
                             })
                             .attr('y', (d, i) => {
-                                return this.findCenter(point)[1] - 35;
+                                return this.findCenter(point)[1] - 15;
                             })
                             .attr('dx', 5)
-                            .attr('dy', 16 * I)
+                            .attr('dy', 15)
                             .text(function (d) {
                                 return data.data;
 
@@ -628,7 +639,6 @@ export class DrawPoint extends Component {
             })
             .on("dragstart", (d, i) => {
                 this.selected = d;
-                // debugger;
                 if ((this.points.indexOf(d) == 0) && (this.points.length > 2)) {
                     this.points.push(d)
                     this.redraw();
@@ -705,7 +715,7 @@ export class DrawPoint extends Component {
                         })
                 }
             })
-            debugger;
+
             //给新增的path绑定数据
             let path = sl.select('path').attr('id'),
                 i = parseInt(path.slice(4, path.length));

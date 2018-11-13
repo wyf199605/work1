@@ -217,6 +217,28 @@ export class BwTableModule extends Component {
         }
     }
 
+    private addOldData(data: obj[]): obj[]{
+        let res = data;
+        if (data) {
+
+            let editParam = this.editParam;
+            if (editParam) {
+                let varList = [];
+                ['insert', 'update', 'delete'].forEach(type => {
+                    let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                        typeVarList = editParam[type];
+
+                    if (canOld && Array.isArray(typeVarList)) {
+                        varList = varList.concat(typeVarList)
+                    }
+                });
+                // 加上OLD变量
+                BwRule.addOldField(BwRule.getOldField(varList), data);
+            }
+        }
+        return res;
+    }
+
     private ftableInit(ajaxData?: obj) {
         let ui = this.ui;
         this.ftable = new FastBtnTable(
@@ -252,23 +274,7 @@ export class BwTableModule extends Component {
                             let {data, head} = response;
                             // 选项查询处理(wbf)
                             this.sectionField(response);
-                            if (data) {
-
-                                let editParam = this.editParam;
-                                if (editParam) {
-                                    let varList = [];
-                                    ['insert', 'update', 'delete'].forEach(type => {
-                                        let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
-                                            typeVarList = editParam[type];
-
-                                        if (canOld && Array.isArray(typeVarList)) {
-                                            varList = varList.concat(typeVarList)
-                                        }
-                                    });
-                                    // 加上OLD变量
-                                    BwRule.addOldField(BwRule.getOldField(varList), data);
-                                }
-                            }
+                            data = this.addOldData(data);
                             return {
                                 data,
                                 total: head ? head.totalNum : 0,
@@ -411,21 +417,6 @@ export class BwTableModule extends Component {
      * @param ajaxData - 查询参数
      */
     private pivotInit(ajaxData: obj = {}) {
-        // let isFirst = tableDom.classList.contains('mobileTable');
-        this.pivotRefresh(ajaxData).then((response) => {
-            if (tools.isEmpty(response)) {
-                return;
-            }
-            this.ftable = new FastBtnTable(
-                Object.assign(this.baseFtablePara, {
-                    exportTitle: this.ui.caption,
-                    cols: colsParaGet(response.meta),
-                    data: response.data
-                })
-            );
-            this.ftableReady();
-        });
-
         /**
          * 把返回的数据与UI合并成交叉制表的列参数(具体规则要问下小路, 太久记不清了)
          * @param meta
@@ -503,7 +494,23 @@ export class BwTableModule extends Component {
             });
 
             return colsPara;
-        }
+        };
+
+        // let isFirst = tableDom.classList.contains('mobileTable');
+        return this.pivotRefresh(ajaxData).then((response) => {
+            if (tools.isEmpty(response)) {
+                return;
+            }
+            response.data = this.addOldData(response.data);
+            this.ftable = new FastBtnTable(
+                Object.assign(this.baseFtablePara, {
+                    exportTitle: this.ui.caption,
+                    cols: colsParaGet(response.meta),
+                    data: response.data
+                })
+            );
+            this.ftableReady();
+        });
     }
 
     protected _sectionField: string; // 分组字段
@@ -670,9 +677,8 @@ export class BwTableModule extends Component {
 
     refresh(data?: obj) {
         if(this.isPivot){
-            return this.pivotRefresh(data).then((response) => {
-                this.ftable && (this.ftable.data = response.data || []);
-            });
+            this.ftable && this.ftable.destroy();
+            return this.pivotInit(data);
         }else{
             return this.ftable.tableData.refresh(data).then(() => {
                 this.aggregate.get(data);

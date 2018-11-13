@@ -182,10 +182,10 @@ export class ButtonAction {
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
         if(dataObj && (!Array.isArray(dataObj) || dataObj.length === 1)){
-            addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
+            addr && (addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj));
         }
         if(avtData){
-            addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())});
+            addr && (addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())}));
         }
         let varType = btn.actionAddr.varType, res: any = data;
 
@@ -236,6 +236,9 @@ export class ButtonAction {
                 }).catch(() => {
                 });
                 break;
+            case 'passwd':
+                this.changPasswd(btn, data, callback);
+                break;
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
@@ -248,6 +251,10 @@ export class ButtonAction {
                 }, url);
                 self.btnRefresh(btn.refresh, url);
         }
+    }
+
+    private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
+
     }
 
     initBarCode(res,data,dataObj){
@@ -282,50 +289,6 @@ export class ButtonAction {
     /**
      * 后台有配置actionHandle情况下的处理
      */
-    // private checkAction(btn: R_Button, dataObj: obj|obj[], callback = (r) => {}, url?:string, addr?:string, ajaxType?:string, ajaxData?:any) {
-    //     let varType = btn.actionAddr.varType, self = this;
-    //     if (varType === 3 && typeof ajaxData !== 'string') {
-    //         // 如果varType === 3 则都转为数组传到后台
-    //         if (!Array.isArray(ajaxData)) {
-    //             ajaxData = [ajaxData];
-    //         }
-    //         ajaxData = JSON.stringify(ajaxData);
-    //     }
-    //     BwRule.ajax(BW.CONF.siteUrl + addr, {
-    //         urlData: varType !== 3,
-    //         type: ajaxType,
-    //         defaultCallback : btn.openType !== 'popup',
-    //         data: ajaxData,
-    //         success: function (r) {
-    //             let data = tools.keysVal(r, ['body', 'bodyList', 0]);
-    //             if (data && (data.type || data.type === 0)) {
-    //                 if (data.type === 0) {
-    //                     Modal.alert(data.showText);
-    //                 } else {
-    //                     Modal.confirm({
-    //                         msg: data.showText,
-    //                         callback: (index) => {
-    //                             if (index == true) {
-    //                                 self.checkAction(btn, dataObj, callback, url, data.url, ajaxType, ajaxData);
-    //                             }
-    //                         }
-    //                     });
-    //                 }
-    //             }else{
-    //                 // 默认提示
-    //                 if (!('hintAfterAction' in btn) || btn.hintAfterAction) {
-    //                     if (data && data.showText) {
-    //                         Modal.alert(data.showText);
-    //                     } else if(btn.openType !== 'popup'){
-    //                         Modal.toast(`${btn.title}成功`);
-    //                         self.btnRefresh(btn.refresh, url);
-    //                     }
-    //                 }
-    //                 callback(r);
-    //             }
-    //         }
-    //     });
-    // }
     private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
         let self = this;
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
@@ -417,15 +380,22 @@ export class ButtonAction {
             width: width,
             isAdaptiveCenter: true,
             isMb: false,
+            top : tools.isMb ? 80 : null,
+            onClose : () => {
+                modal.destroy(() => {
+                    if (res.downloadAddr) {
+                        offShellMonitor();
+                    }
+                });
+                if(type === 3){
+                    BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
+                }
+            }
         };
-        if(tools.isMb){
-            para.top = 80;
-        }
+
         if (type === 3 || type === 5) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
-        }
-
-        if (type === 4) {
+        }else if (type === 4) {
             para['className'] = 'action-type-4';
         }
 
@@ -597,101 +567,7 @@ export class ButtonAction {
         tipDom = d.query('.progress-title', modal.bodyWrapper); //盘点机提示
 
 
-        /**
-         * 盘点机上传下载
-         * @param ajaxData
-         * @param shellData  传递给shell的数据
-         * @param pos
-         * @param msg
-         * @param btn  确定按钮
-         */
-        function inventoryAjax(ajaxData: obj | string, btn?: HTMLElement, shellData?: obj, pos?: any, msg?: string) {
-            if (!loading) {
-                // TODO
-                loading = new Loading({
-                    msg: '正在获取数据...'
-                });
-            } else {
-                loading && loading.show();
-            }
-
-            BwRule.Ajax.fetch(CONF.siteUrl + url, {
-                type: 'POST',
-                data: ajaxData
-            }).then(({response}) => {
-                if (msg === 'callDownload') {
-                    shellData['data'] = response.body.bodyList[0].inventData;
-
-                    if ("AppShell" in window) {
-                        pos.casio.download(shellData.port, shellData.speed, shellData.data, (e) => {
-                            sendFinish && sendFinish(e);
-                        }, (e) => {
-                            sendMsg && sendMsg(e);
-                        })
-                    } else {
-                        pos.inventory({
-                            msg: msg,
-                            data: shellData,
-                        });
-                    }
-                } else {
-                    let resData = response.body && response.body.bodyList && response.body.bodyList[0];
-                    if (resData && resData.showText) {
-                        Modal.confirm({
-                            msg: resData.showText,
-                            callback: (index) => {
-                                if (index == true) {
-                                    loading && loading.show();
-                                    // BwRule.ajax(CONF.siteUrl + resData.url,{
-                                    //     type : 'post',
-                                    //     data : ajaxData,
-                                    //     success : (res) => {
-                                    //         successCb(res)
-                                    //     }
-                                    // })
-                                    BwRule.Ajax.fetch(CONF.siteUrl + resData.url, {
-                                        type: 'post',
-                                        data: ajaxData,
-                                    }).then(({response}) => {
-                                        successCb(response)
-
-                                    });
-                                } else {
-                                    btn.classList.remove('disabled');
-                                }
-                            }
-                        })
-                    } else {
-                        successCb(response)
-                    }
-                }
-            }).finally(() => {
-                loading && loading.hide();
-            });
-
-            function successCb(datas) {
-                loading && loading.hide();
-                Modal.alert(datas.msg);
-                onOk();
-                modal.destroy(() => {
-                    offShellMonitor();
-                });
-            }
-        }
-
-        modal.onClose = () => {
-            modal.destroy(() => {
-                if (res.downloadAddr) {
-                    offShellMonitor();
-                }
-            });
-            if(type === 3){
-                BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
-            }
-            return;
-        };
-
-        if (type === 3) {
+        if (type === 3 || type === 5) {
             list();
         } else if (res.atvarparams) {
             //type4 or handle or
@@ -786,8 +662,6 @@ export class ButtonAction {
                 }
                 tools.isMb && (modal.position = 'comCenter');
             });
-        } else if (type === 5) {
-            list();
         }
 
         function list() {
@@ -821,6 +695,88 @@ export class ButtonAction {
         function offShellMonitor() {
             d.off(window, 'sendMessage');
             d.off(window, 'sendFinish');
+        }
+
+        /**
+         * 盘点机上传下载
+         * @param ajaxData
+         * @param shellData  传递给shell的数据
+         * @param pos
+         * @param msg
+         * @param btn  确定按钮
+         */
+        function inventoryAjax(ajaxData: obj | string, btn?: HTMLElement, shellData?: obj, pos?: any, msg?: string) {
+            if (!loading) {
+                // TODO
+                loading = new Loading({
+                    msg: '正在获取数据...'
+                });
+            } else {
+                loading && loading.show();
+            }
+
+            BwRule.Ajax.fetch(CONF.siteUrl + url, {
+                type: 'POST',
+                data: ajaxData
+            }).then(({response}) => {
+                if (msg === 'callDownload') {
+                    shellData['data'] = response.body.bodyList[0].inventData;
+
+                    if ("AppShell" in window) {
+                        pos.casio.download(shellData.port, shellData.speed, shellData.data, (e) => {
+                            sendFinish && sendFinish(e);
+                        }, (e) => {
+                            sendMsg && sendMsg(e);
+                        })
+                    } else {
+                        pos.inventory({
+                            msg: msg,
+                            data: shellData,
+                        });
+                    }
+                } else {
+                    let resData = response.body && response.body.bodyList && response.body.bodyList[0];
+                    if (resData && resData.showText) {
+                        Modal.confirm({
+                            msg: resData.showText,
+                            callback: (index) => {
+                                if (index == true) {
+                                    loading && loading.show();
+                                    // BwRule.ajax(CONF.siteUrl + resData.url,{
+                                    //     type : 'post',
+                                    //     data : ajaxData,
+                                    //     success : (res) => {
+                                    //         successCb(res)
+                                    //     }
+                                    // })
+                                    BwRule.Ajax.fetch(CONF.siteUrl + resData.url, {
+                                        type: 'post',
+                                        data: ajaxData,
+                                    }).then(({response}) => {
+                                        successCb(response)
+
+                                    });
+                                } else {
+                                    btn.classList.remove('disabled');
+                                }
+                            }
+                        })
+                    } else {
+                        successCb(response)
+                    }
+                }
+            }).finally(() => {
+                loading && loading.hide();
+            });
+
+            function successCb(datas) {
+                loading && loading.hide();
+                Modal.alert(datas.msg);
+                onOk();
+                modal.destroy(() => {
+                    offShellMonitor();
+                });
+            }
         }
     }
 
