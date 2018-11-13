@@ -352,7 +352,7 @@ export class NewMBForm {
                         }
                     }
                 },
-                onDelete() {
+                onDelete: () => {
                     if (tools.isNotEmpty(upperKeyData)) {
                         for (let name in upperKeyData) {
                             if (this.coms[name]) {
