@@ -94,7 +94,7 @@ export class DetailModal {
                         // 验证成功
                         tools.isFunction(para.confirm) && para.confirm(data).then(()=>{
                             modal.isShow = false;
-                            this.destroy();
+                            this.para && this.destroy();
                         });
                     }
                 }
@@ -111,7 +111,7 @@ export class DetailModal {
             isOnceDestroy: true,
             body: formWrapper,
             onClose:()=>{
-                this.destroy();
+                this.para && this.destroy();
                 tools.isFunction(para.cancel) && para.cancel();
             },
             footer: tools.isMb ? {
@@ -124,7 +124,7 @@ export class DetailModal {
                         className: 'modal-btn edit-cancel',
                         onClick: () => {
                             modal.isShow = false;
-                            this.destroy();
+                            this.para && this.destroy();
                         }
                     },
                     footButtons.rightPanel
@@ -204,7 +204,6 @@ export class DetailModal {
         });
         this.editModule = null;
         this.para = null;
-
     }
 }
 

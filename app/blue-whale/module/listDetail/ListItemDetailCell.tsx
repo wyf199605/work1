@@ -6,14 +6,14 @@ import {BwRule} from "../../common/rule/BwRule";
 import tools = G.tools;
 import d = G.d;
 import {ActionSheet} from "../../../global/components/ui/actionSheet/actionSheet";
-import sys = BW.sys;
 import {ListItemDetail} from "./ListItemDetail";
+import sys = BW.sys;
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
 
 // 文件信息
 interface IFile {
-    unique?:string;
+    unique?: string;
     filesize?: number;
     filename?: string;
     addr?: string;
@@ -24,7 +24,7 @@ interface IDetailCell extends IComponentPara {
     type?: DetailCellType;
     caption?: string;
     value?: string | string[];
-    field?:R_Field;
+    field?: R_Field;
 }
 
 export class ListItemDetailCell extends Component {
@@ -33,6 +33,7 @@ export class ListItemDetailCell extends Component {
     private actionSheet: ActionSheet;
     private _currentFile: IFile;
     private fileType: string = '';
+
     set currentFile(fileInfo: IFile) {
         this._currentFile = fileInfo;
     }
@@ -93,7 +94,7 @@ export class ListItemDetailCell extends Component {
             d.append(imgsWrapper, <i className="appcommon app-zanwushuju"/>);
             return;
         }
-        if (Array.isArray(value)) {
+        if (Array.isArray(value) && tools.isNotEmpty(value)) {
             value.forEach((v) => {
                 d.append(imgsWrapper, <img src={v} alt={this.para.caption}/>);
             })
@@ -111,15 +112,16 @@ export class ListItemDetailCell extends Component {
                             content: '下载至本地',
                             icon: 'bg-download fg-white appcommon app-xiazaidaobendi',
                             onClick: () => {
-                                if(this.fileType === '43'){
+                                if (this.fileType === '43') {
                                     BwRule.link({
-                                        link:this.para.field.link.dataAddr,
-                                        varList:this.para.field.link.varList,
-                                        dataType:this.para.field.dataType || this.para.field.atrrs.dataType,
-                                        data:this.para.detailPage.defaultData,
-                                        type:this.para.field.link.type
+                                        link: this.para.field.link.dataAddr,
+                                        varList: this.para.field.link.varList,
+                                        dataType: this.para.field.dataType || this.para.field.atrrs.dataType,
+                                        data: this.para.detailPage.defaultData,
+                                        type: this.para.field.link.type
                                     });
-                                }else{
+                                } else {
+                                    // this.downloadFile(BW.CONF.siteUrl + this.currentFile.addr);
                                     sys.window.download(BW.CONF.siteUrl + this.currentFile.addr);
                                 }
                             }
@@ -127,7 +129,7 @@ export class ListItemDetailCell extends Component {
                     ]
                 });
             }
-            value.forEach((f, index) => {
+            Array.isArray(value) && value.forEach((f, index) => {
                 d.append(fileWrapper, <div className="detail-cell-file-item" data-index={index}>
                     <div className="file-icon"><i className="appcommon app-wenjian"/></div>
                     <div className="file-info">
@@ -140,6 +142,14 @@ export class ListItemDetailCell extends Component {
         } else {
             d.append(fileWrapper, <i className="appcommon app-zanwushuju"/>);
         }
+    }
+
+    private downloadFile(src: string) {
+        let iframe = document.createElement('iframe'),
+            body = document.getElementsByTagName('body')[0];
+        iframe.style.display = 'none';
+        iframe.src = "javascript: '<script>location.href=\"" + src + "\"<\/script>'";
+        body.appendChild(iframe);
     }
 
     private initEvent = (() => {
@@ -184,14 +194,14 @@ export class ListItemDetailCell extends Component {
                                 this.createAllFiles(dataArr, this.innerEl.files);
                             })
                         }
-                        break;
+                            break;
                         case '40':
-                        case '43':{
-                            let file:string = data as string,
+                        case '43': {
+                            let file: string = data as string,
                                 files = JSON.parse(file);
                             this.createAllFiles(files, this.innerEl.files);
                         }
-                        break;
+                            break;
                     }
                 } else {
                     this.files = [];
@@ -212,7 +222,7 @@ export class ListItemDetailCell extends Component {
 
     // 计算文件大小
     private calcFileSize(limit: number): string {
-        if (limit <= 0){
+        if (limit <= 0) {
             return '未知';
         }
         let size: string = "";

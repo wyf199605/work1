@@ -16,9 +16,10 @@ export class ListItemDetail {
     private cells: objOf<ListItemDetailCell> = {};
     public defaultData: obj = {};
     public currentPage: number = 1;
-    public totalNumber: number = 1;
+    public totalNumber: number = 0;
     private ajaxUrl: string = '';
     private actionSheet: ActionSheet;
+    private isFirst: boolean = true;
 
     constructor(private para: EditPagePara) {
         let wrapper = <div className="list-item-detail-wrapper"/>,
@@ -47,7 +48,7 @@ export class ListItemDetail {
                     field: field
                 });
             }
-        })
+        });
     }
 
     // 初始化详情数据
@@ -60,7 +61,7 @@ export class ListItemDetail {
                     pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
                 });
                 BwRule.Ajax.fetch(url).then(({response}) => {
-                    if(tools.isNotEmpty(response.body.bodyList[0])){
+                    if (tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)) {
                         let res: obj = {};
                         let meta = response.body.bodyList[0].meta,
                             dataTab = response.body.bodyList[0].dataList[0];
@@ -78,26 +79,31 @@ export class ListItemDetail {
                                 data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
                             }
                         }
+                        resolve(data);
+                    }else{
+                        Modal.alert('暂无数据!');
+                        resolve(BwRule.getDefaultByFields(fields));
                     }
-                    resolve(data);
-                })
+                });
             } else {
-                for (let key in this.cells) {
-                    data[key] = '';
-                }
                 Modal.alert('无数据地址!');
-                resolve(data);
+                resolve(BwRule.getDefaultByFields(fields));
             }
         })
     }
 
     // 上一页下一页加载数据
-    changePage(page = -1) {
-        if (page > 0) {
-            if (page > this.totalNumber) {
-                this.currentPage = this.totalNumber;
+    changePage(page?: number) {
+        if (tools.isNotEmpty(page)) {
+            if (page > 0) {
+                if (page > this.totalNumber) {
+                    this.currentPage = this.totalNumber;
+                } else {
+                    this.currentPage = page;
+                }
             } else {
-                this.currentPage = page;
+                this.totalNumber = 0;
+                this.currentPage = 1;
             }
         }
         this.checkPageButtonDisabled();
@@ -198,13 +204,14 @@ export class ListItemDetail {
                     let isAdd = btn.subType === 'update_save' ? false : true;
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: btn.subType === 'update_save' ? self.defaultData : {},
-                        isAdd:isAdd,
-                        confirm(data){
-                            return new Promise((resolve,reject)=>{
+                        isAdd: isAdd,
+                        confirm(data) {
+                            return new Promise((resolve, reject) => {
                                 ButtonAction.get().clickHandle(btn, data, () => {
                                     switch (btn.subType) {
                                         case 'insert_save': {
-                                            self.changePage(self.totalNumber + 1);
+                                            self.totalNumber += 1;
+                                            self.changePage(1);
                                             resolve();
                                         }
                                             break;
@@ -220,17 +227,18 @@ export class ListItemDetail {
                     }));
                     break;
                 case 'delete_save': {
-                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
-                        if (self.para.uiType === 'detail') {
-                            // 删除后显示下一页，如果已是最后一页，则显示上一页
-                            let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
-                            if(currentPage <= 0){
-                                sys.window.close();
-                            }else{
+                    if (self.totalNumber !== 0) {
+                        ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                            if (self.para.uiType === 'detail') {
+                                // 删除后显示下一页，如果已是最后一页，则显示上一页
+                                let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
+                                self.totalNumber = self.totalNumber - 1;
                                 self.changePage(currentPage);
                             }
-                        }
-                    });
+                        });
+                    } else {
+                        Modal.alert('无数据可以删除!');
+                    }
                 }
                     break;
                 default:
@@ -251,7 +259,7 @@ export class ListItemDetail {
             className: 'list-detail-btn',
             container: btnWrapper,
             onClick: () => {
-                if (this.currentPage !== 1){
+                if (this.currentPage !== 1) {
                     let current = this.currentPage - 1;
                     this.changePage(current);
                 }
@@ -261,7 +269,7 @@ export class ListItemDetail {
             content: '下一页',
             container: btnWrapper,
             onClick: () => {
-                if(this.currentPage !== this.totalNumber){
+                if (this.currentPage !== this.totalNumber) {
                     let current = this.currentPage + 1;
                     this.changePage(current);
                 }
@@ -272,15 +280,17 @@ export class ListItemDetail {
     }
 
     private checkPageButtonDisabled = () => {
-        if (this.totalNumber === 1) {
+        if (this.totalNumber === 1 || this.totalNumber === 0) {
             this.prev.disabled = true;
             this.next.disabled = true;
             return;
         }
         if (this.currentPage === 1) {
             this.prev.disabled = true;
+            this.next.disabled = false;
         } else if (this.currentPage === this.totalNumber) {
             this.next.disabled = true;
+            this.prev.disabled = false;
         } else {
             this.prev.disabled = false;
             this.next.disabled = false;
@@ -329,15 +339,15 @@ export class ListItemDetail {
                 v = tools.isNotEmpty(format.link) ? [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)] : '';
             } else if (type === '27' || type === '28') {
                 // 单图和多图（唯一值） 单文件和多文件(唯一值)
-                if (tools.isNotEmpty(text)){
+                if (tools.isNotEmpty(text)) {
                     let addrArr = text.split(','),
                         arr = [];
-                    addrArr.forEach(md5 => {
+                    tools.isNotEmpty(addrArr) && addrArr.forEach(md5 => {
                         // 根据md5获取文件地址
                         arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
                     });
                     v = arr;
-                }else{
+                } else {
                     v = [];
                 }
             } else if (type === '47' || type === '48') {

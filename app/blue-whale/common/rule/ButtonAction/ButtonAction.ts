@@ -181,7 +181,7 @@ export class ButtonAction {
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
-        if(!Array.isArray(dataObj) || dataObj.length === 1){
+        if(dataObj && (!Array.isArray(dataObj) || dataObj.length === 1)){
             addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj);
         }
         if(avtData){
@@ -236,6 +236,9 @@ export class ButtonAction {
                 }).catch(() => {
                 });
                 break;
+            case 'passwd':
+                this.changPasswd(btn, data, callback);
+                break;
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
@@ -248,6 +251,10 @@ export class ButtonAction {
                 }, url);
                 self.btnRefresh(btn.refresh, url);
         }
+    }
+
+    private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
+
     }
 
     initBarCode(res,data,dataObj){
@@ -596,89 +603,6 @@ export class ButtonAction {
         modal = new Modal(para);
         tipDom = d.query('.progress-title', modal.bodyWrapper); //盘点机提示
 
-
-        /**
-         * 盘点机上传下载
-         * @param ajaxData
-         * @param shellData  传递给shell的数据
-         * @param pos
-         * @param msg
-         * @param btn  确定按钮
-         */
-        function inventoryAjax(ajaxData: obj | string, btn?: HTMLElement, shellData?: obj, pos?: any, msg?: string) {
-            if (!loading) {
-                // TODO
-                loading = new Loading({
-                    msg: '正在获取数据...'
-                });
-            } else {
-                loading && loading.show();
-            }
-
-            BwRule.Ajax.fetch(CONF.siteUrl + url, {
-                type: 'POST',
-                data: ajaxData
-            }).then(({response}) => {
-                if (msg === 'callDownload') {
-                    shellData['data'] = response.body.bodyList[0].inventData;
-
-                    if ("AppShell" in window) {
-                        pos.casio.download(shellData.port, shellData.speed, shellData.data, (e) => {
-                            sendFinish && sendFinish(e);
-                        }, (e) => {
-                            sendMsg && sendMsg(e);
-                        })
-                    } else {
-                        pos.inventory({
-                            msg: msg,
-                            data: shellData,
-                        });
-                    }
-                } else {
-                    let resData = response.body && response.body.bodyList && response.body.bodyList[0];
-                    if (resData && resData.showText) {
-                        Modal.confirm({
-                            msg: resData.showText,
-                            callback: (index) => {
-                                if (index == true) {
-                                    loading && loading.show();
-                                    // BwRule.ajax(CONF.siteUrl + resData.url,{
-                                    //     type : 'post',
-                                    //     data : ajaxData,
-                                    //     success : (res) => {
-                                    //         successCb(res)
-                                    //     }
-                                    // })
-                                    BwRule.Ajax.fetch(CONF.siteUrl + resData.url, {
-                                        type: 'post',
-                                        data: ajaxData,
-                                    }).then(({response}) => {
-                                        successCb(response)
-
-                                    });
-                                } else {
-                                    btn.classList.remove('disabled');
-                                }
-                            }
-                        })
-                    } else {
-                        successCb(response)
-                    }
-                }
-            }).finally(() => {
-                loading && loading.hide();
-            });
-
-            function successCb(datas) {
-                loading && loading.hide();
-                Modal.alert(datas.msg);
-                onOk();
-                modal.destroy(() => {
-                    offShellMonitor();
-                });
-            }
-        }
-
         modal.onClose = () => {
             modal.destroy(() => {
                 if (res.downloadAddr) {
@@ -821,6 +745,88 @@ export class ButtonAction {
         function offShellMonitor() {
             d.off(window, 'sendMessage');
             d.off(window, 'sendFinish');
+        }
+
+        /**
+         * 盘点机上传下载
+         * @param ajaxData
+         * @param shellData  传递给shell的数据
+         * @param pos
+         * @param msg
+         * @param btn  确定按钮
+         */
+        function inventoryAjax(ajaxData: obj | string, btn?: HTMLElement, shellData?: obj, pos?: any, msg?: string) {
+            if (!loading) {
+                // TODO
+                loading = new Loading({
+                    msg: '正在获取数据...'
+                });
+            } else {
+                loading && loading.show();
+            }
+
+            BwRule.Ajax.fetch(CONF.siteUrl + url, {
+                type: 'POST',
+                data: ajaxData
+            }).then(({response}) => {
+                if (msg === 'callDownload') {
+                    shellData['data'] = response.body.bodyList[0].inventData;
+
+                    if ("AppShell" in window) {
+                        pos.casio.download(shellData.port, shellData.speed, shellData.data, (e) => {
+                            sendFinish && sendFinish(e);
+                        }, (e) => {
+                            sendMsg && sendMsg(e);
+                        })
+                    } else {
+                        pos.inventory({
+                            msg: msg,
+                            data: shellData,
+                        });
+                    }
+                } else {
+                    let resData = response.body && response.body.bodyList && response.body.bodyList[0];
+                    if (resData && resData.showText) {
+                        Modal.confirm({
+                            msg: resData.showText,
+                            callback: (index) => {
+                                if (index == true) {
+                                    loading && loading.show();
+                                    // BwRule.ajax(CONF.siteUrl + resData.url,{
+                                    //     type : 'post',
+                                    //     data : ajaxData,
+                                    //     success : (res) => {
+                                    //         successCb(res)
+                                    //     }
+                                    // })
+                                    BwRule.Ajax.fetch(CONF.siteUrl + resData.url, {
+                                        type: 'post',
+                                        data: ajaxData,
+                                    }).then(({response}) => {
+                                        successCb(response)
+
+                                    });
+                                } else {
+                                    btn.classList.remove('disabled');
+                                }
+                            }
+                        })
+                    } else {
+                        successCb(response)
+                    }
+                }
+            }).finally(() => {
+                loading && loading.hide();
+            });
+
+            function successCb(datas) {
+                loading && loading.hide();
+                Modal.alert(datas.msg);
+                onOk();
+                modal.destroy(() => {
+                    offShellMonitor();
+                });
+            }
         }
     }
 

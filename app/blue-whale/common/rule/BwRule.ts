@@ -81,10 +81,13 @@ export class BwRule extends Rule {
                 } else {
                     resolve({})
                 }
-            }).then((gps) => {
+            }).then((gps: obj) => {
                 return new Promise<IAjaxSuccess>((resolve, reject) => {
-
-                    setting.headers = Object.assign(setting.headers || {}, {position: JSON.stringify(gps)});
+                    let gpsObj = {
+                        latitude : gps.latitude,
+                        longitude : gps.longitude
+                    };
+                    setting.headers = Object.assign(setting.headers || {}, {position: JSON.stringify(gpsObj)});
 
                     super.fetch(url, setting).then((result) => {
                         // debugger;

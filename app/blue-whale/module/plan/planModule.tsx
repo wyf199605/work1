@@ -13,6 +13,7 @@ import {DetailModal} from "../listDetail/DetailModal";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -45,6 +46,8 @@ export class PlanModule extends Component{
         super(para);
         let ui = this.ui = para.ui;
         this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
+        //this.isEditPlan = false;
+
 
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
@@ -53,6 +56,23 @@ export class PlanModule extends Component{
             this.plotBtn.disabled = true;
         }
         this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+        this.initSubBtn();
+    }
+
+    protected initSubBtn(){
+        let btnWrapper = d.query('.query-form',this.container),
+            ui = this.ui,
+            subButtons = ui.subButtons.filter((btn) => btn.multiselect === 0);
+
+        subButtons.forEach((btnUi) => {
+            d.append(btnWrapper, <div className="form-com-item">
+                <Button icon={btnUi.icon} content={btnUi.title} data={btnUi}
+                    onClick={() => {
+                        ButtonAction.get().clickHandle(btnUi, void 0, (res) => {
+                        }, void 0 , ui.itemId);
+                }}/>
+            </div>)
+        })
     }
 
     protected initDraw(imageUrl: string){
@@ -60,8 +80,8 @@ export class PlanModule extends Component{
             cols = ui.cols;
 
         this.draw = new DrawPoint({
-            height: 500,
-            width: 800,
+            height: 800,
+            width: 1200,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
