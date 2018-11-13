@@ -180,6 +180,9 @@
         flex: 1 1 auto;
         .list-item-body {
           margin-top: 0;
+          p{
+            color: #666666 !important;
+          }
         }
       }
     }
@@ -246,7 +249,7 @@
         }
       }
       .list-item-details {
-        color: #666;
+        color: #666666;
         width: 100%;
         display: flex;
         align-items: flex-start;
