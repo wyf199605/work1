@@ -69,6 +69,7 @@ export class SlidePopover extends Component {
             isShow: false,
             isBackground: true,
             position: 'up',
+            container: this.wrapper
         }, this.paraModal));
         let rows = this.buttons.length / 3;
         this.modal.height = 42 * rows + 10 * 2 + 'px';  // 10*2是指上下的padding
