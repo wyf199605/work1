@@ -46,6 +46,8 @@ export class PlanModule extends Component{
         super(para);
         let ui = this.ui = para.ui;
         this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
+        //this.isEditPlan = false;
+
 
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
@@ -58,7 +60,7 @@ export class PlanModule extends Component{
     }
 
     protected initSubBtn(){
-        let btnWrapper = d.query('.query-form',this.wrapper),
+        let btnWrapper = d.query('.query-form',this.container),
             ui = this.ui,
             subButtons = ui.subButtons.filter((btn) => btn.multiselect === 0);
 
@@ -78,8 +80,8 @@ export class PlanModule extends Component{
             cols = ui.cols;
 
         this.draw = new DrawPoint({
-            height: 500,
-            width: 800,
+            height: 800,
+            width: 1200,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
