@@ -102,6 +102,13 @@ export class PlanModule extends Component{
                                 resolve(data)
                             });
                         case 'pick':
+                            let pickCol;
+                            for(let col of cols){
+                                if(col.elementType === 'pick'){
+
+                                    break;
+                                }
+                            }
                             break;
                     }
                 })

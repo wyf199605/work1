@@ -20,7 +20,7 @@ interface IDrapPoint extends IComponentPara {
 }
 
 interface IAreaType {
-    type: 'edit';
+    type: 'edit' | 'pick';
     data?: obj;
     name?: string;
 }
