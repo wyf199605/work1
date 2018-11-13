@@ -222,7 +222,6 @@ export class ButtonAction {
 
                 addr = tools.url.addObj(addr, {output: 'json'});
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
-                    console.log(response);
                     //创建条码扫码页面
                     if(response.uiType === 'inventory' && tools.isMb){
                         this.initBarCode(response,data,dataObj);
@@ -289,7 +288,7 @@ export class ButtonAction {
     /**
      * 后台有配置actionHandle情况下的处理
      */
-    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
+    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string, isRefresh = true) {
         let self = this;
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
             data2url: btn.actionAddr.varType !== 3,
@@ -309,14 +308,13 @@ export class ButtonAction {
                             msg: data.showText,
                             callback: (confirmed) => {
                                 if (confirmed) {
-                                    self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then(() => {
+                                    self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url, false).then(() => {
                                         resolve();
                                     });
                                 }
                             }
                         });
                     })
-
                 }
             } else {
                 // 默认提示
@@ -325,7 +323,7 @@ export class ButtonAction {
                         Modal.alert(data.showText);
                     } else if (btn.openType !== 'popup') {
                         Modal.toast(response.msg || `${btn.title}成功`);
-                        self.btnRefresh(btn.refresh, url);
+                        isRefresh && self.btnRefresh(btn.refresh, url);
                     }
                 }
                 return response;
