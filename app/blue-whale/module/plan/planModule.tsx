@@ -48,6 +48,7 @@ export class PlanModule extends Component{
         this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
         //this.isEditPlan = false;
 
+
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
             d.append(this.wrapper, this.btnWrapper);
@@ -59,7 +60,7 @@ export class PlanModule extends Component{
     }
 
     protected initSubBtn(){
-        let btnWrapper = d.query('.query-form',this.wrapper),
+        let btnWrapper = d.query('.query-form',this.container),
             ui = this.ui,
             subButtons = ui.subButtons.filter((btn) => btn.multiselect === 0);
 
