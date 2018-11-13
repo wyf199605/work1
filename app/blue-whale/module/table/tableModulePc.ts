@@ -15,6 +15,7 @@ import {Button} from "../../../global/components/general/button/Button";
 import {TextInput} from "../../../global/components/form/text/text";
 import {Inputs} from "../inputs/inputs";
 import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
+import {TableColumn} from "../../../global/components/newTable/base/TableColumn";
 
 export = class TableModulePc extends TableModule {
 
@@ -394,7 +395,7 @@ export = class TableModulePc extends TableModule {
                     label = new Print({
                         printList: printList ? printList : self.para.printList,
                         container: d.closest(self.wrapper, 'div.page-container'),
-                        cols : self.table.getVisibleCol(),
+                        cols : self.table.getVisibleCol() as any,
                         getData: function () {
                             return self.table.dataGet();
                         },

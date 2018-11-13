@@ -11,7 +11,7 @@ interface ComPara{
     tabIndexKey? : number
 }
 
-type Primitive = string | number | boolean
+// type Primitive = string | number | boolean
 
 interface COL{
     title: string;
@@ -155,7 +155,7 @@ interface R_Input {
     inputType?: string, //1扫描枪；2键盘输入；3键盘选择
 }
 
-declare const mui: any;
+// declare const mui: any;
 
 interface HTMLElementEventMap {
     "pan": IDefinedEvent
@@ -176,5 +176,5 @@ interface IVNode {
     children?: (IVNode | string)[];
     key?: string;
 }
-declare const webkit :any;
-declare const BlueWhaleShell: any;
+// declare const webkit :any;
+// declare const BlueWhaleShell: any;
