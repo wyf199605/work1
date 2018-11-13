@@ -145,7 +145,7 @@ module.exports = class Compiler {
                                 return getPromise(filesurl, self.rConfig.btl.src, rname, target, data);
                             }
                         }).catch((e, fd) => {
-                            fs.close(fd);
+                            fd && fs.close(fd);
                         });
                     }
                     cb();

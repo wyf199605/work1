@@ -7,3 +7,6 @@
 /// <reference path="common/sys/sysPage.pc.ts"/>
 /// <reference path="common/sys/sysTab.pc.ts"/>
 /// <reference path="common/sys/sys.ts"/>
+declare const webkit : any;
+declare const mui : any;
+declare const BlueWhaleShell : any;

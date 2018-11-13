@@ -48,8 +48,8 @@ interface LabelPrintModulePara {
 
     cols?: TableColumn[];
     callBack?: Function,
-    moneys: objOf<obj>;
-    defaultVal: obj;
+    moneys?: objOf<obj>;
+    defaultVal?: obj;
     onSetDefault?: (data: string) => void;
 }
 
