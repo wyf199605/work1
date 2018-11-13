@@ -45,8 +45,8 @@ export class PlanModule extends Component{
     constructor(para: IPlanModulePara){
         super(para);
         let ui = this.ui = para.ui;
-        this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
-        //this.isEditPlan = false;
+        //this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
+        this.isEditPlan = false;
 
 
         if(this.isEditPlan){
