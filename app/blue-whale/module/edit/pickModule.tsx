@@ -51,8 +51,7 @@ export class PickModule extends TextInput {
         this.p = para;
     }
 
-
-    private pickInit() {
+    pickInit() {
         if (!this.modal) {
             let self = this,
                 isDefault = true,

@@ -27,6 +27,10 @@ export = class FormPage extends BasicPage {
                 field: nameFields[f.name]
             };
 
+            if(field.field && field.field.noShow){
+                field.dom.classList.add('hide');
+            }
+
             emPara.fields.push(field);
 
             if(['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit){
@@ -48,7 +52,6 @@ export = class FormPage extends BasicPage {
         //         field.dom.classList.add('disabled');
         //     }
         // }
-
         this.editModule = new EditModule(emPara);
 
         // 编辑标识
