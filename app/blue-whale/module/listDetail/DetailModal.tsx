@@ -33,9 +33,10 @@ interface ComInitFun {
 
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
-    isAdd?:boolean;
+    isAdd?: boolean;
+
     cancel?(); // 取消回调
-    confirm?(data:obj): Promise<any>; //确定回调
+    confirm?(data: obj): Promise<any>; //确定回调
 }
 
 interface NewFormEdit {
@@ -77,7 +78,7 @@ export class DetailModal {
                     Modal.confirm({
                         msg: '确定取消编辑吗?',
                         callback: (flag) => {
-                            if (flag){
+                            if (flag) {
                                 modal.isShow = false;
                             }
                         }
@@ -92,7 +93,7 @@ export class DetailModal {
                     let data = this.dataGet();
                     if (this.validate(data)) {
                         // 验证成功
-                        tools.isFunction(para.confirm) && para.confirm(data).then(()=>{
+                        tools.isFunction(para.confirm) && para.confirm(data).then(() => {
                             modal.isShow = false;
                             this.para && this.destroy();
                         });
@@ -110,7 +111,7 @@ export class DetailModal {
             isModal: tools.isMb,
             isOnceDestroy: true,
             body: formWrapper,
-            onClose:()=>{
+            onClose: () => {
                 this.para && this.destroy();
                 tools.isFunction(para.cancel) && para.cancel();
             },
@@ -118,7 +119,7 @@ export class DetailModal {
                 leftPanel: [footButtons.leftPanel],
                 rightPanel: [footButtons.rightPanel]
             } : {
-                rightPanel:[
+                rightPanel: [
                     {
                         content: '取消',
                         className: 'modal-btn edit-cancel',
@@ -132,9 +133,9 @@ export class DetailModal {
             }
         });
         this.editModule = new NewMBForm(emPara);
-        if (para.isAdd){
-            if(tools.isNotEmpty(para.fm.defDataAddrList)){
-                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response})=>{
+        if (para.isAdd) {
+            if (tools.isNotEmpty(para.fm.defDataAddrList)) {
+                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response}) => {
                     // 字段默认值
                     this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
                     // 新增时的默认值
@@ -146,10 +147,10 @@ export class DetailModal {
                     }
                     this.editModule.set(res);
                 })
-            }else{
+            } else {
                 this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
             }
-        }else{
+        } else {
             // 字段默认值
             this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
             // 修改时字段的值
@@ -324,6 +325,7 @@ export class NewMBForm {
             });
         },
         file: (p): FormCom => {
+            let upperKeyData = {};
             return new Accessory({
                 nameField: p.field.name,
                 container: p.dom,
@@ -335,7 +337,6 @@ export class NewMBForm {
                         type = p.field.dataType || p.field.atrrs.dataType;
                     // fileId 值加入额外数据中
                     if (type === '43') {
-                        let upperKeyData = {};
                         for (let field in data) {
                             let {key, value} = data[field];
                             upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
@@ -352,7 +353,15 @@ export class NewMBForm {
                     }
                 },
                 onDelete() {
-                    this.comsExtraData[p.field.name] = {};
+                    if (tools.isNotEmpty(upperKeyData)) {
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: ''});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = '';
+                            }
+                        }
+                    }
                 }
             });
         },
@@ -495,15 +504,15 @@ export class NewMBForm {
             if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
                 type = 'pickInput';
             } else if (field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
-                if(field.elementType === 'lookup'){
-                    initP.onExtra = (data:obj, relateCols: string[])=>{
-                        relateCols.forEach((relate,index) => {
+                if (field.elementType === 'lookup') {
+                    initP.onExtra = (data: obj, relateCols: string[]) => {
+                        relateCols.forEach((relate, index) => {
                             this.getDom(relate).set(data[relate]);
                         })
                     }
                 }
                 type = 'selectInput';
-            } else if(field.dataType === '77' || (field.atrrs && field.atrrs.dataType === '77')){
+            } else if (field.dataType === '77' || (field.atrrs && field.atrrs.dataType === '77')) {
                 initP.dom && initP.dom.classList.add('hide');
                 type = 'virtual';
             }
