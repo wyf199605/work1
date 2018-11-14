@@ -22,6 +22,10 @@ export class SubBtnMenu {
             children: this.handlerMenuData(para.buttons)
         });
         this.contextMenu.wrapper.classList.add('ftable-context-menu');
+
+        this.contextMenu.onOpen = (node) => {
+            this.onClick && this.onClick(node.content.buttons);
+        }
     }
 
     protected _onClick: (btn: R_Button) => void;
@@ -45,6 +49,10 @@ export class SubBtnMenu {
         return this._show;
     }
 
+    setPosition(x: number, y: number){
+        this.contextMenu.setPosition(x, y);
+    }
+
     // 处理选项转换为menuData
     private handlerMenuData(btns: R_Button[]): IMenuPara[] {
         let menuData: IMenuPara[] = [];
@@ -53,12 +61,18 @@ export class SubBtnMenu {
             menuObj['text'] = btn.caption;
             menuObj['icon'] = btn.icon;
 
-            menuObj['content'].click = () => {
-                this.onClick && this.onClick(btn);
+            menuObj['content'] = {
+                button: btn
             };
 
             menuData.push(menuObj);
         });
         return menuData;
+    }
+
+    destory() {
+        this.contextMenu.destroy();
+        this.contextMenu = null;
+        this._onClick = null;
     }
 }
