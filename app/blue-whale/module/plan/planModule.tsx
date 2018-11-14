@@ -141,7 +141,7 @@ export class PlanModule extends Component{
                         case 'btn':
                             ButtonAction.get().clickHandle(areaType.content.button, areaType.data, () => {
                                 resolve();
-                            });
+                            }, this.pageUrl , ui.itemId);
                             break;
                     }
                 })
