@@ -311,8 +311,8 @@ export class DrawPoint extends Component {
                                   str += (toolData[i] + "<br/>");
                             }
                             that.tooltip.html(str)
-                                .style('left',(D3.event.pageX) + 'px')
-                                .style('top',(D3.event.screenX + D3.event.screenY)- 10 + 'px')
+                                .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
+                                .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
                                 .style('opacity',1.0)
                         }).on('mouseout',function (d) {
                             that.tooltip.style('opacity',0);
