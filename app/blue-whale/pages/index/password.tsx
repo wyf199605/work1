@@ -25,7 +25,7 @@ export class PersonPassword extends BasicPage{
             userInfo = {};
         }
 
-        return BwRule.Ajax.fetch(CONF.siteUrl + CONF.ajaxUrl.personPassword, {
+        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
             type: 'POST',
             data: {
                 'upuserid': userInfo['userid'],
