@@ -4,6 +4,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {IDrawFormatData} from "../plan/planModule";
 import tools = G.tools;
+import {SubBtnMenu} from "../contextMenu/subBtnMenu";
 
 declare const D3;
 //开启描点连线功能
@@ -17,15 +18,17 @@ interface IDrapPoint extends IComponentPara {
     format?: (data: obj) => IDrawFormatData[];
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
     isShow?: boolean; // 默认false
+    subButton?: R_Button[];
 }
 
 interface IAreaType {
-    type: 'edit' | 'pick';
+    type: 'edit' | 'pick' | 'btn';
     data?: obj;
     name?: string;
 }
 
 export class DrawPoint extends Component {
+    protected contextMenu: SubBtnMenu;
     public svg;
     public g;
     public index = 0;
@@ -45,6 +48,7 @@ export class DrawPoint extends Component {
     public zoom;
     private isShowStatus:boolean;
     private tooltip ;
+    protected selectedData: obj;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -57,6 +61,16 @@ export class DrawPoint extends Component {
 
     constructor(protected para: IDrapPoint) {
         super(para);
+        //初始化右键菜单
+        this.contextMenu = new SubBtnMenu({
+            buttons: para.subButton,
+            onClick: () => {
+                this.onAreaClick({
+                    type: 'btn',
+                    data: this.selectedData
+                });
+            }
+        })
 
         this.onAreaClick = para.onAreaClick;
         this.format = para.format;
