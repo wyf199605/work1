@@ -24,7 +24,7 @@ export class SubBtnMenu {
         this.contextMenu.wrapper.classList.add('ftable-context-menu');
 
         this.contextMenu.onOpen = (node) => {
-            this.onClick && this.onClick(node.content.buttons);
+            this.onClick && this.onClick(node.content.button);
         }
     }
 
