@@ -49,22 +49,20 @@ export class PlanModule extends Component{
         this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
         //this.isEditPlan = false;
 
-        let globalBtns = ui.subButtons.filter((btn) => btn.multiselect === 0),
-            subBtns = ui.subButtons.filter((btn) => btn.multiselect !== 0);
-
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
             d.append(this.wrapper, this.btnWrapper);
             this.plotBtn.init();
             this.plotBtn.disabled = true;
         }
-        this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
-        this.initSubBtn(globalBtns);
+        this.initDraw();
+        this.initSubBtn();
     }
 
-    protected initSubBtn(subButtons: R_Button[]){
+    protected initSubBtn(){
         let btnWrapper = d.query('.query-form',this.container),
-            ui = this.ui;
+            ui = this.ui,
+            subButtons = ui.subButtons.filter((btn) => btn.multiselect === 0);
 
         subButtons.forEach((btnUi) => {
             d.append(btnWrapper, <div className="form-com-item">
@@ -77,8 +75,9 @@ export class PlanModule extends Component{
         })
     }
 
-    protected initDraw(imageUrl: string){
+    protected initDraw(){
         let ui = this.ui,
+            sunButtons = ui.subButtons.filter((btn) => btn.multiselect !== 0),
             cols = ui.cols;
 
         this.draw = new DrawPoint({
