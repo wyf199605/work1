@@ -4,6 +4,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {IDrawFormatData} from "../plan/planModule";
 import tools = G.tools;
+import d = G.d;
 import {SubBtnMenu} from "../contextMenu/subBtnMenu";
 
 declare const D3;
@@ -51,9 +52,9 @@ export class DrawPoint extends Component {
     protected selectedData: obj;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
-    static EVT_INSERT_DATA = '__event_insert_area_click__';
-    static EVT_DELETE_DATA = '__event_delete_area_click__';
-    static EVT_IMG_INIT = '__event_image_area_click__';
+    // static EVT_INSERT_DATA = '__event_insert_area_click__';
+    // static EVT_DELETE_DATA = '__event_delete_area_click__';
+    // static EVT_IMG_INIT = '__event_image_area_click__';
 
     protected wrapperInit() {
         return <div className="draw-point-wrapper"/>;
@@ -61,8 +62,13 @@ export class DrawPoint extends Component {
 
     constructor(protected para: IDrapPoint) {
         super(para);
+
+        d.on(this.wrapper,'contextmenu', (e) =>{
+            e.preventDefault()
+        })
         //初始化右键菜单
         this.contextMenu = new SubBtnMenu({
+            container:this.wrapper,
             buttons: para.subButton,
             onClick: () => {
                 this.onAreaClick({
@@ -105,7 +111,8 @@ export class DrawPoint extends Component {
         this.svg = D3.select('.draw-point-wrapper').append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
-            .on('mousedown', () => {
+            .on('mousedown', (e) => {
+                this.contextMenu.show = false;
                 if (!this.isDrawLine) {
                     return
                 }
@@ -173,7 +180,6 @@ export class DrawPoint extends Component {
 
     public render(data?: obj[]) {
 
-
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
@@ -206,7 +212,17 @@ export class DrawPoint extends Component {
         }
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
-            let group = this.g.append('g').datum(d);
+            let group = this.g.append('g').datum(d).on('contextmenu',()=>{
+                if(this.isShowStatus){
+                    this.selectedData = d
+                    D3.event.preventDefault();
+                    console.log(D3.mouse(this.svg.node()));
+                    let x = D3.mouse(this.svg.node())[0],y = D3.mouse(this.svg.node())[1]
+                    this.contextMenu.setPosition(x,y);
+                    this.contextMenu.show = true;
+                }
+            });
+
             let point = [],
                 I = 0,
                 toolData = [];
@@ -356,6 +372,7 @@ export class DrawPoint extends Component {
             }).on('mouseout',function (d) {
             D3.select(this).transition().attr('y',y).ease("bounce");
             }).on('click', tools.pattern.throttling((d)=> {
+               console.log(D3.event);
              this.onAreaClick({
                  type:'pick',
                  data:this._data
@@ -363,9 +380,7 @@ export class DrawPoint extends Component {
              }).then((data)=>{
                  alert(data)
              })
-        }, 1000)).on('contentmenu', ()=> {
-            this.contextMenuEvent.on();
-        })
+        }, 1000))
     }
 
     private contextMenuEvent = (() => {
