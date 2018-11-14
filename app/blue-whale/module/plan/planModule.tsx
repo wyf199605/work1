@@ -100,32 +100,34 @@ export class PlanModule extends Component{
                 return new Promise((resolve, reject) => {
                     switch (areaType.type){
                         case 'edit':
-                            return this.edit.editData(areaType.data, (data) => {
+                            this.edit.editData(areaType.data, (data) => {
                                 resolve(data)
                             });
+                            break;
                         case 'pick':
-                            return new Promise((resolve, reject) => {
-                                for(let col of cols){
-                                    if(col.elementType === 'pick'){
-                                        let pick = new PickModule({
-                                            container: document.body,
-                                            field: col,
-                                            data: areaType.data,
-                                            dataGet: () => areaType.data,
-                                            onGetData: (dataArr: obj[], otherField: string) => {
-                                                resolve(dataArr[0] ? dataArr[0] : null);
-                                                pick.destroy();
-                                            }
-                                        });
-                                        pick.wrapper.classList.add('hide');
-                                        pick.pickInit();
-                                    }
+                            for(let col of cols){
+                                if(col.elementType === 'pick'){
+                                    let pick = new PickModule({
+                                        container: document.body,
+                                        field: col,
+                                        data: areaType.data,
+                                        dataGet: () => areaType.data,
+                                        onGetData: (dataArr: obj[], otherField: string) => {
+                                            resolve(dataArr[0] ? dataArr[0] : null);
+                                            pick.destroy();
+                                        }
+                                    });
+                                    pick.wrapper.classList.add('hide');
+                                    pick.pickInit();
+                                    break;
                                 }
-                            });
+                            }
+                            break;
                         case 'btn':
                             ButtonAction.get().clickHandle(areaType.content.button, areaType.data, () => {
                                 resolve();
-                            })
+                            });
+                            break;
                     }
                 })
 
