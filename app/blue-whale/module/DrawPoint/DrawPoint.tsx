@@ -102,7 +102,7 @@ export class DrawPoint extends Component {
          this.LR = D3.scale.linear()
             .domain([1,6])
             .range([5,0.3])
-        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').style('opacity',0.0)
+        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').attr('display','none')
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
 
@@ -313,9 +313,9 @@ export class DrawPoint extends Component {
                             that.tooltip.html(str)
                                 .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
                                 .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
-                                .style('opacity',1.0)
+                                .style('display','block')
                         }).on('mouseout',function (d) {
-                            that.tooltip.style('opacity',0);
+                            that.tooltip.style('display','none');
                         })
                         .style("pointer-events",()=>{
                             if(this.isDrawLine){
