@@ -738,11 +738,11 @@ export class FastBtnTable extends FastTable{
                      names.push(col.name);
                  }
             });
-            let table: HTMLTableElement = this.mainTable.body.tableEl.cloneNode(true) as HTMLTableElement,
-                thead = d.query('thead', this.mainTable.head.tableEl).cloneNode(true);
-            table.appendChild(thead);
-            table.border = '1';
-            let div = <div style="overflow: auto; height: auto; width: 100%"></div>;
+            let tbody = d.query('tbody', this.mainTable.body.tableEl).cloneNode(true) as HTMLElement,
+                thead = d.query('thead', this.mainTable.head.tableEl).cloneNode(true) as HTMLElement;
+            let table = <table border="1"/>,
+                div = <div style="overflow: auto; height: auto; width: 100%"></div>;
+            table.innerHTML = thead.innerHTML + tbody.innerHTML;
             d.append(document.body, div);
             d.append(div, table);
             tableExport(table, this.exportTitle, action);

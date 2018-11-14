@@ -2,6 +2,10 @@
   position: relative;
   min-width: 50px;
 
+  &.disabled{
+    cursor: no-drop;
+  }
+
   &.error{
       border:1px solid red;
   }

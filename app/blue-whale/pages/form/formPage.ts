@@ -55,6 +55,7 @@ export = class FormPage extends BasicPage {
         //     }
         // }
         this.editModule = new EditModule(emPara);
+
         emPara.fields.forEach((f) => {
             let field = f.field,
                 name = field.name,
