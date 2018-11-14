@@ -36,6 +36,11 @@ export class NewTablePage extends BasicPage{
             tableEl: bwTableEl,
             asynData : para.ui.body.elements[1] // 异步查询
         });
+
+        // Shell触发的刷新事件
+        this.on(BwRule.EVT_REFRESH, () => {
+            bwTable.tableModule && bwTable.tableModule.refresh();
+        });
     }
 }
 
@@ -227,10 +232,6 @@ export class BwTableElement extends Component{
         }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
             this.locationLine(line, para);
         }
-
-        this.on(BwRule.EVT_REFRESH, () => {
-            this.tableModule && this.tableModule.refresh();
-        });
     }
 
     private asynQuery(asynData){
