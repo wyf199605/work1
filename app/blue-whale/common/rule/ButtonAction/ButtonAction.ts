@@ -209,7 +209,7 @@ export class ButtonAction {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
-                self.checkAction(btn, dataObj, addr, ajaxType, res, url, false).then(response => {
+                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
                 }).catch(() => {
@@ -336,7 +336,7 @@ export class ButtonAction {
     /**
      * 后台有配置actionHandle情况下的处理
      */
-    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string, isRefresh = true) {
+    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
         let self = this;
         return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
             data2url: btn.actionAddr.varType !== 3,
@@ -356,7 +356,7 @@ export class ButtonAction {
                             msg: data.showText,
                             callback: (confirmed) => {
                                 if (confirmed) {
-                                    self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url, false).then(() => {
+                                    self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then(() => {
                                         resolve();
                                     });
                                 }
@@ -371,7 +371,6 @@ export class ButtonAction {
                         Modal.alert(data.showText);
                     } else if (btn.openType !== 'popup') {
                         Modal.toast(response.msg || `${btn.title}成功`);
-                        isRefresh && self.btnRefresh(btn.refresh, url);
                     }
                 }
                 return response;
