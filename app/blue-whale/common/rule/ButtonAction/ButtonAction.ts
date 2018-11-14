@@ -209,7 +209,7 @@ export class ButtonAction {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
-                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                self.checkAction(btn, dataObj, addr, ajaxType, res, url, false).then(response => {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
                 }).catch(() => {
