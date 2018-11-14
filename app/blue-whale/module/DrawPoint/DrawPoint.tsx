@@ -102,7 +102,7 @@ export class DrawPoint extends Component {
          this.LR = D3.scale.linear()
             .domain([1,6])
             .range([5,0.3])
-        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').attr('display','none')
+        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').style('display','none')
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
 
@@ -378,7 +378,7 @@ export class DrawPoint extends Component {
             }).on('click', tools.pattern.throttling((d)=> {
                console.log(D3.event);
              this.onAreaClick({
-                 type:'pick',
+                 type:'link',
                  data:this._data
 
              }).then((data)=>{
