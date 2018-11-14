@@ -146,10 +146,11 @@ export class DrawPoint extends Component {
             on: () => {
                 this.g.selectAll('g').on('click', function (d, i) {
                     self.onAreaClick && self.onAreaClick({
-                        type: 'edit',
+                        type: 'pick',
                         data: d
                     }).then((data) => {
-                        self.showData(data, D3.select(this))
+                        let newData = Object.assign({},d,data);
+                        self.showData(newData, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
                     D3.select(this).select('path').attr('fill', 'gold').attr('fill-opacity', 0.5)
@@ -654,7 +655,7 @@ export class DrawPoint extends Component {
             that.index = parseInt(that.indexStr.slice(4, that.indexStr.length));
             that.points = that.map.get(that.index);
             that.isDrawLine = true;
-            this.fishe = false;
+            that.fishe = false;
             that.redraw();
             that.selectedG = D3.select(this);
             D3.select(this).attr('class',function (d) {
