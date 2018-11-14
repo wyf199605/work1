@@ -2,10 +2,12 @@
 import d = G.d;
 import tools = G.tools;
 import {Button} from "../../../global/components/general/button/Button";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IChangePasswordPara{
     container:HTMLElement;
     confirm?: (obj) => Promise<any> ;
+    cancel?: () => void;
     data?: obj;
 }
 
@@ -19,7 +21,7 @@ export class ChangePassword{
            container: btnGroup,
            content:'确定',
            className:'btn-confirm',
-           onClick:() =>{
+           onClick:() => {
                let data = this.dataGet(body);
                if(tools.isFunction( para.confirm )){
                    para.confirm(data).then(() => {
@@ -33,7 +35,9 @@ export class ChangePassword{
            content:'取消',
            className:'btn-cancel',
            onClick:() =>{
-               this.destory();
+               if(tools.isFunction( para.cancel )){
+                   this.destory();
+               }
            }
        });
        d.append(para.container, body);
@@ -42,14 +46,14 @@ export class ChangePassword{
        let oldPassword = d.query('.old-password', el) as HTMLInputElement;
        let newPassword = d.query('.new-password', el) as HTMLInputElement;
        let confirmPassword = d.query('.confirm-password', el) as HTMLInputElement;
-       let data = [];
+       let data = {};
        if(oldPassword.value == '' || newPassword.value == '' || confirmPassword.value == ''){
-           alert('您有未填写的项目');
-           data = null;
+           Modal.alert('您有未填写的项目');
+           data = {};
        }else{
            if(confirmPassword.value !== newPassword.value){
-               alert('两次输入的密码不一致');
-               data = null;
+               Modal.alert('两次输入的密码不一致');
+               data = {};
            }else{
                data['old_password'] = oldPassword.value;
                data['new_password'] = newPassword.value;
@@ -59,27 +63,19 @@ export class ChangePassword{
    }
 
    static initInput(para:obj): HTMLElement{
-       console.log(para);
-
-       return <form action="#" class="password-form">
+       let form = <form action="#" class="password-form">
            {Object.keys(para).map((key) => <div className="form-group"><span>{key}：</span><input type="text" readOnly value={para[key]}/></div>)}
-           <div className="form-group">
-               <span>旧密码：</span><input className="old-password" type="password" placeholder="请输入旧密码"/>
-           </div>
-           <div className="form-group">
-               <span>新密码：</span><input className="new-password" type="password" placeholder="请输入新密码"/>
-           </div>
-           <div className="form-group">
-               <span>确认密码：</span><input className="confirm-password" type="password" placeholder="确认新密码"/>
-           </div>
-           <div className="btn-group">
-           </div>
        </form>
+       let oldPassword = <div className="form-group"><span>旧密码：</span><input className="old-password" type="password" placeholder="请输入旧密码"/></div>;
+       let newPassword = <div className="form-group"><span>新密码：</span><input className="new-password" type="password" placeholder="请输入新密码"/></div>;
+       let confirmPassword = <div className="form-group"><span>确认密码：</span><input className="confirm-password" type="password" placeholder="确认新密码"/></div>;
+       let btn = <div className="btn-group"/>;
+       let input = h("form",{'class':'password-form'},oldPassword,newPassword,confirmPassword,btn);
+       d.append(form,input);
+       return form;
    }
-   destory(){
+
+   private destory(){
        document.body.classList.remove('cpw-content');
    }
 }
-
-
-

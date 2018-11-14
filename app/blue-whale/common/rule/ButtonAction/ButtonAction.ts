@@ -254,20 +254,24 @@ export class ButtonAction {
     }
 
     private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
-        let that = this;
+        let self = this;
         return new Promise( (resolve, reject)=>{
             require(['ChangePassword', 'Modal'],  (c, m) => {
                 let body = d.create('<div></div>');
-                let changePassword = c.ChangePassword({
+                let changePassword = new c.ChangePassword({
                     container: body,
                     data: dataObj,
-                    confirm: obj =>({
-                    })
+                    confirm: obj =>{
+                        return this.sendMessage(obj);
+                    },
+                    cancel:()=>{
+                        passwordModal.destroy();
+                    }
                 });
                 let passwordModal = new Modal({
                     header: '修改密码',
                     body,
-                    width: '500px',
+                    width: '540px',
                     height: '300px',
                     className: 'password-modal',
                     isOnceDestroy: true,
