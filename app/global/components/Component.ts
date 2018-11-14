@@ -136,9 +136,9 @@ namespace G{
                 if (tools.isNotEmpty(e)) {
                     this._disabled = e;
                     if (this._disabled) {
-                        this.wrapper.classList.add('disabled');
+                        this.wrapper && this.wrapper.classList.add('disabled');
                     } else {
-                        this.wrapper.classList.remove('disabled');
+                        this.wrapper && this.wrapper.classList.remove('disabled');
                     }
                 }
             }

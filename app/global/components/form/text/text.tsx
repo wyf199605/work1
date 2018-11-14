@@ -204,6 +204,20 @@ export class TextInput extends FormCom {
         typeof this.onSet === 'function' && this.onSet(str);
     }
 
+    set disabled(e: boolean){
+        if (this._disabled !== e) {
+            if (tools.isNotEmpty(e)) {
+                this._disabled = e;
+                if (this._disabled) {
+                    this.wrapper && this.wrapper.classList.add('disabled');
+                } else {
+                    this.wrapper && this.wrapper.classList.remove('disabled');
+                }
+            }
+        }
+        this.input && (this.input.disabled = e || false);
+    }
+
     protected wrapperInit(para: ITextInputPara = {}): HTMLElement {
         let icons = para.icons,
             isNotEmptyIcons = tools.isNotEmptyArray(icons);

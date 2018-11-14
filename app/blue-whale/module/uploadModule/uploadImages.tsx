@@ -14,7 +14,7 @@ export interface IImage {
     unique?: string;
     isError?: boolean;
     localUrl?: string;
-    isOnLine?:boolean;
+    isOnLine?: boolean;
 }
 
 interface IUploadImages extends IUploaderPara {
@@ -64,17 +64,17 @@ export class UploadImages extends FormCom {
     set value(val: string) {
         this._value = val || '';
         if (tools.isNotEmpty(val)) {
-            switch (this.imgType){
-                case '20':{
+            switch (this.imgType) {
+                case '20': {
                     this.imgs = [{
                         localUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData),
                         isError: false,
                         unique: val || '',
                     }];
                 }
-                break;
+                    break;
                 case  '27':
-                case  '28':{
+                case  '28': {
                     // 第一次设置值
                     let addrArr = val.split(','),
                         arr = [];
@@ -84,12 +84,12 @@ export class UploadImages extends FormCom {
                             unique: md5,
                             isError: false,
                             localUrl: '',
-                            isOnLine:true
+                            isOnLine: true
                         });
                     });
                     this.imgs = arr;
                 }
-                break;
+                    break;
             }
         } else {
             this.imgs = [];
@@ -153,12 +153,12 @@ export class UploadImages extends FormCom {
                     let imageObj: IImage = {
                         unique: '',
                         isError: false,
-                        isOnLine:false,
-                        localUrl:(window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
+                        isOnLine: false,
+                        localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
                     };
-                    if (tools.isNotEmpty(res.ifExist)){
+                    if (tools.isNotEmpty(res.ifExist)) {
                         Modal.toast('图片已存在!');
-                    }else{
+                    } else {
                         Modal.toast('上传成功!');
                     }
                     switch (this.imgType) {
@@ -177,7 +177,7 @@ export class UploadImages extends FormCom {
                             imageObj.unique = imageId;
                             if (tools.isNotEmpty(data.ifExist)) {
                                 let imgs = this._imgs.filter(img => img.unique === imageId);
-                                if (tools.isEmpty(imgs)){
+                                if (tools.isEmpty(imgs)) {
                                     this.addItem(imageObj);
                                 }
                             } else {
@@ -193,35 +193,36 @@ export class UploadImages extends FormCom {
             text: ''
         });
         this.uploader = uploader;
+        if (tools.isMb)
         // 文件加入到上传队列，开始上传
-        this.uploader.on('filesQueued', (files: File[]) => {
-            if (files.length > 0) {
-                this.para.onChange && this.para.onChange();
-                //开始上传
-                if (!this.loading) {
-                    this.loading = new Loading({
-                        msg: '上传中...',
-                        container: document.body
-                    });
-                    document.body.classList.add('up-disabled');
-                }
-                switch (this.imgType) {
-                    case '20':
-                    case '27': {
-                        if (files.length = 1) {
-                            this.uploader.upload(this.typeUnique);
-                        } else {
-                            Modal.alert('请只上传一张图片!');
+            this.uploader.on('filesQueued', (files: File[]) => {
+                if (files.length > 0) {
+                    this.para.onChange && this.para.onChange();
+                    //开始上传
+                    if (!this.loading) {
+                        this.loading = new Loading({
+                            msg: '上传中...',
+                            container: document.body
+                        });
+                        document.body.classList.add('up-disabled');
+                    }
+                    switch (this.imgType) {
+                        case '20':
+                        case '27': {
+                            if (files.length = 1) {
+                                this.uploader.upload(this.typeUnique);
+                            } else {
+                                Modal.alert('请只上传一张图片!');
+                            }
                         }
+                            break;
+                        case '28': {
+                            this.uploader.upload(this.typeUnique);
+                        }
+                            break;
                     }
-                        break;
-                    case '28': {
-                        this.uploader.upload(this.typeUnique);
-                    }
-                        break;
                 }
-            }
-        });
+            });
         // 上传错误时调用
         uploader.on("uploadError", (file, res) => {
             if (this.loading) {

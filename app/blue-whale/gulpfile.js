@@ -207,6 +207,9 @@ gulp.task('js', function () {
     //unBinding模块
     gulpTsModule(['unBinding/UnBinding'], 'unBinding.js');
 
+    // contextMenu模块
+    gulpTsModule(['contextMenu/*'], 'contextMenu.js');
+
     //inputs模块
     gulpTsModule(['inputs/inputs'], 'inputs.js');
 

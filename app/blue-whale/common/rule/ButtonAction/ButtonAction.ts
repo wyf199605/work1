@@ -400,6 +400,7 @@ export class ButtonAction {
             tipDom,   //盘点机信息提示
             table;    //表格模块
 
+        BwRule.atvar = null;
         if (type === 3 || type === 5) {
             if (len > 6) {
                 width = 100 * 10;
@@ -415,8 +416,8 @@ export class ButtonAction {
             body = d.create(`<div><div class="avatar-load"><div class="conf-left"></div><div class="conf-right">
                 </div></div><div class="avatar-progress"><div class="progress-title">传输尚未开始</div></div></div>`)
         }
-        let caption = response.caption;
-        let para : IModal = {
+        let caption = response.caption,
+            para : IModal = {
             body: body,
             header: caption,
             isOnceDestroy: true,
@@ -477,7 +478,7 @@ export class ButtonAction {
 
                         this.clickHandle(obj, data, (r) => {
                             onOk();
-                        }, url, null, BwRule.atvar.dataGet());
+                        }, url, null, BwRule.atvar && BwRule.atvar.dataGet());
                     }
                 }));
             });

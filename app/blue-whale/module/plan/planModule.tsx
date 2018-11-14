@@ -46,9 +46,8 @@ export class PlanModule extends Component{
     constructor(para: IPlanModulePara){
         super(para);
         let ui = this.ui = para.ui;
-        this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
-        //this.isEditPlan = false;
-
+        //this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
+        this.isEditPlan = false;
 
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
@@ -56,7 +55,7 @@ export class PlanModule extends Component{
             this.plotBtn.init();
             this.plotBtn.disabled = true;
         }
-        this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+        this.initDraw();
         this.initSubBtn();
     }
 
@@ -76,13 +75,15 @@ export class PlanModule extends Component{
         })
     }
 
-    protected initDraw(imageUrl: string){
+    protected initDraw(){
         let ui = this.ui,
+            subButton = ui.subButtons.filter((btn) => btn.multiselect !== 0),
             cols = ui.cols;
 
         this.draw = new DrawPoint({
             height: 800,
             width: 1200,
+            subButton,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
@@ -99,28 +100,34 @@ export class PlanModule extends Component{
                 return new Promise((resolve, reject) => {
                     switch (areaType.type){
                         case 'edit':
-                            return this.edit.editData(areaType.data, (data) => {
+                            this.edit.editData(areaType.data, (data) => {
                                 resolve(data)
                             });
+                            break;
                         case 'pick':
-                            return new Promise((resolve, reject) => {
-                                for(let col of cols){
-                                    if(col.elementType === 'pick'){
-                                        let pick = new PickModule({
-                                            container: document.body,
-                                            field: col,
-                                            data: areaType.data,
-                                            dataGet: () => areaType.data,
-                                            onGetData: (dataArr: obj[], otherField: string) => {
-                                                resolve(dataArr[0] ? dataArr[0] : null);
-                                                pick.destroy();
-                                            }
-                                        });
-                                        pick.wrapper.classList.add('hide');
-                                        pick.pickInit();
-                                    }
+                            for(let col of cols){
+                                if(col.elementType === 'pick'){
+                                    let pick = new PickModule({
+                                        container: document.body,
+                                        field: col,
+                                        data: areaType.data,
+                                        dataGet: () => areaType.data,
+                                        onGetData: (dataArr: obj[], otherField: string) => {
+                                            resolve(dataArr[0] ? dataArr[0] : null);
+                                            pick.destroy();
+                                        }
+                                    });
+                                    pick.wrapper.classList.add('hide');
+                                    pick.pickInit();
+                                    break;
                                 }
-                            })
+                            }
+                            break;
+                        case 'btn':
+                            ButtonAction.get().clickHandle(areaType.content.button, areaType.data, () => {
+                                resolve();
+                            });
+                            break;
                     }
                 })
 
@@ -144,12 +151,19 @@ export class PlanModule extends Component{
     }
 
     protected _ajaxData;
+    get ajaxData(){
+        return this._ajaxData;
+    }
     refresh(ajaxData?: obj){
         this._ajaxData = ajaxData;
         let ui = this.ui,
             url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
         this.setBackground(ajaxData);
 
+        let loading = new Loading({
+            msg: '数据加载中...'
+        });
+        loading.show();
         this.ajax.fetch(tools.url.addObj(url, {nopage: true}), {
             needGps: ui.dataAddr.needGps,
             timeout: 30000,
@@ -178,6 +192,9 @@ export class PlanModule extends Component{
             this.draw.render(data);
         }).catch(e => {
             console.log(e);
+        }).finally(() => {
+            loading && loading.hide();
+            loading = null;
         })
     }
 

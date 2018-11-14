@@ -4,6 +4,8 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {IDrawFormatData} from "../plan/planModule";
 import tools = G.tools;
+import d = G.d;
+import {SubBtnMenu} from "../contextMenu/subBtnMenu";
 
 declare const D3;
 //开启描点连线功能
@@ -17,15 +19,18 @@ interface IDrapPoint extends IComponentPara {
     format?: (data: obj) => IDrawFormatData[];
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
     isShow?: boolean; // 默认false
+    subButton?: R_Button[];
 }
 
 interface IAreaType {
-    type: 'edit' | 'pick';
+    type: 'edit' | 'pick' | 'btn' | 'link';
     data?: obj;
     name?: string;
+    content?: any;
 }
 
 export class DrawPoint extends Component {
+    protected contextMenu: SubBtnMenu;
     public svg;
     public g;
     public index = 0;
@@ -45,11 +50,12 @@ export class DrawPoint extends Component {
     public zoom;
     private isShowStatus:boolean;
     private tooltip ;
+    protected selectedData: obj;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
-    static EVT_INSERT_DATA = '__event_insert_area_click__';
-    static EVT_DELETE_DATA = '__event_delete_area_click__';
-    static EVT_IMG_INIT = '__event_image_area_click__';
+    // static EVT_INSERT_DATA = '__event_insert_area_click__';
+    // static EVT_DELETE_DATA = '__event_delete_area_click__';
+    // static EVT_IMG_INIT = '__event_image_area_click__';
 
     protected wrapperInit() {
         return <div className="draw-point-wrapper"/>;
@@ -57,6 +63,24 @@ export class DrawPoint extends Component {
 
     constructor(protected para: IDrapPoint) {
         super(para);
+
+        d.on(this.wrapper,'contextmenu', (e) =>{
+            e.preventDefault()
+        })
+        //初始化右键菜单
+        this.contextMenu = new SubBtnMenu({
+            container:this.wrapper,
+            buttons: para.subButton,
+            onClick: (btn) => {
+                this.onAreaClick({
+                    type: 'btn',
+                    data: this.selectedData,
+                    content: {
+                        button: btn
+                    }
+                });
+            }
+        })
 
         this.onAreaClick = para.onAreaClick;
         this.format = para.format;
@@ -91,7 +115,8 @@ export class DrawPoint extends Component {
         this.svg = D3.select('.draw-point-wrapper').append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
-            .on('mousedown', () => {
+            .on('mousedown', (e) => {
+                this.contextMenu.show = false;
                 if (!this.isDrawLine) {
                     return
                 }
@@ -158,6 +183,7 @@ export class DrawPoint extends Component {
     private _data;
 
     public render(data?: obj[]) {
+
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
@@ -190,7 +216,17 @@ export class DrawPoint extends Component {
         }
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
-            let group = this.g.append('g').datum(d);
+            let group = this.g.append('g').datum(d).on('contextmenu',()=>{
+                if(this.isShowStatus){
+                    this.selectedData = d
+                    D3.event.preventDefault();
+                    console.log(D3.mouse(this.svg.node()));
+                    let x = D3.mouse(this.svg.node())[0],y = D3.mouse(this.svg.node())[1]
+                    this.contextMenu.setPosition(x,y);
+                    this.contextMenu.show = true;
+                }
+            });
+
             let point = [],
                 I = 0,
                 toolData = [];
@@ -339,7 +375,8 @@ export class DrawPoint extends Component {
                D3.select(this).transition().attr('y',y+4).ease("bounce");
             }).on('mouseout',function (d) {
             D3.select(this).transition().attr('y',y).ease("bounce");
-            }).on('click', (d)=> {
+            }).on('click', tools.pattern.throttling((d)=> {
+               console.log(D3.event);
              this.onAreaClick({
                  type:'pick',
                  data:this._data
@@ -347,8 +384,24 @@ export class DrawPoint extends Component {
              }).then((data)=>{
                  alert(data)
              })
-        })
+        }, 1000))
     }
+
+    private contextMenuEvent = (() => {
+
+        let contextMenuHandler = (e) => {
+            if (e.type === 'contextmenu') {
+                e.preventDefault();
+                alert('这是右键')
+            }
+        }
+            return {
+                on: () => d.on(this.wrapper, 'contextmenu',  contextMenuHandler),
+                off: () => d.off(this.wrapper, 'contextmenu',  contextMenuHandler)
+            }
+
+
+    })()
     private OnDragText(){
         this.selectedG.selectAll('text').remove();
         let w = this.selectedG.node().getBBox().width,g = this.selectedG.node().getBBox().height;
