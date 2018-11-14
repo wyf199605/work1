@@ -121,6 +121,10 @@ export class PlanModule extends Component{
                                         pick.pickInit();
                                     }
                                 }
+                            });
+                        case 'btn':
+                            ButtonAction.get().clickHandle(areaType.content.button, areaType.data, () => {
+                                resolve();
                             })
                     }
                 })

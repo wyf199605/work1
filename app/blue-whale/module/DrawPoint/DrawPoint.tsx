@@ -26,6 +26,7 @@ interface IAreaType {
     type: 'edit' | 'pick' | 'btn';
     data?: obj;
     name?: string;
+    content?: any;
 }
 
 export class DrawPoint extends Component {
@@ -70,10 +71,13 @@ export class DrawPoint extends Component {
         this.contextMenu = new SubBtnMenu({
             container:this.wrapper,
             buttons: para.subButton,
-            onClick: () => {
+            onClick: (btn) => {
                 this.onAreaClick({
                     type: 'btn',
-                    data: this.selectedData
+                    data: this.selectedData,
+                    content: {
+                        button: btn
+                    }
                 });
             }
         })
