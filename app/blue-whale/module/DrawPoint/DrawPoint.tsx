@@ -102,7 +102,7 @@ export class DrawPoint extends Component {
          this.LR = D3.scale.linear()
             .domain([1,6])
             .range([5,0.3])
-        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').style('opacity',0.0)
+        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').style('display','none')
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
 
@@ -311,11 +311,11 @@ export class DrawPoint extends Component {
                                   str += (toolData[i] + "<br/>");
                             }
                             that.tooltip.html(str)
-                                .style('left',(D3.event.pageX) + 'px')
-                                .style('top',(D3.event.pageY + D3.event.scrollY)- 10 + 'px')
-                                .style('opacity',1.0)
+                                .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
+                                .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
+                                .style('display','block')
                         }).on('mouseout',function (d) {
-                            that.tooltip.style('opacity',0);
+                            that.tooltip.style('display','none');
                         })
                         .style("pointer-events",()=>{
                             if(this.isDrawLine){
@@ -378,7 +378,7 @@ export class DrawPoint extends Component {
             }).on('click', tools.pattern.throttling((d)=> {
                console.log(D3.event);
              this.onAreaClick({
-                 type:'pick',
+                 type:'link',
                  data:this._data
 
              }).then((data)=>{
