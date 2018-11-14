@@ -25,6 +25,7 @@ export class SubBtnMenu {
 
         this.contextMenu.onOpen = (node) => {
             this.onClick && this.onClick(node.content.button);
+            this.show = false;
         }
     }
 
