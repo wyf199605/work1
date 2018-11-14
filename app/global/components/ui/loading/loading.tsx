@@ -27,13 +27,6 @@ export class Loading {
             isBackground: false
         });
         this.delayHied();
-        if(container !== body){
-            let offset: ClientRect = para.container.getBoundingClientRect();
-            let wrapper = this.modal.wrapper;
-            wrapper.style.position = 'absolute';
-            wrapper.style.left = (offset.width - 158) / 2 + 'px';
-            wrapper.style.top = Math.max(0, (offset.height - 120) / 2) + 'px';
-        }
         //禁用元素
         if (this.para.disableEl) {
             this.para.disableEl.classList.add('disabled');
@@ -44,6 +37,15 @@ export class Loading {
      * 显示加载框
      * */
     public show() {
+        let para = this. para,
+            container = para.container;
+        if(container !== document.body){
+            let offset: ClientRect = para.container.getBoundingClientRect();
+            let wrapper = this.modal.wrapper;
+            wrapper.style.position = 'absolute';
+            wrapper.style.left = (offset.width - 158) / 2 + 'px';
+            wrapper.style.top = Math.max(0, (offset.height - 120) / 2) + 'px';
+        }
         this.modal.isShow = true;
         this.delayHied();
     }

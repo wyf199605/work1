@@ -29,7 +29,7 @@ export = class FormPage extends BasicPage {
                 field: nameFields[f.name]
             };
 
-            if(field.field && field.field.noShow){
+            if(field.field && field.field.noShow && field.dom){
                 field.dom.classList.add('hide');
             }
 
@@ -69,6 +69,7 @@ export = class FormPage extends BasicPage {
         // 编辑标识
         this.initData();
         this.initEvent();
+        window['tt'] = this;
         // this.initValidate();
     }
 
