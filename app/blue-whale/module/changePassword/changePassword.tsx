@@ -24,9 +24,7 @@ export class ChangePassword{
            onClick:() => {
                let data = this.dataGet(body);
                if(tools.isFunction( para.confirm )){
-                   para.confirm(data).then(() => {
-                       this.destory();
-                   });
+                   para.confirm(data);
                }
            }
        });
@@ -36,7 +34,7 @@ export class ChangePassword{
            className:'btn-cancel',
            onClick:() =>{
                if(tools.isFunction( para.cancel )){
-                   this.destory();
+                   para.cancel();
                }
            }
        });
@@ -75,7 +73,7 @@ export class ChangePassword{
        return form;
    }
 
-   private destory(){
+   destory(){
        document.body.classList.remove('cpw-content');
    }
 }

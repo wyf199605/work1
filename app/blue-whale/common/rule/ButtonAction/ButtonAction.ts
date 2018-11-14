@@ -262,10 +262,13 @@ export class ButtonAction {
                     container: body,
                     data: dataObj,
                     confirm: obj =>{
-                        return this.sendMessage(obj);
+                        return this.sendMessage(obj).then(() => {
+                            changePassword.destory();
+                            passwordModal.isShow = false;
+                        });
                     },
                     cancel:()=>{
-                        passwordModal.destroy();
+                        passwordModal.isShow = false;
                     }
                 });
                 let passwordModal = new Modal({
