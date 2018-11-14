@@ -15,7 +15,7 @@ export = class FormPage extends BasicPage {
 
     constructor(form: HTMLElement, private para: EditPagePara) {
         super(para);
-        // console.log(para);
+        console.log(para);
         let isInsert = para.uiType === 'insert';
         let emPara: EditModulePara = {fields : []};
         let nameFields : {[name : string] : R_Field} = {};
@@ -23,11 +23,23 @@ export = class FormPage extends BasicPage {
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
 
-            let field = {
+            let field: any = {
 
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
                 field: nameFields[f.name]
             };
+            if(nameFields[f.name] && nameFields[f.name].elementType === 'lookup'){
+                field.onExtra = (data, fields) => {
+                    if(editModule){
+                        fields.forEach((field) => {
+                            let com = editModule.getDom(field);
+                            if(com){
+                                com.set(data[field] || '')
+                            }
+                        })
+                    }
+                }
+            }
 
             if(field.field && field.field.noShow){
                 let dom = d.query(`[data-name="${f.name}"]`, form);
@@ -56,7 +68,7 @@ export = class FormPage extends BasicPage {
         //         field.dom.classList.add('disabled');
         //     }
         // }
-        this.editModule = new EditModule(emPara);
+        let editModule = this.editModule = new EditModule(emPara);
 
         emPara.fields.forEach((f) => {
             let field = f.field,
