@@ -69,10 +69,25 @@ export class PlanModule extends Component{
                 <Button icon={btnUi.icon} content={btnUi.title} data={btnUi}
                     onClick={() => {
                         ButtonAction.get().clickHandle(btnUi, void 0, (res) => {
-                        }, void 0 , ui.itemId);
+                        }, this.pageUrl , ui.itemId);
                 }}/>
             </div>)
         })
+    }
+
+    protected pageContainer: HTMLElement;
+    protected _pageUrl: string;
+    get pageUrl() {
+        if (!this._pageUrl) {
+            if (tools.isMb) {
+                this._pageUrl = location.href;
+            } else {
+                let pageContainer = d.closest(this.wrapper, '.page-container[data-src]');
+                this.pageContainer = pageContainer;
+                this._pageUrl = pageContainer ? pageContainer.dataset.src : '';
+            }
+        }
+        return this._pageUrl;
     }
 
     protected initDraw(){
