@@ -11,6 +11,7 @@ import {SelectInput} from "../../../../global/components/form/selectInput/select
 import {Loading} from "../../../../global/components/ui/loading/loading";
 import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
+import {ChangePassword} from "../../../module/changePassword/changePassword";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -254,11 +255,49 @@ export class ButtonAction {
     }
 
     private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
-        require(['ChangePassword', 'Modal'],  (d, m) => {
-            
+        let that = this;
+        return new Promise( (resolve, reject)=>{
+            require(['ChangePassword', 'Modal'],  (c, m) => {
+                let body = d.create('<div></div>');
+                let changePassword = c.ChangePassword({
+                    container: body,
+                    data: dataObj,
+                    confirm: obj =>({
+                    })
+                });
+                let passwordModal = new Modal({
+                    header: '修改密码',
+                    body,
+                    width: '500px',
+                    height: '300px',
+                    className: 'password-modal',
+                    isOnceDestroy: true,
+                    onClose: () => {
+                        changePassword.destory();
+                    },
+                });
+            })
         })
     }
+    sendMessage(para:object){
+        let userInfo: any = window.localStorage.getItem('userInfo');
+        try {
+            userInfo = JSON.parse(userInfo);
+        }catch (e) {
+            userInfo = {};
+        }
 
+        return BwRule.Ajax.fetch(CONF.siteUrl + CONF.ajaxUrl.personPassword, {
+            type: 'POST',
+            data: {
+                'upuserid': userInfo['userid'],
+                'old_password': para['old_password'],
+                'new_password': para['new-password']
+            }
+        }).then((response) => {
+            Modal.toast(response.msg);
+        })
+    }
     initBarCode(res,data,dataObj){
         // console.log(res.body.elements)
         let dataAddr = res.body.elements,

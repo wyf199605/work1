@@ -6,13 +6,13 @@ import {Button} from "../../../global/components/general/button/Button";
 export interface IChangePasswordPara{
     container:HTMLElement;
     confirm?: (obj) => Promise<any> ;
-    userID?:string;
+    data?: obj;
 }
 
 export class ChangePassword{
    constructor(para:IChangePasswordPara){
        let body=<div className="cpw-content">
-           {ChangePassword.initInput(para.userID)}
+           {ChangePassword.initInput(para.data)}
        </div>;
        let btnGroup = d.query('.btn-group', body);
        let confirm = new Button({
@@ -36,11 +36,12 @@ export class ChangePassword{
                this.destory();
            }
        });
+       d.append(para.container, body);
    }
    private dataGet(el:HTMLElement){
-       let oldPassword = d.query('#old-password', el) as HTMLInputElement;
-       let newPassword = d.query('#new-password', el) as HTMLInputElement;
-       let confirmPassword = d.query('#confirm-password', el) as HTMLInputElement;
+       let oldPassword = d.query('.old-password', el) as HTMLInputElement;
+       let newPassword = d.query('.new-password', el) as HTMLInputElement;
+       let confirmPassword = d.query('.confirm-password', el) as HTMLInputElement;
        let data = [];
        if(oldPassword.value == '' || newPassword.value == '' || confirmPassword.value == ''){
            alert('您有未填写的项目');
@@ -57,19 +58,21 @@ export class ChangePassword{
        return data;
    }
 
-   static initInput(para:string): HTMLElement{
+   static initInput(para:obj): HTMLElement{
+       console.log(para);
+
        return <form action="#" class="password-form">
-           {para?<div class="form-group"><span>用户ID：</span><input id="user_id" type="text" readonly value="para"/></div>:null}
-           <div class="form-group">
-               <span>旧密码：</span><input id="old-password" type="password" placeholder="请输入旧密码"/>
+           {Object.keys(para).map((key) => <div className="form-group"><span>{key}：</span><input type="text" readOnly value={para[key]}/></div>)}
+           <div className="form-group">
+               <span>旧密码：</span><input className="old-password" type="password" placeholder="请输入旧密码"/>
            </div>
-           <div class="form-group">
-               <span>新密码：</span><input id="new-password" type="password" placeholder="请输入新密码"/>
+           <div className="form-group">
+               <span>新密码：</span><input className="new-password" type="password" placeholder="请输入新密码"/>
            </div>
-           <div class="form-group">
-               <span>确认密码：</span><input id="confirm-password" type="password" placeholder="确认新密码"/>
+           <div className="form-group">
+               <span>确认密码：</span><input className="confirm-password" type="password" placeholder="确认新密码"/>
            </div>
-           <div class="btn-group">
+           <div className="btn-group">
            </div>
        </form>
    }
