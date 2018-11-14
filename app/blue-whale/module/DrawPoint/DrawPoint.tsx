@@ -356,6 +356,7 @@ export class DrawPoint extends Component {
             }).on('mouseout',function (d) {
             D3.select(this).transition().attr('y',y).ease("bounce");
             }).on('click', tools.pattern.throttling((d)=> {
+               console.log(D3.event);
              this.onAreaClick({
                  type:'pick',
                  data:this._data
@@ -363,9 +364,7 @@ export class DrawPoint extends Component {
              }).then((data)=>{
                  alert(data)
              })
-        }, 1000)).on('contentmenu', ()=> {
-            this.contextMenuEvent.on();
-        })
+        }, 1000))
     }
 
     private contextMenuEvent = (() => {
