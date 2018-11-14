@@ -157,6 +157,10 @@ export class PlanModule extends Component{
             url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
         this.setBackground(ajaxData);
 
+        let loading = new Loading({
+            msg: '数据加载中...'
+        });
+        loading.show();
         this.ajax.fetch(tools.url.addObj(url, {nopage: true}), {
             needGps: ui.dataAddr.needGps,
             timeout: 30000,
@@ -185,6 +189,9 @@ export class PlanModule extends Component{
             this.draw.render(data);
         }).catch(e => {
             console.log(e);
+        }).finally(() => {
+            loading && loading.hide();
+            loading = null;
         })
     }
 
