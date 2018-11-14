@@ -36,6 +36,12 @@ export class NewTablePage extends BasicPage{
             tableEl: bwTableEl,
             asynData : para.ui.body.elements[1] // 异步查询
         });
+
+        // Shell触发的刷新事件
+        this.on(BwRule.EVT_REFRESH, () => {
+            bwTable.tableModule && bwTable.tableModule.refresh();
+        });
+
     }
 }
 
