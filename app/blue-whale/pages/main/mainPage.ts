@@ -296,6 +296,9 @@ export = class MainPage {
     }());
 
     private static myselfMenu = (function () {
+        BwRule.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+            console.log(response);
+        });
         //顶部个人信息下拉窗口点击事件
         let items = [
             {
