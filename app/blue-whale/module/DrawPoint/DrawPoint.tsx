@@ -63,6 +63,7 @@ export class DrawPoint extends Component {
         super(para);
         //初始化右键菜单
         this.contextMenu = new SubBtnMenu({
+            container:this.wrapper,
             buttons: para.subButton,
             onClick: () => {
                 this.onAreaClick({
@@ -173,7 +174,6 @@ export class DrawPoint extends Component {
 
     public render(data?: obj[]) {
 
-
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
@@ -206,7 +206,17 @@ export class DrawPoint extends Component {
         }
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
-            let group = this.g.append('g').datum(d);
+            let group = this.g.append('g').datum(d).on('contextmenu',()=>{
+                if(this.isShowStatus){
+                    this.selectedData = d
+                    D3.event.preventDefault();
+                    console.log(D3.mouse(this.svg.node()));
+                    let x = D3.mouse(this.svg.node())[0],y = D3.mouse(this.svg.node())[1]
+                    this.contextMenu.setPosition(x,y);
+                    this.contextMenu.show = true;
+                }
+            });
+
             let point = [],
                 I = 0,
                 toolData = [];
