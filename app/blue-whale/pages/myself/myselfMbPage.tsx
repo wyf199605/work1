@@ -53,7 +53,7 @@ export = class myselfMbPage {
         items.forEach((item) => {
             let li = <li className="mui-table-view-cell">
                 <a href="#" className="mui-navigate-right">
-                    <i className={item.icon} style="color:#f15054;margin-right:10px"/>
+                    <i className={item.icon}/>
                     {item.content}
                 </a>
             </li>;
