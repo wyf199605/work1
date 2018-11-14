@@ -158,6 +158,8 @@ export class DrawPoint extends Component {
     private _data;
 
     public render(data?: obj[]) {
+
+
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
@@ -339,7 +341,7 @@ export class DrawPoint extends Component {
                D3.select(this).transition().attr('y',y+4).ease("bounce");
             }).on('mouseout',function (d) {
             D3.select(this).transition().attr('y',y).ease("bounce");
-            }).on('click', (d)=> {
+            }).on('click', tools.pattern.throttling((d)=> {
              this.onAreaClick({
                  type:'pick',
                  data:this._data
@@ -347,8 +349,26 @@ export class DrawPoint extends Component {
              }).then((data)=>{
                  alert(data)
              })
+        }, 1000)).on('contentmenu', ()=> {
+            this.contextMenuEvent.on();
         })
     }
+
+    private contextMenuEvent = (() => {
+
+        let contextMenuHandler = (e) => {
+            if (e.type === 'contextmenu') {
+                e.preventDefault();
+                alert('这是右键')
+            }
+        }
+            return {
+                on: () => d.on(this.wrapper, 'contextmenu',  contextMenuHandler),
+                off: () => d.off(this.wrapper, 'contextmenu',  contextMenuHandler)
+            }
+
+
+    })()
     private OnDragText(){
         this.selectedG.selectAll('text').remove();
         let w = this.selectedG.node().getBBox().width,g = this.selectedG.node().getBBox().height;
