@@ -49,7 +49,6 @@ export class PlanModule extends Component{
         //this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
         this.isEditPlan = false;
 
-
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
             d.append(this.wrapper, this.btnWrapper);
