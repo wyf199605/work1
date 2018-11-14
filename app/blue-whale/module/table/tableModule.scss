@@ -1,5 +1,6 @@
 .fl-pc .table-module-has-sub {
   .sub-table-tab-wrapper {
+    overflow: hidden;
     height: calc(45% - 10px);
     .table-module-sub {
       height: 100% !important;
@@ -98,6 +99,7 @@
 .table-module-wrapper {
   height: 100%;
   background-color: #fafafa;
+  overflow: hidden;
   & > .showDetail {
     position: fixed;
     max-width: 300px;
