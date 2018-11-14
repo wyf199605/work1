@@ -23,7 +23,7 @@ interface IDrapPoint extends IComponentPara {
 }
 
 interface IAreaType {
-    type: 'edit' | 'pick' | 'btn' | 'link';
+    type: 'edit' | 'pick' | 'btn'| 'link';
     data?: obj;
     name?: string;
     content?: any;
@@ -312,7 +312,7 @@ export class DrawPoint extends Component {
                             }
                             that.tooltip.html(str)
                                 .style('left',(D3.event.pageX) + 'px')
-                                .style('top',(D3.event.pageY)- 10 + 'px')
+                                .style('top',(D3.event.pageY + D3.event.scrollY)- 10 + 'px')
                                 .style('opacity',1.0)
                         }).on('mouseout',function (d) {
                             that.tooltip.style('opacity',0);
@@ -387,21 +387,7 @@ export class DrawPoint extends Component {
         }, 1000))
     }
 
-    private contextMenuEvent = (() => {
 
-        let contextMenuHandler = (e) => {
-            if (e.type === 'contextmenu') {
-                e.preventDefault();
-                alert('这是右键')
-            }
-        }
-            return {
-                on: () => d.on(this.wrapper, 'contextmenu',  contextMenuHandler),
-                off: () => d.off(this.wrapper, 'contextmenu',  contextMenuHandler)
-            }
-
-
-    })()
     private OnDragText(){
         this.selectedG.selectAll('text').remove();
         let w = this.selectedG.node().getBBox().width,g = this.selectedG.node().getBBox().height;
