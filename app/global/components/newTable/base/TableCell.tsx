@@ -109,10 +109,8 @@ export abstract class TableCell {
     }
     set colspan(colspan: number) {
         colspan = colspan || 1 ;
-        if(colspan !== this.colspan) {
-            this._colspan = colspan;
-            this.wrapper.colSpan = colspan;
-        }
+        this._colspan = colspan;
+        this.wrapper.colSpan = colspan;
     }
 
     // 行合并
@@ -122,12 +120,10 @@ export abstract class TableCell {
     }
     set rowspan(rowspan: number) {
         rowspan = rowspan || 1;
-        if(rowspan !== this.rowspan){
-            this._rowspan = rowspan;
-            this.wrapper.rowSpan = rowspan;
-            if(this.rowspan !== 1){
-                this.wrapper.style.height = rowspan * 40 + 'px';
-            }
+        this._rowspan = rowspan;
+        this.wrapper.rowSpan = rowspan;
+        if(this.rowspan !== 1){
+            this.wrapper.style.height = rowspan * 40 + 'px';
         }
     }
 
