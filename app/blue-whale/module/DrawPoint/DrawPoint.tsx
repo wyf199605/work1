@@ -312,7 +312,7 @@ export class DrawPoint extends Component {
                             }
                             that.tooltip.html(str)
                                 .style('left',(D3.event.pageX) + 'px')
-                                .style('top',(D3.event.pageY + D3.event.scrollY)- 10 + 'px')
+                                .style('top',(D3.event.screenX + D3.event.screenY)- 10 + 'px')
                                 .style('opacity',1.0)
                         }).on('mouseout',function (d) {
                             that.tooltip.style('opacity',0);
