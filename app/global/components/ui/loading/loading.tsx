@@ -12,18 +12,19 @@ export interface ILoadingPara {
 
 export class Loading {
     private modal: Modal = null;
+    protected container: HTMLElement;
     constructor(private para: ILoadingPara) {
         para = para ? para : {};
         para.msg = para.msg ? para.msg : '加载中...';
         let body = document.body;
-        let container = tools.isEmpty(para.container) ? body : para.container;
+        this.container = tools.isEmpty(para.container) ? body : para.container;
         this.modal = new Modal({
             isMb: false,
-            container,
+            container: this.container,
             width: '158px',
             height:'120px',
             body: <div><div className="spinner"></div><div>{para.msg}</div></div>,
-            className: 'modal-loading' + (container !== body ? ' container-loading' : ''),
+            className: 'modal-loading' + (this.container !== body ? ' container-loading' : ''),
             isBackground: false
         });
         this.delayHied();
@@ -37,10 +38,9 @@ export class Loading {
      * 显示加载框
      * */
     public show() {
-        let para = this. para,
-            container = para.container;
+        let container = this.container;
         if(container !== document.body){
-            let offset: ClientRect = para.container.getBoundingClientRect();
+            let offset: ClientRect = this.container.getBoundingClientRect();
             let wrapper = this.modal.wrapper;
             wrapper.style.position = 'absolute';
             wrapper.style.left = (offset.width - 158) / 2 + 'px';

@@ -60,7 +60,7 @@ export class FlowListPC extends BasicPage{
                                 bwEl:response.body.elements[0],
                                 container:tabEl
                             })
-                        })
+                        });
                     } else {
                         // 表格存在 刷新并显示
                         this.subTables[index].refresh().catch();

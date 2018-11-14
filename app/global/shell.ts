@@ -428,10 +428,25 @@ namespace G{
             }
         };
 
+        const image = {
+            // 编辑指定图片
+            editImg(img: string, back: IShellEventHandler){
+                ShellBase.handler('editImg', {
+                    type: 0,
+                    img
+                }, back)
+            },
+            // 截取当前屏幕并编辑
+            editPrintScreen(back: IShellEventHandler){
+                ShellBase.handler('editImg', {
+                    type: 1,
+                }, back)
+            }
+        };
 
         return {
 
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp
+            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image
         }
     })(window, document);
 

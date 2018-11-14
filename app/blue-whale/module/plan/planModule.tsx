@@ -151,6 +151,9 @@ export class PlanModule extends Component{
     }
 
     protected _ajaxData;
+    get ajaxData(){
+        return this._ajaxData;
+    }
     refresh(ajaxData?: obj){
         this._ajaxData = ajaxData;
         let ui = this.ui,

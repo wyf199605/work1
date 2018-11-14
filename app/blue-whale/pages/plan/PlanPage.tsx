@@ -51,6 +51,10 @@ export class PlanPage extends BasicPage {
         //         container: this.wrapper
         //     });
         // })
+
+        this.on(BwRule.EVT_REFRESH, () => {
+            planModule && planModule.refresh(planModule.ajaxData);
+        });
     }
 
 
