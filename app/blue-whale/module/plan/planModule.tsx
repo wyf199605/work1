@@ -55,7 +55,7 @@ export class PlanModule extends Component{
             this.plotBtn.init();
             this.plotBtn.disabled = true;
         }
-        this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
+        this.initDraw();
         this.initSubBtn();
     }
 
@@ -75,13 +75,15 @@ export class PlanModule extends Component{
         })
     }
 
-    protected initDraw(imageUrl: string){
+    protected initDraw(){
         let ui = this.ui,
+            subButton = ui.subButtons.filter((btn) => btn.multiselect !== 0),
             cols = ui.cols;
 
         this.draw = new DrawPoint({
             height: 800,
             width: 1200,
+            subButton,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
