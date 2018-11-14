@@ -58,6 +58,7 @@
     .draw-point-wrapper{
       height: calc(100% - 38px);
       overflow: auto;
+      position: relative;
       svg{
         background: #fff;
         margin: 0 auto;
