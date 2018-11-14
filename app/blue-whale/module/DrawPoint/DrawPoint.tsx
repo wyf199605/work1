@@ -372,9 +372,9 @@ export class DrawPoint extends Component {
             .attr('fill','#666666')
             .text("\ue6e1")
             .on('mouseover',function (d) {
-               D3.select(this).transition().attr('y',y+4).ease("bounce");
+               D3.select(this).transition().attr('y',y+4).ease("bounce").attr('cursor','pointer');
             }).on('mouseout',function (d) {
-            D3.select(this).transition().attr('y',y).ease("bounce");
+            D3.select(this).transition().attr('y',y).ease("bounce").attr('cursor','default');
             }).on('click', tools.pattern.throttling((d)=> {
                console.log(D3.event);
              this.onAreaClick({
