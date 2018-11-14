@@ -77,12 +77,13 @@ export class PlanModule extends Component{
 
     protected initDraw(){
         let ui = this.ui,
-            sunButtons = ui.subButtons.filter((btn) => btn.multiselect !== 0),
+            subButton = ui.subButtons.filter((btn) => btn.multiselect !== 0),
             cols = ui.cols;
 
         this.draw = new DrawPoint({
             height: 800,
             width: 1200,
+            subButton,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
