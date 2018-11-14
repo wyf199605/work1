@@ -15,8 +15,9 @@ export interface IMbListPara extends IComponentPara {
     isMulti?: boolean;  // 是否多选
     itemButtons?: string[];
     multiButtons?: string[];
-    itemClick?: (btnIndex: number, itemIndex: number) => void;
+    buttonsClick?: (btnIndex: number, itemIndex: number) => void;
     multiClick?: (btnIndex:number,itemsIndexes:number[]) => void;
+    itemClick?: (index: number) => void;
     // statusColor?: string;
     dataManager?: {
         pageSize?: number;
@@ -63,7 +64,7 @@ export class MbList extends Component {
                 buttons.push({
                     content: btn,
                     onClick: () => {
-                        tools.isFunction(this.para.itemClick) && this.para.itemClick(index + 2, this.currentSelectItemIndex);
+                        tools.isFunction(this.para.buttonsClick) && this.para.buttonsClick(index + 2, this.currentSelectItemIndex);
                     }
                 })
             });
@@ -95,13 +96,19 @@ export class MbList extends Component {
         let moreBtnClick = (e) => {
             this.multiActionSheet.isShow = true;
         };
+        let multiBtnClick = (e)=>{
+            let index = parseInt(d.closest(e.target,'.multi-button').dataset.index);
+            tools.isFunction(this.para.multiClick) && this.para.multiClick(index,this.getSelectIndexes());
+        };
         return {
             on: () => {
                 d.on(this.multiButtonsWrapper,'click','.list-buttons .more-btn',moreBtnClick);
+                d.on(this.multiButtonsWrapper,'click','.list-buttons .multi-button',multiBtnClick);
                 d.on(this.multiIcon, 'click', multiEvent);
             },
             off: () => {
                 d.off(this.multiButtonsWrapper,'click','.list-buttons .more-btn',moreBtnClick);
+                d.off(this.multiButtonsWrapper,'click','.list-buttons .multi-button',multiBtnClick);
                 d.off(this.multiIcon, 'click', multiEvent);
             }
         }
@@ -146,14 +153,14 @@ export class MbList extends Component {
         if (tools.isNotEmptyArray(multiButtons)) {
             if (multiButtons.length <= 2) {
                 multiButtons.forEach((item, index) => {
-                    buttonHtml.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
+                    buttonHtml.push(`<div class="item-button multi-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
                 });
             } else {
                 let moreButtons = multiButtons.slice(2),
                     showButtons = multiButtons.slice(0, 2);
                 buttonHtml.push(`<div class="more-btn">更多</div>`);
                 showButtons.forEach((item, index) => {
-                    buttonHtml.push(`<div class="item-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
+                    buttonHtml.push(`<div class="item-button multi-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
                 });
                 let buttons = [];
                 moreButtons.forEach((btn, index) => {
@@ -276,7 +283,10 @@ export class MbList extends Component {
             isCheckBox: this.multiple,
             btns: this.para.itemButtons,
             buttonClick: (btnIndex, itemIndex) => {
-                tools.isFunction(this.para.itemClick) && this.para.itemClick(btnIndex, itemIndex);
+                tools.isFunction(this.para.buttonsClick) && this.para.buttonsClick(btnIndex, itemIndex);
+            },
+            itemClick:(index) => {
+                tools.isFunction(this.para.itemClick) && this.para.itemClick(index);
             }
             // statusColor: this.para.statusColor
         });

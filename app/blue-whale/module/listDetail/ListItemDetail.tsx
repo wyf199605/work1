@@ -202,6 +202,10 @@ export class ListItemDetail {
                 case 'update_save' :
                 case 'insert_save':
                     let isAdd = btn.subType === 'update_save' ? false : true;
+                    if (!isAdd && self.totalNumber === 0){
+                        Modal.alert('没有数据可以编辑!');
+                        return;
+                    }
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: btn.subType === 'update_save' ? self.defaultData : {},
                         isAdd: isAdd,

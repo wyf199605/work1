@@ -2,6 +2,20 @@
   padding-left: 0px;
   padding-right: 0px;
   height: calc(100% - 23px);
+
+  .tooltip{
+    user-select:none;
+    position: absolute;
+    width: 120px;
+    height: auto;
+    font-family: SimSun;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid;
+    background-color: white;
+    border-radius: 5px;
+
+  }
   .custom-button{
     box-shadow: 0px 2px 3px #c8c8c8 inset !important;
     border-radius: 4%;

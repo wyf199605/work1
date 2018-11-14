@@ -3,29 +3,26 @@
 import {MbListItemData} from "../../../global/components/mbList/MbListItem";
 import tools = G.tools;
 import d = G.d;
-import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {MbList} from "../../../global/components/mbList/MbList";
 import {BwRule} from "../../common/rule/BwRule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import BasicPage from "../basicPage";
 
 export interface IBwMbList extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
     ajaxData?: obj;
+    dom:HTMLElement;
 }
 
-export class BwMbList extends Component {
-    protected wrapperInit(para: IBwMbList): HTMLElement {
-        return <div className="mb-list-page"/>;
-    }
-
+export class BwMbList extends BasicPage {
     private isImgTpl: boolean = false;
     private layout: obj = {};
     private captions: string[] = [];
     private imgLabelColor: string = '';
     // private statusColor: string = '';
     private isMulti: boolean = false;
-
+    private defaultData:obj[] = [];
     constructor(private para: IBwMbList) {
         super(para);
         this.getButtons(para.ui.body.elements[0].subButtons);
@@ -57,7 +54,7 @@ export class BwMbList extends Component {
                 btnArr.push(`<div class="global-btn-item ${className}" data-index="${index}">${btn.caption}</div>`);
             });
             globalButtonWrapper.innerHTML = btnArr.join('');
-            this.wrapper.appendChild(globalButtonWrapper);
+            this.para.dom.appendChild(globalButtonWrapper);
         }
     }
 
@@ -73,8 +70,8 @@ export class BwMbList extends Component {
             multiButtons.push(btn.caption);
         });
         let wrapper: HTMLElement;
-        d.append(this.wrapper, wrapper = <div className="mblist-page-mblist-wrapper"/>);
-        if (tools.isNotEmpty(this.allButtons[0])){
+        d.append(this.para.dom, wrapper = <div className="mblist-page-mblist-wrapper"/>);
+        if (tools.isNotEmpty(this.allButtons[0])) {
             wrapper.classList.add('global-buttons-height');
         }
         this.mbList = new MbList({
@@ -82,11 +79,31 @@ export class BwMbList extends Component {
             isMulti: this.isMulti,
             itemButtons: itemButtons,
             multiButtons: multiButtons,
+            buttonsClick: (btnIndex, itemIndex) => {
+                let buttons = this.allButtons[1] || [],
+                    btn = buttons[btnIndex],
+                    data = this.defaultData[itemIndex];
+                console.log(data);
+            },
+            itemClick: (index) => {
+                let data = this.defaultData[index];
+                console.log(data);
+            },
+            multiClick:(btnIndex, itemsIndexes) => {
+                let buttons = this.allButtons[1] || [],
+                    btn = buttons[btnIndex],
+                    data = [];
+                this.defaultData.forEach((da,index) => {
+                    itemsIndexes.indexOf(index) > -1 && data.push(da);
+                });
+                console.log(data);
+            },
             container: wrapper,
             dataManager: {
                 pageSize: 10,
                 isPulldownRefresh: true,
                 render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
+                    this.defaultData = data;
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
                 ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
@@ -207,18 +224,18 @@ export class BwMbList extends Component {
                     }
                         break;
                     case 'status': {
-                        let field = layout['status'],md5 = item[field];
+                        let field = layout['status'], md5 = item[field];
                         itemObj['status'] = tools.isNotEmpty(md5) ? BwRule.fileUrlGet(md5, field) : '';
                     }
                         break;
-                    case  'imgLabelColor':{
+                    case  'imgLabelColor': {
                         let imgLabelColor = layout['imgLabelColor'];
                         if (tools.isNotEmpty(imgLabelColor)) {
                             let {r, g, b} = tools.val2RGB(item[imgLabelColor]);
                             this.imgLabelColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
                         }
                     }
-                    break;
+                        break;
                 }
             }
             listData.push(itemObj);
@@ -235,10 +252,10 @@ export class BwMbList extends Component {
         };
         return {
             on: () => {
-                d.on(this.wrapper, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
+                d.on(this.para.dom, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
+                d.off(this.para.dom, 'click', '.global-buttons-wrapper .global-btn-item', globalBtnClick);
             }
         }
     })();

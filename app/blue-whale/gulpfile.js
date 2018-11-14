@@ -255,7 +255,6 @@ gulp.task('js', function () {
 
     gulpTsModule('keyStep/KeyStep', 'KeyStep.js');
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
-    gulpTsModule('mbList/mbList', 'BwMbList.js');
 
     /*page*/
 
@@ -323,6 +322,7 @@ gulp.task('js', function () {
     gulpTsPage('rfid/RfidBarCode/RfidBarCode', 'RfidBarCode.js');
     gulpTsPage('plan/PlanPage', 'PlanPage.js');
     gulpTsPage('permissionTree/permissionTreePage', 'permissionTree.js');
+    gulpTsPage('mbList/mbList', 'BwMbList.js');
 });
 
 /**
