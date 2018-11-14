@@ -4,6 +4,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {IDrawFormatData} from "../plan/planModule";
 import tools = G.tools;
+import d = G.d;
 import {SubBtnMenu} from "../contextMenu/subBtnMenu";
 
 declare const D3;
@@ -51,9 +52,9 @@ export class DrawPoint extends Component {
     protected selectedData: obj;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
-    static EVT_INSERT_DATA = '__event_insert_area_click__';
-    static EVT_DELETE_DATA = '__event_delete_area_click__';
-    static EVT_IMG_INIT = '__event_image_area_click__';
+    // static EVT_INSERT_DATA = '__event_insert_area_click__';
+    // static EVT_DELETE_DATA = '__event_delete_area_click__';
+    // static EVT_IMG_INIT = '__event_image_area_click__';
 
     protected wrapperInit() {
         return <div className="draw-point-wrapper"/>;
@@ -61,6 +62,10 @@ export class DrawPoint extends Component {
 
     constructor(protected para: IDrapPoint) {
         super(para);
+
+        d.on(this.wrapper,'contextmenu', (e) =>{
+            e.preventDefault()
+        })
         //初始化右键菜单
         this.contextMenu = new SubBtnMenu({
             container:this.wrapper,
@@ -106,7 +111,8 @@ export class DrawPoint extends Component {
         this.svg = D3.select('.draw-point-wrapper').append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
-            .on('mousedown', () => {
+            .on('mousedown', (e) => {
+                this.contextMenu.show = false;
                 if (!this.isDrawLine) {
                     return
                 }
