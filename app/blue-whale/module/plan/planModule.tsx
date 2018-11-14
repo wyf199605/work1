@@ -145,7 +145,6 @@ export class PlanModule extends Component{
                             break;
                     }
                 })
-
             }
         });
 
