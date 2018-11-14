@@ -144,6 +144,20 @@ export class PlanModule extends Component{
                             }, this.pageUrl , ui.itemId);
                             break;
                         case 'link':
+                            for(let col of cols){
+                                let link = col.link;
+                                if(tools.isNotEmpty(link)) {
+                                    BwRule.link({
+                                        link: link.dataAddr,
+                                        varList: link.varList,
+                                        dataType: col.atrrs.dataType,
+                                        data: areaType.data,
+                                        needGps: link.needGps === 1,
+                                        type: link.type
+                                    });
+                                    break;
+                                }
+                            }
                             break;
                     }
                 })
