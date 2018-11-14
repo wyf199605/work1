@@ -49,6 +49,8 @@ export class PlanModule extends Component{
         this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
         //this.isEditPlan = false;
 
+        let globalBtns = ui.subButtons.filter((btn) => btn.multiselect === 0),
+            subBtns = ui.subButtons.filter((btn) => btn.multiselect !== 0);
 
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
@@ -57,13 +59,12 @@ export class PlanModule extends Component{
             this.plotBtn.disabled = true;
         }
         this.initDraw(BW.CONF.siteUrl + ui['backGround']['dataAddr']);
-        this.initSubBtn();
+        this.initSubBtn(globalBtns);
     }
 
-    protected initSubBtn(){
+    protected initSubBtn(subButtons: R_Button[]){
         let btnWrapper = d.query('.query-form',this.container),
-            ui = this.ui,
-            subButtons = ui.subButtons.filter((btn) => btn.multiselect === 0);
+            ui = this.ui;
 
         subButtons.forEach((btnUi) => {
             d.append(btnWrapper, <div className="form-com-item">
