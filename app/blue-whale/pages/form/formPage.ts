@@ -29,15 +29,17 @@ export = class FormPage extends BasicPage {
                 field: nameFields[f.name]
             };
 
-            if(field.field && field.field.noShow && field.dom){
-                field.dom.classList.add('hide');
+            if(field.field && field.field.noShow){
+                let dom = d.query(`[data-name="${f.name}"]`, form);
+                console.log(dom);
+                dom && dom.classList.add('hide');
             }
 
             emPara.fields.push(field);
 
-            if(['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit){
-                field.dom && field.dom.classList.add('disabled');
-            }
+            // if(['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit){
+            //     field.dom && field.dom.classList.add('disabled');
+            // }
 
         });
 
@@ -63,6 +65,11 @@ export = class FormPage extends BasicPage {
             if(isNotEdit){
                 let com = this.editModule.getDom(name);
                 com && (com.disabled = true);
+                if(tools.isMb){
+                    com.wrapper.addEventListener('click', () => {
+                        Modal.toast(field.caption + '不可以修改～');
+                    });
+                }
             }
         });
 

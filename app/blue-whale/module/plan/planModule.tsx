@@ -143,6 +143,8 @@ export class PlanModule extends Component{
                                 resolve();
                             }, this.pageUrl , ui.itemId);
                             break;
+                        case 'link':
+                            break;
                     }
                 })
 
