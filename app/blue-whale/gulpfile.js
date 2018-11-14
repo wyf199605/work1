@@ -202,7 +202,7 @@ gulp.task('js', function () {
     ], 'uploadModule.js');
 
     //changePassword模块
-    gulpTsModule(['changePassword'], 'changePasswordMoudle.js');
+    gulpTsModule(['changePassword/*'], 'changePasswordModule.js');
 
     //unBinding模块
     gulpTsModule(['unBinding/UnBinding'], 'unBinding.js');
@@ -258,6 +258,8 @@ gulp.task('js', function () {
     gulpTsModule('mbList/mbList', 'BwMbList.js');
 
     /*page*/
+
+    gulpTsPage('index/password','personPassword.js');
     gulpTsPage('form/formPage', 'form-page.js');
     gulpTsPage('rfid/RfidBing/RfidBing', 'rfidbing.js');
     gulpTsPage('helper/HelperEdit', 'HelperEdit.js');
