@@ -402,6 +402,11 @@ export = class MainPage {
                         }
                     })
                 });
+
+            }).finally(() => {
+                spinner && spinner.hide();
+                spinner = null;
+                toggleEl.classList.remove('disabled');
                 if (CONF.appid === 'app_fastlion_retail') {
                     items = items.concat([{
                             title: '<a href="javascript:void(0)" data-page-name="changePassword" data-action="changePassword">修改个人密码</a>',
@@ -443,10 +448,6 @@ export = class MainPage {
                     sys.window.open({url: CONF.url.message});
                 });
                 myselfMenu();
-
-                spinner && spinner.hide();
-                spinner = null;
-                toggleEl.classList.remove('disabled');
             });
         }
 

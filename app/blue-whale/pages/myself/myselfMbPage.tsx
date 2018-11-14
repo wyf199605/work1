@@ -15,11 +15,11 @@ export = class myselfMbPage {
     constructor() {
         // mui.init();
         // '.mui-scroll-wrapper').scroll();
+        let items = [];
         BwRule.Ajax.fetch(CONF.ajaxUrl.personalmenu, {
             loading: true
         }).then(({response}) => {
             let menus = response.body && response.body.elements;
-            let items = [];
             menus && menus.forEach((menu) => {
                 items.push({
                     content: menu.menuName,
@@ -33,6 +33,7 @@ export = class myselfMbPage {
                     }
                 })
             });
+        }).finally(() => {
             this.init(items);
         });
     }
