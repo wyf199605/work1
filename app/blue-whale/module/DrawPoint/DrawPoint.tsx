@@ -361,7 +361,11 @@ export class DrawPoint extends Component {
 
     private InitIcon(group,points){
         let x = this.setIconPos(points)[0],
-            y = this.setIconPos(points)[1];
+            y = this.setIconPos(points)[1],
+            urlData;
+         group.attr('id',function (d) {
+            urlData = d;
+        })
         group.append("text").attr('class','iconfont icon-dianpubiaoji')
             .attr('font-family','iconfont')
             .attr('x',()=>{
@@ -379,7 +383,7 @@ export class DrawPoint extends Component {
                console.log(D3.event);
              this.onAreaClick({
                  type:'link',
-                 data:this._data
+                 data:urlData
 
              }).then((data)=>{
                  alert(data)
