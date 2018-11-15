@@ -761,7 +761,7 @@ export class NewTableModule {
                 if (result && result[name]) {
                     cell.errorMsg = result[name].errMsg;
                     // callback(td, false);
-                } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
+                } else if (field.chkAddr) {
                     TableEditModule.checkValue(field, rowData, () => {
                         cell.data = null;
                         lookUpCell && (lookUpCell.data = null);
