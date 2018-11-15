@@ -3,8 +3,8 @@
   min-width: 50px;
 
   &.disabled{
-    input{
-      cursor: no-drop!important;
+    *{
+      cursor: not-allowed!important;
     }
   }
 

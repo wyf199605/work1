@@ -1090,11 +1090,15 @@ export const d = {
             }
 
             let elHeight = el.offsetHeight,
-                elWidth = el.offsetWidth,
-                bodyWidth = document.body.offsetWidth,
-                bodyHeight = document.body.offsetHeight,
-                top = relRect.bottom,
-                left = relRect.left - 2;
+            elWidth = el.offsetWidth,
+            bodyWidth = document.body.offsetWidth,
+            bodyHeight = document.body.offsetHeight,
+            top = relRect.bottom,
+            left = relRect.left - 2;
+
+            if (!useRelWidth) {
+                left = (Math.max(relRect.width - elWidth, 0)) + relRect.left - 2;
+            }
 
             top = top + elHeight < bodyHeight ? top : relRect.top - elHeight - 2;
             left = left + elWidth > bodyWidth ? left - (left + elWidth - bodyWidth) - 2 : left;

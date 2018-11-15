@@ -78,6 +78,10 @@
   div[data-input-type]>div {
     overflow: inherit !important;
     margin: auto;
+
+    .btn-group > .btn{
+      line-height: 38px;
+    }
   }
 
   /*file*/
