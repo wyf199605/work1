@@ -293,12 +293,12 @@ export class ButtonAction {
             userInfo = {};
         }
 
-        return BwRule.Ajax.fetch(CONF.siteUrl + CONF.ajaxUrl.personPassword, {
+        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
             type: 'POST',
             data: {
                 'upuserid': userInfo['userid'],
                 'old_password': para['old_password'],
-                'new_password': para['new-password']
+                'new_password': para['new_password']
             }
         }).then((response) => {
             Modal.toast(response.msg);

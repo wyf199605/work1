@@ -16,9 +16,10 @@ export class ChangePassword{
        let body=<div className="cpw-content">
            {ChangePassword.initInput(para.data)}
        </div>;
-       let btnGroup = d.query('.btn-group', body);
+       let confirmBtn = d.query('.btn-confirm', body);
+       let cancelBtn = d.query('.btn-cancel', body)
        let confirm = new Button({
-           container: btnGroup,
+           container: confirmBtn,
            content:'确定',
            className:'btn-confirm',
            onClick:() => {
@@ -29,7 +30,7 @@ export class ChangePassword{
            }
        });
        let cancel = new Button({
-           container: btnGroup,
+           container: cancelBtn,
            content:'取消',
            className:'btn-cancel',
            onClick:() =>{
@@ -39,6 +40,12 @@ export class ChangePassword{
            }
        });
        d.append(para.container, body);
+       let newPassword = d.query('.new-password', body) as HTMLInputElement;
+       let confirmPassword = d.query('.confirm-password', body) as HTMLInputElement;
+       this.bindBlur(confirmPassword, newPassword, '.confirm-password', body);
+       this.bindBlur(newPassword, confirmPassword, '.new-password', body);
+       this.bindFocus('.confirm-password',body);
+       this.bindFocus('.new-password',body);
    }
    private dataGet(el:HTMLElement){
        let oldPassword = d.query('.old-password', el) as HTMLInputElement;
@@ -50,7 +57,6 @@ export class ChangePassword{
            data = {};
        }else{
            if(confirmPassword.value !== newPassword.value){
-               Modal.alert('两次输入的密码不一致');
                data = {};
            }else{
                data['old_password'] = oldPassword.value;
@@ -59,16 +65,38 @@ export class ChangePassword{
        }
        return data;
    }
-
-   static initInput(para:obj): HTMLElement{
+   // 绑定输入框失焦事件
+   bindBlur(para:obj,other:obj,classString:string,el:HTMLElement){
+       d.on(d.query(classString,el), 'blur',()=>{
+           if( para.value ==''){
+               d.append(d.query('.confirm-group',el),<div class="password-tip">提示：密码不能为空</div>);
+           }
+           else if(para.value !== other.value){
+               d.append(d.query('.confirm-group',el),<div class="password-tip">提示：两次输入的密码不一致</div>);
+           }
+           else{
+               d.append(d.query('.confirm-group',el),<div class="password-tip same">提示：密码一致</div>);
+           }
+       })
+   }
+   // 绑定输入框聚焦事件
+   bindFocus(para:string,el:HTMLElement){
+       d.on(d.query(para,el), 'focus',()=>{
+           let tip = d.query('.password-tip');
+           if(tip){
+               d.remove(tip);
+           }
+       })
+   }
+   static initInput(para?:obj): HTMLElement{
        let form = <form action="#" class="password-form">
-           {Object.keys(para).map((key) => <div className="form-group"><span>{key}：</span><input type="text" readOnly value={para[key]}/></div>)}
+           {para ? Object.keys(para).map((key) => <div className="form-group"><span>{key=='user_id'?'用户名':key}：</span><input type="text" className="input-username" readOnly value={para[key]}/></div>) : null}
        </form>
        let oldPassword = <div className="form-group"><span>旧密码：</span><input className="old-password" type="password" placeholder="请输入旧密码"/></div>;
        let newPassword = <div className="form-group"><span>新密码：</span><input className="new-password" type="password" placeholder="请输入新密码"/></div>;
-       let confirmPassword = <div className="form-group"><span>确认密码：</span><input className="confirm-password" type="password" placeholder="确认新密码"/></div>;
-       let btn = <div className="btn-group"/>;
-       let input = h("form",{'class':'password-form'},oldPassword,newPassword,confirmPassword,btn);
+       let confirmPassword = <div className="form-group confirm-group"><span>确认密码：</span><input className="confirm-password" type="password" placeholder="确认新密码"/></div>;
+       let btn = <div className="btn-group"><div className="btn-confirm change-btn"/><div className="btn-cancel change-btn"/></div>;
+       let input = h("div",{'class':'input-form'},oldPassword,newPassword,confirmPassword,btn);
        d.append(form,input);
        return form;
    }
