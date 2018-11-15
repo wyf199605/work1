@@ -317,6 +317,7 @@ export class PlanModule extends Component{
                     key:'star-drawing',
                     content: '开始描点',
                     icon: 'maodian',
+                    className:'star-drawing',
                     color: 'info',
                     onClick: () => {
                         buttons.forEach((val)=>{
@@ -338,6 +339,7 @@ export class PlanModule extends Component{
                     content: '结束描点',
                     icon: 'wanchengbianji',
                     color: 'success',
+                    className:'end-drawing',
                     isDisabled:false,
                     onClick: () => {
                         //完成编辑--------
@@ -360,6 +362,7 @@ export class PlanModule extends Component{
                     key:'star-edit',
                     content: '编辑描点',
                     icon: 'bianjimaodian',
+                    className:'star-edit',
                     color: 'info',
                     onClick: () => {
                          buttons.forEach((val)=>{
@@ -378,6 +381,7 @@ export class PlanModule extends Component{
                     key:'end-edit',
                     content: '结束编辑',
                     icon: 'tuodong',
+                    className:'end-edit',
                     color: 'success',
                     onClick: () => {
                        buttons.forEach((val)=>{
