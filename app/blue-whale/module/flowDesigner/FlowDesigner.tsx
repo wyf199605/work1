@@ -280,6 +280,7 @@ export class FlowDesigner {
                 // FlowDesigner.AllLineItems.forEach(item => {
                 //     item.flowEditor.disabled = true;
                 // });
+
                 // 禁用所有input
                 d.queryAll('input').forEach(input => {
                     (input as HTMLInputElement).disabled = true;
@@ -295,6 +296,7 @@ export class FlowDesigner {
     static removeAllActive() {
         FlowItem.removeAllActiveClass();
         LineItem.removeAllActive();
+        FlowEditor.hideAllDropdown();
     }
 
     private initEvents = (() => {
@@ -311,7 +313,6 @@ export class FlowDesigner {
             FlowDesigner.rootElement = xmlDoc.documentElement;
             Method.parseToXml.setAttr(FlowDesigner.rootElement, FlowDesigner.flowEditor.get());
 
-            // 然后创建所有的节点，并设置属性
             FlowDesigner.ALLITEMS.forEach(item => {
                 // 创建节点、设置属性、添加到xml节点树中
                 let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
