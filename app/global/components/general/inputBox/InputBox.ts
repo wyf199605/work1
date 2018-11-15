@@ -206,73 +206,120 @@ export class InputBox extends Component {
         return this._isResponsive;
     }
 
-    // 【待改...】
-    responsive() {
+    responsive(){
         if(!this.isResponsive){
             return ;
         }
-        //如果获取不到父容器宽度，则无响应式
-        // let paWidth = parseInt(getComputedStyle(<HTMLElement>this._container)['width']);
-        // console.log('paWidth:',paWidth);
-        // if (paWidth < 1) {
-        //     return;
-        // }
-        //如果当前组件集合宽度 > 父容器宽度
-        // if (parseInt(this.wrapper.style.width) > paWidth && this.children.length > 0) {
-        if (this.children.length > this.limitCount) {
-            //判断是否有更多下拉列表
-            tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button({
-                content: '更多',
-                size: this._size,
-            }));
-            //不存在更多下拉列表，则生成更多下拉列表
-            if (!this._moreBtn || !this._moreBtn.dropDown) {
-                this.wrapper.appendChild(this.moreBtn.wrapper);
-                // this.wrapper.style.width = parseInt(this.wrapper.style.width) + parseInt(getComputedStyle(this._moreBtn.wrapper)['width']) + 'px';
-                // console.log('更多：',parseInt(getComputedStyle(this._moreBtn.wrapper)['width']));
-                let self = this;
-                this.moreBtn.dropDown = new DropDown({
-                    el: self.moreBtn.wrapper,
-                    inline: false,
-                    data: [],
-                    multi: null,
-                    className: "input-box-morebtn"
-                });
+        let childrenWidth = 56;
+        let wrapperWidth = this.wrapper.offsetWidth;
+        for(let i = 0; i < this.children.length; i++){
+            let c = this.children[i];
+            childrenWidth += c.wrapper.offsetWidth;
+            if(childrenWidth > wrapperWidth){
+                tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button({
+                    content: '更多',
+                    size: this._size,
+                }));
+                if (!this._moreBtn || !this._moreBtn.dropDown) {
+                    this.wrapper.appendChild(this.moreBtn.wrapper);
+                    let self = this;
+                    this.moreBtn.dropDown = new DropDown({
+                        el: self.moreBtn.wrapper,
+                        inline: false,
+                        data: [],
+                        multi: null,
+                        className: "input-box-morebtn"
+                    });
+                }
+                    // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
+                    //仅从dom结构上改变了组件，并未改变组件的container属性
+                if (this.moreBtn.dropDown) {
+                    this.moreBtn.dropDown.getUlDom().appendChild(c.wrapper);
+                }
+                this._lastNotMoreIndex = i;
+
+            }else{
+                d.append(this.wrapper, c.wrapper);
+                this._lastNotMoreIndex = Math.min(this._lastNotMoreIndex, i);
             }
-            //从组件集合末尾倒序调整
-            let len = this.children.length;
-            for (let i = len - 1; i >= this.limitCount - 1; i--) {
-                //当组件集合宽度超过限制的最大宽度时，将最后一个非更多下拉列表内的组件放置于更多下拉列表容器内（插入到其第一个子元素之前）
-                // if (parseInt(this.wrapper.style.width) > paWidth) {
-                    let com = this.children[i];
-                    if (com) {
-                        if (this._compactWidth && i > -1) {
-                            com.wrapper.style.marginLeft = 0 + 'px';
-                        }
-                        // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
-                        //仅从dom结构上改变了组件，并未改变组件的container属性
-                        if (this.moreBtn.dropDown) {
-                                this.moreBtn.dropDown.getUlDom().appendChild(com.wrapper);
-                        }
-                        this._lastNotMoreIndex = i;
-                    }
-                // }
+        }
+        if(this._moreBtn){
+            d.append(this.wrapper, this._moreBtn.wrapper);
+            if(this._lastNotMoreIndex === 0){
+                this._moreBtn.destroy();
+                this._moreBtn = null;
             }
         }
 
-        // setTimeout(() => {
-            // debugger;
-        let width = 10;
-
-        for(let i = 0; i < this.limitCount; i ++ ){
-            let child: HTMLElement = this.wrapper.children[i] as HTMLElement;
-            if(child){
-                width += child.offsetWidth;
-            }
-        }
-        this.wrapper.style.width = width + 'px';
-        // }, 500);
     }
+
+    // 【待改...】
+    // responsive() {
+    //     if(!this.isResponsive){
+    //         return ;
+    //     }
+    //     //如果获取不到父容器宽度，则无响应式
+    //     let paWidth = 0;
+    //     this.children.forEach((c) => {
+    //         paWidth += c.wrapper.offsetWidth;
+    //     });
+    //     let wrapperWidth = this.wrapper.offsetWidth;
+    //     // 如果当前组件集合宽度 > 父容器宽度
+    //     if (wrapperWidth > paWidth && this.children.length > 0) {
+    //     // if (this.children.length > this.limitCount) {
+    //         //判断是否有更多下拉列表
+    //         tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button({
+    //             content: '更多',
+    //             size: this._size,
+    //         }));
+    //         //不存在更多下拉列表，则生成更多下拉列表
+    //         if (!this._moreBtn || !this._moreBtn.dropDown) {
+    //             this.wrapper.appendChild(this.moreBtn.wrapper);
+    //             // this.wrapper.style.width = parseInt(this.wrapper.style.width) + parseInt(getComputedStyle(this._moreBtn.wrapper)['width']) + 'px';
+    //             // console.log('更多：',parseInt(getComputedStyle(this._moreBtn.wrapper)['width']));
+    //             let self = this;
+    //             this.moreBtn.dropDown = new DropDown({
+    //                 el: self.moreBtn.wrapper,
+    //                 inline: false,
+    //                 data: [],
+    //                 multi: null,
+    //                 className: "input-box-morebtn"
+    //             });
+    //         }
+    //         //从组件集合末尾倒序调整
+    //         let len = this.children.length;
+    //         for (let i = len - 1; i >= this.limitCount - 1; i--) {
+    //             //当组件集合宽度超过限制的最大宽度时，将最后一个非更多下拉列表内的组件放置于更多下拉列表容器内（插入到其第一个子元素之前）
+    //             // if (parseInt(this.wrapper.style.width) > paWidth) {
+    //             let com = this.children[i];
+    //             if (com) {
+    //                 if (this._compactWidth && i > -1) {
+    //                     com.wrapper.style.marginLeft = 0 + 'px';
+    //                 }
+    //                 // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
+    //                 //仅从dom结构上改变了组件，并未改变组件的container属性
+    //                 if (this.moreBtn.dropDown) {
+    //                     this.moreBtn.dropDown.getUlDom().appendChild(com.wrapper);
+    //                 }
+    //                 this._lastNotMoreIndex = i;
+    //             }
+    //             // }
+    //         }
+    //     }
+    //
+    //     // setTimeout(() => {
+    //         // debugger;
+    //     // let width = 10;
+    //
+    //     // for(let i = 0; i < this.limitCount; i ++ ){
+    //     //     let child: HTMLElement = this.wrapper.children[i] as HTMLElement;
+    //     //     if(child){
+    //     //         width += child.offsetWidth;
+    //     //     }
+    //     // }
+    //     // this.wrapper.style.width = width + 'px';
+    //     // }, 500);
+    // }
 
 
     /*
