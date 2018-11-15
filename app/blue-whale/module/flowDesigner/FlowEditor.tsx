@@ -8,6 +8,7 @@ import {FlowDesigner} from "./FlowDesigner";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {LineItem} from "./LineItem";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 
 export interface IFieldPara{
     name?: string;  // 名称
@@ -30,6 +31,7 @@ export interface IFlowEditorPara extends IFormComPara {
 export class FlowEditor extends FormCom {
 
     static EXIST_NAME = []; // 存放已被使用的name
+    static DropDowns: DropDown[] = [];  // 存放所有下拉列表
 
     // 类型对应的属性列表（类型属性限定表）
     static ATTR_LIMIT = {
@@ -42,7 +44,7 @@ export class FlowEditor extends FormCom {
         task: ['name', 'displayName', 'form', 'assignee', 'taskType', 'performType'],
         transition: ['name', 'displayName'],
         icon: ['iconSmall', 'iconLarge', 'descript', 'visible', 'pause'],
-        'flow-designer': ['displayName', 'processTypeId'],
+        'flow-designer': ['name', 'displayName', 'processTypeId'],
     };
 
     // 属性对应的名称
@@ -64,6 +66,12 @@ export class FlowEditor extends FormCom {
         processVersion: '流程版本',
     };
 
+    static DROPDOWN_KEYVALUE: ListItem = {
+        // 新增下拉列表时在此处添加键值
+        assignee: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
+        taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}]
+    };
+
     private owner: Component | FlowDesigner;
 
     protected wrapperInit(para: IFlowEditorPara): HTMLElement {
@@ -83,19 +91,48 @@ export class FlowEditor extends FormCom {
         para.fields && this.set(para.fields);
     }
 
+    // 隐藏所有下拉列表
+    static hideAllDropdown(){
+        FlowEditor.DropDowns.forEach(dropdown => dropdown.hideList());
+    }
+
     private initFlowEditor(para: IFlowEditorPara){
         // 根据类型判断节点具有的属性(如果在类型属性限定表中没有该类型的话，则类型默认为other，只有name和displayName两个属性)
         FlowEditor.ATTR_LIMIT[para.type in FlowEditor.ATTR_LIMIT? para.type: 'other'].forEach(attr => {
-            let attrEditorWrapper = <div className="attr-editor-wrapper" data-attr={attr}>
-                <div className="attr-editor-description">{FlowEditor.ATTR_DESCRIPTION[attr]}:</div>
-                <input type="text" value=""/>
-            </div>;
+            // 初始化时将start和end节点的name设为start/end
+            let name = ((para.type === 'start' || para.type === 'end') && attr === 'name') ? para.type : '',
+                attrEditorWrapper = <div className="attr-editor-wrapper" data-attr={attr}>
+                    <div className="attr-editor-description">{FlowEditor.ATTR_DESCRIPTION[attr]}:</div>
+                    <div className="attr-editor-input">
+                        <input type="text" value={name} disabled={attr in FlowEditor.DROPDOWN_KEYVALUE && 'disabled'}/>
+                    </div>
+                </div>;
+            if(attr in FlowEditor.DROPDOWN_KEYVALUE){
+                // 添加下拉按钮
+                d.append(d.query('.attr-editor-input', attrEditorWrapper), <i className="floweditor-dropdown icon-arrow-down"></i>);
+                let dropdownWrapper = <div className="dropdown-wrapper" data-attr={attr}>
+                    {/*<div className="dropdown-title"></div>*/}
+                </div>;
+                let dropdown = new DropDown({
+                    data: FlowEditor.DROPDOWN_KEYVALUE[attr],
+                    el: dropdownWrapper,
+                    inline: true,
+                    onSelect: (item, index) => {
+                        this.set({[attr]: item.value});
+                        FlowEditor.hideAllDropdown();
+                    }
+                });
+                dropdown.hideList();    // 初始设置为隐藏
+                d.append(d.closest(this.wrapper, '.design-canvas'), dropdownWrapper);
+                // 将下拉列表存到FlowEditor类和实例中，方便之后隐藏/显示列表
+                this.dropdowns[attr] = dropdown;
+                FlowEditor.DropDowns.push(dropdown);
+            }
             d.append(d.query('.tip-body', this.wrapper), attrEditorWrapper);
         });
     }
 
     private initEvents = (() => {
-
         let clickHandler = (e) => {
             // 点击文字描述也能使input获得焦点,并且记录当前input的值为旧值
             let input;
@@ -125,6 +162,13 @@ export class FlowEditor extends FormCom {
                 // 如果当前值不为空，并且已存在name列表中没有该name时，将其添加到已存在name列表中
                 currentValue && !FlowEditor.EXIST_NAME.includes(currentValue) && FlowEditor.EXIST_NAME.push(currentValue);
             }
+        },
+        dropdownToggleClickHandler = (e) => {
+            // 首先隐藏所有下拉列表，然后（显示/隐藏）当前选择的下拉列表
+            let dropdown = this.dropdowns[d.closest(e.target, '.attr-editor-wrapper', this.wrapper).dataset['attr']],
+                prevState = dropdown.isVisible;
+            FlowEditor.hideAllDropdown();
+            prevState ? dropdown.hideList() : dropdown.showList();
         };
 
         // 使用this.wrapper会使得点击.tip-header时，第一个input获得焦点，对change事件没有影响
@@ -133,10 +177,25 @@ export class FlowEditor extends FormCom {
             on: () => {
                 d.on(this.wrapper, 'click', clickHandler);
                 d.on(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
+                Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
+                    // 所有下拉按钮的点击事件
+                    d.on(
+                        d.query('.floweditor-dropdown', d.query(`.attr-editor-wrapper[data-attr=${attr}]`, this.wrapper)),
+                        'click',
+                        dropdownToggleClickHandler
+                    );
+                });
             },
             off: () => {
                 d.off(this.wrapper, 'click', clickHandler);
                 d.off(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
+                Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
+                    d.off(
+                        d.query('.floweditor-dropdown', d.query(`.attr-editor-wrapper[data-attr=${attr}]`, this.wrapper)),
+                        'click',
+                        dropdownToggleClickHandler
+                    );
+                });
             }
         }
     })();
@@ -148,6 +207,15 @@ export class FlowEditor extends FormCom {
     }
     set type(type: string){
         this._type = type;
+    }
+
+    // 存放当前flowEditor的下拉列表
+    private _dropdowns = {};
+    get dropdowns(){
+        return this._dropdowns;
+    }
+    set dropdowns(dropdowns: Object){
+        this._dropdowns = dropdowns;
     }
 
     // 控制是否显示（以及更新）

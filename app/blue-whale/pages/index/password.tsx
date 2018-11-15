@@ -25,12 +25,12 @@ export class PersonPassword extends BasicPage{
             userInfo = {};
         }
 
-        return BwRule.Ajax.fetch(CONF.siteUrl + CONF.ajaxUrl.personPassword, {
+        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
             type: 'POST',
             data: {
-                'upuserid': userInfo['userid'],
-                'old_password': data['old_password'],
-                'new_password': data['new-password']
+                'userid': userInfo['userid'],
+                'new_password': data['new_password'],
+                'old_password': data['old_password']
             }
         }).then((response) => {
             Modal.toast(response.msg);
