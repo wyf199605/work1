@@ -9,11 +9,36 @@ import {ShellAction} from "../../../global/action/ShellAction";
 import Ajax = G.Ajax;
 import {RfidSettingModal} from "../rfid/RfidSetting/RfidSetting";
 import Shell = G.Shell;
+import sysPcHistory = BW.sysPcHistory;
 
 export = class myselfMbPage {
     constructor() {
         // mui.init();
         // '.mui-scroll-wrapper').scroll();
+        let items = [];
+        BwRule.Ajax.fetch(CONF.ajaxUrl.personalmenu, {
+            loading: true
+        }).then(({response}) => {
+            let menus = response.body && response.body.elements;
+            menus && menus.forEach((menu) => {
+                items.push({
+                    content: menu.menuName,
+                    icon: menu.menuIcon,
+                    onClick: () => {
+                        let addr = menu.menuPath as R_ReqAddr;
+                            if (addr) {
+                                let url = CONF.siteUrl + BwRule.reqAddr(addr);
+                                sys.window.open({url, title: menu.menuName})
+                            }
+                    }
+                })
+            });
+        }).finally(() => {
+            this.init(items);
+        });
+    }
+
+    protected init(items: obj[]){
         let self = this;
         let user = User.get();
         d.setHTML(d.query('#userid'), user.are_id + ' ' + user.department);
@@ -25,10 +50,23 @@ export = class myselfMbPage {
             this.setFontSize(list);
             this.rfidSettingInit(list);
         }
+
+        items.forEach((item) => {
+            let li = <li className="mui-table-view-cell">
+                <a href="#" className="mui-navigate-right">
+                    <i className={item.icon}/>
+                    {item.content}
+                </a>
+            </li>;
+            d.on(li, 'click', () => {
+                item.onClick();
+            });
+            d.append(list, li);
+        });
         // 安卓判断
         if (sys.os === 'ad') {
             let li1 = <li className="mui-table-view-cell" data-page-name="powerManager">
-                        <a href="#" className="mui-navigate-right"> <i class="iconfont icon-023tuceng-copy-copy" style="color:#f15054;margin-right:10px"></i>权限管理</a>
+                    <a href="#" className="mui-navigate-right"> <i class="iconfont icon-023tuceng-copy-copy" style="color:#f15054;margin-right:10px"></i>权限管理</a>
                 </li>,
                 li2 = <li className="mui-table-view-cell" data-page-name="whiteBat">
                     <a href="#" className="mui-navigate-right"> <i class="iconfont icon-renyuan" style="color:#4ea6f1;margin-right:10px"></i>电池白名单</a>

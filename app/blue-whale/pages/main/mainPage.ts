@@ -12,17 +12,21 @@ import {Search} from "../../module/search/search";
 import {SearchInput} from "../../../global/components/form/searchInput/searchInput";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {BwRule} from "../../common/rule/BwRule";
-import {Popover} from "../../../global/components/ui/popover/popover";
+import {IPopoverItemPara, Popover} from "../../../global/components/ui/popover/popover";
 import {BugReportModal} from "../../module/BugReport/BugReport";
+import sysPcHistory = BW.sysPcHistory;
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
+
 interface IProps {
     pageContainer: HTMLDivElement;
     navBar: HTMLDivElement;
     menu: HTMLUListElement; // 导航菜单dom
     shortMenu: HTMLUListElement; // 最近收藏dom
-    nodeId : string;
-    baseUrl : string;
-    searchDom : HTMLElement;
+    nodeId: string;
+    baseUrl: string;
+    searchDom: HTMLElement;
 }
+
 /**
  * 电脑端主界面
  */
@@ -31,8 +35,8 @@ export = class MainPage {
     private static tabContainer: HTMLUListElement = null;
     private static pageContainer: HTMLDivElement;
     private static navBar: HTMLDivElement;
-    private static searchModal : Modal;
-    private static spinner : Loading;
+    private static searchModal: Modal;
+    private static spinner: Loading;
 
     constructor() {
     }
@@ -54,22 +58,24 @@ export = class MainPage {
         MainPage.myselfMenu.init();
         MainPage.rightSidebar.init();
         MainPage.search.init(props);
-      /*let url = `${conf.urlAppid}/v1/commonui/pageroute?page=defaultTab`;
-        sys.window.open({url});*/
+        /*let url = `${conf.urlAppid}/v1/commonui/pageroute?page=defaultTab`;
+          sys.window.open({url});*/
     }
+
     private static search = (function () {
         let ajax = new BwRule.Ajax();
-        function init(props : IProps){
+
+        function init(props: IProps) {
             new SearchInput({
-                container : props.searchDom,
-                className : 'search-form',
-                placeholder : '搜索',
-                ajax : {
-                    url : props.baseUrl,
-                    fun(url, data, recentValue, cb){
-                        if(!MainPage.spinner){
+                container: props.searchDom,
+                className: 'search-form',
+                placeholder: '搜索',
+                ajax: {
+                    url: props.baseUrl,
+                    fun(url, data, recentValue, cb) {
+                        if (!MainPage.spinner) {
                             MainPage.spinner = new Loading({})
-                        }else {
+                        } else {
                             MainPage.spinner.show();
                         }
 
@@ -95,27 +101,28 @@ export = class MainPage {
                     }
                 }
             });
-            function menuPanel(data){
+
+            function menuPanel(data) {
                 let fragment = document.createDocumentFragment(),
                     div = d.create(`<div></div>`);
-                if(data){
+                if (data) {
                     data.forEach(obj => {
                         fragment.appendChild(menuTpl(obj));
                     });
-                }else {
+                } else {
                     fragment.appendChild(d.create(`<div>暂无数据</div>`));
                 }
                 div.appendChild(fragment);
-                if(!MainPage.searchModal){
+                if (!MainPage.searchModal) {
                     MainPage.searchModal = new Modal({
-                        header : '菜单搜索结果',
-                        position : 'left',
-                        className : 'menuPage',
-                        body : div,
-                        isBackground : false,
+                        header: '菜单搜索结果',
+                        position: 'left',
+                        className: 'menuPage',
+                        body: div,
+                        isBackground: false,
                     });
                     MainPage.searchModal.body.parentElement.classList.add('padding-1');
-                }else {
+                } else {
                     MainPage.searchModal.body = div;
                     MainPage.searchModal.isShow = true;
                 }
@@ -123,12 +130,12 @@ export = class MainPage {
                     MainPage.searchModal.isShow = false;
                     let badge = this.querySelector('[data-url]');
                     let num = 0;
-                    if(badge){
+                    if (badge) {
                         num = parseInt(badge.textContent);
                     }
-                    let data = badge ? {badge : num} : {};
+                    let data = badge ? {badge: num} : {};
                     BW.sys.window.open({
-                        url:CONF.siteUrl + this.dataset.href,
+                        url: CONF.siteUrl + this.dataset.href,
                         data: data
                     });
                 });
@@ -152,7 +159,7 @@ export = class MainPage {
                 MainPage.spinner.hide();
             }
 
-            function menuTpl(obj : obj){
+            function menuTpl(obj: obj) {
                 let menu = obj.menuItem;
                 return d.create(`  <div class="file-box col-xs-2 col-md-2 card-white" data-favid="${menu.favid}">
                     <div class="file" title="${obj.menuLocation}">
@@ -168,6 +175,7 @@ export = class MainPage {
                 </div>`)
             }
         }
+
         return {
             init: (props) => {
                 init(props)
@@ -183,56 +191,60 @@ export = class MainPage {
                 faTabBar = tabBar.parentElement.parentElement,
                 contentPage = MainPage.pageContainer,
                 navScroll = (function () {
-                let scroller = $(tabBar.parentElement);
+                    let scroller = $(tabBar.parentElement);
 
-                function scroll(left: number) {
-                    scroller.animate({
-                        scrollLeft: left
-                    });
-                }
-                function scrollToActive() {
-                    let active = <HTMLLIElement>tabBar.querySelector('li.open'),
-                        left: number,
-                        topWidth: number;
+                    function scroll(left: number) {
+                        scroller.animate({
+                            scrollLeft: left
+                        });
+                    }
 
-                    if (active) {
-                        // left = active.position().left + active.width();
-                        left = active.offsetLeft + active.offsetWidth;
-                        topWidth = navBar.offsetWidth;
+                    function scrollToActive() {
+                        let active = <HTMLLIElement>tabBar.querySelector('li.open'),
+                            left: number,
+                            topWidth: number;
 
-                        if (left < 0 || left > topWidth) {
-                            scroll(( left + scroller.scrollLeft() ) - topWidth + 20);
+                        if (active) {
+                            // left = active.position().left + active.width();
+                            left = active.offsetLeft + active.offsetWidth;
+                            topWidth = navBar.offsetWidth;
+
+                            if (left < 0 || left > topWidth) {
+                                scroll((left + scroller.scrollLeft()) - topWidth + 20);
+                            }
                         }
                     }
-                }
-                function toggleBtn() {
-                    navBar.classList[tabBar.offsetWidth > navBar.offsetWidth ? 'add' : 'remove']('hover');
-                }
-                return {
-                    left: function () {
-                        scroll(scroller.scrollLeft() - 500)
-                    },
-                    right: function () {
-                        scroll(scroller.scrollLeft() + 500)
-                    },
-                    toActive: function () {
-                        scrollToActive();
-                    },
-                    toggleBtn: function () {
-                        toggleBtn();
-                    },
-                    calc: function () {
-                        scrollToActive();
-                        toggleBtn();
+
+                    function toggleBtn() {
+                        navBar.classList[tabBar.offsetWidth > navBar.offsetWidth ? 'add' : 'remove']('hover');
                     }
-                }
-            }());
+
+                    return {
+                        left: function () {
+                            scroll(scroller.scrollLeft() - 500)
+                        },
+                        right: function () {
+                            scroll(scroller.scrollLeft() + 500)
+                        },
+                        toActive: function () {
+                            scrollToActive();
+                        },
+                        toggleBtn: function () {
+                            toggleBtn();
+                        },
+                        calc: function () {
+                            scrollToActive();
+                            toggleBtn();
+                        }
+                    }
+                }());
 
             //给open方法加入默认回调
             (function () {
                 let open = sys.window.open;
                 sys.window.open = function (obj, refer) {
-                    obj.callback = typeof obj.callback === 'function' ? obj.callback : ()=>{};
+                    obj.callback = typeof obj.callback === 'function' ? obj.callback : () => {
+                    };
                     let cb = obj.callback;
                     obj.callback = function () {
                         navScroll.calc();
@@ -260,10 +272,10 @@ export = class MainPage {
             $(tabBar).on('click', 'li[data-href]', function () {
                 sys.window.open({url: this.dataset.href});
             }).on('click', '.close[data-href]', function (e) {
-                    sys.window.close('', null, this.dataset.href);
-                    navScroll.toggleBtn();
-                    e.stopPropagation();
-                });
+                sys.window.close('', null, this.dataset.href);
+                navScroll.toggleBtn();
+                e.stopPropagation();
+            });
             // d.on(tabBar,'click', 'li[data-href]', function () {
             //     sys.window.open({url:this.dataset.href});
             // });
@@ -288,6 +300,7 @@ export = class MainPage {
             });
 
         }
+
         return {
             init: () => {
                 init()
@@ -297,39 +310,50 @@ export = class MainPage {
 
     private static myselfMenu = (function () {
         //顶部个人信息下拉窗口点击事件
-        let items = [
+        let self = this;
+        let items: IPopoverItemPara[] = [
             {
                 title: '<a href="javascript:void(0)" data-page-name="myself" data-action="myself">个人资料</a>',
-            },
-            // {
-            //     title: '<a href="javascript:void(0)" data-action="account">账号与安全</a>'
-            // },
-            {
-                title: '<a href="javascript:void(0)" data-action="check">检查新版本</a>'
-            },
-            {
-                title: '<a href="javascript:void(0)" data-action="clear">清理缓存</a>'
+                onClick: () => {
+                    sys.window.open({
+                        url: tools.url.addObj(CONF.url.myself, {
+                            userid: User.get().userid
+                        })
+                    });
+                }
             },
             {
-                title: '<a href="javascript:void(0)" data-page-name="bugReport" data-action="bugReport">故障申告</a>'
+                title: '<a href="javascript:void(0)" data-action="check">检查新版本</a>',
+                onClick: () => {
+                    sys.window.update();
+                }
             },
             {
-                title: '<a href="javascript:void(0)" data-page-name="myApplication" data-action="application">我的申请</a>'
+                title: '<a href="javascript:void(0)" data-action="clear">清理缓存</a>',
+                onClick: () => {
+                    sys.window.clear();
+                }
             },
             {
-                title: '<a href="javascript:void(0)" data-page-name="myApproval" data-action="approval">我的审核</a>'
+                title: '<a href="javascript:void(0)" data-page-name="bugReport" data-action="bugReport">故障申告</a>',
+                onClick: () => {
+                    sys.window.open({url: CONF.url.bugReport});
+                }
+            },
+            {
+                title: '<a href="javascript:void(0)" data-page-name="myApplication" data-action="application">我的申请</a>',
+                onClick: () => {
+                    sys.window.open({url: CONF.url.myApplicationPC});
+                }
+            },
+            {
+                title: '<a href="javascript:void(0)" data-page-name="myApproval" data-action="approval">我的审核</a>',
+                onClick: () => {
+                    sys.window.open({url: CONF.url.myApprovalPC});
+                }
             },
         ];
-        if(CONF.appid === 'app_fastlion_retail'){
-            items = items.concat([{
-                    title: '<a href="javascript:void(0)" data-page-name="changePassword" data-action="changePassword">修改个人密码</a>',
-                }]
-            );
-        }
 
-        items.push({
-            title: '<a data-action="logout">退出登录</a>'
-        });
 
         function myselfMenu() {
             let popover = new Popover({
@@ -338,82 +362,66 @@ export = class MainPage {
                 isWatch: true,
                 items,
                 isBackground: false,
-                onClick: function (index){
+                onClick: function (index, content) {
                     hide();
-                    let str = d.query('a', this).dataset.action;
-                    switch (str) {
-                        case 'myself':
-                            sys.window.open({
-                                url: tools.url.addObj(CONF.url.myself, {
-                                    userid: User.get().userid
-                                })
-                            });
-                            break;
-                        case 'check':
-                            sys.window.update();
-                            break;
-                        case 'clear':
-                            sys.window.clear();
-                            break;
-                        case 'bugReport':
-                            sys.window.open({url: CONF.url.bugReport});
-                            break;
-                        case 'application':
-                            sys.window.open({url: CONF.url.myApplicationPC});
-                            break;
-                        case 'approval':
-                            sys.window.open({url: CONF.url.myApprovalPC});
-                            break;
-                        case 'changePassword':
-                            sys.window.open({
-                                url: CONF.url.changePassword
-                            });
-                            break;
-                        case 'logout':
-                            Modal.confirm({
-                                msg: `您确定要退出登录吗`,
-                                callback: (index) => {
-                                    if (index) {
-                                        let device = Device.get();
-                                        // if(G.tools.isEmpty(device.uuid)) {
-                                        //     sys.window.logout();
-                                        // }else{
-                                        sys.window.logout();
-                                        // }
-                                    }
-                                }
-                            });
-                            break;
-                    }
                 }
             });
 
-            function hide(){
+            function hide() {
                 popover.show = false;
             }
-            // popover.position = "down";
-           /* $('.dropdown-menu').on('click', '[data-action]', function () {
-                let action = this.dataset.action;
-                switch (action) {
-                    case 'myself':
-                        sys.window.open({
-                            url: tools.url.addObj(CONF.url.myself, {
-                                userid: User.get().userid
-                            })
-                        });
-                        break;
-                    case 'account':
-                        break;
-                    case 'check':
-                        sys.window.update();
-                        break;
-                    case 'clear':
-                        sys.window.clear();
-                        break;
-                    case 'bugReport':
-                        sys.window.open({url: CONF.url[this.dataset.pageName]});
-                        break;
-                    case 'logout':
+
+        }
+
+        function openWindow(url: string, title: string){
+            if (sysPcHistory.indexOf(url) >= 0) {
+                sys.window.refresh(url);
+            }
+            sys.window.open({url, title})
+        }
+
+        function init() {
+            let toggleEl = d.query('.popover-toggle');
+            toggleEl.classList.add('disabled');
+            let spinner = new Spinner({
+                el: toggleEl,
+                type: Spinner.SHOW_TYPE.cover
+            });
+            spinner.show();
+            BwRule.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+                let menus = response.body && response.body.elements;
+                menus && menus.forEach((menu) => {
+                    items.push({
+                        title: `<a href="javascript:void(0)">${menu.menuName}</a>`,
+                        onClick: () => {
+                            let addr = <R_ReqAddr>menu.menuPath;
+                            if (addr) {
+                                let url = CONF.siteUrl + BwRule.reqAddr(addr);
+                                openWindow(url, menu.menuName)
+                            }
+                        }
+                    })
+                });
+
+            }).finally(() => {
+                spinner && spinner.hide();
+                spinner = null;
+                toggleEl.classList.remove('disabled');
+                if (CONF.appid === 'app_fastlion_retail') {
+                    items = items.concat([{
+                            title: '<a href="javascript:void(0)" data-page-name="changePassword" data-action="changePassword">修改个人密码</a>',
+                            onClick: () => {
+                                sys.window.open({
+                                    url: CONF.url.changePassword
+                                });
+                            }
+                        }]
+                    );
+                }
+
+                items.push({
+                    title: '<a data-action="logout">退出登录</a>',
+                    onClick: () => {
                         Modal.confirm({
                             msg: `您确定要退出登录吗`,
                             callback: (index) => {
@@ -422,29 +430,27 @@ export = class MainPage {
                                     // if(G.tools.isEmpty(device.uuid)) {
                                     //     sys.window.logout();
                                     // }else{
-                                        sys.window.logout(CONF.url.login);
+                                    sys.window.logout();
                                     // }
                                 }
                             }
                         });
-                        break;
-                }
-            });*/
+                    }
+                });
+                //消息提示窗口点击事件
+                $('.messageList').on('click', 'li', function () {
+                    let src = CONF.siteUrl + $(this).data('url');
+                    sys.window.open({url: src});
+                    $(this).remove();
+                    localMsg.remove(this.dataset.notifyid);
+                });
+                document.querySelector('[data-action=topSeeAllMsg]').addEventListener('click', function () {
+                    sys.window.open({url: CONF.url.message});
+                });
+                myselfMenu();
+            });
         }
 
-        function init() {
-            //消息提示窗口点击事件
-            $('.messageList').on('click', 'li', function () {
-                let src = CONF.siteUrl + $(this).data('url');
-                sys.window.open({url: src});
-                $(this).remove();
-                localMsg.remove(this.dataset.notifyid);
-            });
-            document.querySelector('[data-action=topSeeAllMsg]').addEventListener('click', function () {
-                sys.window.open({url: CONF.url.message});
-            });
-            myselfMenu();
-        }
         return {
             init: () => {
                 init()
@@ -453,7 +459,7 @@ export = class MainPage {
     }());
 
     private static rightSidebar = (function () {
-        let $html = $('html'), $win = $(window), wrap = $('.app-aside'), MEDIAQUERY:obj = {}, app = $('#app');
+        let $html = $('html'), $win = $(window), wrap = $('.app-aside'), MEDIAQUERY: obj = {}, app = $('#app');
         MEDIAQUERY = {
             desktopXL: 1200,
             desktop: 992,

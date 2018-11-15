@@ -7,7 +7,7 @@ import {Mask} from "../mask/mask";
 
 export interface IPopoverPara extends IComponentPara {
     items: IPopoverItemPara[];
-    onClick?: (index: string) => void; //popover点击事件
+    onClick?: (index: string, content: any) => void; //popover点击事件
     target: HTMLElement; // 点击该元素显示popover
     show?: boolean; //设置默认显示popover与否，默认否   可主动设置show控制popover显示隐藏
     position?: 'auto' | 'up' | 'down' | 'right' | 'left'; // popover方向设置，默认auto  可主动设置方向
@@ -20,11 +20,12 @@ export interface IPopoverPara extends IComponentPara {
 export interface IPopoverItemPara extends IComponentPara {
     name?: string;
     title: string;//item的内容
-    onClick?: EventListener;//item的点击事件
+    onClick?: Function;//item的点击事件
     disabled?: boolean;//设置item是否不可点击，默认否
     icon?: string;
     index?: string;//设置索引，无需手动设置，设置了也无效
     show?: boolean;
+    content?: any;
 }
 
 export class Popover extends Component {
@@ -97,7 +98,8 @@ export class Popover extends Component {
                 d.on(self.wrapper, 'click', '.popover-item', click2 = function (e) {
                     // e.stopPropagation();
                     let index: string = d.closest((<HTMLElement>e.target), '[data-index]').dataset.index;
-                    typeof self.onClick === 'function' && self.onClick.call(this, index);
+                    typeof self.onClick === 'function' && self.onClick.call(this, index,
+                        self.popoverItems[index] ? self.popoverItems[index].content : null);
                 });
             },
             off() {
@@ -401,9 +403,11 @@ export class Popover extends Component {
 class PopoverItem extends Component {
 
     public name: string;
+    content: any;
 
     constructor(protected para: IPopoverItemPara) {
         super(para);
+        this.content = para.content;
         this.wrapper.dataset.index = this.para.index;
         this.init();
         this.show = para.show;
@@ -423,7 +427,7 @@ class PopoverItem extends Component {
         this.disabled = para.disabled;
         this.onClick = para.onClick;
         d.on(this.wrapper, 'click', (e) => {
-            typeof this.onClick === 'function' && this.onClick(e);
+            typeof this.onClick === 'function' && this.onClick(e, this.content);
         });
     }
 
@@ -437,7 +441,7 @@ class PopoverItem extends Component {
         return this._title;
     }
 
-    protected _onClick: EventListener = null;
+    protected _onClick: Function = null;
     set onClick(e) {
         this._onClick = e;
     }
