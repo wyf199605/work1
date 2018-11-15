@@ -245,6 +245,7 @@ export class ButtonAction {
                 if(res){
                     openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
                 }
+                callback(null);
                 BW.sys.window.open({
                     url: openUrl,
                     gps: !!btn.actionAddr.needGps,

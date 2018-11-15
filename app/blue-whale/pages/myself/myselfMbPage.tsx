@@ -10,15 +10,17 @@ import Ajax = G.Ajax;
 import {RfidSettingModal} from "../rfid/RfidSetting/RfidSetting";
 import Shell = G.Shell;
 import sysPcHistory = BW.sysPcHistory;
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 export = class myselfMbPage {
     constructor() {
         // mui.init();
         // '.mui-scroll-wrapper').scroll();
         let items = [];
-        BwRule.Ajax.fetch(CONF.ajaxUrl.personalmenu, {
-            loading: true
-        }).then(({response}) => {
+        let loading = new Loading({});
+        loading.show();
+        G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+            response = JSON.parse(response);
             let menus = response.body && response.body.elements;
             menus && menus.forEach((menu) => {
                 items.push({
@@ -34,6 +36,8 @@ export = class myselfMbPage {
                 })
             });
         }).finally(() => {
+            loading && loading.hide();
+            loading = null;
             this.init(items);
         });
     }

@@ -153,6 +153,9 @@ export class SelectInput extends TextInput {
         // super.set(value);
     }
     get value() {
+        if(!this.para){
+            return null;
+        }
         if(this.para.multi){
             // let seleArr = this.dropdown.get();
             // let cacheData = this.data;

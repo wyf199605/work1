@@ -34,6 +34,14 @@ export class LookupModule extends FormCom{
         });
     }
 
+    get disabled(){
+        return this._disabled;
+    }
+    set disabled(flag: boolean){
+        this._disabled = flag;
+        this.selectInput && (this.selectInput.disabled = flag);
+    }
+
     private ajax(callback:Function){
         let {field, rowData} = this.para;
         BwRule.getLookUpOpts(field, rowData).then(options => {

@@ -397,7 +397,7 @@ export class BwTableModule extends Component {
         return new Promise((resolve, reject) => {
             let loading = new Loading({
                 msg: '加载中...',
-                container: this.wrapper
+                container: this.container
             });
             this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(this.ui.dataAddr), {
                 data: Object.assign({}, ajaxData, {pageparams: `{"index"=1,"size"=3000,"total"=1}`})  //设置初始分页条件

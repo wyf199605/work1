@@ -388,7 +388,9 @@ export = class MainPage {
                 type: Spinner.SHOW_TYPE.cover
             });
             spinner.show();
-            BwRule.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+            G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+                // console.log(response);
+                response = JSON.parse(response);
                 let menus = response.body && response.body.elements;
                 menus && menus.forEach((menu) => {
                     items.push({
