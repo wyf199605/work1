@@ -133,7 +133,7 @@ export class FastTableMenu {
             if (tools.isMb) {
                 fm.contextMenu.setPosition(e.deltaX - offsetLeft, e.deltaY - offsetTop + scrollTop);
             } else {
-                fm.contextMenu.setPosition(e.clientX - offsetLeft, e.clientY - offsetTop + scrollTop);
+                fm.contextMenu.setPosition(e.clientX, e.clientY);
             }
             // debugger;
         };
