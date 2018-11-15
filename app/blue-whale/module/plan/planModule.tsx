@@ -46,8 +46,8 @@ export class PlanModule extends Component{
     constructor(para: IPlanModulePara){
         super(para);
         let ui = this.ui = para.ui;
-        //this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
-        this.isEditPlan = false;
+        this.isEditPlan = ui.tableAddr && tools.isNotEmpty(ui.tableAddr.param);
+        //this.isEditPlan = false;
 
         if(this.isEditPlan){
             this.btnWrapper = <div class="plan-opera"/>;
@@ -69,10 +69,25 @@ export class PlanModule extends Component{
                 <Button icon={btnUi.icon} content={btnUi.title} data={btnUi}
                     onClick={() => {
                         ButtonAction.get().clickHandle(btnUi, void 0, (res) => {
-                        }, void 0 , ui.itemId);
+                        }, this.pageUrl , ui.itemId);
                 }}/>
             </div>)
         })
+    }
+
+    protected pageContainer: HTMLElement;
+    protected _pageUrl: string;
+    get pageUrl() {
+        if (!this._pageUrl) {
+            if (tools.isMb) {
+                this._pageUrl = location.href;
+            } else {
+                let pageContainer = d.closest(this.wrapper, '.page-container[data-src]');
+                this.pageContainer = pageContainer;
+                this._pageUrl = pageContainer ? pageContainer.dataset.src : '';
+            }
+        }
+        return this._pageUrl;
     }
 
     protected initDraw(){
@@ -126,11 +141,26 @@ export class PlanModule extends Component{
                         case 'btn':
                             ButtonAction.get().clickHandle(areaType.content.button, areaType.data, () => {
                                 resolve();
-                            });
+                            }, this.pageUrl , ui.itemId);
+                            break;
+                        case 'link':
+                            for(let col of cols){
+                                let link = col.link;
+                                if(tools.isNotEmpty(link)) {
+                                    BwRule.link({
+                                        link: link.dataAddr,
+                                        varList: link.varList,
+                                        dataType: col.atrrs.dataType,
+                                        data: areaType.data,
+                                        needGps: link.needGps === 1,
+                                        type: link.type
+                                    });
+                                    break;
+                                }
+                            }
                             break;
                     }
                 })
-
             }
         });
 

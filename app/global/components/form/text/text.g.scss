@@ -3,7 +3,9 @@
   min-width: 50px;
 
   &.disabled{
-    cursor: no-drop;
+    input{
+      cursor: no-drop!important;
+    }
   }
 
   &.error{

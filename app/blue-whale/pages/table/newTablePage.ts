@@ -41,7 +41,6 @@ export class NewTablePage extends BasicPage{
         this.on(BwRule.EVT_REFRESH, () => {
             bwTable.tableModule && bwTable.tableModule.refresh();
         });
-
     }
 }
 
@@ -233,10 +232,6 @@ export class BwTableElement extends Component{
         }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
             this.locationLine(line, para);
         }
-
-        this.on(BwRule.EVT_REFRESH, () => {
-            this.tableModule && this.tableModule.refresh();
-        });
     }
 
     private asynQuery(asynData){

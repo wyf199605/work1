@@ -102,7 +102,7 @@ export class DrawPoint extends Component {
          this.LR = D3.scale.linear()
             .domain([1,6])
             .range([5,0.3])
-        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').style('opacity',0.0)
+        this.tooltip = D3.select(this.wrapper).append('div').attr('class','tooltip').style('display','none')
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
 
@@ -146,10 +146,11 @@ export class DrawPoint extends Component {
             on: () => {
                 this.g.selectAll('g').on('click', function (d, i) {
                     self.onAreaClick && self.onAreaClick({
-                        type: 'edit',
+                        type: 'pick',
                         data: d
                     }).then((data) => {
-                        self.showData(data, D3.select(this))
+                        let newData = Object.assign({},d,data);
+                        self.showData(newData, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
                     D3.select(this).select('path').attr('fill', 'gold').attr('fill-opacity', 0.5)
@@ -311,11 +312,11 @@ export class DrawPoint extends Component {
                                   str += (toolData[i] + "<br/>");
                             }
                             that.tooltip.html(str)
-                                .style('left',(D3.event.pageX) + 'px')
-                                .style('top',(D3.event.pageY + D3.event.scrollY)- 10 + 'px')
-                                .style('opacity',1.0)
+                                .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
+                                .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
+                                .style('display','block')
                         }).on('mouseout',function (d) {
-                            that.tooltip.style('opacity',0);
+                            that.tooltip.style('display','none');
                         })
                         .style("pointer-events",()=>{
                             if(this.isDrawLine){
@@ -361,7 +362,11 @@ export class DrawPoint extends Component {
 
     private InitIcon(group,points){
         let x = this.setIconPos(points)[0],
-            y = this.setIconPos(points)[1];
+            y = this.setIconPos(points)[1],
+            urlData;
+         group.attr('id',function (d) {
+            urlData = d;
+        })
         group.append("text").attr('class','iconfont icon-dianpubiaoji')
             .attr('font-family','iconfont')
             .attr('x',()=>{
@@ -372,14 +377,14 @@ export class DrawPoint extends Component {
             .attr('fill','#666666')
             .text("\ue6e1")
             .on('mouseover',function (d) {
-               D3.select(this).transition().attr('y',y+4).ease("bounce");
+               D3.select(this).transition().attr('y',y+4).ease("bounce").attr('cursor','pointer');
             }).on('mouseout',function (d) {
-            D3.select(this).transition().attr('y',y).ease("bounce");
+            D3.select(this).transition().attr('y',y).ease("bounce").attr('cursor','default');
             }).on('click', tools.pattern.throttling((d)=> {
                console.log(D3.event);
              this.onAreaClick({
-                 type:'pick',
-                 data:this._data
+                 type:'link',
+                 data:urlData
 
              }).then((data)=>{
                  alert(data)
@@ -650,7 +655,7 @@ export class DrawPoint extends Component {
             that.index = parseInt(that.indexStr.slice(4, that.indexStr.length));
             that.points = that.map.get(that.index);
             that.isDrawLine = true;
-            this.fishe = false;
+            that.fishe = false;
             that.redraw();
             that.selectedG = D3.select(this);
             D3.select(this).attr('class',function (d) {

@@ -23,21 +23,35 @@ export = class FormPage extends BasicPage {
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
 
-            let field = {
+            let field: any = {
 
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
                 field: nameFields[f.name]
             };
+            if(nameFields[f.name] && nameFields[f.name].elementType === 'lookup'){
+                field.onExtra = (data, fields) => {
+                    if(editModule){
+                        fields.forEach((field) => {
+                            let com = editModule.getDom(field);
+                            if(com){
+                                com.set(data[field] || '')
+                            }
+                        })
+                    }
+                }
+            }
 
-            if(field.field && field.field.noShow && field.dom){
-                field.dom.classList.add('hide');
+            if(field.field && field.field.noShow){
+                let dom = d.query(`[data-name="${f.name}"]`, form);
+                console.log(dom);
+                dom && dom.classList.add('hide');
             }
 
             emPara.fields.push(field);
 
-            if(['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit){
-                field.dom && field.dom.classList.add('disabled');
-            }
+            // if(['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit){
+            //     field.dom && field.dom.classList.add('disabled');
+            // }
 
         });
 
@@ -54,7 +68,7 @@ export = class FormPage extends BasicPage {
         //         field.dom.classList.add('disabled');
         //     }
         // }
-        this.editModule = new EditModule(emPara);
+        let editModule = this.editModule = new EditModule(emPara);
 
         emPara.fields.forEach((f) => {
             let field = f.field,
@@ -63,6 +77,11 @@ export = class FormPage extends BasicPage {
             if(isNotEdit){
                 let com = this.editModule.getDom(name);
                 com && (com.disabled = true);
+                if(tools.isMb){
+                    com.wrapper.addEventListener('click', () => {
+                        Modal.toast(field.caption + '不可以修改～');
+                    });
+                }
             }
         });
 
