@@ -77,7 +77,7 @@ export class NewTableModule {
             window.onresize = tools.pattern.debounce(() => {
                 console.log('>>>');
                 this.main.subBtns.box.responsive();
-            }, 1000);
+            }, 500);
             // this.editInit(para.bwEl);
 
             if (tools.isNotEmpty(subUi)) {
