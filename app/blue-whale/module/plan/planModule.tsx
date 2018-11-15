@@ -201,7 +201,7 @@ export class PlanModule extends Component{
         }).then(({response}) => {
             console.log(response);
             let data = response.data;
-            if (data) {
+            if (data && ui.tableAddr && ui.tableAddr.param) {
                 let editParam = ui.tableAddr.param[0];
                 if (editParam) {
                     let varList = [];

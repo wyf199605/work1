@@ -20,6 +20,7 @@ export = class myselfMbPage {
         let loading = new Loading({});
         loading.show();
         G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+            response = JSON.parse(response);
             let menus = response.body && response.body.elements;
             menus && menus.forEach((menu) => {
                 items.push({

@@ -38,6 +38,7 @@ export class PlanPage extends BasicPage {
                     planModule && planModule.refresh(data);
                 }}/>
             </div>);
+
             planModule = new PlanModule({
                 ui: res.ui,
                 container: this.wrapper
@@ -65,6 +66,7 @@ export class PlanPage extends BasicPage {
                 loading.show();
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
                     let ui = response.body.elements[0];
+                    ui.subButtons = (ui.subButtons || []).concat(response.body.subButtons || []);
                     resolve({
                         ui,
                         query: qData
@@ -76,6 +78,7 @@ export class PlanPage extends BasicPage {
                     loading = null;
                 });
             }else{
+                qData.subButtons = (qData.subButtons || []).concat(ui.body.subButtons || []);
                 resolve({
                     ui: qData,
                     query: qData.querier

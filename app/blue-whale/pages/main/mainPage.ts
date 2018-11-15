@@ -389,6 +389,8 @@ export = class MainPage {
             });
             spinner.show();
             G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+                // console.log(response);
+                response = JSON.parse(response);
                 let menus = response.body && response.body.elements;
                 menus && menus.forEach((menu) => {
                     items.push({

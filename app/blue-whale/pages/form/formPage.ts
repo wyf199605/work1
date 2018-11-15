@@ -8,17 +8,20 @@ import sys = BW.sys;
 import tools = G.tools;
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Popover} from "../../../global/components/ui/popover/popover";
+import {Loading} from "../../../global/components/ui/loading/loading";
 export = class FormPage extends BasicPage {
     private editModule : EditModule;
     private validate : Validate;
+    protected fields: R_Field[];
     // private loading =  document.querySelector('.loading');
 
     constructor(form: HTMLElement, private para: EditPagePara) {
         super(para);
-        // console.log(para);
+        console.log(para);
         let isInsert = para.uiType === 'insert';
         let emPara: EditModulePara = {fields : []};
         let nameFields : {[name : string] : R_Field} = {};
+        this.fields = para.fm.fields;
 
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
@@ -43,7 +46,6 @@ export = class FormPage extends BasicPage {
 
             if(field.field && field.field.noShow){
                 let dom = d.query(`[data-name="${f.name}"]`, form);
-                console.log(dom);
                 dom && dom.classList.add('hide');
             }
 
@@ -88,8 +90,29 @@ export = class FormPage extends BasicPage {
         // 编辑标识
         this.initData();
         this.initEvent();
-        window['tt'] = this;
+        window['e'] = this;
         // this.initValidate();
+    }
+
+    private _lookUpData: objOf<ListItem[]> = {};
+    get lookUpData() {
+        return this._lookUpData || {};
+    }
+
+    private get lookup(): Promise<void> {
+        if (tools.isEmpty(this._lookUpData)) {
+            let allPromise = this.fields.filter(col => col.elementType === 'lookup')
+                .map(col => BwRule.getLookUpOpts(col).then((items) => {
+                    // debugger;
+                    this._lookUpData = this._lookUpData || {};
+                    this._lookUpData[col.name] = items;
+                }));
+
+            return Promise.all(allPromise).then(() => {
+            })
+        } else {
+            return Promise.resolve();
+        }
     }
 
 
@@ -259,34 +282,43 @@ export = class FormPage extends BasicPage {
             return data;
         };
 
-        // 字段默认值
-        let defaultVal = BwRule.getDefaultByFields(form.fields);
-        this.editModule.set(defaultVal);
-
         // url请求默认值
         if(form.dataAddr){
-            BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(form.dataAddr))
-                .then(({response}) => {
-                    //	    alert(JSON.stringify(response));
-                    let data = response.data[0];
-                    if (!data) {
-                        Modal.alert('数据为空');
-                        return;
-                    }
+            let loading = new Loading({
+                msg: '默认数据加载中...'
+            });
+            loading.show();
+            Promise.all([
+                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(form.dataAddr)),
+                this.lookup
+            ]).then(([{response}]) => {
+                let data = response.data[0];
+                if (!data) {
+                    Modal.alert('数据为空');
+                    return;
+                }
 
-                    // debugger;
-                    data = addOldField(data);
+                // debugger;
+                data = addOldField(data);
 
-                    //    ajaxLoadedData = response.data[0];
-                    this.editModule.set(data);
-                    //    初始数据获取，不包含收件人id
-                    // startData = getPageData();
-                    if (form.updatefileData) {
-                        BwRule.Ajax.fetch(BwRule.reqAddr(form.updatefileData, data), {
-                            silent: true
-                        });
-                    }
-                });
+                //    ajaxLoadedData = response.data[0];
+                this.setData(data);
+                //    初始数据获取，不包含收件人id
+                // startData = getPageData();
+                if (form.updatefileData) {
+                    BwRule.Ajax.fetch(BwRule.reqAddr(form.updatefileData, data), {
+                        silent: true
+                    });
+                }
+            }).finally(() => {
+                loading && loading.hide();
+                loading = null;
+            });
+            // BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(form.dataAddr))
+            //     .then(({response}) => {
+            //         //	    alert(JSON.stringify(response));
+            //
+            //     });
                 // Rule.ajax(BW.CONF.siteUrl + Rule.reqAddr(form.dataAddr), {
             //     success: (response) => {
             //         //	    alert(JSON.stringify(response));
@@ -310,6 +342,32 @@ export = class FormPage extends BasicPage {
             //         }
             //     }
             // });
+        }else{
+            // 字段默认值
+            let defaultVal = BwRule.getDefaultByFields(form.fields);
+            this.lookup.then(() =>{
+                this.setData(defaultVal);
+            })
         }
+    }
+
+    setData(data: obj){
+        console.log(this.lookUpData);
+        this.fields.forEach((field) => {
+            let name = field.name,
+                com = this.editModule.getDom(name);
+            if(com){
+                if(field.elementType === 'lookup'){
+                    let options = this.lookUpData[name] || [];
+                    for (let opt of options) {
+                        if (opt.value == data[field.lookUpKeyField]) {
+                            com.set(opt);
+                        }
+                    }
+                }else{
+                    com.set(data[name]);
+                }
+            }
+        });
     }
 }
