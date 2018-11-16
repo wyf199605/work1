@@ -52,6 +52,7 @@ export class DrawPoint extends Component {
     private isShowStatus:boolean;
     private tooltip ;
     protected selectedData: obj;
+    private _keyField;
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     // static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -82,7 +83,7 @@ export class DrawPoint extends Component {
                 });
             }
         })
-
+       this._keyField = para.keyField;
         this.onAreaClick = para.onAreaClick;
         this.format = para.format;
         this.map = D3.map(this.points, function (d, i) {
@@ -275,6 +276,9 @@ export class DrawPoint extends Component {
                          // if(I > 1){
                          //     return
                          // }
+                    if(that._keyField !== data.name){
+                        return
+                    }
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
                         .attr("text-anchor", "middle")
@@ -298,8 +302,11 @@ export class DrawPoint extends Component {
                                 val = parseInt(w) * parseInt(g),
                                 font;
                             if(val < 1000){
-                                font = 2;
-                            }else if(val > 10000){
+                                font = 3;
+                            }else if(  val < 3000){
+                                font = 4;
+                            }
+                            else if(val > 10000){
                                font = 16;
                             }
                             else{
@@ -317,6 +324,7 @@ export class DrawPoint extends Component {
                                 .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
                                 .style('display','block')
                         }).on('mouseout',function (d) {
+                            //let s = D3.select(this).node().getComputedTextLength();
                             that.tooltip.style('display','none');
                         })
                         .style("pointer-events",()=>{
@@ -325,11 +333,9 @@ export class DrawPoint extends Component {
                             }else {
                                 return 'auto'
                             }
-                        }).attr('display',function (d) {
-                            if(I > 1){
-                                return 'none'
-                            }
-                        });
+                        })
+                    //this.wrapWord(text, group.select('path').node().getBBox().width/2)
+
                 }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
                     //并且是查看状态下
                     group.select('path').attr('fill',function (d) {
@@ -344,6 +350,33 @@ export class DrawPoint extends Component {
         //this.editEvent.on();
 
     }
+    //字体换行
+    private wrapWord(text, width) {
+        text.each(function() {
+            let text = D3.select(this),
+                words = text.text().split('').reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = text.node().getBoundingClientRect().height,
+                x = +text.attr('x'),
+                y = +text.attr('y'),
+                tspan = text.text(null).append('tspan').attr('x', x).attr('y', y);
+            while (word = words.pop()) {
+                line.push(word);
+                const dash = lineNumber > 0 ? '-' : '';
+                tspan.text(dash + line.join(''));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(''));
+                    line = [word];
+                    tspan = text.append('tspan').attr('dy',6).attr('dx',5).attr('x',x).text(word);
+                    //tspan = text.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y + 15).text(word);
+                }
+            }
+        });
+    }
+
     private setIconPos(str){
         let max = 0,maxStr = [];
         if (str.length >= 0) {
@@ -412,7 +445,7 @@ export class DrawPoint extends Component {
                     if(data.isShow && tools.isNotEmpty(data.data) && !data.isPoint){
                         //绘字
                         I++;
-                        if(I > 1){
+                        if(this._keyField !== data.name){
                             return
                         }
                         let text = this.selectedG.append('text').datum(data.name)
@@ -422,8 +455,11 @@ export class DrawPoint extends Component {
                                     val = parseInt(w) * parseInt(g),
                                     font;
                                 if(val < 1000){
-                                    font = 2;
-                                }else if(val > 10000){
+                                    font = 3;
+                                }else if(val < 3000){
+                                    font = 4;
+                                }
+                                else if(val > 10000){
                                     font = 16;
                                 }
                                 else{
@@ -451,6 +487,7 @@ export class DrawPoint extends Component {
             });
 
     }
+
 
     //find图形中心点的位置
     private findCenter(str) {
@@ -730,8 +767,11 @@ export class DrawPoint extends Component {
                                 val = parseInt(w) * parseInt(g),
                                 font;
                             if(val < 1000){
-                                font = 2;
-                            }else if(val > 10000){
+                                font = 3;
+                            }else if(val < 3000){
+                                font = 4;
+                            }
+                            else if(val > 10000){
                                 font = 16;
                             }
                             else{
