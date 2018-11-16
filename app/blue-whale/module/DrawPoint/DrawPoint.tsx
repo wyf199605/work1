@@ -128,7 +128,9 @@ export class DrawPoint extends Component {
 
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none");
-        this.g.append('image').attr('href', para.image).attr('width', para.width).attr('height', para.height)//添加背景图
+        this.g.append('image').attr('href', ()=>{
+            return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
+        }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
     set imgUrl(url) {
@@ -292,7 +294,7 @@ export class DrawPoint extends Component {
                         .attr('dx', 5)
                         .attr('dy', 15)
                         .text(function (d) {
-                            toolData.push(data.data)
+                            data.data && toolData.push(data.data)
                             return data.data;
 
                         }) .attr('font-size', function (d) {
@@ -316,7 +318,7 @@ export class DrawPoint extends Component {
                             return font + "px"
                         }).on('mouseenter',function (d) {
                             let str = '';
-                            for(let i = 0; i < I; i++){
+                            for(let i = 0; i < toolData.length; i++){
                                   str += (toolData[i] + "<br/>");
                             }
                             that.tooltip.html(str)
@@ -335,7 +337,6 @@ export class DrawPoint extends Component {
                             }
                         })
                     this.wrapWord(text, group.select('path').node().getBBox().width/2,this.findCenter(point)[0],this.findCenter(point)[1])
-
                 }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
                     //并且是查看状态下
                     group.select('path').attr('fill',function (d) {
@@ -481,6 +482,7 @@ export class DrawPoint extends Component {
                                 return data.data;
 
                             })
+                        this.wrapWord(text,   this.selectedG.select('path').node().getBBox().width/2,this.findCenter(point)[0],this.findCenter(point)[1])
                     }
                 })
 
