@@ -171,7 +171,7 @@ export class PlanModule extends Component{
     protected setBackground(obj: obj){
         let backGround = this.ui.backGround;
         if(backGround){
-            let url = CONF.siteUrl + BwRule.reqAddr(backGround, obj);
+            let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
             if(url != this.bgPicture){
                 this.bgPicture = url;
                 console.log(url);
@@ -195,10 +195,10 @@ export class PlanModule extends Component{
             msg: '数据加载中...'
         });
         loading.show();
-        this.ajax.fetch(tools.url.addObj(url, {nopage: true}), {
+        let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
+        this.ajax.fetch(tools.url.addObj(url, data), {
             needGps: ui.dataAddr.needGps,
             timeout: 30000,
-            data: PlanModule.initQueryParams(ajaxData)
         }).then(({response}) => {
             console.log(response);
             let data = response.data;
@@ -598,8 +598,8 @@ export class PlanModule extends Component{
                 op: 2
             });
         }
-        return JSON.stringify({
-            queryparams1: {"not":false, "op":0, "params": params}
-        });
+        return {
+            queryparams1: JSON.stringify({"not":false, "op":0, "params": params})
+        }
     }
 }
