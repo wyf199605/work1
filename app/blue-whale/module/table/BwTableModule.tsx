@@ -1783,8 +1783,7 @@ export class BwTableModule extends Component {
                                 new PasswdModal({
                                     data,
                                     confirm: (ajaxData) => {
-                                        ajaxData.isAdmin = 1;
-                                        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
+                                        return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, {isAdmin: 1}), {
                                             type: 'POST',
                                             data: JSON.stringify([ajaxData])
                                         }).then(({response}) => {
