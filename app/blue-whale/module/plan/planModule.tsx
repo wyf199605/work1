@@ -325,9 +325,13 @@ export class PlanModule extends Component{
                             if(val.content == '编辑描点' || val.content == '结束编辑'){
                                 plotBox.getItem('end-edit').isDisabled = true;
                                 plotBox.getItem('star-edit').isDisabled = true;
-
                             }
+
                         })
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('star-drawing').wrapper.classList.add('custom-button');
 
                         console.log('开始描点')
 
@@ -352,6 +356,11 @@ export class PlanModule extends Component{
                             }
                         })
 
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('end-drawing').wrapper.classList.add('custom-button');
+
                         //把point 清楚
 
                         this.draw.setIsDrawLine(false);
@@ -372,9 +381,13 @@ export class PlanModule extends Component{
                                 plotBox.getItem('star-drawing').isDisabled = true;
                             }
                         })
+                        editBox.getItem('edit').isDisabled = true;
                         console.log('开始编辑')
                         //------------------开始绘图
-
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('star-edit').wrapper.classList.add('custom-button');
                         this.draw.editPoint();
                     },
                 },
@@ -391,6 +404,12 @@ export class PlanModule extends Component{
                                 plotBox.getItem('star-drawing').isDisabled = false;
                             }
                         })
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('end-edit').wrapper.classList.add('custom-button');
+                        this.draw.editPoint();
+                        editBox.getItem('edit').isDisabled = false;
                         this.draw.setIsDrawLine(false);
                         this.draw.editFished();
                     },
@@ -400,7 +419,7 @@ export class PlanModule extends Component{
             let editButtons: IButton[] = [
                 {
                     key: 'edit',
-                    content: '编辑',
+                    content: '绑定',
                     iconPre: 'appcommon',
                     icon: 'app-bianji',
                     onClick: () => {
