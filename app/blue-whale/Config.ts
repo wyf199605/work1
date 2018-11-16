@@ -89,6 +89,8 @@ namespace BW {
             rfidLoginTime: 'rest/invent/keeponline',//盘点页面 间隔请求 防止一直登陆
             flowListCheck: 'flow/system/auditlist', //流程引擎-审核
             flowListApply: 'flow/system/list', // 流程引擎-申请
+            saveFlow: 'process/save',           // 流程引擎-定义流程
+            getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
         },
 
 

@@ -9,6 +9,7 @@ import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {LineItem} from "./LineItem";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
+import {BwRule} from "../../common/rule/BwRule";
 
 export interface IFieldPara{
     name?: string;  // 名称
@@ -69,7 +70,8 @@ export class FlowEditor extends FormCom {
     static DROPDOWN_KEYVALUE: ListItem = {
         // 新增下拉列表时在此处添加键值
         performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
-        taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}]
+        taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
+        processTypeId: []
     };
 
     private owner: Component | FlowDesigner;
@@ -167,6 +169,17 @@ export class FlowEditor extends FormCom {
             // 首先隐藏所有下拉列表，然后（显示/隐藏）当前选择的下拉列表
             let dropdown = this.dropdowns[d.closest(e.target, '.attr-editor-wrapper', this.wrapper).dataset['attr']],
                 prevState = dropdown.isVisible;
+            this.type === 'flow-designer' && BwRule.Ajax.fetch(BW.CONF.ajaxUrl.getProcessTypeId, {
+                type: 'GET'
+            }).then(({response}) => {
+                let dropdownFields: ListItem[] = [];
+                response.body.bodyList[0].forEach((data, index, arr) => {
+                    dropdownFields[index] = {value: data.processTypeId, text: data.processTypeName};
+                });
+                dropdown.setData(dropdownFields);
+            }).catch(err => {
+                console.log(err);
+            });
             FlowEditor.hideAllDropdown();
             prevState ? dropdown.hideList() : dropdown.showList();
         };
