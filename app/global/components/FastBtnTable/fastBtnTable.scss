@@ -3,7 +3,18 @@
     .fast-table-btns {
       padding: 10px 0;
       height: 44px;
-      overflow: hidden;
+      overflow-y: hidden;
+      overflow-x: auto;
+      display: flex;
+      display: -webkit-flex;
+      flex-direction: row-reverse;
+      -webkit-flex-direction: row-reverse;
+      justify-content: space-between;
+      -webkit-justify-content: space-between;
+      .fast-table-statistic-btns{
+        flex-shrink: 0;
+        -webkit-flex-shrink: 0;
+      }
     }
     .tables{
       transition: height 0.4s ease 0s;
@@ -40,15 +51,15 @@
       height: 0;
       padding: 0;
     }
-    &::before{
-      display: table;
-      content: "";
-    }
-    &::after{
-      display: block;
-      content: "";
-      clear: both;
-    }
+    //&::before{
+    //  display: table;
+    //  content: "";
+    //}
+    //&::after{
+    //  display: block;
+    //  content: "";
+    //  clear: both;
+    //}
 
     .fast-table-statistic-btns{
       float: right;

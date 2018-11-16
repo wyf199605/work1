@@ -99,6 +99,7 @@ export class PlanModule extends Component{
             height: 800,
             width: 1200,
             subButton,
+            keyField: ui.keyField,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
@@ -170,7 +171,7 @@ export class PlanModule extends Component{
     protected setBackground(obj: obj){
         let backGround = this.ui.backGround;
         if(backGround){
-            let url = CONF.siteUrl + BwRule.reqAddr(backGround, obj);
+            let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
             if(url != this.bgPicture){
                 this.bgPicture = url;
                 console.log(url);
@@ -194,14 +195,14 @@ export class PlanModule extends Component{
             msg: '数据加载中...'
         });
         loading.show();
-        this.ajax.fetch(tools.url.addObj(url, {nopage: true}), {
+        let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
+        this.ajax.fetch(tools.url.addObj(url, data), {
             needGps: ui.dataAddr.needGps,
             timeout: 30000,
-            data: PlanModule.initQueryParams(ajaxData)
         }).then(({response}) => {
             console.log(response);
             let data = response.data;
-            if (data) {
+            if (data && ui.tableAddr && ui.tableAddr.param) {
                 let editParam = ui.tableAddr.param[0];
                 if (editParam) {
                     let varList = [];
@@ -317,6 +318,7 @@ export class PlanModule extends Component{
                     key:'star-drawing',
                     content: '开始描点',
                     icon: 'maodian',
+                    className:'star-drawing',
                     color: 'info',
                     onClick: () => {
                         buttons.forEach((val)=>{
@@ -338,6 +340,7 @@ export class PlanModule extends Component{
                     content: '结束描点',
                     icon: 'wanchengbianji',
                     color: 'success',
+                    className:'end-drawing',
                     isDisabled:false,
                     onClick: () => {
                         //完成编辑--------
@@ -360,6 +363,7 @@ export class PlanModule extends Component{
                     key:'star-edit',
                     content: '编辑描点',
                     icon: 'bianjimaodian',
+                    className:'star-edit',
                     color: 'info',
                     onClick: () => {
                          buttons.forEach((val)=>{
@@ -378,6 +382,7 @@ export class PlanModule extends Component{
                     key:'end-edit',
                     content: '结束编辑',
                     icon: 'tuodong',
+                    className:'end-edit',
                     color: 'success',
                     onClick: () => {
                        buttons.forEach((val)=>{
@@ -593,8 +598,8 @@ export class PlanModule extends Component{
                 op: 2
             });
         }
-        return JSON.stringify({
-            queryparams1: {"not":false, "op":0, "params": params}
-        });
+        return {
+            queryparams1: JSON.stringify({"not":false, "op":0, "params": params})
+        }
     }
 }

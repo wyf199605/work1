@@ -11,6 +11,7 @@ namespace BW{
     import Ajax = G.Ajax;
     import tools = G.tools;
 
+    export let EVT_SHOW_PAGE = '__EVENT_PAGE_DISPLAY__';
     export class sysPcPage {
 
         constructor(private container : HTMLElement){
@@ -104,6 +105,9 @@ namespace BW{
             let page = this.pages.get(url);
             if(page){
                 page.dom.style.display = 'block';
+                setTimeout(() => {
+                    tools.event.fire(EVT_SHOW_PAGE, null, page.dom);
+                }, 300);
             }
         }
         /**

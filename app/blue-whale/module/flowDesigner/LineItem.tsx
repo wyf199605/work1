@@ -114,10 +114,12 @@ export class LineItem extends Component {
             type: 'transition',
             container: d.query('#design-canvas'),
             owner: this,
-            fields: para.fields,
+            fields: Object.assign(para.fields || {}, {name: `path${LineItem.counter ++}`}),
         });
         this.initEvents.on();
     }
+
+    static counter = 0;
 
     static removeAllActive() {
         FlowDesigner.flowEditor.show = false;

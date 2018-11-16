@@ -93,7 +93,6 @@ export class BwRule extends Rule {
                         // debugger;
                         let {response, xhr} = result;
                         if (tools.isEmpty(response)) {
-                            // TODO 严钰说不用的
                             alert('后台数据为空');
                             reject(Ajax.errRes(xhr, 'emptyData', ''));
                             return;
@@ -460,36 +459,29 @@ export class BwRule extends Rule {
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + data.url, {
                     type: 'POST',
                     data: JSON.stringify(postData),
-                }).then(() => {
-                    typeof confirm === 'function' && confirm();
+                }).then(({response}) => {
+                    if(tools.keysVal(response, 'body', 'bodyList', 0)){
+                        this.checkValue(response, postData, confirm)
+                    }else {
+                        typeof confirm === 'function' && confirm();
+                    }
                 });
-                // BwRule.ajax(BW.CONF.siteUrl + data.url, {
-                //     type: 'POST',
-                //     data: JSON.stringify(postData),
-                //     success: function (r) {
-                //         confirm();
-                //     }
-                // });
             };
         if (!tools.isEmpty(data) && !tools.isEmpty(data.type)) {
             if (data.type === 0) {
                 Modal.alert(data.showText);
-
             } else {
                 Modal.confirm({
                     msg: data.showText,
                     callback: (index) => {
-                        // debugger;
                         if (index == true) {
                             sure()
                         }
                     }
                 });
             }
-            //  typeof callback === 'function' && callback();
         } else {
             typeof confirm === 'function' && confirm();
-            // typeof callback === 'function' && callback();
         }
     }
 

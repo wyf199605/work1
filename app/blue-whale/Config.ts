@@ -45,6 +45,7 @@ namespace BW {
             flowDetail: `commonui/pageroute?page=flowDetail`
         },
         ajaxUrl: {
+            getVersion: 'rest/version/fastlion', // 获取版本号
             personalmenu: `common/personalmenu`, // 个人中心按钮
             personPassword: `common/modpwd`, // 修改密码
             labelDefault: 'common/savelabel', // 标签打印默认值
@@ -87,8 +88,11 @@ namespace BW {
             bugstatus: 'common/obstate', //申告状态
             myself: `common/userinfo`,
             rfidLoginTime: 'rest/invent/keeponline',//盘点页面 间隔请求 防止一直登陆
-            flowListCheck: 'flow/system/auditlist', //流程引擎-审核
+
+            flowListCheck: 'flow/system/auditlist', // 流程引擎-审核
             flowListApply: 'flow/system/list', // 流程引擎-申请
+            saveFlow: 'process/save',           // 流程引擎-定义流程
+            getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
         },
 
 

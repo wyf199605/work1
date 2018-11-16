@@ -235,15 +235,13 @@ export class ButtonAction {
                 }).catch(() => {
                 });
                 break;
-            case 'passwd':
-                this.changPasswd(btn, data, callback);
-                break;
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
                 if(res){
                     openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
                 }
+                callback(null);
                 BW.sys.window.open({
                     url: openUrl,
                     gps: !!btn.actionAddr.needGps,
@@ -252,76 +250,6 @@ export class ButtonAction {
         }
     }
 
-    private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
-        let self = this;
-        return new Promise( (resolve, reject)=>{
-            require(['Modal'],  (c, m) => {
-                let body = d.create('<div class="cpw-content"/>');
-                let passwordModal = new Modal({
-                    header: '修改密码',
-                    body: d.create(`
-                    <div class="cpw-content">
-                    <!---->
-                        <!--<div class="form-group"><span>新密码：</span><input className="new-password input-password" type="password" placeholder="请输入新密码"/></div>-->
-                        <!--<div class="form-group confirm-group"><span>确认密码：</span><input className="confirm-password input-password" type="password" placeholder="确认新密码"/></div>-->
-                    </div>
-                    `),
-                    width: '540px',
-                    height: '300px',
-                    className: 'password-modal',
-                    isOnceDestroy: true,
-                    footer:{
-                        rightPanel: [
-                            {
-                                content: '确认',
-                                onClick: () => {
-                                    let newPassword = d.query('.new-password', body) as HTMLInputElement;
-                                    let confirmPassword = d.query('.confirm-password', body) as HTMLInputElement;
-                                    let data = {};
-                                    if(newPassword.value == '' || confirmPassword.value == ''){
-                                        Modal.alert('您有未填写的项目');
-                                        data = {};
-                                    }else{
-                                        if(confirmPassword.value !== newPassword.value){
-                                            data = {};
-                                            Modal.alert('两次输入的密码不一致');
-                                        }else{
-                                            data['new_password'] = newPassword.value;
-                                        }
-                                    }
-                                    this.sendMessage(data);
-                                }
-                            },
-                            {
-                                content: '取消',
-                                onClick: () => {
-                                    passwordModal.destroy();
-                                }
-                            }
-                        ]
-                    }
-                });
-            })
-        })
-    }
-    sendMessage(para:object){
-        let userInfo: any = window.localStorage.getItem('userInfo');
-        try {
-            userInfo = JSON.parse(userInfo);
-        }catch (e) {
-            userInfo = {};
-        }
-
-        BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword+'?isAdimin=1', {
-            type: 'POST',
-            data: {
-                'upuserid': userInfo['userid'],
-                'new_password': para['new_password']
-            }
-        }).then((response) => {
-            Modal.toast(response.msg);
-        })
-    }
     initBarCode(res,data,dataObj){
         // console.log(res.body.elements)
         let dataAddr = res.body.elements,

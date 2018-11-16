@@ -73,6 +73,9 @@ export class NewTableModule {
             if (this.editable) {
                 this.editBtns.init(this.btnWrapper);
             }
+            let box = tools.keysVal(this.main, 'subBtns', 'box');
+            box && box.responsive();
+
             // this.editInit(para.bwEl);
 
             if (tools.isNotEmpty(subUi)) {
@@ -177,8 +180,9 @@ export class NewTableModule {
                             d.on(i, 'click', () => {
                                 i.classList.toggle('icon-arrow-up');
                                 i.classList.toggle('icon-arrow-down');
+                                this.subBtnShow = i.classList.contains('icon-arrow-up');
                                 for(let sub of Object.values(this.sub)){
-                                    sub && (sub.ftable.btnShow = i.classList.contains('icon-arrow-up'));
+                                    sub && (sub.ftable.btnShow = this.subBtnShow);
                                 }
                             });
                         }
@@ -244,6 +248,8 @@ export class NewTableModule {
             }
         };
     }
+
+    protected subBtnShow: boolean = true;
 
     subRefreshByIndex(index: number) {
         let main = this.main,
@@ -317,6 +323,7 @@ export class NewTableModule {
             tableModule: this,
             container: tabEl
         });
+        this.sub[this.subTabActiveIndex].ftable.btnShow = this.subBtnShow;
     }
 
     protected draggedEvent = (() => {
@@ -361,7 +368,20 @@ export class NewTableModule {
 
     bwEl: IBW_Table;
 
+    responsive(){
+        let sub = this.sub[this.subTabActiveIndex],
+            mainBox: InputBox = tools.keysVal(this.main, 'subBtns', 'box'),
+            subBox: InputBox = tools.keysVal(sub, 'subBtns', 'box'),
+            ftable = this.main.ftable;
+        mainBox && mainBox.responsive();
+        subBox && subBox.responsive();
+        ftable.recountWidth();
+        sub && sub.ftable && sub.ftable.recountWidth();
+    }
+
     refresh(data?: obj) {
+        let box = tools.keysVal(this.main, 'subBtns', 'box');
+        box && box.responsive();
         // 刷新主表
         return this.main.refresh(data).then(() => {
             // 刷新子表
@@ -370,6 +390,9 @@ export class NewTableModule {
             let row = this.main.ftable.rowGet(this.subIndex);
             row && this.subRefresh(row.data);
             this.subWrapper && this.subWrapper.classList.toggle('hide', !row);
+            let sub = this.sub[this.subTabActiveIndex],
+                subBox = tools.keysVal(sub, 'subBtns', 'box');
+            subBox && subBox.responsive();
         });
     }
 
@@ -680,6 +703,25 @@ export class NewTableModule {
                                                         let assignCell = row.cellGet(name) as TableDataCell;
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];
+                                                        }
+                                                    });
+                                                    let rowData = row.data;
+                                                    row.cells.forEach((dataCell) => {
+                                                        if(dataCell !== cell){
+                                                            let column = dataCell.column,
+                                                                field = column.content as R_Field;
+                                                            if(field.elementType === 'lookup'){
+                                                                if(!rowData[field.lookUpKeyField]){
+                                                                    dataCell.data = '';
+                                                                }else{
+                                                                    let options = bwTable.lookUpData[field.name] || [];
+                                                                    for (let opt of options) {
+                                                                        if (opt.value == rowData[field.lookUpKeyField]) {
+                                                                            dataCell.data = opt.text;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
                                                         }
                                                     })
                                                 }

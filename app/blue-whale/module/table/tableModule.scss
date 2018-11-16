@@ -53,9 +53,15 @@
     }
   }
   .fast-table-btns {
+    .edit-btns{
+      flex-basis: 300px;
+      -webkit-flex-basis: 300px;
+      flex-shrink: 0;
+      -webkit-flex-shrink: 0;
+    }
     .more-btns {
-      position: absolute;
-      left: 310px;
+      flex-grow: 2;
+      -webkit-flex-grow: 2;
     }
   }
 }

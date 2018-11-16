@@ -498,7 +498,7 @@ th.selected{
   }
 }
 .element-tree-node.menu-node.ftable-context-menu {
-  position: absolute !important;
+  position: fixed !important;
   width: 100px;
   min-width: 100px;
   background-color: #f2f2f2;
