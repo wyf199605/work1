@@ -5,11 +5,14 @@ import {TextInput} from "../../../global/components/form/text/text";
 import d = G.d;
 import tools = G.tools;
 import {Tooltip} from "../../../global/components/ui/tooltip/tooltip";
+import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {Button} from "../../../global/components/general/button/Button";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
 
 export interface IPasswdModalPara{
-    data?: Array<passwdObj>;
+    confirm?: (data: obj) => Promise<boolean>;
     cancel?: () => void;
-    confirm?: (data: obj) => void;
+    data?: Array<passwdObj>;
 }
 
 interface passwdObj{
@@ -44,34 +47,56 @@ export class PasswdModal{
             {input2}
         </div>);
 
+        let inputBox = new InputBox({});
+        let btn = new Button({
+            content: '确定',
+            type: 'primary',
+            onClick: () => {
+                let value1 = input1.get(),
+                    value2 = input2.get();
+                if(tools.isEmpty(value1)){
+                    Modal.toast('密码不能为空');
+                    return;
+                }
+                if(value1 !== value2){
+                    Modal.toast('密码不一致');
+                    return;
+                }
+                let spinner = new Spinner({
+                    el: btn.wrapper,
+                    type: Spinner.SHOW_TYPE.cover
+                });
+                btn.isDisabled = true;
+                spinner.show();
+                ajaxData['new_password'] = input1.get();
+                para.confirm && para.confirm(ajaxData).then((flag) => {
+                    btn.isDisabled = false;
+                    spinner && spinner.hide();
+                    spinner = null;
+                    if(flag){
+                        modal && modal.destroy();
+                        modal = null;
+                    }
+                });
+            }
+        });
+        inputBox.addItem(new Button({
+            content: '取消',
+            onClick: () => {
+                modal && modal.destroy();
+                modal = null;
+            }
+        }));
+        inputBox.addItem(btn);
+
         let modal = new Modal({
             header: '修改密码',
             className: 'passwd-modal',
-            width: '250px',
+            width: '270px',
             body,
             isOnceDestroy: true,
             footer: {
-                rightPanel: [
-                    {
-                        content: '取消',
-                        onClick: () => {
-                            modal && modal.destroy();
-                            modal = null;
-                        }
-                    },
-                    {
-                        content: '确定',
-                        type: 'primary',
-                        onClick: () => {
-                            let value1 = input1.get(),
-                                value2 = input2.get();
-                            if(tools.isEmpty(value1) || tools.isEmpty(value2)){
-                                Modal.toast('密码不能为空')
-                            }
-                            ajaxData['new_password'] = input1.get();
-                        }
-                    }
-                ]
+                rightPanel: inputBox
             }
         })
     }

@@ -1782,8 +1782,25 @@ export class BwTableModule extends Component {
                                 console.log(data);
                                 new PasswdModal({
                                     data,
-                                    confirm: () => {
-
+                                    confirm: (ajaxData) => {
+                                        ajaxData.isAdmin = 1;
+                                        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
+                                            type: 'POST',
+                                            data: JSON.stringify([ajaxData])
+                                        }).then(({response}) => {
+                                            console.log(response);
+                                            return new Promise((resolve) => {
+                                                if(response.errorCode === 0){
+                                                    resolve(true);
+                                                    Modal.alert(response.msg, '温馨提示', () => {
+                                                        ButtonAction.get().btnRefresh(btn.data.refresh, this.pageUrl);
+                                                    })
+                                                }else{
+                                                    resolve(false);
+                                                    Modal.alert(response.msg);
+                                                }
+                                            })
+                                        })
                                     }
                                 })
                             }
