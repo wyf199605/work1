@@ -1,3 +1,6 @@
 .draw-point-wrapper{
-
+  .ftable-context-menu.draw-point-menu{
+    position: absolute !important;
+    z-index: 200;
+  }
 }

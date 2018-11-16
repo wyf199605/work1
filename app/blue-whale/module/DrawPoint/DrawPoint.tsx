@@ -20,6 +20,7 @@ interface IDrapPoint extends IComponentPara {
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
     isShow?: boolean; // 默认false
     subButton?: R_Button[];
+    keyField?:string;
 }
 
 interface IAreaType {

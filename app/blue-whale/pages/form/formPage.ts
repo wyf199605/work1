@@ -99,6 +99,7 @@ export = class FormPage extends BasicPage {
         return this._lookUpData || {};
     }
 
+    // 加载lookup数据
     private get lookup(): Promise<void> {
         if (tools.isEmpty(this._lookUpData)) {
             let allPromise = this.fields.filter(col => col.elementType === 'lookup')
@@ -351,6 +352,7 @@ export = class FormPage extends BasicPage {
         }
     }
 
+    // 给编辑页设置默认数据
     setData(data: obj){
         console.log(this.lookUpData);
         this.fields.forEach((field) => {

@@ -22,6 +22,7 @@ export class SubBtnMenu {
             children: this.handlerMenuData(para.buttons)
         });
         this.contextMenu.wrapper.classList.add('ftable-context-menu');
+        this.contextMenu.wrapper.classList.add('draw-point-menu');
 
         this.contextMenu.onOpen = (node) => {
             this.onClick && this.onClick(node.content.button);
