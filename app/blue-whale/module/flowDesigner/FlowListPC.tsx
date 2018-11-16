@@ -79,7 +79,6 @@ export class FlowListPC extends BasicPage{
         });
         // 显示当前页时触发的事件
         this.on(BW.EVT_SHOW_PAGE, () => {
-            console.log('>>>');
             let table: NewTableModule = this.subTables[this.currentIndex];
             table && table.responsive();
         })
