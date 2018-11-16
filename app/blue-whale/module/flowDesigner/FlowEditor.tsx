@@ -68,7 +68,7 @@ export class FlowEditor extends FormCom {
 
     static DROPDOWN_KEYVALUE: ListItem = {
         // 新增下拉列表时在此处添加键值
-        assignee: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
+        performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}]
     };
 
@@ -118,7 +118,7 @@ export class FlowEditor extends FormCom {
                     el: dropdownWrapper,
                     inline: true,
                     onSelect: (item, index) => {
-                        this.set({[attr]: item.value});
+                        this.set({[attr]: item.text});
                         FlowEditor.hideAllDropdown();
                     }
                 });

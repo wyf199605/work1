@@ -286,7 +286,7 @@ namespace BW {
 
                     if (page && page.dom) {
                         let refers = sysPcHistory.getRefer(url, -1),
-                            liHtml = '<li><span class="iconfont icon-house"></span></li>',
+                                liHtml = '<li><span class="iconfont icon-house"></span></li>',
                             menu = sysPcHistory.getMenuOrder();
 
                         refers.unshift(url);
