@@ -22,6 +22,7 @@ import Shell = G.Shell;
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Inputs} from "../inputs/inputs";
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
+import {PasswdModal} from "../changePassword/passwdModal";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -1761,7 +1762,14 @@ export class BwTableModule extends Component {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
 
-                        } else if (btn.data.openType.indexOf('flow') > -1) {
+                        } else if(btn.data.openType === 'passwd'){
+                            let selectData = ftable.selectedRowsData[0];
+                            if(selectData){
+                                new PasswdModal({
+
+                                })
+                            }
+                        }else if (btn.data.openType.indexOf('flow') > -1) {
                             // 流程引擎操作按钮
                             let btnUi = btn.data as R_Button,
                                 {multiselect, selectionFlag} = btnUi,

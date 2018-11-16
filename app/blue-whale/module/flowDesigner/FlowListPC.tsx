@@ -25,14 +25,10 @@ interface FlowListPara extends BasicPagePara{
 
 export class FlowListPC extends BasicPage{
     private tableUIUrls:string[] = [];
-    private subTables:obj = {};
-    private currentIndex:number = 0;
+    private subTables:objOf<NewTableModule> = {};
+    private currentIndex:string = '0';
     constructor(para:FlowListPara){
         super(para);
-        // Shell触发的刷新事件
-        this.on(BwRule.EVT_REFRESH, () => {
-            this.subTables[this.currentIndex].refresh().catch();
-        });
         if (tools.isNotEmpty(para.elements)){
             let elements = para.elements,
                 tabsTitle = [];
@@ -48,7 +44,8 @@ export class FlowListPC extends BasicPage{
                 tabParent: tabWrapper,
                 tabs: tabs,
                 className:'first',
-                onClick: (index) => {
+                onClick: (i) => {
+                    let index = i + '';
                     this.currentIndex = index;
                     if (tools.isEmpty(this.subTables[index])) {
                         // 表格不存在
@@ -75,5 +72,15 @@ export class FlowListPC extends BasicPage{
             });
             tab.active(0);
         }
+
+        // Shell触发的刷新事件
+        this.on(BwRule.EVT_REFRESH, () => {
+            this.subTables[this.currentIndex].refresh().catch();
+        });
+        // 显示当前页时触发的事件
+        this.on(BW.EVT_SHOW_PAGE, () => {
+            let table: NewTableModule = this.subTables[this.currentIndex];
+            table && table.responsive();
+        })
     }
 }

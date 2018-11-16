@@ -236,9 +236,6 @@ export class ButtonAction {
                 }).catch(() => {
                 });
                 break;
-            case 'passwd':
-                this.changPasswd(btn, data, callback);
-                break;
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
@@ -254,57 +251,6 @@ export class ButtonAction {
         }
     }
 
-    private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
-        let self = this;
-        return new Promise( (resolve, reject)=>{
-            require(['ChangePassword', 'Modal'],  (c, m) => {
-                let body = d.create('<div></div>');
-                let changePassword = new c.ChangePassword({
-                    container: body,
-                    data: dataObj,
-                    confirm: obj =>{
-                        return this.sendMessage(obj).then(() => {
-                            changePassword.destory();
-                            passwordModal.isShow = false;
-                        });
-                    },
-                    cancel:()=>{
-                        passwordModal.isShow = false;
-                    }
-                });
-                let passwordModal = new Modal({
-                    header: '修改密码',
-                    body,
-                    width: '540px',
-                    height: '300px',
-                    className: 'password-modal',
-                    isOnceDestroy: true,
-                    onClose: () => {
-                        changePassword.destory();
-                    },
-                });
-            })
-        })
-    }
-    sendMessage(para:object){
-        let userInfo: any = window.localStorage.getItem('userInfo');
-        try {
-            userInfo = JSON.parse(userInfo);
-        }catch (e) {
-            userInfo = {};
-        }
-
-        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
-            type: 'POST',
-            data: {
-                'upuserid': userInfo['userid'],
-                'old_password': para['old_password'],
-                'new_password': para['new_password']
-            }
-        }).then((response) => {
-            Modal.toast(response.msg);
-        })
-    }
     initBarCode(res,data,dataObj){
         // console.log(res.body.elements)
         let dataAddr = res.body.elements,
