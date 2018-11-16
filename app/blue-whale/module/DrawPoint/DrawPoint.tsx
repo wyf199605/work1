@@ -314,7 +314,7 @@ export class DrawPoint extends Component {
                             }
 
                             return font + "px"
-                        }).on('mouseover',function (d) {
+                        }).on('mouseenter',function (d) {
                             let str = '';
                             for(let i = 0; i < I; i++){
                                   str += (toolData[i] + "<br/>");
@@ -323,7 +323,7 @@ export class DrawPoint extends Component {
                                 .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
                                 .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
                                 .style('display','block')
-                        }).on('mouseout',function (d) {
+                        }).on('mouseleave',function (d) {
                             //let s = D3.select(this).node().getComputedTextLength();
                             that.tooltip.style('display','none');
                         })
@@ -334,7 +334,7 @@ export class DrawPoint extends Component {
                                 return 'auto'
                             }
                         })
-                    //this.wrapWord(text, group.select('path').node().getBBox().width/2)
+                    this.wrapWord(text, group.select('path').node().getBBox().width/2,this.findCenter(point)[0],this.findCenter(point)[1])
 
                 }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
                     //并且是查看状态下
@@ -351,7 +351,7 @@ export class DrawPoint extends Component {
 
     }
     //字体换行
-    private wrapWord(text, width) {
+    private wrapWord(text, width,centerX,centerY) {
         text.each(function() {
             let text = D3.select(this),
                 words = text.text().split('').reverse(),
@@ -361,7 +361,7 @@ export class DrawPoint extends Component {
                 lineHeight = text.node().getBoundingClientRect().height,
                 x = +text.attr('x'),
                 y = +text.attr('y'),
-                tspan = text.text(null).append('tspan').attr('x', x).attr('y', y);
+                  tspan = text.text(null).append('tspan').attr('dy',lineHeight).attr('dx',5).attr('x',centerX - lineHeight).attr('y',centerY - lineHeight);
             while (word = words.pop()) {
                 line.push(word);
                 const dash = lineNumber > 0 ? '-' : '';
@@ -370,7 +370,7 @@ export class DrawPoint extends Component {
                     line.pop();
                     tspan.text(line.join(''));
                     line = [word];
-                    tspan = text.append('tspan').attr('dy',6).attr('dx',5).attr('x',x).text(word);
+                    tspan = text.append('tspan').attr('dy',lineHeight).attr('dx',5).attr('x',centerX - lineHeight).text(word);
                     //tspan = text.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y + 15).text(word);
                 }
             }
@@ -528,7 +528,7 @@ export class DrawPoint extends Component {
             .transition()
             .duration(750)
             .ease("elastic")
-            .attr('r', this.LR(this.rLate))
+            .attr('r', 2)
             .attr('cx', function (d) {
                 return d[0]
             })
@@ -571,7 +571,7 @@ export class DrawPoint extends Component {
             .attr('fill', 'white')
             .attr('fill-opacity', 0)
             .attr("id", 'path' + this.index)
-            .attr('stroke-width', this.lineLate)
+            .attr('stroke-width','1px')
         // .on('click',function(d,i){
         //      that.indexStr = D3.select(this).attr('id');
         //
@@ -929,13 +929,13 @@ export class DrawPoint extends Component {
             .on('zoom', function (d) {
                 if(D3.event.scale > 6) {
 
-                    D3.selectAll('circle').attr('r',_this.LR(6));
-                    D3.selectAll('path').attr('stroke-width',_this.LV(6))
+                    //D3.selectAll('circle').attr('r',_this.LR(6));
+                    //D3.selectAll('path').attr('stroke-width',_this.LV(6))
                 }else{
                     _this.rLate = _this.lineLate = D3.event.scale;
 
-                    D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
-                    _this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
+                    //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
+                    //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
 
                 }
                    console.log(D3.event.scale);
