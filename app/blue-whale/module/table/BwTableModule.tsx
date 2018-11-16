@@ -1765,8 +1765,26 @@ export class BwTableModule extends Component {
                         } else if(btn.data.openType === 'passwd'){
                             let selectData = ftable.selectedRowsData[0];
                             if(selectData){
+                                let res = G.Rule.varList(btn.data.actionAddr.varList, selectData, true),
+                                    data = [];
+                                for(let key in res){
+                                    for(let col of this.ui.cols){
+                                        if(col.name.toLowerCase() === key){
+                                            data.push({
+                                                title: col.caption,
+                                                name: key,
+                                                value: res[key]
+                                            });
+                                            break;
+                                        }
+                                    }
+                                }
+                                console.log(data);
                                 new PasswdModal({
+                                    data,
+                                    confirm: () => {
 
+                                    }
                                 })
                             }
                         }else if (btn.data.openType.indexOf('flow') > -1) {

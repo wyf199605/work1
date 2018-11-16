@@ -180,8 +180,9 @@ export class NewTableModule {
                             d.on(i, 'click', () => {
                                 i.classList.toggle('icon-arrow-up');
                                 i.classList.toggle('icon-arrow-down');
+                                this.subBtnShow = i.classList.contains('icon-arrow-up');
                                 for(let sub of Object.values(this.sub)){
-                                    sub && (sub.ftable.btnShow = i.classList.contains('icon-arrow-up'));
+                                    sub && (sub.ftable.btnShow = this.subBtnShow);
                                 }
                             });
                         }
@@ -247,6 +248,8 @@ export class NewTableModule {
             }
         };
     }
+
+    protected subBtnShow: boolean = true;
 
     subRefreshByIndex(index: number) {
         let main = this.main,
@@ -320,6 +323,7 @@ export class NewTableModule {
             tableModule: this,
             container: tabEl
         });
+        this.sub[this.subTabActiveIndex].ftable.btnShow = this.subBtnShow;
     }
 
     protected draggedEvent = (() => {

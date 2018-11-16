@@ -178,7 +178,9 @@ namespace BW {
                         }
                     })
                 },
+                uploadVersion: function () {
 
+                },
                 refresh: function (url: string, callback?:Function) {
                     self.pages.refresh(url, () => {
                         // self.window.setBreadcrumb(url);

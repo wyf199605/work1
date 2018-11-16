@@ -9,6 +9,9 @@ namespace BW{
             let closeConfirmConfig: ICloseConfirmPara = null;
 
             return {
+                uploadVersion: function () {
+
+                },
                 backHome: function (){
                     sys.window.open({
                         url: CONF.url.main

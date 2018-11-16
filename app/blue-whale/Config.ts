@@ -45,6 +45,7 @@ namespace BW {
             flowDetail:`commonui/pageroute?page=flowDetail`
         },
         ajaxUrl: {
+            getVersion: 'rest/version/fastlion', // 获取版本号
             personalmenu: `common/personalmenu`, // 个人中心按钮
             personPassword:`common/modpwd`, // 修改密码
             labelDefault: 'common/savelabel', // 标签打印默认值

@@ -65,6 +65,12 @@ export class LoginPage{
         //     container: document.body
         // });
     }
+
+    protected getVersion(){
+        G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({response}) => {
+            console.log(response);
+        })
+    }
     /*
     * 手机短信验证登录
     * */
