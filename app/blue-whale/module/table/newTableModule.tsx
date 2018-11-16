@@ -73,7 +73,8 @@ export class NewTableModule {
             if (this.editable) {
                 this.editBtns.init(this.btnWrapper);
             }
-            this.main.subBtns.box.responsive();
+            let box = tools.keysVal(this.main, 'subBtns', 'box');
+            box && box.responsive();
 
             // this.editInit(para.bwEl);
 
