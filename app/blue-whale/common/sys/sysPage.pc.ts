@@ -105,7 +105,9 @@ namespace BW{
             let page = this.pages.get(url);
             if(page){
                 page.dom.style.display = 'block';
-                tools.event.fire(EVT_SHOW_PAGE, null, page.dom)
+                setTimeout(() => {
+                    tools.event.fire(EVT_SHOW_PAGE, null, page.dom);
+                }, 300);
             }
         }
         /**

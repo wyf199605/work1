@@ -369,15 +369,19 @@ export class NewTableModule {
     bwEl: IBW_Table;
 
     responsive(){
-        let box = tools.keysVal(this.main, 'subBtns', 'box'),
-            sub = this.sub[this.subTabActiveIndex],
+        let sub = this.sub[this.subTabActiveIndex],
+            mainBox: InputBox = tools.keysVal(this.main, 'subBtns', 'box'),
+            subBox: InputBox = tools.keysVal(sub, 'subBtns', 'box'),
             ftable = this.main.ftable;
-        box && box.responsive();
+        mainBox && mainBox.responsive();
+        subBox && subBox.responsive();
         ftable.recountWidth();
         sub && sub.ftable && sub.ftable.recountWidth();
     }
 
     refresh(data?: obj) {
+        let box = tools.keysVal(this.main, 'subBtns', 'box');
+        box && box.responsive();
         // 刷新主表
         return this.main.refresh(data).then(() => {
             // 刷新子表
@@ -386,6 +390,9 @@ export class NewTableModule {
             let row = this.main.ftable.rowGet(this.subIndex);
             row && this.subRefresh(row.data);
             this.subWrapper && this.subWrapper.classList.toggle('hide', !row);
+            let sub = this.sub[this.subTabActiveIndex],
+                subBox = tools.keysVal(sub, 'subBtns', 'box');
+            subBox && subBox.responsive();
         });
     }
 
