@@ -114,6 +114,9 @@ namespace BW{
                         }
                     });
                 },
+                uploadVersion: function (version: string){
+                    self.handle('uploadVersion', {"url": BW.CONF.siteUrl, "code": version});
+                },
                 quit: function () {
                     self.handle('quit');
                 },

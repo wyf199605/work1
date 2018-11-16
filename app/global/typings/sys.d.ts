@@ -36,6 +36,7 @@ interface SYS_Window{
 
     powerManager?();
     whiteBat?();
+    uploadVersion?(version: string);
 }
 
 interface SYS_UI{

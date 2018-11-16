@@ -107,6 +107,9 @@ namespace BW{
                 wake: function (event, data) {
                     self.handle('wake', '{event:"' + event + '",data:"' + data + '"}');
                 },
+                uploadVersion: function (version: string){
+                    self.handle('uploadVersion', `{event: "", data: "${JSON.stringify({"url": BW.CONF.siteUrl, "code": version})}"}`);
+                },
                 opentab: function (userid = '', accessToken = '', noShow?: string[]) {
                     let ja = [
                         {icon: "home", name: "首页", url: CONF.url.home, show: 0},

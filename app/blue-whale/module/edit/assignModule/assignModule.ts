@@ -29,7 +29,7 @@ export default class AssignModule extends AssignModuleBasic{
 
         this.initDeleteEvent();
 
-        let pickDom = <HTMLElement>this.para.container.parentElement.querySelector('span[data-action="picker"]');
+        let pickDom = <HTMLElement>para.container.parentElement.querySelector('span[data-action="picker"]');
 
         this.para.container.parentElement.dataset.name = para.name;
 
@@ -42,7 +42,7 @@ export default class AssignModule extends AssignModuleBasic{
 
     private paraInit(para: AssignPara){
         if(!para.ajaxUrl){
-            return
+            return para
         }
         para.ajax = (data) => {
 

@@ -22,6 +22,7 @@ import Shell = G.Shell;
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Inputs} from "../inputs/inputs";
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
+import {PasswdModal} from "../changePassword/passwdModal";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -924,8 +925,8 @@ export class BwTableModule extends Component {
                         })()
                     }
                 }
-                let queryCols = this.ui.querier.queryparams0 || this.ui.querier.queryparams1
-                    || this.ui.querier.atvarparams || initQueryConfigs(getCols());
+                let queryCols = this.ui.querier && (this.ui.querier.queryparams0 || this.ui.querier.queryparams1
+                    || this.ui.querier.atvarparams) || initQueryConfigs(getCols());
                 require(['QueryBuilder'], (QueryBuilder) => {
                     builder = new QueryBuilder.QueryBuilder({
                         queryConfigs: queryCols, // 查询字段名、值等一些配置，后台数据直接传入
@@ -1761,7 +1762,49 @@ export class BwTableModule extends Component {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
 
-                        } else if (btn.data.openType.indexOf('flow') > -1) {
+                        } else if(btn.data.openType === 'passwd'){
+                            let selectData = ftable.selectedRowsData[0];
+                            if(selectData){
+                                let res = G.Rule.varList(btn.data.actionAddr.varList, selectData, true),
+                                    data = [];
+                                for(let key in res){
+                                    for(let col of this.ui.cols){
+                                        if(col.name.toLowerCase() === key){
+                                            data.push({
+                                                title: col.caption,
+                                                name: key,
+                                                value: res[key]
+                                            });
+                                            break;
+                                        }
+                                    }
+                                }
+                                console.log(data);
+                                new PasswdModal({
+                                    data,
+                                    confirm: (ajaxData) => {
+                                        ajaxData.isAdmin = 1;
+                                        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
+                                            type: 'POST',
+                                            data: JSON.stringify([ajaxData])
+                                        }).then(({response}) => {
+                                            console.log(response);
+                                            return new Promise((resolve) => {
+                                                if(response.errorCode === 0){
+                                                    resolve(true);
+                                                    Modal.alert(response.msg, '温馨提示', () => {
+                                                        ButtonAction.get().btnRefresh(btn.data.refresh, this.pageUrl);
+                                                    })
+                                                }else{
+                                                    resolve(false);
+                                                    Modal.alert(response.msg);
+                                                }
+                                            })
+                                        })
+                                    }
+                                })
+                            }
+                        }else if (btn.data.openType.indexOf('flow') > -1) {
                             // 流程引擎操作按钮
                             let btnUi = btn.data as R_Button,
                                 {multiselect, selectionFlag} = btnUi,

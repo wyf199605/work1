@@ -38,6 +38,7 @@ interface IProps {
 export class LoginPage{
 
     constructor(private props: IProps) {
+        tools.isMb && this.getVersion();
         let response = props.responseBean;
         this.device = Device.get();
         this.deviceUpdate();
@@ -64,6 +65,13 @@ export class LoginPage{
         // let fqa = new FqaModal({
         //     container: document.body
         // });
+    }
+
+    protected getVersion(){
+        G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({response}) => {
+            response = JSON.parse(response);
+            sys.window.uploadVersion(response.data.version);
+        })
     }
     /*
     * 手机短信验证登录

@@ -210,12 +210,21 @@ export class InputBox extends Component {
         if(!this.isResponsive){
             return ;
         }
-        let childrenWidth = 56;
+        let childrenWidth = 56, isFirst = true;
         let wrapperWidth = this.wrapper.offsetWidth;
+        for(let c of this.children){
+            d.append(this.wrapper, c.wrapper);
+        }
         for(let i = 0; i < this.children.length; i++){
             let c = this.children[i];
             childrenWidth += c.wrapper.offsetWidth;
             if(childrenWidth > wrapperWidth){
+                if(isFirst){
+                    isFirst = false;
+                    this._lastNotMoreIndex = i;
+                }
+                    // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
+                    //仅从dom结构上改变了组件，并未改变组件的container属性
                 tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button({
                     content: '更多',
                     size: this._size,
@@ -231,26 +240,25 @@ export class InputBox extends Component {
                         className: "input-box-morebtn"
                     });
                 }
-                    // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
-                    //仅从dom结构上改变了组件，并未改变组件的container属性
-                if (this.moreBtn.dropDown) {
-                    this.moreBtn.dropDown.getUlDom().appendChild(c.wrapper);
-                }
-                this._lastNotMoreIndex = i;
-
             }else{
                 d.append(this.wrapper, c.wrapper);
                 this._lastNotMoreIndex = Math.min(this._lastNotMoreIndex, i);
             }
         }
+
         if(this._moreBtn){
-            d.append(this.wrapper, this._moreBtn.wrapper);
+            this._moreBtn && d.append(this.wrapper, this._moreBtn.wrapper);
             if(this._lastNotMoreIndex === 0){
-                this._moreBtn.destroy();
+                this._moreBtn && this._moreBtn.destroy();
                 this._moreBtn = null;
+            }else {
+                this.children.slice(this._lastNotMoreIndex).forEach((btn) => {
+                    if (this.moreBtn.dropDown) {
+                        this.moreBtn.dropDown.getUlDom().appendChild(btn.wrapper);
+                    }
+                });
             }
         }
-
     }
 
     // 【待改...】
