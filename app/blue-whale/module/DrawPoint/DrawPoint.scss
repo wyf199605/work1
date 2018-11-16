@@ -2,5 +2,25 @@
   .ftable-context-menu.draw-point-menu{
     position: absolute !important;
     z-index: 200;
+    background-color: #FFFFFF;
+    min-width: 125px;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 6px;
+    background-clip: padding-box;
+    font-family: helvetica neue,Helvetica,Arial,sans-serif;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    .element-tree-node.menu-node{
+      background-color: #FFFFFF;
+      .tree-text-wrapper{
+
+        &:hover{
+          color: white !important;
+          background-color: #0081c2;
+          background-image: linear-gradient(to bottom,#0088cc,#0077b3);
+          background-repeat: repeat-x;
+        }
+      }
+    }
+
   }
 }
