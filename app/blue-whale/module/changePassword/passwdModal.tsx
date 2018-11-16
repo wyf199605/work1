@@ -70,13 +70,14 @@ export class PasswdModal{
                 spinner.show();
                 ajaxData['new_password'] = input1.get();
                 para.confirm && para.confirm(ajaxData).then((flag) => {
-                    btn.isDisabled = false;
-                    spinner && spinner.hide();
-                    spinner = null;
                     if(flag){
                         modal && modal.destroy();
                         modal = null;
                     }
+                }).finally(() => {
+                    spinner && spinner.hide();
+                    spinner = null;
+                    btn.isDisabled = false;
                 });
             }
         });
