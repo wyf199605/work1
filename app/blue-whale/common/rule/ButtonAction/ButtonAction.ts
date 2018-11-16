@@ -11,7 +11,6 @@ import {SelectInput} from "../../../../global/components/form/selectInput/select
 import {Loading} from "../../../../global/components/ui/loading/loading";
 import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
-import {ChangePassword} from "../../../module/changePassword/changePassword";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
