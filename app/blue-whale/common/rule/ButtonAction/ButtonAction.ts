@@ -11,7 +11,6 @@ import {SelectInput} from "../../../../global/components/form/selectInput/select
 import {Loading} from "../../../../global/components/ui/loading/loading";
 import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
-import {ChangePassword} from "../../../module/changePassword/changePassword";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -256,31 +255,51 @@ export class ButtonAction {
     private changPasswd(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}){
         let self = this;
         return new Promise( (resolve, reject)=>{
-            require(['ChangePassword', 'Modal'],  (c, m) => {
-                let body = d.create('<div></div>');
-                let changePassword = new c.ChangePassword({
-                    container: body,
-                    data: dataObj,
-                    confirm: obj =>{
-                        return this.sendMessage(obj).then(() => {
-                            changePassword.destory();
-                            passwordModal.isShow = false;
-                        });
-                    },
-                    cancel:()=>{
-                        passwordModal.isShow = false;
-                    }
-                });
+            require(['Modal'],  (c, m) => {
+                let body = d.create('<div class="cpw-content"/>');
                 let passwordModal = new Modal({
                     header: '修改密码',
-                    body,
+                    body: d.create(`
+                    <div class="cpw-content">
+                    <!---->
+                        <!--<div class="form-group"><span>新密码：</span><input className="new-password input-password" type="password" placeholder="请输入新密码"/></div>-->
+                        <!--<div class="form-group confirm-group"><span>确认密码：</span><input className="confirm-password input-password" type="password" placeholder="确认新密码"/></div>-->
+                    </div>
+                    `),
                     width: '540px',
                     height: '300px',
                     className: 'password-modal',
                     isOnceDestroy: true,
-                    onClose: () => {
-                        changePassword.destory();
-                    },
+                    footer:{
+                        rightPanel: [
+                            {
+                                content: '确认',
+                                onClick: () => {
+                                    let newPassword = d.query('.new-password', body) as HTMLInputElement;
+                                    let confirmPassword = d.query('.confirm-password', body) as HTMLInputElement;
+                                    let data = {};
+                                    if(newPassword.value == '' || confirmPassword.value == ''){
+                                        Modal.alert('您有未填写的项目');
+                                        data = {};
+                                    }else{
+                                        if(confirmPassword.value !== newPassword.value){
+                                            data = {};
+                                            Modal.alert('两次输入的密码不一致');
+                                        }else{
+                                            data['new_password'] = newPassword.value;
+                                        }
+                                    }
+                                    this.sendMessage(data);
+                                }
+                            },
+                            {
+                                content: '取消',
+                                onClick: () => {
+                                    passwordModal.destroy();
+                                }
+                            }
+                        ]
+                    }
                 });
             })
         })
@@ -293,11 +312,10 @@ export class ButtonAction {
             userInfo = {};
         }
 
-        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
+        BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword+'?isAdimin=1', {
             type: 'POST',
             data: {
                 'upuserid': userInfo['userid'],
-                'old_password': para['old_password'],
                 'new_password': para['new_password']
             }
         }).then((response) => {

@@ -7,6 +7,7 @@ import CONF = BW.CONF;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Button} from "../../../global/components/general/button/Button";
 import {TextInput} from "../../../global/components/form/text/text";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
 
 export class PersonPassword extends BasicPage{
     constructor(para){
@@ -39,10 +40,20 @@ export class PersonPassword extends BasicPage{
                     }
                 }
                 if(input2.get() === input3.get()){
+                    confirm.isDisabled = true;
+                    let spinner = new Spinner({
+                        el: confirm.wrapper,
+                        type: Spinner.SHOW_TYPE.cover
+                    });
+                    spinner.show();
                     this.sendPassword({
                         "new_password": input2.get(),
                         "old_password": input1.get()
-                    });
+                    }).finally(() => {
+                        confirm.isDisabled = false;
+                        spinner && spinner.hide();
+                        spinner = null;
+                    })
                 }
             }
         });
@@ -77,7 +88,7 @@ export class PersonPassword extends BasicPage{
             userInfo = {};
         }
 
-       BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
+       return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
             type: 'POST',
             data: {
                 'userid': userInfo['userid'],
