@@ -41,6 +41,10 @@ export class NewTablePage extends BasicPage{
         this.on(BwRule.EVT_REFRESH, () => {
             bwTable.tableModule && bwTable.tableModule.refresh();
         });
+        // 显示当前页时触发的事件
+        this.on(BW.EVT_SHOW_PAGE, () => {
+            bwTable.tableModule.responsive();
+        })
     }
 }
 

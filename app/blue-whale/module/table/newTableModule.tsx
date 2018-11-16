@@ -74,10 +74,7 @@ export class NewTableModule {
                 this.editBtns.init(this.btnWrapper);
             }
             this.main.subBtns.box.responsive();
-            window.onresize = tools.pattern.debounce(() => {
-                console.log('>>>');
-                this.main.subBtns.box.responsive();
-            }, 500);
+
             // this.editInit(para.bwEl);
 
             if (tools.isNotEmpty(subUi)) {
@@ -365,6 +362,15 @@ export class NewTableModule {
     })();
 
     bwEl: IBW_Table;
+
+    responsive(){
+        let box = tools.keysVal(this.main, 'subBtns', 'box'),
+            sub = this.sub[this.subTabActiveIndex],
+            ftable = this.main.ftable;
+        box && box.responsive();
+        ftable.recountWidth();
+        sub && sub.ftable && sub.ftable.recountWidth();
+    }
 
     refresh(data?: obj) {
         // 刷新主表
