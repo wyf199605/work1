@@ -610,12 +610,14 @@ export class PlanModule extends Component{
         }
         let params = [];
         for(let key in data){
-            params.push({
-                field: key.toUpperCase(),
-                values: [data[key]],
-                not: false,
-                op: 2
-            });
+            if(data[key]){
+                params.push({
+                    field: key.toUpperCase(),
+                    values: [data[key]],
+                    not: false,
+                    op: 2
+                });
+            }
         }
         return {
             queryparams1: JSON.stringify({"not":false, "op":0, "params": params})
