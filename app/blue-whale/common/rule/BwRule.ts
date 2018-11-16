@@ -462,13 +462,6 @@ export class BwRule extends Rule {
                 }).then(() => {
                     typeof confirm === 'function' && confirm();
                 });
-                // BwRule.ajax(BW.CONF.siteUrl + data.url, {
-                //     type: 'POST',
-                //     data: JSON.stringify(postData),
-                //     success: function (r) {
-                //         confirm();
-                //     }
-                // });
             };
         if (!tools.isEmpty(data) && !tools.isEmpty(data.type)) {
             if (data.type === 0) {

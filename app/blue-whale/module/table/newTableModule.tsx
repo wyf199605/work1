@@ -700,10 +700,14 @@ export class NewTableModule {
                                                             let column = dataCell.column,
                                                                 field = column.content as R_Field;
                                                             if(field.elementType === 'lookup'){
-                                                                let options = bwTable.lookUpData[field.name] || [];
-                                                                for (let opt of options) {
-                                                                    if (opt.value == rowData[field.lookUpKeyField]) {
-                                                                        dataCell.data = opt.text;
+                                                                if(!rowData[field.lookUpKeyField]){
+                                                                    dataCell.data = '';
+                                                                }else{
+                                                                    let options = bwTable.lookUpData[field.name] || [];
+                                                                    for (let opt of options) {
+                                                                        if (opt.value == rowData[field.lookUpKeyField]) {
+                                                                            dataCell.data = opt.text;
+                                                                        }
                                                                     }
                                                                 }
                                                             }
