@@ -315,10 +315,19 @@ export class FlowDesigner {
 
             FlowDesigner.ALLITEMS.forEach(item => {
                 // 创建节点、设置属性、添加到xml节点树中
-                let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
+                let type = item.flowEditor.type,
+                    xmlNode = Method.parseToXml.createXmlElement(type),
                     attrs = item.rectNode.attrs,
-                    layoutStr = [attrs.cx || attrs.x, attrs.cy || attrs.y, attrs.r || attrs.width, attrs.r || attrs.height].join();
-                Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get()));
+                    layoutStr = [attrs.cx || attrs.x, attrs.cy || attrs.y, attrs.r || attrs.width, attrs.r || attrs.height].join(),
+                    dropdownField: IFieldPara = {};
+                Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get(), dropdownField));
+                // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
+                Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
+                    FlowEditor.DROPDOWN_KEYVALUE[attr].forEach(listItem => {
+                        listItem.text === item.flowEditor.get()[attr] && (dropdownField = {[attr]: listItem.value});
+                    });
+                    Method.parseToXml.setAttr(xmlNode, dropdownField);
+                });
                 FlowDesigner.rootElement.appendChild(xmlNode);
             });
             // 再创建所有的连接线，并设置属性和作为谁的子节点
@@ -327,7 +336,6 @@ export class FlowDesigner {
                     toItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.to)[0];
                 // 根据连接线的目标节点的属性设置连接线的属性
                 Method.parseToXml.setAttr(xmlNode, Object.assign({to: toItem.flowEditor.get().name}, line.flowEditor.get()));
-
                 // 首先获取连接线的来源节点，然后将连接线作为来源节点的子节点添加到xml节点树中
                 let fromItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.from)[0];
                 let fromNode;
@@ -348,8 +356,10 @@ export class FlowDesigner {
                 return;
             }
 
-            let xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
-            BwRule.Ajax.fetch('https://bwd.sanfu.com/sf/app_sanfu_retail/null/process/save', {
+            let url = 'https://bwd.sanfu.com/sf/app_sanfu_retail/null/process/save',
+            // let url = 'http://127.0.0.1:8080/sf/app_sanfu_retail/null/process/save',
+                xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
+            BwRule.Ajax.fetch(url, {
                 type: 'POST',
                 data: {process: xmlStr},
             }).then(({response}) => {
