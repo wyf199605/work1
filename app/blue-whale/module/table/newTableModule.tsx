@@ -693,6 +693,19 @@ export class NewTableModule {
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];
                                                         }
+                                                    });
+                                                    let rowData = row.data;
+                                                    row.cells.forEach((dataCell) => {
+                                                        let column = dataCell.column,
+                                                            field = column.content as R_Field;
+                                                        if(field.elementType === 'lookup'){
+                                                            let options = bwTable.lookUpData[field.name] || [];
+                                                            for (let opt of options) {
+                                                                if (opt.value == rowData[field.lookUpKeyField]) {
+                                                                    dataCell.data = opt.text;
+                                                                }
+                                                            }
+                                                        }
                                                     })
                                                 }
                                             });
