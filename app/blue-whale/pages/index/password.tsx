@@ -49,10 +49,13 @@ export class PersonPassword extends BasicPage{
                     this.sendPassword({
                         "new_password": input2.get(),
                         "old_password": input1.get()
-                    }).finally(() => {
+                    },input1).finally(() => {
                         confirm.isDisabled = false;
                         spinner && spinner.hide();
                         spinner = null;
+                        input1.value='';
+                        input2.value='';
+                        input3.value='';
                     })
                 }
             }
@@ -80,7 +83,7 @@ export class PersonPassword extends BasicPage{
             }
         })
     }
-    sendPassword(data:object){
+    sendPassword(data:object,input:TextInput){
         let userInfo: any = window.localStorage.getItem('userInfo');
         try {
             userInfo = JSON.parse(userInfo);
