@@ -1921,8 +1921,9 @@ export class BwTableModule extends Component {
                         btn.isDisabled = false;
                         // 根据表格行数据判断按钮是否可点击
                         if(tools.isNotEmpty(btnField.judgefield) && rowData){
-                            let judges = btnField.judgefield.split(',');
-                            btn.isDisabled = judges.every((judge) => rowData[judge] ? rowData[judge] === 1 : true);
+                            let judges = btnField.judgefield.split(','),
+                                flag = judges.every((judge) => tools.isNotEmpty(rowData[judge]) ? rowData[judge] === 1 : true);
+                            btn.isDisabled = !flag;
                         }
                     } else {
                         btn.isDisabled =  btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
