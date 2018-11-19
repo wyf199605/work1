@@ -270,7 +270,7 @@ export class BwTableElement extends Component{
      */
     private locationLine(line : string, para){
         if(tools.isMb){
-            require(['KeyStep'], (e) => {
+            require(['Inputs'], (e) => {
                 new e.KeyStep({
                     locationLine : line,
                     callback : (ajaxData) => {
