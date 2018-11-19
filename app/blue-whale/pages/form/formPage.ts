@@ -25,7 +25,7 @@ export = class FormPage extends BasicPage {
         let nameFields : {[name : string] : R_Field} = {};
         this.fields = para.fm.fields;
 
-        para.fm.fields.forEach(function (f) {
+        para.fm.fields.forEach((f) => {
             nameFields[f.name] = f;
 
             let field: any = {
@@ -34,26 +34,21 @@ export = class FormPage extends BasicPage {
                 field: nameFields[f.name],
                 onExtra: (data, relateCols, isEmptyClear = false) => {
                     let com = editModule.getDom(f.name);
-                    if (tools.isEmpty(data) && isEmptyClear) {
-                        // table.edit.modifyTd(td, '');
-                        com && com.set('');
-                        return;
-                    }
-                    for(let key in data){
+                    for(let key of relateCols){
                         let hCom = editModule.getDom(key);
                         if(hCom && hCom !== com){
                             let hField = hCom.custom as R_Field;
-                            hCom.set(data[key]);
+                            hCom.set(data[key] || '');
 
                             if (hField.assignSelectFields && hField.assignAddr) {
                                 BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
                                     cache: true,
                                 }).then(({response}) => {
-                                    let data = response.data;
-                                    if (data && data[0]) {
+                                    let res = response.data;
+                                    if (res && res[0]) {
                                         hField.assignSelectFields.forEach((name) => {
                                             let assignCom = editModule.getDom(name);
-                                            assignCom && assignCom.set(data[0][name]);
+                                            assignCom && assignCom.set(res[0][name]);
                                         });
                                         let data = this.dataGet();
                                         this.fields.forEach((field) => {
@@ -248,7 +243,7 @@ export = class FormPage extends BasicPage {
             }
         });
 
-        return data;
+        return Object.assign({}, this._data || {}, data || {});
     }
 
     private initValidate(){
@@ -309,6 +304,18 @@ export = class FormPage extends BasicPage {
         },this.url);
     }
 
+    getOldField(){
+        let btns = this.para.fm.subButtons,
+            varList: R_VarList[] = [];
+        Array.isArray(btns) && btns.forEach(btn => {
+            let addr = btn.actionAddr;
+            if(addr && Array.isArray(addr.varList)){
+                varList = varList.concat(addr.varList)
+            }
+        });
+        return BwRule.getOldField(varList);
+    }
+
     /**
      * 初始化数据
      */
@@ -326,7 +333,7 @@ export = class FormPage extends BasicPage {
                 }
             });
 
-            BwRule.addOldField(BwRule.getOldField(varList), data);
+            BwRule.addOldField(this.getOldField(), data);
 
             return data;
         };
@@ -349,7 +356,6 @@ export = class FormPage extends BasicPage {
 
                 // debugger;
                 data = addOldField(data);
-
                 //    ajaxLoadedData = response.data[0];
                 this.setData(data);
                 //    初始数据获取，不包含收件人id
@@ -395,14 +401,16 @@ export = class FormPage extends BasicPage {
             // 字段默认值
             let defaultVal = BwRule.getDefaultByFields(form.fields);
             this.lookup.then(() =>{
+                defaultVal = addOldField(defaultVal);
                 this.setData(defaultVal);
             })
         }
     }
 
     // 给编辑页设置默认数据
+    protected _data: obj;
     setData(data: obj){
-        console.log(this.lookUpData);
+        this._data = Object.assign({}, data || {});
         this.fields.forEach((field) => {
             let name = field.name,
                 com = this.editModule.getDom(name);

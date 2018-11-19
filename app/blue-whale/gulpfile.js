@@ -258,6 +258,7 @@ gulp.task('js', function () {
 
     gulpTsModule('keyStep/KeyStep', 'KeyStep.js');
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
+    gulpTsModule('mbListModule/mbListModule','MbListModule.js');
 
     /*page*/
 

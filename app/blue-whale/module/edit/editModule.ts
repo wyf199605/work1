@@ -95,6 +95,11 @@ export class EditModule {
                 });
             }
         });
+        if(tools.isEmpty(dataArr)){
+            for(let key in this.comsExtraData[name]){
+                this.comsExtraData[name][key] = '';
+            }
+        }
         if(this.comsExtraData[name] && cip.onExtra){
             cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames);
         }
@@ -539,7 +544,6 @@ export class EditModule {
         for (let n in coms) {
             pageData = tools.obj.merge(pageData, allDateGet(n));
         }
-
         return pageData;
     }
 

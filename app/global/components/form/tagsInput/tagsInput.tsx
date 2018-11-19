@@ -6,15 +6,18 @@ export interface ITagsInputPara extends IFormComPara{
     name : string;
     multi : boolean,
     sepValue : string;
-    ajax?(data:string):Promise<ListItem[]>
+    ajax?(data:string):Promise<ListItem[]>,
+    onItemRemove?: (val: obj[]) => void;
     // ajaxUrl? : string;
     // ajaxSuccess?(data, response) : {value : any, text : string}[];
 }
 export class TagsInput extends FormCom{
     onSet: (val) => void;
+    onItemRemove?: (val: obj[]) => void;
     private com;
     constructor(private para: ITagsInputPara){
         super(para);
+        this.onItemRemove = para.onItemRemove;
         this.comInit();
     }
 
@@ -32,9 +35,12 @@ export class TagsInput extends FormCom{
                 tagClass: '',
                 itemText: 'text',
                 itemValue: 'value',
-                maxTags: this.para.multi ? undefined : 1
+                maxTags: this.para.multi ? undefined : 1,
                 //    confirmKeys: [13, 44]
                 //	freeInput : false
+            });
+            this.com.on('itemRemoved', (event) => {
+                this.onItemRemove && this.onItemRemove(this.get());
             });
 
             this.initEvent();
@@ -46,6 +52,20 @@ export class TagsInput extends FormCom{
             this.event = {};
         });
 
+    }
+
+    // 删除tagsInput中的item项，无参数为清除所有
+    removeItems(items?: any[]){
+        if(!this.com){
+            return
+        }
+        if(items){
+            items.forEach((val) => {
+                this.com.tagsinput('remove', val);
+            })
+        }else{
+            this.com.tagsinput('removeAll');
+        }
     }
 
     public get() : obj[]{
