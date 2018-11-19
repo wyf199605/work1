@@ -26,6 +26,9 @@ export default class AssignModule extends AssignModuleBasic{
         this.para = this.paraInit(para);
 
         this.tagsInput = new TagsInput(this.para);
+        this.tagsInput.onSet = (value) => {
+            console.log(value);
+        };
 
         this.initDeleteEvent();
 
@@ -34,6 +37,7 @@ export default class AssignModule extends AssignModuleBasic{
         this.para.container.parentElement.dataset.name = para.name;
 
         this.initPicker(pickDom, this.para.pickerUrl, para.data, (detail) => {
+            console.log(detail);
             let dataStr = detail.data.map(obj => obj[detail.fromField]).join(';');
             this.set(dataStr);
             this.para.onGetData(detail.data, detail.otherField);

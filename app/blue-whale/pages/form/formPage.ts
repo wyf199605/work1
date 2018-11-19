@@ -9,6 +9,8 @@ import tools = G.tools;
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Popover} from "../../../global/components/ui/popover/popover";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import CONF = BW.CONF;
+import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 export = class FormPage extends BasicPage {
     private editModule : EditModule;
     private validate : Validate;
@@ -29,20 +31,66 @@ export = class FormPage extends BasicPage {
             let field: any = {
 
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
-                field: nameFields[f.name]
-            };
-            if(nameFields[f.name] && nameFields[f.name].elementType === 'lookup'){
-                field.onExtra = (data, fields) => {
-                    if(editModule){
-                        fields.forEach((field) => {
-                            let com = editModule.getDom(field);
-                            if(com){
-                                com.set(data[field] || '')
+                field: nameFields[f.name],
+                onExtra: (data, relateCols, isEmptyClear = false) => {
+                    let com = editModule.getDom(f.name);
+                    if (tools.isEmpty(data) && isEmptyClear) {
+                        // table.edit.modifyTd(td, '');
+                        com && com.set('');
+                        return;
+                    }
+                    for(let key in data){
+                        let hCom = editModule.getDom(key);
+                        if(hCom && hCom !== com){
+                            let hField = hCom.custom as R_Field;
+                            hCom.set(data[key]);
+
+                            if (hField.assignSelectFields && hField.assignAddr) {
+                                BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                    cache: true,
+                                }).then(({response}) => {
+                                    let data = response.data;
+                                    if (data && data[0]) {
+                                        hField.assignSelectFields.forEach((name) => {
+                                            let assignCom = editModule.getDom(name);
+                                            assignCom && assignCom.set(data[0][name]);
+                                        });
+                                        let data = this.dataGet();
+                                        this.fields.forEach((field) => {
+                                            if(field.elementType === 'lookup'){
+                                                let lCom = editModule.getDom(field.name);
+                                                if(!data[field.lookUpKeyField]){
+                                                    lCom.set('');
+                                                }else{
+                                                    let options = this.lookUpData[field.name] || [];
+                                                    for (let opt of options) {
+                                                        if (opt.value == data[field.lookUpKeyField]) {
+                                                            lCom.set(opt.text);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+
+                                })
                             }
-                        })
+                        }
                     }
                 }
-            }
+            };
+            // if(nameFields[f.name] && nameFields[f.name].elementType === 'lookup'){
+            //     field.onExtra = (data, fields) => {
+            //         if(editModule){
+            //             fields.forEach((field) => {
+            //                 let com = editModule.getDom(field);
+            //                 if(com){
+            //                     com.set(data[field] || '')
+            //                 }
+            //             })
+            //         }
+            //     }
+            // }
 
             if(field.field && field.field.noShow){
                 let dom = d.query(`[data-name="${f.name}"]`, form);

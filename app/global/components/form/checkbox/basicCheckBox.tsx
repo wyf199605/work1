@@ -12,7 +12,7 @@ export interface IBasicBoxPara extends IFormComPara {
     onClick?(isChecked: boolean): void;
     clickArea?: 'all' | 'box';
     onSet?(isChecked: boolean): void;
-    custom?: ICustomCheck;
+    customStyle?: ICustomCheck;
     value?: any;
 }
 export interface ICustomCheck {
@@ -69,7 +69,7 @@ export class BasicCheckBox extends FormCom {
         super(para);
 
         // this.container = para.container;
-        this.custom = para.custom;
+        this.customStyle = para.customStyle;
         this._value = para.value;
         this.size = para.size;
         this.onSet = para.onSet;
@@ -177,9 +177,9 @@ export class BasicCheckBox extends FormCom {
             return this._size;
         }
 
-    protected _custom: ICustomCheck;
-    set custom(obj: ICustomCheck) {
-        this._custom = obj;
+    protected _customStyle: ICustomCheck;
+    set customStyle(obj: ICustomCheck) {
+        this._customStyle = obj;
         if (tools.isNotEmpty(obj)) {
             let el = <style></style>;
             let style = '';
@@ -229,8 +229,8 @@ export class BasicCheckBox extends FormCom {
         }
     }
 
-    get custom() {
-        return this._custom;
+    get customStyle() {
+        return this._customStyle;
     }
 
     protected _onClick: (isChecked: boolean) => void;
