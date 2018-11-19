@@ -4,6 +4,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import tools = G.tools;
 import {ITreeNode, PermissionTreeItem} from "./permissionTreeItem";
+import d = G.d;
 
 export interface IPermissionTree extends IComponentPara {
     treeData?: ITreeNode[];
@@ -28,16 +29,26 @@ export class PermissionTree extends Component {
         data.forEach(tree => {
             deepArr.push(this.getDeep(tree.CHILDREN));
         });
-        let maxDeep = Math.max.apply({}, deepArr),
-            styleWidth = window.getComputedStyle(this.treeWrapper).width,
-            width = parseFloat(styleWidth.slice(0, styleWidth.length - 2)) / maxDeep;
+        let maxDeep = Math.max.apply({}, deepArr);
         let levelArr = ['一级', '二级', '三级', '四级', '五级', '六级', '七级', '八级', '九级', '十级'];
         let titleHtml = [];
         for (let i = 0; i < maxDeep; i++) {
-            titleHtml.push(`<div class='level-title' style='width:${100/maxDeep + "%"}'>${levelArr[i]}</div>`);
+            titleHtml.push(`<div class='level-title' style='width:${100 / maxDeep + "%"}'>${levelArr[i]}</div>`);
         }
         this.treeCaptionWrapper.innerHTML = titleHtml.join('');
-        this.createTrees(para, width);
+        this.createTrees(para);
+        let styleWidth = window.getComputedStyle(this.treeWrapper).width,
+            width = parseFloat(styleWidth.slice(0, styleWidth.length - 2)) / maxDeep;
+        let allTitles = d.queryAll('.level-title', this.wrapper);
+        allTitles[0].style.width = `calc(${100 / maxDeep}% - 1px)`;
+        allTitles[allTitles.length - 2].style.width = `calc(${100 / maxDeep}% + 1px)`;
+        this.treeItems.forEach((item, index) => {
+            if (deepArr[index] < maxDeep) {
+                item.setTextWrapperWidth(width - 2,false);
+            } else {
+                item.setTextWrapperWidth(width,true);
+            }
+        });
     }
 
     private getDeep(children: ITreeNode[]) {
@@ -59,14 +70,13 @@ export class PermissionTree extends Component {
 
     private treeItems: PermissionTreeItem[] = [];
 
-    createTrees(data: IPermissionTree, width: number) {
+    createTrees(data: IPermissionTree) {
         if (tools.isNotEmptyArray(data.treeData)) {
             data.treeData.forEach(tree => {
                 this.treeItems.push(new PermissionTreeItem(Object.assign({}, tree, {
                     container: this.treeWrapper,
                     parentNode: null,
                     textHeight: data.textHeight,
-                    textWidth: width
                 })))
             })
         }

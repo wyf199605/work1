@@ -9,6 +9,8 @@ import tools = G.tools;
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Popover} from "../../../global/components/ui/popover/popover";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import CONF = BW.CONF;
+import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 export = class FormPage extends BasicPage {
     private editModule : EditModule;
     private validate : Validate;
@@ -23,26 +25,67 @@ export = class FormPage extends BasicPage {
         let nameFields : {[name : string] : R_Field} = {};
         this.fields = para.fm.fields;
 
-        para.fm.fields.forEach(function (f) {
+        para.fm.fields.forEach((f) => {
             nameFields[f.name] = f;
 
             let field: any = {
 
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
-                field: nameFields[f.name]
-            };
-            if(nameFields[f.name] && nameFields[f.name].elementType === 'lookup'){
-                field.onExtra = (data, fields) => {
-                    if(editModule){
-                        fields.forEach((field) => {
-                            let com = editModule.getDom(field);
-                            if(com){
-                                com.set(data[field] || '')
+                field: nameFields[f.name],
+                onExtra: (data, relateCols, isEmptyClear = false) => {
+                    let com = editModule.getDom(f.name);
+                    for(let key of relateCols){
+                        let hCom = editModule.getDom(key);
+                        if(hCom && hCom !== com){
+                            let hField = hCom.custom as R_Field;
+                            hCom.set(data[key] || '');
+
+                            if (hField.assignSelectFields && hField.assignAddr) {
+                                BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                    cache: true,
+                                }).then(({response}) => {
+                                    let res = response.data;
+                                    if (res && res[0]) {
+                                        hField.assignSelectFields.forEach((name) => {
+                                            let assignCom = editModule.getDom(name);
+                                            assignCom && assignCom.set(res[0][name]);
+                                        });
+                                        let data = this.dataGet();
+                                        this.fields.forEach((field) => {
+                                            if(field.elementType === 'lookup'){
+                                                let lCom = editModule.getDom(field.name);
+                                                if(!data[field.lookUpKeyField]){
+                                                    lCom.set('');
+                                                }else{
+                                                    let options = this.lookUpData[field.name] || [];
+                                                    for (let opt of options) {
+                                                        if (opt.value == data[field.lookUpKeyField]) {
+                                                            lCom.set(opt.text);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+
+                                })
                             }
-                        })
+                        }
                     }
                 }
-            }
+            };
+            // if(nameFields[f.name] && nameFields[f.name].elementType === 'lookup'){
+            //     field.onExtra = (data, fields) => {
+            //         if(editModule){
+            //             fields.forEach((field) => {
+            //                 let com = editModule.getDom(field);
+            //                 if(com){
+            //                     com.set(data[field] || '')
+            //                 }
+            //             })
+            //         }
+            //     }
+            // }
 
             if(field.field && field.field.noShow){
                 let dom = d.query(`[data-name="${f.name}"]`, form);
@@ -200,7 +243,7 @@ export = class FormPage extends BasicPage {
             }
         });
 
-        return data;
+        return Object.assign({}, this._data || {}, data || {});
     }
 
     private initValidate(){
@@ -261,6 +304,18 @@ export = class FormPage extends BasicPage {
         },this.url);
     }
 
+    getOldField(){
+        let btns = this.para.fm.subButtons,
+            varList: R_VarList[] = [];
+        Array.isArray(btns) && btns.forEach(btn => {
+            let addr = btn.actionAddr;
+            if(addr && Array.isArray(addr.varList)){
+                varList = varList.concat(addr.varList)
+            }
+        });
+        return BwRule.getOldField(varList);
+    }
+
     /**
      * 初始化数据
      */
@@ -278,7 +333,7 @@ export = class FormPage extends BasicPage {
                 }
             });
 
-            BwRule.addOldField(BwRule.getOldField(varList), data);
+            BwRule.addOldField(this.getOldField(), data);
 
             return data;
         };
@@ -301,7 +356,6 @@ export = class FormPage extends BasicPage {
 
                 // debugger;
                 data = addOldField(data);
-
                 //    ajaxLoadedData = response.data[0];
                 this.setData(data);
                 //    初始数据获取，不包含收件人id
@@ -347,14 +401,16 @@ export = class FormPage extends BasicPage {
             // 字段默认值
             let defaultVal = BwRule.getDefaultByFields(form.fields);
             this.lookup.then(() =>{
+                defaultVal = addOldField(defaultVal);
                 this.setData(defaultVal);
             })
         }
     }
 
     // 给编辑页设置默认数据
+    protected _data: obj;
     setData(data: obj){
-        console.log(this.lookUpData);
+        this._data = Object.assign({}, data || {});
         this.fields.forEach((field) => {
             let name = field.name,
                 com = this.editModule.getDom(name);

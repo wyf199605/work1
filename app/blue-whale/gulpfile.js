@@ -255,9 +255,8 @@ gulp.task('js', function () {
     // gulpTsModule('newStatistic/basic', 'basic.js');
     gulpTsModule('menuMrg/menuMrg', 'menu.mrg.js');
 
-
-    gulpTsModule('keyStep/KeyStep', 'KeyStep.js');
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
+    gulpTsModule('mbListModule/mbListModule','MbListModule.js');
 
     /*page*/
 

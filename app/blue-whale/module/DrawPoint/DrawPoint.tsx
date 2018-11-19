@@ -128,12 +128,18 @@ export class DrawPoint extends Component {
 
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none");
-        this.g.append('image').attr('href', para.image).attr('width', para.width).attr('height', para.height)//添加背景图
+        this.g.append('image').attr('href', ()=>{
+            return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
+        }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
     set imgUrl(url) {
 
-        this.g.select('image').attr('href', url).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
+        this.g.select('image').attr('href',
+            ()=>{
+                return url && tools.url.addObj(url, {version: new Date().getTime() + ''})
+            }
+        ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
     }
 
     private mousedown() {
@@ -186,7 +192,6 @@ export class DrawPoint extends Component {
     private _data;
 
     public render(data?: obj[]) {
-
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
@@ -233,6 +238,7 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
+            console.log(this.format(d));
             this.format(d)
                 .sort((a) => {
                     if (a.isPoint) {
@@ -241,6 +247,7 @@ export class DrawPoint extends Component {
                         return 0;
                     }
                 }).forEach((data) => {
+                    //console.log(data);
                 //  需要用到有point的data
                 if (data.isPoint && data.data) {
                         group.append('path').datum(data.name)
@@ -261,7 +268,10 @@ export class DrawPoint extends Component {
                                 point = data.data;
                                 this.map.set(index, data.data)
                                 return that.line(data.data)
-                            })
+                            }).on('mouseleave',function (d) {
+                            //let s = D3.select(this).node().getComputedTextLength();
+                            that.tooltip.style('display','none');
+                        })
                         // 判断是否是编辑状态
                         //显示边框 以及 背景颜色
                         if(this.isShowStatus){
@@ -292,7 +302,7 @@ export class DrawPoint extends Component {
                         .attr('dx', 5)
                         .attr('dy', 15)
                         .text(function (d) {
-                            toolData.push(data.data)
+                            data.data && toolData.push(data.data)
                             return data.data;
 
                         }) .attr('font-size', function (d) {
@@ -314,18 +324,15 @@ export class DrawPoint extends Component {
                             }
 
                             return font + "px"
-                        }).on('mouseover',function (d) {
+                        }).on('mouseenter',function (d) {
                             let str = '';
-                            for(let i = 0; i < I; i++){
+                            for(let i = 0; i < toolData.length; i++){
                                   str += (toolData[i] + "<br/>");
                             }
                             that.tooltip.html(str)
                                 .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
                                 .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
                                 .style('display','block')
-                        }).on('mouseout',function (d) {
-                            //let s = D3.select(this).node().getComputedTextLength();
-                            that.tooltip.style('display','none');
                         })
                         .style("pointer-events",()=>{
                             if(this.isDrawLine){
@@ -334,8 +341,10 @@ export class DrawPoint extends Component {
                                 return 'auto'
                             }
                         })
-                    //this.wrapWord(text, group.select('path').node().getBBox().width/2)
+                    let s = this.findCenter(point)[0];
+                    let k = this.findCenter(point)[1];
 
+                    this.wrapWord(text, group.select('path').node().getBBox().width/2,this.findCenter(point)[0],this.findCenter(point)[1])
                 }else if(tools.isNotEmpty(data.bgColor) && this.isShowStatus){
                     //并且是查看状态下
                     group.select('path').attr('fill',function (d) {
@@ -351,7 +360,7 @@ export class DrawPoint extends Component {
 
     }
     //字体换行
-    private wrapWord(text, width) {
+    private wrapWord(text, width,centerX,centerY) {
         text.each(function() {
             let text = D3.select(this),
                 words = text.text().split('').reverse(),
@@ -361,7 +370,7 @@ export class DrawPoint extends Component {
                 lineHeight = text.node().getBoundingClientRect().height,
                 x = +text.attr('x'),
                 y = +text.attr('y'),
-                tspan = text.text(null).append('tspan').attr('x', x).attr('y', y);
+                  tspan = text.text(null).append('tspan').attr('dy',5.3).attr('dx',5).attr('x',centerX - 5.3).attr('y',centerY - 5.3);
             while (word = words.pop()) {
                 line.push(word);
                 const dash = lineNumber > 0 ? '-' : '';
@@ -370,7 +379,7 @@ export class DrawPoint extends Component {
                     line.pop();
                     tspan.text(line.join(''));
                     line = [word];
-                    tspan = text.append('tspan').attr('dy',6).attr('dx',5).attr('x',x).text(word);
+                    tspan = text.append('tspan').attr('dy',5.3).attr('dx',5).attr('x',centerX - 5.3).text(word);
                     //tspan = text.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y + 15).text(word);
                 }
             }
@@ -481,6 +490,7 @@ export class DrawPoint extends Component {
                                 return data.data;
 
                             })
+                        this.wrapWord(text,   this.selectedG.select('path').node().getBBox().width/2,this.findCenter(point)[0],this.findCenter(point)[1])
                     }
                 })
 
@@ -528,7 +538,7 @@ export class DrawPoint extends Component {
             .transition()
             .duration(750)
             .ease("elastic")
-            .attr('r', this.LR(this.rLate))
+            .attr('r', 2)
             .attr('cx', function (d) {
                 return d[0]
             })
@@ -571,7 +581,7 @@ export class DrawPoint extends Component {
             .attr('fill', 'white')
             .attr('fill-opacity', 0)
             .attr("id", 'path' + this.index)
-            .attr('stroke-width', this.lineLate)
+            .attr('stroke-width','1px')
         // .on('click',function(d,i){
         //      that.indexStr = D3.select(this).attr('id');
         //
@@ -929,13 +939,13 @@ export class DrawPoint extends Component {
             .on('zoom', function (d) {
                 if(D3.event.scale > 6) {
 
-                    D3.selectAll('circle').attr('r',_this.LR(6));
-                    D3.selectAll('path').attr('stroke-width',_this.LV(6))
+                    //D3.selectAll('circle').attr('r',_this.LR(6));
+                    //D3.selectAll('path').attr('stroke-width',_this.LV(6))
                 }else{
                     _this.rLate = _this.lineLate = D3.event.scale;
 
-                    D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
-                    _this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
+                    //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
+                    //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
 
                 }
                    console.log(D3.event.scale);

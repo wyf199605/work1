@@ -19,6 +19,7 @@ export default class AssignModule extends AssignModuleBasic{
     private assignData: {[key : string]: any[]} = {};
     // private contactModal : G.Modal;
     private ajax = new BwRule.Ajax();
+    protected selectedData;
 
     constructor(private para: AssignPara){
         super(para);
@@ -26,6 +27,18 @@ export default class AssignModule extends AssignModuleBasic{
         this.para = this.paraInit(para);
 
         this.tagsInput = new TagsInput(this.para);
+        this.tagsInput.onItemRemove = (values) => {
+            let data = [],
+                res = values.map((val) => val.value),
+                detail = this.selectedData;
+            detail && detail.data && detail.data.forEach((obj) => {
+                let val = obj[detail.fromField];
+                if(res.indexOf(val) > -1){
+                    data.push(obj);
+                }
+            });
+            this.para.onGetData(data, detail ? detail.otherField : '');
+        };
 
         this.initDeleteEvent();
 
@@ -34,6 +47,10 @@ export default class AssignModule extends AssignModuleBasic{
         this.para.container.parentElement.dataset.name = para.name;
 
         this.initPicker(pickDom, this.para.pickerUrl, para.data, (detail) => {
+            this.selectedData = detail;
+            if(!para.multi){
+                this.tagsInput.removeItems();
+            }
             let dataStr = detail.data.map(obj => obj[detail.fromField]).join(';');
             this.set(dataStr);
             this.para.onGetData(detail.data, detail.otherField);
@@ -111,7 +128,6 @@ export default class AssignModule extends AssignModuleBasic{
         return tagsValue.slice(0, -1);
     }
     set(data: string): void {
-
         this.tagsInput.set(data);
     }
 

@@ -146,7 +146,6 @@ export = class contactsPage {
                 }else{
                     url = ajaxUrl + (~ajaxUrl.indexOf('?') ? '&' : '?') + getLevelQuery(tapThis.parentElement);
                 }
-                console.log(getLevelQuery(tapThis.parentElement));
 
                 //数据一次性加载时
                 if(self.para.levelField === ''){
@@ -195,7 +194,6 @@ export = class contactsPage {
                         dataManager = new DataManager({
                             isMb: true,
                             render: (e) => {
-                                console.log(e);
                             },
                             page: {
                                 size: len,
@@ -204,9 +202,8 @@ export = class contactsPage {
                             ajax: {
                                 auto: true,
                                 fun: (obj) => {
-                                    console.log(obj);
                                     queryData.pageparams = '{"index"=' + (obj.current + 1) + ', "size"=' + obj.pageSize + '}';
-                                    console.log(queryData.pageparams);
+
                                     return new Promise<{ data: obj[]; total: number; }>((resolve, reject) => {
                                         getList(ajaxUrl, queryData, function (response) {
                                             let level = treeField.length - 1;
@@ -251,7 +248,6 @@ export = class contactsPage {
                     cache: true,
                     data: ajaxData,
                 }).then(({response}) => {
-                    console.log(response);
                     self.response = response;
                     /**
                      * 如果是搜索，则直接显示叶子，并且显示数据的前6项

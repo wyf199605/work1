@@ -166,7 +166,7 @@ export class NewTableModule {
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
-                                    this.subInit(this.bwEl.subTableList[index], subParam, ajaxData, tabEl);
+                                    this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     this.sub[index].refresh(ajaxData).catch();
@@ -307,6 +307,7 @@ export class NewTableModule {
         this.mobileModal && (this.mobileModal.isShow = true);
         Object.values(this.sub).forEach((subTable) => {
             subTable.refresh(ajaxData).catch();
+            subTable.linkedDate = selectedData;
         });
 
     }
@@ -314,7 +315,7 @@ export class NewTableModule {
     public mobileModal: Modal = null;
     private subWrapper: HTMLElement = null;
 
-    subInit(ui: IBW_Table, editParam: IBW_TableAddrParam, ajaxData?: obj, tabEl?: HTMLElement) {
+    subInit(ui: IBW_Table, editParam: IBW_TableAddrParam, rowData: obj, ajaxData?: obj, tabEl?: HTMLElement) {
         this.sub[this.subTabActiveIndex] = new BwSubTableModule({
             ui,
             editParam,
@@ -323,6 +324,7 @@ export class NewTableModule {
             tableModule: this,
             container: tabEl
         });
+        this.sub[this.subTabActiveIndex].linkedDate = rowData;
         this.sub[this.subTabActiveIndex].ftable.btnShow = this.subBtnShow;
     }
 
@@ -690,16 +692,16 @@ export class NewTableModule {
                                 let lookUpKeyField = field.lookUpKeyField,
                                     hCell = row.cellGet(lookUpKeyField);
                                 if (hCell && hCell.column) {
-                                    let filed = hCell.column.content as R_Field;
+                                    let hField = hCell.column.content as R_Field;
                                     hCell !== cell && (hCell.data = data[lookUpKeyField]);
 
-                                    if (filed.assignSelectFields && filed.assignAddr) {
-                                        NewTableModule.initAssignData(filed.assignAddr, row ? row.data : {})
+                                    if (hField.assignSelectFields && hField.assignAddr) {
+                                        NewTableModule.initAssignData(hField.assignAddr, row ? row.data : {})
                                             .then(({response}) => {
 
                                                 let data = response.data;
                                                 if (data && data[0]) {
-                                                    filed.assignSelectFields.forEach((name) => {
+                                                    hField.assignSelectFields.forEach((name) => {
                                                         let assignCell = row.cellGet(name) as TableDataCell;
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];

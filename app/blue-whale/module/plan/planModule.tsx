@@ -166,18 +166,32 @@ export class PlanModule extends Component{
         });
 
     }
-
-    protected bgPicture: string;
+    protected _isEdit = true;
+    get isEdit(){
+        return this._isEdit;
+    }
+    set isEdit(isEdit:boolean){
+        this._isEdit = isEdit;
+        this.plotBtn.disabled = !isEdit;
+    }
     protected setBackground(obj: obj){
         let backGround = this.ui.backGround;
         if(backGround){
-            let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
-            if(url != this.bgPicture){
-                this.bgPicture = url;
-                console.log(url);
-                this.draw.imgUrl = url;
-                // TODO 设置drawPoint图片
+            let img = new Image();
+            img.src = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+            img.onload = ()=>{
+                this.draw.imgUrl = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+                this.isEdit = true;
             }
+            img.onerror = () => {
+                Modal.alert('图层不存在');
+                this.isEdit = false;
+                this.draw.imgUrl = null;
+            }
+
+        }else {
+            Modal.alert('图层不存在');
+            this.plotBtn.disabled = true;
         }
     }
 
@@ -219,7 +233,7 @@ export class PlanModule extends Component{
                 }
             }
             console.log(data);
-            this.plotBtn.disabled = false;
+            this.isEdit && (this.plotBtn.disabled = false);
             this.draw.render(data);
         }).catch(e => {
             console.log(e);
@@ -325,9 +339,13 @@ export class PlanModule extends Component{
                             if(val.content == '编辑描点' || val.content == '结束编辑'){
                                 plotBox.getItem('end-edit').isDisabled = true;
                                 plotBox.getItem('star-edit').isDisabled = true;
-
                             }
+
                         })
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('star-drawing').wrapper.classList.add('custom-button');
 
                         console.log('开始描点')
 
@@ -352,6 +370,11 @@ export class PlanModule extends Component{
                             }
                         })
 
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('end-drawing').wrapper.classList.add('custom-button');
+
                         //把point 清楚
 
                         this.draw.setIsDrawLine(false);
@@ -372,9 +395,13 @@ export class PlanModule extends Component{
                                 plotBox.getItem('star-drawing').isDisabled = true;
                             }
                         })
+                        editBox.getItem('edit').isDisabled = true;
                         console.log('开始编辑')
                         //------------------开始绘图
-
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('star-edit').wrapper.classList.add('custom-button');
                         this.draw.editPoint();
                     },
                 },
@@ -391,6 +418,12 @@ export class PlanModule extends Component{
                                 plotBox.getItem('star-drawing').isDisabled = false;
                             }
                         })
+                        plotBox.children.forEach((c) => {
+                            c.wrapper.classList.remove('custom-button');
+                        })
+                        plotBox.getItem('end-edit').wrapper.classList.add('custom-button');
+                        this.draw.editPoint();
+                        editBox.getItem('edit').isDisabled = false;
                         this.draw.setIsDrawLine(false);
                         this.draw.editFished();
                     },
@@ -400,7 +433,7 @@ export class PlanModule extends Component{
             let editButtons: IButton[] = [
                 {
                     key: 'edit',
-                    content: '编辑',
+                    content: '绑定',
                     iconPre: 'appcommon',
                     icon: 'app-bianji',
                     onClick: () => {
@@ -591,12 +624,14 @@ export class PlanModule extends Component{
         }
         let params = [];
         for(let key in data){
-            params.push({
-                field: key.toUpperCase(),
-                values: [data[key]],
-                not: false,
-                op: 2
-            });
+            if(data[key]){
+                params.push({
+                    field: key.toUpperCase(),
+                    values: [data[key]],
+                    not: false,
+                    op: 2
+                });
+            }
         }
         return {
             queryparams1: JSON.stringify({"not":false, "op":0, "params": params})

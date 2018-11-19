@@ -95,6 +95,11 @@ export class EditModule {
                 });
             }
         });
+        if(tools.isEmpty(dataArr)){
+            for(let key in this.comsExtraData[name]){
+                this.comsExtraData[name][key] = '';
+            }
+        }
         if(this.comsExtraData[name] && cip.onExtra){
             cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames);
         }
@@ -106,6 +111,7 @@ export class EditModule {
         pickInput: (p) => {
             // console.log(dom,field,6)
             return new PickModule({
+                custom: p.field,
                 container: p.dom,
                 field: p.field,
                 data: p.data,
@@ -124,10 +130,11 @@ export class EditModule {
                 return new AssignModule({
                     data: p.data,
                     container: p.dom,
+                    custom: p.field,
                     name: p.field.name,
                     pickerUrl: p.field.dataAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr) : '',
                     ajaxUrl: p.field.assignAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.assignAddr) : '',
-                    multi: true, //field.multiValue,
+                    multi: p.field.atrrs ? p.field.atrrs.multiValueFlag === 1 : true, //field.multiValue,
                     sepValue: sepValue,
                     onSet: this.getAssignSetHandler(p.field),
                     onGetData: (dataArr: obj[], otherField: string) => {
@@ -140,6 +147,7 @@ export class EditModule {
             return new AssignTextModule({
                 data: p.data,
                 container: p.dom,
+                custom: p.field,
                 name: p.field.name,
                 pickerUrl: p.field.dataAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr) : '',
                 ajaxUrl: p.field.assignAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.assignAddr) : '',
@@ -153,6 +161,7 @@ export class EditModule {
         file: (p): FormCom => {
             let com =  new UploadModule({
                 nameField: p.field.name,
+                custom: p.field,
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 onComplete: (response) => {
@@ -188,19 +197,22 @@ export class EditModule {
         richText: (p) => {
             let Rich = sys.isMb ? RichTextMb : RichText;
             return new Rich({
-                container: p.dom
+                container: p.dom,
+                custom: p.field,
             });
         },
 
         richTextInput: (p) => {
             return new RichTextModal({
                 container: p.dom,
+                custom: p.field,
             });
         },
 
         text: (p) => {
             return new TextInput({
                 container: p.dom,
+                custom: p.field,
                 // readonly: field.noEdit
             });
         },
@@ -210,6 +222,7 @@ export class EditModule {
                 return new LookupModule({
                     container: p.dom,
                     field: p.field,
+                    custom: p.field,
                     rowData: p.data,
                     onExtra: (item) => {
                         if(item) {
@@ -253,6 +266,7 @@ export class EditModule {
                     container: p.dom,
                     data: comData,
                     ajax,
+                    custom: p.field,
                     useInputVal : true
 
                 // readonly: field.noEdit
@@ -261,13 +275,16 @@ export class EditModule {
         },
 
         virtual: (p) => {
-            return new Virtual();
+            return new Virtual({
+                custom: p.field
+            });
         },
 
         toggle: (p) => {
             if (this.para.type === 'table') {
                 return new SelectInput({
                     container: p.dom,
+                    custom: p.field,
                     data: [
                         {value: '1', text: '是'},
                         {value: '0', text: '否'}
@@ -275,9 +292,9 @@ export class EditModule {
                 });
             } else {
                 if (sys.isMb) {
-                    return new Toggle({container: p.dom});
+                    return new Toggle({container: p.dom, custom: p.field});
                 } else {
-                    return new CheckBox({container: p.dom});
+                    return new CheckBox({container: p.dom, custom: p.field});
                 }
             }
         },
@@ -285,6 +302,7 @@ export class EditModule {
         datetime: (p) => {
             return new (sys.isMb ? DatetimeMb : Datetime)({
                 container: p.dom,
+                custom: p.field,
                 format: p.field.displayFormat,
                 // readonly: field.noEdit
             });
@@ -526,7 +544,6 @@ export class EditModule {
         for (let n in coms) {
             pageData = tools.obj.merge(pageData, allDateGet(n));
         }
-
         return pageData;
     }
 

@@ -94,7 +94,7 @@ export class PersonPassword extends BasicPage{
        return BwRule.Ajax.fetch(CONF.ajaxUrl.personPassword, {
             type: 'POST',
             data: {
-                'userid': userInfo['userid'],
+                'upuser_id': userInfo['userid'],
                 'new_password': data['new_password'],
                 'old_password': data['old_password']
             }

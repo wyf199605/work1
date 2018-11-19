@@ -19,7 +19,8 @@
   }
   .custom-button{
     box-shadow: 0px 2px 3px #c8c8c8 inset !important;
-    border-radius: 4%;
+    background-color: #F8F8F8 !important;
+    border-radius: 4% !important;
   }
   .selected{
     fill: #e60c0c;
@@ -40,18 +41,19 @@
       height: 38px;
       padding: 7px 0;
       background-color: #ffffff;
-      //box-shadow: 0px 3px 4px 0px rgba(164, 164, 164, 0.14);
-      //div{
-      //  padding: 0px 8px;
-      //  &:hover{
-      //    cursor: pointer;
-      //    border: 0.5px solid #cccc;
-      //    border-radius: 5%;
-      //    text-align: center;
-      //    box-shadow: 0px 0px 1px #c8c8c8 inset;
-      //  }
-      //
-      //}
+     .input-box-horizontal{
+       button{
+         background-color: #FFFFFF;
+         color: black;
+         border: 0px;
+         &:hover{
+            border-radius: 3px !important;
+            background: #f8f8f8;
+            opacity: 0.65;
+            border: 1px solid #eeeeee;
+         }
+       }
+     }
     }
   }
   .plan-content{
@@ -74,8 +76,7 @@
           }
           .line{
             //fill: white;
-            stroke: steelblue;
-            stroke-opacity: 0.66;
+            stroke: #4682b4;
             //fill-opacity: 0;
           }
           circle {
@@ -86,9 +87,9 @@
 
             cursor: move;
 
-            stroke: steelblue;
+            stroke: #084d84;
 
-            stroke-width:1.5px;
+            stroke-width:0.5px;
 
           }
         }
