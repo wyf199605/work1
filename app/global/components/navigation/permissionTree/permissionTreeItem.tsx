@@ -17,7 +17,6 @@ export interface ITreeNode extends IComponentPara {
 interface IPermissionTreeItem extends ITreeNode {
     parentNode?: PermissionTreeItem;
     textHeight?: number;
-    textWidth?: number;
 }
 
 export class PermissionTreeItem extends Component {
@@ -36,10 +35,9 @@ export class PermissionTreeItem extends Component {
         super(para);
         this.textHeight = tools.isNotEmpty(para.textHeight) ? para.textHeight : 50;
         this.parentNode = para.parentNode || null;
-        this.textWidth = para.textWidth;
+        // this.textWidth = para.textWidth;
         this.createText(para);
         this.createChildren(para);
-        this.textWrapper.style.width = this.textWidth + 'px';
         if (tools.isNotEmptyArray(para.CHILDREN)) {
             this.wrapper.style.height = this.setHeight(para.CHILDREN) * this.textHeight + 'px';
         } else {
@@ -48,16 +46,22 @@ export class PermissionTreeItem extends Component {
         }
     }
 
-    private _textWidth: number;
-    set textWidth(tw: number) {
-        this._textWidth = tw;
-    }
-
-    get textWidth() {
-        if (this._textWidth < 120) {
-            this._textWidth = 120;
+    setTextWrapperWidth(width:number,isMaxDeep:boolean){
+        if (this.para.PARENTID === 'root'){
+            this.textWrapper.style.width = width + 'px';
+            if (!isMaxDeep){
+                width = width + 2;
+            }
+            setTextWrapperWidthChildren(this.children || [],width);
         }
-        return this._textWidth;
+        function setTextWrapperWidthChildren(nodes:PermissionTreeItem[],nodeWidth:number){
+            nodes.forEach(node => {
+                node.textWrapper.style.width = nodeWidth + 'px';
+                if (tools.isNotEmpty(node.children)){
+                    setTextWrapperWidthChildren(node.children,nodeWidth);
+                }
+            })
+        }
     }
 
     // 文本高度
@@ -138,8 +142,7 @@ export class PermissionTreeItem extends Component {
                 this.children.push(new PermissionTreeItem(Object.assign({}, child, {
                     container: this.childrenWrapper,
                     parentNode: this,
-                    textHeight: this.textHeight,
-                    textWidth: this.textWidth
+                    textHeight: this.textHeight
                 })));
             })
         }
