@@ -318,6 +318,7 @@ export class DrawPoint extends Component {
                             return font + "px"
                         }).on('mouseenter',function (d) {
                             let str = '';
+                            D3.stopPropagation();
                             for(let i = 0; i < toolData.length; i++){
                                   str += (toolData[i] + "<br/>");
                             }
@@ -326,6 +327,7 @@ export class DrawPoint extends Component {
                                 .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
                                 .style('display','block')
                         }).on('mouseleave',function (d) {
+                            D3.stopPropagation();
                             //let s = D3.select(this).node().getComputedTextLength();
                             that.tooltip.style('display','none');
                         })
