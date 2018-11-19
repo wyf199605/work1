@@ -544,7 +544,6 @@ export class EditModule {
         for (let n in coms) {
             pageData = tools.obj.merge(pageData, allDateGet(n));
         }
-
         return pageData;
     }
 
