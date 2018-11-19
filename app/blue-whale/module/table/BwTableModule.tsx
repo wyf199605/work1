@@ -1782,10 +1782,14 @@ export class BwTableModule extends Component {
                                 console.log(data);
                                 new PasswdModal({
                                     data,
-                                    confirm: (ajaxData) => {
+                                    confirm: (res) => {
+                                        let ajaxData = {};
+                                        for(let key in data){
+                                            ajaxData['up' + key] = data[key];
+                                        }
                                         return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, {isAdmin: 1}, false), {
                                             type: 'POST',
-                                            data: JSON.stringify([ajaxData])
+                                            data: JSON.stringify([Object.assign(ajaxData, res)])
                                         }).then(({response}) => {
                                             console.log(response);
                                             return new Promise((resolve) => {

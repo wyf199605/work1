@@ -95,6 +95,11 @@ export class EditModule {
                 });
             }
         });
+        if(tools.isEmpty(dataArr)){
+            for(let key in this.comsExtraData[name]){
+                this.comsExtraData[name][key] = '';
+            }
+        }
         if(this.comsExtraData[name] && cip.onExtra){
             cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames);
         }

@@ -108,7 +108,13 @@ namespace BW{
                     self.handle('wake', '{event:"' + event + '",data:"' + data + '"}');
                 },
                 uploadVersion: function (version: string){
-                    self.handle('uploadVersion', `{event: "", data: "${JSON.stringify({"url": BW.CONF.siteUrl, "code": version})}"}`);
+                    self.handle('uploadVersion', JSON.stringify({
+                        event: "",
+                        data: {
+                            url: BW.CONF.siteUrl,
+                            code: version
+                        }
+                    }));
                 },
                 opentab: function (userid = '', accessToken = '', noShow?: string[]) {
                     let ja = [

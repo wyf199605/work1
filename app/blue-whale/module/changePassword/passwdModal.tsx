@@ -28,7 +28,7 @@ export class PasswdModal{
             {para.data ? para.data.map((data) => {
                 let input = <TextInput readonly={true}/>;
                 input.set(data.value);
-                ajaxData[data.name] = data.value;
+                // ajaxData[data.name] = data.value;
                 return <div className="form-group">
                     <label className="control-label">{data.title}</label>
                     {input}

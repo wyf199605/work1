@@ -34,16 +34,17 @@ export = class FormPage extends BasicPage {
                 field: nameFields[f.name],
                 onExtra: (data, relateCols, isEmptyClear = false) => {
                     let com = editModule.getDom(f.name);
-                    if (tools.isEmpty(data) && isEmptyClear) {
-                        // table.edit.modifyTd(td, '');
-                        com && com.set('');
-                        return;
-                    }
-                    for(let key in data){
+
+                    // if (tools.isEmpty(data) && isEmptyClear) {
+                    //     // table.edit.modifyTd(td, '');
+                    //     com && com.set('');
+                    //     return;
+                    // }
+                    for(let key of relateCols){
                         let hCom = editModule.getDom(key);
                         if(hCom && hCom !== com){
                             let hField = hCom.custom as R_Field;
-                            hCom.set(data[key]);
+                            hCom.set(data[key] || '');
 
                             if (hField.assignSelectFields && hField.assignAddr) {
                                 BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
