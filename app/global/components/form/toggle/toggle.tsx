@@ -5,7 +5,7 @@ import tools = G.tools;
 
 interface ITogglePara extends IFormComPara{
     checked?: boolean;
-    custom?: ICustom;
+    customStyle?: ICustom;
     size?: number;
     onClick?(isChecked: boolean): void;
     onSet?(isChecked: boolean): void;
@@ -66,7 +66,7 @@ export class Toggle extends FormCom{
     constructor(para: ITogglePara){
         super(para);
 
-        this.custom = para.custom;
+        this.customStyle = para.customStyle;
         this.checked = para.checked;
         this.onClick = para.onClick;
         this.onSet = para.onSet;
@@ -181,19 +181,19 @@ export class Toggle extends FormCom{
         return this._disabled;
     }
 
-    protected _custom: ICustom;
-    set custom(obj: ICustom){
+    protected _customStyle: ICustom;
+    set customStyle(obj: ICustom){
         if(tools.isNotEmpty(obj) && this.wrapper){
-            this._custom = obj;
+            this._customStyle = obj;
             //debugger;
             let check = this.wrapper.querySelector('.toggle-checked'),
                 noCheck = this.wrapper.querySelector('.toggle-no-checked');
-            check.innerHTML = tools.str.toEmpty(this.custom.check);
-            noCheck.innerHTML = tools.str.toEmpty(this.custom.noCheck);
+            check.innerHTML = tools.str.toEmpty(this.customStyle.check);
+            noCheck.innerHTML = tools.str.toEmpty(this.customStyle.noCheck);
         }
     }
-    get custom(){
-        return this._custom;
+    get customStyle(){
+        return this._customStyle;
     }
 
     protected _onClick: (isChecked: boolean) => void;

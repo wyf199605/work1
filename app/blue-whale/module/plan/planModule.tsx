@@ -167,17 +167,10 @@ export class PlanModule extends Component{
 
     }
 
-    protected bgPicture: string;
     protected setBackground(obj: obj){
         let backGround = this.ui.backGround;
         if(backGround){
-            let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
-            if(url != this.bgPicture){
-                this.bgPicture = url;
-                console.log(url);
-                this.draw.imgUrl = url;
-                // TODO 设置drawPoint图片
-            }
+            this.draw.imgUrl = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
         }
     }
 

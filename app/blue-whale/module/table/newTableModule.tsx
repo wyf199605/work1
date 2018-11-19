@@ -690,16 +690,16 @@ export class NewTableModule {
                                 let lookUpKeyField = field.lookUpKeyField,
                                     hCell = row.cellGet(lookUpKeyField);
                                 if (hCell && hCell.column) {
-                                    let filed = hCell.column.content as R_Field;
+                                    let hField = hCell.column.content as R_Field;
                                     hCell !== cell && (hCell.data = data[lookUpKeyField]);
 
-                                    if (filed.assignSelectFields && filed.assignAddr) {
-                                        NewTableModule.initAssignData(filed.assignAddr, row ? row.data : {})
+                                    if (hField.assignSelectFields && hField.assignAddr) {
+                                        NewTableModule.initAssignData(hField.assignAddr, row ? row.data : {})
                                             .then(({response}) => {
 
                                                 let data = response.data;
                                                 if (data && data[0]) {
-                                                    filed.assignSelectFields.forEach((name) => {
+                                                    hField.assignSelectFields.forEach((name) => {
                                                         let assignCell = row.cellGet(name) as TableDataCell;
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];

@@ -11,7 +11,7 @@ export interface ITagsInputPara extends IFormComPara{
     // ajaxSuccess?(data, response) : {value : any, text : string}[];
 }
 export class TagsInput extends FormCom{
-    onSet: (val) => {};
+    onSet: (val) => void;
     private com;
     constructor(private para: ITagsInputPara){
         super(para);
