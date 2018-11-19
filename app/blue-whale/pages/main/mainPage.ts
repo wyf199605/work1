@@ -328,30 +328,30 @@ export = class MainPage {
                     sys.window.update();
                 }
             },
-            {
-                title: '<a href="javascript:void(0)" data-action="clear">清理缓存</a>',
-                onClick: () => {
-                    sys.window.clear();
-                }
-            },
-            {
-                title: '<a href="javascript:void(0)" data-page-name="bugReport" data-action="bugReport">故障申告</a>',
-                onClick: () => {
-                    sys.window.open({url: CONF.url.bugReport});
-                }
-            },
-            {
-                title: '<a href="javascript:void(0)" data-page-name="myApplication" data-action="application">我的申请</a>',
-                onClick: () => {
-                    sys.window.open({url: CONF.url.myApplicationPC});
-                }
-            },
-            {
-                title: '<a href="javascript:void(0)" data-page-name="myApproval" data-action="approval">我的审核</a>',
-                onClick: () => {
-                    sys.window.open({url: CONF.url.myApprovalPC});
-                }
-            },
+            // {
+            //     title: '<a href="javascript:void(0)" data-action="clear">清理缓存</a>',
+            //     onClick: () => {
+            //         sys.window.clear();
+            //     }
+            // },
+            // {
+            //     title: '<a href="javascript:void(0)" data-page-name="bugReport" data-action="bugReport">故障申告</a>',
+            //     onClick: () => {
+            //         sys.window.open({url: CONF.url.bugReport});
+            //     }
+            // },
+            // {
+            //     title: '<a href="javascript:void(0)" data-page-name="myApplication" data-action="application">我的申请</a>',
+            //     onClick: () => {
+            //         sys.window.open({url: CONF.url.myApplicationPC});
+            //     }
+            // },
+            // {
+            //     title: '<a href="javascript:void(0)" data-page-name="myApproval" data-action="approval">我的审核</a>',
+            //     onClick: () => {
+            //         sys.window.open({url: CONF.url.myApprovalPC});
+            //     }
+            // },
         ];
 
 

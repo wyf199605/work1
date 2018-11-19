@@ -1859,7 +1859,8 @@ export class BwTableModule extends Component {
                                 {multiselect, selectionFlag} = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
-                            let select = multiselect === 1 ? selectedData[0] : selectedData;
+                            let select = Object.assign(this.linkedDate || {},
+                                (multiselect === 1 ? selectedData[0] : selectedData) || {});
                             let tData = ftable.tableData.data;
 
                             if (btnUi.haveRoll) {
@@ -1906,19 +1907,27 @@ export class BwTableModule extends Component {
             this.ftable.off(FastTable.EVT_SELECTED, handler);
             this.ftable.on(FastTable.EVT_SELECTED, handler = () => {
                 let selectedLen = ftable.selectedRows.length,
+                    rowData = ftable.selectedRowsData[0],
                     allLen = ftable.rows.length;
 
                 box.children.forEach(btn => {
-                    let selectionFlag = btn.data.selectionFlag,
-                        len = btn.data.selectionFlag ? allLen - selectedLen : selectedLen;
+                    let btnField = btn.data as R_Button,
+                        selectionFlag = btnField.selectionFlag,
+                        len = btnField.selectionFlag ? allLen - selectedLen : selectedLen;
 
                     if (len === 0) {
-                        btn.isDisabled = selectionFlag ? false : btn.data.multiselect > 0;
+                        btn.isDisabled = selectionFlag ? false : btnField.multiselect > 0;
                     } else if (selectedLen === 1) {
                         btn.isDisabled = false;
+                        // 根据表格行数据判断按钮是否可点击
+                        if(tools.isNotEmpty(btnField.judgefield) && rowData){
+                            let judges = btnField.judgefield.split(',');
+                            btn.isDisabled = judges.every((judge) => rowData[judge] ? rowData[judge] === 1 : true);
+                        }
                     } else {
-                        btn.isDisabled = btn.data.multiselect !== 2;
+                        btn.isDisabled =  btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
                     }
+
                 });
             });
         };
@@ -1931,6 +1940,9 @@ export class BwTableModule extends Component {
             }
         }
     })();
+
+    // 按钮关联数据，每次按钮请求时需附带的参数
+    public linkedDate = {};
 
     destroy() {
         super.destroy();
