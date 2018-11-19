@@ -135,7 +135,11 @@ export class DrawPoint extends Component {
 
     set imgUrl(url) {
 
-        this.g.select('image').attr('href', url).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
+        this.g.select('image').attr('href',
+            ()=>{
+                return url && tools.url.addObj(url, {version: new Date().getTime() + ''})
+            }
+        ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
     }
 
     private mousedown() {
