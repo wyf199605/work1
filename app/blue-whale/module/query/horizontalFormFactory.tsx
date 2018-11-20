@@ -115,7 +115,7 @@ export class HorizontalQueryModule extends Component {
                                             paramObj["not"] = false;
                                             paramObj["op"] = 0;
                                             paramObj["field"] = key;
-                                            paramObj["values"] = forms[key].get();
+                                            paramObj["values"] = [forms[key].get()];
                                             params.push(paramObj);
                                         }
                                     }

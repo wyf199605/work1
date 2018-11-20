@@ -72,6 +72,7 @@ interface IBW_Table{
     printSetting?: string;
     showSubField?:string;
     layout?:IBW_Layout; // 移动化
+    subTableAddr?:R_ReqAddr; //移动化
 }
 
 interface IBW_Layout{

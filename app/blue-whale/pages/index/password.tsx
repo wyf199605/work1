@@ -36,52 +36,40 @@ export class PersonPassword extends BasicPage{
             onClick:() => {
                 for(let input of[input1, input2, input3]){
                     if(!input.get()){
+                        Modal.alert('您有未填写的项目');
                         return
                     }
                 }
-                if(input2.get() === input3.get()){
-                    confirm.isDisabled = true;
-                    let spinner = new Spinner({
-                        el: confirm.wrapper,
-                        type: Spinner.SHOW_TYPE.cover
-                    });
-                    spinner.show();
-                    this.sendPassword({
-                        "new_password": input2.get(),
-                        "old_password": input1.get()
-                    },input1).finally(() => {
-                        confirm.isDisabled = false;
-                        spinner && spinner.hide();
-                        spinner = null;
-                        input1.value='';
-                        input2.value='';
-                        input3.value='';
-                    })
+                if(input1.get() === input2.get()){
+                    Modal.alert('新密码和旧密码不能相同');
+                    return
+                }else{
+                    if(input2.get() === input3.get()){
+                        confirm.isDisabled = true;
+                        let spinner = new Spinner({
+                            el: confirm.wrapper,
+                            type: Spinner.SHOW_TYPE.cover
+                        });
+                        spinner.show();
+                        this.sendPassword({
+                            "new_password": input2.get(),
+                            "old_password": input1.get()
+                        },input1).finally(() => {
+                            confirm.isDisabled = false;
+                            spinner && spinner.hide();
+                            spinner = null;
+                            input1.value='';
+                            input2.value='';
+                            input3.value='';
+                        })
+                    }else{
+                        Modal.alert('新密码和确认密码不一致');
+                    }
                 }
+
             }
         });
         d.append(para.dom, body);
-        this.bindBlur('.old-group',body,[input1, input2, input3]);
-        this.bindBlur('.new-group',body,[input1, input2, input3]);
-        this.bindBlur('.confirm-group',body,[input1, input2, input3])
-    }
-    bindBlur(para:string,el:HTMLElement,inputs:TextInput[]){
-        let temp = para + ' '+'input';
-        d.on(d.query(temp,el),'blur',()=>{
-            let tip = d.query('.password-tip',el);
-            if(tip){
-                d.remove(tip);
-            }
-            for(let input of inputs){
-                if(!input.get()){
-                    d.append(d.query('.confirm-group',el),<div className="password-tip">提示：密码为空</div>);
-                    return
-                }
-            }
-            if(inputs[1].get() !== inputs[2].get()){
-                d.append(d.query('.confirm-group',el),<div className="password-tip">提示：两次输入密码不一致</div>);
-            }
-        })
     }
     sendPassword(data:object,input:TextInput){
         let userInfo: any = window.localStorage.getItem('userInfo');
@@ -99,7 +87,7 @@ export class PersonPassword extends BasicPage{
                 'old_password': data['old_password']
             }
         }).then((response) => {
-            Modal.toast(response.msg);
+            Modal.alert(response.msg);
         });
     }
 }
