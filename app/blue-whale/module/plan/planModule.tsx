@@ -166,11 +166,32 @@ export class PlanModule extends Component{
         });
 
     }
-
+    protected _isEdit = true;
+    get isEdit(){
+        return this._isEdit;
+    }
+    set isEdit(isEdit:boolean){
+        this._isEdit = isEdit;
+        this.plotBtn.disabled = !isEdit;
+    }
     protected setBackground(obj: obj){
         let backGround = this.ui.backGround;
         if(backGround){
-            this.draw.imgUrl = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+            let img = new Image();
+            img.src = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+            img.onload = ()=>{
+                this.draw.imgUrl = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+                this.isEdit = true;
+            }
+            img.onerror = () => {
+                Modal.alert('图层不存在');
+                this.isEdit = false;
+                this.draw.imgUrl = null;
+            }
+
+        }else {
+            Modal.alert('图层不存在');
+            this.plotBtn.disabled = true;
         }
     }
 
@@ -212,7 +233,7 @@ export class PlanModule extends Component{
                 }
             }
             console.log(data);
-            this.plotBtn.disabled = false;
+            this.isEdit && (this.plotBtn.disabled = false);
             this.draw.render(data);
         }).catch(e => {
             console.log(e);
