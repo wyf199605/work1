@@ -14,13 +14,14 @@ export class BwMbList extends BasicPage {
 
     constructor(private para: IBwMbList) {
         super(para);
-        // if (tools.isNotEmpty(para.ui) && tools.isNotEmpty(para.ui.body.elements[0].layout)){
-        //     let container = tools.isMb ? d.query('.mb-list-page',para.dom) : para.dom;
-        //     new MbListModule({
-        //         ui:para.ui,
-        //         ajaxData:para.ajaxData,
-        //         container:container
-        //     })
-        // }
+        let ui = para.ui as IBW_UI<IBW_Table>;
+        if (tools.isNotEmpty(para.ui) && tools.isNotEmpty(ui.body.elements[0].layout)){
+            let container = tools.isMb ? d.query('.mb-list-page',para.dom) : para.dom;
+            new MbListModule({
+                ui:ui,
+                ajaxData:para.ajaxData,
+                container:container
+            })
+        }
     }
 }

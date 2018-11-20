@@ -110,7 +110,7 @@ export class HorizontalQueryModule extends Component {
                                 if(c.dynamic === 1){
                                     let params = [];
                                     for (let key in forms) {
-                                        if (tools.isNotEmpty(forms[key])){
+                                        if (tools.isNotEmpty(forms[key].get()) && c.field_name !== key){
                                             let paramObj:obj = {};
                                             paramObj["not"] = false;
                                             paramObj["op"] = 0;
@@ -119,7 +119,7 @@ export class HorizontalQueryModule extends Component {
                                             params.push(paramObj);
                                         }
                                     }
-                                    querydata["queryparams0"] = {
+                                    querydata = {
                                         "not":false,
                                         "op":0,
                                         "params":params
@@ -212,9 +212,10 @@ export class HorizontalQueryModule extends Component {
             if (tools.isEmpty(url)) {
                 reject();
             } else {
-                BwRule.Ajax.fetch(url,{
-                    data:querydata
-                }).then(({response}) => {
+                let ajaxUrl = tools.isNotEmpty(querydata) ? tools.url.addObj(url,{
+                    "queryparams0":JSON.stringify(querydata)
+                }) : url;
+                BwRule.Ajax.fetch(ajaxUrl).then(({response}) => {
                     let fields = [];
                     if (response.data[0]) {
                         fields = Object.keys(response.data[0]);
