@@ -14,6 +14,9 @@ export class BwMbList extends BasicPage {
 
     constructor(private para: IBwMbList) {
         super(para);
+        switch (para.ui.uiType){
+
+        }
         let ui = para.ui as IBW_UI<IBW_Table>;
         if (tools.isNotEmpty(para.ui) && tools.isNotEmpty(ui.body.elements[0].layout)){
             let container = tools.isMb ? d.query('.mb-list-page',para.dom) : para.dom;
