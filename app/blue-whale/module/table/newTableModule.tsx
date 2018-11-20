@@ -170,6 +170,7 @@ export class NewTableModule {
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     this.sub[index].refresh(ajaxData).catch();
+                                    this.sub[index].linkedDate = selectedData;
                                 }
                             }
                         });
