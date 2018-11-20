@@ -255,8 +255,6 @@ gulp.task('js', function () {
     // gulpTsModule('newStatistic/basic', 'basic.js');
     gulpTsModule('menuMrg/menuMrg', 'menu.mrg.js');
 
-
-    gulpTsModule('keyStep/KeyStep', 'KeyStep.js');
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
     gulpTsModule('mbListModule/mbListModule','MbListModule.js');
 
@@ -327,6 +325,7 @@ gulp.task('js', function () {
     gulpTsPage('plan/PlanPage', 'PlanPage.js');
     gulpTsPage('permissionTree/permissionTreePage', 'permissionTree.js');
     gulpTsPage('mbList/mbList', 'BwMbList.js');
+    gulpTsPage('mbList/mbTabList', 'BwMbTabList.js');
 });
 
 /**

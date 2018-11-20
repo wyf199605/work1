@@ -6,6 +6,10 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Toast} from "../../../global/components/feedback/toast/Toast";
 import {BwRule} from "../../common/rule/BwRule";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
+import {FastBtnTable} from "../../../global/components/FastBtnTable/FastBtnTable";
+import {Button} from "../../../global/components/general/button/Button";
+import {ShellAction} from "../../../global/action/ShellAction";
+import Shell = G.Shell;
 
 interface InputsPara {
     inputs: R_Input[]
@@ -17,9 +21,14 @@ interface InputsPara {
     tableModule? : Function
     queryModule? : Function
 }
-
+interface IKeyStepPara{
+    callback(text : string, input? : R_Input) : Promise<any>
+    container? : HTMLElement
+    inputs? : R_Input[]
+    locationLine? : string
+}
 /**
- * monitorKey
+ * Inputs在pc端为按键输入，移动端为扫码
  */
 export class Inputs {
     private p: InputsPara;
@@ -52,7 +61,8 @@ export class Inputs {
         this.isProcess = true;
         return BwRule.Ajax.fetch(aUrl)
             .then(({response}) => {
-                this.condition(response,aUrl)
+                this.condition(response,aUrl);
+                return response;
             }).catch(() => {
                 this.isProcess = false;
             })
@@ -70,7 +80,7 @@ export class Inputs {
             atvarObj = body.atvarObj,
             catType = category.type,
             showText = category.showText,
-            ftable = tools.isFunction(this.p.table) && this.p.table();
+            ftable : FastBtnTable = tools.isFunction(this.p.table) && this.p.table();
 
         this.url = category.url;
         switch (catType) {
@@ -81,7 +91,8 @@ export class Inputs {
                 break;
             case 1:
                 // 标签打印
-                ftable.labelPrint.show(ftable.labelBtn.wrapper, category.printList, () => {
+                let tableModule = this.p.tableModule();
+                tableModule.labelPrint.show(tableModule.labelBtn.wrapper, category.printList, () => {
                     this.ajax(CONF.siteUrl + this.url);
                 });
                 this.logTip(showText);
@@ -223,26 +234,18 @@ export class Inputs {
      */
     private eventInit(para: InputsPara) {
         if(G.tools.isMb){
-            let keyStep = null;
-            // para.inputs.forEach(input => {
-            //     if(!keyStep){
-                    require(['KeyStep'], (e) => {
-                        keyStep = new e.KeyStep({
-                            inputs : para.inputs,
-                            callback : (ajaxData, input) => {
-                                if(input && !this.isProcess){
-                                    return this.matchPass(input, ajaxData);
-                                }else if(para.locationLine){
-                                    this.rowSelect(para.locationLine, ajaxData);
-                                }
-                            }
-                        })
-                    });
-                // }else {
-                //
-                // }
-            // });
-
+            new KeyStep({
+                inputs : para.inputs,
+                callback : (ajaxData, input) => {
+                    if(input && !this.isProcess){
+                        return this.matchPass(input, ajaxData);
+                    }else if(para.locationLine){
+                        return this.rowSelect(para.locationLine, ajaxData);
+                    }else {
+                        return new Promise(resolve => {resolve()})
+                    }
+                }
+            });
             return;
         }
         para.inputs.forEach(input => {
@@ -251,9 +254,8 @@ export class Inputs {
                 line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 let handle = () => {
-                    let reg = this.regExpMatch(input, text);
+                    let reg = regExpMatch(input, text);
                     //匹配成功
-                    console.log(reg, text)
                     if(reg){
                         this.matchPass(reg, text);
                     }else if(line){
@@ -280,37 +282,208 @@ export class Inputs {
     }
 
     private rowSelect(line, text){
-        let index = this.para.table().locateToRow(line, text, true),
-            tableModule = this.para.tableModule();
+        return new Promise(resolve => {
+            let fstable = tools.isFunction(this.para.table) && this.para.table(),
+                index = fstable && fstable.locateToRow(line, text, true),
+                tableModule = tools.isFunction(this.para.tableModule) && this.para.tableModule();
 
-        if(tools.isNotEmpty(index) && tableModule && tableModule.bwEl.subTableList) {
-            tableModule.subRefreshByIndex(index);
+            if(tools.isNotEmpty(index) && tableModule && tableModule.bwEl.subTableList) {
+                tableModule.subRefreshByIndex(index);
+            }
+            resolve();
+        })
+    }
+}
+
+export class KeyStep{
+    private p : IKeyStepPara;
+    constructor(para : IKeyStepPara){
+        this.p = para;
+        let can2dScan = Shell.inventory.can2dScan,
+            btn : Button;
+
+        if(!can2dScan && tools.isMb){
+            btn = new Button({
+                type: 'link',
+                content: '扫码查询',
+                size: 'large',
+                container: para.container,
+                className: 'keystep',
+                icon:  'richscan_icon',
+                onClick: () => {
+                    this.evenHandle(para, can2dScan);
+                }
+            });
+        }else {
+            this.evenHandle(para, can2dScan);
         }
+        // 拖动
+        d.on(btn.wrapper, 'touchstart', function (e : TouchEvent) {
+            let ev = e.touches[0],
+                wrapper = btn.wrapper,
+                evX = ev.clientX,
+                evY = ev.clientY,
+                top = wrapper.offsetTop,
+                left = wrapper.offsetLeft;
+
+            let moveHandler = function (i : TouchEvent) {
+                let iv = i.touches[0],
+                    ivX = iv.clientX,
+                    ivY = iv.clientY,
+                    distanceX = evX - ivX,
+                    distanceY = evY - ivY;
+                wrapper.style.left = left - distanceX - 30 + 'px';
+                wrapper.style.top = top - distanceY + 'px';
+            };
+
+            let endHandler =  function () {
+                d.off(document, 'touchmove', moveHandler);
+                d.off(document, 'touchend', endHandler);
+            };
+
+            d.on(document, 'touchmove',moveHandler);
+            d.on(document, 'touchend',endHandler);
+        })
+    }
+
+    evenHandle(para : IKeyStepPara, can2dScan : boolean){
+        if(Array.isArray(para.inputs)){
+            para.inputs.forEach(input => {
+                let type = input.inputType;
+                switch (type) {
+                    case '0':
+                    case '2': // 移动端支持连续扫码
+                        if(can2dScan){
+                            let open = () => {
+                                this.scanOpen().then((res : obj) => {
+                                    if(res.success && res.data !== 'openSuponScan') {
+                                        this.p.callback(res.data, regExpMatch(input, res.data))
+                                    }
+                                    open();
+                                });
+                            };
+                            open();
+                        }else {
+                            let open = () => {
+                                this.open(para).then((text : string) => {
+                                    let reg = regExpMatch(input, text),
+                                        conScan = tools.isMb && type === '2';
+
+                                    this.p.callback(text, reg).then((response) => {
+                                        let body = response && response.body && response.body.bodyList && response.body.bodyList[0] || {},
+                                            category = body.category || {},
+                                            catType = category.type,
+                                            dataType = body.dataType; // 0：表格数据覆盖
+
+                                        if(conScan && dataType === 0 && ![1,2,3,4].includes(catType)){
+                                            open();
+                                        }
+                                    });
+
+                                    if(!reg && conScan){
+                                        open();
+                                    }
+                                });
+                            };
+                            open();
+
+                        }
+                        break;
+                    case '1':
+                        if(can2dScan){
+                            this.startEpc(input);
+                        }
+                        break;
+                }
+            })
+        }else if(para.locationLine){ // 定位功能
+            if(can2dScan){
+                let open = () => {
+                    this.scanOpen().then((res : obj) => {
+                        if(res.success && res.data !== 'openSuponScan') {
+                            this.p.callback(res.data)
+                        }
+                        open();
+                    });
+                };
+                open();
+            }else {
+                this.open(para).then((text : string) => {
+                    this.p.callback(text)
+                });
+
+            }
+        }
+    }
+
+    scanOpen(){
+        return new Promise((resolve, reject) => {
+            Shell.inventory.scan2dOn((res) => {
+                resolve(res)
+            });
+        })
+
     }
 
     /**
-     * 正则匹配按键
-     * @param input
-     * @param inputContent
-     * @returns {boolean}
+     * type0 rfid及手机扫码
+     * @param {IKeyStepPara} para
      */
-    private regExpMatch(input, inputContent: string) {
-        let regArr = null,
-            data = null,
-            len = inputContent.length,
-            minLen = input.minLength,
-            maxLen = input.maxLength;
-
-        if (input.fieldRegex && minLen <= len && len <= maxLen) {
-            regArr = input.fieldRegex.split(';');
-            regArr.forEach(r => {
-                let patt = inputContent.match(r);
-                if (patt && patt[0] === inputContent) {
-                    data = input;
+    open(para : IKeyStepPara){
+        return new Promise((resolve, reject) => {
+            ShellAction.get().device().scan({
+                callback: (even) => {
+                    resolve(JSON.parse(even.detail).data)
                 }
             });
-        }
-        return data;
+        })
     }
 
+    startEpc(input : R_Input){
+        let timer = null, isLoading = false, arr = [];
+        Shell.inventory.startEpc(null, (result) => {
+            if(result.success){
+                result.data.forEach(obj => {
+                    let reg = regExpMatch(input, obj.epc);
+                    reg && arr.push(obj.epc);
+                });
+
+                if(!timer && !isLoading) {
+                    timer = setTimeout(() => {
+                        isLoading = true;
+                        if(tools.isNotEmpty(arr)){
+                            this.p.callback(arr.join(','), input)
+                                .then(() => isLoading = false);
+                        }
+                        arr = [];
+                        timer = null;
+                    },1000);
+                }
+            }
+        });
+    }
+}
+
+/**
+ * 正则匹配
+ * @param input
+ * @param inputContent
+ */
+function regExpMatch(input : R_Input, inputContent: string) {
+    let regArr = null,
+        data = null,
+        len = inputContent.length,
+        minLen = input.minLength,
+        maxLen = input.maxLength;
+
+    if (input.fieldRegex && minLen <= len && len <= maxLen) {
+        regArr = input.fieldRegex.split(';');
+        regArr.forEach(r => {
+            let patt = inputContent.match(r);
+            if (patt && patt[0] === inputContent) {
+                data = input;
+            }
+        });
+    }
+    return data;
 }
