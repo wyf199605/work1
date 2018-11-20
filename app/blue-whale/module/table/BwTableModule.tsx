@@ -1859,7 +1859,7 @@ export class BwTableModule extends Component {
                                 {multiselect, selectionFlag} = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
-                            let select = Object.assign(this.linkedDate || {},
+                            let select = Object.assign({}, this.linkedDate || {},
                                 (multiselect === 1 ? selectedData[0] : selectedData) || {});
                             let tData = ftable.tableData.data;
 

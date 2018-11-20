@@ -283,8 +283,12 @@ export class FlowDesigner {
 
                 // 禁用所有input
                 d.queryAll('input').forEach(input => {
-                    (input as HTMLInputElement).disabled = true;
+                    (input as HTMLInputElement).readOnly = true;
                 });
+
+                // 所有的下拉列表都不可用
+                [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS).forEach(item => item.flowEditor.initEvents.off());
+                d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item));
 
                 // FlowDesigner.flowEditor.show = true;
             }).catch(err => {

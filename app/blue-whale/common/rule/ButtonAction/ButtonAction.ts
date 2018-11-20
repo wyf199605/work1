@@ -256,29 +256,35 @@ export class ButtonAction {
             codeStype:object[],
             url:string,
             uniqueFlag:string,
-            ajaxUrl:string;
+            ajaxUrl:string,
+            uploadUrl:string,
+            downUrl:string;
         for(let i = 0;i < dataAddr.length;i++){
             url =   dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
-        }
+            uploadUrl = dataAddr[i].uploadAddr.dataAddr;
 
+        }
+        console.log(codeStype[0]["IMPORTDATAMODE"])
         BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
             data:data
         }).then(({response})=>{
-
+            console.log(response)
             response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
         })
 
-        // new RfidBarCode({
-        //      codeStype:codeStype,
-        //      SHO_ID:dataObj['SHO_ID'],
-        //      USERID:dataObj['USERID'],
-        //      url:ajaxUrl,
-        //     uniqueFlag
-        // })
+        require(['RfidBarCode'],(p)=>{
+            new p.RfidBarCode({
+                codeStype:codeStype,
+                SHO_ID:dataObj['SHO_ID'],
+                USERID:dataObj['USERID'],
+                uploadUrl:uploadUrl,
+                downUrl:url,
+                uniqueFlag:uniqueFlag
+            })
+        })
     }
-
     /**
      * 后台有配置actionHandle情况下的处理
      */

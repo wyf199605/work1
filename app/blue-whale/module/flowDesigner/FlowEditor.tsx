@@ -90,7 +90,16 @@ export class FlowEditor extends FormCom {
         // flowEditor初始化
         this.initFlowEditor(para);
         this.initEvents.on();
-        para.fields && this.set(para.fields);
+        if(para.fields){
+            let fields = para.fields;
+            // 查看流程时获取的数据也要进行转换
+            Object.keys(fields).forEach(key => {
+                if(key in FlowEditor.DROPDOWN_KEYVALUE){
+                    fields[key] = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0].text;
+                }
+            });
+            this.set(fields);
+        }
     }
 
     // 隐藏所有下拉列表
@@ -106,7 +115,7 @@ export class FlowEditor extends FormCom {
                 attrEditorWrapper = <div className="attr-editor-wrapper" data-attr={attr}>
                     <div className="attr-editor-description">{FlowEditor.ATTR_DESCRIPTION[attr]}:</div>
                     <div className="attr-editor-input">
-                        <input type="text" value={name} disabled={attr in FlowEditor.DROPDOWN_KEYVALUE && 'disabled'}/>
+                        <input type="text" value={name} readonly={attr in FlowEditor.DROPDOWN_KEYVALUE && 'readonly'}/>
                     </div>
                 </div>;
             if(attr in FlowEditor.DROPDOWN_KEYVALUE){
@@ -134,7 +143,7 @@ export class FlowEditor extends FormCom {
         });
     }
 
-    private initEvents = (() => {
+    public initEvents = (() => {
         let clickHandler = (e) => {
             // 点击文字描述也能使input获得焦点,并且记录当前input的值为旧值
             let input;

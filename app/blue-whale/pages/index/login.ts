@@ -71,6 +71,8 @@ export class LoginPage{
         G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({response}) => {
             response = JSON.parse(response);
             sys.window.uploadVersion(response.data.version);
+        }).catch((e) => {
+            console.log(e);
         })
     }
     /*
