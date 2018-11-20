@@ -29,8 +29,8 @@ interface IBW_UI<U>{
         elements: [U, any];
         subButtons: R_Button[];
     }
-    caption: string; // 标题
-    uiType: string;
+    caption?: string; // 标题
+    uiType?: string;
 }
 
 interface IBW_Plan_Table extends IBW_Table{
