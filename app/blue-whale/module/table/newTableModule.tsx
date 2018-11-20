@@ -39,6 +39,7 @@ export class NewTableModule {
     private rowData: obj;
     private tab: Tab;
     private showSubField: string = '';
+    protected subModal: Modal;
 
     get defaultData() {
         return this._defaultData
@@ -94,7 +95,7 @@ export class NewTableModule {
                     tabWrapper = <div className="sub-table-tab-wrapper"/>;
                     d.append(container, tabWrapper);
                 } else {
-                    modal = new Modal({
+                    this.subModal = modal = new Modal({
                         className: 'modal-mbPage sub-table',
                         isBackground: false,
                         height: '60%',
@@ -272,6 +273,10 @@ export class NewTableModule {
         } else {
             this.mobileModal && (this.mobileModal.isShow = false);
         }
+    }
+
+    set subModalShow(flag: boolean){
+        this.subModal && (this.subModal.isShow = flag);
     }
 
     private noLoadSub(mftable, main) {
