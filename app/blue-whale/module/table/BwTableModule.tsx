@@ -1836,7 +1836,11 @@ export class BwTableModule extends Component {
                             let field = btn.data.openType.split('-')[1];
                             switch (field){
                                 case 'look':{
-                                    new FlowDesigner(dataAddr);
+                                    BwRule.Ajax.fetch(dataAddr).then(({response}) => {
+                                        new FlowDesigner(response);
+                                    }).catch(err => {
+                                        console.log(err);
+                                    });
                                 }
                                 break;
                                 case 'design':{

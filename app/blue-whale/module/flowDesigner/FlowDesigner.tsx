@@ -145,7 +145,7 @@ export class FlowDesigner {
     static flowEditor: FlowEditor;
     static rootElement: Element;
 
-    constructor(url?: string) {
+    constructor(responseData?: any) {
         FlowEditor.EXIST_NAME = [];
         let body = <div className="design-canvas" id="design-canvas"/>;
         let modal = new Modal({
@@ -163,7 +163,7 @@ export class FlowDesigner {
             }
         });
         let Tip: Tips;
-        tools.isEmpty(url) && (Tip = new Tips({
+        tools.isEmpty(responseData) && (Tip = new Tips({
             container: body
         }));
 
@@ -180,120 +180,116 @@ export class FlowDesigner {
         this.initEvents.on();
         let _this = this;
 
-        // 如果有url传入，根据url获取xml==>根据xml绘制流程（流程不可修改）
+        // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程（流程不可修改）
         // 如果没有则需要自己绘制流程
-        if (tools.isNotEmpty(url)) {
-            BwRule.Ajax.fetch(url).then(({response}) => {
-                // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
-                FlowDesigner.flowEditor.show = false;
-                modal.modalHeader.title = '查看流程';
-                _this.initEvents.closeSaveFlowEvent();
-                d.remove(d.query('.header-btn-right'));
+        if (tools.isNotEmpty(responseData)) {
+            // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
+            FlowDesigner.flowEditor.show = false;
+            modal.modalHeader.title = '查看流程';
+            _this.initEvents.closeSaveFlowEvent();
+            d.remove(d.query('.header-btn-right'));
 
-                let xmlStr = response.body.bodyList[0].dataList[0].toString(),
-                    rootElement = Method.loadXMLStr(xmlStr).documentElement;
+            let xmlStr = responseData['body'].bodyList[0].dataList[0].toString(),
+                rootElement = Method.loadXMLStr(xmlStr).documentElement;
 
-                // 设置FlowDesigner的属性
-                let fields = Method.getFields(rootElement, 'flow-designer');
-                FlowDesigner.flowEditor.set(fields);
+            // 设置FlowDesigner的属性
+            let fields = Method.getFields(rootElement, 'flow-designer');
+            FlowDesigner.flowEditor.set(fields);
 
-                // 绘制xml中的所有节点
-                rootElement.childNodes.forEach((child) => {
-                    if (child.nodeType === 1) {
-                        let layout = child.attributes.layout.value.split(',').map(item => parseInt(item)),
-                            isComplete: boolean = false,
-                            fields = Method.getFields(child);
+            // 绘制xml中的所有节点
+            rootElement.childNodes.forEach((child) => {
+                if (child.nodeType === 1) {
+                    let layout = child.attributes.layout.value.split(',').map(item => parseInt(item)),
+                        isComplete: boolean = false,
+                        fields = Method.getFields(child);
 
-                        // 存在xml中没有isComplete属性情况
-                        'isComplete' in child.attributes && (
-                            isComplete = child.attributes.isComplete.value === 'true'
-                        );
-                        let shape = new FlowItem({
-                            type: child.tagName,
-                            text: fields['displayName'],
-                            position: {x: layout[0], y: layout[1]},
-                            width: layout[2],
-                            height: layout[3],
-                            isComplete: isComplete,
-                            container: d.query('#design-canvas'),
-                            fields: fields,
-                        });
-
-                        // 设置节点的data-name
-                        shape.wrapper.dataset.name = child.attributes.name.value;
-                        let arr = FlowDesigner.ALLITEMS || [];
-                        FlowDesigner.ALLITEMS = arr.concat([shape]);
-
-                        // 开始节点的內圆也要改变颜色
-                        if(shape.isStart && shape.isComplete){
-                            d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#31ccff';
-                        }
-                    }
-                });
-
-                // 绘制连接线
-                rootElement.childNodes.forEach(child => {
-                    if (child.nodeType === 1) {
-                        let transitions = d.queryAll('transition', child);
-                        transitions.forEach(transition => {
-                            if (tools.isNotEmpty(transition) && tools.isNotEmpty(transition.attributes['to'].value)) {
-                                let start = Method.searchFlowItem(child.attributes.name.value),
-                                    end = Method.searchFlowItem(transition.attributes['to'].value) || null;
-
-                                // xml中最后的节点可能有to属性，但是最后的节点是没有连线的
-                                if (tools.isEmpty(end)) {
-                                    return;
-                                }
-                                let lineItem = new LineItem({
-                                    startNode: start.rectNode,
-                                    endNode: end.rectNode,
-                                    container: d.query('#design-canvas'),
-                                    fields: Method.getFields(transition),
-                                });
-                                lineItem.active = false;
-
-                                let relationsArr = start.relations || [],
-                                    lineItems = start.lineItems || [],
-                                    allLineItems = FlowDesigner.AllLineItems || [];
-                                FlowDesigner.AllLineItems = allLineItems.concat([lineItem]);
-                                start.relations = relationsArr.concat(end);
-                                start.lineItems = lineItems.concat([lineItem]);
-                                FlowDesigner.removeAllActive();
-                            }
-                        })
-                    }
-                });
-
-                // 如果节点已经完成，则对应的连接线的颜色也要改变
-                FlowDesigner.ALLITEMS.filter(item => item.isComplete).forEach(item => {
-                    tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
-                        lineItem.isComplete = true;
+                    // 存在xml中没有isComplete属性情况
+                    'isComplete' in child.attributes && (
+                        isComplete = child.attributes.isComplete.value === 'true'
+                    );
+                    let shape = new FlowItem({
+                        type: child.tagName,
+                        text: fields['displayName'],
+                        position: {x: layout[0], y: layout[1]},
+                        width: layout[2],
+                        height: layout[3],
+                        isComplete: isComplete,
+                        container: d.query('#design-canvas'),
+                        fields: fields,
                     });
-                });
 
-                // FlowDesigner.flowEditor.disabled = true;
-                // 设置节点不可移动但可以点击查看属性
-                FlowDesigner.ALLITEMS.forEach(item => {
-                    item.initEvents.closeDrag();
-                    // item.flowEditor.disabled = true;
-                });
-                // FlowDesigner.AllLineItems.forEach(item => {
-                //     item.flowEditor.disabled = true;
-                // });
+                    // 设置节点的data-name
+                    shape.wrapper.dataset.name = child.attributes.name.value;
+                    let arr = FlowDesigner.ALLITEMS || [];
+                    FlowDesigner.ALLITEMS = arr.concat([shape]);
 
-                // 禁用所有input
-                d.queryAll('input').forEach(input => {
-                    (input as HTMLInputElement).readOnly = true;
-                });
-
-                // 所有的下拉列表都不可用
-                [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS).forEach(item => item.flowEditor.initEvents.off());
-                d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item));
-
-                // FlowDesigner.flowEditor.show = true;
-            }).catch(err => {
-                console.log(err);
+                    // 开始节点的內圆也要改变颜色
+                    if(shape.isStart && shape.isComplete){
+                        d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#31ccff';
+                    }
+                }
             });
+
+            // 绘制连接线
+            rootElement.childNodes.forEach(child => {
+                if (child.nodeType === 1) {
+                    let transitions = d.queryAll('transition', child);
+                    transitions.forEach(transition => {
+                        if (tools.isNotEmpty(transition) && tools.isNotEmpty(transition.attributes['to'].value)) {
+                            let start = Method.searchFlowItem(child.attributes.name.value),
+                                end = Method.searchFlowItem(transition.attributes['to'].value) || null;
+
+                            // xml中最后的节点可能有to属性，但是最后的节点是没有连线的
+                            if (tools.isEmpty(end)) {
+                                return;
+                            }
+                            let lineItem = new LineItem({
+                                startNode: start.rectNode,
+                                endNode: end.rectNode,
+                                container: d.query('#design-canvas'),
+                                fields: Method.getFields(transition),
+                            });
+                            lineItem.active = false;
+
+                            let relationsArr = start.relations || [],
+                                lineItems = start.lineItems || [],
+                                allLineItems = FlowDesigner.AllLineItems || [];
+                            FlowDesigner.AllLineItems = allLineItems.concat([lineItem]);
+                            start.relations = relationsArr.concat(end);
+                            start.lineItems = lineItems.concat([lineItem]);
+                            FlowDesigner.removeAllActive();
+                        }
+                    })
+                }
+            });
+
+            // 如果节点已经完成，则对应的连接线的颜色也要改变
+            FlowDesigner.ALLITEMS.filter(item => item.isComplete).forEach(item => {
+                tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
+                    lineItem.isComplete = true;
+                });
+            });
+
+            // FlowDesigner.flowEditor.disabled = true;
+            // 设置节点不可移动但可以点击查看属性
+            FlowDesigner.ALLITEMS.forEach(item => {
+                item.initEvents.closeDrag();
+                // item.flowEditor.disabled = true;
+            });
+            // FlowDesigner.AllLineItems.forEach(item => {
+            //     item.flowEditor.disabled = true;
+            // });
+
+            // 禁用所有input
+            d.queryAll('input').forEach(input => {
+                (input as HTMLInputElement).readOnly = true;
+            });
+
+            // 所有的下拉列表都不可用
+            [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS).forEach(item => item.flowEditor.initEvents.off());
+            d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item));
+
+            // FlowDesigner.flowEditor.show = true;
         }
     }
 
