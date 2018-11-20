@@ -16,15 +16,15 @@ export class PersonPassword extends BasicPage{
         let body=<div className="pw-content">
             <div className="form-group old-group">
                 <label >旧密码：</label>
-                {input1 = <TextInput placeholder="请输入旧密码" type="password"/>}
+                {input1 = <TextInput custom="旧密码" placeholder="请输入旧密码" type="password"/>}
             </div>
             <div className="form-group new-group">
                 <label>新密码：</label>
-                {input2 = <TextInput placeholder="请输入新密码" type="password"/>}
+                {input2 = <TextInput custom="新密码" placeholder="请输入新密码" type="password"/>}
             </div>
             <div className="form-group confirm-group">
                 <label>确认密码：</label>
-                {input3 = <TextInput placeholder="确认密码" type="password"/>}
+                {input3 = <TextInput custom="确认密码" placeholder="确认密码" type="password"/>}
             </div>
             <div className="btn-group"><div className="btn-confirm change-btn"/></div>
         </div>;
@@ -36,7 +36,7 @@ export class PersonPassword extends BasicPage{
             onClick:() => {
                 for(let input of[input1, input2, input3]){
                     if(!input.get()){
-                        Modal.alert('您有未填写的项目');
+                        Modal.alert(input.custom + '不能为空');
                         return
                     }
                 }
@@ -86,7 +86,7 @@ export class PersonPassword extends BasicPage{
                 'new_password': data['new_password'],
                 'old_password': data['old_password']
             }
-        }).then((response) => {
+        }).then(({response}) => {
             Modal.alert(response.msg);
         });
     }
