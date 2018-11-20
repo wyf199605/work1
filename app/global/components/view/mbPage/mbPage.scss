@@ -1,7 +1,7 @@
 .modal-mbPage{
   width: 100%;
   .modal-body{
-    max-height: none;
+    max-height: none!important;
     height: 100vh;
     > div{
       height: 100%;

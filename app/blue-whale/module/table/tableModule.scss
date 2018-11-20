@@ -5,9 +5,9 @@
     .table-module-sub {
       height: 100% !important;
     }
-    .tab-content{
+    .tab-content {
       height: calc(100% - 42px);
-      .tab-pane{
+      .tab-pane {
         height: 100%;
       }
     }
@@ -53,7 +53,7 @@
     }
   }
   .fast-table-btns {
-    .edit-btns{
+    .edit-btns {
       flex-basis: 300px;
       -webkit-flex-basis: 300px;
       flex-shrink: 0;
@@ -273,71 +273,126 @@
 
   }
 }
-.full-icon{
+
+.full-icon {
   float: right;
   line-height: 42px;
   margin-right: 15px;
   cursor: pointer;
 }
-.fl-pc{
-  .sub-table-full .modal-body{
+
+.fl-pc {
+  .sub-table-full .modal-body {
     max-height: none !important;
   }
 }
+
 // 移动端多子表 tab 样式
-.modal-mbPage.sub-table{
-  .mbPage-body{
+.modal-mbPage {
+  .mbPage-body {
     -webkit-transform: translateZ(0);
     -ms-transform: translateZ(0);
     -o-transform: translateZ(0);
     transform: translateZ(0);
     position: relative;
-    padding-top: 70px !important;
-    .nav-tabs{
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      padding: 0;
-      margin: 0;
-      left: 0;
-      width: auto;
-      background-color: #ffffff;
-      position: fixed;
-      //float: left;
-      //white-space: nowrap;
-      top: 30px;
-      z-index: 1;
-      overflow-x: auto;
-      overflow-y: hidden;
-      min-width: 100%;
-      li{
-        height: 40px;
-        text-align: center;
-        width: auto;
-        padding: 0 15px;
-        line-height: 40px;
-        //border-bottom: 1px solid #e2e2e2;
-        outline: none;
-        flex-shrink: 0;
-        flex-grow: 0;
+    //padding-top: 70px !important;
+    .tab-content {
+      height: calc(100% - 40px);
+      .tab-pane {
+        height: 100%;
       }
-      li.active>a{
+    }
+    //.nav-tabs{
+    //  display: flex;
+    //  justify-content: flex-start;
+    //  align-items: center;
+    //  padding: 0;
+    //  margin: 0;
+    //  left: 0;
+    //  width: auto;
+    //  background-color: #ffffff;
+    //  position: fixed;
+    //  //float: left;
+    //  //white-space: nowrap;
+    //  top: 30px;
+    //  z-index: 1;
+    //  overflow-x: auto;
+    //  overflow-y: hidden;
+    //  min-width: 100%;
+    //  li{
+    //    height: 40px;
+    //    text-align: center;
+    //    width: auto;
+    //    padding: 0 15px;
+    //    line-height: 40px;
+    //    //border-bottom: 1px solid #e2e2e2;
+    //    outline: none;
+    //    flex-shrink: 0;
+    //    flex-grow: 0;
+    //  }
+    //  li.active>a{
+    //    display: inline-block;
+    //    height: 100%;
+    //    border-bottom: 2px solid #005bac;
+    //    color: #007AFF;
+    //    &:hover{
+    //      border: none;
+    //      border-bottom: 2px solid #007AFF;
+    //      color: #007AFF;
+    //    }
+    //  }
+    //}
+    //.nav-tabs>li>a{
+    //  color: #8e8e93;
+    //  border-radius: 0;
+    //  border: none;
+    //}
+  }
+}
+
+.fl-mobile.tablePage {
+  .nav-tabs {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    width: auto;
+    background-color: #ffffff;
+    z-index: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 100%;
+    border-bottom: 1px solid #ccc;
+    & > li {
+      height: 40px;
+      text-align: center;
+      width: auto;
+      padding: 0 15px;
+      line-height: 40px;
+      outline: none;
+      flex-shrink: 0;
+      flex-grow: 0;
+      & > a {
+        color: #8e8e93;
+        border-radius: 0;
+        border: none;
+      }
+      &.active > a {
         display: inline-block;
         height: 100%;
         border-bottom: 2px solid #005bac;
         color: #007AFF;
-        &:hover{
+        &:hover {
           border: none;
           border-bottom: 2px solid #007AFF;
           color: #007AFF;
         }
       }
     }
-    .nav-tabs>li>a{
-      color: #8e8e93;
-      border-radius: 0;
-      border: none;
-    }
+  }
+  .tab-content {
+    padding: 0;
   }
 }
 
