@@ -208,14 +208,6 @@
                 justify-content: space-around;
                 align-items: center;
                 height: 36px;
-                @each $attr, $bottom in $dropdown-attr-list{
-                    // 有下拉列表时禁用input，但不设置opacity
-                    &[data-attr=#{$attr}]{
-                        input[disabled] {
-                            opacity: 1;
-                        }
-                    }
-                }
                 .attr-editor-description{
                     width: 67px;
                     text-align: right;
