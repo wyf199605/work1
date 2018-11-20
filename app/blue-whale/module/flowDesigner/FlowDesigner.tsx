@@ -152,7 +152,7 @@ export class FlowDesigner {
             body: body,
             header: {
                 title: '新增流程',
-                rightPanel: <i className="add-flow icon-jiahao"></i>,
+                rightPanel: <i className="add-flow iconfont icon-jiahao"></i>,
             },
             className: 'flow-modal',
             width: '90%',

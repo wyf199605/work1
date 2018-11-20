@@ -257,6 +257,7 @@ gulp.task('js', function () {
 
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
     gulpTsModule('mbListModule/mbListModule','MbListModule.js');
+    gulpTsModule('mbListModule/mbListView','MbListView.js');
 
     /*page*/
 

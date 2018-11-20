@@ -129,8 +129,19 @@ interface R_Field extends COL {
     isCanSort?: boolean;
     fileInfo?:R_ReqAddr; // 文件信息地址
 }
-interface R_SubTable_Field extends R_Field{
-    subTableAddr?:R_ReqAddr; // 移动端列表页子表地址
+interface R_SubTable_Field{
+    caption : string;//panel 标题，有可能为空
+    fields : R_Field [];//面板中元素列表  input date 下拉等
+    subButtons? : R_Button[];//操作按钮列表
+    defDataAddrList? : R_ReqAddr[];//默认值获取地址列表
+    dataAddr : R_ReqAddr;//获取数据后台地址
+    updatefileData? : R_ReqAddr;
+    subTableAddr?:R_SubTable_Field_UIAddr[]; // 移动端列表页子表地址
+}
+interface R_SubTable_Field_UIAddr{
+    uiAddr?:R_ReqAddr;
+    caption?:string;
+    multPage:number;
 }
 interface winOpen {
     url: string;
