@@ -47,6 +47,9 @@ export class FlowListPC extends BasicPage{
                 onClick: (i) => {
                     let index = i + '';
                     this.currentIndex = index;
+                    for(let item of Object.values(this.subTables)){
+                        item.subModalShow = false;
+                    }
                     if (tools.isEmpty(this.subTables[index])) {
                         // 表格不存在
                         BwRule.Ajax.fetch(this.tableUIUrls[index]).then(({response}) => {
@@ -56,11 +59,12 @@ export class FlowListPC extends BasicPage{
                             this.subTables[index] = new NewTableModule({
                                 bwEl:response.body.elements[0],
                                 container:tabEl
-                            })
+                            });
                         });
                     } else {
                         // 表格存在 刷新并显示
                         this.subTables[index].refresh().catch();
+                        this.subTables[index].subModalShow = true;
                     }
                 }
             });

@@ -120,7 +120,7 @@ export class FlowEditor extends FormCom {
                 </div>;
             if(attr in FlowEditor.DROPDOWN_KEYVALUE){
                 // 添加下拉按钮
-                d.append(d.query('.attr-editor-input', attrEditorWrapper), <i className="floweditor-dropdown icon-arrow-down"></i>);
+                d.append(d.query('.attr-editor-input', attrEditorWrapper), <i className="floweditor-dropdown appcommon app-xiala"></i>);
                 let dropdownWrapper = <div className="dropdown-wrapper" data-attr={attr}>
                     {/*<div className="dropdown-title"></div>*/}
                 </div>;
