@@ -129,7 +129,9 @@ interface R_Field extends COL {
     isCanSort?: boolean;
     fileInfo?:R_ReqAddr; // 文件信息地址
 }
-
+interface R_SubTable_Field extends R_Field{
+    subTableAddr?:R_ReqAddr; // 移动端列表页子表地址
+}
 interface winOpen {
     url: string;
     gps?: boolean;

@@ -108,10 +108,21 @@ export class HorizontalQueryModule extends Component {
                             fun: (url, val, callback) => {
                                 let querydata: obj = {}, forms = this.forms || {};
                                 if(c.dynamic === 1){
+                                    let params = [];
                                     for (let key in forms) {
                                         if (tools.isNotEmpty(forms[key])){
-                                            querydata[key] = forms[key].get();
+                                            let paramObj:obj = {};
+                                            paramObj["not"] = false;
+                                            paramObj["op"] = 0;
+                                            paramObj["field"] = key;
+                                            paramObj["values"] = forms[key].get();
+                                            params.push(paramObj);
                                         }
+                                    }
+                                    querydata["queryparams0"] = {
+                                        "not":false,
+                                        "op":0,
+                                        "params":params
                                     }
                                 }
                                 this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name,querydata).then((result) => {
