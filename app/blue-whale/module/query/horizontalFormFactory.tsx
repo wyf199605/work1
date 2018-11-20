@@ -10,27 +10,28 @@ import {Datetime} from "../../../global/components/form/datetime/datetime";
 import {NumInput} from "../../../global/components/form/numInput/numInput";
 import {TextInput} from "../../../global/components/form/text/text";
 import {BwRule} from "../../common/rule/BwRule";
-import {BasicBoxGroup} from "../../../global/components/form/selectBoxGroup/selectBoxGroup";
 import {Button} from "../../../global/components/general/button/Button";
 
 export interface IHorizontalQueryModule extends IComponentPara {
     qm: IBw_Query;
     search?: (data) => any;
 }
+
 export class HorizontalQueryModule extends Component {
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
         return <div className="horizontalQueryModule"/>;
     }
 
-    protected forms: FormCom[];
+    protected forms: objOf<FormCom> = {};
     protected defaultData: obj;
-    private _extraWrapper:HTMLElement;
-    get extraWrapper(){
-        if (!this._extraWrapper){
+    private _extraWrapper: HTMLElement;
+    get extraWrapper() {
+        if (!this._extraWrapper) {
             this._extraWrapper = <div className="extra-wrapper"/>;
         }
         return this._extraWrapper;
     }
+
     protected _search: (data) => any;
     set search(flag) {
         this._search = flag;
@@ -45,15 +46,15 @@ export class HorizontalQueryModule extends Component {
         this.defaultData = this.getDefaultData(para.qm.queryparams1);
         this.search = para.search;
         this.__initForms(para);
-        if (this.forms.length > 0 && (para.qm.queryType == 1 || para.qm.queryType == 3)) {
-            d.append(d.query('.query-form',this.wrapper), <div className="form-com-item">
+        if (tools.isNotEmpty(this.forms) && (para.qm.queryType == 1 || para.qm.queryType == 3)) {
+            d.append(d.query('.query-form', this.wrapper), <div className="form-com-item">
                 <Button className="query-search-btn" content="查询" onClick={() => {
                     typeof this.search === 'function' && this.search(this.json);
                 }}/>
             </div>);
         }
         // 自定义内容
-        d.append(d.query('.query-form',this.wrapper),this.extraWrapper);
+        d.append(d.query('.query-form', this.wrapper), this.extraWrapper);
     }
 
     // 获取默认数据
@@ -68,8 +69,7 @@ export class HorizontalQueryModule extends Component {
     // 初始化FormCom控件
     private __initForms(para: IHorizontalQueryModule) {
         let cond: QueryConf[] = para.qm.queryparams1 || [];
-        this.forms = [];
-        tools.isNotEmpty(this.wrapper) && d.append(this.wrapper,<div className="query-form">
+        tools.isNotEmpty(this.wrapper) && d.append(this.wrapper, <div className="query-form">
             {cond.map(c => {
                 let extra: obj = {};
                 if (para.qm.queryType == 2 || para.qm.queryType == 4) {
@@ -106,7 +106,26 @@ export class HorizontalQueryModule extends Component {
                                                return {text: data.title, value: data.value};
                                            })} ajax={tools.isEmpty(c.link) ? void 0 : {
                             fun: (url, val, callback) => {
-                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                let querydata: obj = {}, forms = this.forms || {};
+                                if(c.dynamic === 1){
+                                    let params = [];
+                                    for (let key in forms) {
+                                        if (tools.isNotEmpty(forms[key].get()) && c.field_name !== key){
+                                            let paramObj:obj = {};
+                                            paramObj["not"] = false;
+                                            paramObj["op"] = 0;
+                                            paramObj["field"] = key;
+                                            paramObj["values"] = forms[key].get();
+                                            params.push(paramObj);
+                                        }
+                                    }
+                                    querydata = {
+                                        "not":false,
+                                        "op":0,
+                                        "params":params
+                                    }
+                                }
+                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name,querydata).then((result) => {
                                     typeof callback === 'function' && callback(result);
                                 })
                             }
@@ -155,8 +174,7 @@ export class HorizontalQueryModule extends Component {
                     tools.isNotEmpty(this.defaultData[fieldName])
                     && com.set(this.defaultData[fieldName]);
                 }
-
-                this.forms.push(com);
+                this.forms[c.field_name] = com;
                 return props.showFlag ? <div className={"form-com-item"}>
                     <div className="form-com-title">{c.caption + '：'}</div>
                     {com}
@@ -167,8 +185,8 @@ export class HorizontalQueryModule extends Component {
 
     // 获取数据
     get json() {
-        let json: obj = {},str = [];
-        this.forms.forEach(form => {
+        let json: obj = {}, str = [];
+        Object.values(this.forms).forEach(form => {
             let cond: QueryConf = form.custom,
                 value = form.value;
             json[cond.field_name] = value;
@@ -189,12 +207,15 @@ export class HorizontalQueryModule extends Component {
         return json;
     }
 
-    private getDropDownData(url: string, fieldName: string): Promise<Array<{ title: string, value: string }[] | string[]>> {
+    private getDropDownData(url: string, fieldName: string,querydata?:obj): Promise<Array<{ title: string, value: string }[] | string[]>> {
         return new Promise<any>((resolve, reject) => {
             if (tools.isEmpty(url)) {
                 reject();
             } else {
-                BwRule.Ajax.fetch(url).then(({response}) => {
+                let ajaxUrl = tools.isNotEmpty(querydata) ? tools.url.addObj(url,{
+                    "queryparams0":JSON.stringify(querydata)
+                }) : url;
+                BwRule.Ajax.fetch(ajaxUrl).then(({response}) => {
                     let fields = [];
                     if (response.data[0]) {
                         fields = Object.keys(response.data[0]);
@@ -223,7 +244,7 @@ export class HorizontalQueryModule extends Component {
     }
 
     destroy() {
-        this.forms && this.forms.forEach((form) => {
+        this.forms && Object.values(this.forms).forEach((form) => {
             form.destroy();
         });
         this.forms = null;
