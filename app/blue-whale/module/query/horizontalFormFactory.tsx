@@ -107,25 +107,28 @@ export class HorizontalQueryModule extends Component {
                                            })} ajax={tools.isEmpty(c.link) ? void 0 : {
                             fun: (url, val, callback) => {
                                 let querydata: obj = {}, forms = this.forms || {};
-                                if(c.dynamic === 1){
+                                if (c.dynamic === 1) {
                                     let params = [];
                                     for (let key in forms) {
-                                        if (tools.isNotEmpty(forms[key].get()) && c.field_name !== key){
-                                            let paramObj:obj = {};
-                                            paramObj["not"] = false;
-                                            paramObj["op"] = 0;
-                                            paramObj["field"] = key;
-                                            paramObj["values"] = [forms[key].get()];
+                                        if (tools.isNotEmpty(forms[key].get()) && c.field_name !== key) {
+                                            let paramObj: QueryParam = {
+                                                not: false,
+                                                op: 2,
+                                                field: key,
+                                                values: [forms[key].get()],
+                                            };
                                             params.push(paramObj);
                                         }
                                     }
-                                    querydata = {
-                                        "not":false,
-                                        "op":0,
-                                        "params":params
+                                    if(tools.isNotEmpty(params[0])){
+                                        querydata = {
+                                            not: false,
+                                            op: 0,
+                                            params: params
+                                        }
                                     }
                                 }
-                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name,querydata).then((result) => {
+                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name, querydata).then((result) => {
                                     typeof callback === 'function' && callback(result);
                                 })
                             }
@@ -207,15 +210,20 @@ export class HorizontalQueryModule extends Component {
         return json;
     }
 
-    private getDropDownData(url: string, fieldName: string,querydata?:obj): Promise<Array<{ title: string, value: string }[] | string[]>> {
+    private getDropDownData(url: string, fieldName: string, querydata?: obj): Promise<Array<{ title: string, value: string }[] | string[]>> {
         return new Promise<any>((resolve, reject) => {
             if (tools.isEmpty(url)) {
                 reject();
             } else {
-                let ajaxUrl = tools.isNotEmpty(querydata) ? tools.url.addObj(url,{
-                    "queryparams0":JSON.stringify(querydata)
-                }) : url;
-                BwRule.Ajax.fetch(ajaxUrl).then(({response}) => {
+                let ajaxData = {};
+                if (tools.isNotEmpty(querydata)){
+                    ajaxData = {
+                        "queryparams0": JSON.stringify(querydata)
+                    };
+                }
+                BwRule.Ajax.fetch(url,{
+                    data:ajaxData
+                }).then(({response}) => {
                     let fields = [];
                     if (response.data[0]) {
                         fields = Object.keys(response.data[0]);
