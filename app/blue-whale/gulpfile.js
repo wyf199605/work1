@@ -327,6 +327,7 @@ gulp.task('js', function () {
     gulpTsPage('plan/PlanPage', 'PlanPage.js');
     gulpTsPage('permissionTree/permissionTreePage', 'permissionTree.js');
     gulpTsPage('mbList/mbList', 'BwMbList.js');
+    gulpTsPage('mbList/mbTabList', 'BwMbTabList.js');
 });
 
 /**
