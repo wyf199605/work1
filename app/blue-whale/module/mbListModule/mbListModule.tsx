@@ -7,9 +7,9 @@ import {BwRule} from "../../common/rule/BwRule";
 import {MbListItemData} from "../../../global/components/mbList/MbListItem";
 import tools = G.tools;
 import d = G.d;
+import sys = BW.sys;
 export interface IMbListModule extends IComponentPara{
     ui: IBW_UI<IBW_Table>;
-    ajaxData?: obj;
 }
 
 export class MbListModule extends Component{
@@ -87,8 +87,11 @@ export class MbListModule extends Component{
                 console.log(data);
             },
             itemClick: (index) => {
-                let data = this.defaultData[index];
-                console.log(data);
+                let data = this.defaultData[index],
+                    url = BW.CONF.siteUrl + BwRule.reqAddr(this.para.ui.body.elements[0].subTableAddr,data);
+                sys.window.open({
+                    url:url
+                })
             },
             multiClick:(btnIndex, itemsIndexes) => {
                 let buttons = this.allButtons[1] || [],
@@ -124,7 +127,7 @@ export class MbListModule extends Component{
                         })
                     })
                 },
-                ajaxData: this.para.ajaxData || {}
+                ajaxData: null
             }
         })
     }

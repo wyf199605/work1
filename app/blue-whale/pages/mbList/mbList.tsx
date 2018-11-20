@@ -4,10 +4,10 @@ import BasicPage from "../basicPage";
 import {MbListModule} from "../../module/mbListModule/mbListModule";
 import tools = G.tools;
 import d = G.d;
+import {MbListView} from "../../module/mbListModule/mbListView";
 
 export interface IBwMbList extends IComponentPara {
     ui: IBW_UI<IBW_Table> | IBW_UI<R_SubTable_Field>;
-    ajaxData?: obj;
     dom: HTMLElement;
 }
 
@@ -22,14 +22,18 @@ export class BwMbList extends BasicPage {
                     let container = tools.isMb ? d.query('.mb-list-page', para.dom) : para.dom;
                     new MbListModule({
                         ui: ui,
-                        ajaxData: para.ajaxData,
                         container: container
                     })
                 }
             }
                 break;
             case 'view': {
-
+                let ui = para.ui as IBW_UI<R_SubTable_Field>,
+                    container = tools.isMb ? d.query('.mb-list-page', para.dom) : para.dom;
+                new MbListView({
+                    ui: ui,
+                    container: container
+                })
             }
                 break;
         }
