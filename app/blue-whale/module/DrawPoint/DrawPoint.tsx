@@ -114,7 +114,7 @@ export class DrawPoint extends Component {
     }
 
     public InitSvg(para) {
-        this.svg = D3.select('.draw-point-wrapper').append('svg')
+        this.svg = D3.select(this.wrapper).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
             .on('mousedown', (e) => {
