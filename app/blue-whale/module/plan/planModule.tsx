@@ -166,33 +166,29 @@ export class PlanModule extends Component{
         });
 
     }
-    protected _isEdit = true;
-    get isEdit(){
-        return this._isEdit;
-    }
-    set isEdit(isEdit:boolean){
-        this._isEdit = isEdit;
-        this.plotBtn.disabled = !isEdit;
-    }
-    protected setBackground(obj: obj){
-        let backGround = this.ui.backGround;
-        if(backGround){
-            let img = new Image();
-            img.src = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
-            img.onload = ()=>{
-                this.draw.imgUrl = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
-                this.isEdit = true;
-            }
-            img.onerror = () => {
-                Modal.alert('图层不存在');
-                this.isEdit = false;
-                this.draw.imgUrl = null;
-            }
 
-        }else {
-            Modal.alert('图层不存在');
-            this.plotBtn.disabled = true;
-        }
+    protected setBackground(obj: obj): Promise<any>{
+        return new Promise((resolve, reject) => {
+            let backGround = this.ui.backGround;
+            if(backGround){
+                let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+                url = url && tools.url.addObj(url, {version: new Date().getTime() + ''});
+
+                let img = new Image();
+                img.src = url;
+                img.onload = ()=>{
+                    this.draw.imgUrl = url;
+                    resolve();
+                };
+                img.onerror = () => {
+                    reject();
+                }
+
+            }else {
+                reject();
+            }
+        });
+
     }
 
     protected _ajaxData;
@@ -203,44 +199,49 @@ export class PlanModule extends Component{
         this._ajaxData = ajaxData;
         let ui = this.ui,
             url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
-        this.setBackground(ajaxData);
+        this.setBackground(ajaxData).then(() => {
+            let loading = new Loading({
+                msg: '数据加载中...'
+            });
+            loading.show();
+            let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
+            this.ajax.fetch(tools.url.addObj(url, data), {
+                needGps: ui.dataAddr.needGps,
+                timeout: 30000,
+            }).then(({response}) => {
+                console.log(response);
+                let data = response.data;
+                if (data && ui.tableAddr && ui.tableAddr.param) {
+                    let editParam = ui.tableAddr.param[0];
+                    if (editParam) {
+                        let varList = [];
+                        ['insert', 'update', 'delete'].forEach(type => {
+                            let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                                typeVarList = editParam[type];
 
-        let loading = new Loading({
-            msg: '数据加载中...'
-        });
-        loading.show();
-        let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
-        this.ajax.fetch(tools.url.addObj(url, data), {
-            needGps: ui.dataAddr.needGps,
-            timeout: 30000,
-        }).then(({response}) => {
-            console.log(response);
-            let data = response.data;
-            if (data && ui.tableAddr && ui.tableAddr.param) {
-                let editParam = ui.tableAddr.param[0];
-                if (editParam) {
-                    let varList = [];
-                    ['insert', 'update', 'delete'].forEach(type => {
-                        let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
-                            typeVarList = editParam[type];
-
-                        if (canOld && Array.isArray(typeVarList)) {
-                            varList = varList.concat(typeVarList)
-                        }
-                    });
-                    // 加上OLD变量
-                    BwRule.addOldField(BwRule.getOldField(varList), data);
+                            if (canOld && Array.isArray(typeVarList)) {
+                                varList = varList.concat(typeVarList)
+                            }
+                        });
+                        // 加上OLD变量
+                        BwRule.addOldField(BwRule.getOldField(varList), data);
+                    }
                 }
-            }
-            console.log(data);
-            this.isEdit && (this.plotBtn.disabled = false);
-            this.draw.render(data);
-        }).catch(e => {
-            console.log(e);
-        }).finally(() => {
-            loading && loading.hide();
-            loading = null;
-        })
+                console.log(data);
+                this.plotBtn.disabled = false;
+                this.draw.render(data);
+            }).catch(e => {
+                console.log(e);
+            }).finally(() => {
+                loading && loading.hide();
+                loading = null;
+            })
+        }).catch(() => {
+            Modal.alert('图层不存在');
+            this.plotBtn.disabled = true;
+        });
+
+
     }
 
     format(field: R_Field, cellData: any, rowData: obj): IDrawFormatData{

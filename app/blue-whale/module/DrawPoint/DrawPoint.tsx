@@ -134,10 +134,9 @@ export class DrawPoint extends Component {
     }
 
     set imgUrl(url) {
-
         this.g.select('image').attr('href',
             ()=>{
-                return url && tools.url.addObj(url, {version: new Date().getTime() + ''})
+                return url
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
     }
