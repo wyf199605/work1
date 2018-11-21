@@ -526,7 +526,8 @@ export class DrawPoint extends Component {
 
     //绘图
     private redraw() {
-        let svg = D3.select('svg').select('.g-wrapper');
+        //let svg = D3.select('svg').select('.g-wrapper');
+        let svg = this.g;
         svg.selectAll('g').select('#path' + this.index)
             .attr("d", (d, i) => {
                 return this.line(this.map.get(this.index))
