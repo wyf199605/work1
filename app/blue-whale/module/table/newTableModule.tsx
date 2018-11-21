@@ -39,6 +39,7 @@ export class NewTableModule {
     private rowData: obj;
     private tab: Tab;
     private showSubField: string = '';
+    protected subModal: Modal;
 
     get defaultData() {
         return this._defaultData
@@ -94,7 +95,7 @@ export class NewTableModule {
                     tabWrapper = <div className="sub-table-tab-wrapper"/>;
                     d.append(container, tabWrapper);
                 } else {
-                    modal = new Modal({
+                    this.subModal = modal = new Modal({
                         className: 'modal-mbPage sub-table',
                         isBackground: false,
                         height: '60%',
@@ -170,7 +171,7 @@ export class NewTableModule {
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     this.sub[index].refresh(ajaxData).catch();
-                                    this.sub[index].linkedDate = selectedData;
+                                    this.sub[index].linkedData = selectedData;
                                 }
                             }
                         });
@@ -274,6 +275,10 @@ export class NewTableModule {
         }
     }
 
+    set subModalShow(flag: boolean){
+        this.subModal && (this.subModal.isShow = flag);
+    }
+
     private noLoadSub(mftable, main) {
         let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
             ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
@@ -308,7 +313,7 @@ export class NewTableModule {
         this.mobileModal && (this.mobileModal.isShow = true);
         Object.values(this.sub).forEach((subTable) => {
             subTable.refresh(ajaxData).catch();
-            subTable.linkedDate = selectedData;
+            subTable.linkedData = selectedData;
         });
 
     }
@@ -325,7 +330,7 @@ export class NewTableModule {
             tableModule: this,
             container: tabEl
         });
-        this.sub[this.subTabActiveIndex].linkedDate = rowData;
+        this.sub[this.subTabActiveIndex].linkedData = rowData;
         this.sub[this.subTabActiveIndex].ftable.btnShow = this.subBtnShow;
     }
 

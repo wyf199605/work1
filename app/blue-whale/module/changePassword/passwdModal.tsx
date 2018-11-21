@@ -94,6 +94,8 @@ export class PasswdModal{
             header: '修改密码',
             className: 'passwd-modal',
             width: '270px',
+            isMb: false,
+            top: tools.isMb ? 80 : void 0,
             body,
             isOnceDestroy: true,
             footer: {

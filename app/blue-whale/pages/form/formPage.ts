@@ -123,7 +123,8 @@ export = class FormPage extends BasicPage {
                 let com = this.editModule.getDom(name);
                 com && (com.disabled = true);
                 if(tools.isMb){
-                    com.wrapper.addEventListener('click', () => {
+                    let wrapper = com.wrapper || com.container;
+                    wrapper && wrapper.addEventListener('click', () => {
                         Modal.toast(field.caption + '不可以修改～');
                     });
                 }

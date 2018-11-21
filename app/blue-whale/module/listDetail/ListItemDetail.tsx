@@ -19,7 +19,6 @@ export class ListItemDetail {
     public totalNumber: number = 0;
     private ajaxUrl: string = '';
     private actionSheet: ActionSheet;
-    private isFirst: boolean = true;
 
     constructor(private para: EditPagePara) {
         let wrapper = <div className="list-item-detail-wrapper"/>,
