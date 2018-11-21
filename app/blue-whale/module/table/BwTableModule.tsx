@@ -23,6 +23,7 @@ import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Inputs} from "../inputs/inputs";
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 import {PasswdModal} from "../changePassword/passwdModal";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -1859,6 +1860,17 @@ export class BwTableModule extends Component {
                             //     Modal.alert('请选最多一条数据');
                             //     return;
                             // }
+                            btn && (btn.isDisabled = true);
+                            let spinner = new Spinner({
+                                el: btn.wrapper,
+                                type: Spinner.SHOW_TYPE.replace,
+                                time: 10000,
+                                onTimeout: () => {
+                                    btn && (btn.isDisabled = false);
+                                    Modal.toast('当前网络不佳～');
+                                }
+                            });
+                            spinner.show();
                             let btnUi = btn.data as R_Button,
                                 {multiselect, selectionFlag} = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?
@@ -1893,6 +1905,8 @@ export class BwTableModule extends Component {
                                     if (tools.isNotEmpty(locData)) {
                                         clearInterval(interval);
                                         ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                            btn && (btn.isDisabled = false);
+                                            spinner && spinner.hide();
                                         }, this.pageUrl, this.ui.itemId);
                                     }
                                 }, 50);
@@ -1901,6 +1915,8 @@ export class BwTableModule extends Component {
                                 window.localStorage.removeItem('nextKeyField');
                                 window.localStorage.removeItem('currentKeyField');
                                 ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                    btn && (btn.isDisabled = false);
+                                    spinner && spinner.hide();
                                 }, this.pageUrl, this.ui.itemId);
                             }
                         }

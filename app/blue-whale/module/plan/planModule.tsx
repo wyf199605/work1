@@ -182,10 +182,12 @@ export class PlanModule extends Component{
                 };
                 img.onerror = () => {
                     reject();
+                    this.draw.imgUrl = null;
                 }
 
             }else {
                 reject();
+                this.draw.imgUrl = null;
             }
         });
 
@@ -199,11 +201,11 @@ export class PlanModule extends Component{
         this._ajaxData = ajaxData;
         let ui = this.ui,
             url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
+        let loading = new Loading({
+            msg: '数据加载中...'
+        });
+        loading.show();
         this.setBackground(ajaxData).then(() => {
-            let loading = new Loading({
-                msg: '数据加载中...'
-            });
-            loading.show();
             let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
             this.ajax.fetch(tools.url.addObj(url, data), {
                 needGps: ui.dataAddr.needGps,
@@ -239,6 +241,8 @@ export class PlanModule extends Component{
         }).catch(() => {
             Modal.alert('图层不存在');
             this.plotBtn.disabled = true;
+            loading && loading.hide();
+            loading = null;
         });
 
 
