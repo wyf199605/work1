@@ -606,9 +606,10 @@ export class BwTableModule extends Component {
             return;
         }
         let link = field.link;
+
         if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
             BwRule.link({
-                link: link.dataAddr,
+                link: tools.str.parseTpl(link.dataAddr, rowData, true, true),
                 varList: link.varList,
                 dataType: field.atrrs.dataType,
                 data: rowData,

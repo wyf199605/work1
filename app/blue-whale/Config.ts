@@ -42,7 +42,9 @@ namespace BW {
             myApplicationPC: `ui/menu/n3008_data-3008?p_n=n3008_data-3008&page=myApplication`,
             myApproval: `commonui/pageroute?page=myApproval`,
             myApprovalPC: `ui/menu/n3009_data-3009?p_n=n3009_data-3009&page=myApplication`,
-            flowDetail: `commonui/pageroute?page=flowDetail`
+            flowDetail: `commonui/pageroute?page=flowDetail`,
+
+            msgList : 'newPage/MsgListPage',
         },
         ajaxUrl: {
             getVersion: 'rest/version/fastlion', // 获取版本号

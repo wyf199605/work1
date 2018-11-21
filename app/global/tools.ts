@@ -246,13 +246,14 @@ namespace G {
              * @param tpl
              * @param data
              * @param isEncode
+             * @param isOne 为true时解析{xx}对应的data
              * @return {string}
              */
-            parseTpl: function (tpl: string, data: obj, isEncode = true) {
-                let parseReg = /\{\{\S+?}}/g,
+            parseTpl: function (tpl: string, data: obj, isEncode = true, isOne = false) {
+                let parseReg = isOne ?/\{\S+?}/g : /\{\{\S+?}}/g,
                     self = this;
                 return tpl.replace(parseReg, function (param) {
-                    param = param.slice(2, -2);
+                    param = isOne ? param.slice(1, -1) : param.slice(2, -2);
 
                     let [key, param1] = param.split(','),
                         isEn = param1 ? param1 === '1' : isEncode,

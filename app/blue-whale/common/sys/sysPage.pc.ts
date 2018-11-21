@@ -60,11 +60,26 @@ namespace BW{
 
             // 打开内网
             if(o.url.indexOf(location.hostname) > -1) {
-                Ajax.fetch(o.url, {data: o.data}).then(({response}) => {
-                    d.setHTML(page, response);
+                let start = o.url.indexOf('newPage');
+                if(start > -1){ // 非btl页面
+                    let name = o.url.substr(start + 8, o.url.length);
+                    require([name], function (e) {
+                        // let container = d.create('<div id = "${name}"></div>');
+                        // d.append(page, container);
+                        new e[name]({
+                            dom : page
+                        })
+                    });
                     callback(page);
                     typeof o.callback === 'function' && o.callback();
-                });
+                }else {
+                    Ajax.fetch(o.url, {data: o.data}).then(({response}) => {
+                        d.setHTML(page, response);
+                        callback(page);
+                        typeof o.callback === 'function' && o.callback();
+                    });
+                }
+
             }else{
                 // 外网url, 创建iframe
                 let iframe = <HTMLIFrameElement>d.create(`<iframe width="100%" src="${o.url}"></iframe>`);

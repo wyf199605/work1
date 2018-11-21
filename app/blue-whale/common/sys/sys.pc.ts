@@ -130,10 +130,15 @@ namespace BW {
             return {
                 open: function (o: winOpen, refer?: string) {
                     if (self.inMain) {
-
                         let isNew = self.pages.open(o);
-                        self.tabs.open(o.url);
-                        sysPcHistory.add({url: o.url, refer, title:''});
+                        if(o.url.indexOf('newPage') > -1){ // 不走btl模板的页面
+                            let title = o.title;
+                            self.tabs.open(o.url, title);
+                            sysPcHistory.add({url: o.url, refer, title: title});
+                        }else {
+                            self.tabs.open(o.url);
+                            sysPcHistory.add({url: o.url, refer, title: ''});
+                        }
                         if (!isNew) {
 
                             self.window.fire('wake', self.pages.get(o.url).dom, o.url);

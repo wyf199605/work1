@@ -16,9 +16,9 @@ namespace BW{
             this.menuEventInit();
         }
 
-        open(url:string){
+        open(url:string, title?: string){
             if(!this.tabs[url]) {
-                this.createNewTab(url, undefined);
+                this.createNewTab(url, title);
             }
             this.activeTab(url);
         }
