@@ -31,6 +31,7 @@ export interface IBwTableModulePara extends IComponentPara {
     isSub?: boolean;
     ajaxData?: obj;
     editParam?: IBW_TableAddrParam;
+    btnShow?: boolean
 }
 
 interface IEditImgModuleUploadHandler {
@@ -62,7 +63,7 @@ export class BwTableModule extends Component {
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
         super(para);
-
+        this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
@@ -108,6 +109,15 @@ export class BwTableModule extends Component {
             // 正常表格
             this.ftableInit(para.ajaxData);
         }
+    }
+
+    protected _btnShow: boolean = true;
+    get btnShow(){
+        return this._btnShow;
+    }
+    set btnShow(flag: boolean){
+        this._btnShow = flag;
+        this.ftable && (this.ftable.btnShow = flag);
     }
 
     private get baseFtablePara(): IFastBtnTablePara {
@@ -286,7 +296,7 @@ export class BwTableModule extends Component {
                 }
             })
         );
-
+        this.ftable.btnShow = this.btnShow;
 
         !this.isDrill && this.ftable.btnAdd('filter', {
             type: 'default',
@@ -511,6 +521,7 @@ export class BwTableModule extends Component {
                     data: response.data
                 })
             );
+            this.ftable.btnShow = this.btnShow;
             this.ftableReady();
         });
     }

@@ -184,7 +184,7 @@ export class NewTableModule {
                                 i.classList.toggle('icon-arrow-down');
                                 this.subBtnShow = i.classList.contains('icon-arrow-up');
                                 for(let sub of Object.values(this.sub)){
-                                    sub && (sub.ftable.btnShow = this.subBtnShow);
+                                    sub && (sub.btnShow = this.subBtnShow);
                                 }
                             });
                         }
@@ -217,8 +217,8 @@ export class NewTableModule {
                                     let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
 
                                     let sub = this.sub[this.subTabActiveIndex],
-                                        isShow = sub ? sub.ftable.btnShow : true;
-                                    sub && (sub.ftable.btnShow = true);
+                                        isShow = sub ? sub.btnShow : true;
+                                    sub && (sub.btnShow = true);
 
                                     new Modal({
                                         body: tabEl,
@@ -227,7 +227,7 @@ export class NewTableModule {
                                             title: '子表全屏'
                                         },
                                         onClose: () => {
-                                            sub && (sub.ftable.btnShow = isShow);
+                                            sub && (sub.btnShow = isShow);
                                             this.sub[this.subTabActiveIndex].ftable.removeAllModal();
                                             d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
                                             this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
@@ -328,10 +328,10 @@ export class NewTableModule {
             ajaxData,
             isSub: true,
             tableModule: this,
-            container: tabEl
+            container: tabEl,
+            btnShow: this.subBtnShow
         });
         this.sub[this.subTabActiveIndex].linkedData = rowData;
-        this.sub[this.subTabActiveIndex].ftable.btnShow = this.subBtnShow;
     }
 
     protected draggedEvent = (() => {
