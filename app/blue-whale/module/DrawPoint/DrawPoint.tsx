@@ -574,8 +574,8 @@ export class DrawPoint extends Component {
         }
         this.editEvent.off();
         //！！每一次创建都会开辟一个新得path
-        var svg = D3.select('svg').select('.g-wrapper')
-        let group = svg.append('g').attr('class',function (d) {
+        //var svg = D3.select('svg').select('.g-wrapper')
+        let group = this.g.append('g').attr('class',function (d) {
             return 'insert'
         });
 
@@ -849,7 +849,8 @@ export class DrawPoint extends Component {
                                     self.isDrawLine = true;
                                 }
                                 self.g.attr('cursor','defalut')
-                                D3.select('svg').on('.zoom',null)
+                                //D3.select('svg').on('.zoom',null)
+                                this.svg.on('.zoom',null)
                             }
                         }
                     })
@@ -938,7 +939,7 @@ export class DrawPoint extends Component {
             .y(Y)
             .scaleExtent([1, 10])
             .on('zoomstart', function () {
-                D3.select("svg").on("dblclick.zoom", null);
+               _this.svg.on("dblclick.zoom", null);
             })
             .on('zoom', function (d) {
                 if(D3.event.scale > 6) {
@@ -953,7 +954,7 @@ export class DrawPoint extends Component {
                 }
                        console.log(D3.event.scale);
                 let s = D3.select('svg').select('.g-wrapper');
-                       D3.select('svg').select('.g-wrapper').attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
+                  _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
             }).on("zoomend", function (d) {
                 console.log("结束")
