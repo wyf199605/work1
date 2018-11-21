@@ -1863,8 +1863,10 @@ export class BwTableModule extends Component {
                                 {multiselect, selectionFlag} = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
-                            let select = Object.assign({}, this.linkedDate || {},
-                                (multiselect === 1 ? selectedData[0] : selectedData) || {});
+                            let linkedData = this.linkedData || {};
+                            let select = multiselect === 1
+                                ? Object.assign({}, linkedData, selectedData[0])
+                                : selectedData.map((o) => Object.assign({}, linkedData, o));
                             let tData = ftable.tableData.data;
 
                             if (btnUi.haveRoll) {
@@ -1947,7 +1949,7 @@ export class BwTableModule extends Component {
     })();
 
     // 按钮关联数据，每次按钮请求时需附带的参数
-    public linkedDate = {};
+    public linkedData = {};
 
     destroy() {
         super.destroy();
