@@ -268,10 +268,7 @@ export class DrawPoint extends Component {
                                 point = data.data;
                                 this.map.set(index, data.data)
                                 return that.line(data.data)
-                            }).on('mouseleave',function (d) {
-                            //let s = D3.select(this).node().getComputedTextLength();
-                            that.tooltip.style('display','none');
-                        })
+                            })
                         // 判断是否是编辑状态
                         //显示边框 以及 背景颜色
                         if(this.isShowStatus){
@@ -324,15 +321,18 @@ export class DrawPoint extends Component {
                             }
 
                             return font + "px"
-                        }).on('mouseenter',function (d) {
+                        }).on('mouseover',function (d) {
                             let str = '';
                             for(let i = 0; i < toolData.length; i++){
                                   str += (toolData[i] + "<br/>");
                             }
                             that.tooltip.html(str)
-                                .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
-                                .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
+                                .style('left',(D3.mouse(that.svg.node())[0]) + 12 + 'px')
+                                .style('top',(D3.mouse(that.svg.node())[1]) + 12 + 'px')
                                 .style('display','block')
+                        }).on('mouseout',function (d) {
+                            //let s = D3.select(this).node().getComputedTextLength();
+                            that.tooltip.style('display','none');
                         })
                         .style("pointer-events",()=>{
                             if(this.isDrawLine){
@@ -369,8 +369,13 @@ export class DrawPoint extends Component {
                 lineNumber = 0,
                 lineHeight = text.node().getBoundingClientRect().height,
                 x = +text.attr('x'),
-                y = +text.attr('y'),
-                  tspan = text.text(null).append('tspan').attr('dy',5.3).attr('dx',5).attr('x',centerX - 5.3).attr('y',centerY - 5.3);
+                y = +text.attr('y');
+            if(lineHeight >= 18){
+                lineHeight = 15
+            }else {
+                lineHeight = 5.3
+            }
+                let  tspan = text.text(null).append('tspan').attr('dy',lineHeight).attr('dx',5).attr('x',centerX - 5.3).attr('y',centerY - 5.3);
             while (word = words.pop()) {
                 line.push(word);
                 const dash = lineNumber > 0 ? '-' : '';
@@ -379,7 +384,7 @@ export class DrawPoint extends Component {
                     line.pop();
                     tspan.text(line.join(''));
                     line = [word];
-                    tspan = text.append('tspan').attr('dy',5.3).attr('dx',5).attr('x',centerX - 5.3).text(word);
+                    tspan = text.append('tspan').attr('dy',lineHeight).attr('dx',5).attr('x',centerX - 5.3).text(word);
                     //tspan = text.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y + 15).text(word);
                 }
             }
