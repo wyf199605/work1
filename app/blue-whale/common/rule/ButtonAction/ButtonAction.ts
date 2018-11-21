@@ -238,7 +238,7 @@ export class ButtonAction {
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
-                if(res){
+                if(varType === 3 && res){
                     openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
                 }
                 callback(null);
