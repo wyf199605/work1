@@ -35,8 +35,8 @@ export class PermissionTree extends Component {
         for (let i = 0; i < maxDeep; i++) {
             titleHtml.push(`<div class='level-title' style='width:${100 / maxDeep + "%"}'>${levelArr[i]}</div>`);
         }
+        this.createTrees(para,maxDeep);
         this.treeCaptionWrapper.innerHTML = titleHtml.join('');
-        this.createTrees(para);
         let styleWidth = window.getComputedStyle(this.treeWrapper).width,
             width = parseFloat(styleWidth.slice(0, styleWidth.length - 2)) / maxDeep;
         let allTitles = d.queryAll('.level-title', this.wrapper);
@@ -70,13 +70,14 @@ export class PermissionTree extends Component {
 
     private treeItems: PermissionTreeItem[] = [];
 
-    createTrees(data: IPermissionTree) {
+    createTrees(data: IPermissionTree,maxDeep:number) {
         if (tools.isNotEmptyArray(data.treeData)) {
             data.treeData.forEach(tree => {
                 this.treeItems.push(new PermissionTreeItem(Object.assign({}, tree, {
                     container: this.treeWrapper,
                     parentNode: null,
                     textHeight: data.textHeight,
+                    maxDeep:maxDeep
                 })))
             })
         }

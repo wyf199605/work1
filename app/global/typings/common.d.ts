@@ -136,7 +136,7 @@ interface R_SubTable_Field{
     defDataAddrList? : R_ReqAddr[];//默认值获取地址列表
     dataAddr : R_ReqAddr;//获取数据后台地址
     updatefileData? : R_ReqAddr;
-    subTableAddr?:R_SubTable_Field_UIAddr[]; // 移动端列表页子表地址
+    subTableList?:R_SubTable_Field_UIAddr[]; // 移动端列表页子表地址
 }
 interface R_SubTable_Field_UIAddr{
     uiAddr?:R_ReqAddr;

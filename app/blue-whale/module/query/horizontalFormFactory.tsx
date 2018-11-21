@@ -87,7 +87,7 @@ export class HorizontalQueryModule extends Component {
                     type = c.type || c.atrrs.dataType;
                 switch (type) {
                     case 'VALUELIST':
-                        com = <SelectInput clickType={0} readonly={true}
+                        com = <SelectInput useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};
@@ -100,7 +100,7 @@ export class HorizontalQueryModule extends Component {
                         }} {...props}/>;
                         break;
                     case 'VALUE':
-                        com = <SelectInput clickType={0} readonly={true}
+                        com = <SelectInput useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};
@@ -135,7 +135,7 @@ export class HorizontalQueryModule extends Component {
                         }} {...props}/>;
                         break;
                     case 'QRYVALUE':
-                        com = <SelectInput clickType={0} readonly={true}
+                        com = <SelectInput useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};
@@ -148,7 +148,7 @@ export class HorizontalQueryModule extends Component {
                         }} {...props}/>;
                         break;
                     case 'RESVALUE':
-                        com = <SelectInput clickType={0} readonly={true}
+                        com = <SelectInput useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};
