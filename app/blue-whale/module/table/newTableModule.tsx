@@ -176,8 +176,8 @@ export class NewTableModule {
                             }
                         });
                         if (!tools.isMb) {
-                            d.query('ul.nav-tabs',this.subWrapper).appendChild(<i className="fa fa-expand full-icon"/>);
-                            let i = <i title="点击展开按钮" className="iconfont icon-arrow-up full-icon"/>;
+                            d.query('ul.nav-tabs',this.subWrapper).appendChild(<i title="放大" className="fa fa-expand full-icon"/>);
+                            let i = <i title="点击隐藏按钮" className="iconfont icon-arrow-up full-icon"/>;
                             d.query('ul.nav-tabs',this.subWrapper).appendChild(i);
                             d.on(i, 'click', () => {
                                 i.classList.toggle('icon-arrow-up');
@@ -185,6 +185,7 @@ export class NewTableModule {
                                 this.subBtnShow = i.classList.contains('icon-arrow-up');
                                 for(let sub of Object.values(this.sub)){
                                     sub && (sub.btnShow = this.subBtnShow);
+                                    this.subBtnShow ? i.title = '点击隐藏按钮' : i.title = '点击展开按钮';
                                 }
                             });
                         }
