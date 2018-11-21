@@ -17,6 +17,7 @@ export interface ITreeNode extends IComponentPara {
 interface IPermissionTreeItem extends ITreeNode {
     parentNode?: PermissionTreeItem;
     textHeight?: number;
+    maxDeep?: number;
 }
 
 export class PermissionTreeItem extends Component {
@@ -35,30 +36,35 @@ export class PermissionTreeItem extends Component {
         super(para);
         this.textHeight = tools.isNotEmpty(para.textHeight) ? para.textHeight : 50;
         this.parentNode = para.parentNode || null;
-        // this.textWidth = para.textWidth;
         this.createText(para);
         this.createChildren(para);
         if (tools.isNotEmptyArray(para.CHILDREN)) {
             this.wrapper.style.height = this.setHeight(para.CHILDREN) * this.textHeight + 'px';
         } else {
             this.textWrapper.style.height = this.textHeight + 'px';
-            this.wrapper.style.borderRight = '1px solid #e2e2e2';
+            this.textWrapper.style.borderRight = '1px solid #e2e2e2';
         }
     }
 
-    setTextWrapperWidth(width:number,isMaxDeep:boolean){
-        if (this.para.PARENTID === 'root'){
+    setTextWrapperWidth(width: number, isMaxDeep: boolean) {
+        if (this.para.PARENTID === 'root') {
             this.textWrapper.style.width = width + 'px';
-            if (!isMaxDeep){
+            if (!isMaxDeep) {
                 width = width + 2;
             }
-            setTextWrapperWidthChildren(this.children || [],width);
+            setTextWrapperWidthChildren(this.children || [], width);
         }
-        function setTextWrapperWidthChildren(nodes:PermissionTreeItem[],nodeWidth:number){
+
+        function setTextWrapperWidthChildren(nodes: PermissionTreeItem[], nodeWidth: number) {
             nodes.forEach(node => {
-                node.textWrapper.style.width = nodeWidth + 'px';
-                if (tools.isNotEmpty(node.children)){
-                    setTextWrapperWidthChildren(node.children,nodeWidth);
+                let deep = node.para.ELEMENTID.split('.').length;
+                if (deep < node.para.maxDeep && tools.isEmpty(node.children)){
+                    node.textWrapper.style.width = (nodeWidth + 1) + 'px';
+                }else{
+                    node.textWrapper.style.width = nodeWidth + 'px';
+                }
+                if (tools.isNotEmpty(node.children)) {
+                    setTextWrapperWidthChildren(node.children, nodeWidth);
                 }
             })
         }
@@ -96,7 +102,9 @@ export class PermissionTreeItem extends Component {
     get isChecked() {
         return this._isChecked;
     }
+
     private checkBox: CheckBox = null;
+
     createText(para: IPermissionTreeItem) {
         this.checkBox = new CheckBox({
             text: para.TEXT || '',
@@ -142,9 +150,12 @@ export class PermissionTreeItem extends Component {
                 this.children.push(new PermissionTreeItem(Object.assign({}, child, {
                     container: this.childrenWrapper,
                     parentNode: this,
-                    textHeight: this.textHeight
+                    textHeight: this.textHeight,
+                    maxDeep:this.para.maxDeep
                 })));
             })
+        } else {
+
         }
     }
 
@@ -153,6 +164,8 @@ export class PermissionTreeItem extends Component {
         items.forEach(item => {
             if (item.CHILDREN) {
                 number += this.setHeight(item.CHILDREN)
+            } else {
+                number += 1;
             }
         });
         return number || items.length;
