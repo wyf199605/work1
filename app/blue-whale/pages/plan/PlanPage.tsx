@@ -9,6 +9,8 @@ import d = G.d;
 import tools = G.tools;
 import {PlanModule} from "../../module/plan/planModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+
 
 interface IPlanPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Plan_Table>
@@ -35,7 +37,19 @@ export class PlanPage extends BasicPage {
                     uiPath: qData['uiPath'],
                     setting: null
                 }} search={(data) => {
-                    planModule && planModule.refresh(data);
+                    console.log(data)
+                    let f = 0 ,F = 0;
+                    for( let re in data){
+                           if(tools.isEmpty(data[re])){
+                               F++
+                           }
+                           f++
+                    }
+                    if(f !== F){
+                        planModule && planModule.refresh(data);
+                    }else {
+                        Modal.alert('没有图层');
+                    }
                 }}/>
             </div>);
 

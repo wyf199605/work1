@@ -171,7 +171,7 @@ export class NewTableModule {
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     this.sub[index].refresh(ajaxData).catch();
-                                    this.sub[index].linkedDate = selectedData;
+                                    this.sub[index].linkedData = selectedData;
                                 }
                             }
                         });
@@ -313,7 +313,7 @@ export class NewTableModule {
         this.mobileModal && (this.mobileModal.isShow = true);
         Object.values(this.sub).forEach((subTable) => {
             subTable.refresh(ajaxData).catch();
-            subTable.linkedDate = selectedData;
+            subTable.linkedData = selectedData;
         });
 
     }
@@ -330,7 +330,7 @@ export class NewTableModule {
             tableModule: this,
             container: tabEl
         });
-        this.sub[this.subTabActiveIndex].linkedDate = rowData;
+        this.sub[this.subTabActiveIndex].linkedData = rowData;
         this.sub[this.subTabActiveIndex].ftable.btnShow = this.subBtnShow;
     }
 
