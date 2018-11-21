@@ -319,6 +319,7 @@ gulp.task('js', function () {
     gulpTsPage('attendance/checkIn', 'checkIn.js');
     gulpTsPage('attendance/changePassword', 'changePassword.js');
 
+    gulpTsPage('tabs/tabsPage', 'tabsPage.js');
     gulpTsPage('basicPage', 'basicPage.js');
     gulpTsPage('rfid/RfidSetting/RfidSetting', 'RfidSetting.js');
 

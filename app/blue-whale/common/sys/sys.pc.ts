@@ -302,11 +302,17 @@ namespace BW {
                                 }
                             }
                         }
-                        let liHtmlDom = d.create('<ol class="breadcrumb">' + liHtml + '</ol>');
-                        d.on(liHtmlDom, 'click', 'a[data-href]', function () {
-                            self.window.open({url: this.dataset.href});
-                        });
-                        page.dom.insertBefore(liHtmlDom, page.dom.firstElementChild);
+                        let breadcrumb = d.query('.breadcrumb', page.dom);
+                        if(breadcrumb){
+                            breadcrumb.innerHTML = liHtml;
+                        }else{
+                            let liHtmlDom = d.create('<ol class="breadcrumb">' + liHtml + '</ol>');
+
+                            d.on(liHtmlDom, 'click', 'a[data-href]', function () {
+                                self.window.open({url: this.dataset.href});
+                            });
+                            page.dom.insertBefore(liHtmlDom, page.dom.firstElementChild);
+                        }
                     }
 
                 }

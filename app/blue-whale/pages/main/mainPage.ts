@@ -439,6 +439,7 @@ export = class MainPage {
                         });
                     }
                 });
+                myselfMenu();
                 //消息提示窗口点击事件
                 $('.messageList').on('click', 'li', function () {
                     let src = CONF.siteUrl + $(this).data('url');
@@ -449,7 +450,6 @@ export = class MainPage {
                 document.querySelector('[data-action=topSeeAllMsg]').addEventListener('click', function () {
                     sys.window.open({url: CONF.url.message});
                 });
-                myselfMenu();
             });
         }
 
