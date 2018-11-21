@@ -950,9 +950,8 @@ export class DrawPoint extends Component {
 
                     //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
                     //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
-
                 }
-                   console.log(D3.event.scale);
+                       console.log(D3.event.scale);
                        D3.select('svg').select('.g-wrapper').attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
 
