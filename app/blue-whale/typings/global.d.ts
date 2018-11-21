@@ -22,11 +22,16 @@
 //     btnArr: BT_Btn[];
 // }
 
-
+interface IBW_Menu{
+    menuName: string;
+    menuType: number;
+    menuIcon : string;
+    menuPath: R_ReqAddr;
+}
 
 interface IBW_UI<U>{
     body:{
-        elements: [U, any];
+        elements: [U, any] | Array<U>;
         subButtons: R_Button[];
     }
     caption?: string; // 标题
