@@ -426,9 +426,9 @@ class PopoverItem extends Component {
         this.icon = para.icon;
         this.disabled = para.disabled;
         this.onClick = para.onClick;
-        d.on(this.wrapper, 'click', (e) => {
+        d.on(this.wrapper, 'click', tools.pattern.throttling((e) => {
             typeof this.onClick === 'function' && this.onClick(e, this.content);
-        });
+        }, 1000));
     }
 
     protected _title: string;
