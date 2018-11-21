@@ -6,6 +6,8 @@ import {ListItemDetail} from "../listDetail/ListItemDetail";
 import {BwRule} from "../../common/rule/BwRule";
 import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import {MbListModule} from "./mbListModule";
+import tools = G.tools;
+import d = G.d;
 
 interface IMbListView extends IComponentPara {
     ui: IBW_UI<R_SubTable_Field>;
