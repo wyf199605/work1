@@ -35,18 +35,24 @@ export class PermissionTree extends Component {
         for (let i = 0; i < maxDeep; i++) {
             titleHtml.push(`<div class='level-title' style='width:${100 / maxDeep + "%"}'>${levelArr[i]}</div>`);
         }
-        this.createTrees(para,maxDeep);
+        this.createTrees(para, maxDeep);
         this.treeCaptionWrapper.innerHTML = titleHtml.join('');
-        let styleWidth = window.getComputedStyle(this.treeWrapper).width,
+        let width = 0;
+        if (tools.isMb) {
+            width = 120;
+            this.wrapper.style.width = maxDeep * 120 + 'px';
+        } else {
+            let styleWidth = window.getComputedStyle(this.treeWrapper).width;
             width = parseFloat(styleWidth.slice(0, styleWidth.length - 2)) / maxDeep;
+        }
         let allTitles = d.queryAll('.level-title', this.wrapper);
         allTitles[0].style.width = `calc(${100 / maxDeep}% - 1px)`;
         allTitles[allTitles.length - 2].style.width = `calc(${100 / maxDeep}% + 1px)`;
         this.treeItems.forEach((item, index) => {
             if (deepArr[index] < maxDeep) {
-                item.setTextWrapperWidth(width - 2,false);
+                item.setTextWrapperWidth(width - 2, false);
             } else {
-                item.setTextWrapperWidth(width,true);
+                item.setTextWrapperWidth(width, true);
             }
         });
     }
@@ -70,14 +76,14 @@ export class PermissionTree extends Component {
 
     private treeItems: PermissionTreeItem[] = [];
 
-    createTrees(data: IPermissionTree,maxDeep:number) {
+    createTrees(data: IPermissionTree, maxDeep: number) {
         if (tools.isNotEmptyArray(data.treeData)) {
             data.treeData.forEach(tree => {
                 this.treeItems.push(new PermissionTreeItem(Object.assign({}, tree, {
                     container: this.treeWrapper,
                     parentNode: null,
                     textHeight: data.textHeight,
-                    maxDeep:maxDeep
+                    maxDeep: maxDeep
                 })))
             })
         }

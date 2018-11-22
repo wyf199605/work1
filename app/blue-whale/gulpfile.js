@@ -328,6 +328,8 @@ gulp.task('js', function () {
     gulpTsPage('permissionTree/permissionTreePage', 'permissionTree.js');
     gulpTsPage('mbList/mbList', 'BwMbList.js');
     gulpTsPage('mbList/mbTabList', 'BwMbTabList.js');
+
+    gulpTsPage('msgList/MsgListPage', 'MsgListPage.js');
 });
 
 /**

@@ -313,11 +313,17 @@ export class NewTableModule {
         // 查询从表时不需要带上选项参数
         delete ajaxData['queryoptionsparam'];
         this.mobileModal && (this.mobileModal.isShow = true);
-        Object.values(this.sub).forEach((subTable) => {
-            subTable.refresh(ajaxData).catch();
-            subTable.linkedData = selectedData;
-        });
-
+        if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
+            let showSubSeq = selectedData[this.showSubField].split(',');
+            this.tab.setTabsShow(showSubSeq);
+            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+            this.tab.active(parseInt(showSubSeq[0]) - 1);
+        }else{
+            Object.values(this.sub).forEach((subTable) => {
+                subTable.refresh(ajaxData).catch();
+                subTable.linkedData = selectedData;
+            });
+        }
     }
 
     public mobileModal: Modal = null;

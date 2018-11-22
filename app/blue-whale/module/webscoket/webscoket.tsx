@@ -10,6 +10,7 @@ import sys = BW.sys;
 import sysPcHistory = BW.sysPcHistory;
 import CONF = BW.CONF;
 import {BwRule} from "../../common/rule/BwRule";
+import localMsg = G.localMsg;
 declare let ReconnectingWebSocket : any;
 
 export = class webscoket {
@@ -28,6 +29,26 @@ export = class webscoket {
             Modal.toast('您的浏览器不支持websocket.');
             return;
         }
+
+        let heartCheck = {
+            timeout: 55000,        // 55s发一次心跳，比server端设置的连接时间稍微小一点，在接近断开的情况下以通信的方式去重置连接时间。
+            serverTimeoutObj: null,
+            reset: function () {
+                clearTimeout(this.timeoutObj);
+                clearTimeout(this.serverTimeoutObj);
+                return this;
+            },
+            start: function () {
+                this.serverTimeoutObj = setInterval(function () {
+                    if ( self.ws.readyState == 1) {
+                        console.log("连接状态，发送消息保持连接");
+                        self.ws.send(JSON.stringify({reqType:"ping"}));
+                        heartCheck.reset().start();    // 如果获取到消息，说明连接是正常的，重置心跳检测
+                    }
+                }, this.timeout)
+            }
+        }
+
         // console.info("创建websocket对象成功.");
         self.ws.onopen = () => {
             console.info("websocket 连接打开.");
@@ -66,25 +87,6 @@ export = class webscoket {
                 }
             }
         });
-
-        var heartCheck = {
-            timeout: 55000,        // 55s发一次心跳，比server端设置的连接时间稍微小一点，在接近断开的情况下以通信的方式去重置连接时间。
-            serverTimeoutObj: null,
-            reset: function () {
-                clearTimeout(this.timeoutObj);
-                clearTimeout(this.serverTimeoutObj);
-                return this;
-            },
-            start: function () {
-                this.serverTimeoutObj = setInterval(function () {
-                    if ( self.ws.readyState == 1) {
-                        console.log("连接状态，发送消息保持连接");
-                        self.ws.send(JSON.stringify({reqType:"ping"}));
-                        heartCheck.reset().start();    // 如果获取到消息，说明连接是正常的，重置心跳检测
-                    }
-                }, this.timeout)
-            }
-        }
     }
 
     private onMessage(r){
@@ -114,11 +116,12 @@ export = class webscoket {
                     }
                     tools.event.fire('newMsg', JSON.stringify(data.data.dataMap));
                 }else if(os === 'pc'){
-                    let listData=data.data.dataMap;
-                    for(let i=0;i<listData.length;i++){
-                        $('.messageList').prepend(self.messageDom(listData[i]));
+                    let listData = data.data.dataMap,
+                        msgDom = d.query('.unreadMsgNum');
+                    msgDom.classList.remove('hide');
+                    msgDom.innerText = G.localMsg.getUnreadCount() + '';
+                    for( let i = 0; i < listData.length; i ++ ){
                         let url = CONF.siteUrl + listData[i].content.link;
-
                         new Notify({
                             title:dataMap.sender,
                             content:listData[i].content.content,
@@ -171,17 +174,15 @@ export = class webscoket {
     }
 
     private messageDom(listData){
-        let messageDom='<li class="unread" data-url="'+listData.content.link+'" data-notifyid="'+listData.notifyId+'">'+
-            '<a href="javascript:void(0)" class="unread">'+
-            '<div class="clearfix">'+
-            '<div class="thread-content">'+
-//                '<span class="author">'+data.data.userId+'</span>'+
-            '<span class="preview">'+listData.content.content+'</span>'+
-            '<span class="time">'+listData.createDate+'</span>'+
-            '</div>'+
-            '</div>'+
-            '</a>'+
-            '</li>';
-        return messageDom;
+        return <li class="unread" data-url={listData.content.link} data-notifyid = {listData.notifyId}>
+                <a href="javascript:void(0)" class="unread">
+                    <div class="clearfix">
+                          <div class="thread-content">
+                              <span class="preview">{listData.content.content}</span>
+                              <span class="time">{listData.createDate}</span>
+                         </div>
+                    </div>
+                </a>
+            </li>;
     }
 }
