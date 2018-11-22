@@ -370,6 +370,27 @@ namespace G{
             }
             return isMulti ? varData : varData[0];
         }
+
+        /**
+         * 解析parseVarList数据
+         * @param parseVarList
+         * @param data
+         */
+        static parseVarList(parseVarList : R_VarList[], data : obj | obj[]){
+            let isMulti = Array.isArray(data);
+            isMulti || (data = [data]);
+            parseVarList = Array.isArray(parseVarList) ? parseVarList : [];
+
+            let parData = (<obj[]>data).map(function (d) {
+                let para = {};
+                parseVarList.forEach(function (p) {
+                    para[p.varName] = tools.str.parseTpl(p.varValue, d);
+                });
+                return para;
+            });
+
+            return isMulti ? parData : parData[0];
+        }
     }
 }
 

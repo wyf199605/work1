@@ -6,6 +6,7 @@ import localMsg = G.localMsg;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import sys = BW.sys;
 import CONF = BW.CONF;
+import {Pagination} from "../../../global/components/navigation/pagination/pagination";
 
 interface IDataMapPara {
     content: {
@@ -28,21 +29,67 @@ export class MsgListPage extends BasicPage {
         this.unReadDom = this.listCreate(0);
         this.allMsgDom = this.listCreate();
         this.initTab();
+
+    }
+
+    private paging(arr : IDataMapPara[], html : HTMLElement, read : number){
+        let pagDom = <div class="msg-paging"></div>,
+            len = arr.length;
+        if(len > 5){
+            let pag = new Pagination({
+                container : pagDom,
+                pageOptions : [5],
+                onChange : (state) => {
+                    console.log(state)
+                    html.innerHTML = null;
+                    return new Promise(resolve => {
+                        let index = state.current * 5,
+                            data = arr.slice(index, index + 5);
+                        data.forEach(obj => {
+                            d.append(html, this.createLi(obj, read));
+                        });
+                        resolve()
+                    })
+
+                }
+            });
+            pag.total = len;
+            d.append(this.getDom(read), pagDom)
+        }
+    }
+
+    private getDom(read : number){
+        switch (read) {
+            case 0:
+                return this._unReadDom;
+            case 1:
+                return this._readDom;
+        }
+        return this._allMsgDom;
     }
 
     private listCreate(read?: number): HTMLElement {
         let html = <ul class="msg-list"></ul>,
-            data = localMsg.get();
+            data = localMsg.get(),
+            arr = [];
+
         data.forEach(obj => {
             if (tools.isNotEmpty(read)) {
                 if (read === obj.isread) {
-                    d.append(html, this.createLi(obj, read));
+                    arr.push(obj);
                 }
             } else {
+                arr.push(obj);
+            }
+        });
+        arr.forEach((obj : IDataMapPara, i) => {
+            if(i < 5){
                 d.append(html, this.createLi(obj, read));
             }
         });
-
+        setTimeout(() => {
+            this.paging(arr, html, read);
+        });
         return html;
     }
 
@@ -61,6 +108,7 @@ export class MsgListPage extends BasicPage {
                     </div>}
                 </div>
             </li>;
+
         d.on(li, 'click', function () {
             sys.window.open({url: CONF.siteUrl + obj.content.link});
             if (read !== 1) {
@@ -68,6 +116,7 @@ export class MsgListPage extends BasicPage {
             }
             localMsg.read(notifyId)
         });
+
         d.on(del, 'click', function (e) {
             e.stopPropagation();
             Modal.confirm({
@@ -87,6 +136,7 @@ export class MsgListPage extends BasicPage {
         new Tab({
             tabParent: this.pageWrapper,
             panelParent: this.pageWrapper,
+            className : 'msg-tab',
             tabs: [{
                 title: '未读信息',
                 dom: this.unReadDom,
