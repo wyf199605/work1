@@ -1,10 +1,21 @@
 .msgListPage{
+  padding-bottom: 0;
+  .msg-tab{
+    &>div{
+      height: 85vh;
+      &>ul{
+        height: 80vh;
+        overflow: auto;
+      }
+    }
+  }
+
   .msg-list{
     padding-left: 15px;
     padding-right: 15px;
     .msg-li{
       border-bottom: dashed .5px #e2e2e2;
-      padding-bottom: 40px;
+      padding-bottom: 37px;
       cursor: pointer;
       padding-top: 15px;
       .msg-title{
@@ -36,6 +47,9 @@
           }
         }
       }
+    }
+    .msg-paging{
+      padding: 10px;
     }
   }
   .opacity-6{

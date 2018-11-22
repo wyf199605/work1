@@ -609,7 +609,7 @@ export class BwTableModule extends Component {
 
         if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
             BwRule.link({
-                link: tools.str.parseTpl(link.dataAddr, rowData, true, true),
+                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
                 varList: link.varList,
                 dataType: field.atrrs.dataType,
                 data: rowData,
