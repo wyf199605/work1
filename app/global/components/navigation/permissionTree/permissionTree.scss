@@ -24,6 +24,9 @@
         align-items: center;
         min-height: 50px;
         min-width: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         //max-width: 240px;
         padding-left: 20px;
         height: 100%;
