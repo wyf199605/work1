@@ -109,6 +109,7 @@ export class NewTableModule {
                             this.active.isMain = true;
                         }
                     });
+                    modal.className = 'sub-table-page-modal';
                     this.main.subBtns.box && (modal.wrapper.style.bottom = '36px');
                     // modal.wrapper.style.right = '0';
                     modal.wrapper.style.left = 'auto';

@@ -1888,8 +1888,10 @@ export class BwTableModule extends Component {
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
                             let linkedData = this.linkedData || {};
                             let select = multiselect === 1
-                                ? Object.assign({}, linkedData, selectedData[0])
-                                : selectedData.map((o) => Object.assign({}, linkedData, o));
+                                ? Object.assign({}, linkedData, selectedData[0] || {})
+                                : selectedData.map((o) => Object.assign({}, linkedData || {}, o));
+                            select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
+
                             let tData = ftable.tableData.data;
 
                             if (btnUi.haveRoll) {
