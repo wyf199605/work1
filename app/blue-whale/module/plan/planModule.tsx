@@ -99,7 +99,7 @@ export class PlanModule extends Component{
             height: 800,
             width: 1200,
             subButton,
-            keyField: ui.keyField,
+            ui,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {

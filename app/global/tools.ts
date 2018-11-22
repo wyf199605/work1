@@ -115,13 +115,16 @@ namespace G {
         }()),
         isMb: isMb,
         isPc: !isMb,
-        val2RGB(colorVal: number) {
+        val2RGB(colorVal: number | string) {
             let r = 0,
                 g = 0,
                 b = 0;
 
             // 显示颜色
-            if (typeof colorVal === 'number') {
+            if (typeof colorVal !== 'number') {
+                colorVal = parseInt(colorVal);
+            }
+            if (typeof colorVal == 'number' && !isNaN(colorVal)) {
                 r = colorVal % 256;
                 g = Math.floor(colorVal / 256) % 256;
                 b = Math.floor(colorVal / 256 / 256) % 256;
