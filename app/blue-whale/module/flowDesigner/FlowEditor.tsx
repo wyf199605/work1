@@ -115,7 +115,7 @@ export class FlowEditor extends FormCom {
                 attrEditorWrapper = <div className="attr-editor-wrapper" data-attr={attr}>
                     <div className="attr-editor-description">{FlowEditor.ATTR_DESCRIPTION[attr]}:</div>
                     <div className="attr-editor-input">
-                        <input type="text" value={name} readonly={attr in FlowEditor.DROPDOWN_KEYVALUE && 'readonly'}/>
+                        <input type="text" value={name} readOnly={attr in FlowEditor.DROPDOWN_KEYVALUE}/>
                     </div>
                 </div>;
             if(attr in FlowEditor.DROPDOWN_KEYVALUE){

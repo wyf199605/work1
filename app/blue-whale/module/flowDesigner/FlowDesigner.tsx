@@ -274,11 +274,7 @@ export class FlowDesigner {
             // 设置节点不可移动但可以点击查看属性
             FlowDesigner.ALLITEMS.forEach(item => {
                 item.initEvents.closeDrag();
-                // item.flowEditor.disabled = true;
             });
-            // FlowDesigner.AllLineItems.forEach(item => {
-            //     item.flowEditor.disabled = true;
-            // });
 
             // 禁用所有input
             d.queryAll('input').forEach(input => {
