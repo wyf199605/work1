@@ -23,7 +23,7 @@
         display: flex;
         align-items: center;
         min-height: 50px;
-        min-width: 60px;
+        min-width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -60,6 +60,7 @@
       text-align: center;
       border-right: 1px solid #e2e2e2;
       font-size: 16px;
+      min-width: 120px;
       &:last-child{
         border-right: none;
       }
