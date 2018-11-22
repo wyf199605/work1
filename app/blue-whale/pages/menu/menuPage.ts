@@ -15,7 +15,8 @@ export = class menuPage extends BasicPage {
             }
         };
         $('.file-box').on('click', 'a[data-href]', function () {
-            MENU.openWindowWithBadge(BW.CONF.siteUrl + this.dataset.href, this);
+            let parseVarList = JSON.parse(this.dataset.parse);
+            MENU.openWindowWithBadge(tools.url.addObj(BW.CONF.siteUrl + this.dataset.href,G.Rule.parseVarList(parseVarList, {})), this);
         });
         function animationHover(element, animation) {
             element = $(element);
