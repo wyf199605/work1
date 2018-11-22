@@ -350,49 +350,51 @@
   }
 }
 
-.fl-mobile.tablePage {
-  .nav-tabs {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 0;
-    margin: 0;
-    width: auto;
-    background-color: #ffffff;
-    z-index: 1;
-    overflow-x: auto;
-    overflow-y: hidden;
-    min-width: 100%;
-    border-bottom: 1px solid #ccc;
-    & > li {
-      height: 40px;
-      text-align: center;
+.fl-mobile {
+  .flowListPC, .sub-table-page-modal{
+    .nav-tabs {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 0;
+      margin: 0;
       width: auto;
-      padding: 0 15px;
-      line-height: 40px;
-      outline: none;
-      flex-shrink: 0;
-      flex-grow: 0;
-      & > a {
-        color: #8e8e93;
-        border-radius: 0;
-        border: none;
-      }
-      &.active > a {
-        display: inline-block;
-        height: 100%;
-        border-bottom: 2px solid #005bac;
-        color: #007AFF;
-        &:hover {
+      background-color: #ffffff;
+      z-index: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+      min-width: 100%;
+      border-bottom: 1px solid #ccc;
+      & > li {
+        height: 40px;
+        text-align: center;
+        width: auto;
+        padding: 0 15px;
+        line-height: 40px;
+        outline: none;
+        flex-shrink: 0;
+        flex-grow: 0;
+        & > a {
+          color: #8e8e93;
+          border-radius: 0;
           border: none;
-          border-bottom: 2px solid #007AFF;
+        }
+        &.active > a {
+          display: inline-block;
+          height: 100%;
+          border-bottom: 2px solid #005bac;
           color: #007AFF;
+          &:hover {
+            border: none;
+            border-bottom: 2px solid #007AFF;
+            color: #007AFF;
+          }
         }
       }
     }
-  }
-  .tab-content {
-    padding: 0;
+    .tab-content {
+      padding: 0;
+    }
   }
 }
 

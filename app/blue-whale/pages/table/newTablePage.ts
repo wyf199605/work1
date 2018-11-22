@@ -25,7 +25,6 @@ export class NewTablePage extends BasicPage{
 
     constructor(para: ITablePagePara) {
         super(para);
-
         d.classAdd(this.dom.parentElement, 'table-page');
 
         let bwTableEl = para.ui.body.elements[0];

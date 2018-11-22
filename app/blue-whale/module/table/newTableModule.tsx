@@ -109,6 +109,7 @@ export class NewTableModule {
                             this.active.isMain = true;
                         }
                     });
+                    modal.className = 'sub-table-page-modal';
                     this.main.subBtns.box && (modal.wrapper.style.bottom = '36px');
                     // modal.wrapper.style.right = '0';
                     modal.wrapper.style.left = 'auto';
@@ -176,15 +177,16 @@ export class NewTableModule {
                             }
                         });
                         if (!tools.isMb) {
-                            d.query('ul.nav-tabs',this.subWrapper).appendChild(<i className="fa fa-expand full-icon"/>);
-                            let i = <i title="点击展开按钮" className="iconfont icon-arrow-up full-icon"/>;
+                            d.query('ul.nav-tabs',this.subWrapper).appendChild(<i title="放大" className="fa fa-expand full-icon"/>);
+                            let i = <i title="点击隐藏按钮" className="iconfont icon-arrow-up full-icon"/>;
                             d.query('ul.nav-tabs',this.subWrapper).appendChild(i);
                             d.on(i, 'click', () => {
                                 i.classList.toggle('icon-arrow-up');
                                 i.classList.toggle('icon-arrow-down');
                                 this.subBtnShow = i.classList.contains('icon-arrow-up');
                                 for(let sub of Object.values(this.sub)){
-                                    sub && (sub.ftable.btnShow = this.subBtnShow);
+                                    sub && (sub.btnShow = this.subBtnShow);
+                                    this.subBtnShow ? i.title = '点击隐藏按钮' : i.title = '点击展开按钮';
                                 }
                             });
                         }
@@ -217,8 +219,8 @@ export class NewTableModule {
                                     let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
 
                                     let sub = this.sub[this.subTabActiveIndex],
-                                        isShow = sub ? sub.ftable.btnShow : true;
-                                    sub && (sub.ftable.btnShow = true);
+                                        isShow = sub ? sub.btnShow : true;
+                                    sub && (sub.btnShow = true);
 
                                     new Modal({
                                         body: tabEl,
@@ -227,7 +229,7 @@ export class NewTableModule {
                                             title: '子表全屏'
                                         },
                                         onClose: () => {
-                                            sub && (sub.ftable.btnShow = isShow);
+                                            sub && (sub.btnShow = isShow);
                                             this.sub[this.subTabActiveIndex].ftable.removeAllModal();
                                             d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
                                             this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
@@ -311,11 +313,17 @@ export class NewTableModule {
         // 查询从表时不需要带上选项参数
         delete ajaxData['queryoptionsparam'];
         this.mobileModal && (this.mobileModal.isShow = true);
-        Object.values(this.sub).forEach((subTable) => {
-            subTable.refresh(ajaxData).catch();
-            subTable.linkedData = selectedData;
-        });
-
+        if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
+            let showSubSeq = selectedData[this.showSubField].split(',');
+            this.tab.setTabsShow(showSubSeq);
+            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+            this.tab.active(parseInt(showSubSeq[0]) - 1);
+        }else{
+            Object.values(this.sub).forEach((subTable) => {
+                subTable.refresh(ajaxData).catch();
+                subTable.linkedData = selectedData;
+            });
+        }
     }
 
     public mobileModal: Modal = null;
@@ -328,10 +336,10 @@ export class NewTableModule {
             ajaxData,
             isSub: true,
             tableModule: this,
-            container: tabEl
+            container: tabEl,
+            btnShow: this.subBtnShow
         });
         this.sub[this.subTabActiveIndex].linkedData = rowData;
-        this.sub[this.subTabActiveIndex].ftable.btnShow = this.subBtnShow;
     }
 
     protected draggedEvent = (() => {

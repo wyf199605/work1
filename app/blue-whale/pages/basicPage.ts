@@ -66,7 +66,20 @@ export default class BasicPage{
         }
         this.initWebscoket();
         this.initHelpMsg(para);
+
+        this._pageWrapper = this.wrapperInit();
+        this._pageWrapper && d.append(para.dom, this._pageWrapper)
     }
+
+    protected wrapperInit() : HTMLElement{
+        return null;
+    }
+
+    protected _pageWrapper: HTMLElement;
+    get pageWrapper(){
+        return this._pageWrapper
+    }
+
 
     protected initHelpMsg(para){
         // let element = para.ui && para.ui.body && para.ui.body.elements && para.ui.body.elements[0],

@@ -440,15 +440,17 @@ export = class MainPage {
                     }
                 });
                 myselfMenu();
+
                 //消息提示窗口点击事件
-                $('.messageList').on('click', 'li', function () {
-                    let src = CONF.siteUrl + $(this).data('url');
-                    sys.window.open({url: src});
-                    $(this).remove();
-                    localMsg.remove(this.dataset.notifyid);
-                });
-                document.querySelector('[data-action=topSeeAllMsg]').addEventListener('click', function () {
-                    sys.window.open({url: CONF.url.message});
+                let msgDom = d.query('.messagesContent'),
+                    unreadMsgNum = d.query('#unreadMsgNum'),
+                    num = localMsg.getUnreadCount();
+                if(num > 0){
+                    unreadMsgNum.classList.remove('hide');
+                    unreadMsgNum.innerText = num + '';
+                }
+                d.on(msgDom, 'click', function () {
+                    sys.window.open({url: CONF.url.msgList, title : '消息'});
                 });
             });
         }

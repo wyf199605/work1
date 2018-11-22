@@ -20,7 +20,7 @@ interface IDrapPoint extends IComponentPara {
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
     isShow?: boolean; // 默认false
     subButton?: R_Button[];
-    keyField?:string;
+    ui: IBW_Plan_Table;
 }
 
 interface IAreaType {
@@ -53,6 +53,7 @@ export class DrawPoint extends Component {
     private tooltip ;
     protected selectedData: obj;
     private _keyField;
+    protected ui: IBW_Plan_Table
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     // static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -83,7 +84,8 @@ export class DrawPoint extends Component {
                 });
             }
         })
-       this._keyField = para.keyField;
+        this.ui = para.ui;
+       this._keyField = para.ui.keyField;
         this.onAreaClick = para.onAreaClick;
         this.format = para.format;
         this.map = D3.map(this.points, function (d, i) {

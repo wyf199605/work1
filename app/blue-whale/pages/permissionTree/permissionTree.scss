@@ -1,5 +1,15 @@
 .permission-page {
+  background-color: #ffffff;
   .permission-page-buttons {
     padding: 10px 0;
+  }
+  &.mui-content {
+    .permission-tree-wrapper {
+      .trees {
+        .select-box .check-text {
+          white-space: pre-wrap;
+        }
+      }
+    }
   }
 }

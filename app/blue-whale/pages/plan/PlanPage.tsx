@@ -27,31 +27,35 @@ export class PlanPage extends BasicPage {
         //下半部
         this.getUi(para.ui).then(res => {
             let qData = res.query;
-            d.append(para.dom, this.wrapper = <div class="plan-wrapper">
-                <HorizontalQueryModule qm={{
-                    autTag: qData['autTag'],
-                    hasOption: qData['hasOption'],
-                    queryType: qData['queryType'],
-                    queryparams1: qData['queryparams0'] || qData['queryparams1'] || qData['atvarparams'],
-                    scannableTime: 0,
-                    uiPath: qData['uiPath'],
-                    setting: null
-                }} search={(data) => {
-                    console.log(data)
-                    let f = 0 ,F = 0;
-                    for( let re in data){
-                           if(tools.isEmpty(data[re])){
-                               F++
-                           }
-                           f++
+            d.append(para.dom, this.wrapper = <div class="plan-wrapper"/>);
+            let query = <HorizontalQueryModule
+                container={this.wrapper}
+                qm={{
+                autTag: qData['autTag'],
+                hasOption: qData['hasOption'],
+                queryType: qData['queryType'],
+                queryparams1: qData['queryparams0'] || qData['queryparams1'] || qData['atvarparams'],
+                scannableTime: 0,
+                uiPath: qData['uiPath'],
+                setting: null
+            }} search={(data) => {
+                console.log(data)
+                let isEmpty = true;
+                for(let key in data){
+                    if(!isEmpty){
+                        break;
                     }
-                    if(f !== F){
-                        planModule && planModule.refresh(data);
-                    }else {
-                        Modal.alert('没有图层');
-                    }
-                }}/>
-            </div>);
+                    isEmpty = isEmpty && tools.isEmpty(data[key]);
+                }
+                if(isEmpty){
+                    Modal.alert('没有图层');
+                    return Promise.reject();
+                }else {
+                    planModule && planModule.refresh(data);
+                    return Promise.resolve();
+                }
+
+            }}/>;
 
             planModule = new PlanModule({
                 ui: res.ui,

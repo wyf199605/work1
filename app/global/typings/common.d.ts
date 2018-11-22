@@ -94,6 +94,7 @@ interface R_ReqAddr {
     commitType?: number; //
     needGps?:number; // 是否开启GPS：0 => false, 1 => true
     varList?: R_VarList[];
+    parseVarList?: R_VarList[];
     type?: string;
     addrType?:boolean;
 }
@@ -182,7 +183,7 @@ interface R_Input {
     dataAddr?: R_ReqAddr,
     container?: HTMLElement, //按键绑定的dom
     uiType?: number,
-    inputType?: string, // 0扫码（rfid设备为扫码枪，手机设备为二维码）1.rfid扫码（支持多个）2.多条码扫码（不支持手机扫二维码）
+    inputType?: string, // 0扫码（rfid设备可连续扫码，手机单次扫码）1.rfid扫码  2.扫码（rfid设备，手机启用连续扫码）
 }
 
 interface HTMLElementEventMap {

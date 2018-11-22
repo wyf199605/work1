@@ -8,6 +8,7 @@ import Ajax = G.Ajax;
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {ImgModalMobile} from "../ImgModalMobile";
 import {BugReportModal} from "../../module/BugReport/BugReport";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 export class BwRule extends Rule {
     /**
@@ -88,6 +89,14 @@ export class BwRule extends Rule {
                         longitude : gps.longitude
                     };
                     setting.headers = Object.assign(setting.headers || {}, {position: JSON.stringify(gpsObj)});
+
+                    // 设置loading加载框
+                    let loading: Loading;
+                    if(setting.loading){
+                        loading = new Loading(setting.loading);
+                        loading.show();
+                        delete setting.loading;
+                    }
 
                     super.fetch(url, setting).then((result) => {
                         // debugger;
@@ -171,6 +180,9 @@ export class BwRule extends Rule {
                         }
 
                         reject(reason);
+                    }).finally(() => {
+                        loading && loading.hide();
+                        loading = null;
                     });
 
                 })

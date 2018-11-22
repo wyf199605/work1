@@ -117,7 +117,6 @@ export default class SideBarMrg {
         let firstLoadSpinner = SideBarMrg.loadTpl();
         d.append(this.para.menu, firstLoadSpinner);
 
-
         this.menu = new Menu({
             expand: true,
             container: this.para.menu,

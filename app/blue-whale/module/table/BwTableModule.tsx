@@ -31,6 +31,7 @@ export interface IBwTableModulePara extends IComponentPara {
     isSub?: boolean;
     ajaxData?: obj;
     editParam?: IBW_TableAddrParam;
+    btnShow?: boolean
 }
 
 interface IEditImgModuleUploadHandler {
@@ -62,7 +63,7 @@ export class BwTableModule extends Component {
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
         super(para);
-
+        this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
@@ -108,6 +109,15 @@ export class BwTableModule extends Component {
             // 正常表格
             this.ftableInit(para.ajaxData);
         }
+    }
+
+    protected _btnShow: boolean = true;
+    get btnShow(){
+        return this._btnShow;
+    }
+    set btnShow(flag: boolean){
+        this._btnShow = flag;
+        this.ftable && (this.ftable.btnShow = flag);
     }
 
     private get baseFtablePara(): IFastBtnTablePara {
@@ -286,7 +296,7 @@ export class BwTableModule extends Component {
                 }
             })
         );
-
+        this.ftable.btnShow = this.btnShow;
 
         !this.isDrill && this.ftable.btnAdd('filter', {
             type: 'default',
@@ -511,6 +521,7 @@ export class BwTableModule extends Component {
                     data: response.data
                 })
             );
+            this.ftable.btnShow = this.btnShow;
             this.ftableReady();
         });
     }
@@ -595,9 +606,10 @@ export class BwTableModule extends Component {
             return;
         }
         let link = field.link;
+
         if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
             BwRule.link({
-                link: link.dataAddr,
+                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
                 varList: link.varList,
                 dataType: field.atrrs.dataType,
                 data: rowData,
@@ -1877,8 +1889,10 @@ export class BwTableModule extends Component {
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
                             let linkedData = this.linkedData || {};
                             let select = multiselect === 1
-                                ? Object.assign({}, linkedData, selectedData[0])
-                                : selectedData.map((o) => Object.assign({}, linkedData, o));
+                                ? Object.assign({}, linkedData, selectedData[0] || {})
+                                : selectedData.map((o) => Object.assign({}, linkedData || {}, o));
+                            select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
+
                             let tData = ftable.tableData.data;
 
                             if (btnUi.haveRoll) {
