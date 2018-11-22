@@ -11,6 +11,8 @@ import {NumInput} from "../../../global/components/form/numInput/numInput";
 import {TextInput} from "../../../global/components/form/text/text";
 import {BwRule} from "../../common/rule/BwRule";
 import {Button} from "../../../global/components/general/button/Button";
+import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IHorizontalQueryModule extends IComponentPara {
     qm: IBw_Query;
@@ -22,6 +24,7 @@ export class HorizontalQueryModule extends Component {
         return <div className="horizontalQueryModule"/>;
     }
 
+    protected modal: Modal;
     protected forms: objOf<FormCom> = {};
     protected defaultData: obj;
     private _extraWrapper: HTMLElement;
@@ -85,9 +88,10 @@ export class HorizontalQueryModule extends Component {
                     }, extra),
                     fieldName = c.field_name,
                     type = c.type || c.atrrs.dataType;
+                let SelectConstruct: typeof SelectInputMb | typeof SelectInput = tools.isMb ? SelectInputMb : SelectInput;
                 switch (type) {
                     case 'VALUELIST':
-                        com = <SelectInput useInputVal={true}
+                        com = <SelectConstruct useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};
@@ -100,7 +104,7 @@ export class HorizontalQueryModule extends Component {
                         }} {...props}/>;
                         break;
                     case 'VALUE':
-                        com = <SelectInput useInputVal={true}
+                        com = <SelectConstruct useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};
@@ -135,7 +139,7 @@ export class HorizontalQueryModule extends Component {
                         }} {...props}/>;
                         break;
                     case 'QRYVALUE':
-                        com = <SelectInput useInputVal={true}
+                        com = <SelectConstruct useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};
@@ -148,7 +152,7 @@ export class HorizontalQueryModule extends Component {
                         }} {...props}/>;
                         break;
                     case 'RESVALUE':
-                        com = <SelectInput useInputVal={true}
+                        com = <SelectConstruct useInputVal={true}
                                            data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
                                                let data = this.formatData(res);
                                                return {text: data.title, value: data.value};

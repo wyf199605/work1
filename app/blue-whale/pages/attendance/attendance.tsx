@@ -162,7 +162,7 @@ export = class AttendancePage extends BasicPage {
         let timer = setTimeout(() => {
             li.className = 'animated';
             clearTimeout(timer);
-        }, 1);
+        }, 300);
     }
 
     //销毁

@@ -29,22 +29,22 @@ const strategies = {
         if (value === 0) {
             return true;
         }
-        return typeof data == "string" ? !(data.length > value) : true;
+        return tools.isEmpty(data) ? true : (typeof data == "string" ? !(data.length > value) : true);
     },
 
     maxValue: function (data, value) {
-        return typeof data == "number" ? data < value : true;
+        return tools.isEmpty(data) ? true : (typeof data == "number" ? data < value : true);
     },
 
     minLength: function (data, value) {
         if (value === 0) {
             return true;
         }
-        return typeof data == "string" ? !(data.length < value) : true;
+        return tools.isEmpty(data) ? true : (typeof data == "string" ? !(data.length < value) : true);
     },
 
     minValue: function (data, value) {
-        return typeof data == "number" ? !(data < value) : true;
+        return tools.isEmpty(data) ? true : (typeof data == "number" ? !(data < value) : true);
     },
 
     requieredFlag: function (data, value) {
@@ -56,8 +56,8 @@ const strategies = {
     },
 
     number: function (data, value) {
-        if (data === "") {
-            return false;
+        if (tools.isEmpty(data)) {
+            return true;
         } else {
             return !isNaN(data);
         }
