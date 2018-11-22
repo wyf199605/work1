@@ -196,7 +196,7 @@ export class RfidBarCode extends Component {
                         }
                     }></i>
 
-                        <p class="value2" style="color:rgb(0, 122, 255)">100000</p>
+                        <p class="value2" style="color:rgb(0, 122, 255)"></p>
                         <span className="title3">分类-标题3 </span> <i className="iconfont icon-shuxie" onclick={() => {
 
                         let mode = new Modal({
@@ -249,7 +249,7 @@ export class RfidBarCode extends Component {
                         })
 
                     }}></i>
-                        <p class="value3" style="color:rgb(0, 122, 255)">2321312</p>
+                        <p class="value3" style="color:rgb(0, 122, 255)"></p>
                     </div>
                     <div class="rfid-barCode-right">
                         <p class="title">条码</p>
@@ -307,22 +307,13 @@ export class RfidBarCode extends Component {
                                                // let data = res.data;
                                                 if(res.success){
                                                     this.domHash['scanamout'].innerText = res.data.scanNum;
+                                                    alert(JSON.stringify(Where));
+                                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                        alert(JSON.stringify(res.data + '数量'));
+                                                        this.domHash['count'].innerText = res.data;
+                                                    })
                                                 }
 
-                                                // if (data.name) {
-                                                //     let arr = data.array;
-                                                //     for (let i = 0; i < arr.length; i++) {
-                                                //         alert(arr[i].classify1_value)
-                                                //         this.domHash['barcode'].innerText = arr[i].barcode;
-                                                //         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                                                //         this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                //         this.domHash['count'].innerText = arr[i].count;
-                                                //         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                                                //         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                                                //         this.domHash['Commodity'].innerText = arr[i].name;
-                                                //     }
-                                                //
-                                                // }
                                             })
 
                                         } else if (this.mode[key] == '替换') {
@@ -365,11 +356,15 @@ export class RfidBarCode extends Component {
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
+                                                        //this.domHash['count'].innerText = arr[i].count;
                                                         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                                                         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                                         this.domHash['Commodity'].innerText = arr[i].name;
                                                     }
+                                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                        alert(JSON.stringify(res.data + '数量'));
+                                                        this.domHash['count'].innerText = res.data;
+                                                    })
 
                                                 }
 
@@ -384,11 +379,15 @@ export class RfidBarCode extends Component {
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
+                                                       // this.domHash['count'].innerText = arr[i].count;
                                                         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                                                         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                                         this.domHash['Commodity'].innerText = arr[i].name;
                                                     }
+                                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                        alert(JSON.stringify(res.data + '数量'));
+                                                        this.domHash['count'].innerText = res.data;
+                                                    })
 
                                                 }
                                             })
@@ -430,11 +429,15 @@ export class RfidBarCode extends Component {
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
+                                                        //this.domHash['count'].innerText = arr[i].count;
                                                         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                                                         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                                         this.domHash['Commodity'].innerText = arr[i].name;
                                                     }
+                                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                        alert(JSON.stringify(res.data + '数量'));
+                                                        this.domHash['count'].innerText = res.data;
+                                                    })
 
                                                 }
 
@@ -487,11 +490,15 @@ export class RfidBarCode extends Component {
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
+                                                        //this.domHash['count'].innerText = arr[i].count;
                                                         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                                                         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                                         this.domHash['Commodity'].innerText = arr[i].name;
                                                     }
+                                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                        alert(JSON.stringify(res.data + '数量'));
+                                                        this.domHash['count'].innerText = res.data;
+                                                    })
 
                                                 }
                                             })
@@ -535,11 +542,15 @@ export class RfidBarCode extends Component {
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
+                                                        //this.domHash['count'].innerText = arr[i].count;
                                                         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                                                         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                                         this.domHash['Commodity'].innerText = arr[i].name;
                                                     }
+                                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                        alert(JSON.stringify(res.data + '数量'));
+                                                        this.domHash['count'].innerText = res.data;
+                                                    })
 
                                                 }
 
@@ -551,6 +562,10 @@ export class RfidBarCode extends Component {
                                                 num.innerText = (parseInt(num.innerText) + 1) + '';
                                                 if(res.success){
                                                     this.domHash['scanamout'].innerText = res.data.scanNum;
+                                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                        alert(JSON.stringify(res.data + '数量'));
+                                                        this.domHash['count'].innerText = res.data;
+                                                    })
                                                 }
                                             })
                                         } else {
@@ -591,13 +606,17 @@ export class RfidBarCode extends Component {
                                                         this.domHash['barcode'].innerText = arr[i].barcode;
                                                         this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                                         this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        this.domHash['count'].innerText = arr[i].count;
+                                                        //this.domHash['count'].innerText = arr[i].count;
                                                         this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                                                         this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                                         this.domHash['Commodity'].innerText = arr[i].name;
                                                     }
 
                                                 }
+                                                G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                                    alert(JSON.stringify(res.data + '数量'));
+                                                    this.domHash['count'].innerText = res.data;
+                                                })
 
                                             })
                                         }
@@ -637,7 +656,7 @@ export class RfidBarCode extends Component {
                             footer: {},
                             onOk: () => {
                                 let val = d.query('.set-rfid-code')['value'],
-                                    category = [];
+                                    category = [],Where = {};
                                 category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
                                 d.query('.rfid-barCode-content>.rfid-barCode-right>.value').innerText = val;
                                 //替换，累加，上传 参数值需要实时变化
@@ -651,6 +670,7 @@ export class RfidBarCode extends Component {
                                 } else {
                                     optionStype = 0;
                                 }
+
                                 let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
                                     let data = res.data;
                                     let arr = data.array;
@@ -659,13 +679,29 @@ export class RfidBarCode extends Component {
                                             this.domHash['barcode'].innerText = arr[i].barcode;
                                             this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                                             this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                            this.domHash['count'].innerText = arr[i].count;
+                                            //this.domHash['count'].innerText = arr[i].count;
                                             this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                                             this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                             this.domHash['Commodity'].innerText = arr[i].name;
                                         }
 
                                     }
+                                    if (G.tools.isNotEmpty(this.fields)) {
+
+                                        for (let i = 0; i < this.fields.length; i++) {
+                                            if (i == 0) {
+                                                Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                            } else if (i == 1) {
+                                                Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                            } else if (i == 2) {
+                                                Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                            }
+                                        }
+                                    }
+                                    G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                                        alert(JSON.stringify(res.data + '数量'));
+                                        this.domHash['count'].innerText = res.data;
+                                    })
 
                                 })
 
@@ -719,7 +755,12 @@ export class RfidBarCode extends Component {
                                         onClick: function () {
                                             console.log(updataEl.getText());
                                             ;
-                                            G.Shell.inventory.uploadcodedata(para.uniqueFlag, (res) => {
+                                            let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, (res) => {
+                                                if(!res.success){
+                                                    Modal.alert('上传失败');
+                                                }else {
+                                                    Modal.alert('上传成功')
+                                                }
                                             })
                                             mode.destroy();
                                         }
@@ -788,9 +829,30 @@ export class RfidBarCode extends Component {
                                         let success = false;
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
                                             if (res.success) {
-                                                this.domHash['scanamout'].innerText = res.data.scanNum;
-                                            }
 
+                                                this.domHash['scanamout'].innerText = res.data.scanNum;
+                                                let Where = {};
+                                                if (G.tools.isNotEmpty(this.fields)) {
+
+                                                    for (let i = 0; i < this.fields.length; i++) {
+                                                        if (i == 0) {
+                                                            Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                        } else if (i == 1) {
+                                                            Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                        } else if (i == 2) {
+                                                            Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                        }
+                                                    }
+                                                }
+                                                G.Shell.inventory.getCountData(para.uniqueFlag,where,(res)=>{
+                                                    alert(JSON.stringify(res.data + '数量'));
+                                                    this.domHash['count'].innerText = res.data;
+                                                })
+                                                d.query('.total-nums>span').innerText = res.data.scanNum;
+                                                Modal.alert('删除成功');
+                                            }else {
+                                                Modal.alert('删除失败');
+                                            }
 
                                         })
                                         //进行重新渲染
@@ -867,6 +929,10 @@ export class RfidBarCode extends Component {
              let s =  G.Shell.inventory.dealbarcode(2,params,(res)=>{
                    if(res.success){
                        this.domHash['scanamout'].innerText = res.data.scanNum;
+                       G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                           alert(JSON.stringify(res.data + '数量'));
+                           this.domHash['count'].innerText = res.data;
+                       })
                    }
                 })
 
@@ -899,12 +965,15 @@ export class RfidBarCode extends Component {
                 let s = G.Shell.inventory.dealbarcode(2,params,(res)=>{
                     if(res.success){
                         this.domHash['scanamout'].innerText = res.data.scanNum;
+                        G.Shell.inventory.getCountData(para.uniqueFlag,Where,(res)=>{
+                            alert(JSON.stringify(res.data + '数量'));
+                            this.domHash['count'].innerText = res.data;
+                        })
                     }
 
                 })
             }
         }
-
         let category = d.query('.rfid-shelf-number>.shelf-category'),
             barcode = d.query('.rfid-barCode-content>.rfid-barCode-right>.value'),
             barcodeTitl = d.query('.rfid-barCode-content>.rfid-barCode-right>.title'),
@@ -945,6 +1014,7 @@ export class RfidBarCode extends Component {
         let loading = new Loading({
             msg: "加载中"
         })
+        let where = {};
         this.params = {
             optionStype: 0,
             num: 0,
@@ -952,6 +1022,7 @@ export class RfidBarCode extends Component {
         }
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
+            alert(JSON.stringify(res))
             let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
             let pageName = data.data;;
             this.uid = pageName.uid;
@@ -959,8 +1030,9 @@ export class RfidBarCode extends Component {
             this.domHash['title'].innerText = pageName.funTitle;
             this.domHash['barcodeTitl'].innerHTML = pageName.uidName;
             //分类字段
-            this.domHash['count'].innerHTML = pageName.count;
+            //this.domHash['count'].innerHTML = pageName.count;
             this.fields = pageName.fields;
+            alert(JSON.stringify(data.data));
             this.fields.forEach((val) => {
                 if (val.index == 1) {
                     this.domHash['category'].innerText = val.title;
@@ -973,10 +1045,10 @@ export class RfidBarCode extends Component {
             loading.destroy();
 
         })
-
         G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
-            //alert(JSON.stringify(res))
+            alert(JSON.stringify(res))
             let data = res.data;
+
             this.fields.forEach((res) => {
                 let arr = data.array;
                 if (res.index == 1) {
@@ -1009,15 +1081,32 @@ export class RfidBarCode extends Component {
                     this.domHash['barcode'].innerText = arr[i].barcode;
                     this.domHash['categoryVal'].innerText = arr[i].classify1_value;
                     this.domHash['scanamout'].innerText = arr[i].scanCount;
-                    this.domHash['count'].innerText = arr[i].count;
+                    //this.domHash['count'].innerText = arr[i].count;
                     this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
                     this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                     this.domHash['Commodity'].innerText = arr[i].name;
                 }
+                if (G.tools.isNotEmpty(this.fields)) {
 
+                    for (let i = 0; i < this.fields.length; i++) {
+                        if (i == 0) {
+                            where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                        } else if (i == 1) {
+                            where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                        } else if (i == 2) {
+                            where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                        }
+                    }
+                }
+                G.Shell.inventory.getCountData(para.uniqueFlag,where,(res)=>{
+                    alert(JSON.stringify(res.data + '数量'));
+                    this.domHash['count'].innerText = res.data;
+                })
             }
+
 
         })
     }
 
 }
+
