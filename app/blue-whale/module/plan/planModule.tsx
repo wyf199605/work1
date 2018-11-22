@@ -57,6 +57,57 @@ export class PlanModule extends Component{
         }
         this.initDraw();
         tools.isPc && this.initSubBtn();
+        this.initStatusBar([
+            {
+                STATUS_NAME: '空闲',
+                GRIDBACKCOLOR: 'red',
+                STATUS_ID: "1",
+            }
+        ])
+    }
+
+    initStatusBar(backColors){
+        // let ui = this.ui,
+        //     backColors = ui.backColor;
+        if(tools.isNotEmpty(backColors)){
+            let body = <div class="status-list"/>;
+            let modal = new Modal({
+                className: 'plan-status-modal',
+                isMb: false,
+                body,
+                header: tools.isMb ? null : {
+                    isClose: false,
+                    title: '状态',
+                    isDrag: true
+                },
+                isBackground: false,
+                escKey: false,
+                width: '100px',
+                container: this.container,
+                top: 160,
+                zIndex: 499
+            });
+            modal.wrapper.style.left = (tools.isMb ? -5 :document.body.offsetWidth - 150) + 'px';
+            backColors.forEach((item) => {
+                let {r, g, b} = tools.val2RGB(item.GRIDBACKCOLOR),
+                    color = `rgb(${r}, ${g}, ${b})`;
+                d.append(body, <div className="status-item">
+                    <div className="status-ball" style={'background: ' + item.GRIDBACKCOLOR}/>
+                    {item.STATUS_NAME}
+                </div>)
+            });
+
+            if(tools.isMb){
+                d.on(this.container, 'touchstart', (ev) => {
+                    if(!d.matches(ev.target as HTMLElement, '.plan-status-modal')){
+                        modal.wrapper.style.transform = 'translateX(-80px)';
+                    }
+                });
+                d.on(modal.wrapper, 'touchstart', () => {
+                    modal.wrapper.style.transform = 'translateX(0)';
+                });
+            }
+        }
     }
 
     protected initSubBtn(){

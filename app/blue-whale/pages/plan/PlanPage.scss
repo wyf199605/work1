@@ -102,6 +102,36 @@
 
 }
 
+.plan-status-modal.modal-wrapper{
+  transition: transform 0.8s;
+  .modal-header{
+    height: 20px;
+    &>h1{
+      display: none;
+    }
+  }
+  .modal-body{
+    min-width: unset;
+    .status-list{
+      padding: 0 10px;
+      .status-item{
+        height: 20px;
+        line-height: 20px;
+        position: relative;
+        padding-left: 25px;
+        .status-ball{
+          position: absolute;
+          left: 0;
+          top: 2px;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
+
 .plan-page.fl-mobile {
   & > .mui-content {
     height: 100%;
