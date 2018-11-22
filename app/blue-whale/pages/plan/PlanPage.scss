@@ -1,10 +1,11 @@
-.plan-page{
+
+.plan-page {
   padding-left: 0px;
   padding-right: 0px;
   height: calc(100% - 23px);
 
-  .tooltip{
-    user-select:none;
+  .tooltip {
+    user-select: none;
     position: absolute;
     width: 120px;
     height: auto;
@@ -17,65 +18,65 @@
     opacity: 1;
 
   }
-  .custom-button{
+  .custom-button {
     box-shadow: 0px 2px 3px #c8c8c8 inset !important;
     background-color: #F8F8F8 !important;
     border-radius: 4% !important;
   }
-  .selected{
+  .selected {
     fill: #e60c0c;
     stroke: #ca3025;
   }
-  .plan-wrapper{
+  .plan-wrapper {
     height: 100%;
-    .horizontalQueryModule{
+    .horizontalQueryModule {
       position: relative;
       height: 50px;
       border-bottom: 1px solid #cccccc;
       z-index: 1;
     }
-    .plan-opera{
+    .plan-opera {
       display: flex;
       flex-wrap: nowrap;
       justify-content: space-around;
       height: 38px;
       padding: 7px 0;
       background-color: #ffffff;
-     .input-box-horizontal{
-       button{
-         background-color: #FFFFFF;
-         color: black;
-         border: 0px;
-         &:hover{
+      .input-box-horizontal {
+        button {
+          background-color: #FFFFFF;
+          color: black;
+          border: 0px;
+          &:hover {
             border-radius: 3px !important;
             background: #f8f8f8;
             opacity: 0.65;
             border: 1px solid #eeeeee;
-         }
-       }
-     }
+          }
+        }
+      }
     }
   }
-  .plan-content{
+  .plan-content {
     height: calc(100% - 50px);
-    .draw-point-wrapper{
+    .draw-point-wrapper {
       height: calc(100% - 38px);
       overflow: auto;
       position: relative;
-      svg{
+      svg {
         background: #fff;
         margin: 0 auto;
         display: block;
-        g{
-          .iconfont{
+        g {
+          .iconfont {
             font-size: 12px;
           }
 
-          .selected{
+          .selected {
             fill: #e60c0c;
             stroke: #ca3025;
           }
-          .line{
+          .line {
             //fill: white;
             stroke: #4682b4;
             //fill-opacity: 0;
@@ -90,7 +91,7 @@
 
             stroke: #084d84;
 
-            stroke-width:0.5px;
+            stroke-width: 0.5px;
 
           }
         }
@@ -100,5 +101,45 @@
   }
 
 }
+
+.plan-page.fl-mobile {
+  & > .mui-content {
+    height: 100%;
+    .plan-wrapper {
+      height: 100%;
+      .plan-content {
+        height: 100%;
+        .draw-point-wrapper{
+          height: 100%;
+          width: 100%;
+          overflow: auto;
+
+        }
+      }
+    }
+  }
+  .plan-opera{
+    display: none;
+  }
+  .queryBuilder {
+
+    .plan-query-form-body {
+      height: calc(100% - 44px);
+      .footer-btn-group {
+        padding: 10px 30px;
+        position: absolute;
+        .btn {
+
+        }
+      }
+    }
+  }
+
+  .plan-wrapper {
+
+  }
+
+}
+
 
 

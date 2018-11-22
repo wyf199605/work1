@@ -13,10 +13,11 @@ import {BwRule} from "../../common/rule/BwRule";
 import {Button} from "../../../global/components/general/button/Button";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {MbPage} from "../../../global/components/view/mbPage/MbPage";
 
 export interface IHorizontalQueryModule extends IComponentPara {
     qm: IBw_Query;
-    search?: (data) => any;
+    search?: (data) => Promise<any>;
 }
 
 export class HorizontalQueryModule extends Component {
@@ -24,16 +25,9 @@ export class HorizontalQueryModule extends Component {
         return <div className="horizontalQueryModule"/>;
     }
 
-    protected modal: Modal;
+    protected modal: QueryModal;
     protected forms: objOf<FormCom> = {};
     protected defaultData: obj;
-    private _extraWrapper: HTMLElement;
-    get extraWrapper() {
-        if (!this._extraWrapper) {
-            this._extraWrapper = <div className="extra-wrapper"/>;
-        }
-        return this._extraWrapper;
-    }
 
     protected _search: (data) => any;
     set search(flag) {
@@ -49,15 +43,34 @@ export class HorizontalQueryModule extends Component {
         this.defaultData = this.getDefaultData(para.qm.queryparams1);
         this.search = para.search;
         this.__initForms(para);
-        if (tools.isNotEmpty(this.forms) && (para.qm.queryType == 1 || para.qm.queryType == 3)) {
-            d.append(d.query('.query-form', this.wrapper), <div className="form-com-item">
-                <Button className="query-search-btn" content="查询" onClick={() => {
-                    typeof this.search === 'function' && this.search(this.json);
-                }}/>
-            </div>);
-        }
         // 自定义内容
-        d.append(d.query('.query-form', this.wrapper), this.extraWrapper);
+        if (tools.isNotEmpty(this.forms) && (para.qm.queryType == 1 || para.qm.queryType == 3)) {
+            if(tools.isMb){
+                let queryBtn = d.query('[data-action="showQuery"]');
+                queryBtn && d.on(queryBtn, 'click', () => {
+                    this.modal.show = true;
+                });
+                this.modal = new QueryModal({
+                    body: this.wrapper,
+                    onClear: () => {
+                        for(let item of Object.values(this.forms || {})){
+                            item.set('');
+                        }
+                    },
+                    onSearch: () => {
+                        typeof this.search === 'function' && this.search(this.json).then(() => {
+                            this.modal.show = false;
+                        });
+                    }
+                });
+            }else{
+                d.append(d.query('.query-form', this.wrapper), <div className="form-com-item">
+                    <Button className="query-search-btn" content="查询" onClick={() => {
+                        typeof this.search === 'function' && this.search(this.json);
+                    }}/>
+                </div>);
+            }
+        }
     }
 
     // 获取默认数据
@@ -262,5 +275,49 @@ export class HorizontalQueryModule extends Component {
         this.forms = null;
         this.search = null;
         super.destroy();
+    }
+}
+interface IQueryModalPara{
+    body: HTMLElement;
+    onClear?: Function;
+    onSearch?: Function;
+}
+
+class QueryModal{
+    protected modal: Modal;
+    protected mbPage: MbPage;
+    constructor(para: IQueryModalPara){
+        this.modal = new Modal({
+            className: 'modal-mbPage queryBuilder',
+            isBackground: false,
+            zIndex : 500
+        });
+        let body = <div className="plan-query-form-body">
+            {para.body}
+            <div className="footer-btn-group">
+                <Button content="重置" onClick={() => {
+                    para.onClear && para.onClear();
+                }}/>
+                <Button content="搜索" type="primary" onClick={() => {
+                    para.onSearch && para.onSearch();
+                }}/>
+            </div>
+        </div>;
+
+        let closeEl = <a className="mui-icon mui-icon-left-nav mui-pull-left" data-action="hide"/>;
+        d.on(closeEl, 'click', () => {
+            this.modal.isShow = false;
+        });
+        this.mbPage = new MbPage({
+            container: this.modal.bodyWrapper,
+            body: body,
+            left: closeEl,
+            title: '搜索',
+            className: 'mbPage-query'
+        });
+    }
+
+    set show(flag: boolean){
+        this.modal.isShow = flag;
     }
 }

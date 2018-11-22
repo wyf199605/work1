@@ -56,7 +56,7 @@ export class PlanModule extends Component{
             this.plotBtn.disabled = true;
         }
         this.initDraw();
-        this.initSubBtn();
+        tools.isPc && this.initSubBtn();
     }
 
     protected initSubBtn(){
@@ -197,55 +197,57 @@ export class PlanModule extends Component{
     get ajaxData(){
         return this._ajaxData;
     }
-    refresh(ajaxData?: obj){
-        this._ajaxData = ajaxData;
-        let ui = this.ui,
-            url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
-        let loading = new Loading({
-            msg: '数据加载中...'
-        });
-        loading.show();
-        this.setBackground(ajaxData).then(() => {
-            let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
-            this.ajax.fetch(tools.url.addObj(url, data), {
-                needGps: ui.dataAddr.needGps,
-                timeout: 30000,
-            }).then(({response}) => {
-                console.log(response);
-                let data = response.data;
-                if (data && ui.tableAddr && ui.tableAddr.param) {
-                    let editParam = ui.tableAddr.param[0];
-                    if (editParam) {
-                        let varList = [];
-                        ['insert', 'update', 'delete'].forEach(type => {
-                            let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
-                                typeVarList = editParam[type];
+    refresh(ajaxData?: obj): Promise<any>{
+        return new Promise((resolve, reject) => {
+            this._ajaxData = ajaxData;
+            let ui = this.ui,
+                url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
+            let loading = new Loading({
+                msg: '数据加载中...'
+            });
+            loading.show();
+            this.setBackground(ajaxData).then(() => {
+                let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
+                this.ajax.fetch(tools.url.addObj(url, data), {
+                    needGps: ui.dataAddr.needGps,
+                    timeout: 30000,
+                }).then(({response}) => {
+                    console.log(response);
+                    let data = response.data;
+                    if (data && ui.tableAddr && ui.tableAddr.param) {
+                        let editParam = ui.tableAddr.param[0];
+                        if (editParam) {
+                            let varList = [];
+                            ['insert', 'update', 'delete'].forEach(type => {
+                                let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                                    typeVarList = editParam[type];
 
-                            if (canOld && Array.isArray(typeVarList)) {
-                                varList = varList.concat(typeVarList)
-                            }
-                        });
-                        // 加上OLD变量
-                        BwRule.addOldField(BwRule.getOldField(varList), data);
+                                if (canOld && Array.isArray(typeVarList)) {
+                                    varList = varList.concat(typeVarList)
+                                }
+                            });
+                            // 加上OLD变量
+                            BwRule.addOldField(BwRule.getOldField(varList), data);
+                        }
                     }
-                }
-                console.log(data);
-                this.plotBtn.disabled = false;
-                this.draw.render(data);
-            }).catch(e => {
-                console.log(e);
-            }).finally(() => {
+                    console.log(data);
+                    this.plotBtn.disabled = false;
+                    this.draw.render(data);
+                }).catch(e => {
+                    console.log(e);
+                }).finally(() => {
+                    loading && loading.hide();
+                    loading = null;
+                    resolve();
+                })
+            }).catch(() => {
+                Modal.alert('图层不存在');
+                this.plotBtn.disabled = true;
                 loading && loading.hide();
                 loading = null;
-            })
-        }).catch(() => {
-            Modal.alert('图层不存在');
-            this.plotBtn.disabled = true;
-            loading && loading.hide();
-            loading = null;
-        });
-
-
+                reject();
+            });
+        })
     }
 
     format(field: R_Field, cellData: any, rowData: obj): IDrawFormatData{
