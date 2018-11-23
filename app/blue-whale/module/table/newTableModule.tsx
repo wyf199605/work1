@@ -97,7 +97,7 @@ export class NewTableModule {
                     d.append(container, tabWrapper);
                 } else {
                     this.subModal = modal = new Modal({
-                        className: 'modal-mbPage sub-table',
+                        className: 'modal-mbPage sub-table sub-table-page-modal',
                         isBackground: false,
                         height: '60%',
                         width: '75%',
@@ -110,7 +110,6 @@ export class NewTableModule {
                             this.active.isMain = true;
                         }
                     });
-                    modal.className = 'sub-table-page-modal';
                     this.main.subBtns.box && (modal.wrapper.style.bottom = '36px');
                     // modal.wrapper.style.right = '0';
                     modal.wrapper.style.left = 'auto';
@@ -118,7 +117,7 @@ export class NewTableModule {
                     modal.wrapper.style.bottom = '40px';
                     this.mobileModal = modal;
                     let mbPage = new MbPage({
-                        headerHeight: '30px',
+                        // headerHeight: '30px',
                         container: modal.bodyWrapper,
                         title: '子表',
                         right: [{

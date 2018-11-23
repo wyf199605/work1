@@ -228,6 +228,25 @@ export class PlanModule extends Component{
                             });
                             this.detailModal && (this.detailModal.isShow = false);
                             clearTimeout(timer);
+                            let body = <div className="plan-item-detail">
+                                <div className="plan-item-content">
+                                    {contents.map((text) => <span className="text">{text}</span>)}
+                                </div>
+                                <div className="plan-btn-groups">
+                                    {subButton.map((btn) => {
+                                        let button: Button = <Button content={btn.caption} color="primary" onClick={() => {
+                                            button.isDisabled = true;
+                                            button.isLoading = true;
+                                            ButtonAction.get().clickHandle(btn, data, () => {
+                                                button.isDisabled = false;
+                                                button.isLoading = false;
+                                                resolve();
+                                            }, this.pageUrl , ui.itemId);
+                                        }}/>;
+                                        return button;
+                                    })}
+                                </div>
+                            </div>;
                             this.detailModal = new Modal({
                                 className: 'plan-detail-modal',
                                 isOnceDestroy: true,
@@ -238,25 +257,13 @@ export class PlanModule extends Component{
                                     this.detailModal = null;
                                     timer = setTimeout(() => {
                                         this.draw.wrapper.style.paddingBottom = '0px';
-                                    }, 100)
+                                    }, 100);
+                                    reject();
                                 },
                                 header: {
                                     title,
                                 },
-                                body: <div className="plan-item-detail">
-                                    <div className="plan-item-content">
-                                        {contents.map((text) => <span className="text">{text}</span>)}
-                                    </div>
-                                    <div className="plan-btn-groups">
-                                        {subButton.map((btn) => {
-                                            return <Button content={btn.caption} color="primary" onClick={() => {
-                                                ButtonAction.get().clickHandle(btn, data, () => {
-                                                    resolve();
-                                                }, this.pageUrl , ui.itemId);
-                                            }}/>;
-                                        })}
-                                    </div>
-                                </div>,
+                                body,
                             });
                             this.draw.wrapper.style.paddingBottom = '240px';
                             break;
