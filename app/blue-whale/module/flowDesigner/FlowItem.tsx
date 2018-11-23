@@ -396,7 +396,7 @@ export class FlowItem extends Component {
 
     destroy() {
         this.rectNode.remove();
-        FlowDesigner.ALLITEMS.indexOf(this) > 0 && FlowDesigner.ALLITEMS.splice(FlowDesigner.ALLITEMS.indexOf(this));
+        FlowDesigner.ALLITEMS.indexOf(this) >= 0 && FlowDesigner.ALLITEMS.splice(FlowDesigner.ALLITEMS.indexOf(this));
         this.initEvents.off();
         this.flowEditor.destroy();
         super.destroy();
