@@ -143,6 +143,7 @@
           height: 100%;
           width: 100%;
           overflow: auto;
+          transition: padding 0.2s ease 0s;
           &::-webkit-scrollbar{
             display: none;
           }
@@ -167,8 +168,53 @@
     }
   }
 
-  .plan-wrapper {
+  .plan-detail-modal{
+    width: 90%;
+    max-height: 240px;
+    .head-wrapper{
+      padding: 3px 0;
+      background-color: #3185ff;
+      .modal-header{
+        border-bottom: none;
+        background-color: #3185ff;
+        h1{
+          margin: 0;
+          color: #fff;
+          font-weight: normal;
+        }
+        .close{
+          color: #fff;
+        }
+      }
+    }
 
+    .modal-body{
+      padding: 10px 10px 5px;
+      overflow: hidden;
+      .plan-item-detail{
+        .plan-item-content{
+          margin-right: -30px;
+          display: flex;
+          flex-wrap: wrap;
+          span.text{
+            padding-right: 30px;
+          }
+        }
+        .plan-btn-groups{
+          padding: 10px 0;
+          display: flex;
+          flex-wrap: wrap;
+          margin-right: -20px;
+          .btn{
+            margin-right: 20px;
+            margin-bottom: 10px;
+            color: #108ee9;
+            background-color: white;
+            border-color: #108ee9;
+          }
+        }
+      }
+    }
   }
 
 }
