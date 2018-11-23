@@ -208,8 +208,8 @@ export class DrawPoint extends Component {
             this.map.remove(i)
         }
         if (!this.g.selectAll('g').empty()) {
-            D3.select('.g-wrapper').selectAll('g').remove();
-            D3.select('.g-wrapper').selectAll('circle').remove();
+           this.g.selectAll('g').remove();
+           this.g.selectAll('circle').remove();
         }
 
         this.renderData = data;
@@ -226,14 +226,14 @@ export class DrawPoint extends Component {
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d).on('contextmenu',()=>{
-                if(this.isShowStatus){
+                //if(this.isShowStatus){
                     this.selectedData = d
                     D3.event.preventDefault();
                     console.log(D3.mouse(this.svg.node()));
                     let x = D3.mouse(this.svg.node())[0],y = D3.mouse(this.svg.node())[1]
                     this.contextMenu.setPosition(x,y);
                     this.contextMenu.show = true;
-                }
+               // }
             });
 
             let point = [],
