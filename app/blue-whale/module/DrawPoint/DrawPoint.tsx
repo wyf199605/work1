@@ -227,8 +227,15 @@ export class DrawPoint extends Component {
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d)
             if(tools.isMb){
-                d.on(group.node(),'press',()=>{
-                    console.log('这是长按事件');
+                G.d.on(group.node(),'press',(res)=> {
+                    console.log(D3.event);
+                    this.onAreaClick({
+                        type: 'modal',
+                        data: d
+
+                    }).then((data) => {
+                        alert(data)
+                    })
                 })
             }else {
                 group.on('contextmenu',()=>{
