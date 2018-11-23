@@ -57,18 +57,12 @@ export class PlanModule extends Component{
         }
         this.initDraw();
         tools.isPc && this.initSubBtn();
-        this.initStatusBar([
-            {
-                STATUS_NAME: '空闲',
-                GRIDBACKCOLOR: 'red',
-                STATUS_ID: "1",
-            }
-        ])
+        this.initStatusBar()
     }
 
-    initStatusBar(backColors){
-        // let ui = this.ui,
-        //     backColors = ui.backColor;
+    initStatusBar(){
+        let ui = this.ui,
+            backColors = ui.backColor;
         if(tools.isNotEmpty(backColors)){
             let body = <div class="status-list"/>;
             let modal = new Modal({
@@ -99,7 +93,7 @@ export class PlanModule extends Component{
 
             if(tools.isMb){
                 d.on(this.container, 'touchstart', (ev) => {
-                    if(!d.matches(ev.target as HTMLElement, '.plan-status-modal')){
+                    if(!d.closest(ev.target as HTMLElement, '.plan-status-modal')){
                         modal.wrapper.style.transform = 'translateX(-80px)';
                     }
                 });
