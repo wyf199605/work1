@@ -51,7 +51,9 @@ export class PlanPage extends BasicPage {
                     Modal.alert('没有图层');
                     return Promise.reject();
                 }else {
-                    planModule && planModule.refresh(data);
+                    planModule && planModule.refresh(data).catch(()=>{
+
+                    });
                     return Promise.resolve();
                 }
 
