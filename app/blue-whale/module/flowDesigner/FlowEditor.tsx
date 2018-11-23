@@ -236,7 +236,7 @@ export class FlowEditor extends FormCom {
     get dropdowns(){
         return this._dropdowns;
     }
-    set dropdowns(dropdowns: Object){
+    set dropdowns(dropdowns: object){
         this._dropdowns = dropdowns;
     }
 
@@ -249,7 +249,7 @@ export class FlowEditor extends FormCom {
         *   如果是Component，那么只有当前为显示状态并且准备隐藏的时候，才更新节点的data-name和文本
         * */
         let fields = this.get();
-        if(!(this.owner instanceof FlowDesigner) && tools.isNotEmpty(this.show) && !show && this.show !== show){
+        if(this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) && tools.isNotEmpty(this.show) && !show && this.show !== show){
             this.owner['wrapper'].dataset.name = fields.name;
             if(this.owner['isEnd'] || this.owner['isStart']){
                 // 如果节点是开始或结束节点，则不需要更新文本
@@ -268,7 +268,7 @@ export class FlowEditor extends FormCom {
             fields.name && (d.query('#design-canvas').dataset.name = fields.name);
         }
         this._show = show;
-        this.wrapper.classList.toggle('hide', !show);
+        this.wrapper && this.wrapper.classList.toggle('hide', !show);
     }
     get show() {
         return this._show;
@@ -296,5 +296,15 @@ export class FlowEditor extends FormCom {
     }
     set value(value: IFieldPara){
         this.set(value);
+    }
+
+    destroy() {
+        this.initEvents.off();
+        FlowEditor.DropDowns.forEach(dropdown => {
+            Object.keys(this.dropdowns).forEach(attr => {
+               d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
+            });
+        });
+        super.destroy();
     }
 }

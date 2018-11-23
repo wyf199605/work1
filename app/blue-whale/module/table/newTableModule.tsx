@@ -222,6 +222,10 @@ export class NewTableModule {
                             }
                             if (!tools.isMb) {
                                 d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
+                                    if(tools.isEmpty(this.sub[this.subTabActiveIndex])){
+                                        Modal.alert('当前没有子表可以全屏显示!');
+                                        return;
+                                    }
                                     let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
 
                                     let sub = this.sub[this.subTabActiveIndex],
