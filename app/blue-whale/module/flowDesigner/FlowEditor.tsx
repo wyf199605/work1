@@ -10,6 +10,7 @@ import {LineItem} from "./LineItem";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 import {BwRule} from "../../common/rule/BwRule";
+import CONF = BW.CONF;
 
 export interface IFieldPara{
     name?: string;  // 名称
@@ -62,7 +63,17 @@ export class FlowEditor extends FormCom {
         // 新增下拉列表时在此处添加键值
         performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
+        assignee: [
+            {value: ':currentuserid', text: '登录用户'},
+            {value: '', text: '角色'},
+            {value: '_group', text: '用户组'},
+            {value: '#', text: 'valueList用户配置'},
+        ]
     };
+
+    static addressList = [
+        {text: 'valueList用户配置', address: CONF.ajaxUrl.test}
+    ];
 
     private owner: Component | FlowDesigner;
 
@@ -85,7 +96,8 @@ export class FlowEditor extends FormCom {
             // 查看流程时获取的数据也要进行转换
             Object.keys(fields).forEach(key => {
                 if(key in FlowEditor.DROPDOWN_KEYVALUE){
-                    fields[key] = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0].text;
+                    let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
+                    valueText && (fields[key] = valueText.text);
                 }
             });
             this.set(fields);
@@ -121,6 +133,14 @@ export class FlowEditor extends FormCom {
                     onSelect: (item, index) => {
                         this.set({[attr]: item.text});
                         FlowEditor.hideAllDropdown();
+                        if(item.text === FlowEditor.addressList[0].text){
+                            console.log('in it');
+                            BwRule.Ajax.fetch(FlowEditor.addressList[0].address).then(({response}) => {
+                                console.log(response);
+                            }).catch(err => {
+                                console.log(err);
+                            });
+                        }
                     }
                 });
                 dropdown.hideList();    // 初始设置为隐藏
@@ -168,17 +188,6 @@ export class FlowEditor extends FormCom {
             // 首先隐藏所有下拉列表，然后（显示/隐藏）当前选择的下拉列表
             let dropdown = this.dropdowns[d.closest(e.target, '.attr-editor-wrapper', this.wrapper).dataset['attr']],
                 prevState = dropdown.isVisible;
-            this.type === 'flow-designer' && BwRule.Ajax.fetch(BW.CONF.ajaxUrl.getProcessTypeId, {
-                type: 'GET'
-            }).then(({response}) => {
-                let dropdownFields: ListItem[] = [];
-                response.body.bodyList[0].forEach((data, index, arr) => {
-                    dropdownFields[index] = {value: data.processTypeId, text: data.processTypeName};
-                });
-                dropdown.setData(dropdownFields);
-            }).catch(err => {
-                console.log(err);
-            });
             FlowEditor.hideAllDropdown();
             prevState ? dropdown.hideList() : dropdown.showList();
         };
@@ -292,6 +301,7 @@ export class FlowEditor extends FormCom {
 
     destroy() {
         this.initEvents.off();
+        FlowEditor.EXIST_NAME.indexOf(this.get().name) > 0 && FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
         FlowEditor.DropDowns.forEach(dropdown => {
             Object.keys(this.dropdowns).forEach(attr => {
                d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));

@@ -4,7 +4,7 @@
     .flow-modal {
         width: 100%;
         height: 100%;
-        $dropdown-attr-list: ('performType': 25px, 'taskType': 50px, 'processTypeId': 25px);    // 新增下拉列表时在此处添加属性
+        $dropdown-attr-list: ('performType': 25px, 'taskType': 50px, 'assignee': 75px);    // 新增下拉列表时在此处添加属性
         .modal-header {
             background-color: #005bac;
             .close {
