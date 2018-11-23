@@ -45,7 +45,6 @@ export class MbListModule extends Component{
                 container:this.wrapper
             });
             let btnArr:IButton[] = [];
-            globalButtons = globalButtons.concat(globalButtons).concat(globalButtons);
             globalButtons.forEach((btn,index) => {
                 btnArr.push({
                     content:btn.caption,

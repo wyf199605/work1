@@ -47,7 +47,8 @@ export class NewTableModule {
             : null;
     }
 
-    private currentSelectedIndexes:number[] = [];
+    private currentSelectedIndexes: number[] = [];
+
     constructor(para: ITableModulePara) {
         console.log(para);
         this.bwEl = para.bwEl;
@@ -155,7 +156,7 @@ export class NewTableModule {
                         return;
                     }
                     firstRow.selected = true;
-                   let noLoadSub = this.noLoadSub(mftable, main);
+                    let noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)) {
                         this.tab = new Tab({
                             panelParent: tabWrapper,
@@ -172,22 +173,24 @@ export class NewTableModule {
                                     this.currentSelectedIndexes.push(index);
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
-                                    if (!~this.currentSelectedIndexes.indexOf(index)){
+                                    if (!~this.currentSelectedIndexes.indexOf(index)) {
                                         this.sub[index].refresh(ajaxData).catch();
+                                        this.currentSelectedIndexes.push(index);
                                     }
                                     this.sub[index].linkedData = selectedData;
                                 }
                             }
                         });
                         if (!tools.isMb) {
-                            d.query('ul.nav-tabs',this.subWrapper).appendChild(<i title="放大" className="fa fa-expand full-icon"/>);
+                            d.query('ul.nav-tabs', this.subWrapper).appendChild(<i title="放大"
+                                                                                   className="fa fa-expand full-icon"/>);
                             let i = <i title="点击隐藏按钮" className="iconfont icon-arrow-up full-icon"/>;
-                            d.query('ul.nav-tabs',this.subWrapper).appendChild(i);
+                            d.query('ul.nav-tabs', this.subWrapper).appendChild(i);
                             d.on(i, 'click', () => {
                                 i.classList.toggle('icon-arrow-up');
                                 i.classList.toggle('icon-arrow-down');
                                 this.subBtnShow = i.classList.contains('icon-arrow-up');
-                                for(let sub of Object.values(this.sub)){
+                                for (let sub of Object.values(this.sub)) {
                                     sub && (sub.btnShow = this.subBtnShow);
                                     this.subBtnShow ? i.title = '点击隐藏按钮' : i.title = '点击展开按钮';
                                 }
@@ -214,14 +217,14 @@ export class NewTableModule {
                                 let showSubSeq = selectedData[this.showSubField].split(',');
                                 this.tab.setTabsShow(showSubSeq);
                                 this.tab.active(parseInt(showSubSeq[0]) - 1);
-                                this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
+                                parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
                             } else {
                                 this.tab.active(0);
                                 this.currentSelectedIndexes.push(0);
                             }
                             if (!tools.isMb) {
                                 d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
-                                    if(tools.isEmpty(this.sub[this.subTabActiveIndex])){
+                                    if (tools.isEmpty(this.sub[this.subTabActiveIndex])) {
                                         Modal.alert('当前没有子表可以全屏显示!');
                                         return;
                                     }
@@ -279,7 +282,7 @@ export class NewTableModule {
                 this.tab.active(parseInt(showSubSeq[0]) - 1);
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
-            }else{
+            } else {
                 !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 this.currentSelectedIndexes.push(0);
@@ -289,7 +292,7 @@ export class NewTableModule {
         }
     }
 
-    set subModalShow(flag: boolean){
+    set subModalShow(flag: boolean) {
         this.subModal && (this.subModal.isShow = flag);
     }
 
@@ -333,9 +336,10 @@ export class NewTableModule {
             let showSubSeq = selectedData[this.showSubField].split(',');
             this.tab.setTabsShow(showSubSeq);
             this.tab.active(this.subTabActiveIndex);
+            this.currentSelectedIndexes.push(this.subTabActiveIndex);
             let subs = [];
             for (let key in this.sub) {
-                if(~showSubSeq.indexOf(key) && tools.isNotEmpty(this.sub[key])){
+                if (~showSubSeq.indexOf(parseInt(key) + 1 + '') && tools.isNotEmpty(this.sub[key])) {
                     subs.push(this.sub[key]);
                 }
             }
@@ -343,7 +347,7 @@ export class NewTableModule {
                 subTable.refresh(ajaxData).catch();
                 subTable.linkedData = selectedData;
             });
-        }else{
+        } else {
             Object.values(this.sub).forEach((subTable) => {
                 subTable.refresh(ajaxData).catch();
                 subTable.linkedData = selectedData;
@@ -409,7 +413,7 @@ export class NewTableModule {
 
     bwEl: IBW_Table;
 
-    responsive(){
+    responsive() {
         let sub = this.sub[this.subTabActiveIndex],
             mainBox: InputBox = tools.keysVal(this.main, 'subBtns', 'box'),
             subBox: InputBox = tools.keysVal(sub, 'subBtns', 'box'),
@@ -496,9 +500,9 @@ export class NewTableModule {
                     }
                 }
 
-                if(status.edit){
+                if (status.edit) {
                     dbclick.on();
-                }else{
+                } else {
                     dbclick.off();
                 }
             },
@@ -747,13 +751,13 @@ export class NewTableModule {
                                                     });
                                                     let rowData = row.data;
                                                     row.cells.forEach((dataCell) => {
-                                                        if(dataCell !== cell){
+                                                        if (dataCell !== cell) {
                                                             let column = dataCell.column,
                                                                 field = column.content as R_Field;
-                                                            if(field.elementType === 'lookup'){
-                                                                if(!rowData[field.lookUpKeyField]){
+                                                            if (field.elementType === 'lookup') {
+                                                                if (!rowData[field.lookUpKeyField]) {
                                                                     dataCell.data = '';
-                                                                }else{
+                                                                } else {
                                                                     let options = bwTable.lookUpData[field.name] || [];
                                                                     for (let opt of options) {
                                                                         if (opt.value == rowData[field.lookUpKeyField]) {
