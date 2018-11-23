@@ -50,6 +50,7 @@ export = class NewCount extends NewStatisticBase{
                 top: 200,
                 container: this.para.container,
                 isBackground: tools.isMb,
+                isOnceDestroy: true,
                 position: tools.isMb ? 'center' : 'default',
                 footer: {},
                 isMb: false,

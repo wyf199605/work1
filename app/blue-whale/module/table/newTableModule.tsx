@@ -311,17 +311,21 @@ export class NewTableModule {
     protected subIndex = 0;
 
     subRefresh(rowData?: obj) {
+        let main = this.main,
+            mftable = main.ftable,
+            selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {});
+        if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
+            let showSubSeq = selectedData[this.showSubField].split(',');
+            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+        }
         let bwEl = this.bwEl,
-            subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex],
-            main = this.main,
-            mftable = main.ftable;
+            subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex];
 
         if (tools.isEmpty(subUi)) {
             return;
         }
 
-        let selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {}),
-            ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(subUi.dataAddr.varList, selectedData));
+        let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(subUi.dataAddr.varList, selectedData));
 
         // 查询从表时不需要带上选项参数
         delete ajaxData['queryoptionsparam'];
@@ -329,8 +333,7 @@ export class NewTableModule {
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
             this.tab.setTabsShow(showSubSeq);
-            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
-            this.tab.active(parseInt(showSubSeq[0]) - 1);
+            this.tab.active(this.subTabActiveIndex);
         }else{
             Object.values(this.sub).forEach((subTable) => {
                 subTable.refresh(ajaxData).catch();
@@ -957,6 +960,7 @@ export class NewTableModule {
                         // loading = null;
                         cancel();
                         tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                        this.currentSelectedIndexes = [];
                     });
                 }).finally(() => {
                     loading && loading.destroy();

@@ -114,9 +114,17 @@ export class DrawPoint extends Component {
             f && f();
         });
     }
+    private getDistance(p1, p2) {
+        var x = p2 - p1,
+            y = p2 - p1;
+        return Math.sqrt((x * x) + (y * y));
+    };
 
     public InitSvg(para) {
-        let _this = this;
+        let _this = this,
+            istouch = false,
+            start = [],
+            now = [];
         this.svg = D3.select(this.wrapper).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
@@ -129,17 +137,30 @@ export class DrawPoint extends Component {
                 this.redraw();
             })
 
-
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none")
-            .on('touchstart',function () {
-                _this.svg.on("dblclick.zoom", null);
-            })
-            .on('touchmove',function () {
-                //D3.select(this).attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
-            })
-            .on('touchend',function () {
-                
-            })
+            // .on('touchstart',function () {
+            //    // _this.svg.on("dblclick.zoom", null);
+            //    if( D3.touches(this).length >=2){
+            //       // alert('这是两个');
+            //        //alert(D3.touches(this));
+            //        istouch = true;
+            //        start = D3.touches(this)[0];
+            //    }
+            // })
+            // .on('touchmove',function () {
+            //     if(D3.touches(this).length >=2 && istouch){
+            //         now = D3.touches(this)[0];
+            //         let scale = _this.getDistance(now[0],now[1])/_this.getDistance(start[0],start[1]);
+            //         D3.select(this).attr('transform', "scale(" + scale.toFixed(2) + ")");
+            //     }
+            //
+            // })
+            // .on('touchend',function () {
+            //    // alert(D3.event)
+            //     if(istouch){
+            //         istouch = false;
+            //     }
+            // })
         this.g.append('image').attr('href', ()=>{
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
@@ -238,13 +259,18 @@ export class DrawPoint extends Component {
             let group = this.g.append('g').datum(d)
             if(tools.isMb){
                 G.d.on(group.node(),'press',(res)=> {
+
+                    group.select('path').attr('fill-opacity','0.9');
+                    setTimeout(()=>{
+                        group.select('path').attr('fill-opacity','0.56');
+                    },1000)
                     console.log(D3.event);
                     this.onAreaClick({
                         type: 'modal',
                         data: d
 
-                    }).then((data) => {
-                        alert(data)
+                    }).catch((e) => {
+                        console.log(e);
                     })
                 })
             }else {
