@@ -75,9 +75,7 @@ namespace G{
             }
             _storage.setItem('local_msg', JSON.stringify(array));
 
-            setTimeout(() => {
-                _notify();
-            },100)
+            _notify();
         };
         let _add = function (arr) {
             //     console.log(_get(), arr);
