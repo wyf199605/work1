@@ -269,8 +269,8 @@ export class DrawPoint extends Component {
                         type: 'modal',
                         data: d
 
-                    }).then((data) => {
-                        alert(data)
+                    }).catch((e) => {
+                        console.log(e);
                     })
                 })
             }else {

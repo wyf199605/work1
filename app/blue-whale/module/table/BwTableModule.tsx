@@ -1850,16 +1850,22 @@ export class BwTableModule extends Component {
                             switch (field){
                                 case 'look':{
                                     BwRule.Ajax.fetch(dataAddr).then(({response}) => {
-                                        new FlowDesigner(response);
+                                        new FlowDesigner(response, field);
                                     }).catch(err => {
                                         console.log(err);
                                     });
                                 }
-                                break;
+                                    break;
                                 case 'design':{
-                                    new FlowDesigner();
+                                    BwRule.Ajax.fetch(dataAddr, {
+                                        type: 'GET'
+                                    }).then(({response}) => {
+                                        new FlowDesigner(response, field);
+                                    }).catch(err => {
+                                        console.log(err);
+                                    });
                                 }
-                                break;
+                                    break;
                             }
                         } else {
                             // 通用操作按钮

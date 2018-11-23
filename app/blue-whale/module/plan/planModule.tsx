@@ -135,8 +135,10 @@ export class PlanModule extends Component{
         return this._pageUrl;
     }
 
+    protected detailModal: Modal;
     protected initDraw(){
         let ui = this.ui,
+            timer = null,
             subButton = ui.subButtons.filter((btn) => btn.multiselect !== 0),
             cols = ui.cols;
 
@@ -224,12 +226,22 @@ export class PlanModule extends Component{
                                     contents.push(item.data);
                                 }
                             });
-
-                            let modal = new Modal({
+                            this.detailModal && (this.detailModal.isShow = false);
+                            clearTimeout(timer);
+                            this.detailModal = new Modal({
                                 className: 'plan-detail-modal',
+                                isOnceDestroy: true,
+                                position: "down",
+                                isMb: false,
+                                isBackground: false,
+                                onClose: () => {
+                                    this.detailModal = null;
+                                    timer = setTimeout(() => {
+                                        this.draw.wrapper.style.paddingBottom = '0px';
+                                    }, 100)
+                                },
                                 header: {
                                     title,
-                                    isClose: false
                                 },
                                 body: <div className="plan-item-detail">
                                     <div className="plan-item-content">
@@ -237,7 +249,7 @@ export class PlanModule extends Component{
                                     </div>
                                     <div className="plan-btn-groups">
                                         {subButton.map((btn) => {
-                                            return <Button content={btn.caption} onClick={() => {
+                                            return <Button content={btn.caption} color="primary" onClick={() => {
                                                 ButtonAction.get().clickHandle(btn, data, () => {
                                                     resolve();
                                                 }, this.pageUrl , ui.itemId);
@@ -245,11 +257,8 @@ export class PlanModule extends Component{
                                         })}
                                     </div>
                                 </div>,
-                                position: "down",
-                                isMb: false,
-                                isBackground: false,
-                                isShow: true,
                             });
+                            this.draw.wrapper.style.paddingBottom = '240px';
                             break;
                     }
                 })
@@ -289,6 +298,7 @@ export class PlanModule extends Component{
         return this._ajaxData;
     }
     refresh(ajaxData?: obj): Promise<any>{
+        this.detailModal && (this.detailModal.isShow = false);
         return new Promise((resolve, reject) => {
             this._ajaxData = ajaxData;
             let ui = this.ui,

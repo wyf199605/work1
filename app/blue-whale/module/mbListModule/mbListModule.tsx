@@ -41,21 +41,23 @@ export class MbListModule extends Component{
     private initGlobalButtons() {
         let globalButtons = this.allButtons[0] || [];
         if (tools.isNotEmpty(globalButtons)) {
+            let sliderPopover = new SlidePopover({
+                container:this.wrapper
+            });
             let btnArr:IButton[] = [];
+            globalButtons = globalButtons.concat(globalButtons).concat(globalButtons);
             globalButtons.forEach((btn,index) => {
                 btnArr.push({
                     content:btn.caption,
                     icon:btn.icon ? btn.icon.split(' ')[1] : '',
                     iconPre:btn.icon ? btn.icon.split(' ')[0] : '',
                     onClick:()=>{
-                        ButtonAction.get().clickHandle(btn,{});
+                        // ButtonAction.get().clickHandle(btn,{});
+                        sliderPopover.modal.isShow = false;
                     }
                 })
             });
-            new SlidePopover({
-                buttons:btnArr,
-                container:this.wrapper
-            });
+            sliderPopover.buttons = btnArr;
         }
     }
 
