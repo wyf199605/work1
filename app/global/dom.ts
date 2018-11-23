@@ -46,6 +46,8 @@ interface IEventCacheHandlers{
 
 interface ITouchZoomEvent extends ICustomEvent{
     scale: number;
+    centerX: number;
+    centerY: number;
 }
 
 interface ICustomEvent {
@@ -170,20 +172,26 @@ let event = (function () {
                     eventOn(el, EVENT_START, selector, this.handler = (ev: TouchEvent) =>{
                         let touches = ev.touches;
                         if(touches.length === 2){
+                            let centerX = Math.abs(touches[0].clientX - touches[1].clientX) / 2,
+                                centerY = Math.abs(touches[0].clientY - touches[1].clientY) / 2;
                             let startDistance = Math.sqrt(Math.pow(touches[0].clientX - touches[1].clientX, 2)
                                 + Math.pow(touches[0].clientY - touches[1].clientY, 2));
                             eventOn(el, EVENT_MOVE, moveHandler = (ev: TouchEvent) =>{
                                 let touches = ev.touches;
                                 let moveDistance = Math.sqrt(Math.pow((touches[0].clientX - touches[1].clientX),2)
                                     + Math.pow((touches[0].clientY - ev.touches[1].clientY),2));
-                                this.scale = moveDistance / startDistance;
+                                if(moveDistance / startDistance > 1){
+                                    this.scale += 0.005;
+                                }else if(moveDistance / startDistance < 1){
+                                    this.scale -= 0.005;
+                                }
+                                startDistance = moveDistance;
                                 let dispatcher = dispatcherGet(el);
-                                dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, this.scale));
+                                dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, this.scale, centerX, centerY));
                             });
                             eventOn(el, EVENT_END, endHandler = () =>{
                                 eventOff(el, EVENT_END, endHandler);
                                 eventOff(el, EVENT_MOVE, moveHandler);
-                                this.scale = 1;
                             });
                         }
                     });
@@ -280,8 +288,8 @@ let event = (function () {
             }
         };
 
-        function getTouchZoomEvent(ev: TouchEvent , scale): ITouchZoomEvent {
-            return Object.assign({}, getCustomEvent(ev, 'touchzoom'),{scale})
+        function getTouchZoomEvent(ev: TouchEvent , scale, centerX, centerY): ITouchZoomEvent {
+            return Object.assign({}, getCustomEvent(ev, 'touchzoom'),{scale, centerX, centerY})
         }
 
         function getCustomEvent(ev: TouchEvent, type): ICustomEvent{
