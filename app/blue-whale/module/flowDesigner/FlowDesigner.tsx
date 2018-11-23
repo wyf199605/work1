@@ -156,7 +156,7 @@ export class FlowDesigner {
         let modal = new Modal({
             body: body,
             header: {
-                title: '新增流程',
+                title: '流程设计',
                 rightPanel: <i className="add-flow iconfont icon-jiahao"></i>,
             },
             className: 'flow-modal',
@@ -222,6 +222,7 @@ export class FlowDesigner {
 
                     if(tools.isNotEmpty(shape)){
                         // 设置节点的data-name
+                        shape.calcWidthAndHeight();
                         shape.wrapper.dataset.name = child.attributes.name.value;
                         let arr = FlowDesigner.ALLITEMS || [];
                         FlowDesigner.ALLITEMS = arr.concat([shape]);
