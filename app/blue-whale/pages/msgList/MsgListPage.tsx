@@ -35,12 +35,12 @@ export class MsgListPage extends BasicPage {
     private paging(arr : IDataMapPara[], html : HTMLElement, read : number){
         let pagDom = <div class="msg-paging"></div>,
             len = arr.length;
+
         if(len > 5){
             let pag = new Pagination({
                 container : pagDom,
                 pageOptions : [5],
                 onChange : (state) => {
-                    console.log(state)
                     html.innerHTML = null;
                     return new Promise(resolve => {
                         let index = state.current * 5,
@@ -61,11 +61,11 @@ export class MsgListPage extends BasicPage {
     private getDom(read : number){
         switch (read) {
             case 0:
-                return this._unReadDom;
+                return this.unReadDom;
             case 1:
-                return this._readDom;
+                return this.readDom;
         }
-        return this._allMsgDom;
+        return this.allMsgDom;
     }
 
     private listCreate(read?: number): HTMLElement {
@@ -73,6 +73,7 @@ export class MsgListPage extends BasicPage {
             data = localMsg.get(),
             arr = [];
 
+        this.getDom(read) && (this.getDom(read).innerHTML = null);
         data.forEach(obj => {
             if (tools.isNotEmpty(read)) {
                 if (read === obj.isread) {
@@ -87,9 +88,9 @@ export class MsgListPage extends BasicPage {
                 d.append(html, this.createLi(obj, read));
             }
         });
-        setTimeout(() => {
-            this.paging(arr, html, read);
-        });
+        // setTimeout(() => {
+        this.paging(arr, html, read);
+        // });
         return html;
     }
 
@@ -97,7 +98,7 @@ export class MsgListPage extends BasicPage {
         let del,
             notifyId = obj.notifyId,
             li = <li className={'msg-li ' + (obj.isread === 1 ? 'opacity-6' : '')}>
-                <div className="msg-title">{obj.content.caption || '我是标题'}</div>
+                <div className="msg-title">{obj.content.caption || '消息提示'}</div>
                 <div className="msg-content">{obj.content.content}</div>
                 <div class="msg-last">
                     <div className="msg-time">时间：{obj.createDate}</div>
@@ -110,7 +111,7 @@ export class MsgListPage extends BasicPage {
             </li>;
 
         d.on(li, 'click', function () {
-            sys.window.open({url: CONF.siteUrl + obj.content.link});
+            // sys.window.open({url: CONF.siteUrl + obj.content.link});
             if (read !== 1) {
                 li.classList.add('opacity-6');
             }
@@ -169,41 +170,45 @@ export class MsgListPage extends BasicPage {
 
     private _readDom: HTMLElement;
     get readDom() {
+        if (!this._readDom) {
+            this._readDom = <div class="read-msg"></div>;
+        }
         return this._readDom;
     }
 
     set readDom(html: HTMLElement) {
-        if (!this._readDom) {
-            this._readDom = <div class="read-msg"></div>;
-        }
-        this._readDom.innerHTML = null;
-        d.append(this._readDom, html);
+        this.removeUl(this.readDom);
+        d.prepend(this.readDom, html);
     }
 
     private _unReadDom: HTMLElement;
     get unReadDom() {
+        if (!this._unReadDom) {
+            this._unReadDom = <div class="unread-msg"></div>;
+        }
         return this._unReadDom;
     }
 
     set unReadDom(html: HTMLElement) {
-        if (!this._unReadDom) {
-            this._unReadDom = <div class="unread-msg"></div>;
-        }
-        this._unReadDom.innerHTML = null;
-        d.append(this._unReadDom, html);
+        this.removeUl(this.allMsgDom);
+        d.prepend(this.unReadDom, html);
     }
 
     private _allMsgDom: HTMLElement;
     get allMsgDom() {
+        if (!this._allMsgDom) {
+            this._allMsgDom = <div class="all-msg"></div>;
+        }
         return this._allMsgDom;
     }
 
     set allMsgDom(html: HTMLElement) {
-        if (!this._allMsgDom) {
-            this._allMsgDom = <div class="all-msg"></div>;
-        }
-        this._allMsgDom.innerHTML = null;
-        d.append(this._allMsgDom, html);
+        this.removeUl(this.allMsgDom);
+        d.prepend(this.allMsgDom, html);
     }
 
+    private removeUl(dom : HTMLElement){
+        let ul = d.query('.msg-list', dom);
+        ul && ul.remove();
+    }
 }
