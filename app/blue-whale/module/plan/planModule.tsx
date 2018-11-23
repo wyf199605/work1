@@ -86,7 +86,7 @@ export class PlanModule extends Component{
                 let {r, g, b} = tools.val2RGB(item.GRIDBACKCOLOR),
                     color = `rgb(${r}, ${g}, ${b})`;
                 d.append(body, <div className="status-item">
-                    <div className="status-ball" style={'background: ' + item.GRIDBACKCOLOR}/>
+                    <div className="status-ball" style={'background: ' + color}/>
                     {item.STATUS_NAME}
                 </div>)
             });
