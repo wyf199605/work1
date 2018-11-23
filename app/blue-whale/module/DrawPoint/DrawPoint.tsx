@@ -24,7 +24,7 @@ interface IDrapPoint extends IComponentPara {
 }
 
 interface IAreaType {
-    type: 'edit' | 'pick' | 'btn'| 'link';
+    type: 'edit' | 'pick' | 'btn'| 'link' | 'modal';
     data?: obj;
     name?: string;
     content?: any;
@@ -225,16 +225,25 @@ export class DrawPoint extends Component {
         }
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
-            let group = this.g.append('g').datum(d).on('contextmenu',()=>{
-                //if(this.isShowStatus){
+            let group = this.g.append('g').datum(d)
+            if(tools.isMb){
+                d.on(group.node(),'press',()=>{
+                    console.log('这是长按事件');
+                })
+            }else {
+                group.on('contextmenu',()=>{
+                    //if(this.isShowStatus){
                     this.selectedData = d
                     D3.event.preventDefault();
                     console.log(D3.mouse(this.svg.node()));
                     let x = D3.mouse(this.svg.node())[0],y = D3.mouse(this.svg.node())[1]
                     this.contextMenu.setPosition(x,y);
                     this.contextMenu.show = true;
-               // }
-            });
+                    // }
+                });
+            }
+
+
 
             let point = [],
                 I = 0,
