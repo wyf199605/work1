@@ -1,4 +1,5 @@
 /// <amd-module name="Validate"/>
+import tools = G.tools;
 export interface ValidateRule {
     rule: string; // maxLength, maxValue, minLength, minValue, requieredFlag, regExp
     errMsg?: string;
