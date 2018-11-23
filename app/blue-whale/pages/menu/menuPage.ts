@@ -1,4 +1,5 @@
 import BasicPage from "basicPage";
+import tools = G.tools;
 
 export = class menuPage extends BasicPage {
     constructor(private para) {
