@@ -188,11 +188,7 @@ export class FlowItem extends Component {
             off: () => {
                 this.rectNode.unclick(this.clickHandler());
                 this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
-            },
-            // 关闭节点的移动事件，从xml中解析时，只能查看属性，所以要将移动事件关闭（或打开点击事件）
-            closeDrag: () => {
-                this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
-            },
+            }
         }
     })();
 
@@ -201,7 +197,6 @@ export class FlowItem extends Component {
 
         return function () {
             FlowDesigner.removeAllActive();
-            FlowDesigner.flowEditor.show = false;
             self.active === false && (self.active = true);
             if (FlowDesigner.CURRENT_SELECT_TYPE === 'transition') {
                 let arr = Tips.TransitionItems || [];
@@ -209,7 +204,6 @@ export class FlowItem extends Component {
                 // 是否连接自己
                 if (self === Tips.TransitionItems[0]) {
                     self.active = false;
-                    FlowDesigner.flowEditor.show = true;
                 } else {
                     Tips.TransitionItems = arr.concat([self]);
                 }
@@ -221,7 +215,6 @@ export class FlowItem extends Component {
                         container: d.query('#design-canvas')
                     });
                     FlowDesigner.removeAllActive();
-                    FlowDesigner.flowEditor.show = false;
                     lineItem.line.attr({
                         stroke: '#005bac'
                     });
@@ -244,7 +237,6 @@ export class FlowItem extends Component {
         let _this = this;
         return function () {
             LineItem.removeAllActive();
-            FlowDesigner.flowEditor.show = false;
             if (_this.active !== true) {
                 FlowItem.removeAllActiveClass();
                 _this.active = true;
@@ -336,7 +328,6 @@ export class FlowItem extends Component {
 
     // 移除所有 flow-item 的 active 样式
     static removeAllActiveClass() {
-        FlowDesigner.flowEditor.show = false;
         d.queryAll('.flow-item').forEach((item) => {
             item.classList.remove('active');
             item.classList.remove('active');
@@ -401,7 +392,10 @@ export class FlowItem extends Component {
     }
 
     destroy() {
-        super.destroy();
+        this.rectNode.remove();
+        FlowDesigner.ALLITEMS.indexOf(this) > 0 && FlowDesigner.ALLITEMS.splice(FlowDesigner.ALLITEMS.indexOf(this));
         this.initEvents.off();
+        this.flowEditor.destroy();
+        super.destroy();
     }
 }

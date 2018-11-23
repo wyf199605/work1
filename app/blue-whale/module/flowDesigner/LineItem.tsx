@@ -73,18 +73,22 @@ export class LineItem extends Component {
     }
 
     setTextWrapperPosition() {
-        let path = this.line.attrs.path,
+        let path = this.line.attrs && this.line.attrs.path,
             x1 = path[0][1],
             y1 = path[0][2],
             x2 = path[1][5],
             y2 = path[1][6];
-        let style = window.getComputedStyle(this.wrapper),
-            widthStr = style.width,
-            heightStr = style.height,
-            width = Number(widthStr.slice(0, widthStr.length - 2)),
-            height = Number(heightStr.slice(0, heightStr.length - 2));
-        this.wrapper.style.left = x1 + (x2 - x1) / 2 - width / 2 + 'px';
-        this.wrapper.style.top = y1 + (y2 - y1) / 2 - height / 2 + 'px';
+        try {
+            let style = window.getComputedStyle(this.wrapper),
+                widthStr = style.width,
+                heightStr = style.height,
+                width = Number(widthStr.slice(0, widthStr.length - 2)),
+                height = Number(heightStr.slice(0, heightStr.length - 2));
+            this.wrapper.style.left = x1 + (x2 - x1) / 2 - width / 2 + 'px';
+            this.wrapper.style.top = y1 + (y2 - y1) / 2 - height / 2 + 'px';
+        }catch (e) {
+
+        }
     }
 
     constructor(para: ILineItemPara) {
@@ -94,7 +98,7 @@ export class LineItem extends Component {
         this.to = para.endNode;
         let line = FlowDesigner.PAPER.connection(this.from, this.to);
         FlowDesigner.connections = arr.concat([line]);
-        this.line = line.line;
+        line && (this.line = line.line);
         this.wrapper.innerText = '';
         this.setTextWrapperPosition();
         this.isComplete && this.line.attr({stroke: '#31ccff'});
@@ -122,7 +126,6 @@ export class LineItem extends Component {
     static counter = 0;
 
     static removeAllActive() {
-        FlowDesigner.flowEditor.show = false;
         let arr = FlowDesigner.AllLineItems || [];
         arr.forEach((item) => {
             item.line.attr({
@@ -165,7 +168,9 @@ export class LineItem extends Component {
     })();
 
     destroy() {
-        super.destroy();
         this.initEvents.off();
+        this.line.node.remove();
+        this.line.prev.remove();
+        super.destroy();
     }
 }

@@ -19,7 +19,7 @@ export class Tips extends Component {
                     <div className="tip-item-inner" id="save"><i className="appcommon app-baocun1"/>保存</div>
                 </div>
                 <div className="tip-item">
-                    <div className="tip-item-inner" id="otherSave"><i className="appcommon app-baocun1"/>另存为</div>
+                    <div className="tip-item-inner delete-item" id="delete-item"><i className="appcommon app-shanchu"/>删除</div>
                 </div>
                 <div className="tip-line"/>
                 <div className="tip-item">
@@ -139,14 +139,33 @@ export class Tips extends Component {
             });
             target.classList.add('active');
         };
+        let deleteItem = () => {
+            let deleteLine = [];
+            FlowDesigner.ALLITEMS.forEach(item => {
+                if(item && item.active){
+                    FlowDesigner.AllLineItems.forEach((line) => {
+                        line.from === item.rectNode && deleteLine.push(line) && line.destroy();
+                        line.to === item.rectNode && deleteLine.push(line) && line.destroy();
+                    });
+                    item.destroy() && FlowDesigner.removeAllActive();
+                }
+            });
+            FlowDesigner.AllLineItems.forEach((line, index, arr) => {
+                deleteLine.forEach(dLine => {
+                    line === dLine && arr.splice(index, 1);
+                })
+            });
+        };
         return {
             on: () => {
                 d.on(this.wrapper, 'mousedown', '.drag-item', selectItem);
                 d.on(this.wrapper, 'click', '.click-item', clickItemHandler);
+                d.on(this.wrapper, 'click', '.delete-item', deleteItem);
             },
             off: () => {
                 d.off(this.wrapper, 'mousedown', '.drag-item', selectItem);
                 d.off(this.wrapper, 'click', '.click-item', clickItemHandler);
+                d.off(this.wrapper, 'click', '.delete-item', deleteItem);
             }
         }
     })();

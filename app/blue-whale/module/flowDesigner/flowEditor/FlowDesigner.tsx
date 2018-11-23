@@ -1,6 +1,6 @@
 /// <amd-module name="FlowDesigner"/>
 /// <amd-dependency path="raphael" name="Raphael"/>
-import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {Modal} from "../../../../global/components/feedback/modal/Modal";
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import d = G.d;
@@ -98,7 +98,7 @@ export class FlowDesigner {
             paperWidth = paper.width,
             paperHeight = paper.height;
         FlowDesigner.PAPER = Raphael('design-canvas', parseInt(paperWidth.slice(0, paperWidth.length - 2)), parseInt(paperHeight.slice(0, paperHeight.length - 2)));
-        FlowDesigner.flowEditor = new FlowEditor({
+         = new FlowEditor({
             type:'flow-designer',
             container:d.query('#design-canvas')
         });
@@ -115,7 +115,7 @@ export class FlowDesigner {
             let target = e.target;
             if (target.tagName === 'svg') {
                 FlowDesigner.removeAllActive();
-                FlowDesigner.flowEditor.show = true;
+                .show = true;
             }
         };
         return {
@@ -198,13 +198,13 @@ export class FlowItem extends Component {
         });
         this.rectNode.click(function () {
             LineItem.removeAllActive();
-            FlowDesigner.flowEditor.show = false;
+            .show = false;
             self.active === false && (self.active = true);
             if (FlowDesigner.CURRENT_SELECT_TYPE === 'transition') {
                 let arr = Tips.TransitionItems || [];
                 if(self === Tips.TransitionItems[0]){
                     self.active = false;
-                    FlowDesigner.flowEditor.show = true;
+                    .show = true;
                 }else{
                     Tips.TransitionItems = arr.concat([self]);
                 }
@@ -218,7 +218,7 @@ export class FlowItem extends Component {
                         container: d.query('#design-canvas')
                     });
                     FlowDesigner.removeAllActive();
-                    FlowDesigner.flowEditor.show = false;
+                    .show = false;
                     lineItem.line.attr({
                         stroke: '#005bac'
                     });
@@ -290,7 +290,7 @@ export class FlowItem extends Component {
         let _this = this;
         return function () {
             LineItem.removeAllActive();
-            FlowDesigner.flowEditor.show = false;
+            .show = false;
             if (_this.active !== true) {
                 FlowItem.removeAllActiveClass();
                 _this.active = true;
@@ -382,7 +382,7 @@ export class FlowItem extends Component {
 
     // 移除所有 flow-item 的 active 样式
     static removeAllActiveClass() {
-        FlowDesigner.flowEditor.show = false;
+        .show = false;
         d.queryAll('.flow-item').forEach((item) => {
             item.classList.remove('active');
             item.classList.remove('active');
@@ -512,7 +512,7 @@ class LineItem extends Component {
     }
 
     static removeAllActive() {
-        FlowDesigner.flowEditor.show = false;
+        .show = false;
         let arr = FlowDesigner.AllLineItems || [];
         arr.forEach((item) => {
             item.line.attr({
