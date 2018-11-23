@@ -95,8 +95,8 @@ namespace BW {
             flowListApply: 'flow/system/list', // 流程引擎-申请
             modifyFlow: 'process/modify/',      // 流程修改
             getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
+            test: 'pick/n3022_data-3022/pick-3022-1',
         },
-
 
         init(siteUrl: string, appid: string, version: string, webscoket) {
             this.siteUrl = siteUrl;
