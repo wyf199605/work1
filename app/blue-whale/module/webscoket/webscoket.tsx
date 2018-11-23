@@ -116,24 +116,21 @@ export = class webscoket {
                     }
                     tools.event.fire('newMsg', JSON.stringify(data.data.dataMap));
                 }else if(os === 'pc'){
-                    let listData = data.data.dataMap,
-                        msgDom = d.query('.unreadMsgNum');
-                    msgDom.classList.remove('hide');
-                    msgDom.innerText = G.localMsg.getUnreadCount() + '';
-                    for( let i = 0; i < listData.length; i ++ ){
-                        let url = CONF.siteUrl + listData[i].content.link;
+                    let listData = data.data.dataMap;
+                    listData.forEach(obj => {
+                        let url = CONF.siteUrl + obj.content.link;
                         new Notify({
-                            title:dataMap.sender,
-                            content:listData[i].content.content,
+                            title: obj.content.caption || '消息提示',
+                            content: obj.content.content,
                             onClick : () => {
+                                localMsg.read(dataMap.notifyId);
                                 if (sysPcHistory.indexOf(url) >= 0) {
                                     sys.window.refresh(url);
                                 }
                                 sys.window.open({url})
                             }
                         })
-
-                    }
+                    });
                 }
 
 

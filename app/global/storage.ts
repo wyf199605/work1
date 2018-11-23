@@ -53,6 +53,18 @@ namespace G{
     export let localMsg = (function () {
         let _storage = window.localStorage;
 
+        let _notify = function(){
+            if(G.tools.isPc){
+                let unreadMsgNum = d.query('#unreadMsgNum'),
+                    num = _getUnreadCount();
+                if(num > 0){
+                    unreadMsgNum.classList.remove('hide');
+                    unreadMsgNum.innerText = num + '';
+                }else {
+                    unreadMsgNum.classList.add('hide');
+                }
+            }
+        };
         let _get = function () {
             let s = _storage.getItem('local_msg');
             return s ? JSON.parse(s) : [];
@@ -62,6 +74,10 @@ namespace G{
                 array = [];
             }
             _storage.setItem('local_msg', JSON.stringify(array));
+
+            setTimeout(() => {
+                _notify();
+            },100)
         };
         let _add = function (arr) {
             //     console.log(_get(), arr);

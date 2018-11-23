@@ -89,8 +89,7 @@ interface R_ReqAddr {
     needGps?:number;
     varList?: R_VarList[];
     type?: string;
-    parseVarList? : obj[];
-
+    parseVarList?: R_VarList[];
 }
 
 interface R_Field extends COL {

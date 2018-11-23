@@ -129,22 +129,27 @@ namespace BW {
         public window = (function (self) {
             return {
                 open: function (o: winOpen, refer?: string) {
+                    let url = o.url;
                     if (self.inMain) {
-                        let isNew = self.pages.open(o);
-                        if(o.url.indexOf('newPage') > -1){ // 不走btl模板的页面
+                        let isNew = self.pages.open(o),
+                            isNotBtl = url.indexOf('newPage') > -1;
+                        if(isNotBtl){ // 不走btl模板的页面
                             let title = o.title;
-                            self.tabs.open(o.url, title);
-                            sysPcHistory.add({url: o.url, refer, title: title});
+                            self.tabs.open(url, title);
+                            sysPcHistory.add({url: url, refer, title: title});
                         }else {
                             self.tabs.open(o.url);
-                            sysPcHistory.add({url: o.url, refer, title: ''});
+                            sysPcHistory.add({url: url, refer, title: ''});
                         }
                         if (!isNew) {
-
-                            self.window.fire('wake', self.pages.get(o.url).dom, o.url);
+                            if(isNotBtl){
+                                self.window.refresh(url);
+                            }else {
+                                self.window.fire('wake', self.pages.get(url).dom, url);
+                            }
                         }
                     } else {
-                        location.assign(o.url);
+                        location.assign(url);
                     }
                     localStorage.setItem('viewData', JSON.stringify(o.extras));
                 },
