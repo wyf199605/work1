@@ -44,6 +44,7 @@ namespace BW {
             myApprovalPC: `ui/menu/n3009_data-3009?p_n=n3009_data-3009&page=myApplication`,
             flowDetail: `commonui/pageroute?page=flowDetail`,
 
+            /*-- url带有newPage，不走btl模板MsgListPage为页面名称 --*/
             msgList : 'newPage/MsgListPage',
         },
         ajaxUrl: {
