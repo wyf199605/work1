@@ -14,65 +14,69 @@ import Component = G.Component;
 declare const Raphael;
 
 Raphael.fn.connection = function (obj1, obj2, line, bg) {
-    bg = '#b6d1e0';
-    if (obj1.line && obj1.from && obj1.to) {
-        line = obj1;
-        obj1 = line.from;
-        obj2 = line.to;
-    }
+    try {
+        bg = '#b6d1e0';
+        if (obj1.line && obj1.from && obj1.to) {
+            line = obj1;
+            obj1 = line.from;
+            obj2 = line.to;
+        }
 
-    var bb1 = obj1.getBBox(),
-        bb2 = obj2.getBBox(),
-        p = [{x: bb1.x + bb1.width / 2, y: bb1.y - 1},
-            {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
-            {x: bb1.x - 1, y: bb1.y + bb1.height / 2},
-            {x: bb1.x + bb1.width + 1, y: bb1.y + bb1.height / 2},
-            {x: bb2.x + bb2.width / 2, y: bb2.y - 1},
-            {x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1},
-            {x: bb2.x - 1, y: bb2.y + bb2.height / 2},
-            {x: bb2.x + bb2.width + 1, y: bb2.y + bb2.height / 2}],
-        d = {}, dis = [];
-    for (var i = 0; i < 4; i++) {
-        for (var j = 4; j < 8; j++) {
-            var dx = Math.abs(p[i].x - p[j].x),
-                dy = Math.abs(p[i].y - p[j].y);
-            if ((i == j - 4) || (((i != 3 && j != 6) || p[i].x < p[j].x) && ((i != 2 && j != 7) || p[i].x > p[j].x) && ((i != 0 && j != 5) || p[i].y > p[j].y) && ((i != 1 && j != 4) || p[i].y < p[j].y))) {
-                dis.push(dx + dy);
-                d[dis[dis.length - 1]] = [i, j];
+        var bb1 = obj1.getBBox(),
+            bb2 = obj2.getBBox(),
+            p = [{x: bb1.x + bb1.width / 2, y: bb1.y - 1},
+                {x: bb1.x + bb1.width / 2, y: bb1.y + bb1.height + 1},
+                {x: bb1.x - 1, y: bb1.y + bb1.height / 2},
+                {x: bb1.x + bb1.width + 1, y: bb1.y + bb1.height / 2},
+                {x: bb2.x + bb2.width / 2, y: bb2.y - 1},
+                {x: bb2.x + bb2.width / 2, y: bb2.y + bb2.height + 1},
+                {x: bb2.x - 1, y: bb2.y + bb2.height / 2},
+                {x: bb2.x + bb2.width + 1, y: bb2.y + bb2.height / 2}],
+            d = {}, dis = [];
+        for (var i = 0; i < 4; i++) {
+            for (var j = 4; j < 8; j++) {
+                var dx = Math.abs(p[i].x - p[j].x),
+                    dy = Math.abs(p[i].y - p[j].y);
+                if ((i == j - 4) || (((i != 3 && j != 6) || p[i].x < p[j].x) && ((i != 2 && j != 7) || p[i].x > p[j].x) && ((i != 0 && j != 5) || p[i].y > p[j].y) && ((i != 1 && j != 4) || p[i].y < p[j].y))) {
+                    dis.push(dx + dy);
+                    d[dis[dis.length - 1]] = [i, j];
+                }
             }
         }
-    }
-    if (dis.length == 0) {
-        var res = [0, 4];
-    } else {
-        res = d[Math.min.apply(Math, dis)];
-    }
-    var x1 = p[res[0]].x,
-        y1 = p[res[0]].y,
-        x4 = p[res[1]].x,
-        y4 = p[res[1]].y;
-    dx = Math.max(Math.abs(x1 - x4) / 2, 10);
-    dy = Math.max(Math.abs(y1 - y4) / 2, 10);
-    var x2 = [x1, x1, x1 - dx, x1 + dx][res[0]].toFixed(3),
-        y2 = [y1 - dy, y1 + dy, y1, y1][res[0]].toFixed(3),
-        x3 = [0, 0, 0, 0, x4, x4, x4 - dx, x4 + dx][res[1]].toFixed(3),
-        y3 = [0, 0, 0, 0, y1 + dy, y1 - dy, y4, y4][res[1]].toFixed(3);
-    var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
-    if (line && line.line) {
-        line.bg && line.bg.attr({path: path});
-        line.line.attr({path: path});
-    } else {
-        var color = typeof line == "string" ? line : "#b6d1e0";
-        return {
-            bg: bg && bg.split && this.path(path).attr({
-                stroke: bg.split("|")[0],
-                fill: "none",
-                "stroke-width": bg.split("|")[1] || 2
-            }),
-            line: this.path(path).attr({stroke: color, fill: "none"}),
-            from: obj1,
-            to: obj2
-        };
+        if (dis.length == 0) {
+            var res = [0, 4];
+        } else {
+            res = d[Math.min.apply(Math, dis)];
+        }
+        var x1 = p[res[0]].x,
+            y1 = p[res[0]].y,
+            x4 = p[res[1]].x,
+            y4 = p[res[1]].y;
+        dx = Math.max(Math.abs(x1 - x4) / 2, 10);
+        dy = Math.max(Math.abs(y1 - y4) / 2, 10);
+        var x2 = [x1, x1, x1 - dx, x1 + dx][res[0]].toFixed(3),
+            y2 = [y1 - dy, y1 + dy, y1, y1][res[0]].toFixed(3),
+            x3 = [0, 0, 0, 0, x4, x4, x4 - dx, x4 + dx][res[1]].toFixed(3),
+            y3 = [0, 0, 0, 0, y1 + dy, y1 - dy, y4, y4][res[1]].toFixed(3);
+        var path = ["M", x1.toFixed(3), y1.toFixed(3), "C", x2, y2, x3, y3, x4.toFixed(3), y4.toFixed(3)].join(",");
+        if (line && line.line) {
+            line.bg && line.bg.attr({path: path});
+            line.line.attr({path: path});
+        } else {
+            var color = typeof line == "string" ? line : "#b6d1e0";
+            return {
+                bg: bg && bg.split && this.path(path).attr({
+                    stroke: bg.split("|")[0],
+                    fill: "none",
+                    "stroke-width": bg.split("|")[1] || 2
+                }),
+                line: this.path(path).attr({stroke: color, fill: "none"}),
+                from: obj1,
+                to: obj2
+            };
+        }
+    }catch (e) {
+
     }
 };
 
@@ -104,7 +108,7 @@ const Method = {
     getFields: function(node: Node, type: string = node['tagName']){
         // 根据类型属性限定表(ATTR_LIMIT)中的属性查找节点的所有属性值，返回该节点所有属性和值的集合
         let fields = {};
-        FlowEditor.ATTR_LIMIT[type].forEach(item => {
+        FlowEditor.ATTR_LIMIT[type] && FlowEditor.ATTR_LIMIT[type].forEach(item => {
             item in node['attributes'] && (fields[item] = node['attributes'].getNamedItem(item).value);
         });
         return fields;
@@ -144,8 +148,9 @@ export class FlowDesigner {
     static AllLineItems: LineItem[] = [];
     static flowEditor: FlowEditor;
     static rootElement: Element;
+    static processId: number;
 
-    constructor(responseData?: any) {
+    constructor(responseData?: any, type?: string) {
         FlowEditor.EXIST_NAME = [];
         let body = <div className="design-canvas" id="design-canvas"/>;
         let modal = new Modal({
@@ -162,44 +167,40 @@ export class FlowDesigner {
                 modal.destroy();
             }
         });
-        let Tip: Tips;
-        tools.isEmpty(responseData) && (Tip = new Tips({
-            container: body
-        }));
+        let Tip: Tips = null;
+        type === 'design' && (
+            Tip = new Tips({
+                container: body
+            })
+        );
 
         let paper = window.getComputedStyle(body),
             paperWidth = paper.width,
             paperHeight = paper.height;
         FlowDesigner.PAPER = Raphael('design-canvas', parseInt(paperWidth.slice(0, paperWidth.length - 2)), parseInt(paperHeight.slice(0, paperHeight.length - 2)));
 
-        FlowDesigner.flowEditor = new FlowEditor({
-            type: 'flow-designer',
-            container: d.query('#design-canvas'),
-            owner: this,
-        });
         this.initEvents.on();
         let _this = this;
 
-        // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程（流程不可修改）
+        // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程
         // 如果没有则需要自己绘制流程
         if (tools.isNotEmpty(responseData)) {
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
-            FlowDesigner.flowEditor.show = false;
-            modal.modalHeader.title = '查看流程';
-            _this.initEvents.closeSaveFlowEvent();
-            d.remove(d.query('.header-btn-right'));
+            if(type === 'look'){
+                modal.modalHeader.title = '查看流程';
+                _this.initEvents.closeSaveFlowEvent();
+                d.remove(d.query('.header-btn-right'));
+                d.query('#design-canvas').style.pointerEvents = 'none';
+            }else{
+                FlowDesigner.processId = responseData.data[0]['process_id'];
+            }
 
-            let xmlStr = responseData['body'].bodyList[0].dataList[0].toString(),
+            let xmlStr = responseData.data[0].process,
                 rootElement = Method.loadXMLStr(xmlStr).documentElement;
-
-            // 设置FlowDesigner的属性
-            let fields = Method.getFields(rootElement, 'flow-designer');
-            FlowDesigner.flowEditor.set(fields);
-
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
                 if (child.nodeType === 1) {
-                    let layout = child.attributes.layout.value.split(',').map(item => parseInt(item)),
+                    let layout = child.attributes.layout && child.attributes.layout.value.split(',').map(item => parseInt(item)),
                         isComplete: boolean = false,
                         fields = Method.getFields(child);
 
@@ -207,7 +208,8 @@ export class FlowDesigner {
                     'isComplete' in child.attributes && (
                         isComplete = child.attributes.isComplete.value === 'true'
                     );
-                    let shape = new FlowItem({
+                    let shape: FlowItem = null;
+                    layout && (shape = new FlowItem({
                         type: child.tagName,
                         text: fields['displayName'],
                         position: {x: layout[0], y: layout[1]},
@@ -216,16 +218,22 @@ export class FlowDesigner {
                         isComplete: isComplete,
                         container: d.query('#design-canvas'),
                         fields: fields,
-                    });
+                    }));
 
-                    // 设置节点的data-name
-                    shape.wrapper.dataset.name = child.attributes.name.value;
-                    let arr = FlowDesigner.ALLITEMS || [];
-                    FlowDesigner.ALLITEMS = arr.concat([shape]);
+                    if(tools.isNotEmpty(shape)){
+                        // 设置节点的data-name
+                        shape.wrapper.dataset.name = child.attributes.name.value;
+                        let arr = FlowDesigner.ALLITEMS || [];
+                        FlowDesigner.ALLITEMS = arr.concat([shape]);
 
-                    // 开始节点的內圆也要改变颜色
-                    if(shape.isStart && shape.isComplete){
-                        d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#31ccff';
+                        // 完成状态的样式
+                        shape.isComplete && (
+                            shape.wrapper.style.color = 'white',
+                            shape.wrapper.style.backgroundColor = '#31ccff'
+                        );
+                        if(shape.isStart && shape.isComplete){
+                            d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#ffffff';
+                        }
                     }
                 }
             });
@@ -270,22 +278,17 @@ export class FlowDesigner {
                 });
             });
 
-            // FlowDesigner.flowEditor.disabled = true;
-            // 设置节点不可移动但可以点击查看属性
-            FlowDesigner.ALLITEMS.forEach(item => {
-                item.initEvents.closeDrag();
-            });
-
             // 禁用所有input
             d.queryAll('input').forEach(input => {
                 (input as HTMLInputElement).readOnly = true;
             });
 
             // 所有的下拉列表都不可用
-            [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS).forEach(item => item.flowEditor.initEvents.off());
-            d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item));
+            type === 'look' && (
+                [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS).forEach(item => item.flowEditor && item.flowEditor.initEvents.off()),
+                d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item))
+            )
 
-            // FlowDesigner.flowEditor.show = true;
         }
     }
 
@@ -300,23 +303,15 @@ export class FlowDesigner {
             let target = e.target;
             if (target.tagName === 'svg') {
                 FlowDesigner.removeAllActive();
-                FlowDesigner.flowEditor.show = true;
             }
         };
         let saveFlowHandler = (e) => {
-            if([].concat(FlowDesigner).concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems).some(item => tools.isEmpty(item.flowEditor.get().name))){
+            if([].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems).some(item => tools.isEmpty(item.flowEditor.get().name))){
                 Modal.toast('名称不能为空!');
-                return;
-            }
-            if(tools.isEmpty(FlowDesigner.flowEditor.get().processTypeId)){
-                Modal.toast('流程类型不能为空!');
                 return;
             }
             let xmlDoc = Method.loadXMLStr(`<?xml version="1.0" encoding="UTF-8"?><process></process>`);
             FlowDesigner.rootElement = xmlDoc.documentElement;
-            // 流程设计的processTypeId数据也需要进行转换
-            let processTypeId = FlowDesigner.flowEditor.dropdowns['processTypeId'];
-            Method.parseToXml.setAttr(FlowDesigner.rootElement, Object.assign(FlowDesigner.flowEditor.get(), {processTypeId: processTypeId.data[processTypeId.selectIndex].value}));
 
             FlowDesigner.ALLITEMS.forEach(item => {
                 // 创建节点、设置属性、添加到xml节点树中
@@ -348,7 +343,7 @@ export class FlowDesigner {
             });
             
             let xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
-            BwRule.Ajax.fetch(BW.CONF.ajaxUrl.saveFlow, {
+            BwRule.Ajax.fetch(BW.CONF.ajaxUrl.modifyFlow + FlowDesigner.processId, {
                 type: 'POST',
                 data: {process: xmlStr},
             }).then(({response}) => {

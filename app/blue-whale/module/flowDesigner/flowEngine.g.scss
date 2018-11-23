@@ -43,7 +43,7 @@
             height: 100%;
             .dropdown-wrapper {
                 position: absolute;
-                left: 283px;
+                right: 283px;
                 bottom: 20px;
                 // 新增列表时需要修改
                 $bottom: 25px !default;
@@ -197,7 +197,7 @@
         }
         .flow-editor {
             position: absolute;
-            left: 20px;
+            right: 20px;
             bottom: 20px;
             width: 260px;
             height: auto;
