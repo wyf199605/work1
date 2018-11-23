@@ -25,7 +25,7 @@ export class ButtonAction {
      * button点击后业务操作规则
      */
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
-    }, url?: string, itemId?: string, atvData? : obj) {
+    }, url?: string, itemId?: string, atvData?: obj) {
         let self = this;
         if (btn.subType === 'excel') {
 
@@ -105,7 +105,7 @@ export class ButtonAction {
                     word = hintWords[btn.buttonType];
                 if (btn.subType === 'with_draw') {
                     word = '撤销';
-                }else if(btn.subType === 'reject'){
+                } else if (btn.subType === 'reject') {
                     word = '退回';
                 }
                 Modal.confirm({
@@ -176,15 +176,15 @@ export class ButtonAction {
      * 处理按钮规则buttonType=0:get,1:post,2put,3delete
      */
     private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
-    }, url?: string, avtData? : obj) {
+    }, url?: string, avtData?: obj) {
         let {addr, data} = BwRule.reqAddrFull(btn.actionAddr, dataObj),
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
-        if(dataObj && (!Array.isArray(dataObj) || dataObj.length === 1)){
+        if (dataObj && (!Array.isArray(dataObj) || dataObj.length === 1)) {
             addr && (addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj));
         }
-        if(avtData){
+        if (avtData) {
             addr && (addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())}));
         }
         let varType = btn.actionAddr.varType, res: any = data;
@@ -192,13 +192,13 @@ export class ButtonAction {
         if (varType === 3 && typeof data !== 'string') {
             // 如果varType === 3 则都转为数组传到后台
             let tmp = data;
-            if (tools.isEmpty(data)){
+            if (tools.isEmpty(data)) {
                 // 不传任何数据
 
-            }else if(!Array.isArray(tmp)) {
+            } else if (!Array.isArray(tmp)) {
                 tmp = [tmp];
                 res = JSON.stringify(tmp);
-            }else{
+            } else {
                 res = JSON.stringify(tmp);
             }
         }
@@ -223,10 +223,10 @@ export class ButtonAction {
                 addr = tools.url.addObj(addr, {output: 'json'});
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     //创建条码扫码页面
-                    if(response.uiType === 'inventory' && tools.isMb){
-                        this.initBarCode(response,data,dataObj);
+                    if (response.uiType === 'inventory' && tools.isMb) {
+                        this.initBarCode(response, data, dataObj);
                         self.btnRefresh(btn.refresh, url);
-                    }else{
+                    } else {
                         self.btnPopup(response, () => {
                             self.btnRefresh(btn.refresh, url);
                         }, url);
@@ -238,7 +238,7 @@ export class ButtonAction {
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
-                if(varType === 3 && res){
+                if (varType === 3 && res) {
                     openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
                 }
                 callback(null);
@@ -250,17 +250,17 @@ export class ButtonAction {
         }
     }
 
-   private initBarCode(res,data,dataObj){
+    private initBarCode(res, data, dataObj) {
         // console.log(res.body.elements)
         let dataAddr = res.body.elements,
-            codeStype:object[],
-            url:string,
-            uniqueFlag:string,
-            ajaxUrl:string,
-            uploadUrl:string,
-            downUrl:string;
+            codeStype: object[],
+            url: string,
+            uniqueFlag: string,
+            ajaxUrl: string,
+            uploadUrl: string,
+            downUrl: string;
         console.log(dataAddr);
-        for(let i = 0;i < dataAddr.length;i++){
+        for (let i = 0; i < dataAddr.length; i++) {
             url = dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
@@ -270,17 +270,18 @@ export class ButtonAction {
         console.log(codeStype[0]["IMPORTDATAMODE"])
 
 
-        require(['RfidBarCode'],(p)=>{
+        require(['RfidBarCode'], (p) => {
             new p.RfidBarCode({
-                codeStype:codeStype,
-                SHO_ID:dataObj['SHO_ID'],
-                USERID:dataObj['USERID'],
-                uploadUrl:uploadUrl,
-                downUrl:url,
-                uniqueFlag:uniqueFlag
+                codeStype: codeStype,
+                SHO_ID: dataObj['SHO_ID'],
+                USERID: dataObj['USERID'],
+                uploadUrl: uploadUrl,
+                downUrl: url,
+                uniqueFlag: uniqueFlag
             })
         })
     }
+
     /**
      * 后台有配置actionHandle情况下的处理
      */
@@ -345,7 +346,7 @@ export class ButtonAction {
             loading: Loading,
             sendMsg,
             sendFinish,
-            width,    //模态框宽度
+            width: number,    //模态框宽度
             progress, //进度条
             tipDom,   //盘点机信息提示
             table;    //表格模块
@@ -357,7 +358,7 @@ export class ButtonAction {
             } else {
                 width = 180 * len;
             }
-        } else if (res.downloadAddr) {
+        } else {
             width = 260;
         }
         //模态框参数
@@ -367,29 +368,30 @@ export class ButtonAction {
                 </div></div><div class="avatar-progress"><div class="progress-title">传输尚未开始</div></div></div>`)
         }
         let caption = response.caption,
-            para : IModal = {
-            body: body,
-            header: caption,
-            isOnceDestroy: true,
-            width: width,
-            isAdaptiveCenter: true,
-            isMb: false,
-            top : tools.isMb ? 80 : null,
-            onClose : () => {
-                modal.destroy(() => {
-                    if (res.downloadAddr) {
-                        offShellMonitor();
+            para: IModal = {
+                body: body,
+                header: caption,
+                isOnceDestroy: true,
+                width: width + 'px',
+                height: tools.isMb ? '300px': void 0,
+                isAdaptiveCenter: true,
+                isMb: false,
+                top: tools.isMb ? 80 : null,
+                onClose: () => {
+                    modal.destroy(() => {
+                        if (res.downloadAddr) {
+                            offShellMonitor();
+                        }
+                    });
+                    if (type === 3) {
+                        BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
                     }
-                });
-                if(type === 3){
-                    BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
                 }
-            }
-        };
+            };
 
         if (type === 3 || type === 5) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
-        }else if (type === 4) {
+        } else if (type === 4) {
             para['className'] = 'action-type-4';
         }
 
@@ -408,15 +410,15 @@ export class ButtonAction {
                                 data[0] = selectInput;
 
                                 let errTip = '',
-                                    atvData =  BwRule.atvar.dataGet(),
+                                    atvData = BwRule.atvar.dataGet(),
                                     atvarparams = res.atvarparams;
                                 atvarparams.forEach(obj => {
-                                    if(obj.atrrs.requiredFlag === 1 && atvData[obj.field_name] === ''){
+                                    if (obj.atrrs.requiredFlag === 1 && atvData[obj.field_name] === '') {
                                         errTip += obj.caption + ',';
                                     }
                                 });
-                                if(errTip !== ''){
-                                    Modal.alert(errTip.substring(0,errTip.length - 1) + '不能为空');
+                                if (errTip !== '') {
+                                    Modal.alert(errTip.substring(0, errTip.length - 1) + '不能为空');
                                     return;
                                 }
                             } else if (type === 5) {

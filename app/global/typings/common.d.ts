@@ -195,6 +195,8 @@ interface HTMLElementEventMap {
     "panright": IDefinedEvent
     "panup": IDefinedEvent
     "pandown": IDefinedEvent
+    "press": ICustomEvent
+    "touchzoom": ITouchZoomEvent
 }
 interface IVNode {
     tag: string;
