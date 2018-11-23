@@ -16,8 +16,8 @@ export class SlidePopover extends Component {
 
     protected wrapperInit() {
         return <div className="slide-popover-wrapper">
-            <div className="slide-buttons"></div>
-            <div className="popover-toggle iconfont icon-arrow-down"></div>
+            <div className="slide-buttons"/>
+            <div className="popover-toggle iconfont icon-arrow-down"/>
         </div>;
     }
 
@@ -55,7 +55,7 @@ export class SlidePopover extends Component {
 
     // 创建按钮组
     private createButtons() {
-        this.buttons.forEach((button, index) => {
+        this.buttons.forEach((button) => {
             let slideButtonWrapper = <div className="slide-button-wrapper">
                 <Button {...Object.assign(button, {size: 'large'})}/>
             </div>;
@@ -83,7 +83,7 @@ export class SlidePopover extends Component {
 
     // 初始化事件
     private initEvent = (() => {
-        let toggleClickHandler = (e) => {
+        let toggleClickHandler = () => {
                 // 显示模态框
                 this.modal.isShow = true;
             },
