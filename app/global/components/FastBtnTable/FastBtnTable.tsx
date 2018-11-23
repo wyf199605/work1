@@ -303,7 +303,8 @@ export class FastBtnTable extends FastTable{
             cells = [];
             self.rows.forEach((row) => {
                 row.cells.forEach((cell) => {
-                    if(cell.text.toUpperCase().indexOf(str.toUpperCase()) > -1){
+                    let column = cell.column;
+                    if(column.show && !column.isVirtual && cell.text.toUpperCase().indexOf(str.toUpperCase()) > -1){
                         cell.highLight = str;
                         cells.push(cell);
                     }
@@ -338,144 +339,6 @@ export class FastBtnTable extends FastTable{
             }
         }
     })();
-
-   /* private initFilter(){
-        return new Button({
-            type: 'default',
-            icon: 'sousuo',
-            content: '本地过滤',
-            onClick: () => {
-            },
-        });
-    }
-
-    protected filter(){
-
-        let show = (() => {
-
-            let modal:Modal = null,
-                builder = null;
-
-            let searchHandler = () => {
-                // search();
-                modal.isShow = false;
-            };
-
-            let showOriginTable = () => {
-
-            };
-
-            let init = () => {
-                if(builder === null) {
-                    let body = tools.isMb ?
-                        <div className="mui-content">
-                            <ul className="mui-table-view" data-query-name="local"></ul>
-                            <div data-action="add" data-name="local" className="mui-btn mui-btn-block mui-btn-primary">
-                                <span className="mui-icon mui-icon-plusempty"></span> 添加条件
-                            </div>
-                        </div>
-                        :
-                        <form className="filter-form" data-query-name="local">
-                            <span data-action="add" className="iconfont blue icon-jiahao"></span>
-                        </form>;
-
-                    modal = new Modal({
-                        container: d.closest(this.wrapper, '.page-container'),
-                        header: '本地过滤',
-                        body: body,
-                        position: tools.isMb ? 'full' : '',
-                        width: '730px',
-                        isShow: true,
-                    });
-                    modal.className = 'local';
-                    modal.className = 'queryBuilder';
-
-                    if(tools.isMb){
-                        modal.className = 'modal-mobile';
-
-                        modal.modalHeader.rightPanel = (()=>{
-                            let rightInputBox = new InputBox(),
-                                clearBtn = new Button({
-                                    content: '清除',
-                                    onClick: () => {
-                                        showOriginTable();
-                                        modal.isShow = false;
-                                    }
-                                }),
-                                saveBtn = new Button({
-                                    icon: 'sousuo',
-                                    onClick:searchHandler
-                                });
-                            rightInputBox.addItem(clearBtn);
-                            rightInputBox.addItem(saveBtn);
-                            return rightInputBox;
-                        })();
-
-                        mui(body).on('tap', '[data-action="add"]', function () {
-                            builder.rowAdd();
-
-                            let ul = (this as HTMLElement).previousElementSibling;
-                            ul.scrollTop = ul.scrollHeight;
-
-                        });
-                    } else {
-
-                        modal.footer = {
-                            rightPanel: (() => {
-                                let rightBox = new InputBox();
-                                rightBox.addItem(new Button({
-                                    content: '取消',
-                                    type: 'default',
-                                    key: 'cancelBtn'
-                                }));
-                                rightBox.addItem(new Button({
-                                    content: '清除',
-                                    type: 'default',
-                                    key: 'clearBtn',
-                                    onClick: () => {
-                                        showOriginTable();
-                                        modal.isShow = false;
-                                    }
-                                }));
-                                rightBox.addItem(new Button({
-                                    content: '查询',
-                                    type: 'primary',
-                                    onClick: searchHandler,
-                                    key: 'queryBtn'
-                                }));
-
-                                return rightBox;
-                            })()
-                        }
-                    }
-
-                    builder = new QueryBuilder({
-                        queryConfigs: initQueryConfigs(this.dataTools.getCols()), // 查询字段名、值等一些配置，后台数据直接传入
-                        resultDom: tools.isMb ? d.query('ul.mui-table-view', body) : body, // 查询条件容器
-                        setting: null  // 默认值
-                    });
-
-                }
-
-                function initQueryConfigs(cols: R_Field[]): QueryConf[] {
-                    return cols.map(col => {
-                        return {
-                            caption: col.title,
-                            field_name: col.name,
-                            dynamic: 0,
-                            link: '',
-                            type: '',
-                            atrrs: col.atrrs
-                        }
-                    });
-                }
-            };
-
-            return () => {
-                init();
-            }
-        })();
-    }*/
 
     private initStatistic(){
         if(this.isButton){
@@ -578,10 +441,21 @@ export class FastBtnTable extends FastTable{
                         cols: this.dataTools.getCols(),
                         isShow: true,
                         colDataGet: (colName) => {
-                            let colCounts = this.dataTools.getColCounts()[colName];
+                            let column = this.columnGet(colName);
+                            if(column){
+                                let field = column.content as R_Field;
+                                if(field.elementType === 'lookup'){
+                                    colName = field.lookUpKeyField;
+                                    console.log(colName);
+                                }
+                            }
+                            let colCounts = this.dataTools.getColCounts();
                             let obj = {};
-                            for (let value of Object.values(colCounts)) {
-                                obj[value[0]] = value[1]
+                            console.log(colCounts);
+                            if(colName in colCounts){
+                                for (let value of Object.values(colCounts[colName])) {
+                                    obj[value[0]] = value[1]
+                                }
                             }
                             return obj;
                         },

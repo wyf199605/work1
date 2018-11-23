@@ -40,6 +40,11 @@ interface IBW_UI<U>{
 
 interface IBW_Plan_Table extends IBW_Table{
     backGround: R_ReqAddr;
+    backColor: Array<{
+        STATUS_NAME: string; // 状态名称
+        GRIDBACKCOLOR: string;  // 状态颜色
+        STATUS_ID: string;  // 状态ID
+    }>
 }
 
 interface IBW_Table{

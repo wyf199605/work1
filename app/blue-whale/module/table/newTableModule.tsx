@@ -47,6 +47,7 @@ export class NewTableModule {
             : null;
     }
 
+    private currentSelectedIndexes:number[] = [];
     constructor(para: ITableModulePara) {
         console.log(para);
         this.bwEl = para.bwEl;
@@ -109,6 +110,7 @@ export class NewTableModule {
                             this.active.isMain = true;
                         }
                     });
+                    modal.className = 'sub-table-page-modal';
                     this.main.subBtns.box && (modal.wrapper.style.bottom = '36px');
                     // modal.wrapper.style.right = '0';
                     modal.wrapper.style.left = 'auto';
@@ -168,9 +170,12 @@ export class NewTableModule {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
                                     this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
+                                    this.currentSelectedIndexes.push(index);
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
-                                    this.sub[index].refresh(ajaxData).catch();
+                                    if (!~this.currentSelectedIndexes.indexOf(index)){
+                                        this.sub[index].refresh(ajaxData).catch();
+                                    }
                                     this.sub[index].linkedData = selectedData;
                                 }
                             }
@@ -210,11 +215,17 @@ export class NewTableModule {
                                 let showSubSeq = selectedData[this.showSubField].split(',');
                                 this.tab.setTabsShow(showSubSeq);
                                 this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
                             } else {
                                 this.tab.active(0);
+                                this.currentSelectedIndexes.push(0);
                             }
                             if (!tools.isMb) {
                                 d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
+                                    if(tools.isEmpty(this.sub[this.subTabActiveIndex])){
+                                        Modal.alert('当前没有子表可以全屏显示!');
+                                        return;
+                                    }
                                     let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
 
                                     let sub = this.sub[this.subTabActiveIndex],
@@ -246,6 +257,7 @@ export class NewTableModule {
                 let self = this;
                 mftable.click.add('.section-inner-wrapper.pseudo-table tbody tr[data-index]', function () {
                     let rowIndex = parseInt(this.dataset.index);
+                    self.currentSelectedIndexes = [];
                     self.subRefreshByIndex(rowIndex);
                 });
             }
@@ -267,9 +279,11 @@ export class NewTableModule {
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
                 this.tab.active(parseInt(showSubSeq[0]) - 1);
                 pseudoTable && pseudoTable.setPresentSelected(index);
+                this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
             }else{
                 !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
                 pseudoTable && pseudoTable.setPresentSelected(index);
+                this.currentSelectedIndexes.push(0);
             }
         } else {
             this.mobileModal && (this.mobileModal.isShow = false);

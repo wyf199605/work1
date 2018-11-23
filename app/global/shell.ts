@@ -370,6 +370,10 @@ namespace G{
             downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,back:IShellEventHandler){
                 return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl},back,null,false);
             },
+            //条码扫码总量统计
+            getCountData(uniqueFlag:string,where:obj,back:IShellEventHandler){
+                return ShellBase.handler('getCountData',{uniqueFlag:uniqueFlag,where:where},back);
+            },
             dealbarcode(type:number,params:object,back:IShellEventHandler){
                 return ShellBase.handler('dealbarcode',{type:type,params:params},back ,null,false);
             },

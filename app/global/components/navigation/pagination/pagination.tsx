@@ -7,7 +7,7 @@ import tools = G.tools;
 
 interface IPaginationPara extends IComponentPara {
     // current?: number,           // 当前页
-    total?: number,             // 总记录数属性
+    total?: number,             // 总记录数属性  TODO 暂时不支持初始化设置
     pageSize?: number,          // 单页条数
     pageOptions?: number[],      // 单页条数可选项
     onChange: (state: IPaginationState) => Promise<any>;

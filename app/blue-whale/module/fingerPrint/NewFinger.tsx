@@ -43,7 +43,6 @@ export class NewFinger {
     }
 
     protected initFingerOpen(){
-        console.log('<<<');
         Shell.finger.cancel();
         setTimeout(() => {
             Shell.finger.get({
@@ -77,6 +76,7 @@ export class NewFinger {
     protected findFinger(obj: {type: number, print: string}){
         let type = obj.type,
             print = obj.print;
+
         this.IDB.getCollection(NewFinger.FINGER_TABLE).then((store) => {
             store.find((val) => {
                 // Modal.alert(val.prints['type' + type])

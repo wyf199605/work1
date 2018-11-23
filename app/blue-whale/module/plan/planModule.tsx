@@ -56,7 +56,52 @@ export class PlanModule extends Component{
             this.plotBtn.disabled = true;
         }
         this.initDraw();
-        this.initSubBtn();
+        tools.isPc && this.initSubBtn();
+        this.initStatusBar()
+    }
+
+    initStatusBar(){
+        let ui = this.ui,
+            backColors = ui.backColor;
+        if(tools.isNotEmpty(backColors)){
+            let body = <div class="status-list"/>;
+            let modal = new Modal({
+                className: 'plan-status-modal',
+                isMb: false,
+                body,
+                header: tools.isMb ? null : {
+                    isClose: false,
+                    title: '状态',
+                    isDrag: true
+                },
+                isBackground: false,
+                escKey: false,
+                width: '100px',
+                container: this.container,
+                top: 160,
+                zIndex: 499
+            });
+            modal.wrapper.style.left = (tools.isMb ? -5 :document.body.offsetWidth - 150) + 'px';
+            backColors.forEach((item) => {
+                let {r, g, b} = tools.val2RGB(item.GRIDBACKCOLOR),
+                    color = `rgb(${r}, ${g}, ${b})`;
+                d.append(body, <div className="status-item">
+                    <div className="status-ball" style={'background: ' + color}/>
+                    {item.STATUS_NAME}
+                </div>)
+            });
+
+            if(tools.isMb){
+                d.on(this.container, 'touchstart', (ev) => {
+                    if(!d.closest(ev.target as HTMLElement, '.plan-status-modal')){
+                        modal.wrapper.style.transform = 'translateX(-80px)';
+                    }
+                });
+                d.on(modal.wrapper, 'touchstart', () => {
+                    modal.wrapper.style.transform = 'translateX(0)';
+                });
+            }
+        }
     }
 
     protected initSubBtn(){
@@ -99,7 +144,7 @@ export class PlanModule extends Component{
             height: 800,
             width: 1200,
             subButton,
-            keyField: ui.keyField,
+            ui,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
@@ -197,55 +242,57 @@ export class PlanModule extends Component{
     get ajaxData(){
         return this._ajaxData;
     }
-    refresh(ajaxData?: obj){
-        this._ajaxData = ajaxData;
-        let ui = this.ui,
-            url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
-        let loading = new Loading({
-            msg: '数据加载中...'
-        });
-        loading.show();
-        this.setBackground(ajaxData).then(() => {
-            let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
-            this.ajax.fetch(tools.url.addObj(url, data), {
-                needGps: ui.dataAddr.needGps,
-                timeout: 30000,
-            }).then(({response}) => {
-                console.log(response);
-                let data = response.data;
-                if (data && ui.tableAddr && ui.tableAddr.param) {
-                    let editParam = ui.tableAddr.param[0];
-                    if (editParam) {
-                        let varList = [];
-                        ['insert', 'update', 'delete'].forEach(type => {
-                            let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
-                                typeVarList = editParam[type];
+    refresh(ajaxData?: obj): Promise<any>{
+        return new Promise((resolve, reject) => {
+            this._ajaxData = ajaxData;
+            let ui = this.ui,
+                url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
+            let loading = new Loading({
+                msg: '数据加载中...'
+            });
+            loading.show();
+            this.setBackground(ajaxData).then(() => {
+                let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
+                this.ajax.fetch(tools.url.addObj(url, data), {
+                    needGps: ui.dataAddr.needGps,
+                    timeout: 30000,
+                }).then(({response}) => {
+                    console.log(response);
+                    let data = response.data;
+                    if (data && ui.tableAddr && ui.tableAddr.param) {
+                        let editParam = ui.tableAddr.param[0];
+                        if (editParam) {
+                            let varList = [];
+                            ['insert', 'update', 'delete'].forEach(type => {
+                                let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                                    typeVarList = editParam[type];
 
-                            if (canOld && Array.isArray(typeVarList)) {
-                                varList = varList.concat(typeVarList)
-                            }
-                        });
-                        // 加上OLD变量
-                        BwRule.addOldField(BwRule.getOldField(varList), data);
+                                if (canOld && Array.isArray(typeVarList)) {
+                                    varList = varList.concat(typeVarList)
+                                }
+                            });
+                            // 加上OLD变量
+                            BwRule.addOldField(BwRule.getOldField(varList), data);
+                        }
                     }
-                }
-                console.log(data);
-                this.plotBtn.disabled = false;
-                this.draw.render(data);
-            }).catch(e => {
-                console.log(e);
-            }).finally(() => {
+                    console.log(data);
+                    this.plotBtn.disabled = false;
+                    this.draw.render(data);
+                }).catch(e => {
+                    console.log(e);
+                }).finally(() => {
+                    loading && loading.hide();
+                    loading = null;
+                    resolve();
+                })
+            }).catch(() => {
+                Modal.alert('图层不存在');
+                this.plotBtn.disabled = true;
                 loading && loading.hide();
                 loading = null;
-            })
-        }).catch(() => {
-            Modal.alert('图层不存在');
-            this.plotBtn.disabled = true;
-            loading && loading.hide();
-            loading = null;
-        });
-
-
+                reject();
+            });
+        })
     }
 
     format(field: R_Field, cellData: any, rowData: obj): IDrawFormatData{

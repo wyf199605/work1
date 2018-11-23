@@ -20,11 +20,11 @@ interface IDrapPoint extends IComponentPara {
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
     isShow?: boolean; // 默认false
     subButton?: R_Button[];
-    keyField?:string;
+    ui: IBW_Plan_Table;
 }
 
 interface IAreaType {
-    type: 'edit' | 'pick' | 'btn'| 'link';
+    type: 'edit' | 'pick' | 'btn'| 'link' | 'modal';
     data?: obj;
     name?: string;
     content?: any;
@@ -53,6 +53,7 @@ export class DrawPoint extends Component {
     private tooltip ;
     protected selectedData: obj;
     private _keyField;
+    protected ui: IBW_Plan_Table
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     // static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -83,7 +84,8 @@ export class DrawPoint extends Component {
                 });
             }
         })
-       this._keyField = para.keyField;
+        this.ui = para.ui;
+       this._keyField = para.ui.keyField;
         this.onAreaClick = para.onAreaClick;
         this.format = para.format;
         this.map = D3.map(this.points, function (d, i) {
@@ -206,8 +208,8 @@ export class DrawPoint extends Component {
             this.map.remove(i)
         }
         if (!this.g.selectAll('g').empty()) {
-            D3.select('.g-wrapper').selectAll('g').remove();
-            D3.select('.g-wrapper').selectAll('circle').remove();
+           this.g.selectAll('g').remove();
+           this.g.selectAll('circle').remove();
         }
 
         this.renderData = data;
@@ -223,16 +225,32 @@ export class DrawPoint extends Component {
         }
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
-            let group = this.g.append('g').datum(d).on('contextmenu',()=>{
-                if(this.isShowStatus){
+            let group = this.g.append('g').datum(d)
+            if(tools.isMb){
+                G.d.on(group.node(),'press',(res)=> {
+                    console.log(D3.event);
+                    this.onAreaClick({
+                        type: 'modal',
+                        data: d
+
+                    }).then((data) => {
+                        alert(data)
+                    })
+                })
+            }else {
+                group.on('contextmenu',()=>{
+                    //if(this.isShowStatus){
                     this.selectedData = d
                     D3.event.preventDefault();
                     console.log(D3.mouse(this.svg.node()));
                     let x = D3.mouse(this.svg.node())[0],y = D3.mouse(this.svg.node())[1]
                     this.contextMenu.setPosition(x,y);
                     this.contextMenu.show = true;
-                }
-            });
+                    // }
+                });
+            }
+
+
 
             let point = [],
                 I = 0,
