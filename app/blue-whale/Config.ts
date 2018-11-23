@@ -93,7 +93,7 @@ namespace BW {
 
             flowListCheck: 'flow/system/auditlist', // 流程引擎-审核
             flowListApply: 'flow/system/list', // 流程引擎-申请
-            saveFlow: 'process/save',           // 流程引擎-定义流程
+            modifyFlow: 'process/modify/',      // 流程修改
             getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
         },
 
