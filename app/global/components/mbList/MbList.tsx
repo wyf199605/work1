@@ -85,7 +85,8 @@ export class MbList extends Component {
     // 事件
     private initEvents = (() => {
         // 批量按钮点击
-        let multiEvent = () => {
+        let multiEvent = (e) => {
+            e.stopPropagation();
             this.multiple = !this.multiple;
             this.multiButtonsWrapper.classList.toggle('hide', !this.multiple);
             d.query('.cancel-multi', this.multiIcon).classList.toggle('hide', !this.multiple);
