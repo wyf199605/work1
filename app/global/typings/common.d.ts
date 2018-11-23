@@ -94,8 +94,8 @@ interface R_ReqAddr {
     commitType?: number; //
     needGps?:number; // 是否开启GPS：0 => false, 1 => true
     varList?: R_VarList[];
-    parseVarList?: R_VarList[];
     type?: string;
+    parseVarList?: R_VarList[];
     addrType?:boolean;
 }
 

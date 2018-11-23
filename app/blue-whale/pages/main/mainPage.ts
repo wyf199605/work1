@@ -16,6 +16,7 @@ import {IPopoverItemPara, Popover} from "../../../global/components/ui/popover/p
 import {BugReportModal} from "../../module/BugReport/BugReport";
 import sysPcHistory = BW.sysPcHistory;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import {Notify} from "../../../global/components/feedback/notify/Notify";
 
 interface IProps {
     pageContainer: HTMLDivElement;

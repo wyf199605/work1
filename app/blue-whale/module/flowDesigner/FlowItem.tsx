@@ -171,8 +171,10 @@ export class FlowItem extends Component {
     // 文本内容
     private _text: string;
     set text(text: string) {
-        this._text = text;
-        this.wrapper.innerHTML = text;
+        let limitLength = 50,
+            limitText = text.length > limitLength ? text.slice(0, limitLength) + '...' : text;
+        this._text = limitText;
+        this.wrapper.innerHTML = limitText;
     }
 
     get text() {
@@ -295,10 +297,11 @@ export class FlowItem extends Component {
     }
 
     // 计算文本内容的宽高
-    private calcWidthAndHeight(): { width: number, height: number } {
+    public calcWidthAndHeight(): { width: number, height: number } {
         let style = window.getComputedStyle(this.wrapper),
             widthStr = style.width,
             heightStr = style.height;
+        this.rectNode && this.rectNode.attr({width: parseInt(widthStr), height: parseInt(heightStr)});
         return {
             width: Number(widthStr.slice(0, widthStr.length - 2)),
             height: Number(heightStr.slice(0, heightStr.length - 2))

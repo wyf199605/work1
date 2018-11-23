@@ -44,8 +44,6 @@ export class FlowEditor extends FormCom {
         subprocess: ['name', 'displayName', 'processName'],
         task: ['name', 'displayName', 'form', 'assignee', 'taskType', 'performType'],
         transition: ['name', 'displayName'],
-        icon: ['iconSmall', 'iconLarge', 'descript', 'visible', 'pause'],
-        'flow-designer': ['name', 'displayName', 'processTypeId'],
     };
 
     // 属性对应的名称
@@ -58,20 +56,12 @@ export class FlowEditor extends FormCom {
         assignee: '参与者',
         taskType: '任务类型',
         performType: '参与类型',
-        iconSmall: '小图',
-        iconLarge: '大图',
-        descript: '描述',
-        visible: '是否可见',
-        pause: '禁用',
-        processTypeId: '流程类型',
-        processVersion: '流程版本',
     };
 
     static DROPDOWN_KEYVALUE: ListItem = {
         // 新增下拉列表时在此处添加键值
         performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
-        processTypeId: []
     };
 
     private owner: Component | FlowDesigner;
@@ -251,18 +241,20 @@ export class FlowEditor extends FormCom {
         let fields = this.get();
         if(this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) && tools.isNotEmpty(this.show) && !show && this.show !== show){
             this.owner['wrapper'].dataset.name = fields.name;
+            let limitLength = 50,
+                limitDisplayName = fields.displayName.length > limitLength ? fields.displayName.slice(0, limitLength) + '...' : fields.displayName;
             if(this.owner['isEnd'] || this.owner['isStart']){
                 // 如果节点是开始或结束节点，则不需要更新文本
             }else if(this.owner['isDiamond']){
                 // 如果是菱形，则更新diamond-text里的文本
-                d.query('.diamond-text', this.owner['wrapper']).textContent = fields.displayName || this.type;
+                d.query('.diamond-text', this.owner['wrapper']).textContent = limitDisplayName || this.type;
             }else if(this.owner instanceof LineItem){
                 // 是连接线，除非有值否则不显示文本，并且要设置文本显示的位置
-                this.owner['wrapper'].textContent = fields.displayName || '';
+                this.owner['wrapper'].textContent = limitDisplayName || '';
                 this.owner.setTextWrapperPosition();
             }else{
                 // 是矩形就在wrapper上更新
-                this.owner['wrapper'].textContent = fields.displayName || this.type;
+                this.owner['wrapper'].textContent = limitDisplayName || this.type;
             }
         }else if(this.owner instanceof FlowDesigner){
             fields.name && (d.query('#design-canvas').dataset.name = fields.name);

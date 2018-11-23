@@ -116,6 +116,7 @@ export class DrawPoint extends Component {
     }
 
     public InitSvg(para) {
+        let _this = this;
         this.svg = D3.select(this.wrapper).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
@@ -129,7 +130,16 @@ export class DrawPoint extends Component {
             })
 
 
-        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none");
+        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none")
+            .on('touchstart',function () {
+                _this.svg.on("dblclick.zoom", null);
+            })
+            .on('touchmove',function () {
+                //D3.select(this).attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
+            })
+            .on('touchend',function () {
+                
+            })
         this.g.append('image').attr('href', ()=>{
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
