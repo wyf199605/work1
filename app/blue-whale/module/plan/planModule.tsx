@@ -158,11 +158,12 @@ export class PlanModule extends Component{
                 return res;
             },
             onAreaClick: (areaType) => {
+                let {data, type, name, content} = areaType;
                 return new Promise((resolve, reject) => {
-                    switch (areaType.type){
+                    switch (type){
                         case 'edit':
-                            this.edit.editData(areaType.data, (data) => {
-                                resolve(data)
+                            this.edit.editData(data, (d) => {
+                                resolve(d)
                             });
                             break;
                         case 'pick':
@@ -171,8 +172,8 @@ export class PlanModule extends Component{
                                     let pick = new PickModule({
                                         container: document.body,
                                         field: col,
-                                        data: areaType.data,
-                                        dataGet: () => areaType.data,
+                                        data,
+                                        dataGet: () => data,
                                         onGetData: (dataArr: obj[], otherField: string) => {
                                             resolve(dataArr[0] ? dataArr[0] : null);
                                             pick.destroy();
@@ -185,7 +186,7 @@ export class PlanModule extends Component{
                             }
                             break;
                         case 'btn':
-                            ButtonAction.get().clickHandle(areaType.content.button, areaType.data, () => {
+                            ButtonAction.get().clickHandle(content.button, data, () => {
                                 resolve();
                             }, this.pageUrl , ui.itemId);
                             break;
@@ -197,13 +198,58 @@ export class PlanModule extends Component{
                                         link: link.dataAddr,
                                         varList: link.varList,
                                         dataType: col.atrrs.dataType,
-                                        data: areaType.data,
+                                        data,
                                         needGps: link.needGps === 1,
                                         type: link.type
                                     });
                                     break;
                                 }
                             }
+                            break;
+                        case 'modal':
+                            let formatTexts: IDrawFormatData[] = [],
+                                title = '',
+                                contents = [];
+
+                            cols && cols.forEach((col) => {
+                                let name = col.name;
+                                if(name in data){
+                                    formatTexts.push(this.format(col, data[name], data));
+                                }
+                            });
+                            formatTexts.forEach((item) => {
+                                if(item.name === ui.keyField){
+                                    title = item.data || '详情';
+                                }else if(tools.isNotEmpty(item.data) && item.isShow && !item.isPoint){
+                                    contents.push(item.data);
+                                }
+                            });
+
+                            let modal = new Modal({
+                                className: 'plan-detail-modal',
+                                header: {
+                                    title,
+                                    isClose: false
+                                },
+                                body: <div className="plan-item-detail">
+                                    <div className="plan-item-content">
+                                        {contents.map((text) => <span className="text">{text}</span>)}
+                                    </div>
+                                    <div className="plan-btn-groups">
+                                        {subButton.map((btn) => {
+                                            return <Button content={btn.caption} onClick={() => {
+                                                ButtonAction.get().clickHandle(btn, data, () => {
+                                                    resolve();
+                                                }, this.pageUrl , ui.itemId);
+                                            }}/>;
+                                        })}
+                                    </div>
+                                </div>,
+                                position: "down",
+                                isMb: false,
+                                isBackground: false,
+                                isShow: true,
+                            });
                             break;
                     }
                 })
