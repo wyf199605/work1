@@ -70,7 +70,7 @@ export class FlowListPC extends BasicPage{
                         });
                     } else {
                         // 表格存在 刷新并显示
-                        this.subTables[index].tableModule.refresh().catch();
+                        // this.subTables[index].tableModule.refresh().catch();
                         this.subTables[index].tableModule.subModalShow = true;
                     }
                 }
