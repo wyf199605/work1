@@ -184,7 +184,7 @@ export class FlowDesigner {
 
         // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程
         // 如果没有则需要自己绘制流程
-        if (tools.isNotEmpty(responseData))       {
+        if (tools.isNotEmpty(responseData)){
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
             if(type === 'look'){
                 modal.modalHeader.title = '查看流程';
@@ -208,6 +208,10 @@ export class FlowDesigner {
                     'isComplete' in child.attributes && (
                         isComplete = child.attributes.isComplete.value === 'true'
                     );
+                    'name' in child.attributes && (
+                        FlowEditor.EXIST_NAME.push(child.attributes.name.value)
+                    );
+                    console.log(FlowEditor.EXIST_NAME);
                     let shape: FlowItem = null;
                     layout && (shape = new FlowItem({
                         type: child.tagName,
@@ -219,13 +223,13 @@ export class FlowDesigner {
                         container: d.query('#design-canvas'),
                         fields: fields,
                     }));
+                    let arr = FlowDesigner.ALLITEMS || [];
+                    FlowDesigner.ALLITEMS = arr.concat([shape]);
 
                     if(tools.isNotEmpty(shape)){
                         // 设置节点的data-name
                         shape.calcWidthAndHeight();
                         shape.wrapper.dataset.name = child.attributes.name.value;
-                        let arr = FlowDesigner.ALLITEMS || [];
-                        FlowDesigner.ALLITEMS = arr.concat([shape]);
 
                         // 完成状态的样式
                         shape.isComplete && (
@@ -244,7 +248,7 @@ export class FlowDesigner {
                 if (child.nodeType === 1) {
                     let transitions = d.queryAll('transition', child);
                     transitions.forEach(transition => {
-                        if (tools.isNotEmpty(transition) && tools.isNotEmpty(transition.attributes['to'].value)) {
+                        if (tools.isNotEmpty(transition) && transition.attributes['to'] && tools.isNotEmpty(transition.attributes['to'].value)) {
                             let start = Method.searchFlowItem(child.attributes.name.value),
                                 end = Method.searchFlowItem(transition.attributes['to'].value) || null;
 
@@ -306,6 +310,7 @@ export class FlowDesigner {
             }
         };
         let saveFlowHandler = (e) => {
+            console.log([].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems));
             if([].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems).some(item => tools.isEmpty(item.flowEditor.get().name))){
                 Modal.toast('名称不能为空!');
                 return;
@@ -330,12 +335,12 @@ export class FlowDesigner {
                 let xmlNode = Method.parseToXml.createXmlElement(line.flowEditor.type),
                     toItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.to)[0];
                 // 根据连接线的目标节点的属性设置连接线的属性
-                Method.parseToXml.setAttr(xmlNode, Object.assign({to: toItem.flowEditor.get().name}, line.flowEditor.get()));
+                toItem && line.flowEditor && Method.parseToXml.setAttr(xmlNode, Object.assign({to: toItem.flowEditor.get().name}, line.flowEditor.get()));
                 // 首先获取连接线的来源节点，然后将连接线作为来源节点的子节点添加到xml节点树中
                 let fromItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.from)[0],
                     fromNode = null;
                 FlowDesigner.rootElement.childNodes['forEach'](item => {
-                    if('name' in item['attributes'] && fromItem.flowEditor.get().name === item['attributes'].getNamedItem('name').value){
+                    if(fromItem && 'name' in item['attributes'] && fromItem.flowEditor.get().name === item['attributes'].getNamedItem('name').value){
                         fromNode = item;
                     }
                 });

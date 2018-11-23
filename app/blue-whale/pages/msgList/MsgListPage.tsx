@@ -190,7 +190,7 @@ export class MsgListPage extends BasicPage {
     }
 
     set unReadDom(html: HTMLElement) {
-        this.removeUl(this.allMsgDom);
+        this.removeUl(this.unReadDom);
         d.prepend(this.unReadDom, html);
     }
 

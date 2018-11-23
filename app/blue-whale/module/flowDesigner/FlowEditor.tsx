@@ -301,7 +301,7 @@ export class FlowEditor extends FormCom {
 
     destroy() {
         this.initEvents.off();
-        FlowEditor.EXIST_NAME.indexOf(this.get().name) > 0 && FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
+        FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 && FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
         FlowEditor.DropDowns.forEach(dropdown => {
             Object.keys(this.dropdowns).forEach(attr => {
                d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
