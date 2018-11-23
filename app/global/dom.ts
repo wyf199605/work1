@@ -148,6 +148,50 @@ let event = (function () {
         };
 
         let events = {
+            touchzoom:{
+                type: 'touchzoom',
+                scale: 1,
+                handler:null,
+                on(el:Node, selector:string){
+                    let touchzoom = events.touchzoom,
+                        scale = 1,
+                        moveHandler,endHandler;
+                    eventOn(el, EVENT_START, selector, touchzoom.handler = (ev: TouchEvent) =>{
+                        if(ev.touches.length >=2){
+                            let start;
+                            if(ev.touches.length == 2){
+                                start = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2));
+                            }else {
+                                let a = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2)),
+                                    b = Math.sqrt(Math.pow((ev.touches.item(1).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(1).pageY - ev.touches.item(2).pageY),2)),
+                                    c = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(2).pageY),2));
+                                let p = 0.5 * (a + b + c);
+                                start= Math.sqrt(p * (p - a) * (p - b)* (p-c));
+                            }
+                            eventOn(el, EVENT_MOVE, moveHandler = (ev) =>{
+                                if(ev.touches.length == 2){
+                                    let move_distance = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2));
+                                    scale = move_distance / start;
+                                }else {
+                                    let a = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2)),
+                                        b = Math.sqrt(Math.pow((ev.touches.item(1).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(1).pageY - ev.touches.item(2).pageY),2)),
+                                        c = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(2).pageY),2));
+                                    let p = 0.5 * (a + b + c);
+                                    let move_area = Math.sqrt(p * (p - a) * (p - b)* (p-c));
+                                    scale = move_area / start;
+                                }
+                            });
+                            let dispatcher = dispatcherGet(el);
+                            dispatcher && dispatcher.call(el, getTouchZoomEvent(ev,  scale));
+                            eventOn(el, EVENT_END, endHandler = (ev) =>{
+                                if(touchzoom.scale !== 1){
+                                    touchzoom.scale = 1;
+                                }
+                            });
+                        }
+                    });
+                }
+            },
             press: {
                 type: 'press',
                 time: 700,
@@ -238,6 +282,10 @@ let event = (function () {
                 }
             }
         };
+
+        function getTouchZoomEvent(ev: TouchEvent , scale) {
+            return Object.assign({}, getCustomEvent(ev, 'touchzoom'),{scale})
+        }
 
         function getCustomEvent(ev: TouchEvent, type){
             return {
@@ -565,9 +613,9 @@ let event = (function () {
         }
         eventArrayGet(types).forEach(function (type) {
             // 兼容mui
-            if ('mui' in window && tools.isMb && type === 'click') {
-                type = 'tap';
-            }
+            // if ('mui' in window && tools.isMb && type === 'click') {
+            //     type = 'tap';
+            // }
 
             // 是否第一次绑定此元素的此事件类型
             let first = false;

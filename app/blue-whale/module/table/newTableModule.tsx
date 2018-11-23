@@ -310,17 +310,21 @@ export class NewTableModule {
     protected subIndex = 0;
 
     subRefresh(rowData?: obj) {
+        let main = this.main,
+            mftable = main.ftable,
+            selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {});
+        if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
+            let showSubSeq = selectedData[this.showSubField].split(',');
+            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+        }
         let bwEl = this.bwEl,
-            subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex],
-            main = this.main,
-            mftable = main.ftable;
+            subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex];
 
         if (tools.isEmpty(subUi)) {
             return;
         }
 
-        let selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {}),
-            ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(subUi.dataAddr.varList, selectedData));
+        let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(subUi.dataAddr.varList, selectedData));
 
         // 查询从表时不需要带上选项参数
         delete ajaxData['queryoptionsparam'];
@@ -328,8 +332,17 @@ export class NewTableModule {
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
             this.tab.setTabsShow(showSubSeq);
-            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
-            this.tab.active(parseInt(showSubSeq[0]) - 1);
+            this.tab.active(this.subTabActiveIndex);
+            let subs = [];
+            for (let key in this.sub) {
+                if(~showSubSeq.indexOf(key) && tools.isNotEmpty(this.sub[key])){
+                    subs.push(this.sub[key]);
+                }
+            }
+            Object.values(subs).forEach((subTable) => {
+                subTable.refresh(ajaxData).catch();
+                subTable.linkedData = selectedData;
+            });
         }else{
             Object.values(this.sub).forEach((subTable) => {
                 subTable.refresh(ajaxData).catch();
@@ -414,7 +427,6 @@ export class NewTableModule {
         return this.main.refresh(data).then(() => {
             // 刷新子表
             !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
-            let ftable = this.main.ftable;
             let row = this.main.ftable.rowGet(this.subIndex);
             row && this.subRefresh(row.data);
             this.subWrapper && this.subWrapper.classList.toggle('hide', !row);
@@ -948,6 +960,7 @@ export class NewTableModule {
                 }).then(({response}) => {
 
                     BwRule.checkValue(response, saveData, () => {
+                        this.currentSelectedIndexes = [];
                         // 刷新主表
                         this.refresh();
                         Modal.toast(response.msg);

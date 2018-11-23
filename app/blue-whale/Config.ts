@@ -44,6 +44,7 @@ namespace BW {
             myApprovalPC: `ui/menu/n3009_data-3009?p_n=n3009_data-3009&page=myApplication`,
             flowDetail: `commonui/pageroute?page=flowDetail`,
 
+            /*-- url带有newPage，不走btl模板MsgListPage为页面名称 --*/
             msgList : 'newPage/MsgListPage',
         },
         ajaxUrl: {
@@ -95,8 +96,8 @@ namespace BW {
             flowListApply: 'flow/system/list', // 流程引擎-申请
             modifyFlow: 'process/modify/',      // 流程修改
             getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
+            test: 'pick/n3022_data-3022/pick-3022-1',
         },
-
 
         init(siteUrl: string, appid: string, version: string, webscoket) {
             this.siteUrl = siteUrl;
