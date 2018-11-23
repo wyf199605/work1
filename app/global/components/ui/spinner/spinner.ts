@@ -6,13 +6,20 @@ interface SpinnerShowPara{
     type : number;
     className? : string;
     size? : number;
+    time? : number; //设置超时关闭
+    onTimeout?: Function; // 超时事件
 }
 import tools = G.tools;
 export class Spinner{
     protected spinnerDom : HTMLDivElement = null;
     protected visible : boolean = false;
+    protected timer: number;
+    protected time: number;
+    protected onTimeout: Function;
 
     constructor(protected para : SpinnerShowPara){
+        this.time = para.time || 20000; // 超时时间默认20秒；
+        this.onTimeout = para.onTimeout;
         this.initSpinner();
     }
 
@@ -37,7 +44,11 @@ export class Spinner{
         let method = this.methods[this.para.type];
         if(method){
             method.show();
-            this.visible = true
+            this.visible = true;
+            this.timer = setTimeout(() => {
+                this.onTimeout && this.onTimeout();
+                this.hide();
+            }, this.time);
         }
     }
 
@@ -47,6 +58,8 @@ export class Spinner{
             method.hide();
             this.visible = false;
         }
+        clearTimeout(this.timer);
+        this.timer = null;
     }
 
     isVisible(){

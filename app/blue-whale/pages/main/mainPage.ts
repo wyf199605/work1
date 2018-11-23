@@ -16,6 +16,7 @@ import {IPopoverItemPara, Popover} from "../../../global/components/ui/popover/p
 import {BugReportModal} from "../../module/BugReport/BugReport";
 import sysPcHistory = BW.sysPcHistory;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import {Notify} from "../../../global/components/feedback/notify/Notify";
 
 interface IProps {
     pageContainer: HTMLDivElement;
@@ -439,17 +440,19 @@ export = class MainPage {
                         });
                     }
                 });
-                //消息提示窗口点击事件
-                $('.messageList').on('click', 'li', function () {
-                    let src = CONF.siteUrl + $(this).data('url');
-                    sys.window.open({url: src});
-                    $(this).remove();
-                    localMsg.remove(this.dataset.notifyid);
-                });
-                document.querySelector('[data-action=topSeeAllMsg]').addEventListener('click', function () {
-                    sys.window.open({url: CONF.url.message});
-                });
                 myselfMenu();
+
+                //消息提示窗口点击事件
+                let msgDom = d.query('.messagesContent'),
+                    unreadMsgNum = d.query('#unreadMsgNum'),
+                    num = localMsg.getUnreadCount();
+                if(num > 0){
+                    unreadMsgNum.classList.remove('hide');
+                    unreadMsgNum.innerText = num + '';
+                }
+                d.on(msgDom, 'click', function () {
+                    sys.window.open({url: CONF.url.msgList, title : '消息'});
+                });
             });
         }
 

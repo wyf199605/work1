@@ -57,7 +57,7 @@ export class Inputs {
         return this.ajax(ajaxUrl);
     }
 
-    private ajax(aUrl){
+    private ajax(aUrl : string){
         this.isProcess = true;
         return BwRule.Ajax.fetch(aUrl)
             .then(({response}) => {
@@ -68,7 +68,7 @@ export class Inputs {
             })
     }
 
-    private condition(response, aUrl){
+    private condition(response : obj, aUrl : string){
         let elements = response.body && response.body.elements && response.body.elements[0] && response.body.elements[0];
         if(elements){
             this.atvarParams(elements.atvarparams, elements.subButtons, aUrl);
@@ -86,7 +86,6 @@ export class Inputs {
         switch (catType) {
             case 0:
                 // 数据覆盖
-                this.logTip(showText);
                 this.isProcess = false;
                 break;
             case 1:
@@ -95,7 +94,6 @@ export class Inputs {
                 tableModule.labelPrint.show(tableModule.labelBtn.wrapper, category.printList, () => {
                     this.ajax(CONF.siteUrl + this.url);
                 });
-                this.logTip(showText);
                 break;
             case 2:
                 // 提示错误信息
@@ -127,7 +125,6 @@ export class Inputs {
             case 4:
                 // 提示信息,自动下一步
                 this.ajax(CONF.siteUrl + this.url);
-                this.logTip(showText);
                 break;
             default :
                 this.isProcess = false;
@@ -135,15 +132,15 @@ export class Inputs {
         if(dataType === 0){
             this.dataCover(ftable, response);
         }
-        if (tools.isEmpty(catType)) {
-            this.logTip(showText);
-        }
+
+        this.logTip(showText);
+
         if(atvarObj){
             this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl);
         }
     }
 
-    private dataCover(ftable, response : obj){
+    private dataCover(ftable : FastBtnTable, response : obj){
         let data = response.data,
             queryModule = this.para.queryModule && this.para.queryModule();
 
@@ -160,7 +157,10 @@ export class Inputs {
         }
     }
 
-    private logTip(showText){
+    private logTip(showText : string){
+        if(tools.isEmpty(showText)){
+            return;
+        }
         this.m && this.m.destroy();
         this.m = new Toast({
             type: 'simple',
@@ -171,7 +171,7 @@ export class Inputs {
         });
     }
 
-    private atvarParams(atvarparams : obj, subButtons : obj[], aUrl){
+    private atvarParams(atvarparams : obj, subButtons : obj[], aUrl : string){
         this.isProcess = true;
         let atv, modal =  new Modal({
             header : {
@@ -281,7 +281,7 @@ export class Inputs {
         });
     }
 
-    private rowSelect(line, text){
+    private rowSelect(line : string, text : string){
         return new Promise(resolve => {
             let fstable = tools.isFunction(this.para.table) && this.para.table(),
                 index = fstable && fstable.locateToRow(line, text, true),

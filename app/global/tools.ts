@@ -115,13 +115,16 @@ namespace G {
         }()),
         isMb: isMb,
         isPc: !isMb,
-        val2RGB(colorVal: number) {
+        val2RGB(colorVal: number | string) {
             let r = 0,
                 g = 0,
                 b = 0;
 
             // 显示颜色
-            if (typeof colorVal === 'number') {
+            if (typeof colorVal !== 'number') {
+                colorVal = parseInt(colorVal);
+            }
+            if (typeof colorVal == 'number' && !isNaN(colorVal)) {
                 r = colorVal % 256;
                 g = Math.floor(colorVal / 256) % 256;
                 b = Math.floor(colorVal / 256 / 256) % 256;
@@ -675,22 +678,21 @@ namespace G {
             },
             throttling: function(action, delay){ // 函数节流
                 let last = 0;
-                return function(){
+                return function(...args){
                     let curr = + new Date();
                     if (curr - last > delay){
-                        action.apply(this, arguments) ;
+                        action.apply(this, args) ;
                         last = curr
                     }
                 }
             },
             debounce: function (method, delay){ // 函数防抖
                 let timer = null;
-                return function(){
-                    let context = this,args = arguments;
+                return function(...args){
+                    let context = this;
                     clearTimeout(timer);
                     timer = setTimeout(function(){
                         method.apply(context, args);
-
                     },delay);
                 }
             }

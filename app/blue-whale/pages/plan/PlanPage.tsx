@@ -9,6 +9,8 @@ import d = G.d;
 import tools = G.tools;
 import {PlanModule} from "../../module/plan/planModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+
 
 interface IPlanPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Plan_Table>
@@ -25,19 +27,37 @@ export class PlanPage extends BasicPage {
         //下半部
         this.getUi(para.ui).then(res => {
             let qData = res.query;
-            d.append(para.dom, this.wrapper = <div class="plan-wrapper">
-                <HorizontalQueryModule qm={{
-                    autTag: qData['autTag'],
-                    hasOption: qData['hasOption'],
-                    queryType: qData['queryType'],
-                    queryparams1: qData['queryparams0'] || qData['queryparams1'] || qData['atvarparams'],
-                    scannableTime: 0,
-                    uiPath: qData['uiPath'],
-                    setting: null
-                }} search={(data) => {
-                    planModule && planModule.refresh(data);
-                }}/>
-            </div>);
+            d.append(para.dom, this.wrapper = <div class="plan-wrapper"/>);
+            let query = <HorizontalQueryModule
+                container={this.wrapper}
+                qm={{
+                autTag: qData['autTag'],
+                hasOption: qData['hasOption'],
+                queryType: qData['queryType'],
+                queryparams1: qData['queryparams0'] || qData['queryparams1'] || qData['atvarparams'],
+                scannableTime: 0,
+                uiPath: qData['uiPath'],
+                setting: null
+            }} search={(data) => {
+                console.log(data)
+                let isEmpty = true;
+                for(let key in data){
+                    if(!isEmpty){
+                        break;
+                    }
+                    isEmpty = isEmpty && tools.isEmpty(data[key]);
+                }
+                if(isEmpty){
+                    Modal.alert('没有图层');
+                    return Promise.reject();
+                }else {
+                    planModule && planModule.refresh(data).catch(()=>{
+
+                    });
+                    return Promise.resolve();
+                }
+
+            }}/>;
 
             planModule = new PlanModule({
                 ui: res.ui,

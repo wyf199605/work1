@@ -22,11 +22,16 @@
 //     btnArr: BT_Btn[];
 // }
 
-
+interface IBW_Menu{
+    menuName: string;
+    menuType: number;
+    menuIcon : string;
+    menuPath: R_ReqAddr;
+}
 
 interface IBW_UI<U>{
     body:{
-        elements: [U, any];
+        elements: [U, any] | Array<U>;
         subButtons: R_Button[];
     }
     caption?: string; // 标题
@@ -35,6 +40,11 @@ interface IBW_UI<U>{
 
 interface IBW_Plan_Table extends IBW_Table{
     backGround: R_ReqAddr;
+    backColor: Array<{
+        STATUS_NAME: string; // 状态名称
+        GRIDBACKCOLOR: string;  // 状态颜色
+        STATUS_ID: string;  // 状态ID
+    }>
 }
 
 interface IBW_Table{

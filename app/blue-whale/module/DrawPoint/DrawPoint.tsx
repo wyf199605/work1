@@ -20,11 +20,11 @@ interface IDrapPoint extends IComponentPara {
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
     isShow?: boolean; // 默认false
     subButton?: R_Button[];
-    keyField?:string;
+    ui: IBW_Plan_Table;
 }
 
 interface IAreaType {
-    type: 'edit' | 'pick' | 'btn'| 'link';
+    type: 'edit' | 'pick' | 'btn'| 'link' | 'modal';
     data?: obj;
     name?: string;
     content?: any;
@@ -53,6 +53,7 @@ export class DrawPoint extends Component {
     private tooltip ;
     protected selectedData: obj;
     private _keyField;
+    protected ui: IBW_Plan_Table
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
     // static EVT_INSERT_DATA = '__event_insert_area_click__';
@@ -83,7 +84,8 @@ export class DrawPoint extends Component {
                 });
             }
         })
-       this._keyField = para.keyField;
+        this.ui = para.ui;
+       this._keyField = para.ui.keyField;
         this.onAreaClick = para.onAreaClick;
         this.format = para.format;
         this.map = D3.map(this.points, function (d, i) {
@@ -114,6 +116,7 @@ export class DrawPoint extends Component {
     }
 
     public InitSvg(para) {
+        let _this = this;
         this.svg = D3.select(this.wrapper).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
@@ -127,17 +130,25 @@ export class DrawPoint extends Component {
             })
 
 
-        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none");
+        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select',"none")
+            .on('touchstart',function () {
+                _this.svg.on("dblclick.zoom", null);
+            })
+            .on('touchmove',function () {
+                //D3.select(this).attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
+            })
+            .on('touchend',function () {
+                
+            })
         this.g.append('image').attr('href', ()=>{
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
     set imgUrl(url) {
-
         this.g.select('image').attr('href',
             ()=>{
-                return url && tools.url.addObj(url, {version: new Date().getTime() + ''})
+                return url
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
     }
@@ -207,8 +218,8 @@ export class DrawPoint extends Component {
             this.map.remove(i)
         }
         if (!this.g.selectAll('g').empty()) {
-            D3.select('.g-wrapper').selectAll('g').remove();
-            D3.select('.g-wrapper').selectAll('circle').remove();
+           this.g.selectAll('g').remove();
+           this.g.selectAll('circle').remove();
         }
 
         this.renderData = data;
@@ -224,16 +235,32 @@ export class DrawPoint extends Component {
         }
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
-            let group = this.g.append('g').datum(d).on('contextmenu',()=>{
-                if(this.isShowStatus){
+            let group = this.g.append('g').datum(d)
+            if(tools.isMb){
+                G.d.on(group.node(),'press',(res)=> {
+                    console.log(D3.event);
+                    this.onAreaClick({
+                        type: 'modal',
+                        data: d
+
+                    }).catch((e) => {
+                        console.log(e);
+                    })
+                })
+            }else {
+                group.on('contextmenu',()=>{
+                    //if(this.isShowStatus){
                     this.selectedData = d
                     D3.event.preventDefault();
                     console.log(D3.mouse(this.svg.node()));
                     let x = D3.mouse(this.svg.node())[0],y = D3.mouse(this.svg.node())[1]
                     this.contextMenu.setPosition(x,y);
                     this.contextMenu.show = true;
-                }
-            });
+                    // }
+                });
+            }
+
+
 
             let point = [],
                 I = 0,
@@ -268,10 +295,7 @@ export class DrawPoint extends Component {
                                 point = data.data;
                                 this.map.set(index, data.data)
                                 return that.line(data.data)
-                            }).on('mouseleave',function (d) {
-                            //let s = D3.select(this).node().getComputedTextLength();
-                            that.tooltip.style('display','none');
-                        })
+                            })
                         // 判断是否是编辑状态
                         //显示边框 以及 背景颜色
                         if(this.isShowStatus){
@@ -324,15 +348,18 @@ export class DrawPoint extends Component {
                             }
 
                             return font + "px"
-                        }).on('mouseenter',function (d) {
+                        }).on('mouseover',function (d) {
                             let str = '';
                             for(let i = 0; i < toolData.length; i++){
                                   str += (toolData[i] + "<br/>");
                             }
                             that.tooltip.html(str)
-                                .style('left',(D3.mouse(that.svg.node())[0]) + 'px')
-                                .style('top',(D3.mouse(that.svg.node())[1]) + 'px')
+                                .style('left',(D3.mouse(that.svg.node())[0]) + 12 + 'px')
+                                .style('top',(D3.mouse(that.svg.node())[1]) + 12 + 'px')
                                 .style('display','block')
+                        }).on('mouseout',function (d) {
+                            //let s = D3.select(this).node().getComputedTextLength();
+                            that.tooltip.style('display','none');
                         })
                         .style("pointer-events",()=>{
                             if(this.isDrawLine){
@@ -369,8 +396,13 @@ export class DrawPoint extends Component {
                 lineNumber = 0,
                 lineHeight = text.node().getBoundingClientRect().height,
                 x = +text.attr('x'),
-                y = +text.attr('y'),
-                  tspan = text.text(null).append('tspan').attr('dy',5.3).attr('dx',5).attr('x',centerX - 5.3).attr('y',centerY - 5.3);
+                y = +text.attr('y');
+            if(lineHeight >= 18){
+                lineHeight = 15
+            }else {
+                lineHeight = 5.3
+            }
+                let  tspan = text.text(null).append('tspan').attr('dy',lineHeight).attr('dx',5).attr('x',centerX - 5.3).attr('y',centerY - 5.3);
             while (word = words.pop()) {
                 line.push(word);
                 const dash = lineNumber > 0 ? '-' : '';
@@ -379,7 +411,7 @@ export class DrawPoint extends Component {
                     line.pop();
                     tspan.text(line.join(''));
                     line = [word];
-                    tspan = text.append('tspan').attr('dy',5.3).attr('dx',5).attr('x',centerX - 5.3).text(word);
+                    tspan = text.append('tspan').attr('dy',lineHeight).attr('dx',5).attr('x',centerX - 5.3).text(word);
                     //tspan = text.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y + 15).text(word);
                 }
             }
@@ -522,7 +554,8 @@ export class DrawPoint extends Component {
 
     //绘图
     private redraw() {
-        let svg = D3.select('svg').select('.g-wrapper');
+        //let svg = D3.select('svg').select('.g-wrapper');
+        let svg = this.g;
         svg.selectAll('g').select('#path' + this.index)
             .attr("d", (d, i) => {
                 return this.line(this.map.get(this.index))
@@ -570,8 +603,8 @@ export class DrawPoint extends Component {
         }
         this.editEvent.off();
         //！！每一次创建都会开辟一个新得path
-        var svg = D3.select('svg').select('.g-wrapper')
-        let group = svg.append('g').attr('class',function (d) {
+        //var svg = D3.select('svg').select('.g-wrapper')
+        let group = this.g.append('g').attr('class',function (d) {
             return 'insert'
         });
 
@@ -845,7 +878,8 @@ export class DrawPoint extends Component {
                                     self.isDrawLine = true;
                                 }
                                 self.g.attr('cursor','defalut')
-                                D3.select('svg').on('.zoom',null)
+                                //D3.select('svg').on('.zoom',null)
+                                this.svg.on('.zoom',null)
                             }
                         }
                     })
@@ -934,7 +968,7 @@ export class DrawPoint extends Component {
             .y(Y)
             .scaleExtent([1, 10])
             .on('zoomstart', function () {
-                D3.select("svg").on("dblclick.zoom", null);
+               _this.svg.on("dblclick.zoom", null);
             })
             .on('zoom', function (d) {
                 if(D3.event.scale > 6) {
@@ -946,14 +980,12 @@ export class DrawPoint extends Component {
 
                     //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
                     //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
-
                 }
-                   console.log(D3.event.scale);
-                       D3.select('svg').select('.g-wrapper').attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
-
+                       console.log(D3.event.scale);
+                let s = D3.select('svg').select('.g-wrapper');
+                  _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
             }).on("zoomend", function (d) {
-
                 console.log("结束")
             })
 

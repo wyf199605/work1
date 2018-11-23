@@ -56,7 +56,52 @@ export class PlanModule extends Component{
             this.plotBtn.disabled = true;
         }
         this.initDraw();
-        this.initSubBtn();
+        tools.isPc && this.initSubBtn();
+        this.initStatusBar()
+    }
+
+    initStatusBar(){
+        let ui = this.ui,
+            backColors = ui.backColor;
+        if(tools.isNotEmpty(backColors)){
+            let body = <div class="status-list"/>;
+            let modal = new Modal({
+                className: 'plan-status-modal',
+                isMb: false,
+                body,
+                header: tools.isMb ? null : {
+                    isClose: false,
+                    title: '状态',
+                    isDrag: true
+                },
+                isBackground: false,
+                escKey: false,
+                width: '100px',
+                container: this.container,
+                top: 160,
+                zIndex: 499
+            });
+            modal.wrapper.style.left = (tools.isMb ? -5 :document.body.offsetWidth - 150) + 'px';
+            backColors.forEach((item) => {
+                let {r, g, b} = tools.val2RGB(item.GRIDBACKCOLOR),
+                    color = `rgb(${r}, ${g}, ${b})`;
+                d.append(body, <div className="status-item">
+                    <div className="status-ball" style={'background: ' + color}/>
+                    {item.STATUS_NAME}
+                </div>)
+            });
+
+            if(tools.isMb){
+                d.on(this.container, 'touchstart', (ev) => {
+                    if(!d.closest(ev.target as HTMLElement, '.plan-status-modal')){
+                        modal.wrapper.style.transform = 'translateX(-80px)';
+                    }
+                });
+                d.on(modal.wrapper, 'touchstart', () => {
+                    modal.wrapper.style.transform = 'translateX(0)';
+                });
+            }
+        }
     }
 
     protected initSubBtn(){
@@ -90,8 +135,10 @@ export class PlanModule extends Component{
         return this._pageUrl;
     }
 
+    protected detailModal: Modal;
     protected initDraw(){
         let ui = this.ui,
+            timer = null,
             subButton = ui.subButtons.filter((btn) => btn.multiselect !== 0),
             cols = ui.cols;
 
@@ -99,7 +146,7 @@ export class PlanModule extends Component{
             height: 800,
             width: 1200,
             subButton,
-            keyField: ui.keyField,
+            ui,
             container: this.wrapper,
             isShow: !this.isEditPlan,
             format: (data: obj) => {
@@ -113,11 +160,12 @@ export class PlanModule extends Component{
                 return res;
             },
             onAreaClick: (areaType) => {
+                let {data, type, name, content} = areaType;
                 return new Promise((resolve, reject) => {
-                    switch (areaType.type){
+                    switch (type){
                         case 'edit':
-                            this.edit.editData(areaType.data, (data) => {
-                                resolve(data)
+                            this.edit.editData(data, (d) => {
+                                resolve(d)
                             });
                             break;
                         case 'pick':
@@ -126,8 +174,8 @@ export class PlanModule extends Component{
                                     let pick = new PickModule({
                                         container: document.body,
                                         field: col,
-                                        data: areaType.data,
-                                        dataGet: () => areaType.data,
+                                        data,
+                                        dataGet: () => data,
                                         onGetData: (dataArr: obj[], otherField: string) => {
                                             resolve(dataArr[0] ? dataArr[0] : null);
                                             pick.destroy();
@@ -140,7 +188,7 @@ export class PlanModule extends Component{
                             }
                             break;
                         case 'btn':
-                            ButtonAction.get().clickHandle(areaType.content.button, areaType.data, () => {
+                            ButtonAction.get().clickHandle(content.button, data, () => {
                                 resolve();
                             }, this.pageUrl , ui.itemId);
                             break;
@@ -152,7 +200,7 @@ export class PlanModule extends Component{
                                         link: link.dataAddr,
                                         varList: link.varList,
                                         dataType: col.atrrs.dataType,
-                                        data: areaType.data,
+                                        data,
                                         needGps: link.needGps === 1,
                                         type: link.type
                                     });
@@ -160,86 +208,146 @@ export class PlanModule extends Component{
                                 }
                             }
                             break;
+                        case 'modal':
+                            let formatTexts: IDrawFormatData[] = [],
+                                title = '',
+                                contents = [];
+
+                            cols && cols.forEach((col) => {
+                                let name = col.name;
+                                if(name in data){
+                                    formatTexts.push(this.format(col, data[name], data));
+                                }
+                            });
+                            formatTexts.forEach((item) => {
+                                if(item.name === ui.keyField){
+                                    title = item.data || '详情';
+                                }else if(tools.isNotEmpty(item.data) && item.isShow && !item.isPoint){
+                                    contents.push(item.data);
+                                }
+                            });
+                            this.detailModal && (this.detailModal.isShow = false);
+                            clearTimeout(timer);
+                            this.detailModal = new Modal({
+                                className: 'plan-detail-modal',
+                                isOnceDestroy: true,
+                                position: "down",
+                                isMb: false,
+                                isBackground: false,
+                                onClose: () => {
+                                    this.detailModal = null;
+                                    timer = setTimeout(() => {
+                                        this.draw.wrapper.style.paddingBottom = '0px';
+                                    }, 100)
+                                },
+                                header: {
+                                    title,
+                                },
+                                body: <div className="plan-item-detail">
+                                    <div className="plan-item-content">
+                                        {contents.map((text) => <span className="text">{text}</span>)}
+                                    </div>
+                                    <div className="plan-btn-groups">
+                                        {subButton.map((btn) => {
+                                            return <Button content={btn.caption} color="primary" onClick={() => {
+                                                ButtonAction.get().clickHandle(btn, data, () => {
+                                                    resolve();
+                                                }, this.pageUrl , ui.itemId);
+                                            }}/>;
+                                        })}
+                                    </div>
+                                </div>,
+                            });
+                            this.draw.wrapper.style.paddingBottom = '240px';
+                            break;
                     }
                 })
             }
         });
 
     }
-    protected _isEdit = true;
-    get isEdit(){
-        return this._isEdit;
-    }
-    set isEdit(isEdit:boolean){
-        this._isEdit = isEdit;
-        this.plotBtn.disabled = !isEdit;
-    }
-    protected setBackground(obj: obj){
-        let backGround = this.ui.backGround;
-        if(backGround){
-            let img = new Image();
-            img.src = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
-            img.onload = ()=>{
-                this.draw.imgUrl = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
-                this.isEdit = true;
-            }
-            img.onerror = () => {
-                Modal.alert('图层不存在');
-                this.isEdit = false;
+
+    protected setBackground(obj: obj): Promise<any>{
+        return new Promise((resolve, reject) => {
+            let backGround = this.ui.backGround;
+            if(backGround){
+                let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+                url = url && tools.url.addObj(url, {version: new Date().getTime() + ''});
+
+                let img = new Image();
+                img.src = url;
+                img.onload = ()=>{
+                    this.draw.imgUrl = url;
+                    resolve();
+                };
+                img.onerror = () => {
+                    reject();
+                    this.draw.imgUrl = null;
+                }
+
+            }else {
+                reject();
                 this.draw.imgUrl = null;
             }
+        });
 
-        }else {
-            Modal.alert('图层不存在');
-            this.plotBtn.disabled = true;
-        }
     }
 
     protected _ajaxData;
     get ajaxData(){
         return this._ajaxData;
     }
-    refresh(ajaxData?: obj){
-        this._ajaxData = ajaxData;
-        let ui = this.ui,
-            url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
-        this.setBackground(ajaxData);
+    refresh(ajaxData?: obj): Promise<any>{
+        this.detailModal && (this.detailModal.isShow = false);
+        return new Promise((resolve, reject) => {
+            this._ajaxData = ajaxData;
+            let ui = this.ui,
+                url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
+            let loading = new Loading({
+                msg: '数据加载中...'
+            });
+            loading.show();
+            this.setBackground(ajaxData).then(() => {
+                let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
+                this.ajax.fetch(tools.url.addObj(url, data), {
+                    needGps: ui.dataAddr.needGps,
+                    timeout: 30000,
+                }).then(({response}) => {
+                    console.log(response);
+                    let data = response.data;
+                    if (data && ui.tableAddr && ui.tableAddr.param) {
+                        let editParam = ui.tableAddr.param[0];
+                        if (editParam) {
+                            let varList = [];
+                            ['insert', 'update', 'delete'].forEach(type => {
+                                let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                                    typeVarList = editParam[type];
 
-        let loading = new Loading({
-            msg: '数据加载中...'
-        });
-        loading.show();
-        let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
-        this.ajax.fetch(tools.url.addObj(url, data), {
-            needGps: ui.dataAddr.needGps,
-            timeout: 30000,
-        }).then(({response}) => {
-            console.log(response);
-            let data = response.data;
-            if (data && ui.tableAddr && ui.tableAddr.param) {
-                let editParam = ui.tableAddr.param[0];
-                if (editParam) {
-                    let varList = [];
-                    ['insert', 'update', 'delete'].forEach(type => {
-                        let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
-                            typeVarList = editParam[type];
-
-                        if (canOld && Array.isArray(typeVarList)) {
-                            varList = varList.concat(typeVarList)
+                                if (canOld && Array.isArray(typeVarList)) {
+                                    varList = varList.concat(typeVarList)
+                                }
+                            });
+                            // 加上OLD变量
+                            BwRule.addOldField(BwRule.getOldField(varList), data);
                         }
-                    });
-                    // 加上OLD变量
-                    BwRule.addOldField(BwRule.getOldField(varList), data);
-                }
-            }
-            console.log(data);
-            this.isEdit && (this.plotBtn.disabled = false);
-            this.draw.render(data);
-        }).catch(e => {
-            console.log(e);
-        }).finally(() => {
-            loading && loading.hide();
-            loading = null;
+                    }
+                    console.log(data);
+                    this.plotBtn.disabled = false;
+                    this.draw.render(data);
+                }).catch(e => {
+                    console.log(e);
+                }).finally(() => {
+                    loading && loading.hide();
+                    loading = null;
+                    resolve();
+                })
+            }).catch(() => {
+                Modal.alert('图层不存在');
+                this.plotBtn.disabled = true;
+                loading && loading.hide();
+                loading = null;
+                reject();
+            });
         })
     }
 

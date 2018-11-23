@@ -1,4 +1,6 @@
 import BasicPage from "basicPage";
+import tools = G.tools;
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export = class menuPage extends BasicPage {
     constructor(private para) {
@@ -15,7 +17,13 @@ export = class menuPage extends BasicPage {
             }
         };
         $('.file-box').on('click', 'a[data-href]', function () {
-            MENU.openWindowWithBadge(BW.CONF.siteUrl + this.dataset.href, this);
+            let parse = this.dataset.parse, parseVarList;
+            try {
+                parseVarList = parse && JSON.parse(this.dataset.parse);
+            }catch (e) {
+                Modal.alert('后台返回JSON格式错误');
+            }
+            MENU.openWindowWithBadge(tools.url.addObj(BW.CONF.siteUrl + this.dataset.href,G.Rule.parseVarList(parseVarList, {})), this);
         });
         function animationHover(element, animation) {
             element = $(element);

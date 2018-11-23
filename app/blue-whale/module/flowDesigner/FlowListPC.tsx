@@ -5,6 +5,7 @@ import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import tools = G.tools;
 import d = G.d;
 import {BwRule} from "../../common/rule/BwRule";
+import {BwTableElement} from "../../pages/table/newTablePage";
 interface MenuPara{
     menuIcon : string,
     menuName : string,
@@ -25,7 +26,7 @@ interface FlowListPara extends BasicPagePara{
 
 export class FlowListPC extends BasicPage{
     private tableUIUrls:string[] = [];
-    private subTables:objOf<NewTableModule> = {};
+    private subTables:objOf<BwTableElement> = {};
     private currentIndex:string = '0';
     constructor(para:FlowListPara){
         super(para);
@@ -48,23 +49,29 @@ export class FlowListPC extends BasicPage{
                     let index = i + '';
                     this.currentIndex = index;
                     for(let item of Object.values(this.subTables)){
-                        item.subModalShow = false;
+                        item.tableModule.subModalShow = false;
                     }
                     if (tools.isEmpty(this.subTables[index])) {
                         // 表格不存在
-                        BwRule.Ajax.fetch(this.tableUIUrls[index]).then(({response}) => {
+                        BwRule.Ajax.fetch(this.tableUIUrls[index], {
+                            loading: {
+                                msg: '数据加载中...',
+                                disableEl: tabWrapper,
+                                container: document.body
+                            }
+                        }).then(({response}) => {
                             let tabEl = d.query(`.tab-pane.first[data-index="${index}"]`, tab.getPanel());
                             let bwTableEl = response.body.elements[0];
                             bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(response.body.subButtons || []);
-                            this.subTables[index] = new NewTableModule({
-                                bwEl:response.body.elements[0],
+                            this.subTables[index] = new BwTableElement({
+                                tableEl:response.body.elements[0],
                                 container:tabEl
                             });
                         });
                     } else {
                         // 表格存在 刷新并显示
-                        this.subTables[index].refresh().catch();
-                        this.subTables[index].subModalShow = true;
+                        // this.subTables[index].tableModule.refresh().catch();
+                        this.subTables[index].tableModule.subModalShow = true;
                     }
                 }
             });
@@ -79,11 +86,11 @@ export class FlowListPC extends BasicPage{
 
         // Shell触发的刷新事件
         this.on(BwRule.EVT_REFRESH, () => {
-            this.subTables[this.currentIndex].refresh().catch();
+            this.subTables[this.currentIndex].tableModule.refresh().catch();
         });
         // 显示当前页时触发的事件
         this.on(BW.EVT_SHOW_PAGE, () => {
-            let table: NewTableModule = this.subTables[this.currentIndex];
+            let table: NewTableModule = this.subTables[this.currentIndex].tableModule;
             table && table.responsive();
         })
     }

@@ -117,7 +117,6 @@ export default class SideBarMrg {
         let firstLoadSpinner = SideBarMrg.loadTpl();
         d.append(this.para.menu, firstLoadSpinner);
 
-
         this.menu = new Menu({
             expand: true,
             container: this.para.menu,
@@ -143,7 +142,7 @@ export default class SideBarMrg {
             }
         });
 
-        this.menu.onOpen = (node) => {
+        this.menu.onOpen = tools.pattern.throttling((node) => {
             if (node.isLeaf) {
                 let addr = <R_ReqAddr>node.content.menuPath;
                 if (addr) {
@@ -151,7 +150,7 @@ export default class SideBarMrg {
                     this.openWindow(url, node.content.menuName)
                 }
             }
-        }
+        }, 300);
     }
 
     /**

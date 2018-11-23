@@ -28,16 +28,16 @@ export class Loading {
             isBackground: false
         });
         this.delayHied();
-        //禁用元素
-        if (this.para.disableEl) {
-            this.para.disableEl.classList.add('disabled');
-        }
     }
 
     /**
      * 显示加载框
      * */
     public show() {
+        //禁用元素
+        if (this.para.disableEl) {
+            this.para.disableEl.classList.add('disabled');
+        }
         let container = this.container;
         if(container !== document.body){
             let offset: ClientRect = this.container.getBoundingClientRect();
@@ -79,6 +79,10 @@ export class Loading {
     public hide() {
         if(this.modal.wrapper) {
             this.modal.isShow = false;
+        }
+        //禁用元素
+        if (this.para.disableEl) {
+            this.para.disableEl.classList.remove('disabled');
         }
     }
 }

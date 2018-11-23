@@ -238,7 +238,7 @@ export class ButtonAction {
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
-                if(res){
+                if(varType === 3 && res){
                     openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
                 }
                 callback(null);
@@ -250,7 +250,7 @@ export class ButtonAction {
         }
     }
 
-    initBarCode(res,data,dataObj){
+   private initBarCode(res,data,dataObj){
         // console.log(res.body.elements)
         let dataAddr = res.body.elements,
             codeStype:object[],
@@ -259,20 +259,16 @@ export class ButtonAction {
             ajaxUrl:string,
             uploadUrl:string,
             downUrl:string;
+        console.log(dataAddr);
         for(let i = 0;i < dataAddr.length;i++){
-            url =   dataAddr[i].downloadAddr.dataAddr;
+            url = dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
 
         }
         console.log(codeStype[0]["IMPORTDATAMODE"])
-        BwRule.Ajax.fetch(BW.CONF.siteUrl + url,{
-            data:data
-        }).then(({response})=>{
-            console.log(response)
-            response.body && (ajaxUrl =  response.body.bodyList[0].inventData)
-        })
+
 
         require(['RfidBarCode'],(p)=>{
             new p.RfidBarCode({

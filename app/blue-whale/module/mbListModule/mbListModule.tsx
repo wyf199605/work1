@@ -8,6 +8,9 @@ import {MbListItemData} from "../../../global/components/mbList/MbListItem";
 import tools = G.tools;
 import d = G.d;
 import sys = BW.sys;
+import {SlidePopover} from "../../../global/components/ui/slidePopover/slidePopover";
+import {IButton} from "../../../global/components/general/button/Button";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 export interface IMbListModule extends IComponentPara{
     ui: IBW_UI<IBW_Table>;
 }
@@ -38,24 +41,23 @@ export class MbListModule extends Component{
     private initGlobalButtons() {
         let globalButtons = this.allButtons[0] || [];
         if (tools.isNotEmpty(globalButtons)) {
-            let globalButtonWrapper = <div className="global-buttons-wrapper"/>,
-                btnArr = [];
-            globalButtons.forEach((btn, index) => {
-                let className = '';
-                switch (index) {
-                    case 1: {
-                        className = 'clear-data';
-                    }
-                        break;
-                    case 2: {
-                        className = 'add-data';
-                    }
-                        break;
-                }
-                btnArr.push(`<div class="global-btn-item ${className}" data-index="${index}">${btn.caption}</div>`);
+            let sliderPopover = new SlidePopover({
+                container:this.wrapper
             });
-            globalButtonWrapper.innerHTML = btnArr.join('');
-            this.wrapper.appendChild(globalButtonWrapper);
+            let btnArr:IButton[] = [];
+            globalButtons = globalButtons.concat(globalButtons).concat(globalButtons);
+            globalButtons.forEach((btn,index) => {
+                btnArr.push({
+                    content:btn.caption,
+                    icon:btn.icon ? btn.icon.split(' ')[1] : '',
+                    iconPre:btn.icon ? btn.icon.split(' ')[0] : '',
+                    onClick:()=>{
+                        // ButtonAction.get().clickHandle(btn,{});
+                        sliderPopover.modal.isShow = false;
+                    }
+                })
+            });
+            sliderPopover.buttons = btnArr;
         }
     }
 

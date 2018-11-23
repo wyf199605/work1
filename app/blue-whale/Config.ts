@@ -42,7 +42,9 @@ namespace BW {
             myApplicationPC: `ui/menu/n3008_data-3008?p_n=n3008_data-3008&page=myApplication`,
             myApproval: `commonui/pageroute?page=myApproval`,
             myApprovalPC: `ui/menu/n3009_data-3009?p_n=n3009_data-3009&page=myApplication`,
-            flowDetail: `commonui/pageroute?page=flowDetail`
+            flowDetail: `commonui/pageroute?page=flowDetail`,
+
+            msgList : 'newPage/MsgListPage',
         },
         ajaxUrl: {
             getVersion: 'rest/version/fastlion', // 获取版本号
@@ -91,7 +93,7 @@ namespace BW {
 
             flowListCheck: 'flow/system/auditlist', // 流程引擎-审核
             flowListApply: 'flow/system/list', // 流程引擎-申请
-            saveFlow: 'process/save',           // 流程引擎-定义流程
+            modifyFlow: 'process/modify/',      // 流程修改
             getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
         },
 

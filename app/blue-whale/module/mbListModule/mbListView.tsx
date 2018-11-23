@@ -6,6 +6,8 @@ import {ListItemDetail} from "../listDetail/ListItemDetail";
 import {BwRule} from "../../common/rule/BwRule";
 import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import {MbListModule} from "./mbListModule";
+import tools = G.tools;
+import d = G.d;
 
 interface IMbListView extends IComponentPara {
     ui: IBW_UI<R_SubTable_Field>;
@@ -24,7 +26,7 @@ export class MbListView extends Component {
         let listUi: R_SubTable_Field = para.ui.body.elements[0];
         let tabsTitle = ['详情'],
             listUIUrls = [];
-        listUi.subTableAddr.forEach(ele => {
+        listUi.subTableList.forEach(ele => {
             listUIUrls.push(BW.CONF.siteUrl + ele.uiAddr.dataAddr);
             tabsTitle.push(ele.caption);
         });

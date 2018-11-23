@@ -23,6 +23,7 @@ import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Inputs} from "../inputs/inputs";
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 import {PasswdModal} from "../changePassword/passwdModal";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -30,6 +31,7 @@ export interface IBwTableModulePara extends IComponentPara {
     isSub?: boolean;
     ajaxData?: obj;
     editParam?: IBW_TableAddrParam;
+    btnShow?: boolean
 }
 
 interface IEditImgModuleUploadHandler {
@@ -61,7 +63,7 @@ export class BwTableModule extends Component {
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
         super(para);
-
+        this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
@@ -107,6 +109,15 @@ export class BwTableModule extends Component {
             // 正常表格
             this.ftableInit(para.ajaxData);
         }
+    }
+
+    protected _btnShow: boolean = true;
+    get btnShow(){
+        return this._btnShow;
+    }
+    set btnShow(flag: boolean){
+        this._btnShow = flag;
+        this.ftable && (this.ftable.btnShow = flag);
     }
 
     private get baseFtablePara(): IFastBtnTablePara {
@@ -285,7 +296,7 @@ export class BwTableModule extends Component {
                 }
             })
         );
-
+        this.ftable.btnShow = this.btnShow;
 
         !this.isDrill && this.ftable.btnAdd('filter', {
             type: 'default',
@@ -510,6 +521,7 @@ export class BwTableModule extends Component {
                     data: response.data
                 })
             );
+            this.ftable.btnShow = this.btnShow;
             this.ftableReady();
         });
     }
@@ -594,9 +606,10 @@ export class BwTableModule extends Component {
             return;
         }
         let link = field.link;
+
         if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
             BwRule.link({
-                link: link.dataAddr,
+                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
                 varList: link.varList,
                 dataType: field.atrrs.dataType,
                 data: rowData,
@@ -1837,16 +1850,22 @@ export class BwTableModule extends Component {
                             switch (field){
                                 case 'look':{
                                     BwRule.Ajax.fetch(dataAddr).then(({response}) => {
-                                        new FlowDesigner(response);
+                                        new FlowDesigner(response, field);
                                     }).catch(err => {
                                         console.log(err);
                                     });
                                 }
-                                break;
+                                    break;
                                 case 'design':{
-                                    new FlowDesigner();
+                                    BwRule.Ajax.fetch(dataAddr, {
+                                        type: 'GET'
+                                    }).then(({response}) => {
+                                        new FlowDesigner(response, field);
+                                    }).catch(err => {
+                                        console.log(err);
+                                    });
                                 }
-                                break;
+                                    break;
                             }
                         } else {
                             // 通用操作按钮
@@ -1859,12 +1878,27 @@ export class BwTableModule extends Component {
                             //     Modal.alert('请选最多一条数据');
                             //     return;
                             // }
+                            btn && (btn.isDisabled = true);
+                            let spinner = new Spinner({
+                                el: btn.wrapper,
+                                type: Spinner.SHOW_TYPE.replace,
+                                time: 10000,
+                                onTimeout: () => {
+                                    btn && (btn.isDisabled = false);
+                                    Modal.toast('当前网络不佳～');
+                                }
+                            });
+                            spinner.show();
                             let btnUi = btn.data as R_Button,
                                 {multiselect, selectionFlag} = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
-                            let select = Object.assign({}, this.linkedDate || {},
-                                (multiselect === 1 ? selectedData[0] : selectedData) || {});
+                            let linkedData = this.linkedData || {};
+                            let select = multiselect === 1
+                                ? Object.assign({}, linkedData, selectedData[0] || {})
+                                : selectedData.map((o) => Object.assign({}, linkedData || {}, o));
+                            select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
+
                             let tData = ftable.tableData.data;
 
                             if (btnUi.haveRoll) {
@@ -1891,6 +1925,8 @@ export class BwTableModule extends Component {
                                     if (tools.isNotEmpty(locData)) {
                                         clearInterval(interval);
                                         ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                            btn && (btn.isDisabled = false);
+                                            spinner && spinner.hide();
                                         }, this.pageUrl, this.ui.itemId);
                                     }
                                 }, 50);
@@ -1899,6 +1935,8 @@ export class BwTableModule extends Component {
                                 window.localStorage.removeItem('nextKeyField');
                                 window.localStorage.removeItem('currentKeyField');
                                 ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                    btn && (btn.isDisabled = false);
+                                    spinner && spinner.hide();
                                 }, this.pageUrl, this.ui.itemId);
                             }
                         }
@@ -1947,7 +1985,7 @@ export class BwTableModule extends Component {
     })();
 
     // 按钮关联数据，每次按钮请求时需附带的参数
-    public linkedDate = {};
+    public linkedData = {};
 
     destroy() {
         super.destroy();

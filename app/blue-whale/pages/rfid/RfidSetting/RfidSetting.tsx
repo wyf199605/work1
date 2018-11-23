@@ -6,7 +6,6 @@ import d = G.d;
 import {MbPage} from "../../../../global/components/view/mbPage/MbPage";
 export class RfidSettingModal extends Modal{
     private rfidSetting: RfidSetting;
-
     constructor() {
         let rfidSetting = new RfidSetting({});
         super({
@@ -54,7 +53,6 @@ export class RfidSetting extends Component {
         this.clearCook();
         this.keyupReduce();
         this.keyupAdd();
-
     }
 
 
