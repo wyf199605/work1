@@ -201,11 +201,17 @@
 .fl-mobile {
   .modal-mbPage.sub-table {
     .mbPage-header {
+      height: 30px;
+      .mbPage-title{
+        line-height: 30px;
+      }
       .mbPage-left, .mbPage-right, .mbPage-title {
         top: 0 !important;
       }
     }
-
+    .mbPage-body{
+      padding-top: 30px;
+    }
   }
 
   .table-module-wrapper {

@@ -24,7 +24,7 @@ interface IDrapPoint extends IComponentPara {
 }
 
 interface IAreaType {
-    type: 'edit' | 'pick' | 'btn' | 'link' | 'modal';
+    type: 'edit' | 'pick' | 'btn'| 'link' | 'modal';
     data?: obj;
     name?: string;
     content?: any;
@@ -989,31 +989,44 @@ export class DrawPoint extends Component {
                 .domain([0, para.height])
                 .range([0, para.height]);
 
-        this.zoom = D3.behavior.zoom()
-            .x(X)
-            .y(Y)
-            .scaleExtent([1, 10])
-            .on('zoomstart', function () {
-                _this.svg.on("dblclick.zoom", null);
+        if(tools.isMb){
+            let scale = 1;
+            d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
+                scale = ev.scale;
+                scale = Math.min(ev.scale, 2);
+                scale = Math.max(0.5, ev.scale);
+                _this.g.attr('transform', "scale(" + scale + ")");
+                _this.svg.attr('width', scale * 1200);
+                _this.svg.attr('height', scale * 800);
             })
-            .on('zoom', function (d) {
-                if (D3.event.scale > 6) {
+        }else{
+            this.zoom = D3.behavior.zoom()
+                .x(X)
+                .y(Y)
+                .scaleExtent([1, 10])
+                .on('zoomstart', function () {
+                    _this.svg.on("dblclick.zoom", null);
+                })
+                .on('zoom', function (d) {
+                    if(D3.event.scale > 6) {
 
-                    //D3.selectAll('circle').attr('r',_this.LR(6));
-                    //D3.selectAll('path').attr('stroke-width',_this.LV(6))
-                } else {
-                    _this.rLate = _this.lineLate = D3.event.scale;
+                        //D3.selectAll('circle').attr('r',_this.LR(6));
+                        //D3.selectAll('path').attr('stroke-width',_this.LV(6))
+                    }else{
+                        _this.rLate = _this.lineLate = D3.event.scale;
 
-                    //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
-                    //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
-                }
-                console.log(D3.event.scale);
-                let s = D3.select('svg').select('.g-wrapper');
-                _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
+                        //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
+                        //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
+                    }
+                    console.log(D3.event.scale);
+                    let s = D3.select('svg').select('.g-wrapper');
+                    _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
-            }).on("zoomend", function (d) {
-                console.log("结束")
-            })
+                }).on("zoomend", function (d) {
+                    console.log("结束")
+                })
+        }
+
 
     }
 
