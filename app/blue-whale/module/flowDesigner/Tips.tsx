@@ -127,7 +127,7 @@ export class Tips extends Component {
             if (FlowDesigner.CURRENT_SELECT_TYPE === 'transition') {
                 if (tools.isNotEmpty(FlowDesigner.ALLITEMS)) {
                     FlowDesigner.ALLITEMS.forEach(item => {
-                        item.active === true && (Tips.TransitionItems = [item]);
+                        item && item.active && (Tips.TransitionItems = [item]);
                     });
                 }
             }
@@ -140,21 +140,26 @@ export class Tips extends Component {
             target.classList.add('active');
         };
         let deleteItem = () => {
+            // 删除选中的节点和节点相关联的连接线
             let deleteLine = [];
-            FlowDesigner.ALLITEMS.forEach(item => {
-                if(item && item.active){
+            for(let item of FlowDesigner.ALLITEMS){
+                if(item && item.active && item.flowEditor && item.flowEditor.show){
                     FlowDesigner.AllLineItems.forEach((line) => {
                         line.from === item.rectNode && deleteLine.push(line) && line.destroy();
                         line.to === item.rectNode && deleteLine.push(line) && line.destroy();
                     });
                     item.destroy() && FlowDesigner.removeAllActive();
+                    break;
                 }
-            });
+            }
             FlowDesigner.AllLineItems.forEach((line, index, arr) => {
-                deleteLine.forEach(dLine => {
-                    line === dLine && arr.splice(index, 1);
+                deleteLine.forEach(deleteLine => {
+                    line === deleteLine && arr.splice(index, 1);
                 })
             });
+            // console.log('after delete: ');
+            // console.log(FlowDesigner.ALLITEMS);
+            // console.log(FlowDesigner.AllLineItems);
         };
         return {
             on: () => {

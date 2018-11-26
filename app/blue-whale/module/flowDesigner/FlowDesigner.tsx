@@ -141,14 +141,13 @@ const Method = {
 };
 
 export class FlowDesigner {
-    static CURRENT_SELECT_TYPE: string;
+    static CURRENT_SELECT_TYPE: string;     // 当前选择的节点的类型
     static PAPER;
-    static ALLITEMS: FlowItem[] = [];
+    static ALLITEMS: FlowItem[] = [];       // 所有的节点
     static connections: any[] = [];
-    static AllLineItems: LineItem[] = [];
-    static flowEditor: FlowEditor;
-    static rootElement: Element;
-    static processId: number;
+    static AllLineItems: LineItem[] = [];   // 所有的连接线
+    static rootElement: Element;            // 当前流程的xml节点树
+    static processId: number;               // 当前流程的id
 
     constructor(responseData?: any, type?: string) {
         FlowEditor.EXIST_NAME = [];
@@ -197,6 +196,8 @@ export class FlowDesigner {
 
             let xmlStr = responseData.data[0].process,
                 rootElement = Method.loadXMLStr(xmlStr).documentElement;
+            // console.log('xml initial: ');
+            // console.log(xmlStr);
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
                 if (child.nodeType === 1) {
@@ -211,7 +212,6 @@ export class FlowDesigner {
                     'name' in child.attributes && (
                         FlowEditor.EXIST_NAME.push(child.attributes.name.value)
                     );
-                    console.log(FlowEditor.EXIST_NAME);
                     let shape: FlowItem = null;
                     layout && (shape = new FlowItem({
                         type: child.tagName,
@@ -223,11 +223,11 @@ export class FlowDesigner {
                         container: d.query('#design-canvas'),
                         fields: fields,
                     }));
-                    let arr = FlowDesigner.ALLITEMS || [];
-                    FlowDesigner.ALLITEMS = arr.concat([shape]);
 
                     if(tools.isNotEmpty(shape)){
                         // 设置节点的data-name
+                        let arr = FlowDesigner.ALLITEMS || [];
+                        FlowDesigner.ALLITEMS = arr.concat([shape]);
                         shape.calcWidthAndHeight();
                         shape.wrapper.dataset.name = child.attributes.name.value;
 
@@ -277,7 +277,7 @@ export class FlowDesigner {
             });
 
             // 如果节点已经完成，则对应的连接线的颜色也要改变
-            FlowDesigner.ALLITEMS.filter(item => item.isComplete).forEach(item => {
+            FlowDesigner.ALLITEMS.filter(item => item && item.isComplete).forEach(item => {
                 tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
                     lineItem.isComplete = true;
                 });
@@ -291,8 +291,7 @@ export class FlowDesigner {
                 }),
                 [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS).forEach(item => item.flowEditor && item.flowEditor.initEvents.off()),
                 d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item))
-            )
-
+            );
         }
     }
 
@@ -310,25 +309,35 @@ export class FlowDesigner {
             }
         };
         let saveFlowHandler = (e) => {
-            console.log([].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems));
-            if([].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems).some(item => tools.isEmpty(item.flowEditor.get().name))){
+            let allItems = [].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems),
+                allNames = [];
+            if(allItems.some(item => tools.isEmpty(item.flowEditor.get().name))){
                 Modal.toast('名称不能为空!');
                 return;
             }
+            allItems.forEach(item => item.flowEditor.get().name && (allNames[item.flowEditor.get().name] =  allNames[item.flowEditor.get().name] + 1 || 1));
+            for(let attr of Object.keys(allNames)){
+                if(allNames[attr] > 1){
+                    Modal.toast(`名称${attr}重复！`);
+                    return;
+                }
+            }
+
             let xmlDoc = Method.loadXMLStr(`<?xml version="1.0" encoding="UTF-8"?><process></process>`);
             FlowDesigner.rootElement = xmlDoc.documentElement;
-
             FlowDesigner.ALLITEMS.forEach(item => {
                 // 创建节点、设置属性、添加到xml节点树中
-                let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
-                    attrs = item.rectNode.attrs,
-                    layoutStr = [attrs.cx || attrs.x, attrs.cy || attrs.y, attrs.r || attrs.width, attrs.r || attrs.height].join(),
-                    dropdowns = item.flowEditor.dropdowns,
-                    dropdownField: IFieldPara = {};
-                // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
-                Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 && (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
-                Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get(), dropdownField));
-                FlowDesigner.rootElement.appendChild(xmlNode);
+                if(tools.isNotEmpty(item)){
+                    let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
+                        attrs = item.rectNode.attrs,
+                        layoutStr = [attrs.cx || attrs.x, attrs.cy || attrs.y, attrs.r || attrs.width, attrs.r || attrs.height].join(),
+                        dropdowns = item.flowEditor.dropdowns,
+                        dropdownField: IFieldPara = {};
+                    // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
+                    Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 && (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
+                    Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get(), dropdownField));
+                    FlowDesigner.rootElement.appendChild(xmlNode);
+                }
             });
             // 再创建所有的连接线，并设置属性和作为谁的子节点
             FlowDesigner.AllLineItems.forEach(line => {
@@ -381,6 +390,10 @@ export class FlowDesigner {
         FlowDesigner.ALLITEMS = [];
         FlowDesigner.connections = [];
         FlowEditor.EXIST_NAME = [];
+        FlowDesigner.rootElement = null;
+        FlowItem.endCounter = 0;
+        FlowItem.startCounter = 0;
+        LineItem.counter = 0;
         this.initEvents.off();
     }
 }
