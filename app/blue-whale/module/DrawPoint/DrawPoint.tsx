@@ -1019,7 +1019,6 @@ export class DrawPoint extends Component {
                 .range([0, para.height]);
 
         if(tools.isMb){
-            alert('112')
             let scale = 1;
             d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
                 //
