@@ -288,11 +288,14 @@ export class RfidBarCode extends Component {
 
                                             for (let i = 0; i < this.fields.length; i++) {
                                                 if (i == 0) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 1) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 2) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVa   l2'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 }
                                             }
                                         }
@@ -430,11 +433,14 @@ export class RfidBarCode extends Component {
                                         if (G.tools.isNotEmpty(this.fields)) {
                                             for (let i = 0; i < this.fields.length; i++) {
                                                 if (i == 0) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 1) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 2) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 }
                                             }
                                         }
