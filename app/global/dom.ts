@@ -181,7 +181,7 @@ let event = (function () {
                                 centerY = Math.abs(touches[0].clientY - touches[1].clientY) / 2;
                             let startDistance = Math.sqrt(Math.pow(touches[0].clientX - touches[1].clientX, 2)
                                 + Math.pow(touches[0].clientY - touches[1].clientY, 2));
-                            eventOn(el, EVENT_MB_MOVE, moveHandler = (ev: TouchEvent) =>{
+                            eventOn(el, EVENT_MB_MOVE, moveHandler = tools.pattern.throttling((ev: TouchEvent) =>{
                                 let touches = ev.changedTouches;
                                 let moveDistance = Math.sqrt(Math.pow((touches[0].clientX - touches[1].clientX),2)
                                     + Math.pow((touches[0].clientY - ev.touches[1].clientY),2));
@@ -192,7 +192,7 @@ let event = (function () {
                                 }
                                 startDistance = moveDistance;
                                 dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, scale, centerX, centerY));
-                            });
+                            }, 50));
                             eventOn(el, EVENT_MB_END, endHandler = () =>{
                                 eventOff(el, EVENT_END, endHandler);
                                 eventOff(el, EVENT_MOVE, moveHandler);
