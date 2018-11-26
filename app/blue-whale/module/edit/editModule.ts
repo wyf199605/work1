@@ -585,7 +585,7 @@ export class EditModule {
                 }
             }
 
-            ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp'].forEach(ruleName => {
+            ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'VALID_CHARS'].forEach(ruleName => {
                 let ruleVal = field.atrrs[ruleName];
                 if(!tools.isEmpty(ruleVal)){
                     rules.push({
