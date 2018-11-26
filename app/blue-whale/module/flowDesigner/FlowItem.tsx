@@ -28,6 +28,9 @@ export class FlowItem extends Component {
         return <div className="flow-item"/>;
     }
 
+    static startCounter = 0;
+    static endCounter = 0;
+
     // 当前绘制出的 raphael 节点
     private _rectNode: any;
     get rectNode() {
@@ -91,6 +94,8 @@ export class FlowItem extends Component {
             owner: this,
             fields: para.fields,
         });
+        this.isStart && this.flowEditor.set({name: 'start' + (FlowItem.startCounter ++).toString()});
+        this.isEnd && this.flowEditor.set({name: 'end' + (FlowItem.endCounter ++).toString()});
     }
 
     // 所有关联的item
@@ -333,12 +338,13 @@ export class FlowItem extends Component {
     static removeAllActiveClass() {
         d.queryAll('.flow-item').forEach((item) => {
             item.classList.remove('active');
-            item.classList.remove('active');
         });
         let arr = FlowDesigner.ALLITEMS || [];
         arr.forEach(item => {
-            item._active = false;
-            item.flowEditor.show = false;
+            item && (
+                item._active = false,
+                item.flowEditor.show = false
+            )
         })
     }
 
@@ -396,9 +402,11 @@ export class FlowItem extends Component {
 
     destroy() {
         this.rectNode.remove();
-        FlowDesigner.ALLITEMS.indexOf(this) >= 0 && FlowDesigner.ALLITEMS.splice(FlowDesigner.ALLITEMS.indexOf(this));
+        FlowDesigner.ALLITEMS.forEach((item, index, arr) => item === this && arr.splice(index, 1));
         this.initEvents.off();
         this.flowEditor.destroy();
+        this.isStart && FlowItem.startCounter --;
+        this.isEnd && FlowItem.endCounter --;
         super.destroy();
     }
 }

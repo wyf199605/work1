@@ -171,6 +171,7 @@ export class LineItem extends Component {
         this.initEvents.off();
         this.line.node.remove();
         this.line.prev.remove();
+        LineItem.counter --;
         super.destroy();
     }
 }

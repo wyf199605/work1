@@ -134,7 +134,6 @@ export class FlowEditor extends FormCom {
                         this.set({[attr]: item.text});
                         FlowEditor.hideAllDropdown();
                         if(item.text === FlowEditor.addressList[0].text){
-                            console.log('in it');
                             BwRule.Ajax.fetch(FlowEditor.addressList[0].address).then(({response}) => {
                                 console.log(response);
                             }).catch(err => {
@@ -307,6 +306,7 @@ export class FlowEditor extends FormCom {
                d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
             });
         });
+        this.owner = null;
         super.destroy();
     }
 }
