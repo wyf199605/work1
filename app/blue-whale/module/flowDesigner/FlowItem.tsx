@@ -9,6 +9,7 @@ import {FlowDesigner} from "./FlowDesigner";
 import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {Tips} from "./Tips";
 import {LineItem} from "./LineItem";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IFlowItemPara extends IComponentPara {
     type?: string;      // 节点的类型
@@ -209,10 +210,20 @@ export class FlowItem extends Component {
             if (FlowDesigner.CURRENT_SELECT_TYPE === 'transition') {
                 let arr = Tips.TransitionItems || [];
 
-                // 是否连接自己
+                // 连接自己或连接相同名称的节点
+                let transitionFlag = null;
                 if (self === Tips.TransitionItems[0]) {
+                    Modal.toast('不能连接自己！');
+                }else if(Tips.TransitionItems[0] && self.flowEditor.get().name === Tips.TransitionItems[0].flowEditor.get().name){
+                    Modal.toast('名称相同，无法连接！');
+                }else if(Tips.TransitionItems[0] && FlowDesigner.AllLineItems.filter(line =>
+                        (line.from === Tips.TransitionItems[0].rectNode && line.to === self.rectNode && (transitionFlag = 'repeat')) ||
+                        (line.from === self.rectNode && line.to === Tips.TransitionItems[0].rectNode && (transitionFlag = 'reverse')))[0]){
+                    // 禁用二次连接或反向连接
                     self.active = false;
-                } else {
+                    transitionFlag === 'repeat' && Modal.toast('不能重复连线！');
+                    transitionFlag === 'reverse' && Modal.toast('不能反向连线！');
+                }else {
                     Tips.TransitionItems = arr.concat([self]);
                 }
 
@@ -406,8 +417,6 @@ export class FlowItem extends Component {
         FlowDesigner.ALLITEMS.forEach((item, index, arr) => item === this && arr.splice(index, 1));
         this.initEvents.off();
         this.flowEditor.destroy();
-        this.isStart && FlowItem.startCounter --;
-        this.isEnd && FlowItem.endCounter --;
         super.destroy();
     }
 }

@@ -143,9 +143,15 @@ let event = (function () {
 
     let customEvent = (() => {
         const SUPPORT_TOUCH = tools.isMb,
-            EVENT_START = SUPPORT_TOUCH ? 'touchstart' : 'mousedown',
-            EVENT_MOVE = SUPPORT_TOUCH ? 'touchmove' : 'mousemove',
-            EVENT_END = SUPPORT_TOUCH ? 'touchend' : 'mouseup';
+            EVENT_MB_START = 'touchstart',
+            EVENT_MB_MOVE = 'touchmove',
+            EVENT_MB_END = 'touchend',
+            EVENT_PC_START = 'mousedown',
+            EVENT_PC_MOVE = 'mousemove',
+            EVENT_PC_END = 'mouseup',
+            EVENT_START = SUPPORT_TOUCH ? EVENT_MB_START : EVENT_PC_START,
+            EVENT_MOVE = SUPPORT_TOUCH ? EVENT_MB_MOVE : EVENT_PC_MOVE,
+            EVENT_END = SUPPORT_TOUCH ? EVENT_MB_END : EVENT_PC_END;
 
         function dispatcherGet(el:Node) {
             return elemData.get(el)[eventHash] && elemData.get(el)[eventHash].dispatcher
@@ -156,88 +162,95 @@ let event = (function () {
             return  eventData && eventData.handlers ? Object.keys(eventData.handlers) : null;
         }
 
-        let panHandlers = {
-            start: null,
-            end: null,
-            move: null,
-        };
-
         let events = {
-            touchzoom:{
+            touchzoom: {
                 type: 'touchzoom',
-                scale: 1,
-                handler: null,
+                constant: 0.01, // 每次放大缩小的基数
+                handlerName: '__TOUCH_ZOOM_HANDLER__',
                 on(el:Node, selector:string){
-                    let moveHandler,endHandler;
-                    eventOn(el, EVENT_START, selector, this.handler = (ev: TouchEvent) =>{
-                        let touches = ev.touches;
+                    let startHandler,
+                        moveHandler,
+                        endHandler,
+                        scale = 1,
+                        dispatcher = dispatcherGet(el);
+
+                    eventOn(el, EVENT_MB_START, selector, startHandler = (ev: TouchEvent) =>{
+                        let touches = ev.changedTouches;
                         if(touches.length === 2){
                             let centerX = Math.abs(touches[0].clientX - touches[1].clientX) / 2,
                                 centerY = Math.abs(touches[0].clientY - touches[1].clientY) / 2;
                             let startDistance = Math.sqrt(Math.pow(touches[0].clientX - touches[1].clientX, 2)
                                 + Math.pow(touches[0].clientY - touches[1].clientY, 2));
-                            eventOn(el, EVENT_MOVE, moveHandler = tools.pattern.throttling((ev: TouchEvent) =>{
-                                let touches = ev.touches;
+                            eventOn(el, EVENT_MB_MOVE, moveHandler = tools.pattern.throttling((ev: TouchEvent) =>{
+                                let touches = ev.changedTouches;
                                 let moveDistance = Math.sqrt(Math.pow((touches[0].clientX - touches[1].clientX),2)
                                     + Math.pow((touches[0].clientY - ev.touches[1].clientY),2));
                                 if(moveDistance / startDistance > 1){
-                                    this.scale += 0.015;
+                                    scale += this.constant;
                                 }else if(moveDistance / startDistance < 1){
-                                    this.scale -= 0.015;
+                                    scale -= this.constant;
                                 }
                                 startDistance = moveDistance;
-                                let dispatcher = dispatcherGet(el);
-                                dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, this.scale, centerX, centerY));
+                                dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, scale, centerX, centerY));
                             }, 50));
-                            eventOn(el, EVENT_END, endHandler = () =>{
+                            eventOn(el, EVENT_MB_END, endHandler = () =>{
                                 eventOff(el, EVENT_END, endHandler);
                                 eventOff(el, EVENT_MOVE, moveHandler);
                             });
                         }
                     });
+                    d.data(el, startHandler);
+                },
+                off(el:Node, selector:string){
+                    eventOff(el, EVENT_START, selector, d.data(el));
                 }
+
             },
             press: {
                 type: 'press',
                 time: 700,
                 longClick: 0,
-                handler: null,
                 on(el:Node, selector:string){
                     let press = events.press,
                         timer: number = null,
                         touchY = 0,
-                        moveHandler, endHandler;
-                    eventOn(el, EVENT_START, selector, press.handler = (ev) => {
+                        handler,
+                        moveHandler,
+                        endHandler,
+                        dispatcher = dispatcherGet(el);
+
+                    eventOn(el, EVENT_MB_START, selector, handler = (ev) => {
                         clearTimeout(timer);
                         press.longClick = 0;
                         let touch = ev.touches[0];
                         touchY = touch.clientY;
                         timer = setTimeout(() => {
                             press.longClick = 1;
-                            let dispatcher = dispatcherGet(el);
                             dispatcher && dispatcher.call(el, getCustomEvent(ev, 'press'));
                         }, press.time);
-                    });
-                    eventOn(document, EVENT_MOVE, moveHandler = (ev) => {
-                        let touch = ev.touches[0];
-                        if(Math.abs(touch.clientY - touchY) < 10) {
+
+                        eventOn(document, EVENT_MB_MOVE, moveHandler = (ev) => {
+                            let touch = ev.touches[0];
+                            if(Math.abs(touch.clientY - touchY) < 10) {
+                                clearTimeout(timer);
+                            }
+                        });
+
+                        eventOn(document, EVENT_MB_END, endHandler = (ev) => {
                             clearTimeout(timer);
-                        }
+                            if(press.longClick === 1){
+                                ev.preventDefault();
+                                press.longClick = 0;
+                            }
+                            eventOff(document, EVENT_MB_END, endHandler);
+                            eventOff(document, EVENT_MB_MOVE, moveHandler);
+                        });
                     });
-                    eventOn(document, EVENT_END, endHandler = (ev) => {
-                        // if(press.startTime !== null && (new Date().getTime() - press.startTime >= press.time + 100)){
-                        clearTimeout(timer);
-                        if(press.longClick === 1){
-                            ev.preventDefault();
-                            // setTimeout(() => {
-                            press.longClick = 0;
-                            // }, 100);
-                        }
-                        // }
-                    })
+
+                    d.data(el, handler);
                 },
                 off(el:Node, selector:string){
-                    eventOff(el, EVENT_START, selector, this.handler);
+                    eventOff(el, EVENT_MB_START, selector, d.data(el));
                 }
             },
             pan: {
@@ -261,34 +274,32 @@ let event = (function () {
                     }
                 },
                 on (el:Node, selector:string) {
-                    // start
+                    let handler, moveHandler, endHandler;
 
-                    // end
-
-                    // move
-                    eventOn(el, EVENT_START, selector, panHandlers.start = (ev:MouseEvent|TouchEvent) => {
+                    eventOn(el, EVENT_START, selector, handler = (ev:MouseEvent|TouchEvent) => {
                         this.handlers.start.call(el, ev);
 
                         // eventOn(el, EVENT_MOVE, selector, this.handlers.move);
-                        eventOn(el, EVENT_MOVE, panHandlers.move = (ev) => {
+                        eventOn(el, EVENT_MOVE, moveHandler = (ev) => {
                             this.handlers.move.call(el, ev);
                         });
 
                         // eventOn(el, EVENT_END, this.handlers.end);
-                        eventOn(el, EVENT_END, panHandlers.end = (ev) => {
+                        eventOn(el, EVENT_END, endHandler = (ev) => {
                             this.handlers.end.call(el, ev);
-                            eventOff(el, EVENT_MOVE, panHandlers.move);
-                            eventOff(el, EVENT_END, panHandlers.end);
+                            eventOff(el, EVENT_MOVE, moveHandler);
+                            eventOff(el, EVENT_END, endHandler);
                         });
                     });
+                    d.data(el, handler);
                 },
                 off(el: Node, selector: string){
-                    eventOff(el, EVENT_START, selector, panHandlers.start);
+                    eventOff(el, EVENT_START, selector, d.data(el));
                 }
             }
         };
 
-        function getTouchZoomEvent(ev: TouchEvent , scale, centerX, centerY): ITouchZoomEvent {
+        function getTouchZoomEvent(ev: TouchEvent, scale, centerX, centerY): ITouchZoomEvent {
             return Object.assign({}, getCustomEvent(ev, 'touchzoom'),{scale, centerX, centerY})
         }
 
@@ -297,8 +308,8 @@ let event = (function () {
                 type,
                 target: ev.target as HTMLElement,
                 preventDefault: () => {ev.preventDefault()},
-                deltaX: ev.touches[0].clientX,   //	x轴偏移量
-                deltaY: ev.touches[0].clientY,   //	y轴偏移量
+                deltaX: ev.changedTouches[0].clientX,   //	x轴偏移量
+                deltaY: ev.changedTouches[0].clientY,   //	y轴偏移量
                 srcEvent: ev
             }
         }
@@ -500,6 +511,8 @@ let event = (function () {
                 events.pan.off(el, selector)
             }else if(events.press.type === type){
                 events.press.off(el, selector);
+            }else if(events.touchzoom.type === type){
+                events.touchzoom.off(el, selector);
             }
         };
         return {on, off}

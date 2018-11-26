@@ -24,8 +24,6 @@ import tools = G.tools;
 import CONF = BW.CONF;
 import {UploadImages} from "../uploadModule/uploadImages";
 import {Accessory} from "../uploadModule/accessory";
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
-import {ListItemDetail} from "./ListItemDetail";
 
 interface ComInitFun {
     (para: ComInitP): FormCom

@@ -145,7 +145,6 @@ export class FastTable extends Component {
             });
         }
 
-        window['f'] = this;
     }
 
     // 重新计算表格宽度

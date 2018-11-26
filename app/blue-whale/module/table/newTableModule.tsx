@@ -312,8 +312,9 @@ export class NewTableModule {
 
     protected subIndex = 0;
 
-    subRefresh(rowData?: obj) {
-        let main = this.main,
+    subRefresh(rowData?: obj): Promise<Array<any>> {
+        let promise = [],
+            main = this.main,
             mftable = main.ftable,
             selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {});
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
@@ -324,7 +325,7 @@ export class NewTableModule {
             subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex];
 
         if (tools.isEmpty(subUi)) {
-            return;
+            return Promise.resolve([]);
         }
 
         let ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(subUi.dataAddr.varList, selectedData));
@@ -344,15 +345,16 @@ export class NewTableModule {
                 }
             }
             Object.values(subs).forEach((subTable) => {
-                subTable.refresh(ajaxData).catch();
+                promise.push(subTable.refresh(ajaxData).catch());
                 subTable.linkedData = selectedData;
             });
         } else {
             Object.values(this.sub).forEach((subTable) => {
-                subTable.refresh(ajaxData).catch();
+                promise.push(subTable.refresh(ajaxData).catch());
                 subTable.linkedData = selectedData;
             });
         }
+        return Promise.all(promise);
     }
 
     public mobileModal: Modal = null;
@@ -965,7 +967,7 @@ export class NewTableModule {
 
                     BwRule.checkValue(response, saveData, () => {
                         this.currentSelectedIndexes = [];
-                        // 刷新主表
+                        // 主表子表刷新
                         this.refresh();
                         Modal.toast(response.msg);
                         this.editBtns.end();

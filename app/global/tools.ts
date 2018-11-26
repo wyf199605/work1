@@ -668,6 +668,28 @@ namespace G {
             }
         },
 
+        /**
+         * 触发自定义事件
+         * @param dataurl base64字符串
+         * @param filename 文件名称
+         * @param [lastModify] 最后编辑时间
+         */
+        base64ToFile(dataurl: string, filename: string, lastModify?: number){
+            let arr = dataurl.split(',');
+            if(arr.length === 2){
+                let mime = arr[0].match(/:(.*?);/)[1],
+                    bstr = atob(arr[1]),
+                    n = bstr.length,
+                    u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new File([u8arr], filename, {type: mime, lastModified: lastModify});
+            }else{
+                return null;
+            }
+        },
+
         pattern: {
             singleton: function (fn) {
                 let single = null;
