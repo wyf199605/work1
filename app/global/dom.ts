@@ -44,6 +44,21 @@ interface IEventCacheHandlers{
     }
 }
 
+interface ITouchZoomEvent extends ICustomEvent{
+    scale: number;
+    centerX: number;
+    centerY: number;
+}
+
+interface ICustomEvent {
+    type: string,
+    target: HTMLElement,
+    preventDefault: Function,
+    deltaX: number,   //	x轴偏移量
+    deltaY: number,   //	y轴偏移量
+    srcEvent: TouchEvent
+}
+
 interface IDefinedEvent {
     type: string,     // 事件类型
     deltaX: number,   //	x轴偏移量
@@ -151,42 +166,32 @@ let event = (function () {
             touchzoom:{
                 type: 'touchzoom',
                 scale: 1,
-                handler:null,
+                handler: null,
                 on(el:Node, selector:string){
-                    let touchzoom = events.touchzoom,
-                        scale = 1,
-                        moveHandler,endHandler;
-                    eventOn(el, EVENT_START, selector, touchzoom.handler = (ev: TouchEvent) =>{
-                        if(ev.touches.length >=2){
-                            let start;
-                            if(ev.touches.length == 2){
-                                start = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2));
-                            }else {
-                                let a = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2)),
-                                    b = Math.sqrt(Math.pow((ev.touches.item(1).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(1).pageY - ev.touches.item(2).pageY),2)),
-                                    c = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(2).pageY),2));
-                                let p = 0.5 * (a + b + c);
-                                start= Math.sqrt(p * (p - a) * (p - b)* (p-c));
-                            }
-                            eventOn(el, EVENT_MOVE, moveHandler = (ev) =>{
-                                if(ev.touches.length == 2){
-                                    let move_distance = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2));
-                                    scale = move_distance / start;
-                                }else {
-                                    let a = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(1).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(1).pageY),2)),
-                                        b = Math.sqrt(Math.pow((ev.touches.item(1).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(1).pageY - ev.touches.item(2).pageY),2)),
-                                        c = Math.sqrt(Math.pow((ev.touches.item(0).pageX - ev.touches.item(2).pageX),2) + Math.pow((ev.touches.item(0).pageY - ev.touches.item(2).pageY),2));
-                                    let p = 0.5 * (a + b + c);
-                                    let move_area = Math.sqrt(p * (p - a) * (p - b)* (p-c));
-                                    scale = move_area / start;
+                    let moveHandler,endHandler;
+                    eventOn(el, EVENT_START, selector, this.handler = (ev: TouchEvent) =>{
+                        let touches = ev.touches;
+                        if(touches.length === 2){
+                            let centerX = Math.abs(touches[0].clientX - touches[1].clientX) / 2,
+                                centerY = Math.abs(touches[0].clientY - touches[1].clientY) / 2;
+                            let startDistance = Math.sqrt(Math.pow(touches[0].clientX - touches[1].clientX, 2)
+                                + Math.pow(touches[0].clientY - touches[1].clientY, 2));
+                            eventOn(el, EVENT_MOVE, moveHandler = (ev: TouchEvent) =>{
+                                let touches = ev.touches;
+                                let moveDistance = Math.sqrt(Math.pow((touches[0].clientX - touches[1].clientX),2)
+                                    + Math.pow((touches[0].clientY - ev.touches[1].clientY),2));
+                                if(moveDistance / startDistance > 1){
+                                    this.scale += 0.005;
+                                }else if(moveDistance / startDistance < 1){
+                                    this.scale -= 0.005;
                                 }
+                                startDistance = moveDistance;
+                                let dispatcher = dispatcherGet(el);
+                                dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, this.scale, centerX, centerY));
                             });
-                            let dispatcher = dispatcherGet(el);
-                            dispatcher && dispatcher.call(el, getTouchZoomEvent(ev,  scale));
-                            eventOn(el, EVENT_END, endHandler = (ev) =>{
-                                if(touchzoom.scale !== 1){
-                                    touchzoom.scale = 1;
-                                }
+                            eventOn(el, EVENT_END, endHandler = () =>{
+                                eventOff(el, EVENT_END, endHandler);
+                                eventOff(el, EVENT_MOVE, moveHandler);
                             });
                         }
                     });
@@ -283,17 +288,18 @@ let event = (function () {
             }
         };
 
-        function getTouchZoomEvent(ev: TouchEvent , scale) {
-            return Object.assign({}, getCustomEvent(ev, 'touchzoom'),{scale})
+        function getTouchZoomEvent(ev: TouchEvent , scale, centerX, centerY): ITouchZoomEvent {
+            return Object.assign({}, getCustomEvent(ev, 'touchzoom'),{scale, centerX, centerY})
         }
 
-        function getCustomEvent(ev: TouchEvent, type){
+        function getCustomEvent(ev: TouchEvent, type): ICustomEvent{
             return {
                 type,
-                target: ev.target,
+                target: ev.target as HTMLElement,
                 preventDefault: () => {ev.preventDefault()},
                 deltaX: ev.touches[0].clientX,   //	x轴偏移量
                 deltaY: ev.touches[0].clientY,   //	y轴偏移量
+                srcEvent: ev
             }
         }
 
@@ -484,6 +490,8 @@ let event = (function () {
                 events.pan.on(el, selector);
             }else if(events.press.type === type){
                 events.press.on(el, selector);
+            }else if(events.touchzoom.type === type){
+                events.touchzoom.on(el, selector);
             }
         };
 

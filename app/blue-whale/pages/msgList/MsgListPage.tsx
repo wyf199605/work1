@@ -4,9 +4,9 @@ import tools = G.tools;
 import {Tab} from "../../../global/components/ui/tab/tab";
 import localMsg = G.localMsg;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import sys = BW.sys;
-import CONF = BW.CONF;
 import {Pagination} from "../../../global/components/navigation/pagination/pagination";
+import CONF = BW.CONF;
+import sys = BW.sys;
 
 interface IDataMapPara {
     content: {
@@ -32,6 +32,12 @@ export class MsgListPage extends BasicPage {
 
     }
 
+    /**
+     * 分页
+     * @param arr
+     * @param html
+     * @param read
+     */
     private paging(arr : IDataMapPara[], html : HTMLElement, read : number){
         let pagDom = <div class="msg-paging"></div>,
             len = arr.length;
@@ -73,7 +79,9 @@ export class MsgListPage extends BasicPage {
             data = localMsg.get(),
             arr = [];
 
-        this.getDom(read) && (this.getDom(read).innerHTML = null);
+        let dom = this.getDom(read);
+        dom && (dom.innerHTML = null);
+
         data.forEach(obj => {
             if (tools.isNotEmpty(read)) {
                 if (read === obj.isread) {
@@ -88,9 +96,7 @@ export class MsgListPage extends BasicPage {
                 d.append(html, this.createLi(obj, read));
             }
         });
-        // setTimeout(() => {
         this.paging(arr, html, read);
-        // });
         return html;
     }
 
@@ -111,7 +117,7 @@ export class MsgListPage extends BasicPage {
             </li>;
 
         d.on(li, 'click', function () {
-            // sys.window.open({url: CONF.siteUrl + obj.content.link});
+            sys.window.open({url: CONF.siteUrl + obj.content.link});
             if (read !== 1) {
                 li.classList.add('opacity-6');
             }
