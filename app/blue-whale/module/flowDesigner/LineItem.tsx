@@ -118,7 +118,7 @@ export class LineItem extends Component {
             type: 'transition',
             container: d.query('#design-canvas'),
             owner: this,
-            fields: Object.assign(para.fields || {}, {name: `path${LineItem.counter ++}`}),
+            fields: Object.assign({name: `path${LineItem.counter ++}`}, para.fields),
         });
         this.initEvents.on();
     }
@@ -168,8 +168,10 @@ export class LineItem extends Component {
     })();
 
     destroy() {
+        FlowDesigner.connections.forEach((conn, index, arr) => conn.line === this.line && arr.splice(index, 1));
         this.initEvents.off();
         // 注意绘制连接线时会有两条，需要将两条都删除
+        this.flowEditor.destroy();
         this.line.node.remove();
         this.line.prev.remove();
         super.destroy();

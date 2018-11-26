@@ -128,7 +128,7 @@ export class FastBtnTable extends FastTable{
             d.append(searchEl, input);
             d.append(this.btnWrapper, searchEl);
             d.classAdd(this.wrapper, 'has-top-search');
-            d.on(input, 'blur', () => {
+            d.on(input, 'keyup', tools.pattern.debounce(() => {
                 let val = input.value;
                 if(val !== prevValue){
                     prevValue = val;
@@ -146,12 +146,12 @@ export class FastBtnTable extends FastTable{
                         this.search.findCellByKey(val);
                     }
                 }
-            });
-            d.on(input, 'keyup', (ev) => {
-                if(ev.keyCode === 13){
-                    input.blur();
-                }
-            });
+            }, 500));
+            // d.on(input, 'keyup', (ev) => {
+            //     if(ev.keyCode === 13){
+            //         input.blur();
+            //     }
+            // });
         }
     }
 
@@ -441,14 +441,14 @@ export class FastBtnTable extends FastTable{
                         cols: this.dataTools.getCols(),
                         isShow: true,
                         colDataGet: (colName) => {
-                            let column = this.columnGet(colName);
-                            if(column){
-                                let field = column.content as R_Field;
-                                if(field.elementType === 'lookup'){
-                                    colName = field.lookUpKeyField;
-                                    console.log(colName);
-                                }
-                            }
+                            // let column = this.columnGet(colName);
+                            // if(column){
+                            //     let field = column.content as R_Field;
+                            //     if(field.elementType === 'lookup'){
+                            //         colName = field.lookUpKeyField;
+                            //         console.log(colName);
+                            //     }
+                            // }
                             let colCounts = this.dataTools.getColCounts();
                             let obj = {};
                             console.log(colCounts);

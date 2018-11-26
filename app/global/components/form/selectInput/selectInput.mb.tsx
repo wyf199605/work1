@@ -167,19 +167,31 @@ export class SelectInputMb extends TextInput{
         return this.input.value;
     }
 
-    set(value){
-        let index : number = -1;
+    protected _index = -1;
+    set(data){
+        let value = data, text = data;
+        if(typeof data === 'object'){
+            text = data.text;
+            value = data.value
+        }
+
         for (let d:ListItem = null, i = 0; d = this.data[i]; i++){
             if (d.value === value){
                 if(this.pickers[0]){
-                    this.pickers[0].current !== i && (this.pickers[0].current = i);
-                    index = i;
-                    this.para.onSet && this.para.onSet(d, index);
-                    break;
+                    this.pickers[0].current = i;
+                    this._index = i;
+                    this.para.onSet && this.para.onSet(d, this._index);
                 }
             }
         }
-        this.input.value = tools.str.toEmpty(index === -1 ? value : this.data[index][this.para.useInputVal ? 'value' : 'text']);
+        this.input.value = tools.str.toEmpty(this._index === -1 ? text : this.data[this._index][this.para.useInputVal ? 'value' : 'text']);
+    }
+
+    set value(value){
+        this.set(value);
+    }
+    get value(){
+        return this.get();
     }
 
     destroy(){
