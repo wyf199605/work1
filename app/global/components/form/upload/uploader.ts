@@ -93,51 +93,51 @@ export class Uploader extends FormCom {
                 //秒传验证
                 if (para.typeUnique === Uploader.type) {
                     let task = $.Deferred();
-                    let start = new Date().getTime();
-                    //拿到上传文件的唯一名称，用于断点续传
-                    uniqueFileName = md5('' + file.name + file.type + file.lastModifiedDate + file.size);
+                        let start = new Date().getTime();
+                        //拿到上传文件的唯一名称，用于断点续传
+                        uniqueFileName = md5('' + file.name + file.type + file.lastModifiedDate + file.size);
 
-                    (new WebUploader.Uploader()).md5File(file).progress(function (percentage) {
-                        // console.log(percentage);
-                    }).then(function (val) {
-                        // console.log("总耗时: "+((new Date().getTime()) - start)/1000);
+                        (new WebUploader.Uploader()).md5File(file).progress(function (percentage) {
+                            // console.log(percentage);
+                        }).then(function (val) {
+                            // console.log("总耗时: "+((new Date().getTime()) - start)/1000);
 
-                        md5Mark = val;
-                        userInfo.md5 = val;
-                        let ajaxData: obj = {
-                            status: "md5Check"
-                            , md5: val.toUpperCase()
-                            , nameField: para.nameField
-                            , file_name: file.name
-                            , name: uniqueFileName
-                        };
+                            md5Mark = val;
+                            userInfo.md5 = val;
+                            let ajaxData: obj = {
+                                status: "md5Check"
+                                , md5: val.toUpperCase()
+                                , nameField: para.nameField
+                                , file_name: file.name
+                                , name: uniqueFileName
+                            };
 
-                        if (para.thumbField) {
-                            ajaxData.smallField = para.thumbField;
-                        }
-                        Ajax.fetch(backEndUrl, {
-                            type: "POST"
-                            , traditional: true
-                            , data: ajaxData
-                            // , cache: false
-                            , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
-                            , dataType: "json"
-
-                        }).then(function ({response}) {
-                            if (response.ifExist) {   //若存在，这返回失败给WebUploader，表明该文件不需要上传
-                                task.reject('ifExist');
-                                self.com.skipFile(file);
-                                // file.path = data.path;
-                                self.fileName = file.name;
-                                self.para.onComplete(response, file, Uploader.type);
-                            } else {
-                                task.resolve();
-                                //拿到上传文件的唯一名称，用于断点续传
-                                //uniqueFileName = md5(''+userInfo.userId+file.name+file.type+file.lastModifiedDate+file.size);
+                            if (para.thumbField) {
+                                ajaxData.smallField = para.thumbField;
                             }
-                        }).catch(() => {
-                            task.resolve();
-                        });
+                            Ajax.fetch(backEndUrl, {
+                                type: "POST"
+                                , traditional: true
+                                , data: ajaxData
+                                // , cache: false
+                                , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
+                                , dataType: "json"
+
+                            }).then(function ({response}) {
+                                if (response.ifExist) {   //若存在，这返回失败给WebUploader，表明该文件不需要上传
+                                    task.reject('ifExist');
+                                    self.com.skipFile(file);
+                                    // file.path = data.path;
+                                    self.fileName = file.name;
+                                    self.para.onComplete(response, file, Uploader.type);
+                                } else {
+                                    task.resolve();
+                                    //拿到上传文件的唯一名称，用于断点续传
+                                    //uniqueFileName = md5(''+userInfo.userId+file.name+file.type+file.lastModifiedDate+file.size);
+                                }
+                            }).catch(() => {
+                                task.resolve();
+                            });
 
                     });
 

@@ -134,7 +134,6 @@ export class FlowEditor extends FormCom {
                         this.set({[attr]: item.text});
                         FlowEditor.hideAllDropdown();
                         if(item.text === FlowEditor.addressList[0].text){
-                            console.log('in it');
                             BwRule.Ajax.fetch(FlowEditor.addressList[0].address).then(({response}) => {
                                 console.log(response);
                             }).catch(err => {
@@ -180,7 +179,7 @@ export class FlowEditor extends FormCom {
                     }
                 });
                 e.target.dataset.old = currentValue;
-                // 如果当前值不为空，并且已存在name列表中没有该name时，将其添加到已存在name列表中
+                // 添加到已存在name列表中
                 currentValue && !FlowEditor.EXIST_NAME.includes(currentValue) && FlowEditor.EXIST_NAME.push(currentValue);
             }
         },
@@ -307,6 +306,7 @@ export class FlowEditor extends FormCom {
                d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
             });
         });
+        this.owner = null;
         super.destroy();
     }
 }

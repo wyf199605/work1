@@ -9,7 +9,7 @@ import tools = G.tools;
 import d = G.d;
 import sys = BW.sys;
 import {SlidePopover} from "../../../global/components/ui/slidePopover/slidePopover";
-import {IButton} from "../../../global/components/general/button/Button";
+import {Button, IButton} from "../../../global/components/general/button/Button";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 export interface IMbListModule extends IComponentPara{
     ui: IBW_UI<IBW_Table>;
@@ -31,8 +31,8 @@ export class MbListModule extends Component{
         tableListEl.subButtons = (tableListEl.subButtons || []).concat(para.ui.body.subButtons || []);
         this.getButtons(tableListEl.subButtons);
         this.initGlobalButtons();
-        this.handlerLayout(para.ui.body.elements[0].layout, para.ui.body.elements[0].cols);
-        tools.isNotEmpty(this.layout['body']) && this.getBodyCaption(this.layout, para.ui.body.elements[0].cols);
+        this.handlerLayout(tableListEl.layout, tableListEl.cols);
+        tools.isNotEmpty(this.layout['body']) && this.getBodyCaption(this.layout, tableListEl.cols);
         this.initMbList();
         this.initEvents.on();
     }
@@ -51,7 +51,7 @@ export class MbListModule extends Component{
                     icon:btn.icon ? btn.icon.split(' ')[1] : '',
                     iconPre:btn.icon ? btn.icon.split(' ')[0] : '',
                     onClick:()=>{
-                        // ButtonAction.get().clickHandle(btn,{});
+                        ButtonAction.get().clickHandle(btn,{});
                         sliderPopover.modal.isShow = false;
                     }
                 })
@@ -86,6 +86,7 @@ export class MbListModule extends Component{
                     btn = buttons[btnIndex],
                     data = this.defaultData[itemIndex];
                 console.log(data);
+                ButtonAction.get().clickHandle(btn,data);
             },
             itemClick: (index) => {
                 let data = this.defaultData[index],
@@ -101,6 +102,7 @@ export class MbListModule extends Component{
                 this.defaultData.forEach((da,index) => {
                     itemsIndexes.indexOf(index) > -1 && data.push(da);
                 });
+                ButtonAction.get().clickHandle(btn,data);
                 console.log(data);
             },
             container: wrapper,
@@ -253,7 +255,7 @@ export class MbListModule extends Component{
             let index = parseInt(d.closest(e.target, '.global-btn-item').dataset.index),
                 buttons = this.allButtons[0] || [];
             // 全局按钮不需要数据
-            // ButtonAction.get().clickHandle(buttons[index],{});
+            ButtonAction.get().clickHandle(buttons[index],{});
         };
         return {
             on: () => {

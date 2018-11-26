@@ -20,6 +20,7 @@ export class MbListView extends Component {
 
     private currentIndex: number = 0;
     private subLists: MbListModule | ListItemDetail[] = [];
+    private tab: Tab;
 
     constructor(para: IMbListView) {
         super(para);
@@ -27,31 +28,37 @@ export class MbListView extends Component {
         let tabsTitle = ['详情'],
             listUIUrls = [];
         listUi.subTableList.forEach(ele => {
-            listUIUrls.push(BW.CONF.siteUrl + ele.uiAddr.dataAddr);
+            listUIUrls.push(tools.url.addObj(BW.CONF.siteUrl + ele.uiAddr.dataAddr,{
+                output:"json"
+            }));
             tabsTitle.push(ele.caption);
         });
-        let tabWrapper = para.container || document.body, tabs: ITab[] = [],
-            tab = new Tab({
-            panelParent: tabWrapper,
-            tabParent: tabWrapper,
+        let tabs: ITab[] = [];
+        this.tab = new Tab({
+            panelParent: this.wrapper,
+            tabParent: this.wrapper,
             tabs: tabs,
-            className: 'first',
+            className: 'mbListView',
             onClick: (i) => {
                 this.currentIndex = i;
                 if (tools.isEmpty(this.subLists[i])) {
                     // 不存在
-                    if (i === 0){
+                    if (i === 0) {
+                        let tabEl = d.query(`.tab-pane.mbListView[data-index="0"]`, this.tab.getPanel());
                         this.subLists[0] = new ListItemDetail({
                             uiType: 'view',
-                            fm: listUi
+                            fm: listUi,
+                            dom: tabEl
                         });
-                    }else{
-                        BwRule.Ajax.fetch(listUIUrls[i]).then(({response}) => {
-                            let tabEl = d.query(`.tab-pane.first[data-index="${i}"]`, tab.getPanel());
-                            let bwTableEl = response.body.elements[0];
-                            bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(response.body.subButtons || []);
+                    } else {
+                        BwRule.Ajax.fetch(listUIUrls[i-1]).then(({response}) => {
+                            let tabEl = d.query(`.tab-pane.mbListView[data-index="${i}"]`, this.tab.getPanel());
                             this.subLists[i] = new MbListModule({
-                                ui: response.body,
+                                ui: {
+                                    body:response.body,
+                                    uiType:'layout',
+                                    caption:tabsTitle[i]
+                                },
                                 container: tabEl
                             })
                         });
@@ -62,11 +69,32 @@ export class MbListView extends Component {
             }
         });
         tabsTitle.forEach((sub) => {
-            tab.addTab([{
+            this.tab.addTab([{
                 title: sub,
                 dom: null
             }]);
         });
-        tab.active(0);
+        this.tab.active(0);
+        if (tools.isMb) {
+            let width = this.calcNavUlWidth();
+            if (width < document.documentElement.clientWidth){
+                d.query('ul.nav.nav-tabs.nav-tabs-line',this.wrapper).classList.add('space-around');
+            }
+        }
+    }
+
+    private calcNavUlWidth() {
+        let lis = d.queryAll('li.mbListView', this.tab.getTab()),
+            width: number = 0;
+        lis.forEach(li => {
+            let li_width = getWidth(window.getComputedStyle(li).width);
+            width += li_width;
+        });
+
+        function getWidth(width: string) {
+            return tools.isNotEmpty(width) ? parseInt(width.slice(0, width.length - 2)) : 0;
+        }
+
+        return width;
     }
 }

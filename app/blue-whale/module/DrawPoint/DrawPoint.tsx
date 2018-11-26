@@ -133,9 +133,6 @@ export class DrawPoint extends Component {
             })
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-        d.on(this.wrapper, 'touchzoom', () => {
-
-        })
         // .on('touchstart',function () {
         //    // _this.svg.on("dblclick.zoom", null);
         //    if( D3.touches(this).length >=2){
