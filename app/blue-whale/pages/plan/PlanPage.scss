@@ -3,6 +3,35 @@
   padding-left: 0px;
   padding-right: 0px;
   height: calc(100% - 23px);
+  .modal-mbPage{
+    .mbPage{
+      .mbPage-body{
+        .plan-query-form-body{
+          .footer-btn-group{
+            bottom: 18px;
+            left: 0;
+          }
+          .horizontalQueryModule{
+            .query-form{
+              margin: 0 15px;
+              .form-com-item{
+                margin: 15px 0;
+                .text-input{
+                  background-color: rgba(242,242,242,1);
+                  border-radius: 78px;
+                  line-height: 2;
+                  input{
+                    margin: 0px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
 
   .tooltip {
     user-select: none;
