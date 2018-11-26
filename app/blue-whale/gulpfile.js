@@ -172,6 +172,7 @@ gulp.task('js', function () {
     gulpTsModule([
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
+        'listDetail/NewFormFactory',
         'listDetail/DetailModal',
     ], 'listDetail.js');
 
