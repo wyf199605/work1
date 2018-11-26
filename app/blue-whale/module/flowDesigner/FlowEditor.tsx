@@ -179,7 +179,7 @@ export class FlowEditor extends FormCom {
                     }
                 });
                 e.target.dataset.old = currentValue;
-                // 如果当前值不为空，并且已存在name列表中没有该name时，将其添加到已存在name列表中
+                // 添加到已存在name列表中
                 currentValue && !FlowEditor.EXIST_NAME.includes(currentValue) && FlowEditor.EXIST_NAME.push(currentValue);
             }
         },

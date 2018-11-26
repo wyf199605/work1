@@ -140,6 +140,7 @@ export class Tips extends Component {
             target.classList.add('active');
         };
         let deleteItem = () => {
+            // 删除选中的节点和节点相关联的连接线
             let deleteLine = [];
             for(let item of FlowDesigner.ALLITEMS){
                 if(item && item.active && item.flowEditor && item.flowEditor.show){

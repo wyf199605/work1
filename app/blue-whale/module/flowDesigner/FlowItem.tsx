@@ -11,14 +11,14 @@ import {Tips} from "./Tips";
 import {LineItem} from "./LineItem";
 
 export interface IFlowItemPara extends IComponentPara {
-    type?: string;
-    text?: string;
-    position?: {
+    type?: string;      // 节点的类型
+    text?: string;      // 显示的文本
+    position?: {        // 节点的位置
         x: number,
         y: number
     };
-    width?: number;
-    height?: number;
+    width?: number;     // 宽
+    height?: number;    // 高
     isComplete?: boolean;   // 表示该节点是否已经完成
     fields?: IFieldPara;     // 用于初始化flowEditor
 }
@@ -28,8 +28,8 @@ export class FlowItem extends Component {
         return <div className="flow-item"/>;
     }
 
-    static startCounter = 0;
-    static endCounter = 0;
+    static startCounter = 0;    // start节点的个数
+    static endCounter = 0;      // end节点的个数
 
     // 当前绘制出的 raphael 节点
     private _rectNode: any;
@@ -86,16 +86,17 @@ export class FlowItem extends Component {
                 this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, para.width || areaObj.width, para.height || areaObj.height, 5).attr(this.getDefaultAttr(para.position.x, para.position.y));
             }
         }
-        let self = this;
         this.initEvents.on();
+
+        let fields: IFieldPara = {};
+        this.isStart && Object.assign(fields, {name: 'start' + (FlowItem.startCounter ++).toString()});
+        this.isEnd && Object.assign(fields, {name: 'end' + (FlowItem.endCounter ++).toString()});
         this.flowEditor = new FlowEditor({
             type: para.type,
             container: d.query('#design-canvas'),
             owner: this,
-            fields: para.fields,
+            fields: para.fields || fields,
         });
-        this.isStart && this.flowEditor.set({name: 'start' + (FlowItem.startCounter ++).toString()});
-        this.isEnd && this.flowEditor.set({name: 'end' + (FlowItem.endCounter ++).toString()});
     }
 
     // 所有关联的item

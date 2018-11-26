@@ -10,8 +10,8 @@ import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {FlowItem} from "./FlowItem";
 
 export interface ILineItemPara extends IComponentPara {
-    startNode: any;
-    endNode: any;
+    startNode: any;     // 连接线的来源
+    endNode: any;       // 连接线的去向
     fields?: IFieldPara;     // 用于初始化flowEditor
 }
 
@@ -169,6 +169,7 @@ export class LineItem extends Component {
 
     destroy() {
         this.initEvents.off();
+        // 注意绘制连接线时会有两条，需要将两条都删除
         this.line.node.remove();
         this.line.prev.remove();
         LineItem.counter --;

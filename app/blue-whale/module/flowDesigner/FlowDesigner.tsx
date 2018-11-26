@@ -141,14 +141,13 @@ const Method = {
 };
 
 export class FlowDesigner {
-    static CURRENT_SELECT_TYPE: string;
+    static CURRENT_SELECT_TYPE: string;     // 当前选择的节点的类型
     static PAPER;
-    static ALLITEMS: FlowItem[] = [];
+    static ALLITEMS: FlowItem[] = [];       // 所有的节点
     static connections: any[] = [];
-    static AllLineItems: LineItem[] = [];
-    static flowEditor: FlowEditor;
-    static rootElement: Element;
-    static processId: number;
+    static AllLineItems: LineItem[] = [];   // 所有的连接线
+    static rootElement: Element;            // 当前流程的xml节点树
+    static processId: number;               // 当前流程的id
 
     constructor(responseData?: any, type?: string) {
         FlowEditor.EXIST_NAME = [];
@@ -310,12 +309,12 @@ export class FlowDesigner {
             }
         };
         let saveFlowHandler = (e) => {
-            let allItems = [].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems);
+            let allItems = [].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems),
+                allNames = [];
             if(allItems.some(item => tools.isEmpty(item.flowEditor.get().name))){
                 Modal.toast('名称不能为空!');
                 return;
             }
-            let allNames = [];
             allItems.forEach(item => item.flowEditor.get().name && (allNames[item.flowEditor.get().name] =  allNames[item.flowEditor.get().name] + 1 || 1));
             for(let attr of Object.keys(allNames)){
                 if(allNames[attr] > 1){
@@ -323,9 +322,9 @@ export class FlowDesigner {
                     return;
                 }
             }
+
             let xmlDoc = Method.loadXMLStr(`<?xml version="1.0" encoding="UTF-8"?><process></process>`);
             FlowDesigner.rootElement = xmlDoc.documentElement;
-
             FlowDesigner.ALLITEMS.forEach(item => {
                 // 创建节点、设置属性、添加到xml节点树中
                 if(tools.isNotEmpty(item)){
@@ -392,6 +391,9 @@ export class FlowDesigner {
         FlowDesigner.connections = [];
         FlowEditor.EXIST_NAME = [];
         FlowDesigner.rootElement = null;
+        FlowItem.endCounter = 0;
+        FlowItem.startCounter = 0;
+        LineItem.counter = 0;
         this.initEvents.off();
     }
 }
