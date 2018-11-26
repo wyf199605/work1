@@ -137,56 +137,54 @@ export class DrawPoint extends Component {
                 this.mousedown();
                 this.redraw();
             })
-        this.svg.on('touchstart',function () {
-                if(D3.touches(this) && D3.touches(this).length > 1){
-                     let x1 = D3.touches(this)[0][0],
-                         y1 = D3.touches(this)[0][1],
-                         x2 = D3.touches(this)[1][0],
-                         y2 = D3.touches(this)[1][1];
-                     let calX = x2 - x1,
-                         calY = y2 - y1;
-                     spot1 = Math.pow((calX * calX + calY * calY),0.5);
-                }else {
-                    x0 = D3.touches(this)[0][0];
-                    y0 = D3.touches(this)[0][1];
-                }
-             }).on('touchmove',function () {
-               D3.event.sourceEvent.stopPropagation();
-            if(D3.touches(this) && D3.touches(this).length > 1){
-            let x1 = D3.touches(this)[0][0],
-                y1 = D3.touches(this)[0][1],
-                x2 = D3.touches(this)[1][0],
-                y2 = D3.touches(this)[1][1];
-            let calX = x2 - x1,
-                calY = y2 - y1;
-            spot2 = Math.pow((calX * calX + calY * calY),0.5);
-             let len = spot2/1000;
-             alert(len);
-             if(spot2 > spot1){
-                 _this.g.attr('transform',"matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-                 num1 = num1 + len;
-                 num2 = num2 + len;
-             }else {
-                 if(num1 == 0.1 || num2 == 0.1){
-                     _this.g.attr("transform","scale(0.1,0.1)");
-                 }else {
-                     _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-                     num1 = num1 - len;
-                     num2 = num2 - len;
-                 }
-             }}else if(D3.touches(this) && D3.touches(this).length == 1){
-                var x = (D3.touches(this)[0][0] - x0)/30;
-                var y = (D3.touches(this)[0][1] - y0)/30;
-
-                xx = xx + x;
-                yy = yy + y;
-
-                $("g:first").attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-            }
-
-             }).on('touchend',function () {
-
-             })
+        // this.svg.on('touchstart',function () {
+        //         if(D3.touches(this) && D3.touches(this).length > 1){
+        //              let x1 = D3.touches(this)[0][0],
+        //                  y1 = D3.touches(this)[0][1],
+        //                  x2 = D3.touches(this)[1][0],
+        //                  y2 = D3.touches(this)[1][1];
+        //              let calX = x2 - x1,
+        //                  calY = y2 - y1;
+        //              spot1 = Math.pow((calX * calX + calY * calY),0.5);
+        //         }else {
+        //             x0 = D3.touches(this)[0][0];
+        //             y0 = D3.touches(this)[0][1];
+        //         }
+        //      }).on('touchmove',function () {
+        //         if(D3.touches(this) && D3.touches(this).length > 1){
+        //             alert('进来了')
+        //             let x1 = D3.touches(this)[0][0],
+        //                 y1 = D3.touches(this)[0][1],
+        //                 x2 = D3.touches(this)[1][0],
+        //                 y2 = D3.touches(this)[1][1];
+        //             let calX = x2 - x1,
+        //                 calY = y2 - y1;
+        //             spot2 = Math.pow((calX * calX + calY * calY),0.5);
+        //             let len = spot2/7000;
+        //             if(spot2 > spot1){
+        //                 _this.g.attr('transform',"matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
+        //                 num1 = num1 + len;
+        //                 num2 = num2 + len;
+        //             }else {
+        //                 if(num1 == 0.1 || num2 == 0.1){
+        //                     _this.g.attr("transform","scale(0.1,0.1)");
+        //                 }else {
+        //                     _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
+        //                     num1 = num1 - len;
+        //                     num2 = num2 - len;
+        //                 }
+        //             }}else if(D3.touches(this) && D3.touches(this).length == 1){
+        //             let  x = (D3.touches(this)[0][0] - x0)/30;
+        //             let y = (D3.touches(this)[0][1] - y0)/30;
+        //
+        //             xx = xx + x;
+        //             yy = yy + y;
+        //
+        //             _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
+        //         }
+        //      }).on('touchend',function () {
+        //
+        //      })
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
 
@@ -1021,15 +1019,21 @@ export class DrawPoint extends Component {
                 .range([0, para.height]);
 
         if(tools.isMb){
-            // let scale = 1;
-            // d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
-            //     scale = ev.scale;
-            //     scale = Math.min(ev.scale, 2);
-            //     scale = Math.max(0.5, ev.scale);
-            //     _this.g.attr('transform', "scale(" + scale + ")");
-            //     _this.svg.attr('width', scale * 1200);
-            //     _this.svg.attr('height', scale * 800);
-            // })
+            alert('112')
+            let scale = 1;
+            d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
+                //
+                let str = [];
+                str.push(ev.centerX);
+                str.push(ev.centerY);
+                scale = ev.scale;
+                scale = Math.min(ev.scale, 2);
+                scale = Math.max(0.5, ev.scale);
+                // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
+                _this.g.attr('transform', "scale(" + scale + ")");
+                _this.svg.attr('width', scale * 1200);
+                _this.svg.attr('height', scale * 800);
+            })
         }else{
             this.zoom = D3.behavior.zoom()
                 .x(X)
