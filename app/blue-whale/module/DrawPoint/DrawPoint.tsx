@@ -290,8 +290,7 @@ export class DrawPoint extends Component {
                     group.select('path').attr('fill-opacity', '0.9');
                     setTimeout(() => {
                         group.select('path').attr('fill-opacity', '0.56');
-                    }, 1000)
-                    console.log(D3.event);
+                    }, 1000);
                     this.onAreaClick({
                         type: 'modal',
                         data: d
@@ -305,7 +304,6 @@ export class DrawPoint extends Component {
                     //if(this.isShowStatus){
                     this.selectedData = d
                     D3.event.preventDefault();
-                    console.log(D3.mouse(this.svg.node()));
                     let x = D3.mouse(this.svg.node())[0], y = D3.mouse(this.svg.node())[1]
                     this.contextMenu.setPosition(x, y);
                     this.contextMenu.show = true;
@@ -317,7 +315,6 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
-            console.log(this.format(d));
             this.format(d)
                 .sort((a) => {
                     if (a.isPoint) {
@@ -384,7 +381,7 @@ export class DrawPoint extends Component {
                         }).attr('font-size', function (d) {
                             let w = group.select('path').node().getBBox().width,
                                 g = group.select('path').node().getBBox().height;
-                            console.log(w, g)
+
                             let size = parseInt(w) * parseInt(g) + '',
                                 val = parseInt(w) * parseInt(g),
                                 font;
@@ -510,7 +507,7 @@ export class DrawPoint extends Component {
             }).on('mouseout', function (d) {
             D3.select(this).transition().attr('y', y).ease("bounce").attr('cursor', 'default');
         }).on('click', tools.pattern.throttling((d) => {
-            console.log(D3.event);
+
             this.onAreaClick({
                 type: 'link',
                 data: urlData
@@ -697,7 +694,6 @@ export class DrawPoint extends Component {
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
-        console.log(that.selectedG);
 
         // that.selectedG && (that.selectedG.attr('class') !== 'insert') && that.selectedG.attr('id',function (d) {
         //     d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(currentIndex));
@@ -855,7 +851,6 @@ export class DrawPoint extends Component {
         sl.selectAll('text').remove();
         let index = 0;
         this.format(data).forEach((anl, I) => {
-            console.log(anl);
             if (!anl.isPoint && tools.isNotEmpty(anl.data) && anl.isShow) {
                 index++;
                 let text = sl.append('text').datum(anl.name)
@@ -963,7 +958,6 @@ export class DrawPoint extends Component {
                                     this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
 
                                     this.redraw();
-                                    console.log('撤回')
                                 }
 
                                 break;
@@ -1053,12 +1047,10 @@ export class DrawPoint extends Component {
                         //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
                         //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
                     }
-                    console.log(D3.event.scale);
                     let s = D3.select('svg').select('.g-wrapper');
                     _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
                 }).on("zoomend", function (d) {
-                    console.log("结束")
                 })
         }
 

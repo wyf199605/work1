@@ -171,8 +171,7 @@ let event = (function () {
                     let startHandler,
                         moveHandler,
                         endHandler,
-                        scale = 1,
-                        dispatcher = dispatcherGet(el);
+                        scale = 1;
 
                     eventOn(el, EVENT_MB_START, selector, startHandler = (ev: TouchEvent) =>{
                         let touches = ev.changedTouches;
@@ -191,6 +190,7 @@ let event = (function () {
                                     scale -= this.constant;
                                 }
                                 startDistance = moveDistance;
+                                let dispatcher = dispatcherGet(el);
                                 dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, scale, centerX, centerY));
                             }, 50));
                             eventOn(el, EVENT_MB_END, endHandler = () =>{
@@ -214,37 +214,39 @@ let event = (function () {
                     let press = events.press,
                         timer: number = null,
                         touchY = 0,
+                        longClick = 0,
                         handler,
                         moveHandler,
-                        endHandler,
-                        dispatcher = dispatcherGet(el);
+                        endHandler;
 
                     eventOn(el, EVENT_MB_START, selector, handler = (ev) => {
                         clearTimeout(timer);
-                        press.longClick = 0;
+                        longClick = 0;
                         let touch = ev.touches[0];
                         touchY = touch.clientY;
                         timer = setTimeout(() => {
-                            press.longClick = 1;
+                            longClick = 1;
+                            let dispatcher = dispatcherGet(el);
                             dispatcher && dispatcher.call(el, getCustomEvent(ev, 'press'));
                         }, press.time);
 
-                        eventOn(document, EVENT_MB_MOVE, moveHandler = (ev) => {
-                            let touch = ev.touches[0];
-                            if(Math.abs(touch.clientY - touchY) < 10) {
-                                clearTimeout(timer);
-                            }
-                        });
 
-                        eventOn(document, EVENT_MB_END, endHandler = (ev) => {
+                    });
+                    eventOn(document, EVENT_MB_MOVE, moveHandler = (ev) => {
+                        let touch = ev.touches[0];
+                        if(Math.abs(touch.clientY - touchY) < 10) {
                             clearTimeout(timer);
-                            if(press.longClick === 1){
-                                ev.preventDefault();
-                                press.longClick = 0;
-                            }
-                            eventOff(document, EVENT_MB_END, endHandler);
-                            eventOff(document, EVENT_MB_MOVE, moveHandler);
-                        });
+                        }
+                    });
+
+                    eventOn(document, EVENT_MB_END, endHandler = (ev) => {
+                        clearTimeout(timer);
+                        if(longClick === 1){
+                            ev.preventDefault();
+                            longClick = 0;
+                        }
+                        // eventOff(document, EVENT_MB_END, endHandler);
+                        // eventOff(document, EVENT_MB_MOVE, moveHandler);
                     });
 
                     d.data(el, handler);
