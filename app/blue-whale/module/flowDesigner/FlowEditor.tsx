@@ -247,7 +247,7 @@ export class FlowEditor extends FormCom {
         *   如果是Component，那么只有当前为显示状态并且准备隐藏的时候，才更新节点的data-name和文本
         * */
         let fields = this.get();
-        if(this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) && tools.isNotEmpty(this.show) && !show && this.show !== show){
+        if(this.owner && this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) && tools.isNotEmpty(this.show) && !show && this.show !== show){
             this.owner['wrapper'].dataset.name = fields.name;
             let limitLength = 50,
                 limitDisplayName = fields.displayName.length > limitLength ? fields.displayName.slice(0, limitLength) + '...' : fields.displayName;

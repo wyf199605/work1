@@ -144,13 +144,13 @@ export class Tips extends Component {
             let deleteLine = [];
             for(let item of FlowDesigner.ALLITEMS){
                 if(item && item.active && item.flowEditor && item.flowEditor.show){
-                    FlowDesigner.AllLineItems.forEach((line) => {
-                        line.from === item.rectNode && deleteLine.push(line) && line.destroy();
-                        line.to === item.rectNode && deleteLine.push(line) && line.destroy();
-                    });
-                    FlowDesigner.AllLineItems.forEach((line, index, arr) => {
-                        deleteLine.forEach(deleteLine => line === deleteLine && arr.splice(index, 1));
-                    });
+                    for(let line of FlowDesigner.AllLineItems){
+                        if(line.from === item.rectNode || line.to === item.rectNode){
+                            deleteLine.push(line);
+                            line.destroy();
+                        }
+                    }
+                    deleteLine.forEach(line => FlowDesigner.AllLineItems.splice(FlowDesigner.AllLineItems.indexOf(line), 1));
                     item.destroy() && FlowDesigner.removeAllActive();
                     return;
                 }
