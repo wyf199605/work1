@@ -288,11 +288,14 @@ export class RfidBarCode extends Component {
 
                                             for (let i = 0; i < this.fields.length; i++) {
                                                 if (i == 0) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 1) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 2) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 }
                                             }
                                         }
@@ -310,7 +313,7 @@ export class RfidBarCode extends Component {
                                             //先关闭之前的监听重新开启
 
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                alert(JSON.stringify(res.data));
+                                                //alert(JSON.stringify(res.data));
                                                // let data = res.data;
                                                 if(res.success){
                                                     let num = d.query('.total-nums>span');
@@ -366,7 +369,7 @@ export class RfidBarCode extends Component {
                                             G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
 
                                                 let data = res.data;
-                                                alert(JSON.stringify(res));
+                                                //alert(JSON.stringify(res));
                                                 this.fields.forEach((res) => {
                                                     if (res.index == 1) {
                                                         //分类一
@@ -430,11 +433,14 @@ export class RfidBarCode extends Component {
                                         if (G.tools.isNotEmpty(this.fields)) {
                                             for (let i = 0; i < this.fields.length; i++) {
                                                 if (i == 0) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 1) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 } else if (i == 2) {
-                                                    Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                    //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                                    Where[this.fields[i].name] = "";
                                                 }
                                             }
                                         }
@@ -485,7 +491,7 @@ export class RfidBarCode extends Component {
                                         } else if (this.mode[key] == '逐一') {
                                             params['optionStype'] = 2;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                alert(JSON.stringify(res.data));
+                                               // alert(JSON.stringify(res.data));
                                                 if(res.success){
                                                     let num = d.query('.total-nums>span');
                                                     num.innerText = (parseInt(num.innerText) + 1) + '';
@@ -503,7 +509,7 @@ export class RfidBarCode extends Component {
                                         } else {
                                             G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
                                                 let data = res.data;
-                                                alert(JSON.stringify(res));
+                                                //alert(JSON.stringify(res));
                                                 this.fields.forEach((res) => {
                                                     if (res.index == 1) {
                                                         //分类一
@@ -830,7 +836,7 @@ export class RfidBarCode extends Component {
                 }
 
              let s =  G.Shell.inventory.dealbarcode(2,params,(res)=>{
-                 alert(JSON.stringify(res.data))
+                 //alert(JSON.stringify(res.data))
                    if(res.success){
                        this.domHash['scanamout'].innerText = res.data.scanNum;
                        this.refreshCount(para);
@@ -864,7 +870,7 @@ export class RfidBarCode extends Component {
                 }
                 // Modal.alert(G.Shell.inventory.dealbarcode)
                 let s = G.Shell.inventory.dealbarcode(2,params,(res)=>{
-                    alert(JSON.stringify(res))
+                    //alert(JSON.stringify(res))
                     if(res.success){
                         this.domHash['scanamout'].innerText = res.data.scanNum;
                         this.refreshCount(para)
@@ -936,11 +942,10 @@ export class RfidBarCode extends Component {
         }
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
-            alert(JSON.stringify(res) + '下载')
+            //alert(JSON.stringify(res) + '下载')
             if(res.success){
                 loading.destroy();
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
-                alert(JSON.stringify(data) + '接口');
                 let pageName = data.data;
                 this.uid = pageName.uid;
                 this.domHash['inventory'].innerHTML = pageName.AffilTitle;
@@ -970,7 +975,7 @@ export class RfidBarCode extends Component {
         })
         G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
             let data = res.data;
-           alert(JSON.stringify(res))
+           //alert(JSON.stringify(res))
             this.fields.forEach((res) => {
                 let arr = data.array;
                 if (res.index == 1) {
@@ -1035,10 +1040,9 @@ export class RfidBarCode extends Component {
             }
             where[this.uid] = this.domHash['barcode'].innerText;
         }
-        alert(JSON.stringify(where) + 'ppppppppppppp')
         if(!this.stepStatus){
             G.Shell.inventory.getCountData(para.uniqueFlag,where,(res)=>{
-                alert(JSON.stringify(res))
+               // alert(JSON.stringify(res))
                 if(res.success){
                     this.domHash['count'].innerText = res.data;
                     let num = d.query('.total-nums>span');
