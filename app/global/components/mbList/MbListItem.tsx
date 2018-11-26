@@ -252,13 +252,16 @@ export class MbListItem extends Component {
 
     private initEvents = (() => {
         let buttonsEvent = (e) => {
+            e.stopPropagation();
             let index = parseInt(d.closest(e.target, '.item-button').dataset.index);
             tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index, this.index);
         };
-        let itemClick = () => {
+        let itemClick = (e) => {
+            e.stopPropagation();
             tools.isFunction(this.para.itemClick) && this.para.itemClick(this.index);
         };
         let clickMore = (e) => {
+            e.stopPropagation();
             if (this.para.list) {
                 this.para.list.itemActionSheet.isShow = true;
                 this.para.list.currentSelectItemIndex = this.index;
@@ -268,12 +271,12 @@ export class MbListItem extends Component {
             on: () => {
                 d.on(this.wrapper, 'click', '.btn-group .item-button', buttonsEvent);
                 d.on(this.wrapper, 'click', '.btn-group .more-btn', clickMore);
-                d.on(this.wrapper, 'click', '.list-item-details', itemClick);
+                d.on(this.wrapper, 'click', '.list-item-content', itemClick);
             },
             off: () => {
                 d.off(this.wrapper, 'click', '.btn-group .item-button', buttonsEvent);
                 d.off(this.wrapper, 'click', '.btn-group .more-btn', clickMore);
-                d.off(this.wrapper, 'click', '.list-item-details', itemClick);
+                d.off(this.wrapper, 'click', '.list-item-content', itemClick);
             }
         }
     })();
