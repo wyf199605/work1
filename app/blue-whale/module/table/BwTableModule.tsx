@@ -1333,6 +1333,7 @@ export class BwTableModule extends Component {
      */
     private cellFormat(field: R_Field, cellData: any, rowData: obj) {
         let text: string | Node = cellData, // 文字 或 Node
+            data = null,
             color: string,                  // 文字颜色
             bgColor: string,                // 背景颜色
             classes: string[] = [];         // 类名
@@ -1380,6 +1381,7 @@ export class BwTableModule extends Component {
                 for (let opt of options) {
                     if (opt.value == rowData[field.lookUpKeyField]) {
                         text = opt.text;
+                        data = opt.text;
                     }
                 }
             } else {
@@ -1423,7 +1425,7 @@ export class BwTableModule extends Component {
 
         }
 
-        return {text, classes, bgColor, color};
+        return {text, classes, bgColor, color, data};
 
     }
 

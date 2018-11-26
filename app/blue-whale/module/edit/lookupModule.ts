@@ -27,8 +27,8 @@ export class LookupModule extends FormCom{
                 }
             },
             readonly: !!para.field.noEdit,
-            onSet:(item, index) => {
-                this.set(item.value);
+            onSet:(item) => {
+                this.setValue(item, false);
                 this.para.onExtra && this.para.onExtra(item);
             }
         });
@@ -58,11 +58,7 @@ export class LookupModule extends FormCom{
         this.value = value;
     }
 
-
-    get value(){
-        return this.selectInput.getText();
-    }
-    set value(value: any) {
+    protected setValue(value, isSetSelect = true){
         value = (typeof value === 'object' && value !== null) ? value.value : value;
         if(tools.isEmpty(this.options)){
             this.ajax((options:ListItem[])=>{
@@ -72,7 +68,7 @@ export class LookupModule extends FormCom{
                 for(let i = 0; i < options.length; i ++) {
                     let option = options[i];
                     if(option.value === value){
-                        this.selectInput.set(option);
+                        isSetSelect && this.selectInput.set(option);
                         typeof this.onSet === 'function' && this.onSet(option);
                         break;
                     }
@@ -82,7 +78,7 @@ export class LookupModule extends FormCom{
             for(let i = 0; i < this.options.length; i ++) {
                 let option = this.options[i];
                 if(option.value === value){
-                    this.selectInput.set(option);
+                    isSetSelect && this.selectInput.set(option);
                     typeof this.onSet === 'function' && this.onSet(option);
                     break;
                 }
@@ -90,6 +86,14 @@ export class LookupModule extends FormCom{
             // this.selectInput.set(value);
             // typeof this.onSet === 'function' && this.onSet(value);
         }
+    }
+
+
+    get value(){
+        return this.selectInput.getText();
+    }
+    set value(value: any) {
+        this.setValue(value);
     }
 
     protected wrapperInit(para): HTMLElement {

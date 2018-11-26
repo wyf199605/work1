@@ -357,7 +357,7 @@ export class TableDataCell extends TableCell {
         }else{
             let formated = this.format(data);
             if(formated) {
-                let {classes, text, color, bgColor} = formated;
+                let {classes, text, color, bgColor, data} = formated;
                 if(text instanceof Node){
                     this.wrapper && d.append(this.wrapper, text);
                 }else {
@@ -369,6 +369,9 @@ export class TableDataCell extends TableCell {
                 this.classes = classes;
                 this.color = color;
                 this.background = bgColor;
+                if(data){
+                    this.table.tableData.update({[this.name]: data}, this.row.index);
+                }
             }
         }
         !this.table.isWrapLine && this.initMoreBtn();
