@@ -181,9 +181,9 @@ let event = (function () {
                                 let moveDistance = Math.sqrt(Math.pow((touches[0].clientX - touches[1].clientX),2)
                                     + Math.pow((touches[0].clientY - ev.touches[1].clientY),2));
                                 if(moveDistance / startDistance > 1){
-                                    this.scale += 0.005;
+                                    this.scale += 0.015;
                                 }else if(moveDistance / startDistance < 1){
-                                    this.scale -= 0.005;
+                                    this.scale -= 0.015;
                                 }
                                 startDistance = moveDistance;
                                 let dispatcher = dispatcherGet(el);
