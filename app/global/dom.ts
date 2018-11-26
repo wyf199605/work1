@@ -165,7 +165,7 @@ let event = (function () {
         let events = {
             touchzoom: {
                 type: 'touchzoom',
-                constant: 0.01, // 每次放大缩小的基数
+                constant: 0.05, // 每次放大缩小的基数
                 handlerName: '__TOUCH_ZOOM_HANDLER__',
                 on(el:Node, selector:string){
                     let startHandler,
