@@ -1,14 +1,13 @@
 /// <amd-module name="ListItemDetail"/>
 
-import {BwRule} from "../../common/rule/BwRule";
-import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
-import tools = G.tools;
-import {Button} from "../../../global/components/general/button/Button";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
-import {DetailModal} from "./DetailModal";
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
-import sys = BW.sys;
+import {BwRule} from "../../common/rule/BwRule";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
+import {Button} from "../../../global/components/general/button/Button";
+import {DetailModal} from "./DetailModal";
+import tools = G.tools;
 
 export class ListItemDetail {
     // DOM容器
@@ -154,34 +153,43 @@ export class ListItemDetail {
             let btnWrapper = <div className="list-item-detail-buttons"/>;
             this.wrapper.appendChild(btnWrapper);
             if (this.para.uiType === 'detail') {
-                createMoreBtn(buttons, btnWrapper, true);
-                this.createPageButton(btnWrapper);
+                if(tools.isMb){
+                    createMoreBtn(buttons, btnWrapper, true);
+                    this.createPageButton(btnWrapper);
+                }else{
+                    // PC 按钮
+
+                }
             } else {
-                if (buttons.length > 2) {
-                    let btns = buttons.slice(0, 2), moreBtns = buttons.slice(2);
-                    createMoreBtn(moreBtns, btnWrapper, false);
-                    btns.forEach((button, index) => {
-                        new Button({
-                            content: button.caption,
-                            container: btnWrapper,
-                            className: 'list-detail-btn',
-                            onClick: () => {
-                                this.actionSheet.isShow = false;
-                                subBtnEvent(index);
-                            }
-                        })
-                    });
-                } else {
-                    buttons.forEach((button, index) => {
-                        new Button({
-                            content: button.caption,
-                            container: btnWrapper,
-                            className: 'list-detail-btn',
-                            onClick: () => {
-                                subBtnEvent(index);
-                            }
-                        })
-                    });
+                if(tools.isMb){
+                    if (buttons.length > 2) {
+                        let btns = buttons.slice(0, 2), moreBtns = buttons.slice(2);
+                        createMoreBtn(moreBtns, btnWrapper, false);
+                        btns.forEach((button, index) => {
+                            new Button({
+                                content: button.caption,
+                                container: btnWrapper,
+                                className: 'list-detail-btn',
+                                onClick: () => {
+                                    this.actionSheet.isShow = false;
+                                    subBtnEvent(index);
+                                }
+                            })
+                        });
+                    } else {
+                        buttons.forEach((button, index) => {
+                            new Button({
+                                content: button.caption,
+                                container: btnWrapper,
+                                className: 'list-detail-btn',
+                                onClick: () => {
+                                    subBtnEvent(index);
+                                }
+                            })
+                        });
+                    }
+                }else{
+                    // TODO:PC按钮
                 }
             }
         } else {

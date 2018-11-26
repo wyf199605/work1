@@ -53,14 +53,16 @@ export class MbListView extends Component {
                     } else {
                         BwRule.Ajax.fetch(listUIUrls[i-1]).then(({response}) => {
                             let tabEl = d.query(`.tab-pane.mbListView[data-index="${i}"]`, this.tab.getPanel());
-                            this.subLists[i] = new MbListModule({
-                                ui: {
-                                    body:response.body,
-                                    uiType:'layout',
-                                    caption:tabsTitle[i]
-                                },
-                                container: tabEl
-                            })
+                            let uiType = response.uiType;
+                            switch (uiType){
+                                case 'layout':{
+                                    this.subLists[i] = new MbListModule({
+                                        ui: response,
+                                        container: tabEl
+                                    })
+                                }
+                                break;
+                            }
                         });
                     }
                 } else {
