@@ -172,7 +172,6 @@ export class LineItem extends Component {
         // 注意绘制连接线时会有两条，需要将两条都删除
         this.line.node.remove();
         this.line.prev.remove();
-        LineItem.counter --;
         super.destroy();
     }
 }

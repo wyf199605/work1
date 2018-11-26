@@ -70,7 +70,7 @@ Raphael.fn.connection = function (obj1, obj2, line, bg) {
                     fill: "none",
                     "stroke-width": bg.split("|")[1] || 2
                 }),
-                line: this.path(path).attr({stroke: color, fill: "none"}),
+                line: this.path(path).attr({stroke: color, fill: "none", 'arrow-end': 'block-wide-long', 'stroke-width': 2}),
                 from: obj1,
                 to: obj2
             };
@@ -306,6 +306,7 @@ export class FlowDesigner {
             let target = e.target;
             if (target.tagName === 'svg') {
                 FlowDesigner.removeAllActive();
+                Tips.removeActive();
             }
         };
         let saveFlowHandler = (e) => {

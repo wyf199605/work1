@@ -148,15 +148,14 @@ export class Tips extends Component {
                         line.from === item.rectNode && deleteLine.push(line) && line.destroy();
                         line.to === item.rectNode && deleteLine.push(line) && line.destroy();
                     });
+                    FlowDesigner.AllLineItems.forEach((line, index, arr) => {
+                        deleteLine.forEach(deleteLine => line === deleteLine && arr.splice(index, 1));
+                    });
                     item.destroy() && FlowDesigner.removeAllActive();
-                    break;
+                    return;
                 }
             }
-            FlowDesigner.AllLineItems.forEach((line, index, arr) => {
-                deleteLine.forEach(deleteLine => {
-                    line === deleteLine && arr.splice(index, 1);
-                })
-            });
+            FlowDesigner.AllLineItems.filter((line, index, arr) => line.active && arr.splice(index, 1) && line.destroy());
             // console.log('after delete: ');
             // console.log(FlowDesigner.ALLITEMS);
             // console.log(FlowDesigner.AllLineItems);
@@ -180,10 +179,12 @@ export class Tips extends Component {
         d.queryAll('.tip-item-inner').forEach((tip) => {
             tip.classList.remove('active');
         });
+        Tips.TransitionItems = [];
     }
 
     destroy() {
-        super.destroy();
+        Tips.TransitionItems = [];
         this.initEvents.off();
+        super.destroy();
     }
 }
