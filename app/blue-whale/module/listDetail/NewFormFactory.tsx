@@ -1,49 +1,56 @@
-/// <amd-module name="EditModule"/>
-import tools = G.tools;
-import CONF = BW.CONF;
-import sys = BW.sys;
-import AssignModule from "assignModule/assignModule";
-import UploadModule from '../uploadModule/uploadModule';
-import {AssignTextModule} from "./assignModule/assignTextModule";
-import {PickModule} from "./pickModule";
-import {FormCom} from "../../../global/components/form/basic";
-import {TextInput} from "../../../global/components/form/text/text";
-import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
-import {Virtual} from "../../../global/components/form/virtual";
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {Datetime} from "../../../global/components/form/datetime/datetime";
+/// <amd-module name="NewFormFactory"/>
+
+import {BwRule} from "../../common/rule/BwRule";
 import {RichText} from "../../../global/components/form/richText/richText";
+import {TextInput} from "../../../global/components/form/text/text";
+import {Toggle} from "../../../global/components/form/toggle/toggle";
+import {UploadImages} from "../uploadModule/uploadImages";
+import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
+import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/validate";
+import {PickModule} from "../edit/pickModule";
 import {RichTextMb} from "../../../global/components/form/richText/richTextMb";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
-import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
-import {Toggle} from "../../../global/components/form/toggle/toggle";
-import {LookupModule} from "./lookupModule";
-import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/validate";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {BwRule} from "../../common/rule/BwRule";
+import {FormCom} from "../../../global/components/form/basic";
+import {AssignTextModule} from "../edit/assignModule/assignTextModule";
+import {Accessory} from "../uploadModule/accessory";
+import {Virtual} from "../../../global/components/form/virtual";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
-// import {Accessory} from "../flowReport/Accessory";
+import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
+import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import {EditModule} from "../edit/editModule";
+import AssignModule from "../edit/assignModule/assignModule";
+import {Datetime} from "../../../global/components/form/datetime/datetime";
+import {LookupModule} from "../edit/lookupModule";
+import tools = G.tools;
+import CONF = BW.CONF;
 
-interface ComInitFun{
+interface ComInitFun {
     (para: ComInitP): FormCom
 }
-export class EditModule {
-    private coms: objOf<FormCom> = {};
+
+export interface NewFormEdit {
+    fields?: ComInitP[],
+    auto?: boolean; //是否自动初始化dom
+    type?: string;
+    container?: HTMLElement;
+    defaultData?: obj;
+}
+
+export class NewFormFactory {
+    coms: objOf<FormCom> = {};
     private comsExtraData: objOf<obj> = {};
-
     private nameFields: objOf<ComInitP> = {};
-
     private ajax = new BwRule.Ajax();
 
     get assignPromise() {
         return this.ajax.promise;
     }
-    constructor(private para: EditModulePara) {
+
+    constructor(private para: NewFormEdit) {
         if (Array.isArray(para.fields)) {
             para.fields.forEach((f) => {
                 this.nameFields[f.field.name] = f;
             });
-
             if (typeof para.auto === 'undefined' || para.auto) {
                 for (let f of para.fields) {
                     this.init(f.field.name);
@@ -78,11 +85,9 @@ export class EditModule {
         return this.coms[name];
     }
 
-
-    private pickOnGet(cip:ComInitP, dataArr: obj[], otherField: string) {
-        let name =  cip.field.name,
+    private pickOnGet(cip: ComInitP, dataArr: obj[], otherField: string) {
+        let name = cip.field.name,
             fieldNames = otherField ? otherField.split(',') : [];
-
         dataArr.forEach((data) => {
             for (let key in data) {
                 if (!this.comsExtraData[name]) {
@@ -95,23 +100,16 @@ export class EditModule {
                 });
             }
         });
-        if(tools.isEmpty(dataArr)){
-            for(let key in this.comsExtraData[name]){
-                this.comsExtraData[name][key] = '';
-            }
-        }
-        if(this.comsExtraData[name] && cip.onExtra){
+        if (this.comsExtraData[name] && cip.onExtra) {
             cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames);
         }
 
         this.assign.checkAssign(this.comsExtraData[name], cip.onExtra);
     }
 
-    private comTnit:objOf<ComInitFun> = {
+    private comTnit: objOf<ComInitFun> = {
         pickInput: (p) => {
-            // console.log(dom,field,6)
             return new PickModule({
-                custom: p.field,
                 container: p.dom,
                 field: p.field,
                 data: p.data,
@@ -121,7 +119,6 @@ export class EditModule {
                 }
             });
         },
-
         tagsInput: (p) => {
             if (this.para.type === 'table') {
                 return this.comTnit['assignText'](p);
@@ -130,11 +127,10 @@ export class EditModule {
                 return new AssignModule({
                     data: p.data,
                     container: p.dom,
-                    custom: p.field,
                     name: p.field.name,
                     pickerUrl: p.field.dataAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr) : '',
                     ajaxUrl: p.field.assignAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.assignAddr) : '',
-                    multi: p.field.atrrs ? p.field.atrrs.multiValueFlag === 1 : true, //field.multiValue,
+                    multi: true, //field.multiValue,
                     sepValue: sepValue,
                     onSet: this.getAssignSetHandler(p.field),
                     onGetData: (dataArr: obj[], otherField: string) => {
@@ -147,7 +143,6 @@ export class EditModule {
             return new AssignTextModule({
                 data: p.data,
                 container: p.dom,
-                custom: p.field,
                 name: p.field.name,
                 pickerUrl: p.field.dataAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr) : '',
                 ajaxUrl: p.field.assignAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.assignAddr) : '',
@@ -157,165 +152,160 @@ export class EditModule {
                 }
             });
         },
-
         file: (p): FormCom => {
-            let com =  new UploadModule({
+            let upperKeyData = {};
+            return new Accessory({
                 nameField: p.field.name,
-                custom: p.field,
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
+                field: p.field,
+                pageData: this.para.defaultData,
                 onComplete: (response) => {
-                    let data = response.data;
-                    // if(!this.para.fields.some(f => f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase())) {
-                    //     Modal.alert('无法找到附件，附件是否进行过改造');
-                    //     com.com.text = '';
-                    //     return;
-                    // }
-
-                    //fileId 值加入额外数据中
-                    let upperKeyData = {};
-                    for(let field in data){
-                        let {key, value} = data[field];
-                        upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
-                    }
-                    p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
-
-                    this.comsExtraData[p.field.name] = {};
-                    for(let name in upperKeyData) {
-                        if (this.coms[name]) {
-                            this.set({[name]: upperKeyData[name]});
-                        } else {
-                            this.comsExtraData[p.field.name][name] = data[name];
+                    let data = response.data,
+                        type = p.field.dataType || p.field.atrrs.dataType;
+                    // fileId 值加入额外数据中
+                    if (type === '43') {
+                        for (let field in data) {
+                            let {key, value} = data[field];
+                            upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
+                        }
+                        p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
+                        this.comsExtraData[p.field.name] = {};
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: upperKeyData[name]});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = data[name];
+                            }
                         }
                     }
-
+                },
+                onDelete: () => {
+                    if (tools.isNotEmpty(upperKeyData)) {
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: ''});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = '';
+                            }
+                        }
+                    }
                 }
             });
-            return com;
         },
-
         richText: (p) => {
-            let Rich = sys.isMb ? RichTextMb : RichText;
+            let Rich = tools.isMb ? RichTextMb : RichText;
             return new Rich({
-                container: p.dom,
-                custom: p.field,
+                container: p.dom
             });
         },
-
         richTextInput: (p) => {
             return new RichTextModal({
                 container: p.dom,
-                custom: p.field,
             });
         },
-
         text: (p) => {
             return new TextInput({
-                container: p.dom,
-                custom: p.field,
-                // readonly: field.noEdit
+                container: p.dom
             });
         },
-
         selectInput: (p) => {
+            let self = this;
             if (p.field.elementType === 'lookup') {
                 return new LookupModule({
                     container: p.dom,
                     field: p.field,
-                    custom: p.field,
                     rowData: p.data,
                     onExtra: (item) => {
-                        if(item) {
+                        if (item) {
                             setTimeout(() => {
                                 let data = {
                                     [p.field.name]: item.text,
                                     [p.field.lookUpKeyField]: item.value
                                 };
-                                p.onExtra(data, [p.field.lookUpKeyField])
+                                p.onExtra && p.onExtra(data, [p.field.lookUpKeyField])
                             }, 100)
                         }
                     }
                 })
             } else {
-                let ajaxFun = (url: string, value:string, cb: Function) => {
-                    BwRule.Ajax.fetch(url,{
+                let ajaxFun = (url: string, value: string, cb: Function) => {
+                    if (tools.isNotEmpty(p.field.dataAddr.varList)) {
+                        url = CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, this.get());
+                    }
+                    BwRule.Ajax.fetch(url, {
                         needGps: p.field.dataAddr.needGps
                     }).then(({response}) => {
                         let fields = [];
                         if (response.data[0]) {
                             fields = Object.keys(response.data[0]);
                         }
-                        let options = response.data.map(data => {
+                        let options: obj[] = [];
+                        response.data.forEach(data => {
                             // id name 都添加到条件
-                            return {
-                                value: data[p.field.name],
-                                text: fields.map((key) => data[key]).join(','),
-                            };
+                            if (tools.isNotEmpty(data[p.field.name])) {
+                                options.push({
+                                    value: data[p.field.name],
+                                    text: fields.map((key) => data[key]).join(','),
+                                });
+                            }
                         });
                         cb(options);
                     }).finally(() => {
                         cb();
                     });
                 };
-
-                let valueList = p.field.atrrs.valueLists ? p.field.atrrs.valueLists.split(/,|;/) : null,
+                let valueList = p.field.valueLists ? p.field.valueLists.split(/,|;/) : null,
                     comData = Array.isArray(valueList) ? valueList : null,
-                    ajax = p.field.dataAddr ? {fun: ajaxFun, url: CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, p.data)} : null;
-
-                return new (sys.isMb ? SelectInputMb : SelectInput)({
+                    ajax = p.field.dataAddr ? {
+                        fun: ajaxFun,
+                        url: CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, this.get())
+                    } : null;
+                return new (tools.isMb ? SelectInputMb : SelectInput)({
                     container: p.dom,
                     data: comData,
                     ajax,
-                    custom: p.field,
-                    useInputVal : true
+                    useInputVal: true
 
-                // readonly: field.noEdit
+                    // readonly: field.noEdit
                 });
             }
         },
-
         virtual: (p) => {
-            return new Virtual({
-                custom: p.field
-            });
+            return new Virtual();
         },
-
         toggle: (p) => {
             if (this.para.type === 'table') {
                 return new SelectInput({
                     container: p.dom,
-                    custom: p.field,
                     data: [
                         {value: '1', text: '是'},
                         {value: '0', text: '否'}
                     ]
                 });
             } else {
-                if (sys.isMb) {
-                    return new Toggle({container: p.dom, custom: p.field});
+                if (tools.isMb) {
+                    return new Toggle({container: p.dom});
                 } else {
-                    return new CheckBox({container: p.dom, custom: p.field});
+                    return new CheckBox({container: p.dom});
                 }
             }
         },
-
         datetime: (p) => {
-            return new (sys.isMb ? DatetimeMb : Datetime)({
+            return new (tools.isMb ? DatetimeMb : Datetime)({
                 container: p.dom,
-                custom: p.field,
-                format: p.field.displayFormat,
-                // readonly: field.noEdit
+                format: p.field.displayFormat
             });
         },
-
-        // 流程引擎附件
-        accessory: (p) => {
-            // return new Accessory({
-            //     container: p.dom
-            // });
-            return null;
+        img: (p) => {
+            return new UploadImages({
+                container: p.dom,
+                nameField: p.field.name,
+                uploadUrl: BW.CONF.ajaxUrl.fileUpload,
+                pageData: this.para.defaultData,
+                field: p.field
+            });
         }
-
     };
 
     static tableComTypeGet(type: string) {
@@ -338,40 +328,45 @@ export class EditModule {
 
         let field = initP ? initP.field : null;
 
-        if(field){
-            if(field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
+        if (field) {
+            if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
                 type = 'pickInput';
-            } else if(field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
+            } else if (field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
+                if (field.elementType === 'lookup') {
+                    initP.onExtra = (data: obj, relateCols: string[]) => {
+                        relateCols.forEach((relate, index) => {
+                            this.getDom(relate).set(data[relate]);
+                        })
+                    }
+                }
                 type = 'selectInput';
+            } else if (field.dataType === '77' || (field.atrrs && field.atrrs.dataType === '77')) {
+                initP.dom && initP.dom.classList.add('hide');
+                type = 'virtual';
             }
         }
-
-        if(!(type in this.comTnit)) {
+        if (!(type in this.comTnit)) {
             type = 'text';
         }
 
-        if(!initP || !initP.dom){
+        if (!initP || !initP.dom) {
             type = 'virtual';
         }
-
         let com = this.comTnit[type](initP);
         this.assign.init(com, initP);
-
         return com;
     };
 
-
     protected assign = (() => {
 
-        let init = (com:FormCom, p?: ComInitP) => {
-            if(!p){
+        let init = (com: FormCom, p?: ComInitP) => {
+            if (!p) {
                 return;
             }
             let {field, data, onExtra} = p;
-            if(field && (p.field.comType === 'tagsinput')){
+            if (field && (p.field.comType === 'tagsinput')) {
                 return;
             }
-
             com.onSet = (val) => {
                 // debugger;
                 // setTimeout(() => {
@@ -379,8 +374,8 @@ export class EditModule {
                 //         return;
                 //     }
                 data = data || {};
-                if(data[field.name] != val){
-                    assignSend(field, val, Object.assign({}, data, {[field.name] : val}), onExtra);
+                if (data[field.name] != val) {
+                    assignSend(field, val, Object.assign({}, data, {[field.name]: val}), onExtra);
                 }
 
                 // }, 30);
@@ -396,7 +391,7 @@ export class EditModule {
             // debugger;
             Array.isArray(selectFields) && selectFields.forEach((key) => {
                 let data = assignData[key];
-                if( key === fieldName){
+                if (key === fieldName) {
                     return;
                 }
 
@@ -423,7 +418,7 @@ export class EditModule {
          * @param {Function} onExtra
          */
         let assignSend = (field: R_Field, val, data: obj, onExtra: Function) => {
-            if(tools.isEmpty(val) || tools.isEmpty(field.assignAddr)) {
+            if (tools.isEmpty(val) || tools.isEmpty(field.assignAddr)) {
                 return;
             }
             this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.assignAddr, data), {
@@ -432,7 +427,7 @@ export class EditModule {
                 let resData = tools.keysVal(response, 'data', 0),
                     assignData = assignDataGet(val, resData);
 
-                for(let key in assignData){
+                for (let key in assignData) {
                     assignData[key] = Array.isArray(assignData[key]) ? assignData[key].join(';') : ''
                 }
 
@@ -443,11 +438,11 @@ export class EditModule {
         };
 
 
-        let checkAssign = (data:obj, onExtra: Function) => {
+        let checkAssign = (data: obj, onExtra: Function) => {
 
-            for(let fieldName in data){
+            for (let fieldName in data) {
                 let field = this.nameFields[fieldName];
-                if(field && field.field && field.field.assignAddr) {
+                if (field && field.field && field.field.assignAddr) {
                     assignSend(field.field, data[fieldName], data, onExtra);
                 }
             }
@@ -462,7 +457,7 @@ export class EditModule {
 
         return (assignData: objOf<any[]>) => {
             // assign 设置
-            if(typeof assignData !== 'object'){
+            if (typeof assignData !== 'object') {
                 return;
             }
 
@@ -507,39 +502,30 @@ export class EditModule {
      * @return obj
      */
     public get(name?: string) {
-        let pageData:obj = {},
+        let pageData: obj = {},
             coms = this.coms,
             extras = this.comsExtraData;
-
         let allDateGet = (name: string) => {
             let extra = extras[name],
                 dataObj = {[name]: coms[name].get()};
-
             // 字符串转数字
-            for(let name in dataObj){
-                let field = <R_Field>tools.keysVal(this.nameFields, name, 'field'),
+            for (let name in dataObj) {
+                let field = (tools.keysVal(this.nameFields, name, 'field') as R_Field),
                     data = dataObj[name];
-
-                if(!field){
+                if (!field) {
                     continue;
                 }
-
-                if(data && !isNaN(data) && BwRule.isNumber(field.dataType)){
+                if (data && !isNaN(data) && BwRule.isNumber(field.dataType)) {
                     data = Number(data);
                 }
-
                 dataObj[name] = BwRule.maxValue(data, field.dataType, field.atrrs.maxValue);
             }
-
             return extra ? tools.obj.merge(extra, dataObj) : dataObj;
         };
-
-
         // 返回指定name的数据
         if (name) {
             return allDateGet(name);
         }
-
         // 返回所有数据
         for (let n in coms) {
             pageData = tools.obj.merge(pageData, allDateGet(n));
@@ -549,149 +535,70 @@ export class EditModule {
 
     public validate = (() => {
         let v: Validate = null;
-
         let init = () => {
-            if(v !== null){
+            if (v !== null) {
                 return;
             }
-
             v = new Validate();
-
-            // for(let name in this.nameFields){
-            //     let field = this.nameFields[name].field;
-            //     ruleAdd(field);
-            // }
         };
-
-        let ruleAdd = (field:R_Field) => {
-
+        let ruleAdd = (field: R_Field) => {
             // 防止重复添加
-            if(v.get(field.name)){
+            if (v.get(field.name)) {
                 return;
             }
-
             let rules: ValidateRule[] = [];
-
-            if(BwRule.isNumber(field.dataType)){
-                if (tools.isNotEmpty(field.caption)){
+            if (BwRule.isNumber(field.dataType)) {
+                if (tools.isNotEmpty(field.caption)) {
                     rules.push({
                         rule: 'number',
                         title: field.caption
                     })
-                }else{
+                } else {
                     rules.push({
                         rule: 'number'
                     })
                 }
             }
-
-            ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'validChars'].forEach(ruleName => {
+            ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp'].forEach(ruleName => {
                 let ruleVal = field.atrrs[ruleName];
-                if(!tools.isEmpty(ruleVal)){
+                if (!tools.isEmpty(ruleVal)) {
                     rules.push({
                         rule: ruleName,
                         value: ruleVal,
-                        title: field.caption,
-                        errMsg: field.atrrs.inputHint || ''
                     });
                 }
             });
             v.add(field.name, rules);
         };
-
-        let valid = (name: string, data?:any) => {
+        let valid = (name: string, data?: any) => {
             let com = this.coms[name],
                 f = this.nameFields[name];
 
-            if(com && f){
+            if (com && f) {
                 ruleAdd(f.field);
                 data = tools.isUndefined(data) ? this.get(f.field.name)[f.field.name] : data;
-                return v.start({[name] : data});
+                return v.start({[name]: data});
             }
         };
-
-        let start = (name?: string, data?:any) => {
-            if(v === null){
+        let start = (name?: string, data?: any) => {
+            if (v === null) {
                 init();
             }
-            let result:ValidateResult = {};
-            if(name){
+            let result: ValidateResult = {};
+            if (name) {
                 result = valid(name, data);
-            }else{
+            } else {
                 this.para.fields.forEach(f => {
                     result = tools.obj.merge(valid(f.field.name), result);
                 })
             }
             return result;
         };
-
-
         return {start};
     })();
 
-    static checkValue(field: R_Field, rowData: obj, clear:Function): Promise<CheckValueResult> {
-        let name = field.name,
-            chkAddr = field.chkAddr,
-            checkCols = field.chkAddr.varList.map(v => v.varName),
-            emptyCheckResult: CheckValueResult = {errors:[], okNames:[]};
-
-        for (let colName of checkCols){
-            if(rowData[colName] === null || (typeof rowData[colName]) === 'undefined'){
-                emptyCheckResult.errors.push({name: colName, msg: '不能为空'});
-            }else{
-                emptyCheckResult.okNames.push(colName)
-            }
-        }
-
-        return new Promise((resolve) => {
-            if(emptyCheckResult.errors[0]) {
-                resolve(emptyCheckResult);
-                return;
-            }
-
-            let {addr, data} = BwRule.reqAddrFull(chkAddr, rowData);
-
-            // checkValue验证
-            BwRule.Ajax.fetch(CONF.siteUrl + addr, {
-                silent: true,
-                type: 'POST',
-                data: [data],
-            }).then(({response}) => {
-                let data = tools.keysVal(response, 'body', 'bodyList', 0),
-                    {type, showText} = data || {type: '', showText: ''};
-
-                if (type === 0) {
-                    // Modal.alert(showText);
-                    // errorStyle(showText);
-                    resolve({
-                        errors: [{name, msg: showText}],
-                    });
-                } else {
-                    if (type === 1) {
-                        Modal.confirm({
-                            msg: showText,
-                            callback: (flag: boolean) => {
-                                if (!flag) {
-                                    clear();
-                                }
-                            }
-                        });
-                    }
-
-                    resolve({
-                        okNames: chkAddr.varList.map(v => v.varName)
-                    });
-                }
-            }).catch(() => {
-                resolve({
-                    okNames: chkAddr.varList.map(v => v.varName)
-                });
-            })
-        });
-    }
-
-    destroy(name:string){
-        if(this.coms[name]){
+    destroy(name: string) {
+        if (this.coms[name]) {
             this.coms[name].destroy();
             this.comsExtraData[name] = null;
             delete this.coms[name];
@@ -699,29 +606,28 @@ export class EditModule {
     }
 }
 
-
-function assignDataGet(data, resData) : obj{
+function assignDataGet(data, resData): obj {
     let assignValueArr = {},
         assignData: obj = {};
 
-    if(typeof resData !== 'object' || !resData){
+    if (typeof resData !== 'object' || !resData) {
         return assignData;
     }
 
     let keyArr = Object.keys(resData);
 
-    keyArr.forEach( key => {
+    keyArr.forEach(key => {
         let data = resData[key];
         assignValueArr[key] = typeof data === 'string' ? data.split(';') : [data];
     });
 
-    (typeof data === 'string' ? data.split(';') : [data]).forEach( (v, i) => {
+    (typeof data === 'string' ? data.split(';') : [data]).forEach((v, i) => {
         if (tools.isEmpty(v)) {
             return;
         }
         // let assignD : obj = {};
         keyArr.forEach((key) => {
-            if(!assignData[key]){
+            if (!assignData[key]) {
                 assignData[key] = [];
             }
             assignData[key].push(assignValueArr[key][i])

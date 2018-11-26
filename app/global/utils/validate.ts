@@ -22,10 +22,21 @@ let errMsgs = {
     minLength: '{{title}}小于最小长度{{value}}或者为非字符串',
     minValue: '{{title}}小于最小值{{value}}或者为非数字',
     requieredFlag: '{{title}}为空',
-    regExp: '{{title}}匹配正则规则{{value}}'
+    regExp: '{{title}}匹配正则规则{{value}}',
+    validChars: '{{title}}必须由“{{value}}”组成'
 };
 
 const strategies = {
+    validChars: function (data, value: string) {
+        if(typeof data === 'string' && tools.isNotEmpty(data)){
+            return data.split('').every((char) => {
+                return value.indexOf(char) > -1;
+            });
+        }else{
+            return true;
+        }
+    },
+
     maxLength: function (data, value) {
         if (value === 0) {
             return true;
