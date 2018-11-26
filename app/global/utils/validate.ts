@@ -23,11 +23,11 @@ let errMsgs = {
     minValue: '{{title}}小于最小值{{value}}或者为非数字',
     requieredFlag: '{{title}}为空',
     regExp: '{{title}}匹配正则规则{{value}}',
-    VALID_CHARS: '{{title}}必须由“{{value}}”组成'
+    validChars: '{{title}}必须由“{{value}}”组成'
 };
 
 const strategies = {
-    VALID_CHARS: function (data, value: string) {
+    validChars: function (data, value: string) {
         if(typeof data === 'string' && tools.isNotEmpty(data)){
             return data.split('').every((char) => {
                 return value.indexOf(char) > -1;

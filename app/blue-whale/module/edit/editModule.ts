@@ -585,13 +585,14 @@ export class EditModule {
                 }
             }
 
-            ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'VALID_CHARS'].forEach(ruleName => {
+            ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'validChars'].forEach(ruleName => {
                 let ruleVal = field.atrrs[ruleName];
                 if(!tools.isEmpty(ruleVal)){
                     rules.push({
                         rule: ruleName,
                         value: ruleVal,
-                        // title: field.title
+                        title: field.caption,
+                        errMsg: field.atrrs.inputHint || ''
                     });
                 }
             });
