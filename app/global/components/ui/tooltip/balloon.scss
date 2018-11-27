@@ -121,6 +121,7 @@ button[data-balloon] {
 
     &.tooltipiconfont:after {
         font-family: iconfont;
+        pointer-events: none;
     }
 
     &[data-balloon-break] {

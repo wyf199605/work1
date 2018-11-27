@@ -284,47 +284,50 @@ export class ButtonAction {
     /**
      * 后台有配置actionHandle情况下的处理
      */
-    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string) {
+    private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string): Promise<any> {
         let self = this;
-        return BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
-            data2url: btn.actionAddr.varType !== 3,
-            type: ajaxType,
-            // defaultCallback : btn.openType !== 'popup',
-            data: ajaxData,
-            needGps: btn.actionAddr.needGps
+        return new Promise((resolve, reject) => {
+            BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
+                data2url: btn.actionAddr.varType !== 3,
+                type: ajaxType,
+                // defaultCallback : btn.openType !== 'popup',
+                data: ajaxData,
+                needGps: btn.actionAddr.needGps
 
-        }).then(({response}) => {
-            let data = tools.keysVal(response, 'body', 'bodyList', 0);
-            if (data && (data.type || data.type === 0)) {
-                if (data.type === 0) {
-                    Modal.alert(data.showText);
-                } else {
-                    return new Promise((resolve) => {
+            }).then(({response}) => {
+                let data = tools.keysVal(response, 'body', 'bodyList', 0);
+                if (data && (data.type || data.type === 0)) {
+                    if (data.type === 0) {
+                        Modal.alert(data.showText);
+                        resolve(response);
+                    } else {
                         Modal.confirm({
                             msg: data.showText,
                             callback: (confirmed) => {
                                 if (confirmed) {
-                                    self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then(() => {
-                                        resolve();
+                                    self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then((response) => {
+                                        resolve(response);
                                     });
                                 }
                             }
                         });
-                    })
-                }
-            } else {
-                // 默认提示
-                if (!('hintAfterAction' in btn) || btn.hintAfterAction) {
-                    if (data && data.showText) {
-                        Modal.alert(data.showText);
-                    } else if (btn.openType !== 'popup') {
-                        Modal.toast(response.msg || `${btn.title}成功`);
                     }
+                } else {
+                    // 默认提示
+                    if (!('hintAfterAction' in btn) || btn.hintAfterAction) {
+                        if (data && data.showText) {
+                            Modal.alert(data.showText);
+                        } else if (btn.openType !== 'popup') {
+                            Modal.toast(response.msg || `${btn.title}成功`);
+                        }
+                    }
+
+                    resolve(response);
+                    // callback(response);
                 }
-                return response;
-                // callback(response);
-            }
-        });
+            });
+        })
+
     }
 
     /**
