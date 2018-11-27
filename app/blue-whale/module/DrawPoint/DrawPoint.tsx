@@ -137,66 +137,63 @@ export class DrawPoint extends Component {
                 this.mousedown();
                 this.redraw();
             })
-        this.svg.on('touchstart',function () {
-                if(D3.touches(this) && D3.touches(this).length > 1){
-                     let x1 = D3.touches(this)[0][0],
-                         y1 = D3.touches(this)[0][1],
-                         x2 = D3.touches(this)[1][0],
-                         y2 = D3.touches(this)[1][1];
-                     let calX = x2 - x1,
-                         calY = y2 - y1;
-                     spot1 = Math.pow((calX * calX + calY * calY),0.5);
-                }else {
-                    x0 = D3.touches(this)[0][0];
-                    y0 = D3.touches(this)[0][1];
-                }
-             }).on('touchmove',function () {
-               D3.event.sourceEvent.stopPropagation();
-            if(D3.touches(this) && D3.touches(this).length > 1){
-            let x1 = D3.touches(this)[0][0],
-                y1 = D3.touches(this)[0][1],
-                x2 = D3.touches(this)[1][0],
-                y2 = D3.touches(this)[1][1];
-            let calX = x2 - x1,
-                calY = y2 - y1;
-            spot2 = Math.pow((calX * calX + calY * calY),0.5);
-             let len = spot2/1000;
-             alert(len);
-             if(spot2 > spot1){
-                 _this.g.attr('transform',"matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-                 num1 = num1 + len;
-                 num2 = num2 + len;
-             }else {
-                 if(num1 == 0.1 || num2 == 0.1){
-                     _this.g.attr("transform","scale(0.1,0.1)");
-                 }else {
-                     _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-                     num1 = num1 - len;
-                     num2 = num2 - len;
-                 }
-             }}else if(D3.touches(this) && D3.touches(this).length == 1){
-                var x = (D3.touches(this)[0][0] - x0)/30;
-                var y = (D3.touches(this)[0][1] - y0)/30;
-
-                xx = xx + x;
-                yy = yy + y;
-
-                $("g:first").attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-            }
-
-             }).on('touchend',function () {
-
-             })
+        // this.svg.on('touchstart',function () {
+        //         if(D3.touches(this) && D3.touches(this).length > 1){
+        //              let x1 = D3.touches(this)[0][0],
+        //                  y1 = D3.touches(this)[0][1],
+        //                  x2 = D3.touches(this)[1][0],
+        //                  y2 = D3.touches(this)[1][1];
+        //              let calX = x2 - x1,
+        //                  calY = y2 - y1;
+        //              spot1 = Math.pow((calX * calX + calY * calY),0.5);
+        //         }else {
+        //             x0 = D3.touches(this)[0][0];
+        //             y0 = D3.touches(this)[0][1];
+        //         }
+        //      }).on('touchmove',function () {
+        //         if(D3.touches(this) && D3.touches(this).length > 1){
+        //             let x1 = D3.touches(this)[0][0],
+        //                 y1 = D3.touches(this)[0][1],
+        //                 x2 = D3.touches(this)[1][0],
+        //                 y2 = D3.touches(this)[1][1];
+        //             let calX = x2 - x1,
+        //                 calY = y2 - y1;
+        //             spot2 = Math.pow((calX * calX + calY * calY),0.5);
+        //             let len = spot2/1000;
+        //             if(spot2 > spot1){
+        //                 _this.g.attr('transform',"matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
+        //                 num1 = num1 + len;
+        //                 num2 = num2 + len;
+        //             }else {
+        //                 if(num1 == 0.1 || num2 == 0.1){
+        //                     _this.g.attr("transform","scale(0.1,0.1)");
+        //                 }else {
+        //                     _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
+        //                     num1 = num1 - len;
+        //                     num2 = num2 - len;
+        //                 }
+        //             }}else if(D3.touches(this) && D3.touches(this).length == 1){
+        //             let  x = (D3.touches(this)[0][0] - x0)/30;
+        //             let y = (D3.touches(this)[0][1] - y0)/30;
+        //
+        //             xx = xx + x;
+        //             yy = yy + y;
+        //
+        //             _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
+        //         }
+        //      }).on('touchend',function () {
+        //
+        //      })
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
 
-        this.g.append('image').attr('href', () => {
+       let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
     set imgUrl(url) {
-        this.g.select('image').attr('href',
+        this.g.select('image').attr('xlink:href',
             () => {
                 return url
             }
@@ -292,8 +289,7 @@ export class DrawPoint extends Component {
                     group.select('path').attr('fill-opacity', '0.9');
                     setTimeout(() => {
                         group.select('path').attr('fill-opacity', '0.56');
-                    }, 1000)
-                    console.log(D3.event);
+                    }, 1000);
                     this.onAreaClick({
                         type: 'modal',
                         data: d
@@ -307,7 +303,6 @@ export class DrawPoint extends Component {
                     //if(this.isShowStatus){
                     this.selectedData = d
                     D3.event.preventDefault();
-                    console.log(D3.mouse(this.svg.node()));
                     let x = D3.mouse(this.svg.node())[0], y = D3.mouse(this.svg.node())[1]
                     this.contextMenu.setPosition(x, y);
                     this.contextMenu.show = true;
@@ -319,7 +314,6 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
-            console.log(this.format(d));
             this.format(d)
                 .sort((a) => {
                     if (a.isPoint) {
@@ -386,7 +380,7 @@ export class DrawPoint extends Component {
                         }).attr('font-size', function (d) {
                             let w = group.select('path').node().getBBox().width,
                                 g = group.select('path').node().getBBox().height;
-                            console.log(w, g)
+
                             let size = parseInt(w) * parseInt(g) + '',
                                 val = parseInt(w) * parseInt(g),
                                 font;
@@ -512,7 +506,7 @@ export class DrawPoint extends Component {
             }).on('mouseout', function (d) {
             D3.select(this).transition().attr('y', y).ease("bounce").attr('cursor', 'default');
         }).on('click', tools.pattern.throttling((d) => {
-            console.log(D3.event);
+
             this.onAreaClick({
                 type: 'link',
                 data: urlData
@@ -699,7 +693,6 @@ export class DrawPoint extends Component {
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
-        console.log(that.selectedG);
 
         // that.selectedG && (that.selectedG.attr('class') !== 'insert') && that.selectedG.attr('id',function (d) {
         //     d[DrawPoint.POINT_FIELD] = JSON.stringify(that.map.get(currentIndex));
@@ -857,7 +850,6 @@ export class DrawPoint extends Component {
         sl.selectAll('text').remove();
         let index = 0;
         this.format(data).forEach((anl, I) => {
-            console.log(anl);
             if (!anl.isPoint && tools.isNotEmpty(anl.data) && anl.isShow) {
                 index++;
                 let text = sl.append('text').datum(anl.name)
@@ -965,7 +957,6 @@ export class DrawPoint extends Component {
                                     this.selected = this.points.length ? this.points[i > 0 ? i - 1 : 0] : null;
 
                                     this.redraw();
-                                    console.log('撤回')
                                 }
 
                                 break;
@@ -1021,15 +1012,20 @@ export class DrawPoint extends Component {
                 .range([0, para.height]);
 
         if(tools.isMb){
-            // let scale = 1;
-            // d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
-            //     scale = ev.scale;
-            //     scale = Math.min(ev.scale, 2);
-            //     scale = Math.max(0.5, ev.scale);
-            //     _this.g.attr('transform', "scale(" + scale + ")");
-            //     _this.svg.attr('width', scale * 1200);
-            //     _this.svg.attr('height', scale * 800);
-            // })
+            let scale = 1;
+            d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
+                // //
+                // let str = [];
+                // str.push(ev.centerX);
+                // str.push(ev.centerY);
+                // scale = ev.scale;
+                // scale = Math.min(ev.scale, 2);
+                // scale = Math.max(0.5, ev.scale);
+                //  _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
+                // //_this.g.attr('transform', "scale(" + scale + ")");
+                // _this.svg.attr('width', scale * 1200);
+                // _this.svg.attr('height', scale * 800);
+            })
         }else{
             this.zoom = D3.behavior.zoom()
                 .x(X)
@@ -1049,12 +1045,10 @@ export class DrawPoint extends Component {
                         //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
                         //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
                     }
-                    console.log(D3.event.scale);
                     let s = D3.select('svg').select('.g-wrapper');
                     _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
                 }).on("zoomend", function (d) {
-                    console.log("结束")
                 })
         }
 

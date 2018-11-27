@@ -8,11 +8,14 @@ import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
 import {Button} from "../../../global/components/general/button/Button";
 import {DetailModal} from "./DetailModal";
 import tools = G.tools;
+import d = G.d;
+import {FormCom} from "../../../global/components/form/basic";
+import {NewFormEdit, NewFormFactory} from "./NewFormFactory";
 
 export class ListItemDetail {
     // DOM容器
     private wrapper: HTMLElement;
-    private cells: objOf<ListItemDetailCell> = {};
+    private cells: objOf<ListItemDetailCell> | objOf<FormCom> = {};
     public defaultData: obj = {};
     public currentPage: number = 1;
     public totalNumber: number = 0;
@@ -36,19 +39,51 @@ export class ListItemDetail {
     initDetailTpl(fields: R_Field[]) {
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
-        fields.forEach(field => {
-            if (!field.noShow) {
-                this.cells[field.name] = new ListItemDetailCell({
-                    caption: field.caption,
-                    type: this.getType(field.dataType || field.atrrs.dataType || ''),
-                    container: cellsWrapper,
-                    detailPage: this,
-                    field: field
-                });
+        if (tools.isMb){
+            fields.forEach(field => {
+                if (!field.noShow) {
+                    this.cells[field.name] = new ListItemDetailCell({
+                        caption: field.caption,
+                        type: this.getType(field.dataType || field.atrrs.dataType || ''),
+                        container: cellsWrapper,
+                        detailPage: this,
+                        field: field
+                    });
+                }
+            });
+        }else{
+            let emPara:NewFormEdit = {fields: [], defaultData: {}};
+            for (let i = 0, len = fields.length; i < len; i++) {
+                let f = fields[i];
+                if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || (this.para.uiType == 'update' && f.noShow) || (this.para.uiType == 'flow' && f.noShow) || (this.para.uiType == 'detail' && f.noShow)) {
+                    continue;
+                }
+                let field = {
+                    dom: this.createFormWrapper(f, cellsWrapper),
+                    field: f
+                };
+                emPara.fields.push(field);
+                if ((['insert', 'associate'].indexOf(this.para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {
+                    field.dom && field.dom.classList.add('disabled');
+                }
             }
-        });
+            let form = new NewFormFactory(emPara);
+            this.cells = form.coms;
+        }
     }
-
+    private createFormWrapper(field: R_Field, wrapper: HTMLElement): HTMLElement {
+        if (field.comType === 'file' || field.comType === 'img') {
+            return wrapper;
+        } else {
+            let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
+            let formGroupWrapper = <div className="detail-cell" data-name={field.name}
+                                        data-type={field.comType} data-element-type={elementType}>
+                <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
+            </div>;
+            wrapper.appendChild(formGroupWrapper);
+            return formGroupWrapper;
+        }
+    }
     // 初始化详情数据
     initDetailData(): Promise<obj> {
         let fields: R_Field[] = this.para.fm.fields;
@@ -58,7 +93,12 @@ export class ListItemDetail {
                 let url = tools.url.addObj(this.ajaxUrl, {
                     pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
                 });
-                BwRule.Ajax.fetch(url).then(({response}) => {
+                BwRule.Ajax.fetch(url,{
+                    loading:{
+                        msg:'数据加载中...',
+                        disableEl:this.wrapper
+                    }
+                }).then(({response}) => {
                     if (tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)) {
                         let res: obj = {};
                         let meta = response.body.bodyList[0].meta,
@@ -78,7 +118,7 @@ export class ListItemDetail {
                             }
                         }
                         resolve(data);
-                    }else{
+                    } else {
                         Modal.alert('暂无数据!');
                         resolve(BwRule.getDefaultByFields(fields));
                     }
@@ -114,8 +154,14 @@ export class ListItemDetail {
     // 设置详情数据
     render(data: obj) {
         let cells = this.cells;
-        for (let key in cells) {
-            cells[key].render(data[key] || '');
+        if (tools.isMb){
+            for (let key in cells) {
+                (cells[key] as ListItemDetailCell).render(data[key] || '');
+            }
+        }else{
+            for (let key in cells) {
+                (cells[key] as FormCom).set(data[key] || '');
+            }
         }
     }
 
@@ -149,19 +195,40 @@ export class ListItemDetail {
             });
         }
 
+        function createPcButtons(buttons: R_Button[], wrapper: HTMLElement) {
+            buttons.forEach((btn, index) => {
+                new Button({
+                    content: btn.caption,
+                    icon: btn.icon && btn.icon.split(' ')[1],
+                    iconPre: btn.icon && btn.icon.split(' ')[0],
+                    onClick: () => {
+                        subBtnEvent(index);
+                    },
+                    container: wrapper
+                })
+            })
+        }
+
         if (tools.isNotEmpty(buttons)) {
             let btnWrapper = <div className="list-item-detail-buttons"/>;
-            this.wrapper.appendChild(btnWrapper);
+            d.before(d.query('.list-detail-cells-wrapper',this.wrapper),btnWrapper);
             if (this.para.uiType === 'detail') {
-                if(tools.isMb){
+                if (tools.isMb) {
                     createMoreBtn(buttons, btnWrapper, true);
                     this.createPageButton(btnWrapper);
-                }else{
+                } else {
                     // PC 按钮
-
+                    let pcBtnWrapper = <div className="item-buttons"/>,
+                        pageBtnWrapper = <div className="page-buttons"/>;
+                    if (tools.isNotEmpty(buttons)) {
+                        btnWrapper.appendChild(pcBtnWrapper);
+                        createPcButtons(buttons, pcBtnWrapper);
+                    }
+                    btnWrapper.appendChild(pageBtnWrapper);
+                    this.createPageButton(pageBtnWrapper);
                 }
             } else {
-                if(tools.isMb){
+                if (tools.isMb) {
                     if (buttons.length > 2) {
                         let btns = buttons.slice(0, 2), moreBtns = buttons.slice(2);
                         createMoreBtn(moreBtns, btnWrapper, false);
@@ -188,17 +255,24 @@ export class ListItemDetail {
                             })
                         });
                     }
-                }else{
-                    // TODO:PC按钮
+                } else {
+                    // PC 按钮
+                    if(tools.isNotEmpty(buttons)){
+                        let pcBtnWrapper = <div className="item-buttons"/>;
+                        btnWrapper.appendChild(pcBtnWrapper);
+                        createPcButtons(buttons, pcBtnWrapper);
+                    }
                 }
             }
         } else {
-            if (this.para.uiType === 'detail') {
-                let btnWrapper = <div className="list-item-detail-buttons"/>;
-                this.wrapper.appendChild(btnWrapper);
-                this.createPageButton(btnWrapper);
-            } else {
-                this.wrapper.style.paddingBottom = '0px';
+            if (tools.isMb) {
+                if (this.para.uiType === 'detail') {
+                    let btnWrapper = <div className="list-item-detail-buttons"/>;
+                    this.wrapper.appendChild(btnWrapper);
+                    this.createPageButton(btnWrapper);
+                } else {
+                    this.wrapper.style.paddingBottom = '0px';
+                }
             }
         }
 
@@ -209,7 +283,7 @@ export class ListItemDetail {
                 case 'update_save' :
                 case 'insert_save':
                     let isAdd = btn.subType === 'update_save' ? false : true;
-                    if (!isAdd && self.totalNumber === 0){
+                    if (!isAdd && self.totalNumber === 0) {
                         Modal.alert('没有数据可以编辑!');
                         return;
                     }
