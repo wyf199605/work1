@@ -60,9 +60,12 @@
         height: 60px;
         flex: 0 0 60px;
         position: relative;
-        margin-right: 13px;
+        margin-right: 20px;
         &:last-child{
-          margin-right: 0;
+          margin-right: 13px;
+        }
+        &:first-child{
+          margin-left: 7px;
         }
         .close-ball {
           position: absolute;
@@ -110,6 +113,35 @@
           width: 100%;
           height: 100%;
         }
+      }
+    }
+  }
+  .accessory-body{
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 11px 0 14px;
+    .upload{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #005bac;
+      font-size: 14px;
+      width: 110px;
+      height: 36px;
+      background-color: #ffffff;
+      border-radius: 3px;
+      border: solid 1px #005bac;
+      position: relative;
+      input {
+        display: none;
+      }
+      .text-input {
+        display: none;
+      }
+      i{
+        margin-right: 10px;
       }
     }
   }
