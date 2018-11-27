@@ -108,11 +108,19 @@ export class Accessory extends FormCom {
     private accessoryBodyWrapper: HTMLElement;
 
     protected wrapperInit(para: IAccessory): HTMLElement {
-        return <div className="accessory-wrapper">
+        return tools.isMb ? <div className="accessory-wrapper">
             <div className="accessory-title">{para.field.caption || '附件'}</div>
             {
                 this.accessoryBodyWrapper = <div className="accessory-body">
                     <div c-var="uploader" className="upload"><i className="appcommon app-jia"/>添加附件</div>
+                </div>
+            }
+        </div> : <div className="accessory-wrapper">
+            <div className="accessory-title">{para.field.caption || '附件'}</div>
+            {
+                this.accessoryBodyWrapper = <div className="accessory-body">
+                    <div className="accessory-content-wrapper"/>
+                    <div c-var="uploader" className="upload"><i className="iconfont icon-annex"/>添加附件</div>
                 </div>
             }
         </div>;
@@ -141,6 +149,7 @@ export class Accessory extends FormCom {
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             typeUnique: this.typeUnique,
+            text:'',
             onComplete: (res, file, type) => {
                 if (type === this.typeUnique) {
                     if (this.loading) {
