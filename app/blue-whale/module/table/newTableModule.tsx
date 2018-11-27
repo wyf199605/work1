@@ -645,6 +645,7 @@ export class NewTableModule {
     edit = (() => {
 
         let self = this,
+            isOnce = true,
             editModule: EditModule = null;
 
         let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
@@ -818,9 +819,12 @@ export class NewTableModule {
             });
 
             // 控件销毁时验证
-            bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
-                validate(cell);
-            });
+            if(isOnce){
+                isOnce = false;
+                bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
+                    validate(cell);
+                });
+            }
 
             let validate = (cell: FastTableCell): Promise<any> => {
                 return new Promise((resolve, reject) => {
