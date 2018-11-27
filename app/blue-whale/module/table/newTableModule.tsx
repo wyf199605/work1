@@ -646,7 +646,6 @@ export class NewTableModule {
 
         let self = this,
             isOnce = true,
-            validList = [],
             editModule: EditModule = null;
 
         let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
@@ -823,7 +822,7 @@ export class NewTableModule {
             if(isOnce){
                 isOnce = false;
                 bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
-                    validList.push(validate(TableEditModule, cell));
+                    validate(TableEditModule, cell);
                 });
             }
         };
@@ -960,45 +959,39 @@ export class NewTableModule {
         let save = () => {
             return editModule.assignPromise.then(() => {
                 setTimeout(() => {
-                    console.log(validList);
-                    Promise.all(validList).then(() => {}).catch().finally(() => {
-                        validList = [];
-                        setTimeout(() => {
-                            let saveData = editDataGet();
-                            if (tools.isEmpty(saveData.param)) {
-                                Modal.toast('没有数据改变');
-                                cancel();
-                                this.editBtns.end();
-                                return
-                            }
-                            this.saveVerify.then(() => {
-                                let loading = new Loading({
-                                    msg: '保存中',
-                                    disableEl: this.main.wrapper
-                                });
-                                BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
-                                    type: 'POST',
-                                    data: saveData,
-                                }).then(({response}) => {
+                    let saveData = editDataGet();
+                    if (tools.isEmpty(saveData.param)) {
+                        Modal.toast('没有数据改变');
+                        cancel();
+                        this.editBtns.end();
+                        return
+                    }
+                    this.saveVerify.then(() => {
+                        let loading = new Loading({
+                            msg: '保存中',
+                            disableEl: this.main.wrapper
+                        });
+                        BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
+                            type: 'POST',
+                            data: saveData,
+                        }).then(({response}) => {
 
-                                    BwRule.checkValue(response, saveData, () => {
-                                        this.currentSelectedIndexes = [];
-                                        // 主表子表刷新
-                                        this.refresh();
-                                        Modal.toast(response.msg);
-                                        this.editBtns.end();
-                                        // loading && loading.destroy();
-                                        // loading = null;
-                                        cancel();
-                                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
-                                    });
-                                }).finally(() => {
-                                    loading && loading.destroy();
-                                    loading = null;
-                                });
-                            }).catch();
-                        }, 200);
-                    })
+                            BwRule.checkValue(response, saveData, () => {
+                                this.currentSelectedIndexes = [];
+                                // 主表子表刷新
+                                this.refresh();
+                                Modal.toast(response.msg);
+                                this.editBtns.end();
+                                // loading && loading.destroy();
+                                // loading = null;
+                                cancel();
+                                tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                            });
+                        }).finally(() => {
+                            loading && loading.destroy();
+                            loading = null;
+                        });
+                    }).catch();
                 }, 200);
             });
         };
