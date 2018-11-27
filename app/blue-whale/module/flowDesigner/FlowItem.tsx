@@ -82,11 +82,13 @@ export class FlowItem extends Component {
                 this.isDiamond = true;
                 this.wrapper.classList.add('diamond');
                 this.wrapper.appendChild(<div className="diamond-text">{para.type}</div>);
-                this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, this.width, this.height).attr(this.getDefaultAttr(para.position.x, para.position.y)).transform('r45');
+                this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, this.width, this.height)
+                                .attr(this.getDefaultAttr(para.position.x, para.position.y)).transform('r45');
             } else {
                 this.text = para.text || para.type;
                 let areaObj = this.calcWidthAndHeight();
-                this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, para.width || areaObj.width, para.height || areaObj.height, 5).attr(this.getDefaultAttr(para.position.x, para.position.y));
+                this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, para.width || areaObj.width, para.height || areaObj.height, 5)
+                                .attr(this.getDefaultAttr(para.position.x, para.position.y));
             }
         }
         this.initEvents.on();
@@ -227,7 +229,8 @@ export class FlowItem extends Component {
                 let transitionFlag = null;
                 if (self === Tips.TransitionItems[0]) {
                     // Modal.toast('不能连接自己！');
-                }else if(Tips.TransitionItems[0] && self.flowEditor.get().name && self.flowEditor.get().name === Tips.TransitionItems[0].flowEditor.get().name){
+                }else if(Tips.TransitionItems[0] && self.flowEditor.get().name &&
+                            self.flowEditor.get().name === Tips.TransitionItems[0].flowEditor.get().name){
                     // Modal.toast('名称相同，无法连接！');
                 }else if(Tips.TransitionItems[0] && FlowDesigner.AllLineItems.filter(line =>
                         (line.from === Tips.TransitionItems[0].rectNode && line.to === self.rectNode && (transitionFlag = 'repeat')) ||

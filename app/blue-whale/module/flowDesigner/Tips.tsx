@@ -151,7 +151,8 @@ export class Tips extends Component {
                 Modal.toast('名称不能为空!');
                 return;
             }
-            allItems.forEach(item => item.flowEditor.get().name && (allNames[item.flowEditor.get().name] =  allNames[item.flowEditor.get().name] + 1 || 1));
+            allItems.forEach(item => item.flowEditor.get().name &&
+                (allNames[item.flowEditor.get().name] =  allNames[item.flowEditor.get().name] + 1 || 1));
             for(let attr of Object.keys(allNames)){
                 if(allNames[attr] > 1){
                     Modal.toast(`名称${attr}重复！`);
@@ -170,7 +171,8 @@ export class Tips extends Component {
                         dropdowns = item.flowEditor.dropdowns,
                         dropdownField: IFieldPara = {};
                     // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
-                    Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 && (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
+                    Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 &&
+                                (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
                     Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get(), dropdownField));
                     FlowDesigner.rootElement.appendChild(xmlNode);
                 }
@@ -180,12 +182,14 @@ export class Tips extends Component {
                 let xmlNode = Method.parseToXml.createXmlElement(line.flowEditor.type),
                     toItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.to)[0];
                 // 根据连接线的目标节点的属性设置连接线的属性
-                toItem && line.flowEditor && Method.parseToXml.setAttr(xmlNode, Object.assign({to: toItem.flowEditor.get().name}, line.flowEditor.get()));
+                toItem && line.flowEditor && Method.parseToXml.setAttr(xmlNode, Object.assign(
+                        {to: toItem.flowEditor.get().name}, line.flowEditor.get()));
                 // 首先获取连接线的来源节点，然后将连接线作为来源节点的子节点添加到xml节点树中
                 let fromItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.from)[0],
                     fromNode = null;
                 FlowDesigner.rootElement.childNodes['forEach'](item => {
-                    if(fromItem && 'name' in item['attributes'] && fromItem.flowEditor.get().name === item['attributes'].getNamedItem('name').value){
+                    if(fromItem && 'name' in item['attributes'] &&
+                        fromItem.flowEditor.get().name === item['attributes'].getNamedItem('name').value){
                         fromNode = item;
                     }
                 });

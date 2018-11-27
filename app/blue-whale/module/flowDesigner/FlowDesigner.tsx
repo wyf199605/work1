@@ -194,7 +194,8 @@ export class FlowDesigner {
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
                 if (child.nodeType === 1) {
-                    let layout = child.attributes.layout && child.attributes.layout.value.split(',').map(item => parseInt(item)),
+                    let layout = child.attributes.layout && child.attributes.layout.value.split(',')
+                                    .map(item => parseInt(item)),
                         isComplete: boolean = false,
                         fields = Method.getFields(child);
 
@@ -241,7 +242,8 @@ export class FlowDesigner {
                 if (child.nodeType === 1) {
                     let transitions = d.queryAll('transition', child);
                     transitions.forEach(transition => {
-                        if (tools.isNotEmpty(transition) && transition.attributes['to'] && tools.isNotEmpty(transition.attributes['to'].value)) {
+                        if (tools.isNotEmpty(transition) && transition.attributes['to'] &&
+                                tools.isNotEmpty(transition.attributes['to'].value)) {
                             let start = Method.searchFlowItem(child.attributes.name.value),
                                 end = Method.searchFlowItem(transition.attributes['to'].value) || null;
 
@@ -270,9 +272,9 @@ export class FlowDesigner {
             });
 
             // 如果节点已经完成，则对应的连接线的颜色也要改变
-            FlowDesigner.ALLITEMS.filter(item => item && item.isComplete).forEach(item => {
+            FlowDesigner.ALLITEMS.filter(item => item && item.isComplete).forEach((item, index, arr) => {
                 tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
-                    lineItem.isComplete = true;
+                    arr[index + 1] && arr[index + 1].isComplete && (lineItem.isComplete = true);
                 });
             });
 
@@ -282,7 +284,8 @@ export class FlowDesigner {
                 d.queryAll('input').forEach(input => {
                     (input as HTMLInputElement).readOnly = true;
                 }),
-                [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS).forEach(item => item.flowEditor && item.flowEditor.initEvents.off()),
+                [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS)
+                        .forEach(item => item.flowEditor && item.flowEditor.initEvents.off()),
                 d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item))
             );
         }

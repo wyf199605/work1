@@ -76,7 +76,8 @@ export class LineItem extends Component {
             }
         });
 
-        para.fields && para.fields.name && para.fields.name.indexOf('path') > -1 && (LineItem.counter = parseInt(para.fields.name[para.fields.name.length - 1]));
+        para.fields && para.fields.name && para.fields.name.indexOf('path') > -1 &&
+                (LineItem.counter = parseInt(para.fields.name[para.fields.name.length - 1]));
         this.flowEditor = new FlowEditor({
             type: 'transition',
             container: d.query('#design-canvas'),
