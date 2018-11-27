@@ -6,6 +6,7 @@ import {IDrawFormatData} from "../plan/planModule";
 import tools = G.tools;
 import d = G.d;
 import {SubBtnMenu} from "../contextMenu/subBtnMenu";
+import sys = BW.sys;
 
 declare const D3;
 //开启描点连线功能
@@ -186,10 +187,23 @@ export class DrawPoint extends Component {
         //      })
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-
+        // this.g.on('touchstart',function () {
+        //     let slate = [];
+        //     slate.push(D3.touches(this)[0][0])
+        //     slate.push(D3.touches(this)[0][1])
+        //     _this.g.attr("transform","scale(2.5)" +  "translate(" + slate+ ")");
+        //         }).on('touchmove',function () {
+        //             let slate = [];
+        //             slate.push(D3.touches(this)[0][0])
+        //             slate.push(D3.touches(this)[0][1])
+        //         _this.g.attr("transform","scale(2.5)" +  "translate(" + slate+ ")");
+        //         }).on('touchend',function () {
+        //
+        //         })
        let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
+
     }
 
     set imgUrl(url) {
@@ -198,6 +212,23 @@ export class DrawPoint extends Component {
                 return url
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
+        if(tools.isMb){
+            let slate = [-250,-80]
+            this.g.attr("transform","scale(2.5)" + "translate(" + slate+ ")" );
+            this.svg.attr('width',1500).attr('height',1700)
+            this.svg.attr("transform","translate(" + slate+ ")")
+        }
+    }
+    private scaleVal = 0.5;
+    public svgScal(res){
+
+        if(res){
+            this.scaleVal+=0.2;
+            this.g.attr('transform',"scale("+this.scaleVal+")");
+        }else {
+            this.scaleVal-=0.2;
+            this.g.attr('transform',"scale("+this.scaleVal+")");
+        }
     }
 
     private mousedown() {

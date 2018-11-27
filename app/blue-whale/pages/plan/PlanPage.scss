@@ -58,6 +58,13 @@
   }
   .plan-wrapper {
     height: 100%;
+    .initScale{
+      position: absolute;
+      bottom: 8px;
+      div{
+        margin: 10px;
+      }
+    }
     .horizontalQueryModule {
       position: relative;
       height: 50px;
@@ -97,6 +104,7 @@
         margin: 0 auto;
         display: block;
         g {
+          touch-action: auto;
           .iconfont {
             font-size: 12px;
           }

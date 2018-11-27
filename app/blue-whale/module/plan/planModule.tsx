@@ -58,8 +58,24 @@ export class PlanModule extends Component{
         this.initDraw();
         tools.isPc && this.initSubBtn();
         this.initStatusBar();
+        //this.initScale();
     }
 
+    initScale(){
+        if(tools.isMb){
+            let div = <div class="initScale">
+                <div class="narrow" onclick={()=>{
+                  this.draw.svgScal(false)
+                }
+                }> 缩小</div>
+                <div class="enlarge" onclick={()=>{
+                    this.draw.svgScal(true)}
+                }>放大</div>
+            </div>
+            d.append(this.container,div)
+        }
+
+    }
     initStatusBar(){
         let ui = this.ui,
             backColors = ui.backColor;
