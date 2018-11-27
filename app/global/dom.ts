@@ -192,7 +192,7 @@ let event = (function () {
                                 startDistance = moveDistance;
                                 let dispatcher = dispatcherGet(el);
                                 dispatcher && dispatcher.call(el, getTouchZoomEvent(ev, scale, centerX, centerY));
-                            }, 50));
+                            }, 35));
                             eventOn(el, EVENT_MB_END, endHandler = () =>{
                                 eventOff(el, EVENT_END, endHandler);
                                 eventOff(el, EVENT_MOVE, moveHandler);
