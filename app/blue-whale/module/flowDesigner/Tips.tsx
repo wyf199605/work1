@@ -5,8 +5,11 @@ import d = G.d;
 import tools = G.tools;
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
-import {FlowDesigner} from "./FlowDesigner";
+import {FlowDesigner, Method} from "./FlowDesigner";
 import {FlowItem} from "./FlowItem";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {IFieldPara} from "./FlowEditor";
+import {BwRule} from "../../common/rule/BwRule";
 
 export class Tips extends Component {
     static TransitionItems: FlowItem[];
@@ -16,7 +19,7 @@ export class Tips extends Component {
             <div className="tip-header">工具集</div>
             <div className="tip-items">
                 <div className="tip-item">
-                    <div className="tip-item-inner" id="save"><i className="appcommon app-baocun1"/>保存</div>
+                    <div className="tip-item-inner save-flow" id="save"><i className="appcommon app-baocun1"/>保存</div>
                 </div>
                 <div className="tip-item">
                     <div className="tip-item-inner delete-item" id="delete-item"><i className="appcommon app-shanchu"/>删除</div>
@@ -78,7 +81,7 @@ export class Tips extends Component {
         this.initEvents.on();
     }
 
-    private initEvents = (() => {
+    public initEvents = (() => {
         let selectItem = (e) => {
             let movefollow = <span className="move-follow"/>;
             movefollow.innerHTML = d.closest(e.target, '.drag-item').innerHTML;
@@ -113,6 +116,7 @@ export class Tips extends Component {
                     FlowDesigner.ALLITEMS = arr.concat([flowItem]);
                     FlowDesigner.removeAllActive();
                     flowItem.active = true;
+                    FlowItem.toggleDisabledStartAndEnd();
                 }
                 d.off(document, 'mousemove', selectItemMove);
                 d.off(document, 'mouseup', selectItemMoveUp);
@@ -139,6 +143,70 @@ export class Tips extends Component {
             });
             target.classList.add('active');
         };
+
+        let saveFlowHandler = (e) => {
+            let allItems = [].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems),
+                allNames = [];
+            if(allItems.some(item => tools.isEmpty(item.flowEditor.get().name))){
+                Modal.toast('名称不能为空!');
+                return;
+            }
+            allItems.forEach(item => item.flowEditor.get().name &&
+                (allNames[item.flowEditor.get().name] =  allNames[item.flowEditor.get().name] + 1 || 1));
+            for(let attr of Object.keys(allNames)){
+                if(allNames[attr] > 1){
+                    Modal.toast(`名称${attr}重复！`);
+                    return;
+                }
+            }
+
+            let xmlDoc = Method.loadXMLStr(`<?xml version="1.0" encoding="UTF-8"?><process></process>`);
+            FlowDesigner.rootElement = xmlDoc.documentElement;
+            FlowDesigner.ALLITEMS.forEach(item => {
+                // 创建节点、设置属性、添加到xml节点树中
+                if(tools.isNotEmpty(item)){
+                    let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
+                        attrs = item.rectNode.attrs,
+                        layoutStr = [attrs.cx || attrs.x, attrs.cy || attrs.y, attrs.r || attrs.width, attrs.r || attrs.height].join(),
+                        dropdowns = item.flowEditor.dropdowns,
+                        dropdownField: IFieldPara = {};
+                    // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
+                    Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 &&
+                                (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
+                    Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get(), dropdownField));
+                    FlowDesigner.rootElement.appendChild(xmlNode);
+                }
+            });
+            // 再创建所有的连接线，并设置属性和作为谁的子节点
+            FlowDesigner.AllLineItems.forEach(line => {
+                let xmlNode = Method.parseToXml.createXmlElement(line.flowEditor.type),
+                    toItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.to)[0];
+                // 根据连接线的目标节点的属性设置连接线的属性
+                toItem && line.flowEditor && Method.parseToXml.setAttr(xmlNode, Object.assign(
+                        {to: toItem.flowEditor.get().name}, line.flowEditor.get()));
+                // 首先获取连接线的来源节点，然后将连接线作为来源节点的子节点添加到xml节点树中
+                let fromItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.from)[0],
+                    fromNode = null;
+                FlowDesigner.rootElement.childNodes['forEach'](item => {
+                    if(fromItem && 'name' in item['attributes'] &&
+                        fromItem.flowEditor.get().name === item['attributes'].getNamedItem('name').value){
+                        fromNode = item;
+                    }
+                });
+                fromNode && fromNode.appendChild(xmlNode);
+            });
+
+            let xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
+            BwRule.Ajax.fetch(BW.CONF.ajaxUrl.modifyFlow + FlowDesigner.processId, {
+                type: 'POST',
+                data: {process: xmlStr},
+            }).then(({response}) => {
+                Modal.toast(response.msg);
+            }).catch((err) => {
+                console.log(err);
+            });
+        };
+
         let deleteItem = () => {
             // 删除选中的节点和节点相关联的连接线
             let deleteLine = [];
@@ -164,13 +232,15 @@ export class Tips extends Component {
             on: () => {
                 d.on(this.wrapper, 'mousedown', '.drag-item', selectItem);
                 d.on(this.wrapper, 'click', '.click-item', clickItemHandler);
+                d.on(d.query('.save-flow'), 'click', saveFlowHandler);
                 d.on(this.wrapper, 'click', '.delete-item', deleteItem);
             },
             off: () => {
                 d.off(this.wrapper, 'mousedown', '.drag-item', selectItem);
                 d.off(this.wrapper, 'click', '.click-item', clickItemHandler);
+                d.off(d.query('.save-flow'), 'click', saveFlowHandler);
                 d.off(this.wrapper, 'click', '.delete-item', deleteItem);
-            }
+            },
         }
     })();
 
