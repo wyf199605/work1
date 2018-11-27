@@ -119,7 +119,7 @@ export = class FormPage extends BasicPage {
             let field = f.field,
                 name = field.name,
                 isNotEdit = isInsert ? field.noModify : field.noEdit;
-            if(isNotEdit){
+            if(isNotEdit && !field.noShow){
                 let com = this.editModule.getDom(name);
                 com && (com.disabled = true);
                 if(tools.isMb){
