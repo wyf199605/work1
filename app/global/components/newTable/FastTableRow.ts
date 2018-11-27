@@ -212,7 +212,6 @@ export class FastTableRow {
     }
 
     set color(color: string) {
-        console.log(color);
         this.rowsEach(r => color ? (r.wrapper.style.color = color)
             : r.wrapper.style.removeProperty('color'));
     }

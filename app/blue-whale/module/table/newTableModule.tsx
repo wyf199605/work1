@@ -645,7 +645,6 @@ export class NewTableModule {
     edit = (() => {
 
         let self = this,
-            validList: Promise<any>[] = [],
             editModule: EditModule = null;
 
         let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
@@ -820,7 +819,7 @@ export class NewTableModule {
 
             // 控件销毁时验证
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
-                validList.push(validate(cell));
+                validate(cell);
             });
 
             let validate = (cell: FastTableCell): Promise<any> => {
@@ -955,12 +954,7 @@ export class NewTableModule {
 
         let save = () => {
             return editModule.assignPromise.then(() => {
-                let loading = new Loading({
-                    msg: '保存中',
-                    disableEl: this.main.wrapper
-                });
-                Promise.all(validList).then(() => {}).catch().finally(() => {
-                    validList = [];
+                setTimeout(() => {
                     let saveData = editDataGet();
                     if (tools.isEmpty(saveData.param)) {
                         Modal.toast('没有数据改变');
@@ -969,7 +963,10 @@ export class NewTableModule {
                         return
                     }
                     this.saveVerify.then(() => {
-
+                        let loading = new Loading({
+                            msg: '保存中',
+                            disableEl: this.main.wrapper
+                        });
                         BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
                             type: 'POST',
                             data: saveData,
@@ -991,8 +988,7 @@ export class NewTableModule {
                             loading = null;
                         });
                     }).catch();
-                })
-
+                }, 200);
             });
         };
 
@@ -1056,12 +1052,7 @@ export class NewTableModule {
             if(isSave){
                 resolve()
             }else{
-                Modal.confirm({
-                    msg: '输入内容有误，是否继续提交？',
-                    callback: (flag) => {
-                        flag ? resolve() : reject();
-                    }
-                })
+                Modal.alert('您输入的内容有错误信息，请改正后再保存。', '温馨提示', () => reject());
             }
         });
     }

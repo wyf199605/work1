@@ -60,7 +60,7 @@ export class FastTableCell extends TableDataCell {
                 isLastCol = visibleCols.indexOf(this.name) > visibleCols.length / 2;
 
             new Tooltip({
-                visible: tools.isMb,
+                // visible: tools.isMb,
                 errorMsg: msg,
                 el: this.wrapper,
                 length: 'medium',

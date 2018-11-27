@@ -170,7 +170,7 @@ export class SelectInputMb extends TextInput{
     protected _index = -1;
     set(data){
         let value = data, text = data;
-        if(typeof data === 'object'){
+        if(data !== null && typeof data === 'object'){
             text = data.text;
             value = data.value
         }

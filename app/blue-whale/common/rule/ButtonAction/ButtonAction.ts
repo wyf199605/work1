@@ -212,6 +212,7 @@ export class ButtonAction {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
                 }).catch(() => {
+                    callback(null);
                 });
                 break;
             case 'popup':
@@ -233,6 +234,7 @@ export class ButtonAction {
                     }
                     callback(response);
                 }).catch(() => {
+                    callback(null);
                 });
                 break;
             case 'newwin':
@@ -299,7 +301,6 @@ export class ButtonAction {
                 if (data && (data.type || data.type === 0)) {
                     if (data.type === 0) {
                         Modal.alert(data.showText);
-                        resolve(response);
                     } else {
                         Modal.confirm({
                             msg: data.showText,
@@ -308,6 +309,8 @@ export class ButtonAction {
                                     self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then((response) => {
                                         resolve(response);
                                     });
+                                }else{
+                                    reject();
                                 }
                             }
                         });
