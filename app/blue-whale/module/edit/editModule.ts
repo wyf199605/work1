@@ -672,13 +672,13 @@ export class EditModule {
                                 if (!flag) {
                                     clear();
                                 }
+                                resolve({
+                                    okNames: chkAddr.varList.map(v => v.varName)
+                                });
                             }
                         });
                     }
 
-                    resolve({
-                        okNames: chkAddr.varList.map(v => v.varName)
-                    });
                 }
             }).catch(() => {
                 resolve({
