@@ -198,8 +198,8 @@ export class FastTableRow {
         let format = this.fastTable.rowFormat,
             formated = format && format(this.data);
 
-        this.color = formated && formated.color;
-        this.background = formated && formated.bgColor;
+        this.color = formated ? formated.color : '';
+        this.background = formated ? formated.bgColor : '';
     }
 
     get data() {
@@ -212,7 +212,9 @@ export class FastTableRow {
     }
 
     set color(color: string) {
-        color && this.rowsEach(r => r.wrapper.style.color = color);
+        console.log(color);
+        this.rowsEach(r => color ? (r.wrapper.style.color = color)
+            : r.wrapper.style.removeProperty('color'));
     }
 
     get color() {
@@ -220,7 +222,8 @@ export class FastTableRow {
     }
 
     set background(color: string) {
-        color && this.rowsEach(r => r.wrapper.style.background = color);
+        this.rowsEach(r => color ? (r.wrapper.style.background = color)
+            : r.wrapper.style.removeProperty('background'));
     }
 
     get background() {

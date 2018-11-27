@@ -407,6 +407,12 @@
   }
 }
 
+.aggr-wrapper + .fast-table-container{
+  .tables{
+    height: calc(100% - 105px);
+  }
+}
+
 //.fl-mobile{
 //  .table-module-wrapper {
 //    height: 100%;
