@@ -96,7 +96,7 @@ namespace BW {
             flowListApply: 'flow/system/list', // 流程引擎-申请
             modifyFlow: 'process/modify/',      // 流程修改
             getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
-            test: 'ui/associate/n1092_data-3/associate-3?mailid=ZBZX0000934&output=json',
+            test: 'ui/associate/n1092_data-3/associate-3?mailid=ZBZX0000934&output=json'
         },
 
         init(siteUrl: string, appid: string, version: string, webscoket) {

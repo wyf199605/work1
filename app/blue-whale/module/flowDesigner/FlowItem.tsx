@@ -31,6 +31,14 @@ export class FlowItem extends Component {
 
     static startCounter = 0;    // start节点的个数
     static endCounter = 0;      // end节点的个数
+    static itemColor = {
+        task: '#65b3f0',
+        custom: '#71d189',
+        subprocess: '#f56767',
+        decision: '#f8b14b',
+        fork: '#db7bd8',
+        join: '#f5896c',
+    };
     private para: IFlowItemPara;
 
     // 工具集里的start和end节点是否可用
