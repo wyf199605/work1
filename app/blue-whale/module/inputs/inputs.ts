@@ -133,7 +133,7 @@ export class Inputs {
             this.dataCover(ftable, response);
         }
 
-        if(catType !== 2 || catType !== 3){
+        if(catType !== 2 && catType !== 3){
             this.logTip(showText);
         }
 
