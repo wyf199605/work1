@@ -251,6 +251,11 @@ export class Accessory extends FormCom {
     // 渲染附件列表
     render(data: IFileInfo[]) {
         if (tools.isEmpty(data)) {
+            this.listItems.forEach(item => {
+                item.destroy();
+            });
+            this._listItems = [];
+            this._files = [];
             return;
         }
         d.diff(data, this.listItems, {
@@ -279,7 +284,7 @@ export class Accessory extends FormCom {
 
     protected createListItem(para: IAccessoryItem) {
         para = Object.assign({}, para, {
-            container: this.accessoryBodyWrapper,
+            container: tools.isMb ? this.accessoryBodyWrapper : d.query('.accessory-content-wrapper',this.accessoryBodyWrapper),
             index: this.files.length
         });
         return new AccessoryItem(para);
