@@ -848,7 +848,7 @@ export class NewTableModule {
                     TableEditModule.checkValue(field, rowData, () => {
                         cell.data = null;
                         lookUpCell && (lookUpCell.data = null);
-                    })
+                    }, name)
                         .then((res) => {
                             let {errors, okNames} = res;
                             Array.isArray(errors) && errors.forEach(err => {
@@ -954,32 +954,33 @@ export class NewTableModule {
                     this.editBtns.end();
                     return
                 }
-
-                let loading = new Loading({
-                    msg: '保存中',
-                    disableEl: this.main.wrapper
-                });
-
-                BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
-                    type: 'POST',
-                    data: saveData,
-                }).then(({response}) => {
-
-                    BwRule.checkValue(response, saveData, () => {
-                        this.currentSelectedIndexes = [];
-                        // 主表子表刷新
-                        this.refresh();
-                        Modal.toast(response.msg);
-                        this.editBtns.end();
-                        // loading && loading.destroy();
-                        // loading = null;
-                        cancel();
-                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                this.saveVerify.then(() => {
+                    let loading = new Loading({
+                        msg: '保存中',
+                        disableEl: this.main.wrapper
                     });
-                }).finally(() => {
-                    loading && loading.destroy();
-                    loading = null;
-                });
+
+                    BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
+                        type: 'POST',
+                        data: saveData,
+                    }).then(({response}) => {
+
+                        BwRule.checkValue(response, saveData, () => {
+                            this.currentSelectedIndexes = [];
+                            // 主表子表刷新
+                            this.refresh();
+                            Modal.toast(response.msg);
+                            this.editBtns.end();
+                            // loading && loading.destroy();
+                            // loading = null;
+                            cancel();
+                            tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                        });
+                    }).finally(() => {
+                        loading && loading.destroy();
+                        loading = null;
+                    });
+                }).catch();
             });
         };
 
@@ -1035,6 +1036,23 @@ export class NewTableModule {
             rowCanInit
         }
     })();
+
+    get saveVerify(){
+        return new Promise((resolve, reject) => {
+            let isSave = this.main.ftable.isSave
+                && (this.sub[this.subTabActiveIndex] ? this.sub[this.subTabActiveIndex].ftable.isSave : true);
+            if(isSave){
+                resolve()
+            }else{
+                Modal.confirm({
+                    msg: '输入内容有误，是否继续提交？',
+                    callback: (flag) => {
+                        flag ? resolve() : reject();
+                    }
+                })
+            }
+        });
+    }
 
     protected static initAssignData(assignAddr: R_ReqAddr, data: obj) {
         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(assignAddr, data), {

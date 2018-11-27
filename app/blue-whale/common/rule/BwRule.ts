@@ -341,6 +341,7 @@ export class BwRule extends Rule {
         }, para);
 
         url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
+        console.log(url);
         if (para.dataType === BwRule.DT_FILE) {
 
             if(para.type === 'download'){
@@ -403,14 +404,12 @@ export class BwRule extends Rule {
                             case _linkAct.SHOW_IMG :
                                 if (sys.os === 'ad' || sys.os === 'ip') {
                                     sys.window.openImg(rData.DOWNADDR);
-                                } else if (tools.isMb) {
-                                    sys.window.download(rData.DOWNADDR);
                                 } else {
-                                    window.location.href = rData.DOWNADDR;
+                                    sys.window.download(rData.DOWNADDR);
                                 }
                                 break;
                             case _linkAct.DOWNLOAD :
-                                sys.window.download(rData.DOWNADDR);
+                                sys.window.download(rData.DOWNADDR, rData.FILENAME);
                                 break;
                             default:
                         }

@@ -259,7 +259,7 @@ export class ButtonAction {
             ajaxUrl: string,
             uploadUrl: string,
             downUrl: string;
-        console.log(dataAddr);
+
         for (let i = 0; i < dataAddr.length; i++) {
             url = dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
@@ -267,7 +267,6 @@ export class ButtonAction {
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
 
         }
-        console.log(codeStype[0]["IMPORTDATAMODE"])
 
 
         require(['RfidBarCode'], (p) => {
