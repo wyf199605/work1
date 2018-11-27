@@ -19,6 +19,7 @@ export interface IFileInfo {
 
 export interface IAccessory extends IUploaderPara {
     uniques?: string;
+    isModal?: boolean;
 
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
@@ -108,22 +109,26 @@ export class Accessory extends FormCom {
     private accessoryBodyWrapper: HTMLElement;
 
     protected wrapperInit(para: IAccessory): HTMLElement {
-        return tools.isMb ? <div className="accessory-wrapper">
+        let wrapper = <div className="accessory-wrapper">
             <div className="accessory-title">{para.field.caption || '附件'}</div>
             {
                 this.accessoryBodyWrapper = <div className="accessory-body">
                     <div c-var="uploader" className="upload"><i className="appcommon app-jia"/>添加附件</div>
                 </div>
             }
-        </div> : <div className="accessory-wrapper">
-            <div className="accessory-title">{para.field.caption || '附件'}</div>
-            {
-                this.accessoryBodyWrapper = <div className="accessory-body">
-                    <div className="accessory-content-wrapper"/>
-                    <div c-var="uploader" className="upload"><i className="iconfont icon-annex"/>添加附件</div>
-                </div>
-            }
         </div>;
+        if (!para.isModal && !tools.isMb) {
+            wrapper = <div className="accessory-wrapper">
+                <div className="accessory-title">{para.field.caption || '附件'}</div>
+                {
+                    this.accessoryBodyWrapper = <div className="accessory-body">
+                        <div className="accessory-content-wrapper"/>
+                        <div c-var="uploader" className="upload"><i className="iconfont icon-annex"/>添加附件</div>
+                    </div>
+                }
+            </div>;
+        }
+        return wrapper;
     }
 
     constructor(private para: IAccessory) {
@@ -149,7 +154,7 @@ export class Accessory extends FormCom {
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             typeUnique: this.typeUnique,
-            text:'',
+            text: '',
             onComplete: (res, file, type) => {
                 if (type === this.typeUnique) {
                     if (this.loading) {
@@ -164,8 +169,8 @@ export class Accessory extends FormCom {
                         } else {
                             Modal.toast('上传成功!');
                         }
-                        switch (this.fileType){
-                            case '43':{
+                        switch (this.fileType) {
+                            case '43': {
                                 this.files = [{
                                     unique: file.name,
                                     filename: file.name,
@@ -174,24 +179,24 @@ export class Accessory extends FormCom {
                                 }];
                                 this.para.onComplete && this.para.onComplete.call(this, res, file);
                             }
-                            break;
-                            case '47':{
+                                break;
+                            case '47': {
                                 this.value = res.data.unique;
                             }
-                            break;
-                            case '48':{
+                                break;
+                            case '48': {
                                 let v = this.get() || '',
                                     unique = res.data.unique;
-                                if (tools.isNotEmpty(res.ifExist)){
+                                if (tools.isNotEmpty(res.ifExist)) {
                                     let files = this._files.filter(file => file.unique === unique);
-                                    if (tools.isEmpty(files)){
+                                    if (tools.isEmpty(files)) {
                                         this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
                                     }
-                                }else{
+                                } else {
                                     this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
                                 }
                             }
-                            break;
+                                break;
                         }
                     } else {
                         this.para.onError && this.para.onError.call(this, file);
@@ -283,9 +288,14 @@ export class Accessory extends FormCom {
     }
 
     protected createListItem(para: IAccessoryItem) {
+        let container = this.accessoryBodyWrapper;
+        if (!tools.isMb && !this.para.isModal){
+            container = d.query('.accessory-content-wrapper', this.accessoryBodyWrapper);
+        }
         para = Object.assign({}, para, {
-            container: tools.isMb ? this.accessoryBodyWrapper : d.query('.accessory-content-wrapper',this.accessoryBodyWrapper),
-            index: this.files.length
+            container: container,
+            index: this.files.length,
+            isModal: this.para.isModal
         });
         return new AccessoryItem(para);
     }

@@ -159,6 +159,7 @@ export class ListItemDetail {
                 (cells[key] as ListItemDetailCell).render(data[key] || '');
             }
         }else{
+            data = this.defaultData;
             for (let key in cells) {
                 (cells[key] as FormCom).set(data[key] || '');
             }
@@ -430,8 +431,13 @@ export class ListItemDetail {
                     tools.isNotEmpty(addrArr) && addrArr.forEach(md5 => {
                         // 根据md5获取文件地址
                         arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
+                        // if(tools.isMb){
+                        //     arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
+                        // }else{
+                        //     arr.push(md5);
+                        // }
                     });
-                    v = arr;
+                    v = arr.join(',');
                 } else {
                     v = [];
                 }
