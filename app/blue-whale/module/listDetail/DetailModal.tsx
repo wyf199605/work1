@@ -18,7 +18,7 @@ export class DetailModal {
 
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
-        let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData};
+        let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData, isModal: true};
         let formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [];
         for (let i = 0, len = fields.length; i < len; i++) {
@@ -71,7 +71,7 @@ export class DetailModal {
         let modal = new Modal({
             header: para.fm.caption + ' - 编辑',
             width: tools.isMb ? void 0 : '600px',
-            height: tools.isMb ? void 0 : '500px',
+            height: tools.isMb ? void 0 : '600px',
             isMb: tools.isMb,
             className: 'detail-modal',
             isModal: tools.isMb,
