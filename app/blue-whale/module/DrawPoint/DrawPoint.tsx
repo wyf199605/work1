@@ -152,7 +152,6 @@ export class DrawPoint extends Component {
         //         }
         //      }).on('touchmove',function () {
         //         if(D3.touches(this) && D3.touches(this).length > 1){
-        //             alert('进来了')
         //             let x1 = D3.touches(this)[0][0],
         //                 y1 = D3.touches(this)[0][1],
         //                 x2 = D3.touches(this)[1][0],
@@ -160,7 +159,7 @@ export class DrawPoint extends Component {
         //             let calX = x2 - x1,
         //                 calY = y2 - y1;
         //             spot2 = Math.pow((calX * calX + calY * calY),0.5);
-        //             let len = spot2/7000;
+        //             let len = spot2/1000;
         //             if(spot2 > spot1){
         //                 _this.g.attr('transform',"matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
         //                 num1 = num1 + len;
@@ -188,13 +187,13 @@ export class DrawPoint extends Component {
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
 
-        this.g.append('image').attr('href', () => {
+       let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
     set imgUrl(url) {
-        this.g.select('image').attr('href',
+        this.g.select('image').attr('xlink:href',
             () => {
                 return url
             }
@@ -1015,17 +1014,17 @@ export class DrawPoint extends Component {
         if(tools.isMb){
             let scale = 1;
             d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
-                //
-                let str = [];
-                str.push(ev.centerX);
-                str.push(ev.centerY);
-                scale = ev.scale;
-                scale = Math.min(ev.scale, 2);
-                scale = Math.max(0.5, ev.scale);
-                // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
-                _this.g.attr('transform', "scale(" + scale + ")");
-                _this.svg.attr('width', scale * 1200);
-                _this.svg.attr('height', scale * 800);
+                // //
+                // let str = [];
+                // str.push(ev.centerX);
+                // str.push(ev.centerY);
+                // scale = ev.scale;
+                // scale = Math.min(ev.scale, 2);
+                // scale = Math.max(0.5, ev.scale);
+                //  _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
+                // //_this.g.attr('transform', "scale(" + scale + ")");
+                // _this.svg.attr('width', scale * 1200);
+                // _this.svg.attr('height', scale * 800);
             })
         }else{
             this.zoom = D3.behavior.zoom()

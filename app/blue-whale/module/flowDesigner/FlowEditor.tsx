@@ -122,7 +122,8 @@ export class FlowEditor extends FormCom {
                 </div>;
             if(attr in FlowEditor.DROPDOWN_KEYVALUE){
                 // 添加下拉按钮
-                d.append(d.query('.attr-editor-input', attrEditorWrapper), <i className="floweditor-dropdown appcommon app-xiala"></i>);
+                d.append(d.query('.attr-editor-input', attrEditorWrapper),
+                            <i className="floweditor-dropdown appcommon app-xiala"></i>);
                 let dropdownWrapper = <div className="dropdown-wrapper" data-attr={attr}>
                     {/*<div className="dropdown-title"></div>*/}
                 </div>;
@@ -247,7 +248,8 @@ export class FlowEditor extends FormCom {
         *   如果是Component，那么只有当前为显示状态并且准备隐藏的时候，才更新节点的data-name和文本
         * */
         let fields = this.get();
-        if(this.owner && this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) && tools.isNotEmpty(this.show) && !show && this.show !== show){
+        if(this.owner && this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) &&
+                tools.isNotEmpty(this.show) && !show && this.show !== show){
             this.owner['wrapper'].dataset.name = fields.name;
             let limitLength = 50,
                 limitDisplayName = fields.displayName.length > limitLength ? fields.displayName.slice(0, limitLength) + '...' : fields.displayName;
@@ -284,7 +286,8 @@ export class FlowEditor extends FormCom {
     }
     set(fields: IFieldPara){
         for(let attr in fields){
-            let attrEditorWrapper = d.queryAll('.attr-editor-wrapper', this.wrapper).filter(item => item.dataset.attr === attr)[0];
+            let attrEditorWrapper = d.queryAll('.attr-editor-wrapper', this.wrapper)
+                                        .filter(item => item.dataset.attr === attr)[0];
             d.query('input', attrEditorWrapper)['value'] = fields[attr];
         }
     }
@@ -300,7 +303,8 @@ export class FlowEditor extends FormCom {
 
     destroy() {
         this.initEvents.off();
-        FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 && FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
+        FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 &&
+                FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
         FlowEditor.DropDowns.forEach(dropdown => {
             Object.keys(this.dropdowns).forEach(attr => {
                d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
