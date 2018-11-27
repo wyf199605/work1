@@ -49,6 +49,13 @@ export class TextInput extends FormCom {
             this.set(this.get());
         });
 
+        //ios软键盘下去后body滚动的距离还原
+        if(tools.isMb){
+            d.on(this.input, 'blur', () => {
+                document.body.scrollTop = 0;
+            })
+        }
+
     }
 
     protected keyHandle = (e : KeyboardEvent) => {};

@@ -72,13 +72,17 @@ export class ListItemDetail {
         }
     }
     private createFormWrapper(field: R_Field, wrapper: HTMLElement): HTMLElement {
-        let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
-        let formGroupWrapper = <div className="detail-cell" data-name={field.name}
-                                    data-type={field.comType} data-element-type={elementType}>
-            <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
-        </div>;
-        wrapper.appendChild(formGroupWrapper);
-        return formGroupWrapper
+        if (field.comType === 'file' || field.comType === 'img') {
+            return wrapper;
+        } else {
+            let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
+            let formGroupWrapper = <div className="detail-cell" data-name={field.name}
+                                        data-type={field.comType} data-element-type={elementType}>
+                <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
+            </div>;
+            wrapper.appendChild(formGroupWrapper);
+            return formGroupWrapper;
+        }
     }
     // 初始化详情数据
     initDetailData(): Promise<obj> {
@@ -155,6 +159,7 @@ export class ListItemDetail {
                 (cells[key] as ListItemDetailCell).render(data[key] || '');
             }
         }else{
+            data = this.defaultData;
             for (let key in cells) {
                 (cells[key] as FormCom).set(data[key] || '');
             }
@@ -426,8 +431,13 @@ export class ListItemDetail {
                     tools.isNotEmpty(addrArr) && addrArr.forEach(md5 => {
                         // 根据md5获取文件地址
                         arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
+                        // if(tools.isMb){
+                        //     arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
+                        // }else{
+                        //     arr.push(md5);
+                        // }
                     });
-                    v = arr;
+                    v = arr.join(',');
                 } else {
                     v = [];
                 }

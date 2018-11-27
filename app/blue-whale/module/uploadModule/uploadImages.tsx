@@ -193,36 +193,35 @@ export class UploadImages extends FormCom {
             text: ''
         });
         this.uploader = uploader;
-        if (tools.isMb)
         // 文件加入到上传队列，开始上传
-            this.uploader.on('filesQueued', (files: File[]) => {
-                if (files.length > 0) {
-                    this.para.onChange && this.para.onChange();
-                    //开始上传
-                    if (!this.loading) {
-                        this.loading = new Loading({
-                            msg: '上传中...',
-                            container: document.body
-                        });
-                        document.body.classList.add('up-disabled');
-                    }
-                    switch (this.imgType) {
-                        case '20':
-                        case '27': {
-                            if (files.length = 1) {
-                                this.uploader.upload(this.typeUnique);
-                            } else {
-                                Modal.alert('请只上传一张图片!');
-                            }
-                        }
-                            break;
-                        case '28': {
-                            this.uploader.upload(this.typeUnique);
-                        }
-                            break;
-                    }
+        this.uploader.on('filesQueued', (files: File[]) => {
+            if (files.length > 0) {
+                this.para.onChange && this.para.onChange();
+                //开始上传
+                if (!this.loading) {
+                    this.loading = new Loading({
+                        msg: '上传中...',
+                        container: document.body
+                    });
+                    document.body.classList.add('up-disabled');
                 }
-            });
+                switch (this.imgType) {
+                    case '20':
+                    case '27': {
+                        if (files.length = 1) {
+                            this.uploader.upload(this.typeUnique);
+                        } else {
+                            Modal.alert('请只上传一张图片!');
+                        }
+                    }
+                        break;
+                    case '28': {
+                        this.uploader.upload(this.typeUnique);
+                    }
+                        break;
+                }
+            }
+        });
         // 上传错误时调用
         uploader.on("uploadError", (file, res) => {
             if (this.loading) {
@@ -291,6 +290,11 @@ export class UploadImages extends FormCom {
     // 渲染附件列表
     render(data: IImage[]) {
         if (tools.isEmpty(data)) {
+            this.listItems.forEach(item => {
+               item.destroy();
+            });
+            this._imgs = [];
+            this._listItems = [];
             return;
         }
         d.diff(data, this.listItems, {

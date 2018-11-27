@@ -128,6 +128,10 @@ export class FastBtnTable extends FastTable{
             d.append(searchEl, input);
             d.append(this.btnWrapper, searchEl);
             d.classAdd(this.wrapper, 'has-top-search');
+            tools.isMb && d.on(input, 'blur', () => {
+                document.body.scrollTop = 0;
+            });
+
             d.on(input, 'keyup', tools.pattern.debounce(() => {
                 let val = input.value;
                 if(val !== prevValue){

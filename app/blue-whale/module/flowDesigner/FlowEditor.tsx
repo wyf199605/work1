@@ -11,8 +11,9 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 import {BwRule} from "../../common/rule/BwRule";
 import CONF = BW.CONF;
+import {ContactsModule} from "./ContactsModule";
 
-export interface IFieldPara{
+export interface IFieldPara {
     name?: string;  // 名称
     displayName?: string;   // 显示名称
     expr?: string;  // 决策表达式
@@ -64,15 +65,14 @@ export class FlowEditor extends FormCom {
         performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
         assignee: [
-            {value: ':currentuserid', text: '登录用户'},
-            {value: '', text: '角色'},
+            {value: '', text: '用户'},
             {value: '_group', text: '用户组'},
-            {value: '#', text: 'valueList用户配置'},
+            {value: '#', text: '脚本配置'},
         ]
     };
 
     static addressList = [
-        {text: 'valueList用户配置', address: CONF.ajaxUrl.test}
+        {text: '用户', address: CONF.ajaxUrl.test}
     ];
 
     private owner: Component | FlowDesigner;
@@ -91,11 +91,11 @@ export class FlowEditor extends FormCom {
         // flowEditor初始化
         this.initFlowEditor(para);
         this.initEvents.on();
-        if(para.fields){
+        if (para.fields) {
             let fields = para.fields;
             // 查看流程时获取的数据也要进行转换
             Object.keys(fields).forEach(key => {
-                if(key in FlowEditor.DROPDOWN_KEYVALUE){
+                if (key in FlowEditor.DROPDOWN_KEYVALUE) {
                     let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
                     valueText && (fields[key] = valueText.text);
                 }
@@ -105,13 +105,13 @@ export class FlowEditor extends FormCom {
     }
 
     // 隐藏所有下拉列表
-    static hideAllDropdown(){
+    static hideAllDropdown() {
         FlowEditor.DropDowns.forEach(dropdown => dropdown.hideList());
     }
 
-    private initFlowEditor(para: IFlowEditorPara){
+    private initFlowEditor(para: IFlowEditorPara) {
         // 根据类型判断节点具有的属性(如果在类型属性限定表中没有该类型的话，则类型默认为other，只有name和displayName两个属性)
-        FlowEditor.ATTR_LIMIT[para.type in FlowEditor.ATTR_LIMIT? para.type: 'other'].forEach(attr => {
+        FlowEditor.ATTR_LIMIT[para.type in FlowEditor.ATTR_LIMIT ? para.type : 'other'].forEach(attr => {
             // 初始化时将start和end节点的name设为start/end
             let name = ((para.type === 'start' || para.type === 'end') && attr === 'name') ? para.type : '',
                 attrEditorWrapper = <div className="attr-editor-wrapper" data-attr={attr}>
@@ -120,10 +120,10 @@ export class FlowEditor extends FormCom {
                         <input type="text" value={name} readOnly={attr in FlowEditor.DROPDOWN_KEYVALUE}/>
                     </div>
                 </div>;
-            if(attr in FlowEditor.DROPDOWN_KEYVALUE){
+            if (attr in FlowEditor.DROPDOWN_KEYVALUE) {
                 // 添加下拉按钮
                 d.append(d.query('.attr-editor-input', attrEditorWrapper),
-                            <i className="floweditor-dropdown appcommon app-xiala"></i>);
+                    <i className="floweditor-dropdown appcommon app-xiala"></i>);
                 let dropdownWrapper = <div className="dropdown-wrapper" data-attr={attr}>
                     {/*<div className="dropdown-title"></div>*/}
                 </div>;
@@ -132,11 +132,26 @@ export class FlowEditor extends FormCom {
                     el: dropdownWrapper,
                     inline: true,
                     onSelect: (item, index) => {
-                        this.set({[attr]: item.text});
+                        item.text !== FlowEditor.addressList[0].text && this.set({[attr]: item.text});
                         FlowEditor.hideAllDropdown();
-                        if(item.text === FlowEditor.addressList[0].text){
+                        if (item.text === FlowEditor.addressList[0].text) {
                             BwRule.Ajax.fetch(FlowEditor.addressList[0].address).then(({response}) => {
-                                console.log(response);
+                                let field = response.body.elements[0].fields[1];
+                                new ContactsModule({
+                                    field: field,
+                                    onGetData: (datas) => {
+                                        let userName = [],
+                                            userId = [];
+                                        datas.forEach(data => {
+                                            userName.push(data['USERNAME']);
+                                            userId.push(data['USERID'].toLowerCase());
+                                        });
+                                        FlowEditor.DROPDOWN_KEYVALUE[attr][0].value = userId.join(',');
+                                        FlowEditor.DROPDOWN_KEYVALUE[attr][0].text = userName.join(',');
+                                        this.set({[attr]: FlowEditor.DROPDOWN_KEYVALUE[attr][0].text});
+                                        return;
+                                    }
+                                });
                             }).catch(err => {
                                 console.log(err);
                             });
@@ -155,42 +170,42 @@ export class FlowEditor extends FormCom {
 
     public initEvents = (() => {
         let clickHandler = (e) => {
-            // 点击文字描述也能使input获得焦点,并且记录当前input的值为旧值
-            let input;
-            if(e.target.className.split().includes('attr-editor-wrapper')){
-                input = d.query('input', e.target) as HTMLInputElement;
-            }else{
-                input = d.query('input', e.target.parentElement) as HTMLInputElement;
-            }
-            input.focus();
-            input.dataset.old = input.value;
-        },
-        changeHandler = (e) => {
-            // name不能相同
-            if(FlowEditor.EXIST_NAME.includes(e.target.value)){
-                // 如果name已经存在，则重置为旧值
-                Modal.toast('该名称已存在!');
-                e.target.value = e.target.dataset.old;
-            }else{
-                // 否则将改变的值从已存在name中删除，并将旧值置为当前值
-                let currentValue = e.target.value;
-                FlowEditor.EXIST_NAME.forEach((value, index, arr) => {
-                    if(value === e.target.dataset.old){
-                        arr.splice(index, 1);
-                    }
-                });
-                e.target.dataset.old = currentValue;
-                // 添加到已存在name列表中
-                currentValue && !FlowEditor.EXIST_NAME.includes(currentValue) && FlowEditor.EXIST_NAME.push(currentValue);
-            }
-        },
-        dropdownToggleClickHandler = (e) => {
-            // 首先隐藏所有下拉列表，然后（显示/隐藏）当前选择的下拉列表
-            let dropdown = this.dropdowns[d.closest(e.target, '.attr-editor-wrapper', this.wrapper).dataset['attr']],
-                prevState = dropdown.isVisible;
-            FlowEditor.hideAllDropdown();
-            prevState ? dropdown.hideList() : dropdown.showList();
-        };
+                // 点击文字描述也能使input获得焦点,并且记录当前input的值为旧值
+                let input;
+                if (e.target.className.split().includes('attr-editor-wrapper')) {
+                    input = d.query('input', e.target) as HTMLInputElement;
+                } else {
+                    input = d.query('input', e.target.parentElement) as HTMLInputElement;
+                }
+                input.focus();
+                input.dataset.old = input.value;
+            },
+            changeHandler = (e) => {
+                // name不能相同
+                if (FlowEditor.EXIST_NAME.includes(e.target.value)) {
+                    // 如果name已经存在，则重置为旧值
+                    Modal.toast('该名称已存在!');
+                    e.target.value = e.target.dataset.old;
+                } else {
+                    // 否则将改变的值从已存在name中删除，并将旧值置为当前值
+                    let currentValue = e.target.value;
+                    FlowEditor.EXIST_NAME.forEach((value, index, arr) => {
+                        if (value === e.target.dataset.old) {
+                            arr.splice(index, 1);
+                        }
+                    });
+                    e.target.dataset.old = currentValue;
+                    // 添加到已存在name列表中
+                    currentValue && !FlowEditor.EXIST_NAME.includes(currentValue) && FlowEditor.EXIST_NAME.push(currentValue);
+                }
+            },
+            dropdownToggleClickHandler = (e) => {
+                // 首先隐藏所有下拉列表，然后（显示/隐藏）当前选择的下拉列表
+                let dropdown = this.dropdowns[d.closest(e.target, '.attr-editor-wrapper', this.wrapper).dataset['attr']],
+                    prevState = dropdown.isVisible;
+                FlowEditor.hideAllDropdown();
+                prevState ? dropdown.hideList() : dropdown.showList();
+            };
 
         // 使用this.wrapper会使得点击.tip-header时，第一个input获得焦点，对change事件没有影响
         // let tipBody = d.query('.tip-body', this.wrapper);
@@ -223,19 +238,21 @@ export class FlowEditor extends FormCom {
 
     // 节点类型
     private _type: string;
-    get type(){
+    get type() {
         return this._type;
     }
-    set type(type: string){
+
+    set type(type: string) {
         this._type = type;
     }
 
     // 存放当前flowEditor的下拉列表
     private _dropdowns = {};
-    get dropdowns(){
+    get dropdowns() {
         return this._dropdowns;
     }
-    set dropdowns(dropdowns: object){
+
+    set dropdowns(dropdowns: object) {
         this._dropdowns = dropdowns;
     }
 
@@ -248,66 +265,69 @@ export class FlowEditor extends FormCom {
         *   如果是Component，那么只有当前为显示状态并且准备隐藏的时候，才更新节点的data-name和文本
         * */
         let fields = this.get();
-        if(this.owner && this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) &&
-                tools.isNotEmpty(this.show) && !show && this.show !== show){
+        if (this.owner && this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) &&
+            tools.isNotEmpty(this.show) && !show && this.show !== show) {
             this.owner['wrapper'].dataset.name = fields.name;
             let limitLength = 50,
                 limitDisplayName = fields.displayName.length > limitLength ? fields.displayName.slice(0, limitLength) + '...' : fields.displayName;
-            if(this.owner['isEnd'] || this.owner['isStart']){
+            if (this.owner['isEnd'] || this.owner['isStart']) {
                 // 如果节点是开始或结束节点，则不需要更新文本
-            }else if(this.owner['isDiamond']){
+            } else if (this.owner['isDiamond']) {
                 // 如果是菱形，则更新diamond-text里的文本
                 d.query('.diamond-text', this.owner['wrapper']).textContent = limitDisplayName || this.type;
-            }else if(this.owner instanceof LineItem){
+            } else if (this.owner instanceof LineItem) {
                 // 是连接线，除非有值否则不显示文本，并且要设置文本显示的位置
                 this.owner['wrapper'].textContent = limitDisplayName || '';
                 this.owner.setTextWrapperPosition();
-            }else{
+            } else {
                 // 是矩形就在wrapper上更新
                 this.owner['wrapper'].textContent = limitDisplayName || this.type;
             }
-        }else if(this.owner instanceof FlowDesigner){
+        } else if (this.owner instanceof FlowDesigner) {
             fields.name && (d.query('#design-canvas').dataset.name = fields.name);
         }
         this._show = show;
         this.wrapper && this.wrapper.classList.toggle('hide', !show);
     }
+
     get show() {
         return this._show;
     }
 
     // 获取和设置flowEditor
-    get(){
+    get() {
         let fields: IFieldPara = {};
         d.queryAll('.attr-editor-wrapper', this.wrapper).forEach(item => {
             fields[item.dataset.attr] = d.query('input', item)['value'];
         });
         return fields;
     }
-    set(fields: IFieldPara){
-        for(let attr in fields){
+
+    set(fields: IFieldPara) {
+        for (let attr in fields) {
             let attrEditorWrapper = d.queryAll('.attr-editor-wrapper', this.wrapper)
-                                        .filter(item => item.dataset.attr === attr)[0];
+                .filter(item => item.dataset.attr === attr)[0];
             d.query('input', attrEditorWrapper)['value'] = fields[attr];
         }
     }
 
     public _value: IFieldPara;
-    get value(){
+    get value() {
         this._value = this.get();
         return this._value;
     }
-    set value(value: IFieldPara){
+
+    set value(value: IFieldPara) {
         this.set(value);
     }
 
     destroy() {
         this.initEvents.off();
         FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 &&
-                FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
+        FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
         FlowEditor.DropDowns.forEach(dropdown => {
             Object.keys(this.dropdowns).forEach(attr => {
-               d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
+                d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
             });
         });
         this.owner = null;

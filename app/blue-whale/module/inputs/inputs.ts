@@ -133,7 +133,9 @@ export class Inputs {
             this.dataCover(ftable, response);
         }
 
-        this.logTip(showText);
+        if(catType !== 2 && catType !== 3){
+            this.logTip(showText);
+        }
 
         if(atvarObj){
             this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl);

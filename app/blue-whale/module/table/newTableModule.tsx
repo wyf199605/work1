@@ -645,6 +645,7 @@ export class NewTableModule {
     edit = (() => {
 
         let self = this,
+            isOnce = true,
             editModule: EditModule = null;
 
         let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
@@ -818,12 +819,16 @@ export class NewTableModule {
             });
 
             // 控件销毁时验证
-            bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
-                validate(cell);
-            });
+            if(isOnce){
+                isOnce = false;
+                bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
+                    validate(TableEditModule, cell);
+                });
+            }
+        };
 
-            let validate = (cell: FastTableCell) => {
-                // debugger;
+        let validate = (TableEditModule: typeof EditModule, cell: FastTableCell): Promise<any> => {
+            return new Promise((resolve, reject) => {
                 let name = cell.name,
                     field: R_Field = cell.column.content,
                     fastRow = cell.frow,
@@ -843,12 +848,13 @@ export class NewTableModule {
 
                 if (result && result[name]) {
                     cell.errorMsg = result[name].errMsg;
+                    resolve();
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
                     TableEditModule.checkValue(field, rowData, () => {
                         cell.data = null;
                         lookUpCell && (lookUpCell.data = null);
-                    })
+                    }, name)
                         .then((res) => {
                             let {errors, okNames} = res;
                             Array.isArray(errors) && errors.forEach(err => {
@@ -862,13 +868,18 @@ export class NewTableModule {
 
                             Array.isArray(okNames) && okNames.forEach(name => {
                                 cell.errorMsg = null;
-                            })
+                            });
+
+                            resolve();
                         });
                 } else {
                     cell.errorMsg = '';
+                    resolve();
                     // callback(td, true);
                 }
-            };
+            })
+            // debugger;
+
         };
 
         let editModuleLoad = (): Promise<typeof EditModule> => {
@@ -947,39 +958,41 @@ export class NewTableModule {
 
         let save = () => {
             return editModule.assignPromise.then(() => {
-                let saveData = editDataGet();
-                if (tools.isEmpty(saveData.param)) {
-                    Modal.toast('没有数据改变');
-                    cancel();
-                    this.editBtns.end();
-                    return
-                }
-
-                let loading = new Loading({
-                    msg: '保存中',
-                    disableEl: this.main.wrapper
-                });
-
-                BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
-                    type: 'POST',
-                    data: saveData,
-                }).then(({response}) => {
-
-                    BwRule.checkValue(response, saveData, () => {
-                        this.currentSelectedIndexes = [];
-                        // 主表子表刷新
-                        this.refresh();
-                        Modal.toast(response.msg);
-                        this.editBtns.end();
-                        // loading && loading.destroy();
-                        // loading = null;
+                setTimeout(() => {
+                    let saveData = editDataGet();
+                    if (tools.isEmpty(saveData.param)) {
+                        Modal.toast('没有数据改变');
                         cancel();
-                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
-                    });
-                }).finally(() => {
-                    loading && loading.destroy();
-                    loading = null;
-                });
+                        this.editBtns.end();
+                        return
+                    }
+                    this.saveVerify.then(() => {
+                        let loading = new Loading({
+                            msg: '保存中',
+                            disableEl: this.main.wrapper
+                        });
+                        BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
+                            type: 'POST',
+                            data: saveData,
+                        }).then(({response}) => {
+
+                            BwRule.checkValue(response, saveData, () => {
+                                this.currentSelectedIndexes = [];
+                                // 主表子表刷新
+                                this.refresh();
+                                Modal.toast(response.msg);
+                                this.editBtns.end();
+                                // loading && loading.destroy();
+                                // loading = null;
+                                cancel();
+                                tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                            });
+                        }).finally(() => {
+                            loading && loading.destroy();
+                            loading = null;
+                        });
+                    }).catch();
+                }, 200);
             });
         };
 
@@ -1035,6 +1048,18 @@ export class NewTableModule {
             rowCanInit
         }
     })();
+
+    get saveVerify(){
+        return new Promise((resolve, reject) => {
+            let isSave = this.main.ftable.isSave
+                && (this.sub[this.subTabActiveIndex] ? this.sub[this.subTabActiveIndex].ftable.isSave : true);
+            if(isSave){
+                resolve()
+            }else{
+                Modal.alert('您输入的内容有错误信息，请改正后再保存。', '温馨提示', () => reject());
+            }
+        });
+    }
 
     protected static initAssignData(assignAddr: R_ReqAddr, data: obj) {
         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(assignAddr, data), {

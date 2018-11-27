@@ -147,6 +147,14 @@ export class FastTable extends Component {
 
     }
 
+    get isSave(){
+        return this.rows ? this.rows.every((row) => {
+            return row.cells.every((cell) => {
+                return (!cell.show || cell.isVirtual) ? true : tools.isEmpty(cell.errorMsg);
+            })
+        }) : true;
+    }
+
     // 重新计算表格宽度
     recountWidth (){
         this.tablesEach(table => {

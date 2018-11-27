@@ -83,7 +83,13 @@ export class FlowListPC extends BasicPage{
             });
             tab.active(0);
         }
-
+        // window.addEventListener('resize',()=>{
+        //     if(document.activeElement.tagName == 'INPUT'){
+        //         window.setTimeout(()=>{
+        //             document.activeElement.scrollIntoView();
+        //         },100);
+        //     }
+        // });
         // Shell触发的刷新事件
         this.on(BwRule.EVT_REFRESH, () => {
             this.subTables[this.currentIndex].tableModule.refresh().catch();
@@ -92,6 +98,6 @@ export class FlowListPC extends BasicPage{
         this.on(BW.EVT_SHOW_PAGE, () => {
             let table: NewTableModule = this.subTables[this.currentIndex].tableModule;
             table && table.responsive();
-        })
+        });
     }
 }

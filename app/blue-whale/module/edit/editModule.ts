@@ -22,7 +22,6 @@ import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/vali
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
-// import {Accessory} from "../flowReport/Accessory";
 
 interface ComInitFun{
     (para: ComInitP): FormCom
@@ -629,25 +628,24 @@ export class EditModule {
         return {start};
     })();
 
-    static checkValue(field: R_Field, rowData: obj, clear:Function): Promise<CheckValueResult> {
-        let name = field.name,
-            chkAddr = field.chkAddr,
-            checkCols = field.chkAddr.varList.map(v => v.varName),
-            emptyCheckResult: CheckValueResult = {errors:[], okNames:[]};
+    static checkValue(field: R_Field, rowData: obj, clear:Function, name = field.name): Promise<CheckValueResult> {
+        let chkAddr = field.chkAddr;
+            // checkCols = field.chkAddr.varList.map(v => v.varName),
+            // emptyCheckResult: CheckValueResult = {errors:[], okNames:[]};
 
-        for (let colName of checkCols){
-            if(rowData[colName] === null || (typeof rowData[colName]) === 'undefined'){
-                emptyCheckResult.errors.push({name: colName, msg: '不能为空'});
-            }else{
-                emptyCheckResult.okNames.push(colName)
-            }
-        }
+        // for (let colName of checkCols){
+        //     if(rowData[colName] === null || (typeof rowData[colName]) === 'undefined'){
+        //         emptyCheckResult.errors.push({name: colName, msg: '不能为空'});
+        //     }else{
+        //         emptyCheckResult.okNames.push(colName)
+        //     }
+        // }
 
         return new Promise((resolve) => {
-            if(emptyCheckResult.errors[0]) {
-                resolve(emptyCheckResult);
-                return;
-            }
+            // if(emptyCheckResult.errors[0]) {
+            //     resolve(emptyCheckResult);
+            //     return;
+            // }
 
             let {addr, data} = BwRule.reqAddrFull(chkAddr, rowData);
 
@@ -674,13 +672,13 @@ export class EditModule {
                                 if (!flag) {
                                     clear();
                                 }
+                                resolve({
+                                    okNames: chkAddr.varList.map(v => v.varName)
+                                });
                             }
                         });
                     }
 
-                    resolve({
-                        okNames: chkAddr.varList.map(v => v.varName)
-                    });
                 }
             }).catch(() => {
                 resolve({

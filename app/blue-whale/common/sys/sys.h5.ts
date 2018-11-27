@@ -1,6 +1,7 @@
 // import GLOBAL_CONF = require('conf.ts');
 namespace BW{
     import tools = G.tools;
+    import d = G.d;
 
     export class SYSH5 implements SYS_Type{
         public os: string;
@@ -102,8 +103,12 @@ namespace BW{
                 openImg: function (url: string) {
 
                 },
-                download: function (url: string) {
-                    window.location.href = url;
+                download: function (url: string, fileName?: string) {
+                    let a = d.create(`<a href="${url}" download="${fileName}"></a>`);
+                    d.append(document.body, a);
+                    a.click();
+                    d.remove(a);
+                    a = null;
                 },
                 firePreviousPage: function () {
                     

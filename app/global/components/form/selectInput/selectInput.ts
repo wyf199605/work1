@@ -134,7 +134,7 @@ export class SelectInput extends TextInput {
     }
 
     set value(data) {
-        if(typeof data === 'object'){
+        if(data !== null && typeof data === 'object'){
             let {value, text} = data;
             if (!this.dropdown.select(value)) {
                 this.defaultVal = value;
