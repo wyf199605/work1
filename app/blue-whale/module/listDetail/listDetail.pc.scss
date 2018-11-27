@@ -1,13 +1,13 @@
-.fl-pc{
-  .list-item-detail-pc{
-    .list-item-detail-buttons{
+.fl-pc {
+  .list-item-detail-pc {
+    .list-item-detail-buttons {
       display: flex;
       align-items: center;
       padding: 10px 0 15px 0;
-      .item-buttons{
+      .item-buttons {
         margin-right: 60px;
       }
-      button.btn.button-type-default{
+      button.btn.button-type-default {
         background-color: #ffffff;
         border-radius: 3px;
         border: solid 1px #e2e2e2;
@@ -17,52 +17,71 @@
         padding-left: 14px;
         padding-right: 14px;
         margin-right: 20px;
-        &.list-detail-btn{
+        &.list-detail-btn {
           border: solid 1px #005bac;
           color: #005bac;
         }
       }
     }
-    .list-detail-cells-wrapper{
+    .list-detail-cells-wrapper {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      .detail-cell{
+      .accessory-wrapper {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        height: 82px;
+        border: solid 1px #e2e2e2;
+        .accessory-title {
+          flex-shrink: 0;
+          flex-grow: 0;
+          width: 260px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          background-color: #f7f8fa;
+          border-right: solid 1px #dddddd;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          padding-left: 22px;
+        }
+        .accessory-body {
+          height: 100%;
+          background-color: #ffffff;
+          width: calc(100% - 260px);
+        }
+      }
+      .detail-cell {
         width: 33.33%;
         display: flex;
         align-items: center;
         justify-content: flex-start;
         height: 44px;
-        &:nth-child(3n){
-          &>.text-input{
-            border-right: solid 1px #e2e2e2;
-          }
+        border: solid 1px #e2e2e2;
+        &:nth-child(3n) {
+          border-left: none;
         }
-        &:nth-child(n+4){
-          .detail-cell-title{
-            border-top: none;
-          }
-          &>.text-input{
-            border-top: none;
-          }
+        &:nth-child(3n + 2) {
+          border-left: none;
         }
-        &>.text-input{
+        & > .text-input {
           height: 100%;
           background-color: #ffffff;
-          border-top: solid 1px #e2e2e2;
-          border-bottom: solid 1px #e2e2e2;
           width: calc(100% - 170px);
-          &>input{
+          & > input {
             height: 100%;
           }
-          &>.btn-group{
-            &>a.icon{
+          & > .btn-group {
+            & > a.icon {
               display: flex;
               align-items: center;
             }
           }
         }
-        .detail-cell-title{
+        .detail-cell-title {
           flex-shrink: 0;
           flex-grow: 0;
           width: 170px;
@@ -70,7 +89,7 @@
           text-overflow: ellipsis;
           white-space: nowrap;
           background-color: #f7f8fa;
-          border: solid 1px #dddddd;
+          border-right: solid 1px #dddddd;
           height: 100%;
           display: flex;
           align-items: center;
@@ -97,23 +116,23 @@
         background-color: #ffffff;
         padding-right: 16px;
         //border-bottom: 1px solid #e2e2e2;
-        &.disabled{
-          .detail-cell-title[data-input-type="input"]~.text-input>input{
+        &.disabled {
+          .detail-cell-title[data-input-type="input"] ~ .text-input > input {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
           }
         }
-        .text-input{
+        .text-input {
           color: #666666;
           border: 1px solid #ccc;
           border-radius: 5px;
-          & > .btn-group .icon{
+          & > .btn-group .icon {
             display: flex;
             display: -webkit-flex;
             align-items: center;
           }
-          &>input{
+          & > input {
             height: 100%;
             margin-bottom: 0;
             font-size: 14px;
@@ -126,7 +145,7 @@
           max-width: 180px;
           font-size: 14px;
         }
-        .detail-cell-title[data-input-type="datetime"]~.text-input>input{
+        .detail-cell-title[data-input-type="datetime"] ~ .text-input > input {
           pointer-events: none;
         }
       }

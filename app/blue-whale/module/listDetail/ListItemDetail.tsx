@@ -72,13 +72,17 @@ export class ListItemDetail {
         }
     }
     private createFormWrapper(field: R_Field, wrapper: HTMLElement): HTMLElement {
-        let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
-        let formGroupWrapper = <div className="detail-cell" data-name={field.name}
-                                    data-type={field.comType} data-element-type={elementType}>
-            <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
-        </div>;
-        wrapper.appendChild(formGroupWrapper);
-        return formGroupWrapper
+        if (field.comType === 'file' || field.comType === 'img') {
+            return wrapper;
+        } else {
+            let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
+            let formGroupWrapper = <div className="detail-cell" data-name={field.name}
+                                        data-type={field.comType} data-element-type={elementType}>
+                <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
+            </div>;
+            wrapper.appendChild(formGroupWrapper);
+            return formGroupWrapper;
+        }
     }
     // 初始化详情数据
     initDetailData(): Promise<obj> {

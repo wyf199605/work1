@@ -22,7 +22,6 @@ import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/vali
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
-// import {Accessory} from "../flowReport/Accessory";
 
 interface ComInitFun{
     (para: ComInitP): FormCom
