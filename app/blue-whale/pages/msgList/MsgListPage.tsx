@@ -106,11 +106,11 @@ export class MsgListPage extends BasicPage {
             li = <li className={'msg-li ' + (obj.isread === 1 ? 'opacity-6' : '')}>
                 <div className="msg-title">{obj.content.caption || '消息提示'}</div>
                 <div className="msg-content">{obj.content.content}</div>
-                <div class="msg-last">
+                <div className="msg-last">
                     <div className="msg-time">时间：{obj.createDate}</div>
                     <div className="msg-sender">发送人：{obj.sender}</div>
                     {del = <div className="msg-del">
-                        <span class="iconfont icon-shanchu"></span>
+                        <span className="iconfont icon-shanchu"></span>
                         <span>删除</span>
                     </div>}
                 </div>

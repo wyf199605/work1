@@ -1,271 +1,256 @@
 
 
 .fl-pc{
-    .flow-modal {
-        width: 100%;
-        height: 100%;
-        $dropdown-attr-list: ('performType': 25px, 'taskType': 50px, 'assignee': 75px);    // 新增下拉列表时在此处添加属性
-        .modal-header {
-            background-color: #005bac;
-            .close {
-                opacity: 1;
-            }
-            .close, .close:hover {
-                color: #FFFFFF;
-            }
-            h1 {
-                width: 25%;
-                color: #FFFFFF;
-            }
-            .header-btn-right{
-                position: absolute;
-                top: 0;
-                right: 50px;
-                line-height: 38px;
-                .add-flow {
-                    font-size: 18px;
-                    color: #fff;
-                    cursor: pointer;
-                    padding: 0 15px;
-                    &:hover {
-                        opacity: 0.7;
-                    }
-                }
-            }
+  .flow-modal {
+    width: 100%;
+    height: 100%;
+    $dropdown-attr-list: ('performType': 25px, 'taskType': 50px, 'assignee': 75px);    // 新增下拉列表时在此处添加属性
+    .modal-header {
+      background-color: #005bac;
+      .close {
+        opacity: 1;
+      }
+      .close, .close:hover {
+        color: #FFFFFF;
+      }
+      h1 {
+        width: 25%;
+        color: #FFFFFF;
+      }
+    }
+    .modal-body {
+      background-color: #ecf5fd;
+      max-height: none !important;
+    }
+    .design-canvas {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      .dropdown-wrapper {
+        position: absolute;
+        right: 283px;
+        bottom: 20px;
+        // 新增列表时需要修改
+        $bottom: 25px !default;
+        @each $attr, $bottom in $dropdown-attr-list{
+          &[data-attr=#{$attr}]{
+            bottom: $bottom;
+          }
         }
-        .modal-body {
-            background-color: #ecf5fd;
-            max-height: none !important;
+        .dropdown-title {
+          width: 100%;
+          height: 24px;
         }
-        .design-canvas {
-            position: relative;
+        .dropdown-menu {
+          width: 100%;
+          height: 100%;
+          position: relative !important;
+          margin-right: 0;
+          overflow-y: auto;
+          top: 0;
+          .drop-item {
+            padding: 0;
+            height: 24px;
+            .drop-span {
+              line-height: 24px;
+            }
+          }
+        }
+      }
+    }
+    .tip-header {
+      height: 31px;
+      background-color: #005bac;
+      width: 100%;
+      color: #FFFFFF;
+      font-size: 14px;
+      line-height: 30px;
+      text-align: center;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .tips {
+      height: auto;
+      width: 150px;
+      background-color: #ffffff;
+      border-radius: 5px;
+      border: solid 1px #b6d1e0;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      .tip-items {
+        padding: 0 10px;
+        .tip-line {
+          width: 100%;
+          border-bottom: 1px solid #b6d1e0;
+        }
+        .tip-item {
+          padding: 3px 0;
+          height: 30px;
+          width: 100%;
+          user-select: none;
+          .task-item {
+            i {
+              width: 16px;
+            }
+          }
+          .tip-item-inner {
             width: 100%;
             height: 100%;
-            .dropdown-wrapper {
-                position: absolute;
-                right: 283px;
-                bottom: 20px;
-                // 新增列表时需要修改
-                $bottom: 25px !default;
-                @each $attr, $bottom in $dropdown-attr-list{
-                    &[data-attr=#{$attr}]{
-                        bottom: $bottom;
-                    }
-                }
-                .dropdown-title {
-                    width: 100%;
-                    height: 24px;
-                }
-                .dropdown-menu {
-                    width: 100%;
-                    height: 100%;
-                    position: relative !important;
-                    margin-right: 0;
-                    overflow-y: auto;
-                    top: 0;
-                    .drop-item {
-                        padding: 0;
-                        height: 24px;
-                        .drop-span {
-                            line-height: 24px;
-                        }
-                    }
-                }
-            }
-        }
-        .tip-header {
-            height: 31px;
-            background-color: #005bac;
-            width: 100%;
-            color: #FFFFFF;
-            font-size: 14px;
-            line-height: 30px;
-            text-align: center;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-        }
-        .tips {
-            height: auto;
-            width: 150px;
-            background-color: #ffffff;
-            border-radius: 5px;
-            border: solid 1px #b6d1e0;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 1001;
-            .tip-items {
-                padding: 0 10px;
-                .tip-line {
-                    width: 100%;
-                    border-bottom: 1px solid #b6d1e0;
-                }
-                .tip-item {
-                    padding: 3px 0;
-                    height: 30px;
-                    width: 100%;
-                    user-select: none;
-                    .task-item {
-                        i {
-                            width: 16px;
-                        }
-                    }
-                    .tip-item-inner {
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        align-items: center;
-                        padding-left: 20px;
-                        i {
-                            color: #254363;
-                            margin-right: 16px;
-                        }
-                        &.active {
-                            background-color: #f1f8ff;
-                        }
-                    }
-                }
-            }
-        }
-        svg {
-            z-index: 1000;
-        }
-        .flow-item {
-            position: absolute;
-            padding: 10px;
-            min-width: 100px;
-            min-height: 50px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            max-width: 160px;
-            border-radius: 5px;
-            border: solid 1px #b6d1e0;
-            background-color: #ffffff;
-            .inner-circle {
-                width: 18px;
-                height: 18px;
-                top: 10px;
-                left: 10px;
-                background-color: #b6d1e0;
-                border-radius: 50%;
-            }
-            &.end-circle, &.start-circle {
-                border-radius: 50%;
-                min-width: 40px;
-                min-height: 40px;
-                max-width: 40px;
-                width: 40px;
-                height: 40px;
-                border: solid 1px #b6d1e0;
-            }
-            &.complete{
-                border-color: #31ccff !important;
+            padding-left: 20px;
+            i {
+              color: #254363;
+              margin-right: 16px;
             }
             &.active {
-                border-color: #005bac !important;
-                &.diamond {
-                    border-color: #005bac;
-                }
-                .inner-circle {
-                    background-color: #005bac;
-                }
+              background-color: #f1f8ff;
             }
-            &.diamond {
-                min-width: 50px;
-                min-height: 50px;
-                max-width: 50px;
-                width: 50px;
-                height: 50px;
-                border: none;
-                transform: rotate(45deg);
-                border: solid 1px #b6d1e0;
-                background-color: #ffffff;
-                border-radius: 0;
-                .diamond-text {
-                    transform: rotate(-45deg);
-                }
-            }
+          }
         }
-        .lineItem {
-            position: absolute;
-            width: auto;
-            height: auto;
-            z-index: 1002;
-            user-select: none;
-        }
-        .flow-editor {
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
-            width: 260px;
-            height: auto;
-            background-color: #ffffff;
-            border-radius: 5px;
-            border: solid 1px #b6d1e0;
-            z-index: 1001;  // 需要设置，否则无法获取焦点
-            .tip-body{
-                min-height: 36px;
-                .attr-editor-wrapper{
-                    display: flex;
-                    justify-content: space-around;
-                    align-items: center;
-                    height: 36px;
-                    .attr-editor-description{
-                        width: 67px;
-                        text-align: right;
-                        color: #254363;
-                    }
-                    .attr-editor-input {
-                        width: 132px;
-                        height: 24px;
-                        position: relative;
-                        input{
-                            width: 132px;
-                            padding: 0 10px;
-                            line-height: 22px;
-                            background-color: #f5f9fb;
-                            border: solid 1px #b6d0e0;
-                            &:focus{
-                                border: solid 1px #005bac;
-                            }
-                        }
-                        .floweditor-dropdown {
-                            width: 24px;
-                            height: 22px;
-                            position: absolute;
-                            right: 0;
-                            top: 1px;
-                            background-color: #316390;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            color: #f5f9fb;
-                        }
-                    }
-                }
-            }
-        }
-        .flow-editor.hide {
-            display: none;
-        }
+      }
     }
+    svg {
+      z-index: 1000;
+    }
+    .flow-item {
+      position: absolute;
+      padding: 10px;
+      min-width: 100px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      max-width: 160px;
+      border-radius: 5px;
+      border: solid 1px #b6d1e0;
+      background-color: #ffffff;
+      .inner-circle {
+        width: 18px;
+        height: 18px;
+        top: 10px;
+        left: 10px;
+        background-color: #b6d1e0;
+        border-radius: 50%;
+      }
+      &.end-circle, &.start-circle {
+        border-radius: 50%;
+        min-width: 40px;
+        min-height: 40px;
+        max-width: 40px;
+        width: 40px;
+        height: 40px;
+        border: solid 1px #b6d1e0;
+      }
+      &.complete{
+        border-color: #31ccff !important;
+      }
+      &.active {
+        border-color: #005bac !important;
+        &.diamond {
+          border-color: #005bac;
+        }
+        .inner-circle {
+          background-color: #005bac;
+        }
+      }
+      &.diamond {
+        min-width: 50px;
+        min-height: 50px;
+        max-width: 50px;
+        width: 50px;
+        height: 50px;
+        border: none;
+        transform: rotate(45deg);
+        border: solid 1px #b6d1e0;
+        background-color: #ffffff;
+        border-radius: 0;
+        .diamond-text {
+          transform: rotate(-45deg);
+        }
+      }
+    }
+    .lineItem {
+      position: absolute;
+      width: auto;
+      height: auto;
+      z-index: 1002;
+      user-select: none;
+    }
+    .flow-editor {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      width: 260px;
+      height: auto;
+      background-color: #ffffff;
+      border-radius: 5px;
+      border: solid 1px #b6d1e0;
+      z-index: 1001;  // 需要设置，否则无法获取焦点
+      .tip-body{
+        min-height: 36px;
+        .attr-editor-wrapper{
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          height: 36px;
+          .attr-editor-description{
+            width: 67px;
+            text-align: right;
+            color: #254363;
+          }
+          .attr-editor-input {
+            width: 132px;
+            height: 24px;
+            position: relative;
+            input{
+              width: 132px;
+              padding: 0 10px;
+              line-height: 22px;
+              background-color: #f5f9fb;
+              border: solid 1px #b6d0e0;
+              &:focus{
+                border: solid 1px #005bac;
+              }
+            }
+            .floweditor-dropdown {
+              width: 24px;
+              height: 22px;
+              position: absolute;
+              right: 0;
+              top: 1px;
+              background-color: #316390;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              color: #f5f9fb;
+            }
+          }
+        }
+      }
+    }
+    .flow-editor.hide {
+      display: none;
+    }
+  }
 
-    .move-follow {
-        position: absolute;
-        opacity: 0.8;
-        z-index: 10003;
-        color: #000000;
-    }
+  .move-follow {
+    position: absolute;
+    opacity: 0.8;
+    z-index: 10003;
+    color: #000000;
+  }
 
-    .flowListPC {
-        height: calc(100% - 23px);
-        .tab-content {
-            height: calc(100% - 42px);
-            .tab-pane {
-                height: 100%;
-            }
-        }
+  .flowListPC {
+    height: calc(100% - 23px);
+    .tab-content {
+      height: calc(100% - 42px);
+      .tab-pane {
+        height: 100%;
+      }
     }
+  }
 }
