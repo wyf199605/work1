@@ -1,5 +1,6 @@
 .accessory-wrapper{
   .images-wrapper {
+    background-color: #ffffff;
     display: flex;
     display: -webkit-flex;
     align-items: center;
@@ -117,11 +118,13 @@
     }
   }
   .accessory-body{
+    background-color: #ffffff;
     display: flex;
     display: -webkit-flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 11px 0 14px;
+    height: 100%;
     .upload{
       display: flex;
       align-items: center;
@@ -142,6 +145,45 @@
       }
       i{
         margin-right: 10px;
+      }
+    }
+    .accessory-content-wrapper{
+      display: flex;
+      display: -webkit-flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: calc(100% - 140px);
+      .accessory-item{
+        display: flex;
+        display: -webkit-flex;
+        justify-content: flex-start;
+        align-items: center;
+        font-size: 14px;
+        height: 30px;
+        flex: 1 0 30px;
+        i{
+          color: #333333;
+        }
+        .file-name{
+          color: #333333;
+          margin-left: 15px;
+          width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .file-size{
+          color: #b0b0b0;
+          margin-left: 5px;
+        }
+        .deleteBtn{
+          color: #005bac;
+          margin-left: 18px;
+        }
       }
     }
   }

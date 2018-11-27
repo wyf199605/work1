@@ -1,18 +1,19 @@
 /// <amd-module name="AccessoryItem"/>
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
-import {IFileInfo,Accessory} from "./accessory";
-
-export interface IAccessoryItem extends IComponentPara{
-    list?:Accessory;
-    file?:IFileInfo;
-    index?:number;
+import {IFileInfo, Accessory} from "./accessory";
+import tools = G.tools;
+export interface IAccessoryItem extends IComponentPara {
+    list?: Accessory;
+    file?: IFileInfo;
+    index?: number;
 }
 
-export class AccessoryItem extends Component{
+export class AccessoryItem extends Component {
     protected list: Accessory;
+
     protected wrapperInit(para: IAccessoryItem): HTMLElement {
-        return <div className="accessory-item" data-index={para.index}>
+        return tools.isMb ? <div className="accessory-item" data-index={para.index}>
             <div className="file-wrapper">
                 <div className="file-icon"><i className="appcommon app-wenjian"/></div>
                 <div className="file-info">
@@ -21,19 +22,28 @@ export class AccessoryItem extends Component{
                 </div>
             </div>
             <div className="deleteBtn">删除</div>
+        </div> : <div className="accessory-item" data-index={para.index}>
+            <i className="iconfont icon-annex"/>
+            <div c-var="fileName" className="file-name"/>
+            <div c-var="fileSize" className="file-size"/>
+            <div className="deleteBtn">删除</div>
         </div>;
     }
 
-    constructor(private para:IAccessoryItem){
+    constructor(private para: IAccessoryItem) {
         super(para);
         this.list = para.list;
         this._index = para.index;
         para.file && this.render(para.file || {});
     }
 
-    render(data:IFileInfo){
+    render(data: IFileInfo) {
         this.innerEl.fileName.innerText = data.filename || '';
-        this.innerEl.fileSize.innerText = data.filesize ? this.calcFileSize(data.filesize) : '0B';
+        if (tools.isMb){
+            this.innerEl.fileSize.innerText = data.filesize ? this.calcFileSize(data.filesize) : '0B';
+        }else{
+            this.innerEl.fileSize.innerText = data.filesize ? `(${this.calcFileSize(data.filesize)})` : '(0B)';
+        }
     }
 
     // 获取当前索引
@@ -47,8 +57,8 @@ export class AccessoryItem extends Component{
         this.wrapper && (this.wrapper.dataset['index'] = index + '');
     }
 
-    private calcFileSize(limit:number){
-        if (limit <= 0){
+    private calcFileSize(limit: number) {
+        if (limit <= 0) {
             return '未知';
         }
         let size: string = "";
@@ -69,7 +79,7 @@ export class AccessoryItem extends Component{
         return size;
     }
 
-    destroy(){
+    destroy() {
         this.list = null;
         super.destroy();
     }

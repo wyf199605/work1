@@ -290,6 +290,11 @@ export class UploadImages extends FormCom {
     // 渲染附件列表
     render(data: IImage[]) {
         if (tools.isEmpty(data)) {
+            this.listItems.forEach(item => {
+               item.destroy();
+            });
+            this._imgs = [];
+            this._listItems = [];
             return;
         }
         d.diff(data, this.listItems, {
