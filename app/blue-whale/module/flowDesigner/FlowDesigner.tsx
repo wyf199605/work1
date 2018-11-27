@@ -176,8 +176,7 @@ export class FlowDesigner {
         this.initEvents.on();
         let _this = this;
 
-        // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程
-        // 如果没有则需要自己绘制流程
+        // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程；如果没有则需要自己绘制流程
         if (tools.isNotEmpty(responseData)){
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
             if(type === 'look'){
@@ -310,11 +309,9 @@ export class FlowDesigner {
         return {
             on: () => {
                 d.on(d.query('#design-canvas'), 'click', 'svg', clickSVG);
-
             },
             off: () => {
                 d.off(d.query('#design-canvas'), 'click', 'svg', clickSVG);
-
             },
         }
     })();

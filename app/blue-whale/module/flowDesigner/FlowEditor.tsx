@@ -65,15 +65,14 @@ export class FlowEditor extends FormCom {
         performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
         assignee: [
-            {value: ':currentuserid', text: '登录用户'},
-            {value: '', text: '角色'},
+            {value: '', text: '用户'},
             {value: '_group', text: '用户组'},
-            {value: '#', text: 'valueList用户配置'},
+            {value: '#', text: '脚本配置'},
         ]
     };
 
     static addressList = [
-        {text: 'valueList用户配置', address: CONF.ajaxUrl.test}
+        {text: '用户', address: CONF.ajaxUrl.test}
     ];
 
     private owner: Component | FlowDesigner;
@@ -133,15 +132,24 @@ export class FlowEditor extends FormCom {
                     el: dropdownWrapper,
                     inline: true,
                     onSelect: (item, index) => {
-                        this.set({[attr]: item.text});
+                        item.text !== FlowEditor.addressList[0].text && this.set({[attr]: item.text});
                         FlowEditor.hideAllDropdown();
                         if (item.text === FlowEditor.addressList[0].text) {
                             BwRule.Ajax.fetch(FlowEditor.addressList[0].address).then(({response}) => {
                                 let field = response.body.elements[0].fields[1];
                                 new ContactsModule({
                                     field: field,
-                                    onGetData: (data) => {
-                                        console.log(data);
+                                    onGetData: (datas) => {
+                                        let userName = [],
+                                            userId = [];
+                                        datas.forEach(data => {
+                                            userName.push(data['USERNAME']);
+                                            userId.push(data['USERID'].toLowerCase());
+                                        });
+                                        FlowEditor.DROPDOWN_KEYVALUE[attr][0].value = userId.join(',');
+                                        FlowEditor.DROPDOWN_KEYVALUE[attr][0].text = userName.join(',');
+                                        this.set({[attr]: FlowEditor.DROPDOWN_KEYVALUE[attr][0].text});
+                                        return;
                                     }
                                 });
                             }).catch(err => {

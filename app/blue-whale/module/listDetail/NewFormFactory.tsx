@@ -34,6 +34,7 @@ export interface NewFormEdit {
     type?: string;
     container?: HTMLElement;
     defaultData?: obj;
+    isModal?:boolean;
 }
 
 export class NewFormFactory {
@@ -160,6 +161,7 @@ export class NewFormFactory {
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 field: p.field,
                 pageData: this.para.defaultData,
+                isModal:this.para.isModal || false,
                 onComplete: (response) => {
                     let data = response.data,
                         type = p.field.dataType || p.field.atrrs.dataType;
