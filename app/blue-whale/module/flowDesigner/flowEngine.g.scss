@@ -17,21 +17,6 @@
                 width: 25%;
                 color: #FFFFFF;
             }
-            .header-btn-right{
-                position: absolute;
-                top: 0;
-                right: 50px;
-                line-height: 38px;
-                .add-flow {
-                    font-size: 18px;
-                    color: #fff;
-                    cursor: pointer;
-                    padding: 0 15px;
-                    &:hover {
-                        opacity: 0.7;
-                    }
-                }
-            }
         }
         .modal-body {
             background-color: #ecf5fd;

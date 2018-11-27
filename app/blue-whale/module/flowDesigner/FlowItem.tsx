@@ -31,18 +31,20 @@ export class FlowItem extends Component {
 
     static startCounter = 0;    // start节点的个数
     static endCounter = 0;      // end节点的个数
-
-    // 当前绘制出的 raphael 节点
-    private _rectNode: any;
-    get rectNode() {
-        return this._rectNode;
-    }
-
-    set rectNode(rectNode) {
-        this._rectNode = rectNode;
-    }
-
     private para: IFlowItemPara;
+
+    // 工具集里的start和end节点是否可用
+    static toggleDisabledStartAndEnd(){
+        let start = d.query('.tip-item-inner[data-name=start]'),
+            end = d.query('.tip-item-inner[data-name=end]');
+        if(!(start || end)){
+            return;
+        }
+        FlowItem.startCounter >= 1 ? start.style.pointerEvents = 'none' : start.style.pointerEvents = 'auto';
+        FlowItem.startCounter >= 1 ? start.style.opacity = '0.5' : start.style.opacity = '1.0';
+        FlowItem.endCounter >= 1 ? end.style.pointerEvents = 'none' : end.style.pointerEvents = 'auto';
+        FlowItem.endCounter >= 1 ? end.style.opacity = '0.5' : end.style.opacity = '1.0';
+    }
 
     constructor(para: IFlowItemPara) {
         super(para);
@@ -90,14 +92,25 @@ export class FlowItem extends Component {
         this.initEvents.on();
 
         let fields: IFieldPara = {};
-        this.isStart && Object.assign(fields, {name: 'start' + (FlowItem.startCounter ++).toString()});
-        this.isEnd && Object.assign(fields, {name: 'end' + (FlowItem.endCounter ++).toString()});
+        this.isStart && FlowItem.startCounter ++;
+        this.isEnd && FlowItem.endCounter ++;
+        (this.isStart || this.isEnd) && FlowItem.toggleDisabledStartAndEnd();
         this.flowEditor = new FlowEditor({
             type: para.type,
             container: d.query('#design-canvas'),
             owner: this,
             fields: para.fields || fields,
         });
+    }
+
+    // 当前绘制出的 raphael 节点
+    private _rectNode: any;
+    get rectNode() {
+        return this._rectNode;
+    }
+
+    set rectNode(rectNode) {
+        this._rectNode = rectNode;
     }
 
     // 所有关联的item
@@ -188,7 +201,7 @@ export class FlowItem extends Component {
         return this._text;
     }
 
-    initEvents = (() => {
+    public initEvents = (() => {
         return {
             on: () => {
                 this.rectNode.click(this.clickHandler());
@@ -213,16 +226,14 @@ export class FlowItem extends Component {
                 // 连接自己或连接相同名称的节点
                 let transitionFlag = null;
                 if (self === Tips.TransitionItems[0]) {
-                    Modal.toast('不能连接自己！');
-                }else if(Tips.TransitionItems[0] && self.flowEditor.get().name === Tips.TransitionItems[0].flowEditor.get().name){
-                    Modal.toast('名称相同，无法连接！');
+                    // Modal.toast('不能连接自己！');
+                }else if(Tips.TransitionItems[0] && self.flowEditor.get().name && self.flowEditor.get().name === Tips.TransitionItems[0].flowEditor.get().name){
+                    // Modal.toast('名称相同，无法连接！');
                 }else if(Tips.TransitionItems[0] && FlowDesigner.AllLineItems.filter(line =>
                         (line.from === Tips.TransitionItems[0].rectNode && line.to === self.rectNode && (transitionFlag = 'repeat')) ||
                         (line.from === self.rectNode && line.to === Tips.TransitionItems[0].rectNode && (transitionFlag = 'reverse')))[0]){
-                    // 禁用二次连接或反向连接
-                    self.active = false;
-                    transitionFlag === 'repeat' && Modal.toast('不能重复连线！');
-                    transitionFlag === 'reverse' && Modal.toast('不能反向连线！');
+                    // transitionFlag === 'repeat' && Modal.toast('不能重复连线！');
+                    // transitionFlag === 'reverse' && Modal.toast('不能反向连线！');
                 }else {
                     Tips.TransitionItems = arr.concat([self]);
                 }
@@ -413,6 +424,9 @@ export class FlowItem extends Component {
     }
 
     destroy() {
+        this.isStart && FlowItem.startCounter --;
+        this.isEnd && FlowItem.endCounter --;
+        FlowItem.toggleDisabledStartAndEnd();
         this.rectNode.remove();
         FlowDesigner.ALLITEMS.forEach((item, index, arr) => item === this && arr.splice(index, 1));
         this.initEvents.off();

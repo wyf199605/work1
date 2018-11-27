@@ -76,7 +76,7 @@ Raphael.fn.connection = function (obj1, obj2, line, bg) {
     }
 };
 
-const Method = {
+export const Method = {
     // 方法集合
     loadXMLStr: function (xmlStr: string) {
         // 从xml字符串中加载xml对象
@@ -152,7 +152,6 @@ export class FlowDesigner {
             body: body,
             header: {
                 title: '流程设计',
-                rightPanel: <i className="add-flow iconfont icon-jiahao"></i>,
             },
             className: 'flow-modal',
             width: '90%',
@@ -183,8 +182,6 @@ export class FlowDesigner {
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
             if(type === 'look'){
                 modal.modalHeader.title = '查看流程';
-                _this.initEvents.closeSaveFlowEvent();
-                d.remove(d.query('.header-btn-right'));
                 d.query('#design-canvas').style.pointerEvents = 'none';
             }else{
                 FlowDesigner.processId = responseData.data[0]['process_id'];
@@ -303,79 +300,18 @@ export class FlowDesigner {
             if (target.tagName === 'svg') {
                 FlowDesigner.removeAllActive();
                 Tips.removeActive();
+                FlowItem.toggleDisabledStartAndEnd();
             }
-        };
-        let saveFlowHandler = (e) => {
-            let allItems = [].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems),
-                allNames = [];
-            if(allItems.some(item => tools.isEmpty(item.flowEditor.get().name))){
-                Modal.toast('名称不能为空!');
-                return;
-            }
-            allItems.forEach(item => item.flowEditor.get().name && (allNames[item.flowEditor.get().name] =  allNames[item.flowEditor.get().name] + 1 || 1));
-            for(let attr of Object.keys(allNames)){
-                if(allNames[attr] > 1){
-                    Modal.toast(`名称${attr}重复！`);
-                    return;
-                }
-            }
-
-            let xmlDoc = Method.loadXMLStr(`<?xml version="1.0" encoding="UTF-8"?><process></process>`);
-            FlowDesigner.rootElement = xmlDoc.documentElement;
-            FlowDesigner.ALLITEMS.forEach(item => {
-                // 创建节点、设置属性、添加到xml节点树中
-                if(tools.isNotEmpty(item)){
-                    let xmlNode = Method.parseToXml.createXmlElement(item.flowEditor.type),
-                        attrs = item.rectNode.attrs,
-                        layoutStr = [attrs.cx || attrs.x, attrs.cy || attrs.y, attrs.r || attrs.width, attrs.r || attrs.height].join(),
-                        dropdowns = item.flowEditor.dropdowns,
-                        dropdownField: IFieldPara = {};
-                    // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
-                    Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 && (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
-                    Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get(), dropdownField));
-                    FlowDesigner.rootElement.appendChild(xmlNode);
-                }
-            });
-            // 再创建所有的连接线，并设置属性和作为谁的子节点
-            FlowDesigner.AllLineItems.forEach(line => {
-                let xmlNode = Method.parseToXml.createXmlElement(line.flowEditor.type),
-                    toItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.to)[0];
-                // 根据连接线的目标节点的属性设置连接线的属性
-                toItem && line.flowEditor && Method.parseToXml.setAttr(xmlNode, Object.assign({to: toItem.flowEditor.get().name}, line.flowEditor.get()));
-                // 首先获取连接线的来源节点，然后将连接线作为来源节点的子节点添加到xml节点树中
-                let fromItem = FlowDesigner.ALLITEMS.filter(item => item.rectNode === line.from)[0],
-                    fromNode = null;
-                FlowDesigner.rootElement.childNodes['forEach'](item => {
-                    if(fromItem && 'name' in item['attributes'] && fromItem.flowEditor.get().name === item['attributes'].getNamedItem('name').value){
-                        fromNode = item;
-                    }
-                });
-                fromNode && fromNode.appendChild(xmlNode);
-            });
-            
-            let xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
-            BwRule.Ajax.fetch(BW.CONF.ajaxUrl.modifyFlow + FlowDesigner.processId, {
-                type: 'POST',
-                data: {process: xmlStr},
-            }).then(({response}) => {
-                Modal.toast(response.msg);
-            }).catch((err) => {
-                console.log(err);
-            });
         };
 
         return {
             on: () => {
                 d.on(d.query('#design-canvas'), 'click', 'svg', clickSVG);
-                d.on(d.query('.add-flow'), 'click', saveFlowHandler);
+
             },
             off: () => {
                 d.off(d.query('#design-canvas'), 'click', 'svg', clickSVG);
-                d.off(d.query('.add-flow'), 'click', saveFlowHandler);
-            },
-            // 关闭新增流程按钮的点击事件，从xml中读取时不能新增流程
-            closeSaveFlowEvent: () => {
-                d.off(d.query('.add-flow'), 'click', saveFlowHandler);
+
             },
         }
     })();

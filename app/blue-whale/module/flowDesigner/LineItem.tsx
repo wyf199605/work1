@@ -16,8 +16,74 @@ export interface ILineItemPara extends IComponentPara {
 }
 
 export class LineItem extends Component {
+
+    static counter = 0;
+
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
         return <div className="lineItem"/>;
+    }
+
+    static removeAllActive() {
+        let arr = FlowDesigner.AllLineItems || [];
+        arr.forEach((item) => {
+            item.line.attr({
+                stroke: '#b6d1e0'
+            });
+            item.active = false;
+            item.flowEditor.show = false;
+        });
+    }
+
+    public setTextWrapperPosition() {
+        let path = this.line.attrs && this.line.attrs.path,
+            x1 = path[0][1],
+            y1 = path[0][2],
+            x2 = path[1][5],
+            y2 = path[1][6];
+        try {
+            let style = window.getComputedStyle(this.wrapper),
+                widthStr = style.width,
+                heightStr = style.height,
+                width = Number(widthStr.slice(0, widthStr.length - 2)),
+                height = Number(heightStr.slice(0, heightStr.length - 2));
+            this.wrapper.style.left = x1 + (x2 - x1) / 2 - width / 2 + 'px';
+            this.wrapper.style.top = y1 + (y2 - y1) / 2 - height / 2 + 'px';
+        }catch (e) {
+
+        }
+    }
+
+    constructor(para: ILineItemPara) {
+        super(para);
+        let arr = FlowDesigner.connections || [];
+        this.from = para.startNode;
+        this.to = para.endNode;
+        let line = FlowDesigner.PAPER.connection(this.from, this.to);
+        FlowDesigner.connections = arr.concat([line]);
+        line && (this.line = line.line);
+        this.wrapper.innerText = '';
+        this.setTextWrapperPosition();
+        this.isComplete && this.line.attr({stroke: '#31ccff'});
+        let _this = this;
+        line.line.click(function () {
+            if (_this.active === false) {
+                FlowDesigner.removeAllActive();
+                _this.line.attr({
+                    stroke: '#005bac'
+                });
+                _this.active = true;
+                _this.isComplete && _this.line.attr({stroke: '#31ccff'});
+            }
+        });
+
+        para.fields && para.fields.name && para.fields.name.indexOf('path') > -1 && (LineItem.counter = parseInt(para.fields.name[para.fields.name.length - 1]));
+        this.flowEditor = new FlowEditor({
+            type: 'transition',
+            container: d.query('#design-canvas'),
+            owner: this,
+            fields: Object.assign({name: `path${++ LineItem.counter}`}, para.fields),
+        });
+        this.initEvents.on();
     }
 
     private _line: any;
@@ -70,70 +136,6 @@ export class LineItem extends Component {
     }
     get to() {
         return this._to;
-    }
-
-    setTextWrapperPosition() {
-        let path = this.line.attrs && this.line.attrs.path,
-            x1 = path[0][1],
-            y1 = path[0][2],
-            x2 = path[1][5],
-            y2 = path[1][6];
-        try {
-            let style = window.getComputedStyle(this.wrapper),
-                widthStr = style.width,
-                heightStr = style.height,
-                width = Number(widthStr.slice(0, widthStr.length - 2)),
-                height = Number(heightStr.slice(0, heightStr.length - 2));
-            this.wrapper.style.left = x1 + (x2 - x1) / 2 - width / 2 + 'px';
-            this.wrapper.style.top = y1 + (y2 - y1) / 2 - height / 2 + 'px';
-        }catch (e) {
-
-        }
-    }
-
-    constructor(para: ILineItemPara) {
-        super(para);
-        let arr = FlowDesigner.connections || [];
-        this.from = para.startNode;
-        this.to = para.endNode;
-        let line = FlowDesigner.PAPER.connection(this.from, this.to);
-        FlowDesigner.connections = arr.concat([line]);
-        line && (this.line = line.line);
-        this.wrapper.innerText = '';
-        this.setTextWrapperPosition();
-        this.isComplete && this.line.attr({stroke: '#31ccff'});
-        let _this = this;
-        line.line.click(function () {
-            if (_this.active === false) {
-                FlowDesigner.removeAllActive();
-                _this.line.attr({
-                    stroke: '#005bac'
-                });
-                _this.active = true;
-                _this.isComplete && _this.line.attr({stroke: '#31ccff'});
-            }
-        });
-
-        this.flowEditor = new FlowEditor({
-            type: 'transition',
-            container: d.query('#design-canvas'),
-            owner: this,
-            fields: Object.assign({name: `path${LineItem.counter ++}`}, para.fields),
-        });
-        this.initEvents.on();
-    }
-
-    static counter = 0;
-
-    static removeAllActive() {
-        let arr = FlowDesigner.AllLineItems || [];
-        arr.forEach((item) => {
-            item.line.attr({
-                stroke: '#b6d1e0'
-            });
-            item.active = false;
-            item.flowEditor.show = false;
-        });
     }
 
     private _active: boolean;
