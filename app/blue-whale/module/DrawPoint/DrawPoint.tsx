@@ -6,6 +6,7 @@ import {IDrawFormatData} from "../plan/planModule";
 import tools = G.tools;
 import d = G.d;
 import {SubBtnMenu} from "../contextMenu/subBtnMenu";
+import sys = BW.sys;
 
 declare const D3;
 //开启描点连线功能
@@ -105,7 +106,7 @@ export class DrawPoint extends Component {
             .range([3, 0.5]);
         this.LR = D3.scale.linear()
             .domain([1, 6])
-            .range([5, 0.3])
+            .range([5, 0.5])
         this.tooltip = D3.select(this.wrapper).append('div').attr('class', 'tooltip').style('display', 'none')
         let events = this.eventHandlers[DrawPoint.EVT_AREA_CLICK];
 
@@ -117,15 +118,15 @@ export class DrawPoint extends Component {
 
     public InitSvg(para) {
         let _this = this,
-            istouch = false,
-            spot1 = 0,
-            spot2 = 0,
-             num1 = 1,
-             num2 = 1,
-             xx = 0,
-             yy = 0,
-             x0 = 0,
-             y0 = 0;;
+            istouch = false;
+            // spot1 = 0,
+            // spot2 = 0,
+            //  num1 = 1,
+            //  num2 = 1,
+            //  xx = 0,
+            //  yy = 0,
+            //  x0 = 0,
+            //  y0 = 0;;
         this.svg = D3.select(this.wrapper).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
@@ -137,6 +138,7 @@ export class DrawPoint extends Component {
                 this.mousedown();
                 this.redraw();
             })
+        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
         // this.svg.on('touchstart',function () {
         //         if(D3.touches(this) && D3.touches(this).length > 1){
         //              let x1 = D3.touches(this)[0][0],
@@ -184,12 +186,10 @@ export class DrawPoint extends Component {
         //      }).on('touchend',function () {
         //
         //      })
-
-        this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-
        let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
+
     }
 
     set imgUrl(url) {
@@ -198,6 +198,24 @@ export class DrawPoint extends Component {
                 return url
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
+        if(tools.isMb){
+            let slate = [-250,0],
+                slate1 = [-150,-50]
+            this.g.attr("transform","scale(2.5)" + "translate(" + slate+ ")" );
+            this.svg.attr('width',1600).attr('height',1900)
+            this.svg.attr("transform","translate(" + slate1+ ")")
+        }
+    }
+    private scaleVal = 0.5;
+    public svgScal(res){
+
+        if(res){
+            this.scaleVal+=0.2;
+            this.g.attr('transform',"scale("+this.scaleVal+")");
+        }else {
+            this.scaleVal-=0.2;
+            this.g.attr('transform',"scale("+this.scaleVal+")");
+        }
     }
 
     private mousedown() {
@@ -962,13 +980,23 @@ export class DrawPoint extends Component {
                                 break;
 
                             }
-                            case 8: {
+                            case 46: {
                                 //关闭描点操作
                                 //如果是insert的状态就是真删，如果是其他的就是DISPLAY='NONE'
-                                this.selectedG && this.selectedG.attr('class', 'delete').attr('display', 'none');
+                                if(this.selectedG){
+                                    this.selectedG.attr('class', 'delete').select('path').attr('d', function () {
+                                        return '';
+                                    });
+                                    this.isDrawLine = false;
+                                }else {
+                                    D3.select('#path'+ this.index).attr('d',function () {
+                                        return '';
+                                    })
+                                }
+                                this.selectedG &&
                                 this.map.set(this.index, []);
                                 this.points = [];
-                                this.isDrawLine = false;
+
                                 D3.selectAll('circle').remove();
                                 break;
                             }
@@ -1015,14 +1043,15 @@ export class DrawPoint extends Component {
             let scale = 1;
             d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
                 // //
+                // alert('000')
                 // let str = [];
                 // str.push(ev.centerX);
                 // str.push(ev.centerY);
                 // scale = ev.scale;
                 // scale = Math.min(ev.scale, 2);
                 // scale = Math.max(0.5, ev.scale);
-                //  _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
-                // //_this.g.attr('transform', "scale(" + scale + ")");
+                // // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
+                // _this.g.attr('transform', "scale(" + scale + ")");
                 // _this.svg.attr('width', scale * 1200);
                 // _this.svg.attr('height', scale * 800);
             })
@@ -1035,15 +1064,16 @@ export class DrawPoint extends Component {
                     _this.svg.on("dblclick.zoom", null);
                 })
                 .on('zoom', function (d) {
-                    if(D3.event.scale > 6) {
+                    if(D3.event.scale > 5 && D3.event.scale < 8) {
 
-                        //D3.selectAll('circle').attr('r',_this.LR(6));
+                        D3.selectAll('circle').attr('r',1.2);
                         //D3.selectAll('path').attr('stroke-width',_this.LV(6))
-                    }else{
-                        _this.rLate = _this.lineLate = D3.event.scale;
+                    }else if(D3.event.scale > 8){
+                        D3.selectAll('circle').attr('r',0.5);
 
-                        //D3.selectAll('circle').attr('r',_this.LR(_this.rLate));
                         //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
+                    }else {
+                        _this.rLate = _this.lineLate = D3.event.scale;
                     }
                     let s = D3.select('svg').select('.g-wrapper');
                     _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");

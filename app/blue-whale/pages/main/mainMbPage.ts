@@ -21,7 +21,7 @@ export = class mainMbPage {
             pages : {
                 home : CONF.url.home,
                 message : CONF.url.message,
-                contact : CONF.url.contact,
+                contacts : CONF.url.contact,
                 myselfMenu : CONF.url.myselfMenu
             },
             lastShowPage : null,
@@ -74,5 +74,15 @@ export = class mainMbPage {
         };
         let iframes = SUB_PAGE.initPages();
         sys.window.close = double_back;
+
+        let hideMenu = localStorage.getItem('hideBaseMenu'),
+            noShow = hideMenu ? JSON.parse(hideMenu) : [];
+        noShow.forEach((name) => {
+            let navbar = d.query('.mui-bar-tab');
+            if(navbar){
+                let el = d.query(`[data-page-name=${name}]`, navbar);
+                el && el.classList.add('hide');
+            }
+        });
     }
 }
