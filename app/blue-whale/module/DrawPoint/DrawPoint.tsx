@@ -199,10 +199,10 @@ export class DrawPoint extends Component {
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
         if(tools.isMb){
-            let slate = [-250,-80],
-                slate1 = [-150,-80]
+            let slate = [-250,0],
+                slate1 = [-150,-50]
             this.g.attr("transform","scale(2.5)" + "translate(" + slate+ ")" );
-            this.svg.attr('width',1600).attr('height',1700)
+            this.svg.attr('width',1600).attr('height',1900)
             this.svg.attr("transform","translate(" + slate1+ ")")
         }
     }
