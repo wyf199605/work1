@@ -9,13 +9,11 @@ import {Button} from "../../../global/components/general/button/Button";
 import {DetailModal} from "./DetailModal";
 import tools = G.tools;
 import d = G.d;
-import {FormCom} from "../../../global/components/form/basic";
-import {NewFormEdit, NewFormFactory} from "./NewFormFactory";
 
 export class ListItemDetail {
     // DOM容器
     private wrapper: HTMLElement;
-    private cells: objOf<ListItemDetailCell> | objOf<FormCom> = {};
+    private cells: objOf<ListItemDetailCell> = {};
     public defaultData: obj = {};
     public currentPage: number = 1;
     public totalNumber: number = 0;
@@ -39,50 +37,17 @@ export class ListItemDetail {
     initDetailTpl(fields: R_Field[]) {
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
-        if (tools.isMb){
-            fields.forEach(field => {
-                if (!field.noShow) {
-                    this.cells[field.name] = new ListItemDetailCell({
-                        caption: field.caption,
-                        type: this.getType(field.dataType || field.atrrs.dataType || ''),
-                        container: cellsWrapper,
-                        detailPage: this,
-                        field: field
-                    });
-                }
-            });
-        }else{
-            let emPara:NewFormEdit = {fields: [], defaultData: {}};
-            for (let i = 0, len = fields.length; i < len; i++) {
-                let f = fields[i];
-                if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || (this.para.uiType == 'update' && f.noShow) || (this.para.uiType == 'flow' && f.noShow) || (this.para.uiType == 'detail' && f.noShow)) {
-                    continue;
-                }
-                let field = {
-                    dom: this.createFormWrapper(f, cellsWrapper),
-                    field: f
-                };
-                emPara.fields.push(field);
-                if ((['insert', 'associate'].indexOf(this.para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {
-                    field.dom && field.dom.classList.add('disabled');
-                }
+        fields.forEach(field => {
+            if (!field.noShow) {
+                this.cells[field.name] = new ListItemDetailCell({
+                    caption: field.caption,
+                    type: this.getType(field.dataType || field.atrrs.dataType || ''),
+                    container: cellsWrapper,
+                    detailPage: this,
+                    field: field
+                });
             }
-            let form = new NewFormFactory(emPara);
-            this.cells = form.coms;
-        }
-    }
-    private createFormWrapper(field: R_Field, wrapper: HTMLElement): HTMLElement {
-        if (field.comType === 'file' || field.comType === 'img') {
-            return wrapper;
-        } else {
-            let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
-            let formGroupWrapper = <div className="detail-cell" data-name={field.name}
-                                        data-type={field.comType} data-element-type={elementType}>
-                <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
-            </div>;
-            wrapper.appendChild(formGroupWrapper);
-            return formGroupWrapper;
-        }
+        });
     }
     // 初始化详情数据
     initDetailData(): Promise<obj> {
@@ -154,15 +119,8 @@ export class ListItemDetail {
     // 设置详情数据
     render(data: obj) {
         let cells = this.cells;
-        if (tools.isMb){
-            for (let key in cells) {
-                (cells[key] as ListItemDetailCell).render(data[key] || '');
-            }
-        }else{
-            data = this.defaultData;
-            for (let key in cells) {
-                (cells[key] as FormCom).set(data[key] || '');
-            }
+        for (let key in cells) {
+            cells[key].render(data[key] || '');
         }
     }
 
@@ -290,6 +248,7 @@ export class ListItemDetail {
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: btn.subType === 'update_save' ? self.defaultData : {},
                         isAdd: isAdd,
+                        isPC:!tools.isMb,
                         confirm(data) {
                             return new Promise((resolve, reject) => {
                                 ButtonAction.get().clickHandle(btn, data, () => {
@@ -430,13 +389,8 @@ export class ListItemDetail {
                     tools.isNotEmpty(addrArr) && addrArr.forEach(md5 => {
                         // 根据md5获取文件地址
                         arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
-                        // if(tools.isMb){
-                        //     arr.push(BwRule.fileUrlGet(md5, format.name || format.atrrs.fieldName, true));
-                        // }else{
-                        //     arr.push(md5);
-                        // }
                     });
-                    v = arr.join(',');
+                    v = arr;
                 } else {
                     v = [];
                 }
