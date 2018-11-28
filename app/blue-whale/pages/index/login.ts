@@ -678,7 +678,8 @@ export class LoginPage{
                 result.data = response;
                 callback(result).then(() => {
                     loginPage.loginBtnState(10);
-                    let user = User.get();
+                    let user = User.get(),
+                        noShow = [];
                     user.clearStorage();
                     response.dataArr.forEach((col, index) => {
                         if (col.NAME === 'are_id') {
@@ -690,16 +691,18 @@ export class LoginPage{
                             user.username = col.VALUE;
                         } else if (col.NAME === 'auth_code') {
                             loginPage.device.auth_code = col.VALUE;
+                        } else if (col.NAME === 'hideBaseMenu'){
+                            noShow = col.VALUE.split(',');
                         }
                     });
                     // debugger;
                     if (sys.os === 'ad' || sys.os === 'ip') {
                         let accessToken = response.head.accessToken || '';
-                        sys.window.opentab(user.userid, accessToken.toString());
+                        sys.window.opentab(user.userid, accessToken.toString(), noShow);
                     } else {
                         BW.sysPcHistory.setLockKey(user.userid);
                         BW.sysPcHistory.setInitType('1');
-                        sys.window.opentab();
+                        sys.window.opentab(void 0, void 0, noShow);
                         // BW.sysPcHistory.remainLockOnly(() => sys.window.opentab());
                     }
                     resolve();
