@@ -65,15 +65,15 @@ export class FlowEditor extends FormCom {
         performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
         assignee: [
-            {value: '', text: '用户'},
-            {value: '_group', text: '用户组'},
-            {value: '#', text: '脚本配置'},
+            {value: '', text: '用户', address: CONF.ajaxUrl.useAddressList_user},
+            {value: '_group', text: '用户组', address: CONF.ajaxUrl.useAddressList_userGroup},
+            {value: '#', text: '脚本配置', address: CONF.ajaxUrl.useAddressList_scriptSetting},
         ]
     };
 
-    static addressList = [
-        {text: '用户', address: CONF.ajaxUrl.test}
-    ];
+    // static addressList = [
+    //     {text: '', address: CONF.ajaxUrl.useAddressList_user, key: '用户'}
+    // ];
 
     private owner: Component | FlowDesigner;
 
@@ -97,7 +97,7 @@ export class FlowEditor extends FormCom {
             Object.keys(fields).forEach(key => {
                 if (key in FlowEditor.DROPDOWN_KEYVALUE) {
                     let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
-                    valueText && (fields[key] = valueText.text);
+                    valueText && (fields[key] = valueText.value);
                 }
             });
             this.set(fields);
@@ -132,29 +132,36 @@ export class FlowEditor extends FormCom {
                     el: dropdownWrapper,
                     inline: true,
                     onSelect: (item, index) => {
-                        item.text !== FlowEditor.addressList[0].text && this.set({[attr]: item.text});
+                        // 在选中时，判断该项是否含有地址(address)，有的话从地址中获取数据，没有就直接回显
                         FlowEditor.hideAllDropdown();
-                        if (item.text === FlowEditor.addressList[0].text) {
-                            BwRule.Ajax.fetch(FlowEditor.addressList[0].address).then(({response}) => {
-                                let field = response.body.elements[0].fields[1];
-                                new ContactsModule({
-                                    field: field,
-                                    onGetData: (datas) => {
-                                        let userName = [],
-                                            userId = [];
-                                        datas.forEach(data => {
-                                            userName.push(data['USERNAME']);
-                                            userId.push(data['USERID'].toLowerCase());
-                                        });
-                                        FlowEditor.DROPDOWN_KEYVALUE[attr][0].value = userId.join(',');
-                                        FlowEditor.DROPDOWN_KEYVALUE[attr][0].text = userName.join(',');
-                                        this.set({[attr]: FlowEditor.DROPDOWN_KEYVALUE[attr][0].text});
-                                        return;
-                                    }
+                        if(FlowEditor.DROPDOWN_KEYVALUE[attr].some(valueText => 'address' in valueText)){
+                            for(let hasAddressItem of FlowEditor.DROPDOWN_KEYVALUE[attr].filter(item => 'address' in item)){
+                                hasAddressItem === item && BwRule.Ajax.fetch(hasAddressItem.address).then(({response}) => {
+                                    let field = response.body.elements[0].cols[0];
+                                    new ContactsModule({
+                                        field: field,
+                                        onGetData: (datas) => {
+                                            let userName = [],
+                                                userId = [],
+                                                groupId = '',
+                                                assignId = '';
+                                            datas.forEach(data => {
+                                                data['USERNAME'] && userName.push(data['USERNAME']);
+                                                data['USERID'] && userId.push(data['USERID'].toLowerCase());
+                                                data['GROUP_ID'] && (groupId = '_' + data['GROUP_ID'].toLowerCase());
+                                                data['ASSIGN_ID'] && (assignId = '#' + data['ASSIGN_ID'].toLowerCase());
+                                            });
+                                            index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
+                                            this.set({[attr]: userName.join(',') || groupId || assignId});
+                                            return;
+                                        }
+                                    });
+                                }).catch(err => {
+                                    console.log(err);
                                 });
-                            }).catch(err => {
-                                console.log(err);
-                            });
+                            }
+                        }else{
+                            this.set({[attr]: item.text});
                         }
                     }
                 });

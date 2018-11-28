@@ -161,7 +161,7 @@ export = class myselfMbPage {
 
         d.on(d.query('#testNetwork'), 'click', () => {
             this.initModal();
-            let urls = [100, 300, 500, 400].map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, {size: num}));
+            let urls = Array.from({length: 10}, () => 1000).map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, {size: num}));
             let testStart = true;
 
             d.on(d.query('body'), 'click', '.mui-rotate-box', function () {
