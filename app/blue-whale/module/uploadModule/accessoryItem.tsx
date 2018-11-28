@@ -41,6 +41,7 @@ export class AccessoryItem extends Component {
 
     render(data: IFileInfo) {
         this.innerEl.fileName.innerText = data.filename || '';
+        !tools.isMb && (this.innerEl.fileName.title = data.filename || '');
         if (tools.isMb) {
             this.innerEl.fileSize.innerText = data.filesize ? this.calcFileSize(data.filesize) : '0B';
         } else {
