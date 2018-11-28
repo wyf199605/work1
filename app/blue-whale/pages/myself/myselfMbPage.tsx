@@ -68,25 +68,25 @@ export = class myselfMbPage {
             d.append(list, li);
         });
         // 安卓判断
-        if (sys.os === 'ad') {
-            let li1 = <li className="mui-table-view-cell" data-page-name="powerManager">
-                    <a href="#" className="mui-navigate-right"> <i class="iconfont icon-023tuceng-copy-copy" style="color:#f15054;margin-right:10px"></i>权限管理</a>
-                </li>,
-                li2 = <li className="mui-table-view-cell" data-page-name="whiteBat">
-                    <a href="#" className="mui-navigate-right"> <i class="iconfont icon-renyuan" style="color:#4ea6f1;margin-right:10px"></i>电池白名单</a>
-                </li>;
-
-            d.append(list, li1);
-            d.append(list, li2);
-
-            d.on(d.query('[data-page-name=powerManager]'), 'click', function () {
-                sys.window.powerManager();
-            });
-
-            d.on(d.query('[data-page-name=whiteBat]'), 'click', () => {
-                sys.window.whiteBat();
-            });
-        }
+        // if (sys.os === 'ad') {
+        //     let li1 = <li className="mui-table-view-cell" data-page-name="powerManager">
+        //             <a href="#" className="mui-navigate-right"> <i class="iconfont icon-023tuceng-copy-copy" style="color:#f15054;margin-right:10px"></i>权限管理</a>
+        //         </li>,
+        //         li2 = <li className="mui-table-view-cell" data-page-name="whiteBat">
+        //             <a href="#" className="mui-navigate-right"> <i class="iconfont icon-renyuan" style="color:#4ea6f1;margin-right:10px"></i>电池白名单</a>
+        //         </li>;
+        //
+        //     d.append(list, li1);
+        //     d.append(list, li2);
+        //
+        //     d.on(d.query('[data-page-name=powerManager]'), 'click', function () {
+        //         sys.window.powerManager();
+        //     });
+        //
+        //     d.on(d.query('[data-page-name=whiteBat]'), 'click', () => {
+        //         sys.window.whiteBat();
+        //     });
+        // }
         if (CONF.appid === 'app_fastlion_retail') {
             let li = <li className="mui-table-view-cell" id="changePassword">
                 <a href="#" className="mui-navigate-right"> <i className="iconfont icon-renyuan" style="color:#FFB741;margin-right:10px"></i>密码修改</a>
