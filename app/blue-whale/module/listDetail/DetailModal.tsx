@@ -11,6 +11,9 @@ interface IDetailModal extends EditPagePara {
 
     cancel?(); // 取消回调
     confirm?(data: obj): Promise<any>; //确定回调
+    width?: string;
+    height?: string;
+    isPC?: boolean;
 }
 
 export class DetailModal {
@@ -18,7 +21,7 @@ export class DetailModal {
 
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
-        let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData, isModal: true};
+        let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData};
         let formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [];
         for (let i = 0, len = fields.length; i < len; i++) {
@@ -56,10 +59,9 @@ export class DetailModal {
                 className: 'modal-btn eidt-confirm',
                 type: 'primary',
                 onClick: () => {
-                    let data = this.dataGet();
-                    if (this.validate(data)) {
+                    if (this.validate()) {
                         // 验证成功
-                        tools.isFunction(para.confirm) && para.confirm(data).then(() => {
+                        tools.isFunction(para.confirm) && para.confirm(this.dataGet()).then(() => {
                             modal.isShow = false;
                             this.para && this.destroy();
                         });
@@ -68,36 +70,54 @@ export class DetailModal {
             }
         };
 
-        let modal = new Modal({
-            header: para.fm.caption + ' - 编辑',
-            width: tools.isMb ? void 0 : '600px',
-            height: tools.isMb ? void 0 : '600px',
-            isMb: tools.isMb,
-            className: 'detail-modal',
-            isModal: tools.isMb,
-            isOnceDestroy: true,
-            body: formWrapper,
-            onClose: () => {
-                this.para && this.destroy();
-                tools.isFunction(para.cancel) && para.cancel();
-            },
-            footer: tools.isMb ? {
-                leftPanel: [footButtons.leftPanel],
-                rightPanel: [footButtons.rightPanel]
-            } : {
-                rightPanel: [
-                    {
-                        content: '取消',
-                        className: 'modal-btn edit-cancel',
-                        onClick: () => {
-                            modal.isShow = false;
-                            this.para && this.destroy();
-                        }
-                    },
-                    footButtons.rightPanel
-                ]
-            }
-        });
+        let modal:Modal;
+        if (tools.isMb){
+            new Modal({
+                header: para.fm.caption + ' - 编辑',
+                isMb: tools.isMb,
+                className: 'detail-modal',
+                isModal: tools.isMb,
+                isOnceDestroy: true,
+                body: formWrapper,
+                onClose: () => {
+                    this.para && this.destroy();
+                    tools.isFunction(para.cancel) && para.cancel();
+                },
+                footer: {
+                    leftPanel: [footButtons.leftPanel],
+                    rightPanel: [footButtons.rightPanel]
+                }
+            });
+        }else{
+            modal = new Modal({
+                header: para.fm.caption + ' - 编辑',
+                width: para.width || '90%',
+                height: para.height || '90%',
+                className: para.isPC ? 'detail-modal detail-edit' : 'detail-modal',
+                isOnceDestroy: true,
+                body: formWrapper,
+                onClose: () => {
+                    this.para && this.destroy();
+                    tools.isFunction(para.cancel) && para.cancel();
+                },
+                footer: para.isPC ? {
+                    leftPanel: [footButtons.leftPanel],
+                    rightPanel: [footButtons.rightPanel]
+                } : {
+                    rightPanel: [
+                        {
+                            content: '取消',
+                            className: 'modal-btn edit-cancel',
+                            onClick: () => {
+                                modal.isShow = false;
+                                this.para && this.destroy();
+                            }
+                        },
+                        footButtons.rightPanel
+                    ]
+                }
+            });
+        }
         this.editModule = new NewFormFactory(emPara);
         if (para.isAdd) {
             if (tools.isNotEmpty(para.fm.defDataAddrList)) {
@@ -152,7 +172,7 @@ export class DetailModal {
     }
 
     // 验证
-    private validate(pageData?: obj) {
+    private validate() {
         let result = this.editModule.validate.start();
         if (tools.isNotEmpty(result)) {
             for (let key in result) {

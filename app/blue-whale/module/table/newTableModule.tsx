@@ -336,7 +336,6 @@ export class NewTableModule {
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
             this.tab.setTabsShow(showSubSeq);
-
             this.currentSelectedIndexes.push(this.subTabActiveIndex);
             let subs = [];
             for (let key in this.sub) {

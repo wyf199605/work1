@@ -1,4 +1,39 @@
 $cancel-height: 44px;
+.action-sheet-pc{
+  .modal-body{
+    padding: 0;
+  }
+}
+.action-sheet-wrapper-pc{
+  color: #666666;
+  font-size: 14px;
+  .action-sheet-buttons{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .btn-wrapper{
+      width: 100%;
+      height: $cancel-height;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 20px;
+      .btn-content{
+        margin-left: 13px;
+      }
+    }
+  }
+  .action-sheet-cancel{
+    width: 100%;
+    height: $cancel-height;
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid #e2e2e2;
+  }
+}
 .action-sheet-wrapper {
   width: 100%;
   position: absolute;

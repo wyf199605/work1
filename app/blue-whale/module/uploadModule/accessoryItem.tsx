@@ -8,14 +8,13 @@ export interface IAccessoryItem extends IComponentPara {
     list?: Accessory;
     file?: IFileInfo;
     index?: number;
-    isModal?: boolean;
 }
 
 export class AccessoryItem extends Component {
     protected list: Accessory;
 
     protected wrapperInit(para: IAccessoryItem): HTMLElement {
-        let wrapper = <div className="accessory-item" data-index={para.index}>
+        let wrapper =tools.isMb ? <div className="accessory-item" data-index={para.index}>
             <div className="file-wrapper">
                 <div className="file-icon"><i className="appcommon app-wenjian"/></div>
                 <div className="file-info">
@@ -24,15 +23,12 @@ export class AccessoryItem extends Component {
                 </div>
             </div>
             <div className="deleteBtn">删除</div>
+        </div> : <div className="accessory-item" data-index={para.index}>
+            <i className="iconfont icon-annex"/>
+            <div c-var="fileName" className="file-name"/>
+            <div c-var="fileSize" className="file-size"/>
+            <div className="deleteBtn">删除</div>
         </div>;
-        if (!para.isModal && !tools.isMb) {
-            wrapper = <div className="accessory-item" data-index={para.index}>
-                <i className="iconfont icon-annex"/>
-                <div c-var="fileName" className="file-name"/>
-                <div c-var="fileSize" className="file-size"/>
-                <div className="deleteBtn">删除</div>
-            </div>;
-        }
         return wrapper;
     }
 
@@ -45,7 +41,8 @@ export class AccessoryItem extends Component {
 
     render(data: IFileInfo) {
         this.innerEl.fileName.innerText = data.filename || '';
-        if (tools.isMb || this.para.isModal) {
+        !tools.isMb && (this.innerEl.fileName.title = data.filename || '');
+        if (tools.isMb) {
             this.innerEl.fileSize.innerText = data.filesize ? this.calcFileSize(data.filesize) : '0B';
         } else {
             this.innerEl.fileSize.innerText = data.filesize ? `(${this.calcFileSize(data.filesize)})` : '(0B)';

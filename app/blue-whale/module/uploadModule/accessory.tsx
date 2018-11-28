@@ -19,7 +19,6 @@ export interface IFileInfo {
 
 export interface IAccessory extends IUploaderPara {
     uniques?: string;
-    isModal?: boolean;
 
     onComplete?(this: UploadModule, ...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
@@ -109,25 +108,22 @@ export class Accessory extends FormCom {
     private accessoryBodyWrapper: HTMLElement;
 
     protected wrapperInit(para: IAccessory): HTMLElement {
-        let wrapper = <div className="accessory-wrapper">
+        let wrapper =tools.isMb ? <div className="accessory-wrapper">
             <div className="accessory-title">{para.field.caption || '附件'}</div>
             {
                 this.accessoryBodyWrapper = <div className="accessory-body">
                     <div c-var="uploader" className="upload"><i className="appcommon app-jia"/>添加附件</div>
                 </div>
             }
+        </div> : <div className="accessory-wrapper">
+            <div className="accessory-title">{para.field.caption || '附件'}</div>
+            {
+                this.accessoryBodyWrapper = <div className="accessory-body">
+                    <div className="accessory-content-wrapper"/>
+                    <div c-var="uploader" className="upload"><i className="iconfont icon-annex"/>添加附件</div>
+                </div>
+            }
         </div>;
-        if (!para.isModal && !tools.isMb) {
-            wrapper = <div className="accessory-wrapper">
-                <div className="accessory-title">{para.field.caption || '附件'}</div>
-                {
-                    this.accessoryBodyWrapper = <div className="accessory-body">
-                        <div className="accessory-content-wrapper"/>
-                        <div c-var="uploader" className="upload"><i className="iconfont icon-annex"/>添加附件</div>
-                    </div>
-                }
-            </div>;
-        }
         return wrapper;
     }
 
@@ -288,14 +284,10 @@ export class Accessory extends FormCom {
     }
 
     protected createListItem(para: IAccessoryItem) {
-        let container = this.accessoryBodyWrapper;
-        if (!tools.isMb && !this.para.isModal){
-            container = d.query('.accessory-content-wrapper', this.accessoryBodyWrapper);
-        }
+        let container = tools.isMb ? this.accessoryBodyWrapper : d.query('.accessory-content-wrapper', this.accessoryBodyWrapper);
         para = Object.assign({}, para, {
             container: container,
-            index: this.files.length,
-            isModal: this.para.isModal
+            index: this.files.length
         });
         return new AccessoryItem(para);
     }
