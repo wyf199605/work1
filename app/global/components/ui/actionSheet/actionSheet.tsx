@@ -13,6 +13,7 @@ export interface IActionSheetButton extends IButton {
 
 interface IActionSheet {
     buttons: IActionSheetButton[]; // 按钮数组
+    title?:string;
 }
 
 export class ActionSheet extends Modal {
@@ -20,22 +21,27 @@ export class ActionSheet extends Modal {
     private buttons: IActionSheetButton[] = [];
 
     constructor(para: IActionSheet) {
-        super(Object.assign({
+        super(tools.isMb ? {
             width: '100%',
             position: 'down',
             isBackground: true,
             isShow: false
-        }, para));
+        } : {
+            header: para.title,
+            className: 'action-sheet-pc',
+            width:'',
+            height:''
+        });
         // 要给Modal.wrapper的的top属性设置important才能从下方弹出
         this.buttons = para.buttons;
-        this.wrapper.style.setProperty('top', 'auto', 'important');
+        tools.isMb && this.wrapper.style.setProperty('top', 'auto', 'important');
         this.createActionSheet(para);
         this.initEvents.on();
     }
 
     //  创建ActionSheet
     private createActionSheet(para: IActionSheet) {
-        this.actionSheetWrapper = <div className="action-sheet-wrapper"/>;
+        this.actionSheetWrapper = tools.isMb ? <div className="action-sheet-wrapper"/> : <div className="action-sheet-wrapper-pc"/>;
         let line = 1;
         if (tools.isNotEmptyArray(para.buttons)) {
             let buttonsWrapper = <div className="action-sheet-buttons"/>;
@@ -50,14 +56,14 @@ export class ActionSheet extends Modal {
             para.buttons.forEach((item, index) => {
                 let btnWrapper = <div className="btn-wrapper" data-index={index}>
                     <i className={item.icon || 'appcommon app-morenicon'}/>
-                    <div class="btn-content">{item.content || ''}</div>
+                    <div className="btn-content">{item.content || ''}</div>
                 </div>;
                 d.append(buttonsWrapper, btnWrapper);
             });
         }
         d.append(this.actionSheetWrapper, <div className="action-sheet-cancel">取消</div>);
         this.bodyWrapper.appendChild(this.actionSheetWrapper);
-        this.wrapper.style.setProperty('height',(line * 95 + 20 + 44) + 'px','important');
+        tools.isMb && this.wrapper.style.setProperty('height',(line * 95 + 20 + 44) + 'px','important');
     }
     private initEvents = (() => {
         let buttonClick = (e) => {

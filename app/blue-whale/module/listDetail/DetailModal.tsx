@@ -59,10 +59,9 @@ export class DetailModal {
                 className: 'modal-btn eidt-confirm',
                 type: 'primary',
                 onClick: () => {
-                    let data = this.dataGet();
-                    if (this.validate(data)) {
+                    if (this.validate()) {
                         // 验证成功
-                        tools.isFunction(para.confirm) && para.confirm(data).then(() => {
+                        tools.isFunction(para.confirm) && para.confirm(this.dataGet()).then(() => {
                             modal.isShow = false;
                             this.para && this.destroy();
                         });
@@ -173,7 +172,7 @@ export class DetailModal {
     }
 
     // 验证
-    private validate(pageData?: obj) {
+    private validate() {
         let result = this.editModule.validate.start();
         if (tools.isNotEmpty(result)) {
             for (let key in result) {
