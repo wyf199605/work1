@@ -91,9 +91,9 @@ export class DetailModal {
         }else{
             modal = new Modal({
                 header: para.fm.caption + ' - 编辑',
-                width: para.width || '100%',
-                height: para.height || '100%',
-                className: para.isPC ? 'detail-modal full-screen' : 'detail-modal',
+                width: para.width || '90%',
+                height: para.height || '90%',
+                className: para.isPC ? 'detail-modal detail-edit' : 'detail-modal',
                 isOnceDestroy: true,
                 body: formWrapper,
                 onClose: () => {

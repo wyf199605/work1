@@ -29,8 +29,9 @@ export class ActionSheet extends Modal {
         } : {
             header: para.title,
             className: 'action-sheet-pc',
-            width:'',
-            height:''
+            width:'144px',
+            isShow: false,
+            top:200
         });
         // 要给Modal.wrapper的的top属性设置important才能从下方弹出
         this.buttons = para.buttons;

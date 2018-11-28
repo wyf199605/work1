@@ -201,19 +201,20 @@
         }
       }
     }
-    &.full-screen{
+    &.detail-edit{
       .modal-body{
         padding: 10px;
         max-height: 100%;
-        height: calc(100% - 113px) !important;
+        //height: calc(100% - 93px) !important;
       }
       .form-wrapper{
         background-color: #ffffff;
-        padding-left: 16px;
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        height: calc(100% - 53px);
+        height: 100%;
+        padding-left: 0;
+        height: auto;
         .accessory-wrapper{
           width: 100%;
           height: 80px;
@@ -395,14 +396,15 @@
                 align-items: center;
                 font-size: 14px;
                 height: 30px;
-                flex: 1 0 30px;
+                flex: 0 0 30px;
                 i {
                   color: #333333;
                 }
                 .file-name {
                   color: #333333;
                   margin-left: 15px;
-                  width: 200px;
+                  width: auto;
+                  max-width: 200px;
                   overflow: hidden;
                   text-overflow: ellipsis;
                   white-space: nowrap;
