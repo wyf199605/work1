@@ -50,6 +50,7 @@ export class NewTableModule {
     private currentSelectedIndexes: number[] = [];
 
     constructor(para: ITableModulePara) {
+        window['nt'] = this;
         console.log(para);
         this.bwEl = para.bwEl;
         this.showSubField = para.bwEl.showSubField;
@@ -356,7 +357,12 @@ export class NewTableModule {
                 subTable.linkedData = selectedData;
             });
         }
-        return Promise.all(promise);
+        return Promise.all(promise).then((arr) => {
+            if(this.tab && this.tab.index !== this.subTabActiveIndex){
+                this.subTabActiveIndex = this.tab.index;
+            }
+            return arr
+        });
     }
 
     public mobileModal: Modal = null;
@@ -436,7 +442,10 @@ export class NewTableModule {
             // 刷新子表
             !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
             let row = this.main.ftable.rowGet(this.subIndex);
-            row && this.subRefresh(row.data);
+            row && this.subRefresh(row.data).then(() => {
+                this.active.off();
+                this.active.on();
+            });
             this.subWrapper && this.subWrapper.classList.toggle('hide', !row);
             let sub = this.sub[this.subTabActiveIndex],
                 subBox = tools.keysVal(sub, 'subBtns', 'box');
@@ -617,10 +626,12 @@ export class NewTableModule {
         let on = () => {
             this.sub && d.on(this.subWrapper, 'click', handler1 = () => {
                 isMainActive = false;
+                console.log(isMainActive, 's');
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
             d.on(this.main.wrapper, 'click', handler2 = () => {
                 isMainActive = true;
+                console.log(isMainActive);
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
         };
@@ -667,7 +678,7 @@ export class NewTableModule {
             // debugger;
             let mftable = this.main.ftable;
             if (mftable.editing) {
-                return;
+                return Promise.resolve();
             }
             let allPromise: Promise<void>[] = [];
             tableEach(table => {

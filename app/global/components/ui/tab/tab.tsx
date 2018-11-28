@@ -27,6 +27,10 @@ export class Tab {
     protected clickEvent: (tabEl: HTMLElement) => void;  // 点击事件
     protected activeList: HTMLElement[] = [null, null];
     len: number = 0;
+    protected _index = 0;
+    get index(){
+        return this._index;
+    }
 
     constructor(protected para: TabPara) {
         this.panelContainer = Tab.createPanelContainer();
@@ -55,7 +59,7 @@ export class Tab {
 
         //默认激活第一个
         if (this.len > 0) {
-            this.active(0);
+            this.active(this._index);
         }
 
         this.tabIndexKey = para.tabIndexKey;
@@ -171,6 +175,7 @@ export class Tab {
     protected firstIndex = [];
 
     active(index: number) {
+        this._index = index;
         let tab = d.query(`li[data-index="${index}"]`, this.tabContainer),
             panel = d.query(`div.tab-pane[data-index="${index}"]`, this.panelContainer),
             className = this.para.className;
