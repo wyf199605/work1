@@ -2633,6 +2633,10 @@ export class FastTable extends Component {
         return rows;
     }
 
+    closeCellInput(){
+        this.edit.destroyCellInput();
+    }
+
     get editedData() {
         if (this.editing) {
             this.edit.destroyCellInput();

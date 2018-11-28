@@ -646,6 +646,7 @@ export class NewTableModule {
 
         let self = this,
             isOnce = true,
+            validList: Promise<any>[] = [],
             editModule: EditModule = null;
 
         let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
@@ -822,7 +823,7 @@ export class NewTableModule {
             if(isOnce){
                 isOnce = false;
                 bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
-                    validate(TableEditModule, cell);
+                    validList.push(validate(TableEditModule, cell));
                 });
             }
         };
@@ -852,8 +853,8 @@ export class NewTableModule {
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
                     TableEditModule.checkValue(field, rowData, () => {
-                        cell.data = null;
                         lookUpCell && (lookUpCell.data = null);
+                        cell.data = null;
                     }, name)
                         .then((res) => {
                             let {errors, okNames} = res;
@@ -958,41 +959,54 @@ export class NewTableModule {
 
         let save = () => {
             return editModule.assignPromise.then(() => {
+                this.closeCellInput();
+                let loading = new Loading({
+                    msg: '验证中...',
+                    disableEl: this.main.wrapper
+                });
                 setTimeout(() => {
-                    let saveData = editDataGet();
-                    if (tools.isEmpty(saveData.param)) {
-                        Modal.toast('没有数据改变');
-                        cancel();
-                        this.editBtns.end();
-                        return
-                    }
-                    this.saveVerify.then(() => {
-                        let loading = new Loading({
-                            msg: '保存中',
-                            disableEl: this.main.wrapper
-                        });
-                        BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
-                            type: 'POST',
-                            data: saveData,
-                        }).then(({response}) => {
-
-                            BwRule.checkValue(response, saveData, () => {
-                                this.currentSelectedIndexes = [];
-                                // 主表子表刷新
-                                this.refresh();
-                                Modal.toast(response.msg);
-                                this.editBtns.end();
-                                // loading && loading.destroy();
-                                // loading = null;
+                    Promise.all(validList).then(() => {}).catch().finally(() => {
+                        validList = [];
+                        loading && loading.hide();
+                        loading = null;
+                        setTimeout(() => {
+                            let saveData = editDataGet();
+                            if (tools.isEmpty(saveData.param)) {
+                                Modal.toast('没有数据改变');
                                 cancel();
-                                tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
-                            });
-                        }).finally(() => {
-                            loading && loading.destroy();
-                            loading = null;
-                        });
-                    }).catch();
-                }, 200);
+                                this.editBtns.end();
+                                return
+                            }
+                            this.saveVerify.then(() => {
+                                let loading = new Loading({
+                                    msg: '保存中',
+                                    disableEl: this.main.wrapper
+                                });
+                                BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
+                                    type: 'POST',
+                                    data: saveData,
+                                }).then(({response}) => {
+
+                                    BwRule.checkValue(response, saveData, () => {
+                                        this.currentSelectedIndexes = [];
+                                        // 主表子表刷新
+                                        this.refresh();
+                                        Modal.toast(response.msg);
+                                        this.editBtns.end();
+                                        // loading && loading.destroy();
+                                        // loading = null;
+                                        cancel();
+                                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                                    });
+                                }).finally(() => {
+                                    loading && loading.destroy();
+                                    loading = null;
+                                });
+                            }).catch();
+                        }, 100);
+                    })
+                }, 100)
+
             });
         };
 
@@ -1048,6 +1062,14 @@ export class NewTableModule {
             rowCanInit
         }
     })();
+
+    protected closeCellInput(){
+        let subFtable = this.sub[this.subTabActiveIndex] && this.sub[this.subTabActiveIndex].ftable,
+            mainFtable = this.main.ftable;
+
+        mainFtable && mainFtable.closeCellInput();
+        subFtable && subFtable.closeCellInput();
+    }
 
     get saveVerify(){
         return new Promise((resolve, reject) => {

@@ -607,6 +607,10 @@ export class BwTableModule extends Component {
         }
         let link = field.link;
 
+        if(tools.isEmpty(rowData[field.name])){
+            return;
+        }
+
         if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
             BwRule.link({
                 link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
