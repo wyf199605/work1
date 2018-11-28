@@ -209,7 +209,6 @@ export class ListItemDetail {
                 })
             })
         }
-
         if (tools.isNotEmpty(buttons)) {
             let btnWrapper = <div className="list-item-detail-buttons"/>;
             d.before(d.query('.list-detail-cells-wrapper',this.wrapper),btnWrapper);
