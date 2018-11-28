@@ -261,6 +261,7 @@ export class TableBase extends Component {
             if (row && row.isEdited) {
                 row.cells.forEach((cell) => {
                     cell.isEdited = false;
+                    cell.isChecked = false;
                 });
             }
         });

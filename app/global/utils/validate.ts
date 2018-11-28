@@ -60,11 +60,11 @@ const strategies = {
     },
 
     requieredFlag: function (data, value) {
-        return value ? (data !== null && data !== undefined && data !== "") : true;
+        return value ? tools.isNotEmpty(data) : true;
     },
 
     regExp: function (data, value) {
-        return data.match(new RegExp(value)) != null;
+        return data ? data.match(new RegExp(value)) != null : true;
     },
 
     number: function (data, value) {

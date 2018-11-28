@@ -602,9 +602,9 @@ export class EditModule {
             let com = this.coms[name],
                 f = this.nameFields[name];
 
-            if(com && f){
+            if(f){
                 ruleAdd(f.field);
-                data = tools.isUndefined(data) ? this.get(f.field.name)[f.field.name] : data;
+                data = tools.isUndefined(data) ? (com ? this.get(f.field.name)[f.field.name] : null) : data;
                 return v.start({[name] : data});
             }
         };

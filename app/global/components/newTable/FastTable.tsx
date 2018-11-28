@@ -625,6 +625,7 @@ export class FastTable extends Component {
             });
             this.render(0, 1, this.rows.length === 0 ? -1 : i);
             this.initDisabledEditorRow(this.rows[i]);
+            this.rows[i].isAdd = true;
             this._drawSelectedCells();
             // 新增行
             typeof len === 'number' && this.edit.addIndex.add(this.data[i][TableBase.GUID_INDEX]);
@@ -2748,6 +2749,20 @@ export class FastTable extends Component {
         return null;
     }
 
+    get editedCells(): FastTableCell[]{
+        let editedCells: FastTableCell[] = [];
+        this.rows.forEach((row) => {
+            if(row.isAdd){
+                editedCells = editedCells.concat(row.cells);
+            }else{
+                row.cells.forEach((cell) => {
+                    cell.isEdited && editedCells.push(cell);
+                });
+            }
+        });
+        return editedCells;
+    }
+
     protected _editing: boolean = false;
     get editing() {
         return this._editing;
@@ -2795,6 +2810,9 @@ export class FastTable extends Component {
                 this.edit.delIndex.del();
                 this.edit.changeIndex.del();
                 this._drawSelectedCells();
+                this.rows.forEach((row) => {
+                    row.isAdd = false;
+                })
             }
         }
     }

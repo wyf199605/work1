@@ -15,15 +15,27 @@ export = class mainMbPage {
 //             currentWebview.setStyle({'popGesture':'none'});
 // //        }
 //         });
+        let pages = {
+            home : CONF.url.home,
+            message : CONF.url.message,
+            contacts : CONF.url.contact,
+            myselfMenu : CONF.url.myselfMenu
+        };
+
+        let hideMenu = localStorage.getItem('hideBaseMenu'),
+            noShow = hideMenu ? JSON.parse(hideMenu) : [];
+        noShow.forEach((name) => {
+            let navbar = d.query('.mui-bar-tab');
+            if(navbar){
+                let el = d.query(`[data-page-name=${name}]`, navbar);
+                el && el.classList.add('hide');
+                delete pages[name];
+            }
+        });
 
         let SUB_PAGE = {
             pagesContainer : document.getElementById('pagesContainer'),
-            pages : {
-                home : CONF.url.home,
-                message : CONF.url.message,
-                contacts : CONF.url.contact,
-                myselfMenu : CONF.url.myselfMenu
-            },
+            pages,
             lastShowPage : null,
             createIframes : function () {
                 let pageName ,
@@ -74,15 +86,5 @@ export = class mainMbPage {
         };
         let iframes = SUB_PAGE.initPages();
         sys.window.close = double_back;
-
-        let hideMenu = localStorage.getItem('hideBaseMenu'),
-            noShow = hideMenu ? JSON.parse(hideMenu) : [];
-        noShow.forEach((name) => {
-            let navbar = d.query('.mui-bar-tab');
-            if(navbar){
-                let el = d.query(`[data-page-name=${name}]`, navbar);
-                el && el.classList.add('hide');
-            }
-        });
     }
 }

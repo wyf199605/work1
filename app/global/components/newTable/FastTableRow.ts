@@ -17,6 +17,7 @@ export interface IFastTableRowPara {
 
 export class FastTableRow {
     private fastTable: FastTable;
+    public isAdd = false;
     constructor(para: IFastTableRowPara) {
         this.fastTable = para.fastTable;
         this.index = para.index;
