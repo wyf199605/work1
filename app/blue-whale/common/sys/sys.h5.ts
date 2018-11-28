@@ -77,7 +77,7 @@ namespace BW{
                 clear: function () {
                     // self.ui.toast('清除成功');
                 },
-                opentab: function (url, accessToken, noShow?: string[]) {
+                opentab: function (url, accessToken, noShow: string[] = null) {
                     let win = window.parent ? window.parent : window;
                     win.location.href = CONF.url.main;
                     localStorage.setItem('hideBaseMenu', JSON.stringify(noShow));

@@ -78,8 +78,11 @@ export = class mainMbPage {
         let hideMenu = localStorage.getItem('hideBaseMenu'),
             noShow = hideMenu ? JSON.parse(hideMenu) : [];
         noShow.forEach((name) => {
-            let el = d.query(`[data-page-name=${name}]`, document.body);
-            el && el.classList.add('hide');
+            let navbar = d.query('.mui-bar-tab');
+            if(navbar){
+                let el = d.query(`[data-page-name=${name}]`, navbar);
+                el && el.classList.add('hide');
+            }
         });
     }
 }
