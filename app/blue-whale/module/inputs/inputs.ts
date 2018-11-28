@@ -129,17 +129,10 @@ export class Inputs {
             default :
                 this.isProcess = false;
         }
-        if(dataType === 0){
-            this.dataCover(ftable, response);
-        }
 
-        if(catType !== 2 && catType !== 3){
-            this.logTip(showText);
-        }
-
-        if(atvarObj){
-            this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl);
-        }
+        dataType === 0 && this.dataCover(ftable, response);
+        ![2,3].includes(catType) && this.logTip(showText);
+        atvarObj && this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl);
     }
 
     private dataCover(ftable : FastBtnTable, response : obj){
