@@ -658,28 +658,26 @@ export class EditModule {
                 let data = tools.keysVal(response, 'body', 'bodyList', 0),
                     {type, showText} = data || {type: '', showText: ''};
 
-                if (type === 0) {
+                if (type === 1) {
                     // Modal.alert(showText);
                     // errorStyle(showText);
+                    Modal.confirm({
+                        msg: showText,
+                        callback: (flag: boolean) => {
+                            if (!flag) {
+                                clear();
+                            }
+                            resolve({
+                                okNames: chkAddr.varList.map(v => v.varName)
+                            });
+                        }
+                    });
+                } else {
                     resolve({
                         errors: [{name, msg: showText}],
                     });
-                } else {
-                    if (type === 1) {
-                        Modal.confirm({
-                            msg: showText,
-                            callback: (flag: boolean) => {
-                                if (!flag) {
-                                    clear();
-                                }
-                                resolve({
-                                    okNames: chkAddr.varList.map(v => v.varName)
-                                });
-                            }
-                        });
-                    }
-
                 }
+
             }).catch(() => {
                 resolve({
                     okNames: chkAddr.varList.map(v => v.varName)
