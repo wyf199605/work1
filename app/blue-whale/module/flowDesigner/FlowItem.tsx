@@ -89,7 +89,7 @@ export class FlowItem extends Component {
             if (diamondArr.indexOf(para.type) >= 0) {
                 this.isDiamond = true;
                 this.wrapper.classList.add('diamond');
-                this.wrapper.appendChild(<div className="diamond-text">{para.type}</div>);
+                this.wrapper.appendChild(<div className="diamond-text">{para.text || para.type}</div>);
                 this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, this.width, this.height)
                                 .attr(this.getDefaultAttr(para.position.x, para.position.y)).transform('r45');
             } else {
