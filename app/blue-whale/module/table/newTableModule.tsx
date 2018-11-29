@@ -320,7 +320,10 @@ export class NewTableModule {
             selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {});
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
-            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+            let seqIndex = parseInt(showSubSeq[0]) - 1;
+            if(tools.isEmpty(this.sub[seqIndex])){
+                this.subTabActiveIndex = seqIndex;
+            }
         }
         let bwEl = this.bwEl,
             subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex];
@@ -357,12 +360,7 @@ export class NewTableModule {
                 subTable.linkedData = selectedData;
             });
         }
-        return Promise.all(promise).then((arr) => {
-            if(this.tab && this.tab.index !== this.subTabActiveIndex){
-                this.subTabActiveIndex = this.tab.index;
-            }
-            return arr
-        });
+        return Promise.all(promise);
     }
 
     public mobileModal: Modal = null;
