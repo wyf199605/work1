@@ -99,6 +99,7 @@ export class FlowItem extends Component {
                                 .attr(this.getDefaultAttr(para.position.x, para.position.y));
             }
         }
+        this.wrapper.style.backgroundColor = FlowItem.itemColor[para.type];
         this.initEvents.on();
 
         let fields: IFieldPara = {};
@@ -193,7 +194,7 @@ export class FlowItem extends Component {
         if (isComplete) {
             this.wrapper.classList.add('complete');
         } else {
-            this.wrapper.style.borderColor = '#b6d1e0';
+            this.wrapper.style.borderColor = FlowItem.itemColor[this.para.type];
         }
         this._isComplete = isComplete;
     }
