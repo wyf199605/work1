@@ -197,6 +197,8 @@ export class Tips extends Component {
             });
 
             let xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
+            // console.log('save xml: ');
+            // console.log(xmlStr);
             BwRule.Ajax.fetch(BW.CONF.ajaxUrl.modifyFlow + FlowDesigner.processId, {
                 type: 'POST',
                 data: {process: xmlStr},
