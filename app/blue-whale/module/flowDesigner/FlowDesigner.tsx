@@ -144,8 +144,10 @@ export class FlowDesigner {
     static AllLineItems: LineItem[] = [];   // 所有的连接线
     static rootElement: Element;            // 当前流程的xml节点树
     static processId: number;               // 当前流程的id
+    static FlowType: string;                // 当前操作的类型（设计design或查看状态look）
 
     constructor(responseData?: any, type?: string) {
+        type && (FlowDesigner.FlowType = type);
         FlowEditor.EXIST_NAME = [];
         let body = <div className="design-canvas" id="design-canvas"/>;
         let modal = new Modal({
@@ -162,7 +164,7 @@ export class FlowDesigner {
             }
         });
         let Tip: Tips = null;
-        type === 'design' && (
+        FlowDesigner.FlowType === 'design' && (
             Tip = new Tips({
                 container: body
             })
@@ -179,7 +181,7 @@ export class FlowDesigner {
         // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程；如果没有则需要自己绘制流程
         if (tools.isNotEmpty(responseData)){
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
-            if(type === 'look'){
+            if(FlowDesigner.FlowType === 'look'){
                 modal.modalHeader.title = '查看流程';
                 d.query('#design-canvas').style.pointerEvents = 'none';
             }else{
@@ -224,13 +226,18 @@ export class FlowDesigner {
                         shape.calcWidthAndHeight();
                         shape.wrapper.dataset.name = child.attributes.name.value;
 
-                        // 完成状态的样式
-                        shape.isComplete && (
-                            shape.wrapper.style.color = 'white',
-                            shape.wrapper.style.backgroundColor = '#31ccff'
-                        );
-                        if(shape.isStart && shape.isComplete){
-                            d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#ffffff';
+                        if(FlowDesigner.FlowType === 'look'){
+                            if(shape.isComplete){
+                                shape.wrapper.style.color = 'white';
+                                shape.wrapper.style.backgroundColor = FlowItem.itemColor[child.tagName];
+                            }
+                            else{
+                                shape.wrapper.style.backgroundColor = '#ffffff';
+                                shape.wrapper.style.borderColor = FlowItem.itemColor[child.tagName];
+                            }
+                            if(shape.isStart && shape.isComplete){
+                                d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#ffffff';
+                            }
                         }
                     }
                 }
@@ -278,7 +285,7 @@ export class FlowDesigner {
             });
 
             // 所有的下拉列表都不可用
-            type === 'look' && (
+            FlowDesigner.FlowType === 'look' && (
                 // 禁用所有input
                 d.queryAll('input').forEach(input => {
                     (input as HTMLInputElement).readOnly = true;
@@ -317,6 +324,7 @@ export class FlowDesigner {
     })();
 
     destroy() {
+        FlowDesigner.FlowType = null;
         FlowDesigner.AllLineItems = [];
         FlowDesigner.CURRENT_SELECT_TYPE = '';
         FlowDesigner.PAPER = null;

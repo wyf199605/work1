@@ -1,7 +1,6 @@
 
 .fl-pc {
-    $dropdown-attr-list: ('performType': 25px, 'taskType': 50px, 'assignee': 75px); // 新增下拉列表时在此处添加属性
-    $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767, decision: #f8b14b, fork: #db7bd8, join: #f5896c);
+    $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767, decision1: #f8b14b, fork: #db7bd8, join: #f5896c);
     @mixin set-tip-color(){
         @each $item-type, $item-color in $tip-item__type-color-map{
             i.appcommon.app-#{$item-type}{
@@ -42,15 +41,9 @@
 
             .dropdown-wrapper {
                 position: absolute;
-                right: 283px;
-                bottom: 20px;
-                // 新增列表时需要修改
-                $bottom: 25px !default;
-                @each $attr, $bottom in $dropdown-attr-list {
-                    &[data-attr=#{$attr}] {
-                        bottom: $bottom;
-                    }
-                }
+                right: 0;
+                bottom: 0;
+                z-index: 1005;
 
                 .dropdown-title {
                     width: 100%;
@@ -179,7 +172,7 @@
                 border: solid 1px #b6d1e0;
             }
 
-            &.complete {
+            &.start-circle.complete, .end-circle.complete {
                 border-color: #31ccff !important;
             }
 
