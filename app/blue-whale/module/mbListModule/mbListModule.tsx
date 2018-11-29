@@ -11,6 +11,7 @@ import sys = BW.sys;
 import {SlidePopover} from "../../../global/components/ui/slidePopover/slidePopover";
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 export interface IMbListModule extends IComponentPara{
     ui: IBW_UI<IBW_Table>;
 }
@@ -31,7 +32,7 @@ export class MbListModule extends Component{
         tableListEl.subButtons = (tableListEl.subButtons || []).concat(para.ui.body.subButtons || []);
         this.getButtons(tableListEl.subButtons);
         this.initGlobalButtons();
-        this.handlerLayout(tableListEl.layout, tableListEl.cols);
+        this.handlerLayout(tableListEl.layout);
         tools.isNotEmpty(this.layout['body']) && this.getBodyCaption(this.layout, tableListEl.cols);
         this.initMbList();
         this.initEvents.on();
@@ -41,22 +42,41 @@ export class MbListModule extends Component{
     private initGlobalButtons() {
         let globalButtons = this.allButtons[0] || [];
         if (tools.isNotEmpty(globalButtons)) {
-            let sliderPopover = new SlidePopover({
-                container:this.wrapper
-            });
-            let btnArr:IButton[] = [];
-            globalButtons.forEach((btn,index) => {
-                btnArr.push({
-                    content:btn.caption,
-                    icon:btn.icon ? btn.icon.split(' ')[1] : '',
-                    iconPre:btn.icon ? btn.icon.split(' ')[0] : '',
-                    onClick:()=>{
-                        ButtonAction.get().clickHandle(btn,{});
-                        sliderPopover.modal.isShow = false;
-                    }
-                })
-            });
-            sliderPopover.buttons = btnArr;
+            if (tools.isMb){
+                let sliderPopover = new SlidePopover({
+                    container:this.wrapper
+                });
+                let btnArr:IButton[] = [];
+                globalButtons.forEach((btn) => {
+                    btnArr.push({
+                        content:btn.caption,
+                        icon:btn.icon ? btn.icon.split(' ')[1] : '',
+                        iconPre:btn.icon ? btn.icon.split(' ')[0] : '',
+                        onClick:()=>{
+                            ButtonAction.get().clickHandle(btn,{});
+                            sliderPopover.modal.isShow = false;
+                        }
+                    })
+                });
+                sliderPopover.buttons = btnArr;
+            }else{
+                let globalButtonWrapper = <div className="global-button-wrapper"/>;
+                this.wrapper.appendChild(globalButtonWrapper);
+                let buttons:Button[] = [];
+                let box = new InputBox({
+                    container:globalButtonWrapper
+                });
+                globalButtons.forEach((btn) => {
+                    buttons.push(new Button({
+                        content:btn.caption,
+                        container:box.wrapper,
+                        onClick:()=>{
+                            ButtonAction.get().clickHandle(btn,{});
+                        }
+                    }))
+                });
+                box.children = buttons;
+            }
         }
     }
 
@@ -107,14 +127,14 @@ export class MbListModule extends Component{
             },
             container: wrapper,
             dataManager: {
-                pageSize: 10,
+                pageSize: tools.isMb ? 10 : 4,
                 isPulldownRefresh: true,
-                render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
+                render: (start: number, length: number, data: obj[]) => {
                     this.defaultData = data;
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
                 ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
-                    return new Promise<{ data: obj[], total: number }>((resolve, reject) => {
+                    return new Promise<{ data: obj[], total: number }>((resolve) => {
                         let dataAddr: R_ReqAddr = this.para.ui.body.elements[0].dataAddr,
                             url = BW.CONF.siteUrl + BwRule.reqAddr(dataAddr, custom);
                         url = tools.url.addObj(url, {
@@ -150,7 +170,7 @@ export class MbListModule extends Component{
         this.allButtons = buttons;
     }
 
-    private handlerLayout(layout: IBW_Layout, cols: R_Field[]) {
+    private handlerLayout(layout: IBW_Layout) {
         let validLayout: obj = {};
         for (let key in layout) {
             tools.isNotEmpty(layout[key]) && (validLayout[key] = layout[key]);
@@ -210,7 +230,7 @@ export class MbListModule extends Component{
                     case 'title': {
                         let titleField: string[] = layout['title'],
                             titleStr = '';
-                        titleField.forEach((field, index) => {
+                        titleField.forEach((field) => {
                             titleStr += item[field];
                         });
                         itemObj['title'] = titleStr;
