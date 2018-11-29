@@ -206,8 +206,19 @@ namespace BW{
                 },
                 fire : function (type : string, data? : obj,) {
                     tools.event.fire(type, data, window);
+                },
+                getFile: function (callback: (file: File) => void, error: Function) {
+                    let event = '__EVT_GET_IMG_BY_DEVICE__';
+                    self.handle('getImg', {event});
+                    d.once(window, event, function ({detail} : CustomEvent) {
+                        if(detail.success && detail.data){
+                            let data = detail.data;
+                            callback && callback(tools.base64ToFile(data.dataurl, data.filename, data.lastModifyTime));
+                        }else{
+                            error && error(detail);
+                        }
+                    });
                 }
-
             }
         })(this);
 
