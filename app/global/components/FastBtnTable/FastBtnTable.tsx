@@ -574,7 +574,7 @@ export class FastBtnTable extends FastTable{
                 {content: 'csv',icon: 'csv1',type:'default',onClick:() => this.export('csv')},
                 {content: 'excel',icon: 'excel',type:'default',onClick:() => this.export('xls')},
                 {content: 'word',icon: 'word',type:'default',onClick:() => this.export('doc')},
-                {content: 'pdf',icon: 'pdf',type:'default', onClick:() => this.export('pdf')},
+                // {content: 'pdf',icon: 'pdf',type:'default', onClick:() => this.export('pdf')},
                 {content: 'png',icon: 'png',type:'default',onClick:() => this.export('image')}
             ];
             btn.dropDown = new DropDown({
@@ -592,7 +592,7 @@ export class FastBtnTable extends FastTable{
             let data = [{value: 'csv', text: '导出csv'},
                 {value: 'xls', text: '导出excel'},
                 {value: 'doc', text: '导出word'},
-                {value: 'pdf', text: '导出pdf'},
+                // {value: 'pdf', text: '导出pdf'},
                 {value: 'image', text: '导出png'}];
             return {
                 title: '导出报表',
@@ -618,13 +618,12 @@ export class FastBtnTable extends FastTable{
             });
             let tbody = d.query('tbody', this.mainTable.body.tableEl).cloneNode(true) as HTMLElement,
                 thead = d.query('thead', this.mainTable.head.tableEl).cloneNode(true) as HTMLElement;
-            let table = <table border="1"/>,
-                div = <div style="overflow: auto; height: auto; width: 100%"></div>;
-            table.innerHTML = thead.innerHTML + tbody.innerHTML;
-            d.append(document.body, div);
-            d.append(div, table);
-            tableExport(table, this.exportTitle, action);
-            d.remove(div, true);
+            let table: HTMLTableElement = <table border="1" id="tableExport"/>;
+            table.innerHTML = thead.outerHTML + tbody.outerHTML;
+            d.append(document.body, table);
+            tableExport('tableExport', this.exportTitle, action);
+            d.remove(table, true);
+            table = null;
             this.columns.forEach((col) => {
                 if(names.indexOf(col.name) > -1){
                     col.isFixed = true;
