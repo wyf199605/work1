@@ -37,6 +37,7 @@ interface SYS_Window{
     powerManager?();
     whiteBat?();
     uploadVersion?(version: string);
+    getFile(callback: (file: File) => void, error?: Function);
 }
 
 interface SYS_UI{

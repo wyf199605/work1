@@ -62,7 +62,7 @@ export class DrawPoint extends Component {
     // static EVT_IMG_INIT = '__event_image_area_click__';
 
     protected wrapperInit() {
-        return <div className="draw-point-wrapper"/>;
+        return <div className="draw-point-wrapper"/>
     }
 
     constructor(protected para: IDrapPoint) {
@@ -139,57 +139,19 @@ export class DrawPoint extends Component {
                 this.redraw();
             })
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-        // this.svg.on('touchstart',function () {
-        //         if(D3.touches(this) && D3.touches(this).length > 1){
-        //              let x1 = D3.touches(this)[0][0],
-        //                  y1 = D3.touches(this)[0][1],
-        //                  x2 = D3.touches(this)[1][0],
-        //                  y2 = D3.touches(this)[1][1];
-        //              let calX = x2 - x1,
-        //                  calY = y2 - y1;
-        //              spot1 = Math.pow((calX * calX + calY * calY),0.5);
-        //         }else {
-        //             x0 = D3.touches(this)[0][0];
-        //             y0 = D3.touches(this)[0][1];
-        //         }
-        //      }).on('touchmove',function () {
-        //         if(D3.touches(this) && D3.touches(this).length > 1){
-        //             let x1 = D3.touches(this)[0][0],
-        //                 y1 = D3.touches(this)[0][1],
-        //                 x2 = D3.touches(this)[1][0],
-        //                 y2 = D3.touches(this)[1][1];
-        //             let calX = x2 - x1,
-        //                 calY = y2 - y1;
-        //             spot2 = Math.pow((calX * calX + calY * calY),0.5);
-        //             let len = spot2/1000;
-        //             if(spot2 > spot1){
-        //                 _this.g.attr('transform',"matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-        //                 num1 = num1 + len;
-        //                 num2 = num2 + len;
-        //             }else {
-        //                 if(num1 == 0.1 || num2 == 0.1){
-        //                     _this.g.attr("transform","scale(0.1,0.1)");
-        //                 }else {
-        //                     _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-        //                     num1 = num1 - len;
-        //                     num2 = num2 - len;
-        //                 }
-        //             }}else if(D3.touches(this) && D3.touches(this).length == 1){
-        //             let  x = (D3.touches(this)[0][0] - x0)/30;
-        //             let y = (D3.touches(this)[0][1] - y0)/30;
-        //
-        //             xx = xx + x;
-        //             yy = yy + y;
-        //
-        //             _this.g.attr("transform","matrix("+ num1 +",0,0,"+ num2 +","+ xx +","+ yy +")");
-        //         }
-        //      }).on('touchend',function () {
-        //
-        //      })
+        this.g.on('touchstart',function () {
+        }).on('touchmove',function () {
+              let pos = D3.touches(this)[0];
+              let slate = [];
+              slate.push(pos[0])
+              slate.push(pos[1])
+              _this.svg.attr('x',slate[0]).attr('y',slate[1])
+        }).on('touchend',function () {
+          alert(D3.touches(this))
+        })
        let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
-
     }
 
     set imgUrl(url) {
@@ -199,6 +161,7 @@ export class DrawPoint extends Component {
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
         if(tools.isMb){
+
             let slate = [-250,0],
                 slate1 = [-150,-50]
             this.g.attr("transform","scale(2.5)" + "translate(" + slate+ ")" );
@@ -1044,11 +1007,9 @@ export class DrawPoint extends Component {
             d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
                 // //
                 // alert('000')
-                // let str = [];
-                // str.push(ev.centerX);
-                // str.push(ev.centerY);
+                //alert('hah')
                 // scale = ev.scale;
-                // scale = Math.min(ev.scale, 2);
+                // scale = Math.min(ev.scale, 5);
                 // scale = Math.max(0.5, ev.scale);
                 // // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
                 // _this.g.attr('transform', "scale(" + scale + ")");

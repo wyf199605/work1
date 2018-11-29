@@ -116,6 +116,13 @@ namespace BW{
                 },
                 fire : function (type : string, data? : obj,) {
                     tools.event.fire(type, data, window);
+                },
+                getFile: function (callback: (file: File) => void, error: Function) {
+                    let input = <HTMLInputElement>d.create('<input type="file"/>');
+                    input.onchange = () => {
+                        callback && callback(input.files[0]);
+                    };
+                    input.click();
                 }
             }
         })(this);
