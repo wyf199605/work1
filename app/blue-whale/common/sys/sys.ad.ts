@@ -232,7 +232,7 @@ namespace BW{
                     d.once(window, event, function ({detail} : CustomEvent) {
                         if(detail.success && detail.data){
                             let data = detail.data;
-                            callback && callback(tools.base64ToFile(data.dataurl, data.filename, data.lastModifyTime));
+                            callback && callback(tools.base64ToFile(data.dataurl, data.filename));
                         }else{
                             error && error(detail);
                         }

@@ -295,6 +295,7 @@ namespace BW {
                     let input = <HTMLInputElement>d.create('<input type="file"/>');
                     input.onchange = () => {
                         callback && callback(input.files[0]);
+                        input = null;
                     };
                     input.click();
                 },
