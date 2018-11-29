@@ -95,9 +95,11 @@ export class ListItemDetailCell extends Component {
             return;
         }
         if (Array.isArray(value) && tools.isNotEmpty(value)) {
+            let imgHtml = [];
             value.forEach((v) => {
-                d.append(imgsWrapper, <img src={v} alt={this.para.caption}/>);
-            })
+                imgHtml.push(`<img src=${v} alt=${this.para.caption}/>`);
+            });
+            imgsWrapper.innerHTML = imgHtml.join();
         }
     }
 
@@ -126,10 +128,10 @@ export class ListItemDetailCell extends Component {
                                         fileAddr = this.currentFile.addr,
                                         nameArr = fileName.split('.'),
                                         extensionName = nameArr[nameArr.length - 1],
-                                        imgs = ['jpg','png','jpeg','gif'];
-                                    if (~imgs.indexOf(extensionName)){
+                                        imgs = ['jpg', 'png', 'jpeg', 'gif'];
+                                    if (~imgs.indexOf(extensionName)) {
                                         sys.window.openImg(BW.CONF.siteUrl + fileAddr);
-                                    }else{
+                                    } else {
                                         sys.window.download(BW.CONF.siteUrl + fileAddr);
                                     }
                                 }
@@ -138,28 +140,28 @@ export class ListItemDetailCell extends Component {
                     ]
                 });
             }
+            let htmlArr = [];
             Array.isArray(value) && value.forEach((f, index) => {
-                d.append(fileWrapper, <div className="detail-cell-file-item" data-index={index}>
-                    <div className="file-icon"><i className="appcommon app-wenjian"/></div>
-                    <div className="file-info">
-                        <div className="file-name">{f.filename}</div>
-                        <div className="file-size">{this.calcFileSize(f.filesize)}</div>
+                let wrapper = tools.isMb ? `<div class="detail-cell-file-item" data-index=${index}>
+                    <div class="file-icon"><i class="appcommon app-wenjian"></i></div>
+                    <div class="file-info">
+                        <div class="file-name">${f.filename}</div>
+                        <div class="file-size">${this.calcFileSize(f.filesize)}</div>
                     </div>
-                    <i className="file-option appcommon app-gengduo1"/>
-                </div>);
-            })
+                    <i class="file-option appcommon app-gengduo1"></i>
+                </div>` : `<div class="detail-cell-file-item" data-index=${index}>
+                    <i class="iconfont icon-annex"></i>
+                    <div class="file-name" title="${f.filename}">${f.filename}</div>
+                    <div class="file-size">(${this.calcFileSize(f.filesize)})</div>
+                    <i class="file-option appcommon app-gengduo1"></i>
+                </div>`;
+                htmlArr.push(wrapper);
+            });
+            tools.isNotEmpty(htmlArr) && (fileWrapper.innerHTML = htmlArr.join(''));
         } else {
             d.append(fileWrapper, <i className="appcommon app-zanwushuju"/>);
         }
     }
-
-    // private downloadFile(src: string) {
-    //     let iframe = document.createElement('iframe'),
-    //         body = document.getElementsByTagName('body')[0];
-    //     iframe.style.display = 'none';
-    //     iframe.src = "javascript: '<script>location.href=\"" + src + "\"<\/script>'";
-    //     body.appendChild(iframe);
-    // }
 
     private initEvent = (() => {
         let option = (e) => {
@@ -182,6 +184,7 @@ export class ListItemDetailCell extends Component {
         switch (this.para.type) {
             case 'text': {
                 this.innerEl.content.innerText = data as string || '';
+                this.innerEl.content.title = data as string || '';
             }
                 break;
             case 'img': {

@@ -50,6 +50,7 @@ export class NewTableModule {
     private currentSelectedIndexes: number[] = [];
 
     constructor(para: ITableModulePara) {
+        window['nt'] = this;
         console.log(para);
         this.bwEl = para.bwEl;
         this.showSubField = para.bwEl.showSubField;
@@ -319,7 +320,10 @@ export class NewTableModule {
             selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {});
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
-            this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
+            let seqIndex = parseInt(showSubSeq[0]) - 1;
+            if(tools.isEmpty(this.sub[seqIndex])){
+                this.subTabActiveIndex = seqIndex;
+            }
         }
         let bwEl = this.bwEl,
             subUi = bwEl.subTableList && bwEl.subTableList[this.subTabActiveIndex];
@@ -336,7 +340,6 @@ export class NewTableModule {
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
             this.tab.setTabsShow(showSubSeq);
-
             this.currentSelectedIndexes.push(this.subTabActiveIndex);
             let subs = [];
             for (let key in this.sub) {
@@ -437,7 +440,10 @@ export class NewTableModule {
             // 刷新子表
             !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
             let row = this.main.ftable.rowGet(this.subIndex);
-            row && this.subRefresh(row.data);
+            row && this.subRefresh(row.data).then(() => {
+                this.active.off();
+                this.active.on();
+            });
             this.subWrapper && this.subWrapper.classList.toggle('hide', !row);
             let sub = this.sub[this.subTabActiveIndex],
                 subBox = tools.keysVal(sub, 'subBtns', 'box');
@@ -618,10 +624,12 @@ export class NewTableModule {
         let on = () => {
             this.sub && d.on(this.subWrapper, 'click', handler1 = () => {
                 isMainActive = false;
+                console.log(isMainActive, 's');
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
             d.on(this.main.wrapper, 'click', handler2 = () => {
                 isMainActive = true;
+                console.log(isMainActive);
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
         };
@@ -648,9 +656,9 @@ export class NewTableModule {
     edit = (() => {
 
         let self = this,
-            isOnce = true,
-            validList: Promise<any>[] = [],
-            editModule: EditModule = null;
+            handlerName = '__EVT_VALID_CANCEL__',
+            editName = '__EDIT__MODULE__',
+            validList: Promise<any>[] = [];
 
         let tableEach = (fun: (tm: BwTableModule, index: number) => void) => {
             [this.main, ...Object.values(this.sub)].forEach((table, i) => {
@@ -668,7 +676,7 @@ export class NewTableModule {
             // debugger;
             let mftable = this.main.ftable;
             if (mftable.editing) {
-                return;
+                return Promise.resolve();
             }
             let allPromise: Promise<void>[] = [];
             tableEach(table => {
@@ -690,7 +698,7 @@ export class NewTableModule {
         };
 
         let tableEditInit = (TableEditModule: typeof EditModule, bwTable: BwTableModule, defData: obj) => {
-            editModule = new TableEditModule({
+            let editModule = bwTable[editName] = new TableEditModule({
                 auto: false,
                 type: 'table',
                 fields: bwTable.cols.map(f => {
@@ -823,15 +831,16 @@ export class NewTableModule {
             });
 
             // 控件销毁时验证
-            if (isOnce) {
-                isOnce = false;
-                bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell: FastTableCell) => {
-                    validList.push(validate(TableEditModule, cell));
-                });
-            }
+            bwTable.ftable.off(FastTable.EVT_CELL_EDIT_CANCEL, bwTable[handlerName]);
+            bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, bwTable[handlerName] = (cell: FastTableCell) => {
+                validList.push(validate(editModule, cell));
+            });
         };
 
-        let validate = (TableEditModule: typeof EditModule, cell: FastTableCell): Promise<any> => {
+        let cellCancel = (cell: FastTableCell) => {
+        };
+
+        let validate = (editModule, cell: FastTableCell): Promise<any> => {
             return new Promise((resolve, reject) => {
                 let name = cell.name,
                     field: R_Field = cell.column.content,
@@ -855,7 +864,7 @@ export class NewTableModule {
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
-                    TableEditModule.checkValue(field, rowData, () => {
+                    EditClass.checkValue(field, rowData, () => {
                         lookUpCell && (lookUpCell.data = null);
                         cell.data = null;
                     }, name)
@@ -881,14 +890,17 @@ export class NewTableModule {
                     resolve();
                     // callback(td, true);
                 }
-            })
+            }).then(() => cell.isChecked = true)
             // debugger;
 
         };
 
+        let EditClass: typeof EditModule;
+
         let editModuleLoad = (): Promise<typeof EditModule> => {
             return new Promise((resolve) => {
                 require(['EditModule'], (edit) => {
+                    EditClass = edit.EditModule;
                     resolve(edit.EditModule as typeof EditModule);
                 })
             })
@@ -960,8 +972,26 @@ export class NewTableModule {
                 })
         };
 
+        let cellCheckValue = () => {
+            return new Promise((resolve, reject) => {
+                Promise.all([this.main, ...Object.values(this.sub)].map((bwTable) => {
+                    return Promise.all(bwTable.ftable.editedCells.map((cell) => {
+                        if(!cell.isChecked && !cell.isVirtual && cell.show){
+                            return validate(bwTable[editName], cell);
+                        }else{
+                            return Promise.resolve();
+                        }
+                    }))
+                })).then(() => {}).catch((e) => console.log(e)).finally(() => {
+                    resolve()
+                });
+            })
+        };
+
         let save = () => {
-            return editModule.assignPromise.then(() => {
+            return Promise.all([this.main, ...Object.values(this.sub)].map((bwTable) => {
+                return bwTable[editName] ? bwTable[editName].assignPromise : Promise.resolve();
+            })).then(() => {
                 this.closeCellInput();
                 let loading = new Loading({
                     msg: '验证中...',
@@ -970,44 +1000,46 @@ export class NewTableModule {
                 setTimeout(() => {
                     Promise.all(validList).then(() => {
                     }).catch().finally(() => {
-                        validList = [];
-                        loading && loading.hide();
-                        loading = null;
-                        setTimeout(() => {
-                            let saveData = editDataGet();
-                            if (tools.isEmpty(saveData.param)) {
-                                Modal.toast('没有数据改变');
-                                cancel();
-                                this.editBtns.end();
-                                return
-                            }
-                            this.saveVerify.then(() => {
-                                let loading = new Loading({
-                                    msg: '保存中',
-                                    disableEl: this.main.wrapper
-                                });
-                                BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
-                                    type: 'POST',
-                                    data: saveData,
-                                }).then(({response}) => {
-
-                                    BwRule.checkValue(response, saveData, () => {
-                                        this.currentSelectedIndexes = [];
-                                        // 主表子表刷新
-                                        this.refresh();
-                                        Modal.toast(response.msg);
-                                        this.editBtns.end();
-                                        // loading && loading.destroy();
-                                        // loading = null;
-                                        cancel();
-                                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                        cellCheckValue().then(() => {}).finally(() => {
+                            validList = [];
+                            loading && loading.hide();
+                            loading = null;
+                            setTimeout(() => {
+                                let saveData = editDataGet();
+                                if (tools.isEmpty(saveData.param)) {
+                                    Modal.toast('没有数据改变');
+                                    cancel();
+                                    this.editBtns.end();
+                                    return
+                                }
+                                this.saveVerify.then(() => {
+                                    let loading = new Loading({
+                                        msg: '保存中',
+                                        disableEl: this.main.wrapper
                                     });
-                                }).finally(() => {
-                                    loading && loading.destroy();
-                                    loading = null;
-                                });
-                            }).catch();
-                        }, 100);
+                                    BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
+                                        type: 'POST',
+                                        data: saveData,
+                                    }).then(({response}) => {
+
+                                        BwRule.checkValue(response, saveData, () => {
+                                            this.currentSelectedIndexes = [];
+                                            // 主表子表刷新
+                                            this.refresh();
+                                            Modal.toast(response.msg);
+                                            this.editBtns.end();
+                                            // loading && loading.destroy();
+                                            // loading = null;
+                                            cancel();
+                                            tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                                        });
+                                    }).finally(() => {
+                                        loading && loading.destroy();
+                                        loading = null;
+                                    });
+                                }).catch();
+                            }, 100);
+                        })
                     })
                 }, 100)
 
@@ -1082,7 +1114,7 @@ export class NewTableModule {
             if (isSave) {
                 resolve()
             } else {
-                Modal.alert('您输入的内容有错误信息，请改正后再保存。', '温馨提示', () => reject());
+                Modal.alert('您输入的内容有误，请更正后再保存。', '温馨提示', () => reject());
             }
         });
     }

@@ -1015,7 +1015,6 @@ export class Modal extends Component {
 
 
     constructor(para: IModal = {}) {
-
         super(para);
         this.init(para);
     }

@@ -720,6 +720,8 @@ export class PlanModule extends Component{
                     defDataAddrList: this.ui.defDataAddrList,
                     dataAddr: this.ui.dataAddr
                 },
+                width:'600px',
+                height:'600px',
                 defaultData: data,
                 confirm: (data) => {
                     debugger;

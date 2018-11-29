@@ -12,7 +12,7 @@ namespace G{
         require.config({
             baseUrl : config.baseUrl,
             paths: Object.assign({
-                tableExport: ['../plugin/tableExport.min'],
+                tableExport: ['../plugin/tableExport'],
                 JsBarcode: ['../plugin/qrcode/JsBarcode.all.min'],
                 QRCode: ['../plugin/qrcode/qrcode.min'],
                 echarts: ['../plugin/echarts/echarts.min'],

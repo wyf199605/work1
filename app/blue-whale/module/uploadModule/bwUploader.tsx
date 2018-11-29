@@ -3,6 +3,7 @@
 
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import sys = BW.sys;
 
 interface IBwUploaderPara extends IComponentPara{
 
@@ -14,6 +15,9 @@ export class BwUploader extends Component{
     }
 
     constructor(para: IBwUploaderPara){
-        super(para)
+        super(para);
+        sys.window.getFile(() => {
+
+        })
     }
 }

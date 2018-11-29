@@ -77,7 +77,7 @@ namespace BW{
                 clear: function () {
                     // self.ui.toast('清除成功');
                 },
-                opentab: function (url, accessToken, noShow?: string[]) {
+                opentab: function (url, accessToken, noShow: string[] = null) {
                     let win = window.parent ? window.parent : window;
                     win.location.href = CONF.url.main;
                     localStorage.setItem('hideBaseMenu', JSON.stringify(noShow));
@@ -116,6 +116,13 @@ namespace BW{
                 },
                 fire : function (type : string, data? : obj,) {
                     tools.event.fire(type, data, window);
+                },
+                getFile: function (callback: (file: File) => void, error: Function) {
+                    let input = <HTMLInputElement>d.create('<input type="file"/>');
+                    input.onchange = () => {
+                        callback && callback(input.files[0]);
+                    };
+                    input.click();
                 }
             }
         })(this);

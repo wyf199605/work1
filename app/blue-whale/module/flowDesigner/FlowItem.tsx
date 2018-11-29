@@ -89,7 +89,7 @@ export class FlowItem extends Component {
             if (diamondArr.indexOf(para.type) >= 0) {
                 this.isDiamond = true;
                 this.wrapper.classList.add('diamond');
-                this.wrapper.appendChild(<div className="diamond-text">{para.type}</div>);
+                this.wrapper.appendChild(<div className="diamond-text">{para.text || para.type}</div>);
                 this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, this.width, this.height)
                                 .attr(this.getDefaultAttr(para.position.x, para.position.y)).transform('r45');
             } else {
@@ -99,6 +99,7 @@ export class FlowItem extends Component {
                                 .attr(this.getDefaultAttr(para.position.x, para.position.y));
             }
         }
+        this.wrapper.style.backgroundColor = FlowItem.itemColor[para.type];
         this.initEvents.on();
 
         let fields: IFieldPara = {};
@@ -193,7 +194,7 @@ export class FlowItem extends Component {
         if (isComplete) {
             this.wrapper.classList.add('complete');
         } else {
-            this.wrapper.style.borderColor = '#b6d1e0';
+            this.wrapper.style.borderColor = FlowItem.itemColor[this.para.type];
         }
         this._isComplete = isComplete;
     }

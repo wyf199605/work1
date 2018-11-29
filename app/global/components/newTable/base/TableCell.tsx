@@ -410,6 +410,7 @@ export class TableDataCell extends TableCell {
     protected input: FormCom = null;
     protected blurHandler = null;
 
+    public isChecked = false;
     protected _editing: boolean = false;
     get editing(){
         return this._editing;

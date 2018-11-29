@@ -160,62 +160,63 @@ export = class myselfMbPage {
         });
 
         d.on(d.query('#testNetwork'), 'click', () => {
-            this.initModal();
-            let urls = Array.from({length: 10}, () => 1000).map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, {size: num}));
-            let testStart = true;
+            modal.isShow = true;
+        });
+        let modal = this.initModal();
+        let urls = Array.from({length: 5}, () => 1000).map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, {size: num}));
+        let testStart = true;
 
-            d.on(d.query('body'), 'click', '.mui-rotate-box', function () {
-                if (testStart) {
-                    let progressBar = d.query('.mui-progress-bar', this.parentElement);
-                    let progressWidth = d.query('.mui-progress', this.parentElement).offsetWidth;
-                    progressBar.style.width = 0 + 'px';
-                    testStart = false;
-                    this.className += ' animate_start';
-                    let interval = null;
-                    let timeout = null;
-                    let width = 0;
-                    let scroll = 0;
-                    let addWidth = (): void => {
-                        progressBar.style.transition = 0 + 's';
-                        progressBar.style.webkitTransition = 0 + 's';
-                        interval = setInterval(() => {
-                            width++;
-                            this.querySelector('.box-content').innerHTML = '测速中...';
-                            progressBar.style.width = width + 'px';
-                            if (width / progressWidth >= scroll) {
-                                clearInterval(interval);
-                            }
-                        }, 100);
-                    };
-                    addWidth();
-                    self.speedTest(urls, (results: number[]) => {
+        d.on(d.query('body'), 'click', '.mui-rotate-box', function () {
+            if (testStart) {
+                let progressBar = d.query('.mui-progress-bar', this.parentElement);
+                let progressWidth = d.query('.mui-progress', this.parentElement).offsetWidth;
+                progressBar.style.width = 0 + 'px';
+                testStart = false;
+                this.className += ' animate_start';
+                let interval = null;
+                let timeout = null;
+                let width = 0;
+                let scroll = 0;
+                let addWidth = (): void => {
+                    progressBar.style.transition = 0 + 's';
+                    progressBar.style.webkitTransition = 0 + 's';
+                    interval = setInterval(() => {
+                        width++;
+                        this.querySelector('.box-content').innerHTML = '测速中...';
+                        progressBar.style.width = width + 'px';
+                        if (width / progressWidth >= scroll) {
+                            clearInterval(interval);
+                        }
+                    }, 100);
+                };
+                addWidth();
+                self.speedTest(urls, (results: number[]) => {
+                    clearInterval(interval);
+                    clearInterval(timeout);
+                    scroll = (results.length + 1) / urls.length;
+                    progressBar.style.transition = .8 + 's';
+                    progressBar.style.webkitTransition = .8 + 's';
+                    width = progressWidth * (results.length / urls.length);
+                    progressBar.style.width = width + 'px';
+                    timeout = setTimeout(() => {
+                        addWidth();
+                    }, 800);
+                    if (results.length === urls.length) {
                         clearInterval(interval);
                         clearInterval(timeout);
-                        scroll = (results.length + 1) / urls.length;
-                        progressBar.style.transition = .8 + 's';
-                        progressBar.style.webkitTransition = .8 + 's';
-                        width = progressWidth * (results.length / urls.length);
-                        progressBar.style.width = width + 'px';
-                        timeout = setTimeout(() => {
-                            addWidth();
-                        }, 800);
-                        if (results.length === urls.length) {
-                            clearInterval(interval);
-                            clearInterval(timeout);
-                            let sum: number = 0;
-                            results.forEach((val) => {
-                                sum += val;
-                            });
-                            setTimeout(() => {
-                                this.className = this.classList[0];
-                                this.querySelector('.box-content').innerHTML =
-                                    (sum / results.length).toFixed(2) + 'KB/s';
-                                testStart = true;
-                            }, 1000);
-                        }
-                    });
-                }
-            })
+                        let sum: number = 0;
+                        results.forEach((val) => {
+                            sum += val;
+                        });
+                        setTimeout(() => {
+                            this.className = this.classList[0];
+                            this.querySelector('.box-content').innerHTML =
+                                (sum / results.length).toFixed(2) + 'KB/s';
+                            testStart = true;
+                        }, 1000);
+                    }
+                });
+            }
         });
         sys.window.close = double_back;
     }
@@ -250,13 +251,13 @@ export = class myselfMbPage {
             </div>
         </div>;
 
-        let modal = new Modal({
+        return new Modal({
             container: d.closest(wrapper, '.page-container'),
             header: '网络测速',
             body: body,
             position: sys.isMb ? 'full' : '',
             width: '730px',
-            isShow: true
+            isShow: false
         });
     }
 

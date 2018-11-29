@@ -92,7 +92,7 @@ export = class contactPage extends BasicPage {
             className : 'button-call'
         });
         let mobile = d.query('[data-col="MOBILE"]');
-        if(mobile.textContent){
+        if(mobile && mobile.textContent){
             inputBox.addItem(new Button({
                 content : '拨号',
                 icon : 'call',
@@ -109,20 +109,20 @@ export = class contactPage extends BasicPage {
                     sys.window.load('sms:' + mobile.textContent);
                 }
             }));
+            inputBox.addItem(new Button({
+                content : '邮件',
+                icon : 'message',
+                className : 'message',
+                onClick : () => {
+                    let userId = d.query('[data-col="USERID"]').textContent;
+                    BW.sys.window.open({
+                        url: tools.url.addObj(BW.CONF.url.mail, {
+                            defaultvalue: '{"RECEIVERID":"'+userId+'"}'
+                        })
+                    });
+                    // sys.window.load('sms:' + mobile.textContent);
+                }
+            }));
         }
-        inputBox.addItem(new Button({
-            content : '邮件',
-            icon : 'message',
-            className : 'message',
-            onClick : () => {
-                let userId = d.query('[data-col="USERID"]').textContent;
-                BW.sys.window.open({
-                    url: tools.url.addObj(BW.CONF.url.mail, {
-                        defaultvalue: '{"RECEIVERID":"'+userId+'"}'
-                    })
-                });
-                // sys.window.load('sms:' + mobile.textContent);
-            }
-        }));
     }
 }

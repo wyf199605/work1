@@ -71,10 +71,6 @@ export class FlowEditor extends FormCom {
         ]
     };
 
-    // static addressList = [
-    //     {text: '', address: CONF.ajaxUrl.useAddressList_user, key: '用户'}
-    // ];
-
     private owner: Component | FlowDesigner;
 
     protected wrapperInit(para: IFlowEditorPara): HTMLElement {
@@ -166,7 +162,8 @@ export class FlowEditor extends FormCom {
                     }
                 });
                 dropdown.hideList();    // 初始设置为隐藏
-                d.append(d.closest(this.wrapper, '.design-canvas'), dropdownWrapper);
+                // d.append(d.closest(this.wrapper, '.design-canvas'), dropdownWrapper);
+                d.append(this.wrapper, dropdownWrapper);
                 // 将下拉列表存到FlowEditor类和实例中，方便之后隐藏/显示列表
                 this.dropdowns[attr] = dropdown;
                 FlowEditor.DropDowns.push(dropdown);
@@ -184,7 +181,8 @@ export class FlowEditor extends FormCom {
                 } else {
                     input = d.query('input', e.target.parentElement) as HTMLInputElement;
                 }
-                input.focus();
+                input && input.focus();
+                FlowEditor.hideAllDropdown();
                 input.dataset.old = input.value;
             },
             changeHandler = (e) => {
@@ -212,6 +210,22 @@ export class FlowEditor extends FormCom {
                     prevState = dropdown.isVisible;
                 FlowEditor.hideAllDropdown();
                 prevState ? dropdown.hideList() : dropdown.showList();
+                e.stopPropagation();
+                // 控制下拉列表的显示位置
+                let wrapperLength = d.queryAll('.attr-editor-wrapper', this.wrapper).length,
+                    wrapperHeight = parseInt(window.getComputedStyle(d.query('.attr-editor-wrapper', this.wrapper)).height),
+                    targetIndex: number = null;
+                d.queryAll('.attr-editor-wrapper', this.wrapper).filter((item, index) =>
+                    item === d.closest(e.target, '.attr-editor-wrapper', this.wrapper) && (targetIndex = index));
+                let dropdownHeight = d.queryAll('.drop-item', dropdown.ulDom).length *
+                            parseInt(window.getComputedStyle(d.query('.drop-item', dropdown.ulDom)).height) + 8;
+                let bottom = (wrapperLength - targetIndex) * wrapperHeight - dropdownHeight - 26;
+                if(bottom < 0){
+                    d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom =
+                        (wrapperLength - targetIndex) * wrapperHeight + 'px';
+                }else{
+                    d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom = bottom + 'px';
+                }
             };
 
         // 使用this.wrapper会使得点击.tip-header时，第一个input获得焦点，对change事件没有影响
@@ -335,6 +349,7 @@ export class FlowEditor extends FormCom {
         FlowEditor.DropDowns.forEach(dropdown => {
             Object.keys(this.dropdowns).forEach(attr => {
                 d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
+                this.dropdowns[attr].destroy();
             });
         });
         this.owner = null;
