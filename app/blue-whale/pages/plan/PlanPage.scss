@@ -105,6 +105,9 @@
         display: block;
         g {
           touch-action: auto;
+          image{
+            image-rendering: auto;
+          }
           .iconfont {
             font-size: 12px;
           }
