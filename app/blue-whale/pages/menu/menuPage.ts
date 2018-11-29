@@ -17,13 +17,13 @@ export = class menuPage extends BasicPage {
             }
         };
         $('.file-box').on('click', 'a[data-href]', function () {
-            let parse = this.dataset.parse, parseVarList;
+            let parse = this.dataset.parse, menuPath;
             try {
-                parseVarList = parse && JSON.parse(this.dataset.parse);
+                menuPath = parse && JSON.parse(this.dataset.parse);
             }catch (e) {
                 Modal.alert('后台返回JSON格式错误');
             }
-            MENU.openWindowWithBadge(tools.url.addObj(BW.CONF.siteUrl + this.dataset.href,G.Rule.parseVarList(parseVarList, {})), this);
+            MENU.openWindowWithBadge(tools.url.addObj(BW.CONF.siteUrl + this.dataset.href,G.Rule.parseVarList(menuPath.parseVarList, {})), this);
         });
         function animationHover(element, animation) {
             element = $(element);
