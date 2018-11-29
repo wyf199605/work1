@@ -149,7 +149,6 @@ export class FlowEditor extends FormCom {
                                             });
                                             index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
                                             this.set({[attr]: userName.join(',') || groupId || assignId});
-                                            return;
                                         }
                                     });
                                 }).catch(err => {
