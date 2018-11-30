@@ -4,10 +4,10 @@ import d = G.d;
 import tools = G.tools;
 import Ajax = G.Ajax;
 import sys = BW.sys;
-import {FileType} from "../../../global/components/form/newUploader/newUploader"
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {User} from "../../../global/entity/User";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
+import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
 
 
 export interface IBwUploaderPara extends IFormComPara {
@@ -16,24 +16,11 @@ export interface IBwUploaderPara extends IFormComPara {
     nameField: string;
     thumbField?: string;
     maxSize?: number;
-    formData?: () => obj;
+    autoUpload?: boolean; // 自动上传，默认true
     // accept?: FileType;
-    onSuccess?: (response: Array<{ data: any, file: File }>) => void;
+    onSuccess?: (...any) => void;
     onFailure?: () => void;
-}
-
-interface IFileBlock {
-    end: number;
-    start: number;
-    index: number;
-    uniqueFileName: string;
-}
-
-interface IFileData{
-    isExist: boolean;
-    md5: string;
-    uniqueFileName: string;
-    data?: any;
+    uploadUrl?: string;
 }
 
 export class BwUploader extends FormCom {
@@ -43,83 +30,97 @@ export class BwUploader extends FormCom {
     protected nameField: string;
     protected thumbField: string;
     protected formData: () => obj;  // 上传附带数据
-    protected onSuccess: (response: Array<{data: any, file: File}>) => void;
+    protected onSuccess: (...any) => void;
     protected onFailure: () => void;
-    protected fileName: string; // 当前上传成功文件的名称
+    protected filename: string; // 当前上传成功文件的名称
+    protected files: File[] = [];   // 上传成功文件
+    protected temFiles: File[] = []; // 暂存文件，等待上传
+    protected fileUpload: FileUpload;
+    protected input: HTMLInputElement;
 
-    protected wrapperInit() {
-        return <div className="bw-upload-wrapper"/>;
+    protected wrapperInit(para) {
+        this.input = <input className="file-input" type="text" value={para.text || ''}/>;
+        this.input.readOnly = true;
+        return <div className="bw-upload-wrapper">
+            {this.input}
+        </div>;
     }
 
     constructor(para: IBwUploaderPara) {
         super(para);
-        // this.uploadUrl = para.uploadUrl;
+        this.uploadUrl = para.uploadUrl;
         this.nameField = para.nameField;
         this.thumbField = para.thumbField;
         this.maxSize = para.maxSize || -1;
-        this.formData = para.formData;
         this.onSuccess = para.onSuccess;
         this.onFailure = para.onFailure;
+
+        let autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
+        this.fileUpload = new FileUpload({
+            chunk: {
+                chunkSize: this.chunkSize,
+                beforeSendBlock: this.beforeSend.bind(this),
+                afterSendFile: this.afterSendFile.bind(this)
+            },
+            uploadUrl: this.uploadUrl,
+            beforeSendFile: this.beforeSendFile.bind(this)
+        });
 
         d.on(this.wrapper, 'click', () => {
             sys.window.getFile((file: File) => {
                 if(this.maxSize !== -1 && file.size > this.maxSize){
                     Modal.alert('文件大小超过限制');
                 }else{
-                    this.uploadFile(file).then(({data, file}) => {
-                        this.fileName = file.name;
-                        this.onSuccess && this.onSuccess([{data, file}]);
-                    }).catch(() => {
-                        this.onFailure && this.onFailure();
-                        this.fileName = '';
-                    })
+                    this.temFiles = [file];
+                    autoUpload && this.upload();
                 }
             })
         });
     }
 
     get(){
-
+        return this.value;
     }
 
-    set(){
-
+    set(value: string){
+        this.value = value;
     }
 
     get value(){
-        return this.fileName;
+        return this.filename;
     }
 
-    set value(value){
-        this.fileName = value;
+    set value(value: string){
+        this.filename = value;
+        this.input.value = value;
     }
 
-    // 上传文件
-    uploadFile(file: File): Promise<{data: any, file: File}>{
-        return new Promise((resolve, reject) => {
-            // 秒传验证
-            this.beforeSendFile(file).then(({md5, isExist, uniqueFileName, data}) => {
-                if(isExist){
-                    // 若已存在后台，则直接返回
-                    resolve({data: data, file});
-                }else{
-                    // 分片验证
-                    this.chunkUpload(file, uniqueFileName).then(() => {
-                        // 合并请求
-                        this.afterSendFile(file, uniqueFileName, md5).then((response) => {
-                            resolve({data: response, file});
-                        }).catch(() => {
-                            reject();
-                        });
-                    }).catch(() => {
-                        reject();
-                    })
-                }
+    destroy(){
+        this.temFiles = null;
+        this.files = null;
+        this.fileUpload = null;
+        this.input = null;
+        super.destroy();
+    }
+
+    // 调用方法上传暂存文件
+    upload(){
+        this.wrapper.classList.remove('error');
+        this.input.value = '上传中...';
+        this.temFiles && this.temFiles.forEach((file) => {
+            this.fileUpload.upload(file).then((data) => {
+                console.log(data);
+                this.files.push(file);
+                this.value = file.name;
+                this.onSuccess && this.onSuccess(data);
             }).catch(() => {
-                reject();
+                this.wrapper.classList.add('error');
+                this.input.value = '上传失败';
+                this.onFailure && this.onFailure();
             })
         })
     }
+
 
     // 获取文件md5值
     getFileMd5(file: File): Promise<string> {
@@ -136,49 +137,19 @@ export class BwUploader extends FormCom {
         });
     }
 
-    // 分片验证逻辑
-    protected chunkUpload(file: File, uniqueFileName: string) {
-        let totalSize = file.size,
-            totalPieces = Math.ceil(totalSize / this.chunkSize),
-            list: Promise<any>[],
-            startSize = 0,
-            endSize = 0,
-            chunkIndex = 0,
-            blob: Blob;
-
-        while (totalPieces --) {
-            endSize = startSize + this.chunkSize;
-            blob = file.slice(startSize, endSize); // 切片
-
-            list.push(new Promise((resolve, reject) => {
-                this.beforeSend({
-                    end: endSize,
-                    start: startSize,
-                    index: chunkIndex,
-                    uniqueFileName: uniqueFileName,
-                }).then((isExist) => {
-                    if(isExist){
-                        this.upload(blob, file.name).then(() => {
-                            resolve();
-                        }).catch(() => {
-                            reject();
-                        });
-                    }else{
-                        resolve()
-                    }
-                });
-            }));
-            startSize = endSize;
-        }
-        return Promise.all(list);
-    }
-
     // 秒传验证
-    protected beforeSendFile(file: File): Promise<IFileData> {
+    protected beforeSendFile(file: File): Promise<obj> {
         return new Promise((resolve, reject) => {
             this.getFileMd5(file).then(md5 => {
-                let md5Code = md5,
+                let userid = User.get().userid,
+                    md5Code = md5,
                     uniqueFileName = tools.md5('' + file.name + file.type + file.lastModifiedDate + file.size);
+                this.fileUpload.formData = () => {
+                    return {
+                        userId: userid,
+                        md5: md5Code,
+                    }
+                };
                 let ajaxData: obj = {
                     status: "md5Check"
                     , md5: md5Code.toUpperCase()
@@ -200,15 +171,16 @@ export class BwUploader extends FormCom {
                     , dataType: "json"
 
                 }).then(function ({response}) {
-                    resolve({
-                        isExist: response.ifExist,
-                        md5: md5Code,
-                        uniqueFileName,
-                        data: response
-                    });
+                    if(response.ifExist){
+                        reject(response);
+                    }else{
+                        resolve({
+                            md5: md5Code,
+                            uniqueFileName,
+                        });
+                    }
                 }).catch(() => {
                     resolve({
-                        isExist: false,
                         md5: md5Code,
                         uniqueFileName
                     });
@@ -218,14 +190,14 @@ export class BwUploader extends FormCom {
     }
 
     // 分片验证
-    protected beforeSend(block: IFileBlock): Promise<boolean> {
+    protected beforeSend(block: IFileBlock, data): Promise<boolean> {
         return new Promise((resolve, reject) => {
             Ajax.fetch(this.uploadUrl, {
                 type: "POST"
                 , traditional: true
                 , data: {
                     status: "chunkCheck"
-                    , name: block.uniqueFileName
+                    , name: data.uniqueFileName
                     , chunkIndex: block.index
                     , size: block.end - block.start
                 }
@@ -233,23 +205,24 @@ export class BwUploader extends FormCom {
                 , timeout: 1000 //todo 超时的话，只能认为该分片未上传过
                 , dataType: "json"
             }).then(({response}) => {
-                resolve(response.ifExist);
+                resolve(response);
             }).catch(() => {
                 reject(false);
             })
         })
     }
 
-    protected afterSendFile(file: File, uniqueFileName, md5Code): Promise<any>{
+    // 合并请求
+    protected afterSendFile(file: File, data): Promise<any>{
         return new Promise((resolve, reject) => {
             let chunksTotal = Math.ceil(file.size / this.chunkSize);
             if(chunksTotal >= 1){
                 let userInfo = User.get().userid,
                     ajaxData: obj = {
                         status: "chunksMerge"
-                        , name: uniqueFileName
+                        , name: data.uniqueFileName
                         , chunks: chunksTotal
-                        , md5: md5Code.toUpperCase()
+                        , md5: data.md5.toUpperCase()
                         , file_name: file.name
                         , userid: userInfo
                         , nameField: this.nameField
@@ -274,50 +247,4 @@ export class BwUploader extends FormCom {
         })
     }
 
-    protected upload(file: Blob, filename: string): Promise<any> {
-        let url = this.uploadUrl;
-        return new Promise<any>((resolve, reject) => {
-            if (tools.isNotEmpty(file) && tools.isNotEmpty(url)) {
-                let formData = new FormData();
-                let data = this.formData ? this.formData() : null;
-                if (data) {
-                    for (let key in data) {
-                        formData.append(key, data[key]);
-                    }
-                }
-                formData.append('file', file, filename);
-                let result = {success: false, uploading: false, progress: 0};
-                let xhr = new XMLHttpRequest();
-                xhr.open("post", url, true);
-                xhr.addEventListener('error', () => {
-                    reject();
-                });
-                xhr.addEventListener('progress', (evt) => {
-                    if (evt.lengthComputable) {
-                        let percentComplete = Math.round(evt.loaded * 100 / evt.total);
-                        result.uploading = true;
-                        result.progress = percentComplete;
-                    }
-                    else {
-                        result.uploading = false;
-                        result.progress = 0;
-                    }
-                });
-                // xhr.addEventListener("abort", () => reject());
-                xhr.addEventListener("load", (ev) => {
-                    result.uploading = false;
-                    result.success = true;
-                    result.progress = 100;
-                });
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState == 4 && xhr.status == 200) {
-                        resolve(xhr.responseText);
-                    }
-                };
-                xhr.send(formData);
-            } else {
-                reject()
-            }
-        })
-    }
 }

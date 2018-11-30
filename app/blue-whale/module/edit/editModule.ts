@@ -22,6 +22,7 @@ import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/vali
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
+import {BwUploader} from "../uploadModule/bwUploader";
 
 interface ComInitFun{
     (para: ComInitP): FormCom
@@ -158,12 +159,13 @@ export class EditModule {
         },
 
         file: (p): FormCom => {
-            let com =  new UploadModule({
+            let com =  new BwUploader({
                 nameField: p.field.name,
                 custom: p.field,
+                text: '点击上传',
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-                onComplete: (response) => {
+                onSuccess: (response) => {
                     let data = response.data;
                     // if(!this.para.fields.some(f => f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase())) {
                     //     Modal.alert('无法找到附件，附件是否进行过改造');

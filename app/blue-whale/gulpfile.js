@@ -188,19 +188,20 @@ gulp.task('js', function () {
     //mail模块
     gulpTsModule(['mail/mail'], 'mail.js');
 
-    //upload模块
 
-    gulpTsModule(['uploadModule/uploadModule'], 'uploadModule.js');
+    // gulpTsModule(['uploadModule/uploadModule'], 'uploadModule.js');
 
     //drawpoint模块
     gulpTsModule(['DrawPoint/DrawPoint'], 'DrawPoint.js');
 
+    //upload模块
     gulpTsModule([
         'uploadModule/uploadModule',
         'uploadModule/accessoryItem',
         'uploadModule/accessory',
         'uploadModule/uploadImages',
         'uploadModule/uploadImagesItem',
+        'uploadModule/bwUploader',
     ], 'uploadModule.js');
 
     //changePassword模块

@@ -201,3 +201,20 @@
 .up-disabled {
   pointer-events: none !important;
 }
+
+.bw-upload-wrapper{
+  height: 100%;
+  &.error{
+    input.file-input{
+      color: red!important;
+    }
+  }
+  input.file-input{
+    width: 100%;
+    height: 100%;
+    line-height: 100%;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+  }
+}
