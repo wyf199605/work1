@@ -130,7 +130,7 @@ export class MbList extends Component {
         } else {
             this.checkBox && (this.checkBox.checked = false);
         }
-        this.calcCount();
+        tools.isMb && this.calcCount();
     }
 
     private multiButtonsWrapper: HTMLElement;
