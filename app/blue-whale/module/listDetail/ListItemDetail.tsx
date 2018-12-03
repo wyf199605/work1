@@ -39,6 +39,9 @@ export class ListItemDetail {
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
+            if (!tools.isMb){
+                cellsWrapper.classList.add('no-group');
+            }
             fields.forEach(field => {
                 if (!field.noShow) {
                     this.cells[field.name] = new ListItemDetailCell({
