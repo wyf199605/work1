@@ -301,7 +301,7 @@ export class DrawPoint extends Component {
                 }).forEach((data) => {
                 //console.log(data);
                 //  需要用到有point的data
-                if (data.isPoint && data.data) {
+                if (data.isPoint && data.data && tools.isNotEmpty(data.data)) {
                     group.append('path').datum(data.name)
                         .attr("class", 'line')
                         .attr('fill', 'white')
