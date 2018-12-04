@@ -28,6 +28,7 @@ export class HorizontalQueryModule extends Component {
     protected modal: QueryModal;
     protected forms: objOf<FormCom> = {};
     protected defaultData: obj;
+    protected queryparams: QueryConf[];
 
     protected _search: (data) => any;
     set search(flag) {
@@ -40,7 +41,14 @@ export class HorizontalQueryModule extends Component {
 
     constructor(para: IHorizontalQueryModule) {
         super(para);
-        this.defaultData = this.getDefaultData(para.qm.queryparams1);
+        let queryparams: QueryConf[] = [];
+        [para.qm.queryparams1, para.qm.atvarparams].forEach((params) => {
+            if(params){
+                queryparams = queryparams.concat(params);
+            }
+        });
+        this.queryparams = queryparams;
+        this.defaultData = this.getDefaultData(this.queryparams);
         this.search = para.search;
         this.__initForms(para);
         // 自定义内容
@@ -74,6 +82,15 @@ export class HorizontalQueryModule extends Component {
                 </div>);
             }
         }
+        setTimeout(()=>{
+            if(para.qm.autTag === 0){
+                typeof this.search === 'function' && this.search(this.json);
+            }
+        },2500)
+
+    }
+    public autoTag(){
+        typeof this.search === 'function' && this.search(this.json);
     }
 
     // 获取默认数据
@@ -87,7 +104,7 @@ export class HorizontalQueryModule extends Component {
 
     // 初始化FormCom控件
     private __initForms(para: IHorizontalQueryModule) {
-        let cond: QueryConf[] = para.qm.queryparams1 || [];
+        let cond: QueryConf[] = this.queryparams || [];
         tools.isNotEmpty(this.wrapper) && d.append(this.wrapper, <div className="query-form">
             {cond.map(c => {
                 let extra: obj = {};
@@ -108,10 +125,10 @@ export class HorizontalQueryModule extends Component {
                 switch (type) {
                     case 'VALUELIST':
                         com = <SelectConstruct useInputVal={true}
-                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                               let data = this.formatData(res);
-                                               return {text: data.title, value: data.value};
-                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                   let data = this.formatData(res);
+                                                   return {text: data.title, value: data.value};
+                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
                             fun: (url, val, callback) => {
                                 this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
                                     typeof callback === 'function' && callback(result);
@@ -121,10 +138,10 @@ export class HorizontalQueryModule extends Component {
                         break;
                     case 'VALUE':
                         com = <SelectConstruct useInputVal={true}
-                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                               let data = this.formatData(res);
-                                               return {text: data.title, value: data.value};
-                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                   let data = this.formatData(res);
+                                                   return {text: data.title, value: data.value};
+                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
                             fun: (url, val, callback) => {
                                 let querydata: obj = {}, forms = this.forms || {};
                                 if (c.dynamic === 1) {
@@ -156,10 +173,10 @@ export class HorizontalQueryModule extends Component {
                         break;
                     case 'QRYVALUE':
                         com = <SelectConstruct useInputVal={true}
-                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                               let data = this.formatData(res);
-                                               return {text: data.title, value: data.value};
-                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                   let data = this.formatData(res);
+                                                   return {text: data.title, value: data.value};
+                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
                             fun: (url, val, callback) => {
                                 this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
                                     typeof callback === 'function' && callback(result);
@@ -169,10 +186,10 @@ export class HorizontalQueryModule extends Component {
                         break;
                     case 'RESVALUE':
                         com = <SelectConstruct useInputVal={true}
-                                           data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                               let data = this.formatData(res);
-                                               return {text: data.title, value: data.value};
-                                           })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                   let data = this.formatData(res);
+                                                   return {text: data.title, value: data.value};
+                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
                             fun: (url, val, callback) => {
                                 this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
                                     typeof callback === 'function' && callback(result);
