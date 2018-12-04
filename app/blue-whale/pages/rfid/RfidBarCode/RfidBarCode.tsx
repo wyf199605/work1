@@ -735,15 +735,10 @@ export class RfidBarCode extends Component {
                                             //     'barcode': this.domHash['barcode'].innerText,
                                             //     'category': this.domHash['categoryVal'].innerText
                                             // },
-                                            ['key']:{
-                                                    'barcode': this.domHash['barcode'].innerText,
-                                                    'category': this.domHash['categoryVal'].innerText
-                                                },
-                                            value:this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:" + this.domHash['barcode'].innerText,
-                                            text: this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:" + this.domHash['barcode'].innerText
+                                            //this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:"
+                                            value:'当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText,
+                                            text: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText
                                         }, {
-                                            // value: {'barcode': this.domHash['barcode'].innerText, 'category': ''},
-                                            ['key']:{'barcode': this.domHash['barcode'].innerText, 'category': ''},
                                             value:'条码' + this.domHash['barcode'].innerText,
                                             text: '条码' + this.domHash['barcode'].innerText
                                         }]}/>
