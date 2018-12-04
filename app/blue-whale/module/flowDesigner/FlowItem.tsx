@@ -312,16 +312,8 @@ export class FlowItem extends Component {
             this.y = this.oy + dy;
 
             // 移动flow-item
-            if (tools.isNotEmpty(FlowDesigner.connections)) {
-                for (let i = FlowDesigner.connections.length; i--; i >= 0) {
-                    FlowDesigner.PAPER.connection(FlowDesigner.connections[i]);
-                }
-            }
-            if (tools.isNotEmpty(FlowDesigner.AllLineItems)) {
-                for (let i = 0; i < FlowDesigner.AllLineItems.length; i++) {
-                    FlowDesigner.AllLineItems[i].setTextWrapperPosition();
-                }
-            }
+            FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
+            FlowDesigner.connections && FlowDesigner.connections.forEach(connection => FlowDesigner.PAPER.connection(connection));
         };
     }
 

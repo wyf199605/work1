@@ -93,7 +93,7 @@ export class FlowEditor extends FormCom {
             Object.keys(fields).forEach(key => {
                 if (key in FlowEditor.DROPDOWN_KEYVALUE) {
                     let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
-                    valueText && (fields[key] = valueText.value);
+                    valueText && (fields[key] = valueText.text);
                 }
             });
             this.set(fields);
@@ -231,7 +231,7 @@ export class FlowEditor extends FormCom {
         // let tipBody = d.query('.tip-body', this.wrapper);
         return {
             on: () => {
-                d.on(this.wrapper, 'click', clickHandler);
+                d.on(d.query('.tip-body', this.wrapper), 'click', clickHandler);
                 d.on(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
                 Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
                     // 所有下拉按钮的点击事件
@@ -243,7 +243,7 @@ export class FlowEditor extends FormCom {
                 });
             },
             off: () => {
-                d.off(this.wrapper, 'click', clickHandler);
+                d.off(d.query('.tip-body', this.wrapper), 'click', clickHandler);
                 d.off(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
                 Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
                     d.off(

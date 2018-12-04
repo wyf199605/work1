@@ -11,6 +11,7 @@ import {SelectInput} from "../../../../global/components/form/selectInput/select
 import {Loading} from "../../../../global/components/ui/loading/loading";
 import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
+import {User} from "../../../../global/entity/User";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -265,13 +266,13 @@ export class ButtonAction {
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
 
         }
-
-
+        let USER = User.get().userid,
+            SHO = User.get().are_id;
         require(['RfidBarCode'], (p) => {
             new p.RfidBarCode({
                 codeStype: codeStype,
-                SHO_ID: dataObj['SHO_ID'],
-                USERID: dataObj['USERID'],
+                SHO_ID: SHO,
+                USERID: USER,
                 uploadUrl: uploadUrl,
                 downUrl: url,
                 uniqueFlag: uniqueFlag

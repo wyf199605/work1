@@ -117,16 +117,7 @@ export class DrawPoint extends Component {
     }
 
     public InitSvg(para) {
-        let _this = this,
-            istouch = false;
-            // spot1 = 0,
-            // spot2 = 0,
-            //  num1 = 1,
-            //  num2 = 1,
-            //  xx = 0,
-            //  yy = 0,
-            //  x0 = 0,
-            //  y0 = 0;;
+        let _this = this;
         this.svg = D3.select(this.wrapper).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
@@ -139,15 +130,24 @@ export class DrawPoint extends Component {
                 this.redraw();
             })
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-        this.g.on('touchstart',function () {
-        }).on('touchmove',function () {
+        this.g.on('touchstart',function (ev) {
+        }).on('touchmove',function (ev) {
+            let ob = D3.event.changedTouches;
+            let touhs = [];
+             touhs.push(ob[0].clientX)
+            touhs.push(ob[0].clientY)
+            touhs.push(ob[1].clientX)
+            touhs.push(ob[1].clientY)
               let pos = D3.touches(this)[0];
               let slate = [];
               slate.push(pos[0])
               slate.push(pos[1])
               _this.svg.attr('x',slate[0]).attr('y',slate[1])
         }).on('touchend',function () {
-          alert(D3.touches(this))
+            let ob = D3.event.changedTouches;
+            let touhs = [];
+            touhs.push(ob[0].clientX)
+            touhs.push(ob[0].clientY)
         })
        let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
@@ -231,6 +231,9 @@ export class DrawPoint extends Component {
     private _data;
 
     public render(data?: obj[]) {
+        if (tools.isEmpty(data)) {
+            return
+        }
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
@@ -252,15 +255,8 @@ export class DrawPoint extends Component {
 
         this.renderData = data;
         this.index = data.length || 0;//初始化index
-        this.keyDownEvent.on();
-        this.keyUpEvent.on();
-        this.fishe = true;
 
-        let points = [],
-            svg = D3.select('svg').select('g');
-        if (tools.isEmpty(data)) {
-            return
-        }
+        this.fishe = true;
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d)
@@ -305,7 +301,7 @@ export class DrawPoint extends Component {
                 }).forEach((data) => {
                 //console.log(data);
                 //  需要用到有point的data
-                if (data.isPoint && data.data) {
+                if (data.isPoint && data.data && tools.isNotEmpty(data.data)) {
                     group.append('path').datum(data.name)
                         .attr("class", 'line')
                         .attr('fill', 'white')
@@ -414,7 +410,8 @@ export class DrawPoint extends Component {
 
         });
         //this.editEvent.on();
-
+        this.keyDownEvent.on();
+        this.keyUpEvent.on();
     }
 
     //字体换行
@@ -1004,18 +1001,16 @@ export class DrawPoint extends Component {
 
         if(tools.isMb){
             let scale = 1;
-            d.on(this.wrapper.parentElement, 'touchzoom', (ev) => {
-                // //
-                // alert('000')
-                //alert('hah')
-                // scale = ev.scale;
-                // scale = Math.min(ev.scale, 5);
-                // scale = Math.max(0.5, ev.scale);
-                // // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
-                // _this.g.attr('transform', "scale(" + scale + ")");
-                // _this.svg.attr('width', scale * 1200);
-                // _this.svg.attr('height', scale * 800);
-            })
+           //  d.on(this.wrapper, 'touchzoom', (ev) => {
+           //      //
+           //      scale = ev.scale;
+           //      scale = Math.min(ev.scale, 5);
+           //      scale = Math.max(0.5, ev.scale);
+           //      // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
+           //      _this.g.attr('transform', "scale(" + scale + ")");
+           //      _this.svg.attr('width', scale * 1200);
+           //      _this.svg.attr('height', scale * 800);
+           // })
         }else{
             this.zoom = D3.behavior.zoom()
                 .x(X)
