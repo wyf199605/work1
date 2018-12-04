@@ -34,6 +34,7 @@ export class PlanPage extends BasicPage {
                 autTag: qData['autTag'],
                 hasOption: qData['hasOption'],
                 queryType: qData['queryType'],
+                atvarparams:qData['atvarparams'],
                 queryparams1: qData['queryparams0'] || qData['queryparams1'] || qData['atvarparams'],
                 scannableTime: 0,
                 uiPath: qData['uiPath'],
@@ -58,6 +59,7 @@ export class PlanPage extends BasicPage {
                 }
 
             }}/>;
+
 
             planModule = new PlanModule({
                 ui: res.ui,
