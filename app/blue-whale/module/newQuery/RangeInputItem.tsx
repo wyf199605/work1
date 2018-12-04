@@ -3,8 +3,10 @@
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import tools = G.tools;
 import d = G.d;
-import {Datetime} from "../../../global/components/form/datetime/datetime";
 import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
+import {IModal, Modal} from "../../../global/components/feedback/modal/Modal";
+import {Button} from "../../../global/components/general/button/Button";
+import Shell = G.Shell;
 
 interface IRangeInputItem extends IFormComPara {
     isFirst?: boolean;
@@ -90,11 +92,17 @@ export class RangeInputItem extends FormCom {
 
     constructor(private para: IRangeInputItem) {
         super(para);
+        this.initEvents.on();
     }
 
     private initEvents = (() => {
         let audio = () => {
+            Shell.base.speak(0,null,(e)=>{
 
+            });
+            this.createSpeakModal(() => {
+
+            });
         };
         return {
             on: () => d.on(this.wrapper, 'click', '.audio-icon', audio),
@@ -102,8 +110,37 @@ export class RangeInputItem extends FormCom {
         }
     })();
 
+    private createSpeakModal(callback: () => void) {
+        let bodyWrapper = <div className="speak-modal-body-wrapper">
+            <i className="appcommon app-maikefeng"/>
+            <div className="please-speak">请说话</div>
+            <div className="exemple">例如:女装</div>
+            <div className="speak-buttons">
+                <Button content="取消" onClick={() => {
+                    modal.isShow = false;
+                }} className="speak-cancel"/>
+                <Button content="说完了" onClick={() => {
+                    callback && callback();
+                    modal.isShow = false;
+                }} className="speak-done"/>
+            </div>
+        </div>;
+        let modal = new Modal({
+            header: '',
+            isBackground: true,
+            isOnceDestroy: true,
+            body: bodyWrapper,
+            isMb: false,
+            className: 'speak-modal',
+            position: 'center',
+            zIndex: 10000
+        });
+    }
+
     destroy() {
         this.input = null;
+        this.initEvents.off();
+        this.para = null;
         super.destroy();
     }
 }

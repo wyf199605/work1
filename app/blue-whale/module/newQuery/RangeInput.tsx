@@ -51,6 +51,8 @@ export class RangeInput extends FormCom {
     }
 
     destroy() {
+        this.min.destroy();
+        this.max.destroy();
         super.destroy();
     }
 }
