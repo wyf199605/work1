@@ -962,6 +962,7 @@ export class DrawPoint extends Component {
                                     this.selectedG.attr('class', 'delete').select('path').attr('d', function () {
                                         return '';
                                     });
+                                    this.selectedG.selectAll('text').remove();
                                     this.isDrawLine = false;
                                 }else {
                                     D3.select('#path'+ this.index).attr('d',function () {
