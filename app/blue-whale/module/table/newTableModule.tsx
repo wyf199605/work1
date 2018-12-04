@@ -192,7 +192,9 @@ export class NewTableModule {
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     if (!~this.currentSelectedIndexes.indexOf(index)) {
-                                        this.sub[index].refresh(ajaxData).catch();
+                                        this.sub[index].refresh(ajaxData).then(() => {
+                                            this.sub[index].isPivot && this.editInit(this.sub[index]);
+                                        }).catch();
                                         this.currentSelectedIndexes.push(index);
                                     }
                                     this.sub[index].linkedData = selectedData;
@@ -424,7 +426,15 @@ export class NewTableModule {
                 subTable.linkedData = selectedData;
             });
         }
-        return Promise.all(promise);
+        return Promise.all(promise).then((arr) => {
+            Object.values(this.sub).forEach((subTable) => {
+                if(subTable.isPivot){
+                    debugger;
+                    this.editInit(subTable);
+                }
+            });
+            return arr;
+        });
     }
 
     public mobileModal: Modal = null;
@@ -541,6 +551,7 @@ export class NewTableModule {
             let sub = this.sub[this.subTabActiveIndex],
                 subBox = tools.keysVal(sub, 'subBtns', 'box');
             subBox && subBox.responsive();
+
         });
     }
 

@@ -528,6 +528,7 @@ export class BwTableModule extends Component {
                     data: response.data
                 })
             );
+            tools.isPc && (this._btnWrapper = this.ftable.btnWrapper);
             this.ftable.btnShow = this.btnShow;
             this.ftableReady();
         });
