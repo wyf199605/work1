@@ -82,11 +82,11 @@ export class HorizontalQueryModule extends Component {
                 </div>);
             }
         }
-        setTimeout(()=>{
-            if(para.qm.autTag === 0){
-                typeof this.search === 'function' && this.search(this.json);
-            }
-        },2500)
+        // setTimeout(()=>{
+        //     if(para.qm.autTag === 0){
+        //         typeof this.search === 'function' && this.search(this.json);
+        //     }
+        // },2500)
 
     }
     public autoTag(){
