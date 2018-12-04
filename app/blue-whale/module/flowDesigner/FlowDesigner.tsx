@@ -159,7 +159,7 @@ export class FlowDesigner {
             body: body,
             header: {
                 title: '流程设计',
-                rightPanel: <i className={'full-screen iconfont icon-zuidahua'}></i>
+                rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}></i>
             },
             className: 'flow-modal',
             width: '90%',
@@ -351,7 +351,9 @@ export class FlowDesigner {
             FlowDesigner.connections && FlowDesigner.connections.forEach(connection => FlowDesigner.PAPER.connection(connection));
         };
         let clickFullscreenHandler = (e) => {
-            this.modal.wrapper.classList.add('full-screen');
+            this.modal.wrapper.classList.toggle('full-screen');
+            d.query('.icon-fullscreen').classList.toggle('icon-zuidahua');
+            d.query('.icon-fullscreen').classList.toggle('icon-chuangkouhua');
         };
         let mouseWheelHandler = (e) => {
 
@@ -362,13 +364,13 @@ export class FlowDesigner {
                 d.on(d.query('#design-canvas'), 'click', 'svg', clickSVG);
                 d.on(window, 'resize', resizeHandler);
                 d.on(d.query('#design-canvas'), 'mousewheel', mouseWheelHandler);
-                d.on(d.query('.full-screen'), 'click', clickFullscreenHandler);
+                d.on(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
             },
             off: () => {
                 d.off(d.query('#design-canvas'), 'click', 'svg', clickSVG);
                 d.off(window, 'resize', resizeHandler);
                 d.off(d.query('#design-canvas'), 'mousewheel', mouseWheelHandler);
-                d.off(d.query('.full-screen'), 'click', clickFullscreenHandler);
+                d.off(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
             },
         }
     })();
