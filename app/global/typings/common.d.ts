@@ -129,6 +129,9 @@ interface R_Field extends COL {
     chkAddr?: R_ReqAddr;
     isCanSort?: boolean;
     fileInfo?:R_ReqAddr; // 文件信息地址
+    backWhen? : string   // 后台计算规则表格单元格显示 true：显示backColor颜色
+    backColor? : number  // 色码
+
 }
 interface R_SubTable_Field{
     caption : string;//panel 标题，有可能为空
