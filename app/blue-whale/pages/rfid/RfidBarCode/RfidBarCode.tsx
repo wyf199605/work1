@@ -645,7 +645,13 @@ export class RfidBarCode extends Component {
                     <button onclick={
                         () => {
                             console.log(para.codeStype)
-                            let str = [];
+                            let str = [],obj = {};
+                            for(let i=0,data = para.codeStype;i<data.length;i++){
+                                 for(let s in data[i]){
+                                         obj['value'] = data[i][s];
+                                         obj['text'] = data[i][s];
+                                 }
+                            }
                             para.codeStype.forEach((val) => {
                                 let obj = {};
                                 obj['value'] = val['IMPORTDATAMODE'];
@@ -714,6 +720,29 @@ export class RfidBarCode extends Component {
                                 category = res.name;
                             }
                         })
+                        let modeldata = [{
+                            value:'所有',
+                            text: "所有"
+                        }, {
+                            value:this.domHash['category'].innerText + this.domHash['categoryVal'].innerText,
+                            text: this.domHash['category'].innerText + this.domHash['categoryVal'].innerText
+                        }, {
+                            value:'当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText,
+                            text: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText
+                        }, {
+                            value:'条码' + this.domHash['barcode'].innerText,
+                            text: '条码' + this.domHash['barcode'].innerText
+                        }],modeldata1 = [{
+                            value:'所有',
+                            text: "所有"
+                        }, {
+                            value:'当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText,
+                            text: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText
+                        }, {
+                            value:'条码' + this.domHash['barcode'].innerText,
+                            text: '条码' + this.domHash['barcode'].innerText
+                        }]
+                        let stepStatus = this.stepStatus;
                         let deModel = new Modal({
                             isMb: false,
                             position: "center",
@@ -724,24 +753,7 @@ export class RfidBarCode extends Component {
 
                                 <div>
                                     {
-                                        deleteEL = <SelectInputMb data={[{
-                                            value:'所有',
-                                            text: "所有"
-                                        }, {
-                                            value:this.domHash['category'].innerText + this.domHash['categoryVal'].innerText,
-                                            text: this.domHash['category'].innerText + this.domHash['categoryVal'].innerText
-                                        }, {
-                                            // value: {
-                                            //     'barcode': this.domHash['barcode'].innerText,
-                                            //     'category': this.domHash['categoryVal'].innerText
-                                            // },
-                                            //this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:"
-                                            value:'当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText,
-                                            text: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText
-                                        }, {
-                                            value:'条码' + this.domHash['barcode'].innerText,
-                                            text: '条码' + this.domHash['barcode'].innerText
-                                        }]}/>
+                                        deleteEL = <SelectInputMb data={stepStatus ? modeldata1 : modeldata}/>
                                     }
                                 </div>
                             </div>,
