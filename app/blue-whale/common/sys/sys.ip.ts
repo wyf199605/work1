@@ -218,6 +218,27 @@ namespace BW{
                             error && error(detail);
                         }
                     });
+                },
+                editImg: function (callback: Function, image?: string) {
+                    let event = '__EVT_EDIT_IMG';
+                    self.handle('getSignImg', ({
+                        event,
+                        type: 1,
+                        image: image
+                    }));
+                    d.once(window, event, function (response) {
+                        callback && callback(response);
+                    });
+                },
+                getSign: function (callback: Function) {
+                    let event = '__EVT_GET_SIGN';
+                    self.handle('getSignImg',({
+                        event,
+                        type: 0
+                    }));
+                    d.once(window, event, function (response) {
+                        callback && callback(response);
+                    });
                 }
             }
         })(this);

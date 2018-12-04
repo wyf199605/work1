@@ -38,6 +38,8 @@ interface SYS_Window{
     whiteBat?();
     uploadVersion?(version: string);
     getFile(callback: (file: File) => void, error?: Function);
+    editImg?( callback: Function, image?: string);
+    getSign?(callback: Function);
 }
 
 interface SYS_UI{
