@@ -764,7 +764,7 @@ export class RfidBarCode extends Component {
                                                 where[uid] = '';
                                                 where[category] = this.domHash['categoryVal'].innerHTML;
                                                 break;
-                                            case this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:" + this.domHash['barcode'].innerText:
+                                            case '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText:
                                                 where[uid] = this.domHash['barcode'].innerText;
                                                 where[category] = this.domHash['categoryVal'].innerText;
                                                 break;
