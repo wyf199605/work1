@@ -3,6 +3,7 @@ import tools = G.tools;
 import CONF = BW.CONF;
 import sys = BW.sys;
 import AssignModule from "assignModule/assignModule";
+import UploadModule from '../uploadModule/uploadModule';
 import {AssignTextModule} from "./assignModule/assignTextModule";
 import {PickModule} from "./pickModule";
 import {FormCom} from "../../../global/components/form/basic";
@@ -21,7 +22,6 @@ import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/vali
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
-import {BwUploader} from "../uploadModule/bwUploader";
 
 interface ComInitFun{
     (para: ComInitP): FormCom
@@ -158,14 +158,12 @@ export class EditModule {
         },
 
         file: (p): FormCom => {
-            let com =  new BwUploader({
-                text: '点击上传',
-                isChangeText: true,
+            let com =  new UploadModule({
                 nameField: p.field.name,
                 custom: p.field,
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-                onSuccess: (response) => {
+                onComplete: (response) => {
                     let data = response.data;
                     // if(!this.para.fields.some(f => f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase())) {
                     //     Modal.alert('无法找到附件，附件是否进行过改造');

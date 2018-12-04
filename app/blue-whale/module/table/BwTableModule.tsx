@@ -28,7 +28,6 @@ import {FormCom} from "../../../global/components/form/basic";
 import {EditModule} from "../edit/editModule";
 import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {BwUploader} from "../uploadModule/bwUploader";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -1464,7 +1463,7 @@ export class BwTableModule extends Component {
                 upVarList: R_VarList[] = editParam && editParam[editParam.updateType] || [],
                 updatable = upVarList.some(v => fieldName === v.varName),
                 handler = null,
-                uploadModule: BwUploader;
+                uploadModule: UploadModule;
 
             if (md5str && typeof md5str === 'string') {
                 md5Arr = md5str.split(',');
@@ -1525,19 +1524,19 @@ export class BwTableModule extends Component {
             if (updatable) {
                 let imgContainer = <div className="table-img-uploader"/>;
                 d.append(btnWrapper, imgContainer);
-                uploadModule = new BwUploader({
+                uploadModule = new UploadModule({
                     nameField: fieldName,
                     // thumbField: thumbField,
                     container: imgContainer,
                     text: '添加图片',
                     accept: {
                         title: '图片'
-                        , extensions: 'jpg,png,gif,jpeg'
+                        , extensions: 'jpg,png,gif'
                         , mimeTypes: 'image/*'
                     },
-                    multi: true,
                     uploadUrl: CONF.ajaxUrl.fileUpload,
-                    onSuccess: (response, file) => {
+                    showNameOnComplete: false,
+                    onComplete: (response, file) => {
                         let data = response.data,
                             newMd5s = [];
 
