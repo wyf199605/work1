@@ -210,12 +210,22 @@ namespace BW{
                 getFile: function (callback: (file: File) => void, error: Function) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__';
                     self.handle('getImg', {event});
-                    d.once(window, event, function ({detail} : CustomEvent) {
-                        if(detail.success && detail.data){
-                            let data = detail.data;
-                            callback && callback(tools.base64ToFile(data.dataurl, data.filename));
-                        }else{
-                            error && error(detail);
+                    d.once(window, event, function (response : CustomEvent) {
+                        alert(JSON.stringify(response));
+                        try{
+                            let detail = JSON.parse(response.detail);
+
+                            if(detail.success && detail.msg){
+                                let data = detail.msg;
+                                let file: File = tools.base64ToFile(data.dataurl, data.filename);
+                                alert(data.dataurl);
+                                alert(file.type);
+                                callback && callback(file);
+                            }else{
+                                error && error(detail);
+                            }
+                        }catch (e){
+                            error && error();
                         }
                     });
                 }
