@@ -2097,7 +2097,10 @@ export class BwTableModule extends Component {
                 this._btnWrapper = <footer className="mui-bar mui-bar-footer"/>;
                 //
                 d.append(this.wrapper, this._btnWrapper);
-                if (this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons)) {
+                if ((this.tableModule.editType === 'linkage'
+                        && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
+                    || (this.tableModule.editType === 'self')
+                    && this.editParam && tools.isNotEmpty(this.ui.subButtons)) {
                     let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({

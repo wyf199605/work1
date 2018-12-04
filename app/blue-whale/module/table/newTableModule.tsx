@@ -40,7 +40,7 @@ export class NewTableModule {
     private tab: Tab;
     private showSubField: string = '';
     protected subModal: Modal;
-    protected editType: 'self' | 'linkage' = 'linkage';
+    editType: 'self' | 'linkage' = 'linkage';
 
     get defaultData() {
         return this._defaultData
