@@ -119,7 +119,7 @@ export class TextInput1 extends FormCom{
 
     private _type: string;
     set type(str:string) {
-        let types = ['text','button', 'checkbox','password','radio','image','reset','file','submit','textarea'],
+        let types = ['text','button', 'checkbox','password','radio','image','reset','file','submit','textarea','number'],
             type = types.indexOf(str) > -1 ? str : types[0];
 
         this.inputEl.type = this._type = type;

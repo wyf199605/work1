@@ -85,10 +85,10 @@ export class LoginPage{
         let form = d.create(`
         <form action="#" class="login-form">
             <div class="form-group">
-                <input class="tel" type="text" placeholder="请输入手机号码"/>
+                <input class="tel" type="number" placeholder="请输入手机号码"/>
             </div>
             <div class="form-group">
-                <input class="code" type="text" placeholder="请输入短信验证码"/>
+                <input class="code" type="number" placeholder="请输入短信验证码"/>
             </div>
             <div class="btn-group"></div>
         </form>`);
@@ -300,10 +300,10 @@ export class LoginPage{
                 <input class="user" type="text" placeholder="请输入员工号"/>
             </div>
             <div class="form-group">
-                <input class="tel" type="text" placeholder="请输入手机号码"/>
+                <input class="tel" type="number" placeholder="请输入手机号码"/>
             </div>
             <div class="form-group">
-                <input class="code" type="text" placeholder="请输入短信验证码"/>
+                <input class="code" type="number" placeholder="请输入短信验证码"/>
             </div>
             <div class="btn-group"></div>
         </form>`);
