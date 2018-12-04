@@ -645,19 +645,16 @@ export class RfidBarCode extends Component {
                     <button onclick={
                         () => {
                             console.log(para.codeStype)
-                            let str = [],obj = {};
+                            let str = [];
                             for(let i=0,data = para.codeStype;i<data.length;i++){
+                               let obj = {};
                                  for(let s in data[i]){
                                          obj['value'] = data[i][s];
                                          obj['text'] = data[i][s];
                                  }
-                            }
-                            para.codeStype.forEach((val) => {
-                                let obj = {};
-                                obj['value'] = val['IMPORTDATAMODE'];
-                                obj['text'] = val['IMPORTDATAMODE'];
                                 str.push(obj);
-                            })
+                            }
+
                             console.log(str);
                             let updataEl;
 
