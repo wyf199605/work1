@@ -40,7 +40,7 @@ export class NewTableModule {
     private tab: Tab;
     private showSubField: string = '';
     protected subModal: Modal;
-    protected editType: 'self' | 'linkage' = 'linkage';
+    editType: 'self' | 'linkage' = 'linkage';
 
     get defaultData() {
         return this._defaultData
@@ -192,7 +192,9 @@ export class NewTableModule {
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     if (!~this.currentSelectedIndexes.indexOf(index)) {
-                                        this.sub[index].refresh(ajaxData).catch();
+                                        this.sub[index].refresh(ajaxData).then(() => {
+                                            this.sub[index].isPivot && this.editInit(this.sub[index]);
+                                        }).catch();
                                         this.currentSelectedIndexes.push(index);
                                     }
                                     this.sub[index].linkedData = selectedData;
@@ -424,14 +426,22 @@ export class NewTableModule {
                 subTable.linkedData = selectedData;
             });
         }
-        return Promise.all(promise);
+        return Promise.all(promise).then((arr) => {
+            Object.values(this.sub).forEach((subTable) => {
+                if(subTable.isPivot){
+                    debugger;
+                    this.editInit(subTable);
+                }
+            });
+            return arr;
+        });
     }
 
     public mobileModal: Modal = null;
     private subWrapper: HTMLElement = null;
 
     subInit(ui: IBW_Table, editParam: IBW_TableAddrParam, rowData: obj, ajaxData?: obj, tabEl?: HTMLElement) {
-        if(!editParam && ui.tableAddr && ui.tableAddr.param && ui.tableAddr.param[0]){
+        if(ui.tableAddr && ui.tableAddr.param && ui.tableAddr.param[0]){
             editParam = ui.tableAddr.param[0];
         }
         let subTable = this.sub[this.subTabActiveIndex] = new BwSubTableModule({
@@ -541,6 +551,7 @@ export class NewTableModule {
             let sub = this.sub[this.subTabActiveIndex],
                 subBox = tools.keysVal(sub, 'subBtns', 'box');
             subBox && subBox.responsive();
+
         });
     }
 
@@ -609,16 +620,20 @@ export class NewTableModule {
             if (flag) {
                 editing = false;
                 this.active.on();
-                this.main.modify.isCanEdit = flag;
-                this.main.modify.box.disabled = false;
+                if(this.main.editParam){
+                    this.main.modify.isCanEdit = flag;
+                    this.main.modify.box.disabled = false;
+                }
                 this.tab && this.tab.panelContainer.classList.remove('disabled');
             } else {
                 editing = true;
                 switch (this.editType){
                     case 'self':
                         if (bwTable.modify.box !== this.main.modify.box) {
-                            this.main.modify.box.disabled = true;
-                            this.main.modify.isCanEdit = flag;
+                            if(this.main.editParam){
+                                this.main.modify.box.disabled = true;
+                                this.main.modify.isCanEdit = flag;
+                            }
                         } else {
                             this.tab && this.tab.panelContainer.classList.add('disabled');
                         }

@@ -71,13 +71,13 @@ export class BwTableModule extends Component {
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
-        if(!this.tableModule.editable){
+        let ui = this.ui = para.ui;
+        this.isPivot = ui.relateType === 'P';
+        if(!this.tableModule.editable && !this.isPivot){
             this.editParam = null;
         }
 
-        BwRule.beforeHandle.table(para.ui); // 初始化UI, 设置一些默认值
-        let ui = this.ui = para.ui;
-        this.isPivot = ui.relateType === 'P';
+        BwRule.beforeHandle.table(ui); // 初始化UI, 设置一些默认值
 
         this.isDrill = ['web', 'webdrill', 'drill'].includes(ui.uiType); // 是否为钻取
 
@@ -528,6 +528,7 @@ export class BwTableModule extends Component {
                     data: response.data
                 })
             );
+            tools.isPc && (this._btnWrapper = this.ftable.btnWrapper);
             this.ftable.btnShow = this.btnShow;
             this.ftableReady();
         });
@@ -1434,6 +1435,14 @@ export class BwTableModule extends Component {
                 color = 'blue';
             }
 
+            // 后台计算规则
+            let when = field.backWhen;
+            if(when){
+                if(eval(tools.str.parseTpl(when, rowData))){
+                    let {r, g, b} = tools.val2RGB(field.backColor);
+                    text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
+                }
+            }
         }
 
         return {text, classes, bgColor, color, data};
@@ -2089,7 +2098,10 @@ export class BwTableModule extends Component {
                 this._btnWrapper = <footer className="mui-bar mui-bar-footer"/>;
                 //
                 d.append(this.wrapper, this._btnWrapper);
-                if (this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons)) {
+                if ((this.tableModule.editType === 'linkage'
+                        && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
+                    || (this.tableModule.editType === 'self')
+                    && this.editParam && tools.isNotEmpty(this.ui.subButtons)) {
                     let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({

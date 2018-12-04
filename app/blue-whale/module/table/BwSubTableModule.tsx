@@ -2,6 +2,7 @@
 import {BwTableModule, IBwTableModulePara} from "./BwTableModule";
 import tools = G.tools;
 import d = G.d;
+import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 
 export class BwSubTableModule extends BwTableModule{
     constructor(para: IBwTableModulePara) {
@@ -9,8 +10,8 @@ export class BwSubTableModule extends BwTableModule{
 
     }
     protected ftableReady() {
-        super.ftableReady();
         tools.isNotEmpty(this.ui.subButtons) && this.subBtns.init(this.btnWrapper);
+        super.ftableReady();
     }
 
     protected _btnWrapper: HTMLElement;
@@ -18,11 +19,27 @@ export class BwSubTableModule extends BwTableModule{
         if (!this._btnWrapper) {
             // debugger;
             if (tools.isMb) {
+
                 // let modal = this.tableModule.mobileModal;
                 let btnWrapper = <div className="sub-btn-wrapper mui-bar-footer"/>;
                 // modal.bodyWrapper.style.height = 'calc(100% - 39px)';
                 d.append(this.wrapper, btnWrapper);
                 this._btnWrapper = btnWrapper;
+                if (this.tableModule.editType === 'self' && this.editParam && tools.isNotEmpty(this.ui.subButtons)) {
+                    let btnWrapper = <div className="all-btn"/>;
+
+                    new CheckBox({
+                        className: 'edit-toggle',
+                        container: this._btnWrapper,
+                        onClick: (isChecked) => {
+                            this.subBtns.box.isShow = !isChecked;
+                            this.modify.box.isShow = isChecked;
+                        }
+                    });
+
+                    d.append(this._btnWrapper, btnWrapper);
+                    this._btnWrapper = btnWrapper;
+                }
             } else {
                 this._btnWrapper = this.ftable.btnWrapper
             }
