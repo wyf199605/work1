@@ -527,6 +527,10 @@ export class QueryBuilder {
             if(control.inputType === 'datetime' && name === 'input2' ) {
                 Object.assign(para, {defaultHour:23, defaultMinute:59, defaultSeconds: 59});
             }
+
+            if(BwRule.DT_NUMBER === conf.atrrs.dataType){
+                para['type'] = 'number';
+            }
             let com:TextInput = coms[name] = inputTransFactory(coms[name], para, control.inputType, containers[name], sys.isMb);
 
             if (name in control) {
@@ -877,7 +881,9 @@ export class AtVarBuilder{
 
                 // 初始化输入框
                 let para = this.conf2comPara(inputType, conf);
-
+                if(BwRule.DT_NUMBER === conf.atrrs.dataType){
+                    para['type'] = 'number';
+                }
                 let com = inputTransFactory(null, para, inputType, container, sys.isMb);
 
                 com.set(value);
