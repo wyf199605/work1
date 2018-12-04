@@ -207,7 +207,7 @@ namespace BW{
                 fire : function (type : string, data? : obj,) {
                     tools.event.fire(type, data, window);
                 },
-                getFile: function (callback: (file: File) => void, error: Function) {
+                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__';
                     self.handle('getImg', {event});
                     d.once(window, event, function (response : CustomEvent) {
@@ -218,9 +218,8 @@ namespace BW{
                             if(detail.success && detail.msg){
                                 let data = detail.msg;
                                 let file: File = tools.base64ToFile(data.dataurl, data.filename);
-                                alert(data.dataurl);
                                 alert(file.type);
-                                callback && callback(file);
+                                callback && callback([file]);
                             }else{
                                 error && error(detail);
                             }

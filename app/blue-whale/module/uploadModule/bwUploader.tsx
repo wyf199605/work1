@@ -12,15 +12,22 @@ import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fil
 
 export interface IBwUploaderPara extends IFormComPara {
     // uploadUrl?: string;
+    isChangeText?: boolean; // 默认false
     text?: string;
     nameField: string;
     thumbField?: string;
     maxSize?: number;
     autoUpload?: boolean; // 自动上传，默认true
-    // accept?: FileType;
+    accept?: FileType;
+    multi?: boolean;
     onSuccess?: (...any) => void;
-    onFailure?: () => void;
+    onFailure?: (...any) => void;
     uploadUrl?: string;
+}
+interface FileType {
+    title: string;
+    extensions?: string, // 允许的文件后缀，不带点，多个用逗号分割。
+    mimeTypes?: string
 }
 
 export class BwUploader extends FormCom {
@@ -29,16 +36,21 @@ export class BwUploader extends FormCom {
     protected chunkSize = 5000 * 1024;  // 分块大小 5M
     protected nameField: string;
     protected thumbField: string;
-    protected formData: () => obj;  // 上传附带数据
+    // protected formData: () => obj;  // 上传附带数据
     protected onSuccess: (...any) => void;
-    protected onFailure: () => void;
+    protected onFailure: (...any) => void;
     protected filename: string; // 当前上传成功文件的名称
     protected files: File[] = [];   // 上传成功文件
     protected temFiles: File[] = []; // 暂存文件，等待上传
     protected fileUpload: FileUpload;
     protected input: HTMLInputElement;
+    protected accept: FileType;
+    protected multi: boolean;
+    protected isChangeText: boolean;
+    protected text: string;
 
     protected wrapperInit(para) {
+        this.text = para.text;
         this.input = <input className="file-input" type="text" value={para.text || ''}/>;
         this.input.readOnly = true;
         return <div className="bw-upload-wrapper">
@@ -54,6 +66,9 @@ export class BwUploader extends FormCom {
         this.maxSize = para.maxSize || -1;
         this.onSuccess = para.onSuccess;
         this.onFailure = para.onFailure;
+        this.accept = para.accept;
+        this.multi = para.multi || false;
+        this.isChangeText = para.isChangeText || false;
 
         let autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
         this.fileUpload = new FileUpload({
@@ -67,19 +82,37 @@ export class BwUploader extends FormCom {
         });
 
         d.on(this.wrapper, 'click', () => {
-            sys.window.getFile((file: File) => {
-                if(file){
-                    if(this.maxSize !== -1 && file.size > this.maxSize){
-                        Modal.alert('文件大小超过限制');
-                    }else{
-                        this.temFiles = [file];
-                        autoUpload && this.upload();
-                    }
+            sys.window.getFile((files: File[]) => {
+                if(!this.multi){
+                    this.temFiles = [];
                 }
-            }, () => {
+                if(tools.isNotEmpty(files)){
+                    files.forEach((file) => {
+                        if(this.maxSize !== -1 && file.size > this.maxSize){
+                            Modal.alert('文件' + file.name + '大小超过限制');
+                        }else if(!this.acceptVerify(file)){
+                            Modal.alert('文件' + file.name + '类型有误');
+                        }else {
+                            this.temFiles.push(file);
+                        }
+                    });
+                    autoUpload && this.upload();
+                }
+            }, this.multi, this.accept && this.accept.mimeTypes, () => {
                 Modal.alert('获取图片失败', '温馨提示');
             })
         });
+    }
+
+    protected acceptVerify(file: File){
+        if(this.accept && this.accept.extensions && file.name){
+            let arr = file.name.split('.'),
+                ext = arr.reverse()[0],
+                exts = this.accept.extensions.split(',');
+            return exts.indexOf(ext) > -1;
+        }else{
+            return true;
+        }
     }
 
     get(){
@@ -96,10 +129,15 @@ export class BwUploader extends FormCom {
 
     set value(value: string){
         this.filename = value;
-        this.input.value = value;
+        this.setInputValue(value)
+    }
+
+    protected setInputValue(value: string){
+        this.isChangeText && (this.input.value = value || this.text);
     }
 
     destroy(){
+        this.fileUpload &&this.fileUpload.abort();
         this.temFiles = null;
         this.files = null;
         this.fileUpload = null;
@@ -110,17 +148,22 @@ export class BwUploader extends FormCom {
     // 调用方法上传暂存文件
     upload(){
         this.wrapper.classList.remove('error');
-        this.input.value = '上传中...';
-        this.temFiles && this.temFiles.forEach((file) => {
+        this.setInputValue('上传中...');
+        if(!this.multi){
+            this.files = [];
+        }
+        let files = this.multi ? this.temFiles : this.temFiles[0];
+        files && tools.toArray(files).forEach((file) => {
             this.fileUpload.upload(file).then((data) => {
                 console.log(data);
                 this.files.push(file);
+                this.temFiles = [];
+                this.onSuccess && this.onSuccess(data, file);
                 this.value = file.name;
-                this.onSuccess && this.onSuccess(data);
             }).catch(() => {
                 this.wrapper.classList.add('error');
-                this.input.value = '上传失败';
-                this.onFailure && this.onFailure();
+                this.setInputValue('上传失败');
+                this.onFailure && this.onFailure(file);
             })
         })
     }

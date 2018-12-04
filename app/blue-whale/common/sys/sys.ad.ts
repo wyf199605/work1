@@ -226,21 +226,23 @@ namespace BW{
                 whiteBat: function () {
                     this.adHandle('whiteBat', '');
                 },
-                getFile: function (callback: (file: File) => void, error: Function) {
+                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__';
                     self.handle('getImg', '{event:"' + event + '"}');
                     d.once(window, event, function (response : CustomEvent) {
+                        alert(response.detail);
                         try{
                             let detail = JSON.parse(response.detail);
 
                             if(detail.success && detail.msg){
                                 let data = detail.msg;
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
-                                callback && callback(file);
+                                callback && callback([file]);
                             }else{
                                 error && error(detail);
                             }
                         }catch (e){
+                            alert(e);
                             error && error();
                         }
                     });

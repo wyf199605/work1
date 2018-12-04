@@ -10,7 +10,7 @@ import CONF = BW.CONF;
 import {FastBtnTable, IFastBtnTablePara} from "../../../global/components/FastBtnTable/FastBtnTable";
 import {ITableCol, TableBase} from "../../../global/components/newTable/base/TableBase";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
-import {Button} from "../../../global/components/general/button/Button";
+import {Button, IButton} from "../../../global/components/general/button/Button";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {FastTableCell} from "../../../global/components/newTable/FastTableCell";
 import {InventoryBtn, ontimeRefresh} from "./InventoryBtn";
@@ -24,6 +24,11 @@ import {Inputs} from "../inputs/inputs";
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 import {PasswdModal} from "../changePassword/passwdModal";
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import {FormCom} from "../../../global/components/form/basic";
+import {EditModule} from "../edit/editModule";
+import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
+import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import {BwUploader} from "../uploadModule/bwUploader";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -67,6 +72,9 @@ export class BwTableModule extends Component {
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
+        if(!this.tableModule.editable){
+            this.editParam = null;
+        }
 
         BwRule.beforeHandle.table(para.ui); // 初始化UI, 设置一些默认值
         let ui = this.ui = para.ui;
@@ -1456,7 +1464,7 @@ export class BwTableModule extends Component {
                 upVarList: R_VarList[] = editParam && editParam[editParam.updateType] || [],
                 updatable = upVarList.some(v => fieldName === v.varName),
                 handler = null,
-                uploadModule: UploadModule;
+                uploadModule: BwUploader;
 
             if (md5str && typeof md5str === 'string') {
                 md5Arr = md5str.split(',');
@@ -1470,8 +1478,8 @@ export class BwTableModule extends Component {
             let isInsert = row ?
                 ftable.edit.addIndex.get().indexOf(row.data[TableBase.GUID_INDEX]) > -1 : false;
 
-            let rowCanEdit = this.tableModule.edit.rowCanInit(row, this.isSub),
-                cellCanEdit = this.tableModule.edit.cellCanInit(column, isInsert ? 1 : 0);
+            let rowCanEdit = this.edit.rowCanInit(row, this.isSub),
+                cellCanEdit = this.edit.cellCanInit(column, isInsert ? 1 : 0);
 
             updatable = updatable && rowCanEdit && cellCanEdit;
 
@@ -1503,7 +1511,7 @@ export class BwTableModule extends Component {
             let onUploaded = (md5Data: string[]) => {
                 let tableModule = this.tableModule;
                 if (tableModule) {
-                    (this.ftable.editing ? Promise.resolve() : tableModule.editBtns.start())
+                    (this.ftable.editing ? Promise.resolve() : tableModule.editManage.start(this))
                         .then(() => {
                             let row = this.ftable.rowGet(rowIndex);
                             if (row) {
@@ -1517,19 +1525,19 @@ export class BwTableModule extends Component {
             if (updatable) {
                 let imgContainer = <div className="table-img-uploader"/>;
                 d.append(btnWrapper, imgContainer);
-                uploadModule = new UploadModule({
+                uploadModule = new BwUploader({
                     nameField: fieldName,
                     // thumbField: thumbField,
                     container: imgContainer,
                     text: '添加图片',
                     accept: {
                         title: '图片'
-                        , extensions: 'jpg,png,gif'
+                        , extensions: 'jpg,png,gif,jpeg'
                         , mimeTypes: 'image/*'
                     },
+                    multi: true,
                     uploadUrl: CONF.ajaxUrl.fileUpload,
-                    showNameOnComplete: false,
-                    onComplete: (response, file) => {
+                    onSuccess: (response, file) => {
                         let data = response.data,
                             newMd5s = [];
 
@@ -1594,7 +1602,7 @@ export class BwTableModule extends Component {
             deletable = delVarList.some(v => fieldsName.includes(v.varName));
             updatable = upVarList.some(v => fieldsName.includes(v.varName));
             onUploaded = (md5Data: obj) => {
-                this.tableModule && this.tableModule.editBtns.start().then(() => {
+                this.tableModule && this.tableModule.editManage.start(this).then(() => {
                     let row = this.ftable.rowGet(currentRowIndex);
                     row.data = Object.assign(row.data, md5Data);
                 });
@@ -1990,14 +1998,536 @@ export class BwTableModule extends Component {
         }
     })();
 
-    // 按钮关联数据，每次按钮请求时需附带的参数
+    modify = (() => {
+        let self = this,
+            box: InputBox,
+            isEdit = true;
+        let start = () => {
+            if(!isEdit){
+                return Promise.reject();
+            }
+            btnStatus.start();
+            return this.edit.start();
+        };
+
+        let btnStatus = {
+            end: () => {
+                let status = this.edit.editBtnStateInit(box, false);
+
+                if (status.edit) {
+                    dbclick.on();
+                } else {
+                    dbclick.off();
+                }
+            },
+            start: () => {
+                this.edit.editBtnStateInit(box, true);
+                dbclick.off();
+            }
+        };
+
+        let dbclick = (() => {
+            let selector = '.section-inner-wrapper:not(.pseudo-table) tbody td:not(.cell-img)',
+                handler = function () {
+                    self.tableModule.editManage.start(self).then(() => {
+                        this.click();
+                    });
+                };
+            return {
+                on: () => {
+                    d.on(this.container, 'dblclick', selector, handler);
+                },
+                off: () => {
+                    d.off(this.container, 'dblclick', selector, handler);
+                }
+            }
+        })();
+        return {
+            set isCanEdit(flag: boolean){
+                isEdit = flag;
+                isEdit ? dbclick.on() : dbclick.off();
+            },
+            insert: () => {
+                if(!isEdit){
+                    return;
+                }
+                btnStatus.start();
+                this.edit.insert();
+            },
+            delete: () => {
+                if(!isEdit){
+                    return;
+                }
+                btnStatus.start();
+                this.edit.del();
+            },
+            start: () => {
+                return start();
+            },
+            end: () => {
+                btnStatus.end();
+                this.edit.cancel();
+            },
+            save: () => {
+                return this.edit.save();
+            },
+            init(inputBox: InputBox, isChangeBtnStatus = true){
+                box = inputBox;
+                isChangeBtnStatus && this.end();
+            },
+            get box(){
+                return box;
+            }
+        }
+    })();
+
+    protected _btnWrapper: HTMLElement;
+    get btnWrapper() {
+        if (!this._btnWrapper) {
+            // debugger;
+            if (tools.isMb) {
+                d.classAdd(this.wrapper, 'has-footer-btn');
+                this._btnWrapper = <footer className="mui-bar mui-bar-footer"/>;
+                //
+                d.append(this.wrapper, this._btnWrapper);
+                if (this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons)) {
+                    let btnWrapper = <div className="all-btn"/>;
+
+                    new CheckBox({
+                        className: 'edit-toggle',
+                        container: this._btnWrapper,
+                        onClick: (isChecked) => {
+                            this.subBtns.box.isShow = !isChecked;
+                            this.modify.box.isShow = isChecked;
+                        }
+                    });
+
+                    d.append(this._btnWrapper, btnWrapper);
+                    this._btnWrapper = btnWrapper;
+                }
+
+            } else {
+                this._btnWrapper = this.ftable.btnWrapper
+            }
+        }
+        return this._btnWrapper;
+    }
+
+    edit = (() => {
+        let self = this,
+            editModule: EditModule,
+            EditConstruct: typeof EditModule,
+            handler: Function,
+            validList: Promise<any>[] = [];
+
+
+        let cancel = () => {
+            this.ftable.editorCancel();
+        };
+
+        let start = (): Promise<void> => {
+            // debugger;
+            if (this.ftable.editing) {
+                return Promise.resolve();
+            }
+
+            return Promise.all([
+                editModuleLoad(),
+                this.rowDefData
+            ]).then(([TableEditModule, defData]) => {
+
+                tableEditInit(TableEditModule, this, Object.assign({}, defData, this.linkedData || {}));
+            });
+        };
+
+        let tableEditInit = (TableEditModule: typeof EditModule, bwTable: BwTableModule, defData: obj) => {
+            editModule = new TableEditModule({
+                auto: false,
+                type: 'table',
+                fields: bwTable.cols.map(f => {
+                    return {
+                        dom: null,
+                        field: f
+                    }
+                })
+            });
+
+            bwTable.ftable.editorInit({
+                defData,
+                isPivot: bwTable.isPivot,
+                autoInsert: false,
+                inputInit: (cell, col, data) => {
+                    let rowIndex = cell.row.index,
+                        row = bwTable.ftable.rowGet(rowIndex),
+                        field = col.content as R_Field;
+                    let value = data;
+                    if (field.elementType === 'lookup') {
+                        let lookUpKeyField = field.lookUpKeyField,
+                            cell = row.cellGet(lookUpKeyField);
+                        value = cell ? cell.data : '';
+                    }
+
+                    let com = BwRule.isImage(field.atrrs && field.atrrs.dataType) ? null : editModule.init(col.name, {
+                        dom: cell.wrapper,
+                        data: row.data,
+                        field,
+                        onExtra: (data, relateCols, isEmptyClear = false) => {
+                            if (tools.isEmpty(data) && isEmptyClear) {
+                                // table.edit.modifyTd(td, '');
+                                cell.data = '';
+                                return;
+                            }
+                            //TODO 给row.data赋值会销毁当前cell的input
+                            // row.data = Object.assign({}, row.data, data);
+                            for (let key in data) {
+                                let hCell = row.cellGet(key) as TableDataCell;
+                                if (hCell && hCell !== cell) {
+                                    let cellData = data[key];
+                                    if (hCell.data != cellData) {
+                                        hCell.data = cellData || '';
+                                    }
+                                }
+                            }
+                            if (field.elementType === 'lookup') {
+                                let lookUpKeyField = field.lookUpKeyField,
+                                    hCell = row.cellGet(lookUpKeyField);
+                                if (hCell && hCell.column) {
+                                    let hField = hCell.column.content as R_Field;
+                                    hCell !== cell && (hCell.data = data[lookUpKeyField]);
+
+                                    if (hField.assignSelectFields && hField.assignAddr) {
+                                        BwTableModule.initAssignData(hField.assignAddr, row ? row.data : {})
+                                            .then(({response}) => {
+
+                                                let data = response.data;
+                                                if (data && data[0]) {
+                                                    hField.assignSelectFields.forEach((name) => {
+                                                        let assignCell = row.cellGet(name) as TableDataCell;
+                                                        if (assignCell) {
+                                                            assignCell.data = data[0][name];
+                                                        }
+                                                    });
+                                                    let rowData = row.data;
+                                                    row.cells.forEach((dataCell) => {
+                                                        if (dataCell !== cell) {
+                                                            let column = dataCell.column,
+                                                                field = column.content as R_Field;
+                                                            if (field.elementType === 'lookup') {
+                                                                if (!rowData[field.lookUpKeyField]) {
+                                                                    dataCell.data = '';
+                                                                } else {
+                                                                    let options = bwTable.lookUpData[field.name] || [];
+                                                                    for (let opt of options) {
+                                                                        if (opt.value == rowData[field.lookUpKeyField]) {
+                                                                            dataCell.data = opt.text;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    })
+                                                }
+                                            });
+                                    }
+                                }
+                            }
+                            // else if(Array.isArray(field.assignSelectFields)){
+                            //     // 上传文件返回File_id，需要设置file_id值， 或者修改关联的assign的值
+                            //     field.assignSelectFields.forEach((name) => {
+                            //         let cell = row.cellGet(name) as TableDataCell;
+                            //         if(cell){
+                            //             cell.data = data[name] || '';
+                            //         }
+                            //     })
+                            // }
+                        }
+                    });
+
+                    // 设置默认值
+                    if (com instanceof FormCom) {
+                        com.set(value);
+                    }
+                    return com;
+                },
+                cellCanInit: (col, type) => {
+                    // let field = col.content || {};
+                    // return  type === 1 ? !field.noModify : !field.noEdit;
+                    return cellCanInit(col, type);
+                },
+                rowCanInit: (row) => {
+                    // let canRowInit = (isMain: boolean, rowData?: obj) => {
+                    //     if(isMain) {
+                    //         return !(rowData && (rowData['EDITEXPRESS'] === 0));
+                    //     } else {
+                    //         let main = this.main.ftable,
+                    //             mainIndex = main.pseudoTable.presentOffset,
+                    //             mainRowData = main.rowGet(mainIndex).data;
+                    //
+                    //         return canRowInit(true, mainRowData)
+                    //     }
+                    // };
+                    //
+                    // return canRowInit(!bwTable.isSub, row.data);
+                    //当为0时不可编辑
+                    return rowCanInit(row, bwTable.isSub)
+                }
+            });
+
+            // 控件销毁时验证
+            bwTable.ftable.off(FastTable.EVT_CELL_EDIT_CANCEL, handler);
+            bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
+                validList.push(validate(editModule, cell));
+            });
+        };
+
+        let validate = (editModule, cell: FastTableCell): Promise<any> => {
+            return new Promise((resolve, reject) => {
+                let name = cell.name,
+                    field: R_Field = cell.column.content,
+                    fastRow = cell.frow,
+                    rowData = fastRow.data,
+                    lookUpCell,
+                    result;
+
+                if (field.elementType === 'lookup') {
+                    lookUpCell = fastRow.cellGet(field.lookUpKeyField);
+                    if (lookUpCell && lookUpCell.column) {
+                        field = lookUpCell.column.content;
+                        result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
+                    }
+                } else {
+                    result = editModule.validate.start(name, cell.data);
+                }
+
+                if (result && result[name]) {
+                    cell.errorMsg = result[name].errMsg;
+                    resolve();
+                    // callback(td, false);
+                } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
+                    EditConstruct.checkValue(field, rowData, () => {
+                        lookUpCell && (lookUpCell.data = null);
+                        cell.data = null;
+                    }, name)
+                        .then((res) => {
+                            let {errors, okNames} = res;
+                            Array.isArray(errors) && errors.forEach(err => {
+                                let {name, msg} = err,
+                                    cell = fastRow.cellGet(name);
+                                if (cell) {
+                                    cell.errorMsg = msg;
+                                }
+                                //     callback(el, false);
+                            });
+
+                            Array.isArray(okNames) && okNames.forEach(name => {
+                                cell.errorMsg = null;
+                            });
+
+                            resolve();
+                        });
+                } else {
+                    cell.errorMsg = '';
+                    resolve();
+                    // callback(td, true);
+                }
+            }).then(() => cell.isChecked = true)
+            // debugger;
+
+        };
+
+        let editModuleLoad = (): Promise<typeof EditModule> => {
+            return new Promise((resolve) => {
+                require(['EditModule'], (edit) => {
+                    EditConstruct = edit.EditModule;
+                    resolve(edit.EditModule as typeof EditModule);
+                })
+            })
+        };
+
+        let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
+            let paramData: obj = {};
+            varList && ['update', 'delete', 'insert'].forEach(key => {
+                let dataKey = varList[`${key}Type`];
+                if (varList[key] && tableData[dataKey][0]) {
+
+                    let data = BwRule.varList(varList[key], tableData[dataKey], true,
+                        !isPivot);
+                    if (data) {
+                        paramData[key] = data;
+                    }
+                }
+            });
+
+            if (!tools.isEmpty(paramData)) {
+                paramData.itemId = varList.itemId;
+            }
+            return paramData;
+        };
+
+        let editDataGet = () => {
+            let bwTable = this;
+
+            if (!bwTable) {
+                return;
+            }
+
+            let editData = bwTable.ftable.editedData,
+                isPivot = editData.isPivot;
+            delete editData.isPivot;
+            if (this.linkedData) {
+                // 带上当前主表的字段
+                let mainData = this.linkedData;
+                for (let key in editData) {
+                    if (tools.isNotEmpty(editData[key])) {
+                        editData[key].forEach((obj, i) => {
+                            editData[key][i] = Object.assign({}, mainData, obj)
+                        });
+                    }
+                }
+            }
+
+            return editParamDataGet(editData, bwTable.editParam, isPivot);
+        };
+
+        let insert = () => {
+            (this.ftable.editing ? Promise.resolve() : start())
+                .then(() => {
+                    this.ftable.rowAdd();
+                })
+        };
+
+        let cellCheckValue = () => {
+            return Promise.all(this.ftable.editedCells.map((cell) => {
+                if(!cell.isChecked && !cell.isVirtual && cell.show){
+                    return validate(editModule, cell);
+                }else{
+                    return Promise.resolve();
+                }
+            }));
+        };
+
+        let closeCellInput = () => {
+            let ftable = this.ftable;
+
+            ftable && ftable.closeCellInput();
+        };
+
+        let save: () => Promise<obj> = () => {
+            return new Promise((resolve, reject) => {
+                editModule.assignPromise.then(() => {
+                    closeCellInput();
+                    let loading = new Loading({
+                        msg: '验证中...',
+                        disableEl: this.wrapper
+                    });
+                    setTimeout(() => {
+                        Promise.all(validList).then(() => {
+                        }).catch().finally(() => {
+                            cellCheckValue().then(() => {}).finally(() => {
+                                validList = [];
+                                loading && loading.hide();
+                                loading = null;
+                                setTimeout(() => {
+                                    let saveData = editDataGet();
+                                    this.saveVerify.then(() => {
+                                        resolve(saveData);
+                                    }).catch(() => reject());
+                                }, 100);
+                            })
+                        })
+                    }, 100)
+
+                });
+            })
+        };
+
+        let del = () => {
+            let ftable = this.ftable;
+            (ftable.editing ? Promise.resolve() : start())
+                .then(() => {
+                    ftable.rowDel(ftable.selectedRows.map(row => row.index));
+
+                })
+        };
+
+        let cellCanInit = (col, type) => {
+            let field = col.content || {};
+            return type === 1 ? !field.noModify : !field.noEdit;
+        };
+        let rowCanInit = (row, isSub) => {
+            let canRowInit = (isMain: boolean, rowData?: obj) => {
+                if (isMain) {
+                    return !(rowData && (rowData['EDITEXPRESS'] === 0));
+                } else {
+                    let ftable = self.ftable,
+                        index = ftable.pseudoTable.presentOffset,
+                        row = ftable.rowGet(index),
+                        mainRowData = row ? row.data : {};
+
+                    return canRowInit(true, mainRowData)
+                }
+            };
+
+            return tools.isEmpty(row) ? false : canRowInit(!isSub, row.data);
+            //当为0时不可编辑
+        };
+
+        let editBtnStateInit = (box: InputBox, isStart = true) => {
+            let status = {
+                edit: isStart ? false : editVarHas(this.editParam, ['update']),
+                insert: editVarHas(this.editParam, ['insert']),
+                del: editVarHas(this.editParam, ['delete']),
+                save: isStart,
+                cancel: isStart
+            };
+
+            if (box) {
+                for (let key in status) {
+                    let btn = box.getItem(key);
+                    btn && (btn.isDisabled = !status[key]);
+                }
+            }
+            return status;
+        };
+
+        return {
+            start,
+            cancel,
+            save,
+            insert,
+            del,
+            cellCanInit,
+            rowCanInit,
+            editBtnStateInit
+        }
+    })();
+
+    // 关联数据，每次按钮请求时需附带的参数
     public linkedData = {};
+
+    get saveVerify() {
+        return new Promise((resolve, reject) => {
+            let isSave = this.ftable.isSave;
+            if (isSave) {
+                resolve()
+            } else {
+                reject();
+            }
+        });
+    }
+
+    static initAssignData(assignAddr: R_ReqAddr, data: obj) {
+        return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(assignAddr, data), {
+            cache: true,
+        })
+    }
 
     destroy() {
         super.destroy();
         this.ftable.destroy();
         this.imgEdit.destroy();
         this.ftable = null;
+        this.edit = null;
         this.multiImgEdit = null;
         this.imgEdit = null;
         this._ftableReadyHandler = null;
@@ -2017,3 +2547,15 @@ export function drillUrlGet(field: R_Field, data: obj, keyField: string) {
     return url ? CONF.siteUrl + url : '';
 }
 
+
+function editVarHas(varList: IBW_TableAddrParam, hasTypes: string[]) {
+    let types = ['update', 'insert', 'delete'];
+    if (varList) {
+        for (let t of types) {
+            if (hasTypes.indexOf(varList[`${t}Type`]) > -1) {
+                return true
+            }
+        }
+    }
+    return false;
+}

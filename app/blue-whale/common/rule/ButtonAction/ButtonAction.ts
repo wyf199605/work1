@@ -211,9 +211,7 @@ export class ButtonAction {
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
-                }).catch(() => {
-                    callback(null);
-                });
+                }, () => callback(null));
                 break;
             case 'popup':
                 if (!ajaxType) {
@@ -233,9 +231,7 @@ export class ButtonAction {
                         }, url);
                     }
                     callback(response);
-                }).catch(() => {
-                    callback(null);
-                });
+                }, () => callback(null))
                 break;
             case 'newwin':
             default:

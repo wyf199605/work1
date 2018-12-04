@@ -3,7 +3,6 @@ import tools = G.tools;
 import CONF = BW.CONF;
 import sys = BW.sys;
 import AssignModule from "assignModule/assignModule";
-import UploadModule from '../uploadModule/uploadModule';
 import {AssignTextModule} from "./assignModule/assignTextModule";
 import {PickModule} from "./pickModule";
 import {FormCom} from "../../../global/components/form/basic";
@@ -160,9 +159,10 @@ export class EditModule {
 
         file: (p): FormCom => {
             let com =  new BwUploader({
+                text: '点击上传',
+                isChangeText: true,
                 nameField: p.field.name,
                 custom: p.field,
-                text: '点击上传',
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 onSuccess: (response) => {
@@ -277,7 +277,7 @@ export class EditModule {
 
         virtual: (p) => {
             return new Virtual({
-                custom: p.field
+                custom: p && p.field
             });
         },
 

@@ -2,6 +2,24 @@
   .sub-table-tab-wrapper {
     overflow: hidden;
     height: calc(45% - 10px);
+    position: relative;
+
+    .sub-tab-navbar{
+      padding-right: 90px;
+    }
+    .sub-icon-navbar{
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 90px;
+
+      .sub-icon {
+        float: right;
+        line-height: 42px;
+        margin-right: 10px;
+        cursor: pointer;
+      }
+    }
     .table-module-sub {
       height: 100% !important;
     }
@@ -142,6 +160,7 @@
 
       input {
         font-size: 14px;
+        text-align: center;
       }
 
       &:hover {
@@ -281,13 +300,6 @@
     }
 
   }
-}
-
-.full-icon {
-  float: right;
-  line-height: 42px;
-  margin-right: 15px;
-  cursor: pointer;
 }
 
 .fl-pc {

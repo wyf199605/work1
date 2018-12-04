@@ -40,6 +40,7 @@ export class NewTableModule {
     private tab: Tab;
     private showSubField: string = '';
     protected subModal: Modal;
+    protected editType: 'self' | 'linkage' = 'linkage';
 
     get defaultData() {
         return this._defaultData
@@ -50,7 +51,6 @@ export class NewTableModule {
     private currentSelectedIndexes: number[] = [];
 
     constructor(para: ITableModulePara) {
-        window['nt'] = this;
         console.log(para);
         this.bwEl = para.bwEl;
         this.showSubField = para.bwEl.showSubField;
@@ -61,6 +61,10 @@ export class NewTableModule {
         // this.mainEditable = !!mainVarList;
         // this.subEditable = !!subVarList;
         this.editable = !!(mainParam || (subUi && subParam));
+        if(this.bwEl.uiType === 'templ_single'){
+            this.editType = 'self';
+            this.editable = false;
+        }
         let main = this.main = new BwMainTableModule({
             ui: para.bwEl,
             container: para.container,
@@ -71,11 +75,22 @@ export class NewTableModule {
 
         main.onFtableReady = () => {
             if (tools.isNotEmpty(this.bwEl.subButtons)) {
-                main.subBtns.init(this.btnWrapper);
+                main.subBtns.init(this.main.btnWrapper);
             }
 
-            if (this.editable) {
-                this.editBtns.init(this.btnWrapper);
+            if (this.editType === 'linkage' && this.editable) {
+                this.editInit(main);
+                this.active.onChange = (isMain) => {
+                    console.log(isMain);
+                    if(isMain){
+                        this.main.modify.end();
+                    }else{
+                        let sub = this.sub[this.subTabActiveIndex];
+                        sub && sub.modify.end();
+                    }
+                }
+            }else if(this.editType === 'self' && this.main.editParam){
+                this.editInit(main);
             }
             let box = tools.keysVal(this.main, 'subBtns', 'box');
             box && box.responsive();
@@ -141,7 +156,7 @@ export class NewTableModule {
                 }
                 let tabs: ITab[] = [];
                 this.subWrapper = tools.isMb ? modal.wrapper : tabWrapper;
-                !tools.isMb && this.draggedEvent.on();
+                !tools.isMb && this.dragged.on();
                 this.active.on();
                 let isFirst = true;
                 mftable.on(FastTable.EVT_RENDERED, () => {
@@ -169,7 +184,9 @@ export class NewTableModule {
                                     ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
-                                        tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel());
+                                        tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
+                                        subUi = this.bwEl.subTableList[index];
+
                                     this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
                                     this.currentSelectedIndexes.push(index);
                                 } else {
@@ -182,21 +199,8 @@ export class NewTableModule {
                                 }
                             }
                         });
-                        if (!tools.isMb) {
-                            d.query('ul.nav-tabs', this.subWrapper).appendChild(<i title="放大"
-                                                                                   className="fa fa-expand full-icon"/>);
-                            let i = <i title="点击隐藏按钮" className="iconfont icon-arrow-up full-icon"/>;
-                            d.query('ul.nav-tabs', this.subWrapper).appendChild(i);
-                            d.on(i, 'click', () => {
-                                i.classList.toggle('icon-arrow-up');
-                                i.classList.toggle('icon-arrow-down');
-                                this.subBtnShow = i.classList.contains('icon-arrow-up');
-                                for (let sub of Object.values(this.sub)) {
-                                    sub && (sub.btnShow = this.subBtnShow);
-                                    this.subBtnShow ? i.title = '点击隐藏按钮' : i.title = '点击展开按钮';
-                                }
-                            });
-                        }
+
+                        !tools.isMb && !this.subIconWrapper && this.initSubIcon();
                     }
                     this.tab.len <= 0 && this.bwEl.subTableList.forEach((sub) => {
                         this.tab.addTab([{
@@ -223,34 +227,6 @@ export class NewTableModule {
                                 this.tab.active(0);
                                 this.currentSelectedIndexes.push(0);
                             }
-                            if (!tools.isMb) {
-                                d.on(this.tab.getTab(), 'click', '.fa-expand', () => {
-                                    if (tools.isEmpty(this.sub[this.subTabActiveIndex])) {
-                                        Modal.alert('当前没有子表可以全屏显示!');
-                                        return;
-                                    }
-                                    let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
-
-                                    let sub = this.sub[this.subTabActiveIndex],
-                                        isShow = sub ? sub.btnShow : true;
-                                    sub && (sub.btnShow = true);
-
-                                    new Modal({
-                                        body: tabEl,
-                                        className: 'full-screen sub-table-full',
-                                        header: {
-                                            title: '子表全屏'
-                                        },
-                                        onClose: () => {
-                                            sub && (sub.btnShow = isShow);
-                                            this.sub[this.subTabActiveIndex].ftable.removeAllModal();
-                                            d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
-                                            this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                                        }
-                                    });
-                                    this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
-                                });
-                            }
                             pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                             isFirst = false;
                         }
@@ -259,12 +235,100 @@ export class NewTableModule {
 
                 let self = this;
                 mftable.click.add('.section-inner-wrapper.pseudo-table tbody tr[data-index]', function () {
-                    let rowIndex = parseInt(this.dataset.index);
-                    self.currentSelectedIndexes = [];
-                    self.subRefreshByIndex(rowIndex);
+                    let subTables = Object.values(self.sub);
+                    if(subTables.some((table) => table.ftable.editing)){
+                        Modal.confirm({
+                            msg: '是否保存正在编辑的子表的数据？',
+                            callback: (flag) => {
+                                let editSubTables = subTables.filter((table) => table.ftable.editing);
+                                if(flag){
+                                    Promise.all(editSubTables.map((table) => {
+                                        return self.editManage.save(table);
+                                    }))
+                                }else{
+                                    editSubTables.forEach((table) => {
+                                        self.editManage.end(table);
+                                    });
+                                    let rowIndex = parseInt(this.dataset.index);
+                                    self.currentSelectedIndexes = [];
+                                    self.subRefreshByIndex(rowIndex);
+                                }
+                            }
+                        })
+                    }else{
+                        let rowIndex = parseInt(this.dataset.index);
+                        self.currentSelectedIndexes = [];
+                        self.subRefreshByIndex(rowIndex);
+                    }
                 });
             }
         };
+    }
+
+    protected subIconWrapper: HTMLElement = null;
+    protected initSubIcon(){
+        let navbar = d.query('ul.nav-tabs', this.subWrapper),
+            maxIcon,
+            minIcon,
+            btnShowIcon;
+        navbar.classList.add('sub-tab-navbar');
+
+        let iconWrapper = this.subIconWrapper = <div className="sub-icon-navbar">
+            {maxIcon = <i title="最大化" className="fa fa-expand sub-icon"/>}
+            {minIcon = <i title="最小化" className="iconfont icon-zuixiaohua sub-icon"/>}
+            {btnShowIcon = <i title="点击隐藏按钮" className="iconfont icon-arrow-up sub-icon"/>}
+        </div>;
+        d.append(this.subWrapper, iconWrapper);
+
+        // 子表按钮隐藏显示
+        d.on(btnShowIcon, 'click', () => {
+            btnShowIcon.classList.toggle('icon-arrow-up');
+            btnShowIcon.classList.toggle('icon-arrow-down');
+            this.subBtnShow = btnShowIcon.classList.contains('icon-arrow-up');
+            for (let sub of Object.values(this.sub)) {
+                sub && (sub.btnShow = this.subBtnShow);
+                this.subBtnShow ? btnShowIcon.title = '点击隐藏按钮' : btnShowIcon.title = '点击展开按钮';
+            }
+        });
+
+        // 最小化
+        d.on(minIcon, 'click', () => {
+            this.subWrapper.style.transition = 'height 0.5s';
+            this.main.wrapper.style.transition = 'height 0.5s';
+            this.dragged.subHeight = 0;
+            setTimeout(() => {
+                this.subWrapper.style.removeProperty('transition');
+                this.main.wrapper.style.removeProperty('transition');
+            }, 600);
+        });
+
+        // 最大化
+        d.on(maxIcon, 'click', () => {
+            if (tools.isEmpty(this.sub[this.subTabActiveIndex])) {
+                Modal.alert('当前没有子表可以全屏显示!');
+                return;
+            }
+            let tabEl = d.query('.table-module-sub', d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()));
+
+            let sub = this.sub[this.subTabActiveIndex],
+                isShow = sub ? sub.btnShow : true;
+            sub && (sub.btnShow = true);
+
+            new Modal({
+                body: tabEl,
+                className: 'full-screen sub-table-full',
+                header: {
+                    title: '子表全屏'
+                },
+                onClose: () => {
+                    sub && (sub.btnShow = isShow);
+                    this.sub[this.subTabActiveIndex].ftable.removeAllModal();
+                    d.query(`.tab-pane[data-index="${this.subTabActiveIndex}"]`, this.tab.getPanel()).appendChild(tabEl);
+                    this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+                }
+            });
+            this.sub[this.subTabActiveIndex].ftable && this.sub[this.subTabActiveIndex].ftable.recountWidth();
+        });
     }
 
     protected subBtnShow: boolean = true;
@@ -367,7 +431,10 @@ export class NewTableModule {
     private subWrapper: HTMLElement = null;
 
     subInit(ui: IBW_Table, editParam: IBW_TableAddrParam, rowData: obj, ajaxData?: obj, tabEl?: HTMLElement) {
-        this.sub[this.subTabActiveIndex] = new BwSubTableModule({
+        if(!editParam && ui.tableAddr && ui.tableAddr.param && ui.tableAddr.param[0]){
+            editParam = ui.tableAddr.param[0];
+        }
+        let subTable = this.sub[this.subTabActiveIndex] = new BwSubTableModule({
             ui,
             editParam,
             ajaxData,
@@ -376,19 +443,45 @@ export class NewTableModule {
             container: tabEl,
             btnShow: this.subBtnShow
         });
-        this.sub[this.subTabActiveIndex].linkedData = rowData;
+
+        subTable.onFtableReady = () => {
+            subTable.onFtableReady = () => {};
+            subTable.linkedData = rowData;
+            if(this.editType === 'self'){
+                this.editInit(subTable);
+            }else if(this.editType === 'linkage'){
+                subTable.modify.init(this.main.modify.box, !(this.active.isMain || this.editManage.editing));
+                if(this.editManage.editing && !this.main.ftable.editing){
+                    let handler;
+                    subTable.ftable.on(FastTable.EVT_RENDERED, handler = () => {
+                        this.editManage.start(this.sub[this.subTabActiveIndex]);
+                        subTable.ftable.off(FastTable.EVT_RENDERED, handler);
+                    });
+                }
+            }
+        }
     }
 
-    protected draggedEvent = (() => {
+    protected dragged = (() => {
         let mainHeight = 0,
             subHeight = 0,
+            mainWrapper,
+            subWrapper,
             mouseDownHandler = null,
             mouseMoveHandler = null,
             mouseUpHandler = null;
         return {
+            set subHeight(height: number){
+                if(mainWrapper && subWrapper){
+                    mainHeight = mainHeight + subHeight - height;
+                    subHeight = height;
+                    mainWrapper.style.height = mainHeight + 'px';
+                    subWrapper.style.height = subHeight + 'px';
+                }
+            },
             on: () => {
-                let mainWrapper = this.main.wrapper;
-                let subWrapper = this.subWrapper;
+                mainWrapper = this.main.wrapper;
+                subWrapper = this.subWrapper;
                 mainHeight = mainWrapper.offsetHeight;
                 subHeight = subWrapper.offsetHeight;
                 d.on(this.main.container, 'mousedown', '.drag-line', mouseDownHandler = (ev: MouseEvent) => {
@@ -451,169 +544,215 @@ export class NewTableModule {
         });
     }
 
-    editBtns = (() => {
-
-        let box: InputBox,
-            editBtnData: IButton[] = [];
-
-        let start = () => {
-            btnStatus.start();
-            return this.edit.start();
-        };
-
-        let dbclick = (() => {
-            let selector = '.section-inner-wrapper:not(.pseudo-table) tbody td:not(.cell-img)',
-                handler = function () {
-                    start().then(() => {
-                        this.click();
-                    });
-                };
-            return {
-                on: () => {
-                    d.on(this.main.container, 'dblclick', selector, handler);
-                },
-                off: () => {
-                    d.off(this.main.container, 'dblclick', selector, handler);
-                }
-            }
-        })();
-
-
-        let editParamHas = (varNames: string[], isMain?: boolean) => {
-            let params: IBW_TableAddrParam[] = [],
-                mainEditParam = this.main.editParam,
-                subEditParam = tools.isNotEmpty(this.sub) && tools.isNotEmpty(this.sub[this.subTabActiveIndex]) && this.sub[this.subTabActiveIndex].editParam;
-
-            if (typeof isMain === 'undefined') {
-                params = [mainEditParam, subEditParam];
-            } else {
-                params = [isMain ? mainEditParam : subEditParam];
-            }
-
-            return params.some((param) => editVarHas(param, varNames));
-        };
-
-        let btnStatus = {
-            end: (isMain?: boolean) => {
-
-                let status = {
-                    edit: editParamHas(['update'], isMain),
-                    insert: editParamHas(['insert'], isMain),
-                    del: editParamHas(['delete'], isMain),
-                    save: false,
-                    cancel: false
-                };
-
-                if (box) {
-                    for (let key in status) {
-                        let btn = box.getItem(key);
-                        btn && (btn.isDisabled = !status[key]);
-                    }
-                }
-
-                if (status.edit) {
-                    dbclick.on();
-                } else {
-                    dbclick.off();
-                }
-            },
-            start: (isMain?: boolean) => {
-                let status = {
-                    edit: false,
-                    insert: editParamHas(['insert'], isMain),
-                    del: editParamHas(['delete'], isMain),
-                    save: true,
-                    cancel: true
-                };
-                //
-                for (let key in status) {
-                    let btn = box.getItem(key);
-                    if (btn) {
-                        btn.isDisabled = !status[key]
-                    }
-                }
-                dbclick.off();
-            }
-        };
-
-
-        let initInner = (wrapper: HTMLElement) => {
-            editBtnData = [
+    protected editInit(bwTable: BwTableModule){
+        let time = 500;
+        if(tools.isNotEmpty(bwTable.editParam)){
+            let editBtnData = [
                 {
                     key: 'edit',
                     content: '编辑',
-                    onClick: () => {
-                        start();
-                    },
+                    onClick: tools.pattern.throttling(() => {
+                        this.editManage.start(bwTable);
+                    }, time),
                     icon: 'app-bianji',
                     iconPre: 'appcommon'
                 }, {
                     key: 'insert',
                     content: '新增',
-                    onClick: () => {
-                        btnStatus.start();
-                        this.edit.insert();
-                    },
+                    onClick: tools.pattern.throttling(() => {
+                        this.editManage.insert(bwTable);
+                    }, time),
                     icon: 'app-xinzeng',
                     iconPre: 'appcommon'
                 }, {
                     key: 'del',
                     content: '删除',
-                    onClick: () => {
-                        btnStatus.start();
-                        this.edit.del();
-                    },
+                    onClick: tools.pattern.throttling(() => {
+                        this.editManage.del(bwTable);
+                    }, time),
                     icon: 'app-shanchu',
                     iconPre: 'appcommon'
                 }, {
                     key: 'save',
                     content: '保存',
-                    onClick: () => {
-                        this.edit.save()
-                    },
+                    onClick: tools.pattern.throttling(() => {
+                        this.editManage.save(bwTable);
+                    }, time),
                     icon: 'app-baocun',
                     iconPre: 'appcommon'
                 }, {
                     key: 'cancel',
                     content: '取消',
-                    onClick: () => {
-                        btnStatus.end();
-                        this.edit.cancel();
-                    },
+                    onClick: tools.pattern.throttling(() => {
+                        this.editManage.end(bwTable);
+                    }, time),
                     icon: 'app-quxiao',
                     iconPre: 'appcommon'
                 }
             ];
 
-
-            box = new InputBox({
-                container: wrapper
+            let box = new InputBox({
+                container: bwTable.btnWrapper
             });
             d.classAdd(box.wrapper, 'pull-left edit-btns');
             editBtnData.forEach((btnData) => {
                 box.addItem(new Button(btnData));
             });
-            btnStatus.end();
+            bwTable.modify.init(box);
+        }
 
-            this.active.onChange = (isMain) => {
-                this.main.ftable.editing ? btnStatus.start(isMain) : btnStatus.end(isMain);
+    }
+
+    editManage = (() => {
+        let editing = false;
+        let editStatusToggle = (bwTable: BwTableModule, flag: boolean) => {
+            if (flag) {
+                editing = false;
+                this.active.on();
+                this.main.modify.isCanEdit = flag;
+                this.main.modify.box.disabled = false;
+                this.tab && this.tab.panelContainer.classList.remove('disabled');
+            } else {
+                editing = true;
+                switch (this.editType){
+                    case 'self':
+                        if (bwTable.modify.box !== this.main.modify.box) {
+                            this.main.modify.box.disabled = true;
+                            this.main.modify.isCanEdit = flag;
+                        } else {
+                            this.tab && this.tab.panelContainer.classList.add('disabled');
+                        }
+                        break;
+                    case 'linkage':
+                        this.active.isMain
+                            ? (this.tab && this.tab.panelContainer.classList.add('disabled'))
+                            : (this.main.modify.isCanEdit = flag);
+                        break;
+                }
+                this.active.off();
+            }
+        };
+
+        let getTables = (bwTable: BwTableModule, isMain = true): BwTableModule[] => {
+            let tables: BwTableModule[] = [];
+            switch (this.editType){
+                case 'self':
+                    tables = [bwTable];
+                    break;
+                case 'linkage':
+                    tables = isMain ? [this.main] : [...Object.values(this.sub)];
+            }
+            return tables;
+        };
+
+        let save = (bwTable: BwTableModule) => {
+            let tables = getTables(bwTable, this.active.isMain),
+                promises: Promise<obj>[] = [];
+            tables.forEach((table) => {
+                promises.push(table.modify.save());
+            });
+            return Promise.all(promises).then((data) => {
+                let saveData = {
+                    param: [] as obj[]
+                };
+                console.log(data);
+                data.forEach((d) => {
+                    if(tools.isNotEmpty(d)){
+                        saveData.param.push(d);
+                    }
+                });
+                if(tools.isEmpty(saveData.param)){
+                    Modal.toast('没有数据改变');
+                    end(bwTable);
+                    return ;
+                }
+                let loading = new Loading({
+                    msg: '保存中',
+                    disableEl: this.main.wrapper
+                });
+                BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
+                    type: 'POST',
+                    data: saveData,
+                }).then(({response}) => {
+
+                    BwRule.checkValue(response, saveData, () => {
+                        this.currentSelectedIndexes = [];
+                        // 主表子表刷新
+                        this.refresh();
+                        Modal.toast(response.msg);
+                        // loading && loading.destroy();
+                        // loading = null;
+                        end(bwTable);
+                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                    });
+                }).finally(() => {
+                    loading && loading.destroy();
+                    loading = null;
+                });
+            }).catch(() => {
+                Modal.alert('表格中有错误，请改正后再提交！');
+            })
+        };
+
+        let start = (bwTable: BwTableModule): Promise<any> => {
+            editStatusToggle(bwTable, false);
+            let tables = getTables(bwTable, this.active.isMain),
+                promises: Promise<any>[] = [];
+            tables.forEach((table) => {
+                promises.push(table.modify.start());
+            });
+            return new Promise((resolve, reject) => {
+                Promise.all(promises).then(() => resolve()).catch(() => reject());
+            });
+        };
+
+        let end = (bwTable: BwTableModule) => {
+            editStatusToggle(bwTable, true);
+            let tables = getTables(bwTable, this.active.isMain);
+            tables.forEach((table) => {
+                table.modify.end();
+            });
+        };
+
+        let insert = (bwTable: BwTableModule) => {
+            editStatusToggle(bwTable, false);
+            switch (this.editType){
+                case 'self':
+                    bwTable.modify.insert();
+                    break;
+                case 'linkage':
+                    let main = this.main,
+                        sub = this.sub[this.subTabActiveIndex],
+                        table = this.active.isMain ? main : sub;
+                    table && table.modify.insert();
+            }
+        };
+
+        let del = (bwTable: BwTableModule) => {
+            editStatusToggle(bwTable, false);
+            switch (this.editType){
+                case 'self':
+                    bwTable.modify.delete();
+                    break;
+                case 'linkage':
+                    let main = this.main,
+                        sub = this.sub[this.subTabActiveIndex],
+                        table = this.active.isMain ? main : sub;
+                    table && table.modify.delete();
             }
         };
 
         return {
-            init: (wrapper: HTMLElement) => {
-                initInner(wrapper);
+            get editing(){
+                return editing
             },
-            get box() {
-                return box;
-            },
+            save,
             start,
-            end: () => {
-                btnStatus.end();
-            }
+            end,
+            insert,
+            del,
         }
     })();
-
 
     protected active = (() => {
         let isMainActive = true,
@@ -624,12 +763,10 @@ export class NewTableModule {
         let on = () => {
             this.sub && d.on(this.subWrapper, 'click', handler1 = () => {
                 isMainActive = false;
-                console.log(isMainActive, 's');
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
             d.on(this.main.wrapper, 'click', handler2 = () => {
                 isMainActive = true;
-                console.log(isMainActive);
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
         };
@@ -653,8 +790,7 @@ export class NewTableModule {
         }
     })();
 
-    edit = (() => {
-
+    /*edit = (() => {
         let self = this,
             handlerName = '__EVT_VALID_CANCEL__',
             editName = '__EDIT__MODULE__',
@@ -835,9 +971,6 @@ export class NewTableModule {
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, bwTable[handlerName] = (cell: FastTableCell) => {
                 validList.push(validate(editModule, cell));
             });
-        };
-
-        let cellCancel = (cell: FastTableCell) => {
         };
 
         let validate = (editModule, cell: FastTableCell): Promise<any> => {
@@ -1118,49 +1251,15 @@ export class NewTableModule {
             }
         });
     }
-
-    protected static initAssignData(assignAddr: R_ReqAddr, data: obj) {
+    static initAssignData(assignAddr: R_ReqAddr, data: obj) {
         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(assignAddr, data), {
             cache: true,
         })
-    }
-
-    protected _btnWrapper: HTMLElement;
-    protected get btnWrapper() {
-        if (!this._btnWrapper) {
-            let main = this.main;
-            // debugger;
-            if (tools.isMb) {
-                d.classAdd(this.main.wrapper, 'has-footer-btn');
-                this._btnWrapper = <footer className="mui-bar mui-bar-footer"></footer>;
-                //
-                d.append(this.main.wrapper, this._btnWrapper);
-                if (this.editable && tools.isNotEmpty(this.bwEl.subButtons)) {
-                    let btnWrapper = <div className="all-btn"></div>;
-
-                    new CheckBox({
-                        className: 'edit-toggle',
-                        container: this._btnWrapper,
-                        onClick: (isChecked) => {
-                            this.main.subBtns.box.isShow = !isChecked;
-                            this.editBtns.box.isShow = isChecked;
-                        }
-                    });
-
-                    d.append(this._btnWrapper, btnWrapper);
-                    this._btnWrapper = btnWrapper;
-                }
-
-            } else {
-                this._btnWrapper = main.ftable.btnWrapper
-            }
-        }
-        return this._btnWrapper;
-    }
+    }*/
 
     destroy() {
         this.mobileModal && this.mobileModal.destroy();
-        this.draggedEvent.off();
+        this.dragged.off();
         d.remove(this.dragLine);
         this.main && this.main.destroy();
         this.sub && Object.values(this.sub).forEach((subTable) => {
@@ -1170,9 +1269,8 @@ export class NewTableModule {
         this.subWrapper = null;
         this.main = null;
         this.sub = null;
-        this.edit = null;
         this.bwEl = null;
-        this._btnWrapper = null;
+        // this._btnWrapper = null;
         this.tab = null;
     }
 }
@@ -1192,17 +1290,4 @@ function getMainSubVarList(addr: IBW_TableAddr, subItemId?: string) {
     });
 
     return varlist;
-}
-
-
-function editVarHas(varList: IBW_TableAddrParam, hasTypes: string[]) {
-    let types = ['update', 'insert', 'delete'];
-    if (varList) {
-        for (let t of types) {
-            if (hasTypes.indexOf(varList[`${t}Type`]) > -1) {
-                return true
-            }
-        }
-    }
-    return false;
 }

@@ -75,6 +75,12 @@ export class FileUpload{
         })
     }
 
+    abort(){
+        this.xhrs.forEach((xhr) => {
+            xhr.abort();
+        })
+    }
+
     // 分片验证逻辑
     protected chunkUpload(file: File, ...any) {
         let totalSize = file.size,
@@ -84,7 +90,7 @@ export class FileUpload{
             endSize = 0,
             chunkIndex = 0,
             blob: Blob;
-
+        this.xhrs = [];
         while (totalPieces --) {
             endSize = startSize + this.chunkSize;
             blob = file.slice(startSize, endSize); // 切片
@@ -111,6 +117,7 @@ export class FileUpload{
     }
 
     // 文件上传方法
+    protected xhrs: XMLHttpRequest[] = [];
     protected uploadFile(file: Blob, filename: string): Promise<any> {
         let url = this.uploadUrl;
         return new Promise<any>((resolve, reject) => {
@@ -125,6 +132,7 @@ export class FileUpload{
                 formData.append('file', file, filename);
                 let result = {success: false, uploading: false, progress: 0};
                 let xhr = new XMLHttpRequest();
+                this.xhrs.push(xhr);
                 xhr.open("post", url, true);
                 xhr.addEventListener('error', () => {
                     reject();
