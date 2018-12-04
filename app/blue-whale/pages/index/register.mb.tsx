@@ -17,16 +17,16 @@ export class RegisterMbPage extends RegPage{
             <div className="register-title">账号注册</div>
             <form className="register-form">
                 <div className="form-group">
-                    <input id="tel" type="text" placeholder="输入手机号码"/>
+                    <input id="tel" type="number" placeholder="输入手机号码"/>
                 </div>
                 <div className="form-group">
-                    <input id="verifyCodeInput" type="text" maxlength="5" placeholder="输入验证码"/>
+                    <input id="verifyCodeInput" type="number" maxlength="5" placeholder="输入验证码"/>
                     <div className="more-group">
                         <canvas width="80" height="30">您的浏览器不支持canvas，请用其他浏览器打开。</canvas>
                     </div>
                 </div>
                 <div className="form-group">
-                    <input id="verify" type="text" placeholder="输入短信验证码"/>
+                    <input id="verify" type="number" placeholder="输入短信验证码"/>
                     <div className="more-group"/>
                 </div>
                 <div className="btn-group"/>

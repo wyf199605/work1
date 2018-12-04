@@ -19,7 +19,8 @@ export class NumInput extends TextInput{
         super(<ITextInputPara>Object.assign({}, {
             step: 1,
             max: null,
-            min: null
+            min: null,
+            type : 'number'
         }, p, {
             icons : ['iconfont icon-jiahao' , 'iconfont icon-jianhao'],
             iconHandle :  (index) => {
