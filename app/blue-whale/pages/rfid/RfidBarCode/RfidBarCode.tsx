@@ -266,8 +266,11 @@ export class RfidBarCode extends Component {
                 </div>
                 <div class="rifd-bar-code-describe">卅达夏 包袋OL/明媚481 109 黑色</div>
                 <div class="rfid-barCode-nums">
-                    <div class="rfid-barCode-set">
-                        <div class="set-row">
+                    <div class="shelf-nums">
+                        数量(<span class="shelf-mode"></span>)<input type="number"/>
+                    </div>
+                    <div className="rfid-barCode-set">
+                        <div className="set-row">
                             <div>逐一扫描</div>
                             <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
                                     onClick={(isChecked) => {
@@ -314,8 +317,8 @@ export class RfidBarCode extends Component {
 
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
                                                 //alert(JSON.stringify(res.data));
-                                               // let data = res.data;
-                                                if(res.success){
+                                                // let data = res.data;
+                                                if (res.success) {
                                                     let num = d.query('.total-nums>span');
                                                     num.innerText = (parseInt(num.innerText) + 1) + '';
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
@@ -335,7 +338,7 @@ export class RfidBarCode extends Component {
                                             params['optionStype'] = 0;
                                             params['num'] = modeVal['value'] || 0;
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -352,7 +355,7 @@ export class RfidBarCode extends Component {
                                             params['num'] = 0;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
 
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -418,7 +421,7 @@ export class RfidBarCode extends Component {
 
                                     }}></Toggle>
                         </div>
-                        <div class="set-row">
+                        <div className="set-row">
                             <div>累加</div>
                             <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
                                     onClick={(isChecked) => {
@@ -457,7 +460,7 @@ export class RfidBarCode extends Component {
                                             //先关闭之前的监听重新开启
                                             //开启重新的
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -475,7 +478,7 @@ export class RfidBarCode extends Component {
                                             params['num'] = modeVal['value'] || 0;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
                                                 let data = res.data;
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -491,8 +494,8 @@ export class RfidBarCode extends Component {
                                         } else if (this.mode[key] == '逐一') {
                                             params['optionStype'] = 2;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                               // alert(JSON.stringify(res.data));
-                                                if(res.success){
+                                                // alert(JSON.stringify(res.data));
+                                                if (res.success) {
                                                     let num = d.query('.total-nums>span');
                                                     num.innerText = (parseInt(num.innerText) + 1) + '';
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
@@ -559,9 +562,6 @@ export class RfidBarCode extends Component {
 
                                     }}></Toggle>
                         </div>
-                    </div>
-                    <div class="shelf-nums">
-                        数量(<span class="shelf-mode"></span>)<input type="number"/>
                     </div>
                     <div class="total-nums">
                         <i class="iconfont icon-zonghesum1"></i>数量:<span style="color:#007aff">0</span>
