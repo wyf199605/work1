@@ -264,7 +264,11 @@ gulp.task('js', function () {
     // 客户化查询器
     gulpTsModule([
         'newQuery/NewQueryModal',
-        'newQuery/NewQueryItem'
+        'newQuery/NewQueryItem',
+        'newQuery/OptionItem',
+        'newQuery/Options',
+        'newQuery/RangeInputItem',
+        'newQuery/RangeInput'
     ], 'newQueryModule.js');
 
     /*page*/

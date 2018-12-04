@@ -1,7 +1,7 @@
 /// <amd-module name="NewQueryModal"/>
 
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {IQueryItem, NewQueryItem} from "./NewQueryItem";
+import {IQueryItem, IResult, NewQueryItem} from "./NewQueryItem";
 import tools = G.tools;
 
 interface INewQueryPara {
@@ -30,7 +30,7 @@ export class NewQueryModal {
                 rightPanel: [
                     {
                         content: '重置',
-                        className: 'modal-btn eidt-confirm',
+                        className: 'new-query-btn reset',
                         type: 'primary',
                         onClick: () => {
 
@@ -38,10 +38,14 @@ export class NewQueryModal {
                     },
                     {
                         content: '确定',
-                        className: 'modal-btn eidt-confirm',
+                        className: 'new-query-btn confirm',
                         type: 'primary',
                         onClick: () => {
-
+                            let data:IResult[] = [];
+                            this.items.forEach(item => {
+                                data.push(item.get());
+                            });
+                            console.log(data);
                         }
                     }
                 ]
