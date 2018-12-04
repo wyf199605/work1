@@ -93,7 +93,7 @@ export class FlowEditor extends FormCom {
             Object.keys(fields).forEach(key => {
                 if (key in FlowEditor.DROPDOWN_KEYVALUE) {
                     let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
-                    valueText && (fields[key] = valueText.value);
+                    valueText && (fields[key] = valueText.text);
                 }
             });
             this.set(fields);
