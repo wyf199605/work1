@@ -100,7 +100,7 @@ export class FastTable extends Component {
     }
 
     off(name: string, handler?: Function) {
-        super.on(name, handler);
+        super.off(name, handler);
         this.tablesEach((table) => {
             table.off(name, handler);
         });

@@ -3,7 +3,7 @@
 import tools = G.tools;
 
 export interface IFileUpload{
-    beforeSendFile?: (file: File) => Promise<any>;
+    beforeSendFile?: (file: File) => Promise<any>; // promise返回的数据会在beforeSendBlock，afterSendFile方法中作为参数
     formData?: () => obj;   // 上传附带数据
     uploadUrl: string;  // 上传地址
     chunk?: {//是否分块
@@ -33,8 +33,8 @@ export class FileUpload{
         this.chunked = tools.isNotEmpty(para.chunk);
         if(this.chunked){
             this.beforeSendBlock = para.chunk.beforeSendBlock;
-            this.afterSendFile = para.chunk.afterSendFile;
             this.chunkSize = para.chunk.chunkSize;
+            this.afterSendFile = para.chunk.afterSendFile;
         }
     }
 
@@ -45,12 +45,15 @@ export class FileUpload{
         return new Promise((resolve, reject) => {
             // 秒传验证
             this.beforeSendFile(file).then((...any) => {
+                // any是beforeSendFile函数中promise返回的数据，会带入到分块验证与合并请求中去。
+
                 // 分片验证
                 if(this.chunked){
                     this.chunkUpload(file, ...any).then(() => {
                         // 合并请求
-                        this.afterSendFile && this.afterSendFile(file, ...any).then((...any) => {
-                            resolve(any); // 上传成功
+                        this.afterSendFile(file, ...any).then((...anyData) => {
+                            // anyData 为成功后返回的数据
+                            resolve(...anyData); // 上传成功
                         }).catch(() => {
                             reject();
                         });
@@ -58,20 +61,16 @@ export class FileUpload{
                         reject(); // 表示分片上传失败
                     })
                 }else{
-                    this.uploadFile(file, file.name).then((...any) => {
-                        // 合并请求
-                        this.afterSendFile && this.afterSendFile(file, ...any).then((...any) => {
-                            resolve(any); // 上传成功
-                        }).catch(() => {
-                            reject();
-                        });
+                    this.uploadFile(file, file.name).then((response) => {
+                        // 成功返回
+                        resolve(response);
                     }).catch(() => {
                         reject(); // 表示分片上传失败
                     })
                 }
-            }).catch((...any) => {
-                console.log(any);
-                resolve(...any); // 表示已存在后台
+            }).catch((...anyData) => {
+                console.log(anyData);
+                resolve(...anyData); // 表示已存在后台
             })
         })
     }

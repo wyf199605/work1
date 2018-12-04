@@ -68,12 +68,16 @@ export class BwUploader extends FormCom {
 
         d.on(this.wrapper, 'click', () => {
             sys.window.getFile((file: File) => {
-                if(this.maxSize !== -1 && file.size > this.maxSize){
-                    Modal.alert('文件大小超过限制');
-                }else{
-                    this.temFiles = [file];
-                    autoUpload && this.upload();
+                if(file){
+                    if(this.maxSize !== -1 && file.size > this.maxSize){
+                        Modal.alert('文件大小超过限制');
+                    }else{
+                        this.temFiles = [file];
+                        autoUpload && this.upload();
+                    }
                 }
+            }, () => {
+                Modal.alert('获取图片失败', '温馨提示');
             })
         });
     }

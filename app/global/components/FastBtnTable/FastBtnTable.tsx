@@ -97,7 +97,7 @@ export class FastBtnTable extends FastTable{
         let tables = d.query('.tables', this.wrapper);
         if(tables){
             isShow ? tables.style.removeProperty('height')
-                : (tables.style.height = 'calc(100% - 36px)');
+                : (tables.style.height = 'calc(100% - 44px)');
         }
     }
 
