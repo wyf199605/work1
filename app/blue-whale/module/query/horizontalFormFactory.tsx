@@ -39,14 +39,19 @@ export class HorizontalQueryModule extends Component {
         return this._search;
     }
 
-    constructor(para: IHorizontalQueryModule) {
+    private atvarparams_fields:string[] = [];
+    constructor(private para: IHorizontalQueryModule) {
         super(para);
         let queryparams: QueryConf[] = [];
+        tools.isNotEmpty(para.qm.atvarparams) && para.qm.atvarparams.forEach(field => {
+            this.atvarparams_fields.push(field.field_name);
+        });
         [para.qm.queryparams1, para.qm.atvarparams].forEach((params) => {
             if(params){
                 queryparams = queryparams.concat(params);
             }
         });
+
         this.queryparams = queryparams;
         this.defaultData = this.getDefaultData(this.queryparams);
         this.search = para.search;
@@ -122,92 +127,97 @@ export class HorizontalQueryModule extends Component {
                     fieldName = c.field_name,
                     type = c.type || c.atrrs.dataType;
                 let SelectConstruct: typeof SelectInputMb | typeof SelectInput = tools.isMb ? SelectInputMb : SelectInput;
-                switch (type) {
-                    case 'VALUELIST':
-                        com = <SelectConstruct useInputVal={true}
-                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                                   let data = this.formatData(res);
-                                                   return {text: data.title, value: data.value};
-                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                            fun: (url, val, callback) => {
-                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
-                                    typeof callback === 'function' && callback(result);
-                                })
-                            }
-                        }} {...props}/>;
-                        break;
-                    case 'VALUE':
-                        com = <SelectConstruct useInputVal={true}
-                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                                   let data = this.formatData(res);
-                                                   return {text: data.title, value: data.value};
-                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                            fun: (url, val, callback) => {
-                                let querydata: obj = {}, forms = this.forms || {};
-                                if (c.dynamic === 1) {
-                                    let params = [];
-                                    for (let key in forms) {
-                                        if (tools.isNotEmpty(forms[key].get()) && c.field_name !== key) {
-                                            let paramObj: QueryParam = {
-                                                not: false,
-                                                op: 2,
-                                                field: key,
-                                                values: [forms[key].get()],
-                                            };
-                                            params.push(paramObj);
-                                        }
-                                    }
-                                    if(tools.isNotEmpty(params[0])){
-                                        querydata = {
-                                            not: false,
-                                            op: 0,
-                                            params: params
-                                        }
-                                    }
+                if (~this.atvarparams_fields.indexOf(c.field_name)){
+                    com = <SelectInput useInputVal={true}
+                                           data={this.handleAtvarparams(c.field_name,c.data)} {...props}/>;
+                }else{
+                    switch (type) {
+                        case 'VALUELIST':
+                            com = <SelectConstruct useInputVal={true}
+                                                   data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                       let data = this.formatData(res);
+                                                       return {text: data.title, value: data.value};
+                                                   })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                fun: (url, val, callback) => {
+                                    this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                        typeof callback === 'function' && callback(result);
+                                    })
                                 }
-                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name, querydata).then((result) => {
-                                    typeof callback === 'function' && callback(result);
-                                })
-                            }
-                        }} {...props}/>;
-                        break;
-                    case 'QRYVALUE':
-                        com = <SelectConstruct useInputVal={true}
-                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                                   let data = this.formatData(res);
-                                                   return {text: data.title, value: data.value};
-                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                            fun: (url, val, callback) => {
-                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
-                                    typeof callback === 'function' && callback(result);
-                                })
-                            }
-                        }} {...props}/>;
-                        break;
-                    case 'RESVALUE':
-                        com = <SelectConstruct useInputVal={true}
-                                               data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
-                                                   let data = this.formatData(res);
-                                                   return {text: data.title, value: data.value};
-                                               })} ajax={tools.isEmpty(c.link) ? void 0 : {
-                            fun: (url, val, callback) => {
-                                this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
-                                    typeof callback === 'function' && callback(result);
-                                })
-                            }
-                        }} {...props}/>;
-                        break;
-                    case '12':
-                        com = <Datetime format="yyyy-MM-dd" {...props}/>;
-                        break;
-                    case '13':
-                        com = <Datetime format="yyyy-MM-dd HH:mm:ss" {...props}/>;
-                        break;
-                    case '10':
-                        com = <NumInput defaultNum={0} {...props}/>;
-                        break;
-                    default:
-                        com = <TextInput {...props}/>;
+                            }} {...props}/>;
+                            break;
+                        case 'VALUE':
+                            com = <SelectConstruct useInputVal={true}
+                                                   data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                       let data = this.formatData(res);
+                                                       return {text: data.title, value: data.value};
+                                                   })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                fun: (url, val, callback) => {
+                                    let querydata: obj = {}, forms = this.forms || {};
+                                    if (c.dynamic === 1) {
+                                        let params = [];
+                                        for (let key in forms) {
+                                            if (tools.isNotEmpty(forms[key].get()) && c.field_name !== key) {
+                                                let paramObj: QueryParam = {
+                                                    not: false,
+                                                    op: 2,
+                                                    field: key,
+                                                    values: [forms[key].get()],
+                                                };
+                                                params.push(paramObj);
+                                            }
+                                        }
+                                        if(tools.isNotEmpty(params[0])){
+                                            querydata = {
+                                                not: false,
+                                                op: 0,
+                                                params: params
+                                            }
+                                        }
+                                    }
+                                    this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name, querydata).then((result) => {
+                                        typeof callback === 'function' && callback(result);
+                                    })
+                                }
+                            }} {...props}/>;
+                            break;
+                        case 'QRYVALUE':
+                            com = <SelectConstruct useInputVal={true}
+                                                   data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                       let data = this.formatData(res);
+                                                       return {text: data.title, value: data.value};
+                                                   })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                fun: (url, val, callback) => {
+                                    this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                        typeof callback === 'function' && callback(result);
+                                    })
+                                }
+                            }} {...props}/>;
+                            break;
+                        case 'RESVALUE':
+                            com = <SelectConstruct useInputVal={true}
+                                                   data={tools.isEmpty(c.value_list) ? [] : c.value_list.map((res) => {
+                                                       let data = this.formatData(res);
+                                                       return {text: data.title, value: data.value};
+                                                   })} ajax={tools.isEmpty(c.link) ? void 0 : {
+                                fun: (url, val, callback) => {
+                                    this.getDropDownData(BW.CONF.siteUrl + c.link, c.field_name).then((result) => {
+                                        typeof callback === 'function' && callback(result);
+                                    })
+                                }
+                            }} {...props}/>;
+                            break;
+                        case '12':
+                            com = <Datetime format="yyyy-MM-dd" {...props}/>;
+                            break;
+                        case '13':
+                            com = <Datetime format="yyyy-MM-dd HH:mm:ss" {...props}/>;
+                            break;
+                        case '10':
+                            com = <NumInput defaultNum={0} {...props}/>;
+                            break;
+                        default:
+                            com = <TextInput {...props}/>;
+                    }
                 }
 
                 if (fieldName in this.defaultData) {
@@ -275,6 +285,17 @@ export class HorizontalQueryModule extends Component {
                 })
             }
         })
+    }
+
+    private handleAtvarparams(field_name:string,data:obj[]) {
+        let result: obj[] = [];
+        data.forEach(da => {
+            result.push({
+                text:da[field_name],
+                value:da[field_name]
+            })
+        });
+        return result;
     }
 
 
