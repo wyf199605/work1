@@ -47,10 +47,11 @@ export = class webscoket {
                     }
                 }, this.timeout)
             }
-        }
+        };
 
         // console.info("创建websocket对象成功.");
         self.ws.onopen = () => {
+            heartCheck.reset().start();
             console.info("websocket 连接打开.");
         };
         self.ws.onmessage = (r) => {

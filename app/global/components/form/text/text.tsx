@@ -31,12 +31,13 @@ export class TextInput extends FormCom {
             className: '',
             placeholder: '',
             readonly: false,
-            disabled: false
+            disabled: false,
+            type : 'text'
         };
 
         this.para = Object.assign(defaultPara, para);
         this.isReadonly = !!this.para.readonly ;
-
+        this.inputType = this.para.type;
         // this.initInput();
 
         // this.initIcons();
@@ -177,6 +178,17 @@ export class TextInput extends FormCom {
     set(str: string | number): void {
         this.input.value = tools.str.toEmpty(str);
         typeof this.onSet === 'function' && this.onSet(str);
+    }
+
+    private _inputType: string;
+    set inputType(str:string) {
+        let types = ['text','button', 'checkbox','password','radio','image','reset','file','submit','textarea','number'],
+            type = types.indexOf(str) > -1 ? str : types[0];
+
+        this.input.type = this._inputType = type;
+    }
+    get inputType () {
+        return this._inputType;
     }
 
     readonly (is? : boolean){
