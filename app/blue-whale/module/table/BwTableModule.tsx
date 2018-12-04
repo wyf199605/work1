@@ -1434,6 +1434,14 @@ export class BwTableModule extends Component {
                 color = 'blue';
             }
 
+            // 后台计算规则
+            let when = field.backWhen;
+            if(when){
+                if(eval(tools.str.parseTpl(when, rowData))){
+                    let {r, g, b} = tools.val2RGB(field.backColor);
+                    text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
+                }
+            }
         }
 
         return {text, classes, bgColor, color, data};
