@@ -269,13 +269,11 @@ export class ButtonAction {
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
 
         }
-
-
         require(['RfidBarCode'], (p) => {
             new p.RfidBarCode({
                 codeStype: codeStype,
-                SHO_ID: dataObj['SHO_ID'],
-                USERID: dataObj['USERID'],
+                SHO_ID: dataObj['SHO_ID'] || '',
+                USERID: dataObj['USERID'] || '',
                 uploadUrl: uploadUrl,
                 downUrl: url,
                 uniqueFlag: uniqueFlag

@@ -22,6 +22,7 @@ export class SelectInputMb extends TextInput{
         this.pickList = <PickerList isBackground={false} isShow={false} isOnceDestroy={false}
             container={document.body} onSet={(val) => {
             let value = val[0];
+            debugger;
             value = typeof value === 'string' || typeof value === 'number' ? value : value.value;
             this.set(value);
         }}>

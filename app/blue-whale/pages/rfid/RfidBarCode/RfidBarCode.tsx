@@ -725,19 +725,26 @@ export class RfidBarCode extends Component {
                                 <div>
                                     {
                                         deleteEL = <SelectInputMb data={[{
-                                            value: {'barcode': '', 'category': ''},
+                                            value:'所有',
                                             text: "所有"
                                         }, {
-                                            value: {'barcode': '', 'category': this.domHash['categoryVal'].innerHTML},
+                                            value:this.domHash['category'].innerText + this.domHash['categoryVal'].innerText,
                                             text: this.domHash['category'].innerText + this.domHash['categoryVal'].innerText
                                         }, {
-                                            value: {
-                                                'barcode': this.domHash['barcode'].innerText,
-                                                'category': this.domHash['categoryVal'].innerText
-                                            },
+                                            // value: {
+                                            //     'barcode': this.domHash['barcode'].innerText,
+                                            //     'category': this.domHash['categoryVal'].innerText
+                                            // },
+                                            ['key']:{
+                                                    'barcode': this.domHash['barcode'].innerText,
+                                                    'category': this.domHash['categoryVal'].innerText
+                                                },
+                                            value:this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:" + this.domHash['barcode'].innerText,
                                             text: this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:" + this.domHash['barcode'].innerText
                                         }, {
-                                            value: {'barcode': this.domHash['barcode'].innerText, 'category': ''},
+                                            // value: {'barcode': this.domHash['barcode'].innerText, 'category': ''},
+                                            ['key']:{'barcode': this.domHash['barcode'].innerText, 'category': ''},
+                                            value:'条码' + this.domHash['barcode'].innerText,
                                             text: '条码' + this.domHash['barcode'].innerText
                                         }]}/>
                                     }
@@ -750,8 +757,27 @@ export class RfidBarCode extends Component {
 
                                         let value = deleteEL.get(),
                                             where = {};
+                                        console.log(value);
                                         where[uid] = value.barcode;
                                         where[category] = value.category
+                                        switch (value){
+                                            case "所有":
+                                                where[uid] = '';
+                                                where[category] = '';
+                                                break;
+                                            case this.domHash['category'].innerText + this.domHash['categoryVal'].innerText:
+                                                where[uid] = '';
+                                                where[category] = this.domHash['categoryVal'].innerHTML;
+                                                break;
+                                            case this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:" + this.domHash['barcode'].innerText:
+                                                where[uid] = this.domHash['barcode'].innerText;
+                                                where[category] = this.domHash['categoryVal'].innerText;
+                                                break;
+                                            case '条码' + this.domHash['barcode'].innerText:
+                                                where[uid] = this.domHash['barcode'].innerText;
+                                                where[category] = '';
+                                                break;
+                                        }
                                         let success = false;
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
                                             if (res.success) {
@@ -1052,7 +1078,6 @@ export class RfidBarCode extends Component {
                                 this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
                                 this.domHash['Commodity'].innerText = arr[i].name;
                             }
-
                             this.refreshCount(para);
 
                         }
