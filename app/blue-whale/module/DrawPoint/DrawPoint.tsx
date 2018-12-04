@@ -231,9 +231,6 @@ export class DrawPoint extends Component {
     private _data;
 
     public render(data?: obj[]) {
-        if (tools.isEmpty(data)) {
-            return
-        }
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
         //清空上一轮数据
@@ -257,9 +254,14 @@ export class DrawPoint extends Component {
         this.index = data.length || 0;//初始化index
 
         this.fishe = true;
+        if (tools.isEmpty(data)) {
+            return
+        }
         //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
+        let detail = {};
         data.forEach((d, index) => {
-            let group = this.g.append('g').datum(d)
+            let group = this.g.append('g').datum(d);
+            detail = d;
             if (tools.isMb) {
                 G.d.on(group.node(), 'press', (res) => {
 
@@ -332,27 +334,27 @@ export class DrawPoint extends Component {
 
                     //绘字
                     I++;
-                    // if(I > 1){
-                    //     return
-                    // }
-                    if (that._keyField !== data.name) {
+                    if(I > 2){
                         return
                     }
+                    // if (that._keyField !== data.name) {
+                    //     return
+                    // }
                     let text = group.append('text').datum(data.name)
                         .attr('fill', 'black')
                         .attr("text-anchor", "middle")
                         .attr('x', (d, i) => {
-                            return this.findCenter(point)[0]
+                            return this.findCenter(point)[0] - 5.3;
 
                         })
                         .attr('y', (d, i) => {
                             return this.findCenter(point)[1] - 15;
                         })
-                        .attr('dx', 5)
-                        .attr('dy', 15)
+                        .attr('dx', 5 )
+                        .attr('dy', 15 )
                         .text(function (d) {
                             data.data && toolData.push(data.data)
-                            return data.data;
+                            return  detail[d];
 
                         }).attr('font-size', function (d) {
                             let w = group.select('path').node().getBBox().width,
@@ -397,8 +399,8 @@ export class DrawPoint extends Component {
                     let s = this.findCenter(point)[0];
                     let k = this.findCenter(point)[1];
 
-                    this.wrapWord(text, group.select('path').node().getBBox().width / 2, this.findCenter(point)[0], this.findCenter(point)[1])
-                } else if (tools.isNotEmpty(data.bgColor) && this.isShowStatus) {
+                    this.wrapWord(text, group.select('path').node().getBBox().width / 2, this.findCenter(point)[0], this.findCenter(point)[1],I)
+                } else if (tools.isNotEmpty(data.bgColor)) {
                     //并且是查看状态下
                     group.select('path').attr('fill', function (d) {
                         return data.bgColor;
@@ -413,9 +415,18 @@ export class DrawPoint extends Component {
         this.keyDownEvent.on();
         this.keyUpEvent.on();
     }
+    //区域显示颜色
+    private AreaColor( color:string){
+       this.g.selectAll('g').selectAll('path').attr('fill-opacity',function (d) {
+           return color;
+       })
+    }
 
     //字体换行
-    private wrapWord(text, width, centerX, centerY) {
+    private wrapWord(text, width, centerX, centerY,I) {
+        if(I !==2 ){
+            return
+        }
         text.each(function () {
             let text = D3.select(this),
                 words = text.text().split('').reverse(),
@@ -430,7 +441,7 @@ export class DrawPoint extends Component {
             } else {
                 lineHeight = 5.3
             }
-            let tspan = text.text(null).append('tspan').attr('dy', lineHeight).attr('dx', 5).attr('x', centerX - 5.3).attr('y', centerY - 5.3);
+            let tspan = text.text(null).append('tspan').attr('dy', lineHeight + (lineHeight * I)).attr('dx', 5).attr('x', centerX - 5.3).attr('y', centerY - 12);
             while (word = words.pop()) {
                 line.push(word);
                 const dash = lineNumber > 0 ? '-' : '';
@@ -439,7 +450,7 @@ export class DrawPoint extends Component {
                     line.pop();
                     tspan.text(line.join(''));
                     line = [word];
-                    tspan = text.append('tspan').attr('dy', lineHeight).attr('dx', 5).attr('x', centerX - 5.3).text(word);
+                    tspan = text.append('tspan').attr('dy', lineHeight ).attr('dx', 5).attr('x', centerX - 5.3).text(word);
                     //tspan = text.append('tspan').attr('x', x).attr('y', ++lineNumber * lineHeight + y + 15).text(word);
                 }
             }
@@ -550,7 +561,7 @@ export class DrawPoint extends Component {
                             return data.data;
 
                         })
-                    this.wrapWord(text, this.selectedG.select('path').node().getBBox().width / 2, this.findCenter(point)[0], this.findCenter(point)[1])
+                    this.wrapWord(text, this.selectedG.select('path').node().getBBox().width / 2, this.findCenter(point)[0], this.findCenter(point)[1],I)
                 }
             })
 
@@ -630,6 +641,7 @@ export class DrawPoint extends Component {
             this.map.set(this.index, []);
         }
         this.editEvent.off();
+        this.AreaColor('0');
         //！！每一次创建都会开辟一个新得path
         //var svg = D3.select('svg').select('.g-wrapper')
         let group = this.g.append('g').attr('class', function (d) {
@@ -668,6 +680,7 @@ export class DrawPoint extends Component {
     public editFished() {
 
         let that = this;
+        this.AreaColor('0.56');
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
         let currentIndex = this.index;
@@ -698,6 +711,7 @@ export class DrawPoint extends Component {
 
     public fished() {
         let that = this;
+        this.AreaColor('0.56');
         that.selectedG = null;
         D3.selectAll('circle').remove();
         D3.selectAll('path').style("stroke-dasharray", null);
@@ -757,6 +771,7 @@ export class DrawPoint extends Component {
         //获取到当前的编辑path的下标
         // 然后把ponit的点加进去
         let that = this;
+        this.AreaColor('0');
         this.g.selectAll('g').on('click', function (d, i) {
             //点击完成后 不允许触发click事件
             that.indexStr = D3.select(this).select('path').attr('id');
