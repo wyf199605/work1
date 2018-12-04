@@ -71,13 +71,13 @@ export class BwTableModule extends Component {
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
-        if(!this.tableModule.editable){
+        let ui = this.ui = para.ui;
+        this.isPivot = ui.relateType === 'P';
+        if(!this.tableModule.editable && !this.isPivot){
             this.editParam = null;
         }
 
-        BwRule.beforeHandle.table(para.ui); // 初始化UI, 设置一些默认值
-        let ui = this.ui = para.ui;
-        this.isPivot = ui.relateType === 'P';
+        BwRule.beforeHandle.table(ui); // 初始化UI, 设置一些默认值
 
         this.isDrill = ['web', 'webdrill', 'drill'].includes(ui.uiType); // 是否为钻取
 
