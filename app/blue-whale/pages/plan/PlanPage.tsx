@@ -65,6 +65,7 @@ export class PlanPage extends BasicPage {
                 ui: res.ui,
                 container: this.wrapper
             });
+            query.autoTag();
         });
         // BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
         //     let ui = response.body.elements[0];

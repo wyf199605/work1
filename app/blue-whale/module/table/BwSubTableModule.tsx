@@ -10,25 +10,24 @@ export class BwSubTableModule extends BwTableModule{
     }
     protected ftableReady() {
         super.ftableReady();
-        tools.isNotEmpty(this.ui.subButtons) && this.subBtns.init(this.subBtnWrapper);
+        tools.isNotEmpty(this.ui.subButtons) && this.subBtns.init(this.btnWrapper);
     }
 
-    protected _subBtnWrapper: HTMLElement;
-    get subBtnWrapper(){
-        if (!this._subBtnWrapper) {
+    protected _btnWrapper: HTMLElement;
+    get btnWrapper(){
+        if (!this._btnWrapper) {
             // debugger;
             if (tools.isMb) {
-                let modal = this.tableModule.mobileModal;
+                // let modal = this.tableModule.mobileModal;
                 let btnWrapper = <div className="sub-btn-wrapper mui-bar-footer"/>;
-                modal.bodyWrapper.style.height = 'calc(100% - 39px)';
-                d.after(modal.bodyWrapper, btnWrapper);
-                this._subBtnWrapper = btnWrapper;
-
+                // modal.bodyWrapper.style.height = 'calc(100% - 39px)';
+                d.append(this.wrapper, btnWrapper);
+                this._btnWrapper = btnWrapper;
             } else {
-                this._subBtnWrapper = this.ftable.btnWrapper
+                this._btnWrapper = this.ftable.btnWrapper
             }
         }
-        return this._subBtnWrapper;
+        return this._btnWrapper;
     }
 
     wrapperInit(para){
