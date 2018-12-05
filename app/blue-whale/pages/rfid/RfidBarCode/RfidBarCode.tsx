@@ -729,13 +729,8 @@ export class RfidBarCode extends Component {
                         }, {
                             value:'条码' + this.domHash['barcode'].innerText,
                             text: '条码' + this.domHash['barcode'].innerText
-                        }],modeldata1 = [{
-                            value:'所有',
-                            text: "所有"
-                        }, {
-                            value:'当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText,
-                            text: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText
-                        }, {
+                        }],modeldata1 = [
+                         {
                             value:'条码' + this.domHash['barcode'].innerText,
                             text: '条码' + this.domHash['barcode'].innerText
                         }]
