@@ -8,6 +8,23 @@
             }
         }
     }
+    .flow-remark-modal{
+        .modal-body {
+            padding: 0 15px;
+        }
+        .remark-title {
+            margin: 15px 0;
+        }
+        .remark-input-wrapper{
+            margin: 15px 0;
+            &>input {
+                height: 45px;
+                border: 1px solid #edeeee;
+                border-radius: 5px;
+            }
+        }
+    }
+
     .flow-modal {
         width: 100%;
         height: 100%;
