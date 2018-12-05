@@ -681,30 +681,43 @@ export class NewTableModule {
                     end(bwTable);
                     return ;
                 }
-                let loading = new Loading({
-                    msg: '保存中',
-                    disableEl: this.main.wrapper
-                });
-                BwRule.Ajax.fetch(CONF.siteUrl + this.bwEl.tableAddr.dataAddr, {
-                    type: 'POST',
-                    data: saveData,
-                }).then(({response}) => {
 
-                    BwRule.checkValue(response, saveData, () => {
-                        this.currentSelectedIndexes = [];
-                        // 主表子表刷新
-                        this.refresh();
-                        Modal.toast(response.msg);
-                        // loading && loading.destroy();
-                        // loading = null;
-                        end(bwTable);
-                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                let url;
+                if(bwTable.ui.tableAddr){
+                   url = bwTable.ui.tableAddr.dataAddr
+                }
+                if(this.bwEl.tableAddr){
+                    url = this.bwEl.tableAddr.dataAddr;
+                }
+                if(url){
+                    let loading = new Loading({
+                        msg: '保存中',
+                        disableEl: this.main.wrapper
                     });
-                }).finally(() => {
-                    loading && loading.destroy();
-                    loading = null;
-                });
-            }).catch(() => {
+                    BwRule.Ajax.fetch(CONF.siteUrl + url, {
+                        type: 'POST',
+                        data: saveData,
+                    }).then(({response}) => {
+
+                        BwRule.checkValue(response, saveData, () => {
+                            this.currentSelectedIndexes = [];
+                            // 主表子表刷新
+                            this.refresh();
+                            Modal.toast(response.msg);
+                            // loading && loading.destroy();
+                            // loading = null;
+                            end(bwTable);
+                            tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                        });
+                    }).finally(() => {
+                        loading && loading.destroy();
+                        loading = null;
+                    });
+                }else{
+                    Modal.alert('保存失败');
+                }
+            }).catch((e) => {
+                console.log(e);
                 Modal.alert('表格中有错误，请改正后再提交！');
             })
         };

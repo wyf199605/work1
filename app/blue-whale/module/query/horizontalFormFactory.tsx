@@ -39,7 +39,8 @@ export class HorizontalQueryModule extends Component {
         return this._search;
     }
 
-    private atvarparams_fields:string[] = [];
+    private atvarparams_fields: string[] = [];
+
     constructor(private para: IHorizontalQueryModule) {
         super(para);
         let queryparams: QueryConf[] = [];
@@ -47,7 +48,7 @@ export class HorizontalQueryModule extends Component {
             this.atvarparams_fields.push(field.field_name);
         });
         [para.qm.queryparams1, para.qm.atvarparams].forEach((params) => {
-            if(params){
+            if (params) {
                 queryparams = queryparams.concat(params);
             }
         });
@@ -58,7 +59,7 @@ export class HorizontalQueryModule extends Component {
         this.__initForms(para);
         // 自定义内容
         if (tools.isNotEmpty(this.forms) && (para.qm.queryType == 1 || para.qm.queryType == 3)) {
-            if(tools.isMb){
+            if (tools.isMb) {
                 let queryBtn = d.query('[data-action="showQuery"]');
                 queryBtn && d.on(queryBtn, 'click', () => {
                     this.modal.show = true;
@@ -66,10 +67,9 @@ export class HorizontalQueryModule extends Component {
                 this.modal = new QueryModal({
                     body: this.wrapper,
                     onClear: () => {
-                        debugger;
-                        for(let item of Object.values(this.forms || {})){
+                        for (let item of Object.values(this.forms || {})) {
                             item.set('');
-                            let itemWrap =   (d.query('input', item.wrapper) as HTMLInputElement);
+                            let itemWrap = (d.query('input', item.wrapper) as HTMLInputElement);
                             itemWrap && ((d.query('input', item.wrapper) as HTMLInputElement).value = '');
                         }
                     },
@@ -79,7 +79,7 @@ export class HorizontalQueryModule extends Component {
                         });
                     }
                 });
-            }else{
+            } else {
                 d.append(d.query('.query-form', this.wrapper), <div className="form-com-item">
                     <Button className="query-search-btn" content="查询" onClick={() => {
                         typeof this.search === 'function' && this.search(this.json);
@@ -94,7 +94,8 @@ export class HorizontalQueryModule extends Component {
         // },2500)
 
     }
-    public autoTag(){
+
+    public autoTag() {
         typeof this.search === 'function' && this.search(this.json);
     }
 
@@ -127,10 +128,10 @@ export class HorizontalQueryModule extends Component {
                     fieldName = c.field_name,
                     type = c.type || c.atrrs.dataType;
                 let SelectConstruct: typeof SelectInputMb | typeof SelectInput = tools.isMb ? SelectInputMb : SelectInput;
-                if (~this.atvarparams_fields.indexOf(c.field_name)){
+                if (~this.atvarparams_fields.indexOf(c.field_name)) {
                     com = <SelectInput useInputVal={true}
-                                           data={this.handleAtvarparams(c.field_name,c.data)} {...props}/>;
-                }else{
+                                       data={this.handleAtvarparams(c.field_name, c.data)} {...props}/>;
+                } else {
                     switch (type) {
                         case 'VALUELIST':
                             com = <SelectConstruct useInputVal={true}
@@ -166,7 +167,7 @@ export class HorizontalQueryModule extends Component {
                                                 params.push(paramObj);
                                             }
                                         }
-                                        if(tools.isNotEmpty(params[0])){
+                                        if (tools.isNotEmpty(params[0])) {
                                             querydata = {
                                                 not: false,
                                                 op: 0,
@@ -235,26 +236,20 @@ export class HorizontalQueryModule extends Component {
 
     // 获取数据
     get json() {
-        let json: obj = {}, str = [];
-        Object.values(this.forms).forEach(form => {
-            let cond: QueryConf = form.custom,
+        let atvarparams: obj = {}, queryparams1: obj = {};
+        for (let field in this.forms) {
+            let form = this.forms[field],
                 value = form.value;
-            json[cond.field_name] = value;
-            // json.params = json.params || [];
-            // if (form instanceof BasicBoxGroup && Array.isArray(value)) {
-            //     value = value.join(',');
-            // }
-            // value = Array.isArray(value) ? value : [value];
-            // if (!(value.length === 1 && tools.isEmpty(value[0]))) {
-            //     if (!(value.length === 2 && tools.isEmpty(value[0]) && tools.isEmpty(value[1]))) {
-            //         json.params.push([cond.field_name, value])
-            //     }
-            // }
-        });
-        // for (let key in json) {
-        //     json[key] = JSON.stringify(json[key]);
-        // }
-        return json;
+            if (~this.atvarparams_fields.indexOf(field)) {
+                atvarparams[field] = value;
+            } else {
+                queryparams1[field] = value;
+            }
+        }
+        return {
+            atvarparams,
+            queryparams1
+        };
     }
 
     private getDropDownData(url: string, fieldName: string, querydata?: obj): Promise<Array<{ title: string, value: string }[] | string[]>> {
@@ -263,13 +258,13 @@ export class HorizontalQueryModule extends Component {
                 reject();
             } else {
                 let ajaxData = {};
-                if (tools.isNotEmpty(querydata)){
+                if (tools.isNotEmpty(querydata)) {
                     ajaxData = {
                         "queryparams0": JSON.stringify(querydata)
                     };
                 }
-                BwRule.Ajax.fetch(url,{
-                    data:ajaxData
+                BwRule.Ajax.fetch(url, {
+                    data: ajaxData
                 }).then(({response}) => {
                     let fields = [];
                     if (response.data[0]) {
@@ -287,12 +282,12 @@ export class HorizontalQueryModule extends Component {
         })
     }
 
-    private handleAtvarparams(field_name:string,data:obj[]) {
+    private handleAtvarparams(field_name: string, data: obj[]) {
         let result: obj[] = [];
         data.forEach(da => {
             result.push({
-                text:da[field_name],
-                value:da[field_name]
+                text: da[field_name],
+                value: da[field_name]
             })
         });
         return result;
@@ -318,20 +313,22 @@ export class HorizontalQueryModule extends Component {
         super.destroy();
     }
 }
-interface IQueryModalPara{
+
+interface IQueryModalPara {
     body: HTMLElement;
     onClear?: Function;
     onSearch?: Function;
 }
 
-class QueryModal{
+class QueryModal {
     protected modal: Modal;
     protected mbPage: MbPage;
-    constructor(para: IQueryModalPara){
+
+    constructor(para: IQueryModalPara) {
         this.modal = new Modal({
             className: 'modal-mbPage queryBuilder',
             isBackground: false,
-            zIndex : 500
+            zIndex: 500
         });
         let body = <div className="plan-query-form-body">
             {para.body}
@@ -358,7 +355,7 @@ class QueryModal{
         });
     }
 
-    set show(flag: boolean){
+    set show(flag: boolean) {
         this.modal.isShow = flag;
     }
 }
