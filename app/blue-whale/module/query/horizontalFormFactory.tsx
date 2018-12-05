@@ -47,7 +47,8 @@ export class HorizontalQueryModule extends Component {
         tools.isNotEmpty(para.qm.atvarparams) && para.qm.atvarparams.forEach(field => {
             this.atvarparams_fields.push(field.field_name);
         });
-        [para.qm.atvarparams,para.qm.queryparams1].forEach((params) => {
+
+        [para.qm.atvarparams, para.qm.queryparams1].forEach((params) => {
             if (params) {
                 queryparams = queryparams.concat(params);
             }
