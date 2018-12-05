@@ -2436,7 +2436,7 @@ export class BwTableModule extends Component {
 
         let save: () => Promise<obj> = () => {
             return new Promise((resolve, reject) => {
-                editModule.assignPromise.then(() => {
+                editModule && editModule.assignPromise ? editModule.assignPromise.then(() => {
                     closeCellInput();
                     let loading = new Loading({
                         msg: '验证中...',
@@ -2459,7 +2459,7 @@ export class BwTableModule extends Component {
                         })
                     }, 100)
 
-                });
+                }): resolve();
             })
         };
 
