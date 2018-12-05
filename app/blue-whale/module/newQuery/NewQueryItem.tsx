@@ -6,6 +6,7 @@ import d = G.d;
 import tools = G.tools;
 import {Options} from "./Options";
 import {RangeInput} from "./RangeInput";
+import {RangeInputItem} from "./RangeInputItem";
 
 export interface IResult {
     filedName?: string;
@@ -41,6 +42,7 @@ export class NewQueryItem extends Component {
 
     private queryOptions: Options;
     private rangeInput: RangeInput;
+    private textInput: RangeInputItem;
 
     private initContent(para: IQueryItem) {
         switch (this.para.interval) {
@@ -49,7 +51,7 @@ export class NewQueryItem extends Component {
             case 2: {
                 let rangeInput = new RangeInput({
                         container: this.bodyWrapper,
-                        interval:this.para.interval
+                        interval: this.para.interval
                     }),
                     height = 20;
                 height += rangeInput.getHeight();
@@ -59,7 +61,7 @@ export class NewQueryItem extends Component {
                         container: this.bodyWrapper,
                         options: para.optionValue,
                         interval: para.interval,
-                        itemClick:(data:string[]) => {
+                        itemClick: (data: string[]) => {
                             this.rangeInput.set(data);
                         }
                     });
@@ -84,6 +86,15 @@ export class NewQueryItem extends Component {
                 this.bodyWrapper.style.height = height + 'px';
             }
                 break;
+            case 5: {
+                this.textInput = new RangeInputItem({
+                    interval: para.interval,
+                    caption: para.caption,
+                    container:this.bodyWrapper
+                });
+                this.bodyWrapper.style.height = '52px';
+            }
+                break;
         }
     }
 
@@ -101,11 +112,11 @@ export class NewQueryItem extends Component {
         return {
             on: () => {
                 d.on(this.wrapper, 'click', '.new-query-item-title i.iconfont.icon-arrow-up', toggleArrow);
-                d.on(this.bodyWrapper, 'input', '.new-query-input-wrapper input', tools.pattern.debounce(inputChange,300));
+                d.on(this.bodyWrapper, 'input', '.new-query-input-wrapper input', tools.pattern.debounce(inputChange, 300));
             },
             off: () => {
                 d.off(this.wrapper, 'click', '.new-query-item-title i.iconfont.icon-arrow-up', toggleArrow);
-                d.on(this.bodyWrapper, 'input', '.new-query-input-wrapper input', tools.pattern.debounce(inputChange,300));
+                d.on(this.bodyWrapper, 'input', '.new-query-input-wrapper input', tools.pattern.debounce(inputChange, 300));
             }
         }
     })();
@@ -130,12 +141,59 @@ export class NewQueryItem extends Component {
                 };
             }
                 break;
+            case 5: {
+                let val = this.textInput.get();
+                result = {
+                    filedName: this.para.filedName,
+                    intervalValue: tools.isNotEmpty(val) ? [val] : []
+                }
+            }
+                break;
         }
         return result;
     }
 
-    set(data: string[][]) {
-
+    set(data: string[]) {
+        data = data || [];
+        switch (this.para.interval) {
+            case 0:
+            case 1:
+            case 2: {
+                this.rangeInput && this.rangeInput.set(data);
+                this.queryOptions.options.forEach(opt => {
+                    opt.active = false;
+                })
+            }
+                break;
+            case 3: {
+                this.queryOptions.options.forEach(opt => {
+                    if (opt.get() === data) {
+                        opt.active = true;
+                    } else {
+                        opt.active = false;
+                    }
+                })
+            }
+                break;
+            case 4: {
+                let dataArr = [];
+                if (tools.isNotEmpty(data[0])) {
+                    dataArr = data[0].split(',');
+                }
+                this.queryOptions.options.forEach(opt => {
+                    if (~dataArr.indexOf(opt.get()[0])) {
+                        opt.active = true;
+                    } else {
+                        opt.active = false;
+                    }
+                })
+            }
+                break;
+            case 5: {
+                this.textInput.set(data[0] || '');
+            }
+                break;
+        }
     }
 
     destroy() {

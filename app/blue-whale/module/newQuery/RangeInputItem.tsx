@@ -11,13 +11,15 @@ import Shell = G.Shell;
 interface IRangeInputItem extends IFormComPara {
     isFirst?: boolean;
     interval?: number;
+    caption?: string;
 }
 
 export class RangeInputItem extends FormCom {
     get(): string {
         let val: string = '';
         switch (this.para.interval) {
-            case 0: {
+            case 0:
+            case 5: {
                 val = this.input ? this.input.value : '';
             }
                 break;
@@ -31,7 +33,8 @@ export class RangeInputItem extends FormCom {
 
     set(val: string) {
         switch (this.para.interval) {
-            case 0: {
+            case 0:
+            case 5: {
                 this.input.value = tools.str.toEmpty(val);
             }
                 break;
@@ -60,11 +63,14 @@ export class RangeInputItem extends FormCom {
             wrapper: HTMLElement;
         if (para.interval === 0) {
             placeStr = para.isFirst ? '最低值' : '最高值';
+        } else if (para.interval === 5) {
+            placeStr = '请输入' + para.caption;
         } else {
             placeStr = para.isFirst ? '最小时间' : '最大时间';
         }
         switch (para.interval) {
-            case 0: {
+            case 0:
+            case 5: {
                 wrapper = <div className="query-range-input-item new-query-input-wrapper">
                     {this.input = <input type="text" placeholder={placeStr}/>}
                     <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
@@ -97,7 +103,7 @@ export class RangeInputItem extends FormCom {
 
     private initEvents = (() => {
         let audio = () => {
-            Shell.base.speak(0,null,(e)=>{
+            Shell.base.speak(0, null, (e) => {
 
             });
             this.createSpeakModal(() => {
