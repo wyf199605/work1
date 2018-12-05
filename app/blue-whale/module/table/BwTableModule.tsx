@@ -2389,7 +2389,7 @@ export class BwTableModule extends Component {
         let editDataGet = () => {
             let bwTable = this;
 
-            if (!bwTable) {
+            if (!bwTable || !bwTable.ftable) {
                 return;
             }
 
