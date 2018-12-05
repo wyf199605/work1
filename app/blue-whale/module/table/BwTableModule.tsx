@@ -1440,7 +1440,7 @@ export class BwTableModule extends Component {
             if(when){
                 if(eval(tools.str.parseTpl(when, rowData))){
                     let {r, g, b} = tools.val2RGB(field.backColor);
-                    text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
+                    text = <div style={`background: rgb(${r},${g},${b})`}>{text}</div>;
                 }
             }
         }
