@@ -2203,11 +2203,14 @@ export class BwTableModule extends Component {
                             //TODO 给row.data赋值会销毁当前cell的input
                             // row.data = Object.assign({}, row.data, data);
                             for (let key in data) {
-                                let hCell = row.cellGet(key) as TableDataCell;
+                                let hCell = row.cellGet(key);
                                 if (hCell && hCell !== cell) {
                                     let cellData = data[key];
                                     if (hCell.data != cellData) {
                                         hCell.data = cellData || '';
+                                        if(hCell.column.show){
+                                            validate(editModule, hCell);
+                                        }
                                     }
                                 }
                             }
@@ -2221,11 +2224,10 @@ export class BwTableModule extends Component {
                                     if (hField.assignSelectFields && hField.assignAddr) {
                                         BwTableModule.initAssignData(hField.assignAddr, row ? row.data : {})
                                             .then(({response}) => {
-
                                                 let data = response.data;
                                                 if (data && data[0]) {
                                                     hField.assignSelectFields.forEach((name) => {
-                                                        let assignCell = row.cellGet(name) as TableDataCell;
+                                                        let assignCell = row.cellGet(name);
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];
                                                         }
@@ -2322,8 +2324,10 @@ export class BwTableModule extends Component {
                     result = editModule.validate.start(name, cell.data);
                 }
 
-                if (result && result[name]) {
-                    cell.errorMsg = result[name].errMsg;
+                let errorMsg = result && (result[name] || result[field.name]);
+                if (errorMsg) {
+                    cell.errorMsg = errorMsg.errMsg;
+                    lookUpCell && (lookUpCell.errorMsg = errorMsg.errMsg);
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
@@ -2350,6 +2354,7 @@ export class BwTableModule extends Component {
                         });
                 } else {
                     cell.errorMsg = '';
+                    lookUpCell && (lookUpCell.errorMsg = '');
                     resolve();
                     // callback(td, true);
                 }
