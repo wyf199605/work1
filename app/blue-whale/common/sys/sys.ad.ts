@@ -246,6 +246,40 @@ namespace BW{
                             error && error();
                         }
                     });
+                },
+                getEditImg(image: string | Function, callback?: Function){
+                    if(typeof image === 'function'){
+                        callback = image;
+                        image = '';
+                    }
+                    let event = '__EVT_GET_EDIT_IMG_BY_DEVICE__';
+                    d.once(window, event, (response : CustomEvent) => {
+                        let detail = JSON.parse(response.detail);
+
+                    });
+                    self.handle('getSignImg', JSON.stringify({event, type: 1, image}));
+                },
+                getSign(callback: Function){
+                    let event = '__EVT_GET_SIGN_BY_DEVICE__';
+                    d.once(window, event, (response : CustomEvent) => {
+                        let result = {success: false, data: null};
+                        try {
+                            let detail = JSON.parse(response.detail);
+                            if(detail.success && detail.msg){
+                                let data = detail.msg;
+                                let file: File = tools.base64ToFile(data.dataurl, data.filename);
+                                result.success = true;
+                                result.data = {
+                                    file,
+                                    base64: data.dataurl
+                                };
+                            }
+                        }catch (e){
+                            console.log(e);
+                        }
+                        callback(result);
+                    });
+                    self.handle('getSignImg', JSON.stringify({event, type: 0}));
                 }
             }
         })(this);

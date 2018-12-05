@@ -459,12 +459,7 @@ export class FastTable extends Component {
             this.createLeftTable(fastTableCols[1]);
         }
 
-        mainTable.on(TableBase.EVT_COL_COUNT_CHANGED, (indexes) => {
-            if (this.leftTable) {
-                this.leftTable.colCountByIndex(indexes);
-            }
-            this.render(0, void 0, void 0, false);
-        });
+        this.footSelectEvents.on();
     }
 
     // 创建左侧锁列表格
@@ -1066,6 +1061,55 @@ export class FastTable extends Component {
             }
         }
     })();
+
+    protected footSelectEvents = ((self) => {
+        // 列统计change事件
+        function change() {
+            // debugger;
+            let option = this.options[this.selectedIndex];
+            let values = d.data(option),
+                key = d.closest(this, '[data-name]').dataset.name;
+            let indexes = [],
+                mainIndexes = self.mainTable ? self.mainTable.tableData.colCount(key, values) : null,
+                leftIndexes = self.leftTable ? self.leftTable.tableData.colCount(key, values) : null;
+
+            if(mainIndexes !== null && leftIndexes !== null){
+                indexes = mainIndexes.filter((val) => leftIndexes.indexOf(val) > -1);
+            }else if(mainIndexes !== null && leftIndexes === null){
+                indexes = mainIndexes;
+            }else if(mainIndexes === null && leftIndexes !== null){
+                indexes = leftIndexes;
+            }else{
+                indexes = null;
+            }
+
+            // // 触发TableBase.EVT_COL_COUNT_CHANGED事件，并将对应的索引返回
+            // let handlers = self.eventHandlers[TableBase.EVT_COL_COUNT_CHANGED];
+            // handlers && handlers.forEach((item) => {
+            //     typeof item === 'function' && item(indexes);
+            // });
+
+            self.tablesEach((table) => {
+                table.colCountByIndex(indexes);
+            });
+            self.render(0, void 0, void 0, false);
+            // self.body.render(0, Object.keys(self.tableData.get()).length, void 0, false);
+        }
+
+        return {
+            on() {
+                if (self.colCount) {
+                    d.off(self.wrapper, 'change', 'select', change);
+                    d.on(self.wrapper, 'change', 'select', change);
+                }
+            },
+            off() {
+                if (self.colCount) {
+                    d.off(self.wrapper, 'change', 'select', change);
+                }
+            }
+        }
+    })(this);
 
     // 改变列宽
     changeColWidth(width: number, name: string) {
