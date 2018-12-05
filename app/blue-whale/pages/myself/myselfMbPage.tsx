@@ -22,16 +22,18 @@ export = class myselfMbPage {
         G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
             response = JSON.parse(response);
             let menus = response.body && response.body.elements;
+            // console.log('in mb');
+            // console.log(menus);
             menus && menus.forEach((menu) => {
-                items.push({
+                (menu.isPc === 0 || menu.isPc === 2) && items.push({
                     content: menu.menuName,
                     icon: menu.menuIcon,
                     onClick: () => {
                         let addr = menu.menuPath as R_ReqAddr;
-                            if (addr) {
-                                let url = CONF.siteUrl + BwRule.reqAddr(addr);
-                                sys.window.open({url, title: menu.menuName})
-                            }
+                        if (addr) {
+                            let url = CONF.siteUrl + BwRule.reqAddr(addr);
+                            sys.window.open({url, title: menu.menuName})
+                        }
                     }
                 })
             });

@@ -178,7 +178,17 @@ export class FlowReport extends BasicPage {
                         return false;
                     }
                     btn.hintAfterAction = true;
-                    self.save(btn, pageData);
+                    self.save(btn, pageData, function () {
+                        if (tools.isMb){
+                            sys.window.open({
+                                url: BW.CONF.url.myApplication
+                            });
+                        }else{
+                            sys.window.open({
+                                url: BW.CONF.url.myApplicationPC
+                            });
+                        }
+                    });
                     break;
                 case 'submit':
                     if (!self.validate(pageData)) {
@@ -212,33 +222,10 @@ export class FlowReport extends BasicPage {
                     break;
                 case 'agree': {
                     btn.hintAfterAction = true;
-                    let text: TextInput = null,
-                        body = <div>
-                            <div className="title">操作备注:</div>
-                            {text = <TextInput/>}
-                        </div>;
-                    let modal = new Modal({
-                        body: body,
-                        className: 'flow-remark-modal',
-                        footer: {},
-                        width: '310px',
-                        isMb: false,
-                        top: 120,
-                        onOk: () => {
-                            let audit_memo = text.get();
-                            if (tools.isNotEmpty(audit_memo)) {
-                                btn.actionAddr.dataAddr = tools.url.addObj(btn.actionAddr.dataAddr, {
-                                    audit_memo: audit_memo
-                                });
-                                ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
-                                    modal.destroy();
-                                    sys.window.close();
-                                }, self.url);
-                            } else {
-                                Modal.alert('备注不能为空!');
-                            }
-                        }
-                    });
+                    let _this = this;
+                    ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
+                        // sys.window.close();
+                    }, self.url);
                 }
                     break;
                 case 'reject': {
@@ -263,7 +250,6 @@ export class FlowReport extends BasicPage {
                                 });
                                 ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
                                     modal.destroy();
-                                    sys.window.close();
                                 }, self.url);
                             } else {
                                 Modal.alert('备注不能为空!');
