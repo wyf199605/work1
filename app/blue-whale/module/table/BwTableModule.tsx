@@ -1439,21 +1439,8 @@ export class BwTableModule extends Component {
             let when = field.backWhen;
             if(when){
                 if(eval(tools.str.parseTpl(when, rowData))){
-                    // debugger;
-                    let {r, g, b} = tools.val2RGB(field.backColor),
-                        style = {
-                            background: `rgb(${r},${g},${b})`,
-                            position: `absolute`,
-                            left: 0,
-                            right: 0,
-                            display: 'flex',
-                            top: 0,
-                            bottom: 0,
-                            padding: "6px 7px"
-                        };
-                    text = <div style={style}>
-                        <div style={{"margin-top" : "auto", "margin-bottom" : "auto"}}>{text}</div>
-                    </div>;
+                    let {r, g, b} = tools.val2RGB(field.backColor);
+                    bgColor = `rgb(${r},${g},${b})`
                 }
             }
         }
