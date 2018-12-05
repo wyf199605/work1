@@ -2181,7 +2181,7 @@ export class BwTableModule extends Component {
                         dom: cell.wrapper,
                         data: row.data,
                         field,
-                        onExtra: (data, relateCols, isEmptyClear = false) => {
+                        onExtra: (data, relateCols, isEmptyClear = false, isValid = true) => {
                             if (tools.isEmpty(data) && isEmptyClear) {
                                 // table.edit.modifyTd(td, '');
                                 cell.data = '';
@@ -2195,11 +2195,12 @@ export class BwTableModule extends Component {
                                     let cellData = data[key];
                                     if (hCell.data != cellData) {
                                         hCell.data = cellData || '';
-                                        if(hCell.column.show){
-                                            validate(editModule, hCell);
-                                        }
                                     }
                                 }
+                            }
+                            let content = cell.column.content as R_Field;
+                            if(isValid && content.assignSelectFields && content.assignSelectFields[0]){
+                                validate(editModule, cell);
                             }
                             if (field.elementType === 'lookup') {
                                 let lookUpKeyField = field.lookUpKeyField,
@@ -2307,6 +2308,12 @@ export class BwTableModule extends Component {
                         field = lookUpCell.column.content;
                         result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
                     }
+                } else if(field.assignSelectFields && field.assignSelectFields[0]){
+                    lookUpCell = fastRow.cellGet(field.assignSelectFields[0]);
+                    if (lookUpCell && lookUpCell.column) {
+                        field = lookUpCell.column.content;
+                        result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
+                    }
                 } else {
                     result = editModule.validate.start(name, cell.data);
                 }
@@ -2314,7 +2321,7 @@ export class BwTableModule extends Component {
                 let errorMsg = result && (result[name] || result[field.name]);
                 if (errorMsg) {
                     cell.errorMsg = errorMsg.errMsg;
-                    lookUpCell && (lookUpCell.errorMsg = errorMsg.errMsg);
+                    // lookUpCell && (lookUpCell.errorMsg = errorMsg.errMsg);
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
@@ -2341,7 +2348,7 @@ export class BwTableModule extends Component {
                         });
                 } else {
                     cell.errorMsg = '';
-                    lookUpCell && (lookUpCell.errorMsg = '');
+                    // lookUpCell && (lookUpCell.errorMsg = '');
                     resolve();
                     // callback(td, true);
                 }
@@ -2413,7 +2420,7 @@ export class BwTableModule extends Component {
 
         let cellCheckValue = () => {
             return Promise.all(this.ftable.editedCells.map((cell) => {
-                if(!cell.isChecked && !cell.isVirtual && cell.show){
+                if(!cell.isChecked && !cell.isVirtual && cell.show && !cell.disabled){
                     return validate(editModule, cell);
                 }else{
                     return Promise.resolve();
