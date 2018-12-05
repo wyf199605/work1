@@ -2021,7 +2021,6 @@ export class BwTableModule extends Component {
         let btnStatus = {
             end: () => {
                 let status = this.edit.editBtnStateInit(box, false);
-                console.log(status);
                 if (status.edit) {
                     dbclick.on();
                 } else {

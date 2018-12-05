@@ -1069,11 +1069,20 @@ export class FastTable extends Component {
             let option = this.options[this.selectedIndex];
             let values = d.data(option),
                 key = d.closest(this, '[data-name]').dataset.name;
-            let indexes = [];
+            let indexes = [],
+                mainIndexes = self.mainTable ? self.mainTable.tableData.colCount(key, values) : null,
+                leftIndexes = self.leftTable ? self.leftTable.tableData.colCount(key, values) : null;
 
-            self.tablesEach((table) => {
-                indexes = indexes.concat(table.tableData.colCount(key, values))
-            });
+            if(mainIndexes !== null && leftIndexes !== null){
+                indexes = mainIndexes.filter((val) => leftIndexes.indexOf(val) > -1);
+            }else if(mainIndexes !== null && leftIndexes === null){
+                indexes = mainIndexes;
+            }else if(mainIndexes === null && leftIndexes !== null){
+                indexes = leftIndexes;
+            }else{
+                indexes = null;
+            }
+
             // // 触发TableBase.EVT_COL_COUNT_CHANGED事件，并将对应的索引返回
             // let handlers = self.eventHandlers[TableBase.EVT_COL_COUNT_CHANGED];
             // handlers && handlers.forEach((item) => {
@@ -1083,7 +1092,7 @@ export class FastTable extends Component {
             self.tablesEach((table) => {
                 table.colCountByIndex(indexes);
             });
-            this.render(0, void 0, void 0, false);
+            self.render(0, void 0, void 0, false);
             // self.body.render(0, Object.keys(self.tableData.get()).length, void 0, false);
         }
 

@@ -670,7 +670,6 @@ export class NewTableModule {
                 let saveData = {
                     param: [] as obj[]
                 };
-                console.log(data);
                 data.forEach((d) => {
                     if(tools.isNotEmpty(d)){
                         saveData.param.push(d);

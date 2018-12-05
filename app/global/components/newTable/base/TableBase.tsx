@@ -916,7 +916,11 @@ export class TableBase extends Component {
             },
             colCount(key: string, value: any) {
                 isChangeData = true;
-                if (tools.isEmpty(value)) {
+                if (self.columns && self.columns.map((col) => col.name).indexOf(key) === -1){
+                    if(Object.keys(conditions).length === 0){
+                        return null;
+                    }
+                } else if (tools.isEmpty(value)) {
                     delete conditions[key];
                     delete objOfIndex[key];
                 } else {
