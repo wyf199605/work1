@@ -7,6 +7,7 @@ import {NewQueryModal} from "../../module/newQuery/NewQueryModal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RangeInput} from "../../module/newQuery/RangeInput";
 import {dateType} from "../../../global/components/form/datetime/datetime";
+import tools = G.tools;
 
 export class ListDetailPage extends BasicPage {
     constructor(private para: EditPagePara) {
@@ -21,7 +22,16 @@ export class ListDetailPage extends BasicPage {
                     let dataStr: string = response.body.elements[0].querier.mobileSetting.settingValue;
                     dataStr = dataStr.replace(/\s*/g, '').replace(/\\*/g, '');
                     new NewQueryModal({
-                        queryItems: JSON.parse(dataStr)
+                        queryItems: JSON.parse(dataStr),
+                        search: (data) => {
+                            let url = BW.CONF.siteUrl + '/app_sanfu_retail/null/list/node_nobugs?pageparams=%7B%22index%22%3D1%2C%22size%22%3D50%2C%22total%22%3D1%7D';
+                            url = tools.url.addObj(url,{
+                                mqueryparams:JSON.stringify(data)
+                            });
+                            BwRule.Ajax.fetch(url).then(({response})=>{
+                                console.log(response)
+                            })
+                        }
                     })
 
                 });

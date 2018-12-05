@@ -131,6 +131,7 @@ $icon-font-size: 18px;
   justify-content: center;
   font-size: $option-font-size;
   color: #333333;
+  position: relative;
   &.active {
     background-color: #e9f3fc;
     color: #005bac;
