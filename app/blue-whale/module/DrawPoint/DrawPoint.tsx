@@ -293,14 +293,7 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
-            this.format(d)
-                .sort((a) => {
-                    if (a.isPoint) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                }).forEach((data) => {
+            this.format(d).forEach((data) => {
                 //console.log(data);
                 //  需要用到有point的data
                 if (data.isPoint && data.data && tools.isNotEmpty(data.data)) {
