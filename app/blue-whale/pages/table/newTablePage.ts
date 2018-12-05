@@ -1,6 +1,5 @@
 /// <amd-module name="NewTablePage"/>
 import BasicPage from "../basicPage";
-import {TableModule} from "../../module/table/tableModule";
 import {BwRule} from "../../common/rule/BwRule";
 import tools = G.tools;
 import sys = BW.sys;

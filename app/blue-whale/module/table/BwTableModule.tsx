@@ -73,7 +73,7 @@ export class BwTableModule extends Component {
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
         this.isPivot = ui.relateType === 'P';
-        if(!this.tableModule.editable && !this.isPivot){
+        if(this.tableModule && !this.tableModule.editable && !this.isPivot){
             this.editParam = null;
         }
 
@@ -2021,7 +2021,7 @@ export class BwTableModule extends Component {
         let btnStatus = {
             end: () => {
                 let status = this.edit.editBtnStateInit(box, false);
-
+                console.log(status);
                 if (status.edit) {
                     dbclick.on();
                 } else {
@@ -2037,16 +2037,16 @@ export class BwTableModule extends Component {
         let dbclick = (() => {
             let selector = '.section-inner-wrapper:not(.pseudo-table) tbody td:not(.cell-img)',
                 handler = function () {
-                    self.tableModule.editManage.start(self).then(() => {
+                    self.tableModule && self.tableModule.editManage.start(self).then(() => {
                         this.click();
                     });
                 };
             return {
                 on: () => {
-                    d.on(this.container, 'dblclick', selector, handler);
+                    d.on(this.wrapper, 'dblclick', selector, handler);
                 },
                 off: () => {
-                    d.off(this.container, 'dblclick', selector, handler);
+                    d.off(this.wrapper, 'dblclick', selector, handler);
                 }
             }
         })();
@@ -2098,10 +2098,10 @@ export class BwTableModule extends Component {
                 this._btnWrapper = <footer className="mui-bar mui-bar-footer"/>;
                 //
                 d.append(this.wrapper, this._btnWrapper);
-                if ((this.tableModule.editType === 'linkage'
+                if (this.tableModule && ((this.tableModule.editType === 'linkage'
                         && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
                     || (this.tableModule.editType === 'self')
-                    && this.editParam && tools.isNotEmpty(this.ui.subButtons)) {
+                    && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
                     let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({
@@ -2133,12 +2133,12 @@ export class BwTableModule extends Component {
 
 
         let cancel = () => {
-            this.ftable.editorCancel();
+            this.ftable && this.ftable.editorCancel();
         };
 
         let start = (): Promise<void> => {
             // debugger;
-            if (this.ftable.editing) {
+            if (this.ftable && this.ftable.editing) {
                 return Promise.resolve();
             }
 
