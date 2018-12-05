@@ -200,9 +200,9 @@ export class DrawPoint extends Component {
                         self.showData(newData, D3.select(this))
                     })
                 }).on('mouseover', function (d, i) {
-                    D3.select(this).select('path').attr('fill', 'gold').attr('fill-opacity', 0.5)
+                    D3.select(this).select('path').attr('fill-opacity', 0.87)
                 }).on('mouseout', function () {
-                    D3.select(this).select('path').attr('fill', 'white').attr('fill-opacity', 0)
+                    D3.select(this).select('path').attr('fill-opacity', 0.56);
                 });
             },
             off: () => {
@@ -293,7 +293,18 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
-            this.format(d).forEach((data) => {
+         // let tranData =  this.format(d)
+         //        .sort((a, b) => {
+         //            if (!a.isPoint && !b.isPoint) {
+         //                return 0;
+         //            } else if(a.isPoint) {
+         //                return -1;
+         //            } else{
+         //                return 1;
+         //            }
+         //        })
+          let tranData = this.changeArr(this.format(d))
+             tranData.forEach((data) => {
                 //console.log(data);
                 //  需要用到有point的data
                 if (data.isPoint && data.data && tools.isNotEmpty(data.data)) {
@@ -327,9 +338,9 @@ export class DrawPoint extends Component {
 
                     //绘字
                     I++;
-                    if(I > 2){
-                        return
-                    }
+                    // if(I > 2){
+                    //     return
+                    // }
                     // if (that._keyField !== data.name) {
                     //     return
                     // }
@@ -408,6 +419,19 @@ export class DrawPoint extends Component {
         this.keyDownEvent.on();
         this.keyUpEvent.on();
     }
+
+    private changeArr(arr){
+       let index = 0;
+       for(let i= 0;i < arr.length;i++){
+           if(arr[i].isPoint){
+               index = i;
+           }
+       }
+       if(index == 0){ return}
+        let str = arr.splice(index,1);
+        arr.unshift(str[0]);
+        return arr;
+    }
     //区域显示颜色
     private AreaColor( color:string){
        this.g.selectAll('g').selectAll('path').attr('fill-opacity',function (d) {
@@ -417,9 +441,9 @@ export class DrawPoint extends Component {
 
     //字体换行
     private wrapWord(text, width, centerX, centerY,I) {
-        if(I !==2 ){
-            return
-        }
+        // if(I !==2 ){
+        //     return
+        // }
         text.each(function () {
             let text = D3.select(this),
                 words = text.text().split('').reverse(),
