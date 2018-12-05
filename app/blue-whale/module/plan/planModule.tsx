@@ -331,7 +331,7 @@ export class PlanModule extends Component{
             });
             loading.show();
             this.setBackground(ajaxData).then(() => {
-                let data = Object.assign({nopage: true,atavarparams:ajaxData.atavarparams || {}}, PlanModule.initQueryParams(ajaxData.queryparams1));
+                let data = Object.assign({nopage: true,atvarparams:ajaxData.atvarparams || {}}, PlanModule.initQueryParams(ajaxData.queryparams1));
                 this.ajax.fetch(tools.url.addObj(url, data), {
                     needGps: ui.dataAddr.needGps,
                     timeout: 30000,
