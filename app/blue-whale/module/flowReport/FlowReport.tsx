@@ -222,7 +222,6 @@ export class FlowReport extends BasicPage {
                     break;
                 case 'agree': {
                     btn.hintAfterAction = true;
-                    let _this = this;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
                         // sys.window.close();
                     }, self.url);
@@ -231,9 +230,9 @@ export class FlowReport extends BasicPage {
                 case 'reject': {
                     btn.hintAfterAction = true;
                     let text: TextInput = null,
-                        body = <div>
-                            <div className="title">操作备注:</div>
-                            {text = <TextInput/>}
+                        body = <div className='remark-wrapper'>
+                            <div className="remark-title">操作备注:</div>
+                            {text = <TextInput className='remark-input-wrapper'/>}
                         </div>;
                     let modal = new Modal({
                         body: body,
