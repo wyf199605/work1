@@ -21,7 +21,6 @@ export interface IBwUploaderPara extends IFormComPara {
     accept?: FileType;
     multi?: boolean;
     onSuccess?: (...any) => void;
-    onFailure?: (...any) => void;
     uploadUrl?: string;
 }
 interface FileType {
@@ -31,6 +30,10 @@ interface FileType {
 }
 
 export class BwUploader extends FormCom {
+
+    static EVT_FILE_JOIN_QUEUE = '__event_file_join_the_queue__'; // 文件加入上传队列是调用
+    static EVT_UPLOAD_ERROR = '__event_file_upload_error__';    // 文件上传失败时调用
+
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
     protected maxSize: number;  // 上传文件大小，-1为不限制
     protected chunkSize = 5000 * 1024;  // 分块大小 5M
@@ -38,7 +41,6 @@ export class BwUploader extends FormCom {
     protected thumbField: string;
     // protected formData: () => obj;  // 上传附带数据
     protected onSuccess: (...any) => void;
-    protected onFailure: (...any) => void;
     protected filename: string; // 当前上传成功文件的名称
     protected files: File[] = [];   // 上传成功文件
     protected temFiles: File[] = []; // 暂存文件，等待上传
@@ -65,7 +67,6 @@ export class BwUploader extends FormCom {
         this.thumbField = para.thumbField;
         this.maxSize = para.maxSize || -1;
         this.onSuccess = para.onSuccess;
-        this.onFailure = para.onFailure;
         this.accept = para.accept;
         this.multi = para.multi || false;
         this.isChangeText = para.isChangeText || false;
@@ -96,6 +97,7 @@ export class BwUploader extends FormCom {
                             this.temFiles.push(file);
                         }
                     });
+                    this.trigger(BwUploader.EVT_FILE_JOIN_QUEUE, this.temFiles);
                     autoUpload && this.upload();
                 }
             }, this.multi, this.accept && this.accept.mimeTypes, () => {
@@ -133,7 +135,7 @@ export class BwUploader extends FormCom {
     }
 
     protected setInputValue(value: string){
-        this.isChangeText && (this.input.value = value || this.text);
+        this.isChangeText && this.input && (this.input.value = value || this.text);
     }
 
     destroy(){
@@ -147,24 +149,29 @@ export class BwUploader extends FormCom {
 
     // 调用方法上传暂存文件
     upload(){
+        this._isFinish = false;
         this.wrapper.classList.remove('error');
         this.setInputValue('上传中...');
         if(!this.multi){
             this.files = [];
         }
-        let files = this.multi ? this.temFiles : this.temFiles[0];
+        let files = this.multi ? this.temFiles : this.temFiles[0],
+            promises: Promise<any>[] = [];
         files && tools.toArray(files).forEach((file) => {
-            this.fileUpload.upload(file).then((data) => {
+            promises.push(this.fileUpload.upload(file).then((data) => {
                 console.log(data);
                 this.files.push(file);
                 this.temFiles = [];
                 this.onSuccess && this.onSuccess(data, file);
                 this.value = file.name;
             }).catch(() => {
-                this.wrapper.classList.add('error');
+                this.wrapper && this.wrapper.classList.add('error');
                 this.setInputValue('上传失败');
-                this.onFailure && this.onFailure(file);
-            })
+                this.trigger(BwUploader.EVT_UPLOAD_ERROR, file);
+            }))
+        });
+        Promise.all(promises).then(() => {}).finally(() => {
+            this._isFinish = true;
         })
     }
 

@@ -13,6 +13,10 @@ export abstract class FormCom extends Component{
 
     public onSet: (val) => void;
 
+    protected _isFinish = true;
+    get isFinish(){
+        return this._isFinish;
+    }
     protected _value: any;
     abstract get value():any;
     abstract set value(val);
