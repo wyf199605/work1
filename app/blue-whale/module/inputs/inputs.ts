@@ -366,12 +366,15 @@ export class KeyStep{
 
                                     this.p.callback(text, reg).then((response) => {
                                         let body = response && response.body && response.body.bodyList && response.body.bodyList[0] || {},
+                                            elements = response && response.body && response.body.elements && response.body.elements[0] && response.body.elements[0],
                                             category = body.category || {},
                                             catType = category.type,
                                             dataType = body.dataType; // 0：表格数据覆盖
 
                                         if(conScan && dataType === 0 && ![1,2,3,4].includes(catType)){
-                                            open();
+                                            if(!elements && !elements.atvarparams){
+                                                open();
+                                            }
                                         }
                                     });
 
