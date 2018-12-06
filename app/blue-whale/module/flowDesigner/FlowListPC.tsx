@@ -32,28 +32,6 @@ export class FlowListPC extends BasicPage{
     private currentIndex:string = '0';
     constructor(para:FlowListPara){
         super(para);
-        if(sys.window.getSign){
-            sys.window.getSign((res) => {
-                if(res.success){
-                    let image = new Image();
-                    alert(res.data.base64);
-                    image.src = res.data.base64;
-                    image.onload = () => {
-                        new Modal({
-                            header: '图片',
-                            body: <div>
-                                {image}
-                            </div>
-                        })
-                    };
-                    image.onerror = () => {
-                        Modal.alert('获取图片失败！');
-                    }
-                }else{
-                    Modal.alert('获取图片失败');
-                }
-            });
-        }
 
         if (tools.isNotEmpty(para.elements)){
             let elements = para.elements,
