@@ -381,12 +381,13 @@ export class KeyStep{
                         }else {
                             let open = () => {
                                 this.open(para).then((text : string) => {
-                                    let reg = regExpMatch(input, text);
+                                    let reg = regExpMatch(input, text),
+                                        conScan = tools.isMb && type === '2';
 
-                                    this.p.callback(text, reg, open);
+                                    this.p.callback(text, reg, conScan && open);
 
                                     // 没有通过正则匹配
-                                    !reg && tools.isMb && type === '2' && open();
+                                    !reg && conScan && open();
                                 });
                             };
                             open();
