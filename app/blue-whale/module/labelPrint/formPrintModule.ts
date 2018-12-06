@@ -13,6 +13,8 @@ import {SelectInput} from "../../../global/components/form/selectInput/selectInp
 import {TextInput} from "../../../global/components/form/text/text";
 import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {NumInput} from "../../../global/components/form/numInput/numInput";
+import {BwRule} from "../../common/rule/BwRule";
+import Rule = G.Rule;
 
 interface FormPrintModulePara{
     container: HTMLElement;
@@ -301,14 +303,23 @@ export = class FormPrintModule {
         };
 
         //填写表体
+        let cols = this.para.cols;
         for (let row = 1; row < this.tableConf.row; row++) {
             let curRowData = this.tableData.shift();
             leftCache = 0;
             if (curRowData) {
                 for (let col = -1; col < this.tableConf.col - 1; col++) {
                     col !== -1 && (leftCache += this.colSize[col]);
-                    let text = tools.str.toEmpty(curRowData[this.indexToName[col + 1]]);
-                    let width = this.colSize[col + 1] - 10;
+                    let name = this.indexToName[col + 1],
+                        text = tools.str.toEmpty(curRowData[name]),
+                        width = this.colSize[col + 1] - 10;
+
+                    cols.forEach( c => {
+                        if(c.content.name === name){
+                            text = Rule.formatText(text, c.content)
+                        }
+                    });
+
                     // text = `<span class="svgText" style="width: ${width}px;">${text}</span>`;//通过添加span标签用来控制文本溢出
                     //获取当前表格数据的第row+1项因为每一个表格都有表头 所以要加一
                     drawSvg.text(text, {

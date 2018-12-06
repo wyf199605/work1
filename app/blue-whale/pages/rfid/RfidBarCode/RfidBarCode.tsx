@@ -266,8 +266,11 @@ export class RfidBarCode extends Component {
                 </div>
                 <div class="rifd-bar-code-describe">卅达夏 包袋OL/明媚481 109 黑色</div>
                 <div class="rfid-barCode-nums">
-                    <div class="rfid-barCode-set">
-                        <div class="set-row">
+                    <div class="shelf-nums">
+                        数量(<span class="shelf-mode"></span>)<input type="number"/>
+                    </div>
+                    <div className="rfid-barCode-set">
+                        <div className="set-row">
                             <div>逐一扫描</div>
                             <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
                                     onClick={(isChecked) => {
@@ -314,8 +317,8 @@ export class RfidBarCode extends Component {
 
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
                                                 //alert(JSON.stringify(res.data));
-                                               // let data = res.data;
-                                                if(res.success){
+                                                // let data = res.data;
+                                                if (res.success) {
                                                     let num = d.query('.total-nums>span');
                                                     num.innerText = (parseInt(num.innerText) + 1) + '';
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
@@ -335,7 +338,7 @@ export class RfidBarCode extends Component {
                                             params['optionStype'] = 0;
                                             params['num'] = modeVal['value'] || 0;
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -352,7 +355,7 @@ export class RfidBarCode extends Component {
                                             params['num'] = 0;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
 
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -418,7 +421,7 @@ export class RfidBarCode extends Component {
 
                                     }}></Toggle>
                         </div>
-                        <div class="set-row">
+                        <div className="set-row">
                             <div>累加</div>
                             <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
                                     onClick={(isChecked) => {
@@ -457,7 +460,7 @@ export class RfidBarCode extends Component {
                                             //先关闭之前的监听重新开启
                                             //开启重新的
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -475,7 +478,7 @@ export class RfidBarCode extends Component {
                                             params['num'] = modeVal['value'] || 0;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
                                                 let data = res.data;
-                                                if(res.success){
+                                                if (res.success) {
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
                                                     let array = res.data.search.array[0];
                                                     this.domHash['barcode'].innerText = array.barcode;
@@ -491,8 +494,8 @@ export class RfidBarCode extends Component {
                                         } else if (this.mode[key] == '逐一') {
                                             params['optionStype'] = 2;
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                               // alert(JSON.stringify(res.data));
-                                                if(res.success){
+                                                // alert(JSON.stringify(res.data));
+                                                if (res.success) {
                                                     let num = d.query('.total-nums>span');
                                                     num.innerText = (parseInt(num.innerText) + 1) + '';
                                                     this.domHash['scanamout'].innerText = res.data.option.scanNum;
@@ -559,9 +562,6 @@ export class RfidBarCode extends Component {
 
                                     }}></Toggle>
                         </div>
-                    </div>
-                    <div class="shelf-nums">
-                        数量(<span class="shelf-mode"></span>)<input type="number"/>
                     </div>
                     <div class="total-nums">
                         <i class="iconfont icon-zonghesum1"></i>数量:<span style="color:#007aff">0</span>
@@ -646,12 +646,15 @@ export class RfidBarCode extends Component {
                         () => {
                             console.log(para.codeStype)
                             let str = [];
-                            para.codeStype.forEach((val) => {
-                                let obj = {};
-                                obj['value'] = val['IMPORTDATAMODE'];
-                                obj['text'] = val['IMPORTDATAMODE'];
+                            for(let i=0,data = para.codeStype;i<data.length;i++){
+                               let obj = {};
+                                 for(let s in data[i]){
+                                         obj['value'] = data[i][s];
+                                         obj['text'] = data[i][s];
+                                 }
                                 str.push(obj);
-                            })
+                            }
+
                             console.log(str);
                             let updataEl;
 
@@ -714,6 +717,24 @@ export class RfidBarCode extends Component {
                                 category = res.name;
                             }
                         })
+                        let modeldata = [{
+                            value:'所有',
+                            text: "所有"
+                        }, {
+                            value:this.domHash['category'].innerText + this.domHash['categoryVal'].innerText,
+                            text: this.domHash['category'].innerText + this.domHash['categoryVal'].innerText
+                        }, {
+                            value:'当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText,
+                            text: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText
+                        }, {
+                            value:'条码' + this.domHash['barcode'].innerText,
+                            text: '条码' + this.domHash['barcode'].innerText
+                        }],modeldata1 = [
+                         {
+                            value:'条码' + this.domHash['barcode'].innerText,
+                            text: '条码' + this.domHash['barcode'].innerText
+                        }]
+                        let stepStatus = this.stepStatus;
                         let deModel = new Modal({
                             isMb: false,
                             position: "center",
@@ -724,22 +745,7 @@ export class RfidBarCode extends Component {
 
                                 <div>
                                     {
-                                        deleteEL = <SelectInputMb data={[{
-                                            value: {'barcode': '', 'category': ''},
-                                            text: "所有"
-                                        }, {
-                                            value: {'barcode': '', 'category': this.domHash['categoryVal'].innerHTML},
-                                            text: this.domHash['category'].innerText + this.domHash['categoryVal'].innerText
-                                        }, {
-                                            value: {
-                                                'barcode': this.domHash['barcode'].innerText,
-                                                'category': this.domHash['categoryVal'].innerText
-                                            },
-                                            text: this.domHash['category'].innerText + ":" + this.domHash['categoryVal'].innerText + "条码:" + this.domHash['barcode'].innerText
-                                        }, {
-                                            value: {'barcode': this.domHash['barcode'].innerText, 'category': ''},
-                                            text: '条码' + this.domHash['barcode'].innerText
-                                        }]}/>
+                                        deleteEL = <SelectInputMb data={stepStatus ? modeldata1 : modeldata}/>
                                     }
                                 </div>
                             </div>,
@@ -750,8 +756,27 @@ export class RfidBarCode extends Component {
 
                                         let value = deleteEL.get(),
                                             where = {};
+                                        console.log(value);
                                         where[uid] = value.barcode;
                                         where[category] = value.category
+                                        switch (value){
+                                            case "所有":
+                                                where[uid] = '';
+                                                where[category] = '';
+                                                break;
+                                            case this.domHash['category'].innerText + this.domHash['categoryVal'].innerText:
+                                                where[uid] = '';
+                                                where[category] = this.domHash['categoryVal'].innerHTML;
+                                                break;
+                                            case '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText:
+                                                where[uid] = this.domHash['barcode'].innerText;
+                                                where[category] = this.domHash['categoryVal'].innerText;
+                                                break;
+                                            case '条码' + this.domHash['barcode'].innerText:
+                                                where[uid] = this.domHash['barcode'].innerText;
+                                                where[category] = '';
+                                                break;
+                                        }
                                         let success = false;
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
                                             if (res.success) {
@@ -930,6 +955,7 @@ export class RfidBarCode extends Component {
 
     private uid: string;
     private stepArry = [];
+
     private downData(para) {
         let loading = new Loading({
             msg: "加载中"
@@ -945,6 +971,7 @@ export class RfidBarCode extends Component {
             //alert(JSON.stringify(res) + '下载')
             if(res.success){
                 loading.destroy();
+                Modal.alert('下载成功')
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
                 this.uid = pageName.uid;
@@ -960,6 +987,103 @@ export class RfidBarCode extends Component {
                    d.query('.rfid-barCode-nums').style.display = 'none';
                    d.query('.total-rfid>.bar-code-amount').style.display = 'none';
                 }
+                if(this.stepStatus){
+                    let optionStype, Where = {};
+                    if (G.tools.isNotEmpty(this.fields)) {
+
+                        for (let i = 0; i < this.fields.length; i++) {
+                            if (i == 0) {
+                                //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
+                                Where[this.fields[i].name] = "";
+                            } else if (i == 1) {
+                                // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
+                                Where[this.fields[i].name] = "";
+                            } else if (i == 2) {
+                                //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
+                                Where[this.fields[i].name] = "";
+                            }
+                        }
+                    }
+                    let params = {
+                        optionStype: 2,
+                        num: 0,
+                        nameId: para.uniqueFlag,
+                        Where: Where,
+                        codeName: this.uid
+                    }
+
+                    G.Shell.inventory.openRegistInventory(2, params, (res) => {
+                        // alert(JSON.stringify(res.data));
+                        let array = res.data.search.array[0];
+                        if(res.success){
+                            if( this.stepStatus && this.stepArry.indexOf(array.barcode) == -1){
+                                this.stepArry.push(array.barcode);
+                                let num = parseInt(this.domHash['scanamout'].innerText);
+                                this.domHash['scanamout'].innerText = num + 1;
+
+                            }
+                            this.domHash['barcode'].innerText = array.barcode;
+                            this.domHash['categoryVal'].innerText = array.classify1_value;
+                            //this.domHash['count'].innerText = arr[i].count;
+                            this.domHash['categoryVal1'].innerText = array.classify2_value;
+                            this.domHash['categoryVal2'].innerText = array.classify3_value;
+                            this.domHash['Commodity'].innerText = array.name;
+                            this.refreshCount(para)
+                        }
+                    })
+                }else {
+                    G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
+                        let data = res.data;
+                        //alert(JSON.stringify(res))
+                        this.fields.forEach((res) => {
+                            let arr = data.array;
+                            if (res.index == 1) {
+                                //分类一
+                                if (data.name == res.name) {
+                                    for (let i = 0; i < arr.length; i++) {
+                                        this.domHash['categoryVal'] = arr[i].value
+                                    }
+                                }
+                            } else if (res.index == 2) {
+                                //分类二
+                                if (data.name == res.name) {
+                                    for (let i = 0; i < arr.length; i++) {
+                                        this.domHash['categoryVal1'] = arr[i].value
+                                    }
+                                }
+                            } else {
+                                //分类三
+                                if (data.name == res.name) {
+                                    for (let i = 0; i < arr.length; i++) {
+                                        this.domHash['categoryVal2'] = arr[i].value
+                                    }
+                                }
+                            }
+                        })
+                        if (data.name == this.uid) {
+                            let arr = data.array,stepScanCount;
+                            for (let i = 0; i < arr.length; i++) {
+                                this.domHash['barcode'].innerText = arr[i].barcode;
+                                if( this.stepStatus && this.stepArry.indexOf(arr[i].barcode) == -1){
+                                    this.stepArry.push(arr[i].barcode);
+                                    let num = parseInt(this.domHash['scanamout'].innerText);
+                                    this.domHash['scanamout'].innerText = num + 1;
+
+                                }
+                                this.domHash['categoryVal'].innerText = arr[i].classify1_value;
+                                !this.stepStatus && (this.domHash['scanamout'].innerText = arr[i].scanCount);
+                                //this.domHash['count'].innerText = arr[i].count;
+                                this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
+                                this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
+                                this.domHash['Commodity'].innerText = arr[i].name;
+                            }
+                            this.refreshCount(para);
+
+                        }
+
+                    })
+                }
+
 
                 tools.isNotEmpty(this.fields) && this.fields.forEach((val) => {
                     if (val.index == 1) {
@@ -973,57 +1097,7 @@ export class RfidBarCode extends Component {
             }
 
         })
-        G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
-            let data = res.data;
-           //alert(JSON.stringify(res))
-            this.fields.forEach((res) => {
-                let arr = data.array;
-                if (res.index == 1) {
-                    //分类一
-                    if (data.name == res.name) {
-                        for (let i = 0; i < arr.length; i++) {
-                            this.domHash['categoryVal'] = arr[i].value
-                        }
-                    }
-                } else if (res.index == 2) {
-                    //分类二
-                    if (data.name == res.name) {
-                        for (let i = 0; i < arr.length; i++) {
-                            this.domHash['categoryVal1'] = arr[i].value
-                        }
-                    }
-                } else {
-                    //分类三
-                    if (data.name == res.name) {
-                        for (let i = 0; i < arr.length; i++) {
-                            this.domHash['categoryVal2'] = arr[i].value
-                        }
-                    }
-                }
-            })
-            if (data.name == this.uid) {
-                let arr = data.array,stepScanCount;
-                for (let i = 0; i < arr.length; i++) {
-                    this.domHash['barcode'].innerText = arr[i].barcode;
-                   if( this.stepStatus && this.stepArry.indexOf(arr[i].barcode) == -1){
-                       this.stepArry.push(arr[i].barcode);
-                        let num = parseInt(this.domHash['scanamout'].innerText);
-                        this.domHash['scanamout'].innerText = num + 1;
 
-                   }
-                    this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                    !this.stepStatus && (this.domHash['scanamout'].innerText = arr[i].scanCount);
-                    //this.domHash['count'].innerText = arr[i].count;
-                    this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                    this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                    this.domHash['Commodity'].innerText = arr[i].name;
-                }
-
-                this.refreshCount(para);
-
-            }
-
-        })
     }
     private refreshCount(para){
         let where={};

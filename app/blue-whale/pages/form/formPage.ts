@@ -60,7 +60,7 @@ export = class FormPage extends BasicPage {
                                                     let options = this.lookUpData[field.name] || [];
                                                     for (let opt of options) {
                                                         if (opt.value == data[field.lookUpKeyField]) {
-                                                            lCom.set(opt.text);
+                                                            lCom.set(opt.value);
                                                         }
                                                     }
                                                 }

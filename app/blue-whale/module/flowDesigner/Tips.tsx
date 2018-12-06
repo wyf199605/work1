@@ -8,7 +8,7 @@ import IComponentPara = G.IComponentPara;
 import {FlowDesigner, Method} from "./FlowDesigner";
 import {FlowItem} from "./FlowItem";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {IFieldPara} from "./FlowEditor";
+import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {BwRule} from "../../common/rule/BwRule";
 
 export class Tips extends Component {
@@ -171,8 +171,16 @@ export class Tips extends Component {
                         dropdowns = item.flowEditor.dropdowns,
                         dropdownField: IFieldPara = {};
                     // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
-                    Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 &&
-                                (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
+                    Object.keys(dropdowns).forEach((attr) => {
+                        if(dropdowns[attr].selectIndex >= 0){
+                            dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value;
+                        }else{
+                            // 如果没有选择，则用原来的值
+                            dropdownField[attr] = item.flowEditor.value[attr];
+                        }
+                    });
+                    // Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 &&
+                    //             (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value));
                     Method.parseToXml.setAttr(xmlNode, Object.assign({layout: layoutStr}, item.flowEditor.get(), dropdownField));
                     FlowDesigner.rootElement.appendChild(xmlNode);
                 }
@@ -197,6 +205,8 @@ export class Tips extends Component {
             });
 
             let xmlStr = new XMLSerializer().serializeToString(xmlDoc); // 将流程转为xml字符串
+            // console.log('save xml: ');
+            // console.log(xmlStr);
             BwRule.Ajax.fetch(BW.CONF.ajaxUrl.modifyFlow + FlowDesigner.processId, {
                 type: 'POST',
                 data: {process: xmlStr},

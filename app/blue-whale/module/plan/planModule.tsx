@@ -294,7 +294,13 @@ export class PlanModule extends Component{
         return new Promise((resolve, reject) => {
             let backGround = this.ui.backGround;
             if(backGround){
-                let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, obj || {}));
+                let ajaxObj:obj = {};
+                for (let key in obj) {
+                    for (let ok in obj[key]) {
+                        tools.isNotEmpty(obj[key][ok]) && (ajaxObj[ok] = obj[key][ok]);
+                    }
+                }
+                let url = CONF.siteUrl + BwRule.reqAddr(backGround, Object.assign({}, ajaxObj || {}));
                 url = url && tools.url.addObj(url, {version: new Date().getTime() + ''});
 
                 let img = new Image();
@@ -331,7 +337,7 @@ export class PlanModule extends Component{
             });
             loading.show();
             this.setBackground(ajaxData).then(() => {
-                let data = Object.assign({nopage: true}, PlanModule.initQueryParams(ajaxData));
+                let data = Object.assign({nopage: true,atvarparams:JSON.stringify(ajaxData.atvarparams) || ''}, PlanModule.initQueryParams(ajaxData.queryparams1));
                 this.ajax.fetch(tools.url.addObj(url, data), {
                     needGps: ui.dataAddr.needGps,
                     timeout: 30000,

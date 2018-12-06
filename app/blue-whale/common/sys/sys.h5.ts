@@ -104,7 +104,7 @@ namespace BW{
                 openImg: function (url: string) {
 
                 },
-                download: function (url: string, fileName?: string) {
+                download: function (url: string, fileName: string = '') {
                     let a = d.create(`<a href="${url}" download="${fileName}"></a>`);
                     d.append(document.body, a);
                     a.click();
@@ -116,6 +116,16 @@ namespace BW{
                 },
                 fire : function (type : string, data? : obj,) {
                     tools.event.fire(type, data, window);
+                },
+                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
+                    let input = <HTMLInputElement>d.create('<input type="file" class="hide"/>');
+                    input.multiple = multi;
+                    accpet && (input.accept = accpet);
+                    d.on(input, 'change', () => {
+                        callback && callback(Array.prototype.slice.call(input.files));
+                        input = null;
+                    });
+                    input.click();
                 }
             }
         })(this);

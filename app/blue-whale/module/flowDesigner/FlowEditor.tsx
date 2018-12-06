@@ -66,14 +66,10 @@ export class FlowEditor extends FormCom {
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
         assignee: [
             {value: '', text: '用户', address: CONF.ajaxUrl.useAddressList_user},
-            {value: '_group', text: '用户组', address: CONF.ajaxUrl.useAddressList_userGroup},
-            {value: '#', text: '脚本配置', address: CONF.ajaxUrl.useAddressList_scriptSetting},
+            {value: '', text: '用户组', address: CONF.ajaxUrl.useAddressList_userGroup},
+            {value: '', text: '脚本配置', address: CONF.ajaxUrl.useAddressList_scriptSetting},
         ]
     };
-
-    // static addressList = [
-    //     {text: '', address: CONF.ajaxUrl.useAddressList_user, key: '用户'}
-    // ];
 
     private owner: Component | FlowDesigner;
 
@@ -92,12 +88,17 @@ export class FlowEditor extends FormCom {
         this.initFlowEditor(para);
         this.initEvents.on();
         if (para.fields) {
+            this.value = para.fields;
             let fields = para.fields;
             // 查看流程时获取的数据也要进行转换
             Object.keys(fields).forEach(key => {
                 if (key in FlowEditor.DROPDOWN_KEYVALUE) {
-                    let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
-                    valueText && (fields[key] = valueText.value);
+                    if(key === 'assignee'){
+                        fields[key] = para.fields[key];
+                    }else{
+                        let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
+                        valueText && (fields[key] = valueText.text);
+                    }
                 }
             });
             this.set(fields);
@@ -141,6 +142,7 @@ export class FlowEditor extends FormCom {
                                     new ContactsModule({
                                         field: field,
                                         onGetData: (datas) => {
+                                            FlowEditor.DROPDOWN_KEYVALUE[attr].forEach((valueText, current) => current !== index && (valueText.value = ''));
                                             let userName = [],
                                                 userId = [],
                                                 groupId = '',
@@ -153,7 +155,6 @@ export class FlowEditor extends FormCom {
                                             });
                                             index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
                                             this.set({[attr]: userName.join(',') || groupId || assignId});
-                                            return;
                                         }
                                     });
                                 }).catch(err => {
@@ -166,7 +167,8 @@ export class FlowEditor extends FormCom {
                     }
                 });
                 dropdown.hideList();    // 初始设置为隐藏
-                d.append(d.closest(this.wrapper, '.design-canvas'), dropdownWrapper);
+                // d.append(d.closest(this.wrapper, '.design-canvas'), dropdownWrapper);
+                d.append(this.wrapper, dropdownWrapper);
                 // 将下拉列表存到FlowEditor类和实例中，方便之后隐藏/显示列表
                 this.dropdowns[attr] = dropdown;
                 FlowEditor.DropDowns.push(dropdown);
@@ -184,7 +186,8 @@ export class FlowEditor extends FormCom {
                 } else {
                     input = d.query('input', e.target.parentElement) as HTMLInputElement;
                 }
-                input.focus();
+                input && input.focus();
+                FlowEditor.hideAllDropdown();
                 input.dataset.old = input.value;
             },
             changeHandler = (e) => {
@@ -212,13 +215,29 @@ export class FlowEditor extends FormCom {
                     prevState = dropdown.isVisible;
                 FlowEditor.hideAllDropdown();
                 prevState ? dropdown.hideList() : dropdown.showList();
+                e.stopPropagation();
+                // 控制下拉列表的显示位置
+                let wrapperLength = d.queryAll('.attr-editor-wrapper', this.wrapper).length,
+                    wrapperHeight = parseInt(window.getComputedStyle(d.query('.attr-editor-wrapper', this.wrapper)).height),
+                    targetIndex: number = null;
+                d.queryAll('.attr-editor-wrapper', this.wrapper).filter((item, index) =>
+                    item === d.closest(e.target, '.attr-editor-wrapper', this.wrapper) && (targetIndex = index));
+                let dropdownHeight = d.queryAll('.drop-item', dropdown.ulDom).length *
+                            parseInt(window.getComputedStyle(d.query('.drop-item', dropdown.ulDom)).height) + 8;
+                let bottom = (wrapperLength - targetIndex) * wrapperHeight - dropdownHeight - 26;
+                if(bottom < 0){
+                    d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom =
+                        (wrapperLength - targetIndex) * wrapperHeight + 'px';
+                }else{
+                    d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom = bottom + 'px';
+                }
             };
 
         // 使用this.wrapper会使得点击.tip-header时，第一个input获得焦点，对change事件没有影响
         // let tipBody = d.query('.tip-body', this.wrapper);
         return {
             on: () => {
-                d.on(this.wrapper, 'click', clickHandler);
+                d.on(d.query('.tip-body', this.wrapper), 'click', clickHandler);
                 d.on(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
                 Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
                     // 所有下拉按钮的点击事件
@@ -230,7 +249,7 @@ export class FlowEditor extends FormCom {
                 });
             },
             off: () => {
-                d.off(this.wrapper, 'click', clickHandler);
+                d.off(d.query('.tip-body', this.wrapper), 'click', clickHandler);
                 d.off(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
                 Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
                     d.off(
@@ -320,21 +339,22 @@ export class FlowEditor extends FormCom {
 
     public _value: IFieldPara;
     get value() {
-        this._value = this.get();
         return this._value;
     }
 
     set value(value: IFieldPara) {
-        this.set(value);
+        this._value = value;
     }
 
     destroy() {
         this.initEvents.off();
+        FlowEditor.DROPDOWN_KEYVALUE['assignee'].forEach(valueText => valueText.vlaue = '');
         FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 &&
         FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
         FlowEditor.DropDowns.forEach(dropdown => {
             Object.keys(this.dropdowns).forEach(attr => {
                 d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
+                this.dropdowns[attr].destroy();
             });
         });
         this.owner = null;

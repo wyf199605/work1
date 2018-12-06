@@ -204,7 +204,7 @@ export class TableBase extends Component {
         this._isWrapLine =tools.isEmpty(para.isWrapLine) ? false : para.isWrapLine;
         tools.isNotEmpty(this.wrapper) && this._isWrapLine && this.wrapper.classList.add('wrap-line-table');
 
-        this.events.on();
+        // this.events.on();
 
     }
 
@@ -288,38 +288,6 @@ export class TableBase extends Component {
     //         }
     //     }
     // }
-
-    protected events = ((self) => {
-        // 列统计change事件
-        function change() {
-            let option = this.options[this.selectedIndex];
-            let values = d.data(option),
-                key = d.closest(this, '[data-name]').dataset.name;
-
-            let indexes = self.tableData.colCount(key, values);
-
-            // 触发TableBase.EVT_COL_COUNT_CHANGED事件，并将对应的索引返回
-            let handlers = self.eventHandlers[TableBase.EVT_COL_COUNT_CHANGED];
-            handlers && handlers.forEach((item) => {
-                typeof item === 'function' && item(indexes);
-            });
-            self.body.render(0, Object.keys(self.tableData.get()).length, void 0, false);
-        }
-
-        return {
-            on() {
-                if (self.colCount) {
-                    d.off(self.wrapper, 'change', 'select', change);
-                    d.on(self.wrapper, 'change', 'select', change);
-                }
-            },
-            off() {
-                if (self.colCount) {
-                    d.off(self.wrapper, 'change', 'select', change);
-                }
-            }
-        }
-    })(this);
 
     //列统计
     private _colCount: boolean | { text: string };
@@ -948,7 +916,11 @@ export class TableBase extends Component {
             },
             colCount(key: string, value: any) {
                 isChangeData = true;
-                if (tools.isEmpty(value)) {
+                if (self.columns && self.columns.map((col) => col.name).indexOf(key) === -1){
+                    if(Object.keys(conditions).length === 0){
+                        return null;
+                    }
+                } else if (tools.isEmpty(value)) {
                     delete conditions[key];
                     delete objOfIndex[key];
                 } else {

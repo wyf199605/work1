@@ -37,6 +37,10 @@ interface SYS_Window{
     powerManager?();
     whiteBat?();
     uploadVersion?(version: string);
+    getFile(callback: (file: File[]) => void, multi: boolean, accept: string, error?: Function);
+    editImgGet?(image: string, callback: Function);
+    editImgGet?(callback: Function);
+    getSign?(callback: Function);
 }
 
 interface SYS_UI{

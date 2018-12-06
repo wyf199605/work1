@@ -145,28 +145,34 @@ export class FlowDesigner {
     static rootElement: Element;            // 当前流程的xml节点树
     static processId: number;               // 当前流程的id
     static FlowType: string;                // 当前操作的类型（设计design或查看状态look）
+    static removeAllActive() {
+        FlowItem.removeAllActiveClass();
+        LineItem.removeAllActive();
+        FlowEditor.hideAllDropdown();
+    }
 
     constructor(responseData?: any, type?: string) {
         type && (FlowDesigner.FlowType = type);
         FlowEditor.EXIST_NAME = [];
         let body = <div className="design-canvas" id="design-canvas"/>;
-        let modal = new Modal({
+        this.modal = new Modal({
             body: body,
             header: {
                 title: '流程设计',
+                rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}></i>
             },
             className: 'flow-modal',
             width: '90%',
             height: '90%',
             onClose: () => {
                 this.destroy();
-                modal.destroy();
+                this.modal.destroy();
             }
         });
         let Tip: Tips = null;
         FlowDesigner.FlowType === 'design' && (
             Tip = new Tips({
-                container: body
+                container: this.modal.wrapper
             })
         );
 
@@ -182,7 +188,9 @@ export class FlowDesigner {
         if (tools.isNotEmpty(responseData)){
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
             if(FlowDesigner.FlowType === 'look'){
-                modal.modalHeader.title = '查看流程';
+                this.modal.modalHeader.title = '查看流程';
+                d.query('#design-canvas').style.left = '0px';
+                d.query('#design-canvas').style.width = '100%';
                 d.query('#design-canvas').style.pointerEvents = 'none';
             }else{
                 FlowDesigner.processId = responseData.data[0]['process_id'];
@@ -192,6 +200,25 @@ export class FlowDesigner {
                 rootElement = Method.loadXMLStr(xmlStr).documentElement;
             // console.log('xml initial: ');
             // console.log(xmlStr);
+            
+            // 在绘制前，需要根据layout重设画布的大小
+            let maxWidth = 0,
+                maxHeight = 0,
+                maxItemWidth = 0,
+                maxItemHeight = 0;
+            rootElement.childNodes.forEach((child) => {
+                if(child.nodeType === 1){
+                    let layout = child.attributes.layout && child.attributes.layout.value.split(',')
+                            .map(item => parseInt(item));
+                    maxWidth = Math.max(layout[0], maxWidth);
+                    maxHeight = Math.max(layout[1], maxHeight);
+                    maxItemWidth = Math.max(layout[2], maxItemWidth);
+                    maxItemHeight = Math.max(layout[3], maxItemHeight);
+                }
+            });
+            FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
+                    Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
+            
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
                 if (child.nodeType === 1) {
@@ -199,7 +226,6 @@ export class FlowDesigner {
                                     .map(item => parseInt(item)),
                         isComplete: boolean = false,
                         fields = Method.getFields(child);
-
                     // 存在xml中没有isComplete属性情况
                     'isComplete' in child.attributes && (
                         isComplete = child.attributes.isComplete.value === 'true'
@@ -297,10 +323,12 @@ export class FlowDesigner {
         }
     }
 
-    static removeAllActive() {
-        FlowItem.removeAllActiveClass();
-        LineItem.removeAllActive();
-        FlowEditor.hideAllDropdown();
+    private _modal = null;
+    get modal(){
+        return this._modal;
+    }
+    set modal(modal){
+        this._modal = modal;
     }
 
     private initEvents = (() => {
@@ -312,13 +340,37 @@ export class FlowDesigner {
                 FlowItem.toggleDisabledStartAndEnd();
             }
         };
+        let resizeHandler = (e) => {
+            // 窗口大小改变时需要重新设置paper的大小，并且重绘连接线
+            FlowDesigner.PAPER.setSize(
+                Math.max(d.query('#design-canvas').clientWidth, FlowDesigner.PAPER.width),
+                Math.max(d.query('#design-canvas').clientHeight, FlowDesigner.PAPER.height)
+            );
+            FlowDesigner.ALLITEMS && FlowDesigner.ALLITEMS.forEach(item => item.calcWidthAndHeight());
+            FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
+            FlowDesigner.connections && FlowDesigner.connections.forEach(connection => FlowDesigner.PAPER.connection(connection));
+        };
+        let clickFullscreenHandler = (e) => {
+            this.modal.wrapper.classList.toggle('full-screen');
+            d.query('.icon-fullscreen').classList.toggle('icon-zuidahua');
+            d.query('.icon-fullscreen').classList.toggle('icon-chuangkouhua');
+        };
+        let mouseWheelHandler = (e) => {
+
+        };
 
         return {
             on: () => {
                 d.on(d.query('#design-canvas'), 'click', 'svg', clickSVG);
+                d.on(window, 'resize', resizeHandler);
+                d.on(d.query('#design-canvas'), 'mousewheel', mouseWheelHandler);
+                d.on(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
             },
             off: () => {
                 d.off(d.query('#design-canvas'), 'click', 'svg', clickSVG);
+                d.off(window, 'resize', resizeHandler);
+                d.off(d.query('#design-canvas'), 'mousewheel', mouseWheelHandler);
+                d.off(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
             },
         }
     })();

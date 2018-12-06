@@ -390,11 +390,12 @@ export = class MainPage {
             });
             spinner.show();
             G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
-                // console.log(response);
                 response = JSON.parse(response);
                 let menus = response.body && response.body.elements;
+                // console.log('in pc');
+                // console.log(menus);
                 menus && menus.forEach((menu) => {
-                    items.push({
+                    (menu.isPc === 1 || menu.isPc === 2) && items.push({
                         title: `<a href="javascript:void(0)">${menu.menuName}</a>`,
                         onClick: () => {
                             let addr = <R_ReqAddr>menu.menuPath;
