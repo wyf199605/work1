@@ -44,8 +44,8 @@ export class MbListItem extends Component {
         this._index = para.index;
         if (tools.isNotEmptyArray(para.btns)) {
             this.initBtn(para.btns);
-            this.initEvents.on();
         }
+        this.initEvents.on();
         this.isShowCheckBox = para.isCheckBox || false;
         tools.isMb && (this.isShowBtns = para.isCheckBox || false);
         this.render(para.data || {});
