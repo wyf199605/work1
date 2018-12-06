@@ -89,6 +89,8 @@ export class FlowEditor extends FormCom {
         this.initEvents.on();
         if (para.fields) {
             this.value = para.fields;
+            FlowEditor.EXIST_NAME.push(para.fields.name);
+            d.query('.attr-editor-wrapper[data-attr=name] input', this.wrapper).dataset.old = para.fields.name;
             let fields = para.fields;
             // 查看流程时获取的数据也要进行转换
             Object.keys(fields).forEach(key => {
@@ -292,7 +294,7 @@ export class FlowEditor extends FormCom {
         * */
         let fields = this.get();
         if (this.owner && this.owner['wrapper'] && !(this.owner instanceof FlowDesigner) &&
-            tools.isNotEmpty(this.show) && !show && this.show !== show) {
+                tools.isNotEmpty(this.show) && !show && this.show !== show) {
             this.owner['wrapper'].dataset.name = fields.name;
             let limitLength = 50,
                 limitDisplayName = fields.displayName.length > limitLength ? fields.displayName.slice(0, limitLength) + '...' : fields.displayName;
@@ -350,7 +352,7 @@ export class FlowEditor extends FormCom {
         this.initEvents.off();
         FlowEditor.DROPDOWN_KEYVALUE['assignee'].forEach(valueText => valueText.vlaue = '');
         FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 &&
-        FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
+            FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
         FlowEditor.DropDowns.forEach(dropdown => {
             Object.keys(this.dropdowns).forEach(attr => {
                 d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
