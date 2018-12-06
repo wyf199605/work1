@@ -176,7 +176,12 @@ export class Tips extends Component {
                             dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value;
                         }else{
                             // 如果没有选择，则用原来的值
-                            dropdownField[attr] = item.flowEditor.value[attr];
+                            if(attr === 'assignee'){
+                                dropdownField[attr] = item.flowEditor.value[attr];
+                            }else {
+                                let valueText = FlowEditor.DROPDOWN_KEYVALUE[attr].filter(valueText => valueText.text === item.flowEditor.value[attr])[0];
+                                dropdownField[attr] = valueText && valueText.value;
+                            }
                         }
                     });
                     // Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 &&

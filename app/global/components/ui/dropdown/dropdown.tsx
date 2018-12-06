@@ -297,7 +297,7 @@ export class DropDown {
 
     public hideList() {
         this.spinner && this.spinner.hide();
-        this.ulDom.classList.remove('show');
+        this.ulDom && this.ulDom.classList.contains('show') && this.ulDom.classList.remove('show');
         this.isVisible = false;
     }
 
