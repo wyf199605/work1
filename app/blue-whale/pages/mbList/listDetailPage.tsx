@@ -6,6 +6,5 @@ export class ListDetailPage extends BasicPage {
     constructor(private para: EditPagePara) {
         super(para);
         new ListItemDetail(para);
-
     }
 }
