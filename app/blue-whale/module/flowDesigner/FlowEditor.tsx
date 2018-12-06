@@ -66,8 +66,8 @@ export class FlowEditor extends FormCom {
         taskType: [{value: 'Major', text: '主办任务'}, {value: 'Aidant', text: '协办任务'}],
         assignee: [
             {value: '', text: '用户', address: CONF.ajaxUrl.useAddressList_user},
-            {value: '_group', text: '用户组', address: CONF.ajaxUrl.useAddressList_userGroup},
-            {value: '#', text: '脚本配置', address: CONF.ajaxUrl.useAddressList_scriptSetting},
+            {value: '', text: '用户组', address: CONF.ajaxUrl.useAddressList_userGroup},
+            {value: '', text: '脚本配置', address: CONF.ajaxUrl.useAddressList_scriptSetting},
         ]
     };
 
@@ -88,12 +88,17 @@ export class FlowEditor extends FormCom {
         this.initFlowEditor(para);
         this.initEvents.on();
         if (para.fields) {
+            this.value = para.fields;
             let fields = para.fields;
             // 查看流程时获取的数据也要进行转换
             Object.keys(fields).forEach(key => {
                 if (key in FlowEditor.DROPDOWN_KEYVALUE) {
-                    let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
-                    valueText && (fields[key] = valueText.value);
+                    if(key === 'assignee'){
+                        fields[key] = para.fields[key];
+                    }else{
+                        let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
+                        valueText && (fields[key] = valueText.text);
+                    }
                 }
             });
             this.set(fields);
@@ -137,6 +142,7 @@ export class FlowEditor extends FormCom {
                                     new ContactsModule({
                                         field: field,
                                         onGetData: (datas) => {
+                                            FlowEditor.DROPDOWN_KEYVALUE[attr].forEach((valueText, current) => current !== index && (valueText.value = ''));
                                             let userName = [],
                                                 userId = [],
                                                 groupId = '',
@@ -149,7 +155,6 @@ export class FlowEditor extends FormCom {
                                             });
                                             index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
                                             this.set({[attr]: userName.join(',') || groupId || assignId});
-                                            return;
                                         }
                                     });
                                 }).catch(err => {
@@ -232,7 +237,7 @@ export class FlowEditor extends FormCom {
         // let tipBody = d.query('.tip-body', this.wrapper);
         return {
             on: () => {
-                d.on(this.wrapper, 'click', clickHandler);
+                d.on(d.query('.tip-body', this.wrapper), 'click', clickHandler);
                 d.on(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
                 Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
                     // 所有下拉按钮的点击事件
@@ -244,7 +249,7 @@ export class FlowEditor extends FormCom {
                 });
             },
             off: () => {
-                d.off(this.wrapper, 'click', clickHandler);
+                d.off(d.query('.tip-body', this.wrapper), 'click', clickHandler);
                 d.off(d.query('.attr-editor-wrapper[data-attr=name]', this.wrapper), 'change', changeHandler);
                 Object.keys(FlowEditor.DROPDOWN_KEYVALUE).forEach(attr => {
                     d.off(
@@ -334,16 +339,16 @@ export class FlowEditor extends FormCom {
 
     public _value: IFieldPara;
     get value() {
-        this._value = this.get();
         return this._value;
     }
 
     set value(value: IFieldPara) {
-        this.set(value);
+        this._value = value;
     }
 
     destroy() {
         this.initEvents.off();
+        FlowEditor.DROPDOWN_KEYVALUE['assignee'].forEach(valueText => valueText.vlaue = '');
         FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 &&
         FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
         FlowEditor.DropDowns.forEach(dropdown => {

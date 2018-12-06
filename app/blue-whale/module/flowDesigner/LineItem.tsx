@@ -61,7 +61,7 @@ export class LineItem extends Component {
         let line = FlowDesigner.PAPER.connection(this.from, this.to);
         FlowDesigner.connections = arr.concat([line]);
         line && (this.line = line.line);
-        this.wrapper.innerText = '';
+        this.wrapper.innerText = para.fields.displayName || '';
         this.setTextWrapperPosition();
         this.isComplete && this.line.attr({stroke: '#31ccff'});
         let _this = this;

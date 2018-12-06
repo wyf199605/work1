@@ -39,9 +39,9 @@ namespace BW {
             processAuditList: `flowui/flow/n_flow-1/insert?page=processAuditList`,
             processSeekList: `flowui/flow/n_flow-1/insert?page=processSeekList`,
             myApplication: `commonui/pageroute?page=myApplication`,
-            myApplicationPC: `ui/menu/n3008_data-3008?p_n=n3008_data-3008&page=myApplication`,
+            myApplicationPC: `ui/menu/n3008_data-3008?page=myApplication`,
             myApproval: `commonui/pageroute?page=myApproval`,
-            myApprovalPC: `ui/menu/n3009_data-3009?p_n=n3009_data-3009&page=myApplication`,
+            myApprovalPC: `ui/menu/n3009_data-3009?page=myApplication`,
             flowDetail: `commonui/pageroute?page=flowDetail`,
 
             /*-- url带有newPage，不走btl模板MsgListPage为页面名称 --*/

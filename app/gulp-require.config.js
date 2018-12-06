@@ -2,6 +2,18 @@
 let fs = require('fs'),
     Path = require('path');
 
+// 递归创建目录 同步方法
+function mkdirsSync(dirname) {
+    if (fs.existsSync(dirname)) {
+        return true;
+    } else {
+        if (mkdirsSync(Path.dirname(dirname))) {
+            fs.mkdirSync(dirname);
+            return true;
+        }
+    }
+}
+
 module.exports = function(request, rConfig){
     let root = rConfig.path.root;
     let path = root + rConfig.requireConfig.filename;
@@ -9,6 +21,7 @@ module.exports = function(request, rConfig){
 
     // TODO 若文件夹都不存在，会报错？
     if (!fs.existsSync(path)) {
+        mkdirsSync(path);
         fs.writeFileSync(path, configContent);
     }
     let pathContent = fs.readFileSync(path);

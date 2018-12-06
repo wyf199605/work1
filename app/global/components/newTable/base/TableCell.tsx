@@ -611,7 +611,7 @@ export class TableFooterCell extends TableCell{
     get selectEl (){
         if(this._selectEl === null){
             this._selectEl = <select className="form-control"></select>;
-            this._selectEl.add(<option value="all">无</option>, null);
+            this._selectEl.add(<option value="all">--</option>, null);
         }
         return this._selectEl
     }

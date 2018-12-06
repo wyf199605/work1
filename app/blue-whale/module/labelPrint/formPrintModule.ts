@@ -13,6 +13,7 @@ import {SelectInput} from "../../../global/components/form/selectInput/selectInp
 import {TextInput} from "../../../global/components/form/text/text";
 import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {NumInput} from "../../../global/components/form/numInput/numInput";
+import {BwRule} from "../../common/rule/BwRule";
 import Rule = G.Rule;
 
 interface FormPrintModulePara{

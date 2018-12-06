@@ -113,7 +113,7 @@ export default class BasicPage{
 
     private initGesture(para){
         let gestureIcon = d.create('<i class="iconfont icon-gesture blue-gesture"></i>');
-        let sty = "position:fixed; right:40px; bottom : 40px; z-index:900; font-size:40px; color:rgb(0,122,255);";
+        let sty = "position:fixed; right:40px; bottom : 85px; z-index:900; font-size:40px; color:rgb(0,122,255);";
         gestureIcon.setAttribute('style',sty);
         d.on(gestureIcon,'click',()=>{
             let gesture = {

@@ -5,6 +5,7 @@ import d = G.d;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {BwRule} from "../../common/rule/BwRule";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 
 export class BwMainTableModule extends BwTableModule{
 
@@ -23,7 +24,6 @@ export class BwMainTableModule extends BwTableModule{
             }
         }
     }
-
 
     protected tdClickHandler(field: R_Field, rowData: obj)  {
         super.tdClickHandler(field, rowData);
