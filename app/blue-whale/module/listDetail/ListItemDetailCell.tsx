@@ -25,6 +25,7 @@ interface IDetailCell extends IComponentPara {
     caption?: string;
     value?: string | string[];
     field?: R_Field;
+    className?: string;
 }
 
 export class ListItemDetailCell extends Component {
@@ -48,21 +49,21 @@ export class ListItemDetailCell extends Component {
             case 'date':
             case 'datetime':
             case 'text': {
-                wrapper = <div className="detail-cell">
+                wrapper = <div className={"detail-cell " + para.className || ''}>
                     <div c-var="title" className="detail-cell-title">{para.caption}</div>
                     <div c-var="content" className="detail-cell-content"/>
                 </div>;
             }
                 break;
             case 'img': {
-                wrapper = <div className="detail-cell-img-wrapper">
+                wrapper = <div className={"detail-cell-img-wrapper " + para.className || ''}>
                     <div c-var="title" className="detail-cell-imgs-title">{para.caption}</div>
                     <div c-var="imgs" className="detail-cell-imgs"/>
                 </div>;
             }
                 break;
             case 'textarea': {
-                wrapper = <div className="detail-cell-textarea-wrapper">
+                wrapper = <div className={"detail-cell-textarea-wrapper " + para.className || ''}>
                     <div c-var="title" className="detail-cell-imgs-title">{para.caption || '图片'}</div>
                     <div className="detail-cell-mutil-content">
                         <div c-var="content" className="detail-cell-textarea"/>
@@ -71,7 +72,7 @@ export class ListItemDetailCell extends Component {
             }
                 break;
             case 'file': {
-                wrapper = <div className="detail-cell-file-wrapper">
+                wrapper = <div className={"detail-cell-file-wrapper " + para.className || ''}>
                     <div c-var="title" className="detail-cell-imgs-title">{para.caption || '附件'}</div>
                     <div c-var="files" className="detail-cell-files"/>
                 </div>;

@@ -4,3 +4,16 @@
   overflow: hidden;
   background-color: #f8f8f8;
 }
+
+.fl-pc {
+  .mb-list-page-pc {
+    width: 100%;
+    height: calc(100% - 23px);
+    overflow: hidden;
+    background-color: #ffffff;
+    padding: 5px 20px 20px 30px;
+    .mb-list-module .mblist-page-mblist-wrapper .paging-wrapper {
+      margin-top: 20px;
+    }
+  }
+}

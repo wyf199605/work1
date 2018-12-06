@@ -35,20 +35,74 @@ export class ListItemDetail {
 
     // 初始化详情DOM
     initDetailTpl(fields: R_Field[]) {
+        let groupInfo = this.para.fm.groupInfo || [];
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
-        fields.forEach(field => {
+        if (tools.isMb || tools.isEmpty(groupInfo)) {
+            if (!tools.isMb){
+                cellsWrapper.classList.add('no-group');
+            }
+            fields.forEach(field => {
+                if (!field.noShow) {
+                    this.cells[field.name] = new ListItemDetailCell({
+                        caption: field.caption,
+                        type: this.getType(field.dataType || field.atrrs.dataType || ''),
+                        container: cellsWrapper,
+                        detailPage: this,
+                        field: field
+                    });
+                }
+            });
+        } else {
+            let fieldsArr = [...fields];
+            groupInfo.forEach(group => {
+                fieldsArr = this.initPCGroupTpl(group, fieldsArr, cellsWrapper);
+            });
+        }
+    }
+
+    static COLUMN_CLASS_ARR = ['one-column', 'two-column', 'three-column'];
+
+    private initPCGroupTpl(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): R_Field[] {
+        if (tools.isEmpty(groupInfo.cloNames)) {
+            return fields;
+        }
+        let groupsArr = groupInfo.cloNames.split(','),
+            groupFields: R_Field[] = [],
+            fieldsArr = [...fields];
+        groupsArr.forEach(field => {
+            let gFields = fieldsArr.filter(f => f.name === field);
+            if (tools.isNotEmptyArray(gFields)) {
+                groupFields.push(gFields[0]);
+                let index = fieldsArr.indexOf(gFields[0]);
+                fieldsArr.splice(index, 1);
+            }
+        });
+        let cellsWrapper, groupWrapper = <div className="group-wrapper">
+            <div className="group-title">{groupInfo.groupName}</div>
+            {cellsWrapper = <div className="group-cells-wrapper"/>}
+        </div>;
+        wrapper.appendChild(groupWrapper);
+        groupFields.forEach(field => {
+            let className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber)-1],
+                type = this.getType(field.dataType || field.atrrs.dataType || '');
+            if (~['textarea', 'file', 'img'].indexOf(type)) {
+                className = 'one-column';
+            }
             if (!field.noShow) {
                 this.cells[field.name] = new ListItemDetailCell({
                     caption: field.caption,
-                    type: this.getType(field.dataType || field.atrrs.dataType || ''),
+                    type: type,
                     container: cellsWrapper,
                     detailPage: this,
-                    field: field
+                    field: field,
+                    className: className
                 });
             }
         });
+        return fieldsArr;
     }
+
     // 初始化详情数据
     initDetailData(): Promise<obj> {
         let fields: R_Field[] = this.para.fm.fields;
@@ -58,10 +112,10 @@ export class ListItemDetail {
                 let url = tools.url.addObj(this.ajaxUrl, {
                     pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
                 });
-                BwRule.Ajax.fetch(url,{
-                    loading:{
-                        msg:'数据加载中...',
-                        disableEl:this.wrapper
+                BwRule.Ajax.fetch(url, {
+                    loading: {
+                        msg: '数据加载中...',
+                        disableEl: this.wrapper
                     }
                 }).then(({response}) => {
                     if (tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)) {
@@ -167,9 +221,10 @@ export class ListItemDetail {
                 })
             })
         }
+
         if (tools.isNotEmpty(buttons)) {
             let btnWrapper = <div className="list-item-detail-buttons"/>;
-            d.before(d.query('.list-detail-cells-wrapper',this.wrapper),btnWrapper);
+            d.before(d.query('.list-detail-cells-wrapper', this.wrapper), btnWrapper);
             if (this.para.uiType === 'detail') {
                 if (tools.isMb) {
                     createMoreBtn(buttons, btnWrapper, true);
@@ -215,7 +270,7 @@ export class ListItemDetail {
                     }
                 } else {
                     // PC 按钮
-                    if(tools.isNotEmpty(buttons)){
+                    if (tools.isNotEmpty(buttons)) {
                         let pcBtnWrapper = <div className="item-buttons"/>;
                         btnWrapper.appendChild(pcBtnWrapper);
                         createPcButtons(buttons, pcBtnWrapper);
@@ -248,7 +303,7 @@ export class ListItemDetail {
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: btn.subType === 'update_save' ? self.defaultData : {},
                         isAdd: isAdd,
-                        isPC:!tools.isMb,
+                        isPC: !tools.isMb,
                         confirm(data) {
                             return new Promise((resolve, reject) => {
                                 ButtonAction.get().clickHandle(btn, data, () => {

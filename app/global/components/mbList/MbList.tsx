@@ -8,6 +8,7 @@ import tools = G.tools;
 import {DataManager, IDataManagerAjaxStatus} from "../DataManager/DataManager";
 import {CheckBox} from "../form/checkbox/checkBox";
 import {ActionSheet} from "../ui/actionSheet/actionSheet";
+import {ButtonBox} from "./ButtonBox";
 
 export interface IMbListPara extends IComponentPara {
     data?: MbListItemData[];
@@ -16,9 +17,8 @@ export interface IMbListPara extends IComponentPara {
     itemButtons?: string[];
     multiButtons?: string[];
     buttonsClick?: (btnIndex: number, itemIndex: number) => void;
-    multiClick?: (btnIndex:number,itemsIndexes:number[]) => void;
+    multiClick?: (btnIndex: number, itemsIndexes: number[]) => void;
     itemClick?: (index: number) => void;
-    // statusColor?: string;
     dataManager?: {
         pageSize?: number;
         render: (start: number, length: number, data: obj[], isRefresh: boolean) => void;
@@ -37,7 +37,10 @@ export class MbList extends Component {
         super(para);
         this._isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
         // 批量选择按钮
-        para.isMulti && this.createMultiIcon();
+        if (para.isMulti){
+            tools.isMb && this.createMultiIcon();
+            !tools.isMb && (this.multiple = para.isMulti);
+        }
         // 创建底部批量按钮
         tools.isNotEmpty(para.multiButtons) && this.createMultiButtons(para.multiButtons);
         this.render(para.data || []);
@@ -97,20 +100,20 @@ export class MbList extends Component {
         let moreBtnClick = (e) => {
             this.multiActionSheet.isShow = true;
         };
-        let multiBtnClick = (e)=>{
-            let index = parseInt(d.closest(e.target,'.multi-button').dataset.index);
-            tools.isFunction(this.para.multiClick) && this.para.multiClick(index,this.getSelectIndexes());
+        let multiBtnClick = (e) => {
+            let index = parseInt(d.closest(e.target, '.multi-button').dataset.index);
+            tools.isFunction(this.para.multiClick) && this.para.multiClick(index, this.getSelectIndexes());
         };
         return {
             on: () => {
-                d.on(this.multiButtonsWrapper,'click','.list-buttons .more-btn',moreBtnClick);
-                d.on(this.multiButtonsWrapper,'click','.list-buttons .multi-button',multiBtnClick);
-                d.on(this.multiIcon, 'click', multiEvent);
+                d.on(this.multiButtonsWrapper, 'click', '.list-buttons .more-btn', moreBtnClick);
+                tools.isMb && d.on(this.multiButtonsWrapper, 'click', '.list-buttons .multi-button', multiBtnClick);
+                tools.isMb && d.on(this.multiIcon, 'click', multiEvent);
             },
             off: () => {
-                d.off(this.multiButtonsWrapper,'click','.list-buttons .more-btn',moreBtnClick);
-                d.off(this.multiButtonsWrapper,'click','.list-buttons .multi-button',multiBtnClick);
-                d.off(this.multiIcon, 'click', multiEvent);
+                d.off(this.multiButtonsWrapper, 'click', '.list-buttons .more-btn', moreBtnClick);
+                tools.isMb && d.off(this.multiButtonsWrapper, 'click', '.list-buttons .multi-button', multiBtnClick);
+                tools.isMb && d.off(this.multiIcon, 'click', multiEvent);
             }
         }
     })();
@@ -127,7 +130,7 @@ export class MbList extends Component {
         } else {
             this.checkBox && (this.checkBox.checked = false);
         }
-        this.calcCount();
+        tools.isMb && this.calcCount();
     }
 
     private multiButtonsWrapper: HTMLElement;
@@ -135,55 +138,86 @@ export class MbList extends Component {
 
     // 创建多选按钮
     protected createMultiButtons(multiButtons: string[]) {
-        let buttonsWrapper: HTMLElement;
-        this.multiButtonsWrapper = <div className="list-batch-wrapper hide">
-            {this.statisticWrapper = <div className="statistic">
+        if(tools.isMb){
+            let buttonsWrapper: HTMLElement;
+            this.multiButtonsWrapper = <div className="list-batch-wrapper hide">
+                {this.statisticWrapper = <div className="statistic">
+                    <div className="select-all">{this.checkBox = <CheckBox text="全选" onClick={(isChecked) => {
+                        let count = isChecked ? this.listItems.length : 0;
+                        this.countWrapper.innerText = count.toString();
+                        this._listItems.forEach(item => {
+                            item.selected = isChecked;
+                        })
+                    }
+                    }/>}</div>
+                    <span className="count-wrapper">共选择{this.countWrapper = <span>0</span>}条数据</span></div>}
+                {buttonsWrapper = <div className="list-buttons"/>}
+            </div>;
+            this.wrapper.appendChild(this.multiButtonsWrapper);
+            let buttonHtml = [];
+            if (tools.isNotEmptyArray(multiButtons)) {
+                if (multiButtons.length <= 2) {
+                    multiButtons.forEach((item, index) => {
+                        buttonHtml.push(`<div class="item-button multi-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
+                    });
+                } else {
+                    let moreButtons = multiButtons.slice(2),
+                        showButtons = multiButtons.slice(0, 2);
+                    buttonHtml.push(`<div class="more-btn">更多</div>`);
+                    showButtons.forEach((item, index) => {
+                        buttonHtml.push(`<div class="item-button multi-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
+                    });
+                    let buttons = [];
+                    moreButtons.forEach((btn, index) => {
+                        buttons.push({
+                            content: btn,
+                            icon: '',
+                            onClick: () => {
+                                tools.isFunction(this.para.multiClick) && this.para.multiClick(index + 2, this.getSelectIndexes());
+                            }
+                        })
+                    });
+                    this.multiActionSheet = new ActionSheet({
+                        buttons: buttons
+                    })
+                }
+                buttonsWrapper.innerHTML = buttonHtml.join('');
+            } else {
+                buttonsWrapper.classList.add('hide');
+            }
+        }else{
+            this.multiButtonsWrapper = <div className="list-batch-wrapper">
                 <div className="select-all">{this.checkBox = <CheckBox text="全选" onClick={(isChecked) => {
                     let count = isChecked ? this.listItems.length : 0;
-                    this.countWrapper.innerText = count.toString();
                     this._listItems.forEach(item => {
                         item.selected = isChecked;
                     })
                 }
                 }/>}</div>
-                <span className="count-wrapper">共选择{this.countWrapper = <span>0</span>}条数据</span></div>}
-            {buttonsWrapper = <div className="list-buttons"></div>}
-        </div>;
-        this.wrapper.appendChild(this.multiButtonsWrapper);
-        let buttonHtml = [];
-        if (tools.isNotEmptyArray(multiButtons)) {
-            if (multiButtons.length <= 2) {
-                multiButtons.forEach((item, index) => {
-                    buttonHtml.push(`<div class="item-button multi-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
-                });
-            } else {
-                let moreButtons = multiButtons.slice(2),
-                    showButtons = multiButtons.slice(0, 2);
-                buttonHtml.push(`<div class="more-btn">更多</div>`);
-                showButtons.forEach((item, index) => {
-                    buttonHtml.push(`<div class="item-button multi-button ${index === 1 ? 'first' : ''}" data-index="${index}">${item}</div>`);
-                });
+            </div>;
+            this.wrapper.appendChild(this.multiButtonsWrapper);
+            let buttonHtml = [];
+            if (tools.isNotEmptyArray(multiButtons)) {
                 let buttons = [];
-                moreButtons.forEach((btn, index) => {
-                    buttons.push({
-                        content: btn,
-                        icon: '',
-                        onClick: () => {
-                            tools.isFunction(this.para.multiClick) && this.para.multiClick(index + 2,this.getSelectIndexes());
-                        }
-                    })
+                multiButtons.forEach((item, index) => {
+                   buttons.push({
+                       content:item,
+                       onClick:()=>{
+                           tools.isFunction(this.para.multiClick) && this.para.multiClick(index,this.getSelectIndexes());
+                       }
+                   })
                 });
-                this.multiActionSheet = new ActionSheet({
-                    buttons: buttons
-                })
+                new ButtonBox({
+                    children:buttons,
+                    container:this.multiButtonsWrapper,
+                    limitCount:5
+                });
+                this.wrapper.classList.add('padding-bottom');
             }
-            buttonsWrapper.innerHTML = buttonHtml.join('');
-        } else {
-            buttonsWrapper.classList.add('hide');
         }
     }
 
-    private getSelectIndexes(){
+    private getSelectIndexes() {
         let items = this.listItems || [],
             indexes = [];
         items.forEach(item => {
@@ -191,6 +225,7 @@ export class MbList extends Component {
         });
         return indexes;
     }
+
     private calcCount() {
         let count = this.listItems.filter(item => item.selected).length;
         this.countWrapper.innerText = count.toString();
@@ -200,9 +235,10 @@ export class MbList extends Component {
         let page = this.para.dataManager,
             dataManager = new DataManager({
                 page: {
-                    size: page.pageSize || 10,
+                    size: page.pageSize,
                     container: this.wrapper.parentElement,
-                    isPulldownRefresh: page.isPulldownRefresh || false
+                    isPulldownRefresh: page.isPulldownRefresh || false,
+                    options: [10, 20, 50]
                 },
                 render: (start, length, isRefresh) => {
                     typeof page.render === 'function' && page.render(start, length, dataManager.data, isRefresh);
@@ -266,7 +302,7 @@ export class MbList extends Component {
             this._multiple = flag;
             this._listItems.forEach((item, index) => {
                 item.isShowCheckBox = flag;
-                item.isShowBtns = flag;
+                tools.isMb && (item.isShowBtns = flag);
             });
         }
     }
@@ -286,7 +322,7 @@ export class MbList extends Component {
             buttonClick: (btnIndex, itemIndex) => {
                 tools.isFunction(this.para.buttonsClick) && this.para.buttonsClick(btnIndex, itemIndex);
             },
-            itemClick:(index) => {
+            itemClick: (index) => {
                 tools.isFunction(this.para.itemClick) && this.para.itemClick(index);
             }
             // statusColor: this.para.statusColor
