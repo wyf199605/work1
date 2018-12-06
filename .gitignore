@@ -7,3 +7,5 @@ app/package-lock.json
 /dist/
 /dist.min/
 .gitignore
+dist.min.zip
+dist.zip
