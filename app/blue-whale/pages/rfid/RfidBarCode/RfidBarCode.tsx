@@ -734,7 +734,12 @@ export class RfidBarCode extends Component {
                             value:'条码' + this.domHash['barcode'].innerText,
                             text: '条码' + this.domHash['barcode'].innerText
                         }]
+                        let tempCateGory = this.domHash['categoryVal'].innerText;
                         let stepStatus = this.stepStatus;
+                        if(tools.isEmpty(tempCateGory)){
+                            stepStatus = true;
+                        }
+
                         let deModel = new Modal({
                             isMb: false,
                             position: "center",
@@ -957,9 +962,9 @@ export class RfidBarCode extends Component {
     private stepArry = [];
 
     private downData(para) {
-        let loading = new Loading({
-            msg: "加载中"
-        })
+        // let loading = new Loading({
+        //     msg: "加载中"
+        // })
         let where = {};
         this.params = {
             optionStype: 0,
@@ -969,9 +974,8 @@ export class RfidBarCode extends Component {
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
             //alert(JSON.stringify(res) + '下载')
+            Modal.alert(res.msg);
             if(res.success){
-                loading.destroy();
-                Modal.alert('下载成功')
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
                 this.uid = pageName.uid;
