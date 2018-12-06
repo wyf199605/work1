@@ -2,9 +2,14 @@ $normal-font-size: 14px;
 $option-font-size: 13px;
 $icon-font-size: 18px;
 .new-query-modal {
+  &.modal-mobile .modal-header .close{
+    font-size: 30px;
+  }
+
   .modal-body {
     height: calc(100% - 100px);
     padding: 0px;
+    background-color: #f2f2f2;
   }
   .foot-wrapper > .modal-footer {
     display: flex;
@@ -44,33 +49,13 @@ $icon-font-size: 18px;
       }
     }
   }
-  .new-query-modal-body {
+  .new-query-wrapper {
+    padding: 0 16px;
     width: 100%;
+    background-color: #ffffff;
     min-height: 100%;
-    background-color: #f2f2f2;
-    .new-query-wrapper {
-      padding: 0 16px;
-      width: 100%;
-      background-color: #ffffff;
-      .new-query-item:last-child {
-        border-bottom: none;
-      }
-    }
-    .new-query-wxtra-wrapper {
-      height: 54px;
-      display: flex;
-      display: -webkit-flex;
-      align-items: center;
-      justify-content: flex-end;
-      width: 100%;
-      padding: 0 16px;
-      button.btn.advance-search {
-        font-size: $normal-font-size;
-        color: #005bac;
-        border: none;
-        background-color: transparent;
-        padding: 0;
-      }
+    .new-query-item:last-child {
+      border-bottom: none;
     }
   }
 }
@@ -143,29 +128,26 @@ $icon-font-size: 18px;
       height: 14px;
       bottom: 0;
       right: 0;
-      border-top: 7px solid transparent;
-      border-bottom: 7px solid #005bac;
-      border-left: 10px solid transparent;
-      border-right: 10px solid #005bac;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid #005bac;
+      border-left: 11px solid transparent;
+      border-right: 11px solid #005bac;
       border-bottom-right-radius: 5px;
     }
-    &:after {
-      position: absolute;
-      content: '\2714';
-      width: 20px;
-      height: 14px;
-      bottom: 0;
-      right: 0;
-      display: flex;
-      justify-content: flex-end;
-      font-size: 10px;
-      color: #ffffff;
-      padding-right: 2px;
-      padding-top: 2px;
-      text-align: right;
-      line-height: normal;
-      border-bottom-right-radius: 5px;
-    }
+  }
+  i.appcommon.app-gou{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 22px;
+    height: 16px;
+    color: #ffffff;
+    display: flex;
+    justify-content: flex-end;
+    border-bottom-right-radius: 5px;
+    padding-right: 2px;
+    font-size: 4px;
+    padding-top: 1px;
   }
 }
 

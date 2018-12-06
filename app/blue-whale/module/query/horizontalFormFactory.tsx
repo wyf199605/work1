@@ -53,7 +53,6 @@ export class HorizontalQueryModule extends Component {
                 this.modal = new QueryModal({
                     body: this.wrapper,
                     onClear: () => {
-                        debugger;
                         for(let item of Object.values(this.forms || {})){
                             item.set('');
                             let itemWrap =   (d.query('input', item.wrapper) as HTMLInputElement);

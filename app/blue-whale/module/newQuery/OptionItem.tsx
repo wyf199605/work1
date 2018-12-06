@@ -6,11 +6,11 @@ export interface IOptionItem extends IFormComPara {
     optionData?: string[];
     itemClick?: (data: string[]) => void;
     interval?: number;
-    index?:number;
+    index?: number;
 }
 
 export class OptionItem extends FormCom {
-    get() : string[]{
+    get(): string[] {
         let val;
         switch (this.para.interval) {
             case 0:
@@ -34,12 +34,12 @@ export class OptionItem extends FormCom {
             case 0:
             case 1:
             case 2: {
-                this.wrapper.innerText = `${val[0]}~${val[1]}`;
+                this.textWrapper.innerText = `${val[0]}~${val[1]}`;
             }
                 break;
             case 3:
             case 4: {
-                this.wrapper.innerText = val[1] || val[0];
+                this.textWrapper.innerText = val[1] || val[0];
             }
                 break;
         }
@@ -53,8 +53,14 @@ export class OptionItem extends FormCom {
         return this.get();
     }
 
+    private gouIcon: HTMLElement;
+    private textWrapper: HTMLElement;
+
     protected wrapperInit(para: IOptionItem): HTMLElement {
-        return <div className="new-query-option-item"/>;
+        return <div className="new-query-option-item">
+            {this.textWrapper = <span/>}
+            {this.gouIcon = <i className="appcommon app-gou hide"/>}
+        </div>;
     }
 
     constructor(private para: IOptionItem) {
@@ -62,14 +68,17 @@ export class OptionItem extends FormCom {
         this.value = para.optionData || [];
     }
 
-    private _active:boolean;
-    set active(active:boolean){
+    private _active: boolean;
+    set active(active: boolean) {
         this._active = active;
-        this.wrapper.classList.toggle('active',this._active);
+        this.wrapper.classList.toggle('active', this._active);
+        this.gouIcon.classList.toggle('hide', !this._active);
     }
-    get active(){
+
+    get active() {
         return this._active;
     }
+
     // 获取当前索引
     protected _index: number;
     get index() {

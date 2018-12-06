@@ -1,4 +1,4 @@
-/// <amd-module name="NewQueryModal"/>
+/// <amd-module name="NewQueryModalMb"/>
 
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {IQueryItem, IResult, NewQueryItem} from "./NewQueryItem";
@@ -12,16 +12,14 @@ interface INewQueryPara {
     advanceSearch?:QueryModulePara;
 }
 
-export class NewQueryModal {
+export class NewQueryModalMb {
 
     private queryWrapper: HTMLElement = <div className="new-query-wrapper"/>;
-    private extraWrapper: HTMLElement = <div className="new-query-wxtra-wrapper"/>;
     private modal: Modal;
 
     constructor(private para: INewQueryPara) {
         this.initModal();
         this.initItems(para.queryItems);
-        this.initExtraContent();
     }
 
     /**
@@ -44,14 +42,31 @@ export class NewQueryModal {
      * @date 2018/12/5
      * @Description: 初始化查询Modal
      */
+    static QUERY_MODULE_NAME = 'QueryModuleMb';
     private initModal() {
         this.modal = new Modal({
-            header: '搜索',
+            header: {
+                title:'搜索',
+                rightPanel:new Button({
+                    content: '高级搜索',
+                    className: 'advance-search',
+                    onClick: () => {
+                        Modal.alert('暂不支持高级搜索!');
+                        let advanceSearch = this.para.advanceSearch;
+                        if (tools.isNotEmpty(advanceSearch)){
+                            require([NewQueryModalMb.QUERY_MODULE_NAME],(Query) => {
+                                let query:QueryModule = new Query(advanceSearch);
+                                query.show();
+                            })
+                        }
+                    },
+                }).wrapper
+            },
             isMb: tools.isMb,
             className: 'new-query-modal',
             isModal: tools.isMb,
             isOnceDestroy: false,
-            body: <div className="new-query-modal-body">{this.queryWrapper}{this.extraWrapper}</div>,
+            body: this.queryWrapper,
             footer: {
                 rightPanel: [
                     {
@@ -98,29 +113,6 @@ export class NewQueryModal {
             this._items.push(new NewQueryItem(Object.assign({}, item, {
                 container: this.queryWrapper
             })));
-        })
-    }
-
-    /**
-     * @author WUML
-     * @date 2018/12/5
-     * @Description: 额外内容(高级搜索)
-     */
-    static QUERY_MODULE_NAME = 'QueryModuleMb';
-    private initExtraContent() {
-        new Button({
-            content: '高级搜索',
-            className: 'advance-search',
-            onClick: () => {
-                let advanceSearch = this.para.advanceSearch;
-                if (tools.isNotEmpty(advanceSearch)){
-                    require([NewQueryModal.QUERY_MODULE_NAME],(Query) => {
-                        let query:QueryModule = new Query(advanceSearch);
-                        query.show();
-                    })
-                }
-            },
-            container:this.extraWrapper
         })
     }
 

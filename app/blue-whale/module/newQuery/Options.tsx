@@ -111,7 +111,7 @@ export class Options extends FormCom {
 
     private initEvents = (() => {
         let toggleSelect = (e) => {
-            let index = parseInt(e.target.dataset.index);
+            let index = parseInt(d.closest(e.target,'.new-query-option-item').dataset.index);
             switch (this.para.interval) {
                 case 0:
                 case 1:

@@ -2,44 +2,10 @@
 
 import BasicPage from "../basicPage";
 import {ListItemDetail} from "../../module/listDetail/ListItemDetail";
-import {Button} from "../../../global/components/general/button/Button";
-import {NewQueryModal} from "../../module/newQuery/NewQueryModal";
-import {BwRule} from "../../common/rule/BwRule";
-import {RangeInput} from "../../module/newQuery/RangeInput";
-import {dateType} from "../../../global/components/form/datetime/datetime";
-import tools = G.tools;
 
 export class ListDetailPage extends BasicPage {
     constructor(private para: EditPagePara) {
         super(para);
-        // new ListItemDetail(para);
-
-        new Button({
-            content: '点我',
-            container: para.dom,
-            onClick: () => {
-                BwRule.Ajax.fetch(BW.CONF.ajaxUrl.queryTest).then(({response}) => {
-                    let dataStr: string = response.body.elements[0].querier.mobileSetting.settingValue;
-                    dataStr = dataStr.replace(/\s*/g, '').replace(/\\*/g, '');
-                    new NewQueryModal({
-                        queryItems: JSON.parse(dataStr),
-                        search: (data) => {
-                            let url = BW.CONF.siteUrl + '/app_sanfu_retail/null/list/node_nobugs?pageparams=%7B%22index%22%3D1%2C%22size%22%3D50%2C%22total%22%3D1%7D';
-                            url = tools.url.addObj(url,{
-                                mqueryparams:JSON.stringify(data)
-                            });
-                            BwRule.Ajax.fetch(url).then(({response})=>{
-                                console.log(response)
-                            })
-                        }
-                    })
-
-                });
-                // let data = JSON.parse("[{\"filedName\":\"NOBUGS_BD\",\"caption\":\"后端责任人\",\"interval\":3,\"optionValue\":[[\"黄金财\",\"HJC\"],[\"李志峰\",\"LZF\"],[\"王明权\",\"WMQ\"]]},{\"filedName\":\"CREATETIME\",\"caption\":\"创建时间\",\"interval\":2,\"optionValue\":[[\"2018-11-01\",\"2018-11-3023:59:59\"]]},{\"filedName\":\"NOBUGS_SORTED\",\"caption\":\"分类\",\"interval\":3,\"optionValue\":[[\"前端问题\"],[\"配置问题\"],[\"后台问题\"]]},{\"filedName\":\"NOBUGS_STATUS\",\"caption\":\"状态\",\"interval\":4,\"optionValue\":[[\"open\"],[\"confirm\"],[\"fixed\"],[\"reopen\"],[\"close\"],[\"pending\"],[\"和熊猫一样错误\"]]},{\"filedName\":\"NOBUGS_ID\",\"caption\":\"问题序号\",\"interval\":0,\"optionValue\":[[\"10100\",\"10110\"],[\"10100\",\"10110\"],[\"10100\",\"10110\"]]}]");
-                // new NewQueryModal({
-                //     queryItems: data
-                // })
-            }
-        })
+        new ListItemDetail(para);
     }
 }

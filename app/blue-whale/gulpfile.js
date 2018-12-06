@@ -263,7 +263,7 @@ gulp.task('js', function () {
 
     // 客户化查询器
     gulpTsModule([
-        'newQuery/NewQueryModal',
+        'newQuery/NewQueryModalMb',
         'newQuery/NewQueryItem',
         'newQuery/OptionItem',
         'newQuery/Options',
