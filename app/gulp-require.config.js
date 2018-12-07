@@ -19,7 +19,6 @@ module.exports = function(request, rConfig){
     let path = root + rConfig.requireConfig.filename;
     let configContent = fs.readFileSync('../required.config.js');
 
-    // TODO 若文件夹都不存在，会报错？
     if (!fs.existsSync(path)) {
         mkdirsSync(path);
         fs.writeFileSync(path, configContent);
