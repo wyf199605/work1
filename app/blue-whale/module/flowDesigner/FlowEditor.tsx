@@ -60,6 +60,13 @@ export class FlowEditor extends FormCom {
         performType: '参与类型',
     };
 
+    /*
+    *   数据转换有三个地方：
+    *       1. FlowEditor（当前）的constructor里，因为初始化时从后台获取的是value，而在flowEditor里显示的是text
+    *       2. （当前）FlowEditor.initFlowEditor()的dropdown.onSelect()里，要将下拉列表选择的数据回显到flowEditor中
+    *       3. Tips.tsx的saveFlowHandler，保存时要传给后台的是value，而在flowEditor中显示的是text
+    *       另： 对于使用通讯录的下拉列表（assignee），暂时是特殊处理的，因为如果在加载时要显示名称，必须获取所有的id-名称对（处理待定）
+    * */
     static DROPDOWN_KEYVALUE: ListItem = {
         // 新增下拉列表时在此处添加键值
         performType: [{value: 'ANY', text: '普通参与'}, {value: 'ALL', text: '会签参与'}],
@@ -144,7 +151,7 @@ export class FlowEditor extends FormCom {
                                     new ContactsModule({
                                         field: field,
                                         onGetData: (datas) => {
-                                            FlowEditor.DROPDOWN_KEYVALUE[attr].forEach((valueText, current) => current !== index && (valueText.value = ''));
+                                            FlowEditor.DROPDOWN_KEYVALUE[attr].forEach((valueText, current, arr) => current !== index && (arr[current].value = ''));
                                             let userName = [],
                                                 userId = [],
                                                 groupId = '',

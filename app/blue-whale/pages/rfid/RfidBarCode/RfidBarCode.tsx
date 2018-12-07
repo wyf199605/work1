@@ -739,7 +739,6 @@ export class RfidBarCode extends Component {
                         if(tools.isEmpty(tempCateGory)){
                             stepStatus = true;
                         }
-
                         let deModel = new Modal({
                             isMb: false,
                             position: "center",
@@ -790,6 +789,7 @@ export class RfidBarCode extends Component {
                                                 this.refreshCount(para);
                                                 d.query('.total-nums>span').innerText = res.data.scanNum;
                                                 Modal.alert('删除成功');
+                                                this.stepArry = [];
                                             }else {
                                                 Modal.alert('删除失败');
                                             }
