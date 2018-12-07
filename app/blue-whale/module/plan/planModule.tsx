@@ -396,7 +396,7 @@ export class PlanModule extends Component{
 
         if (field && field.atrrs) {
             let dataType = field.atrrs.dataType,
-                isImg = dataType === BwRule.DT_IMAGE;
+                isImg = dataType === BwRule.DT_IMAGE || dataType === BwRule.DT_SIGN;
 
             if(dataType === '77'){
                 if(DrawPoint.POINT_FIELD in rowData){

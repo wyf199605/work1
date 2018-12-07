@@ -14,7 +14,6 @@ import {Button, IButton} from "../../../global/components/general/button/Button"
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {FastTableCell} from "../../../global/components/newTable/FastTableCell";
 import {InventoryBtn, ontimeRefresh} from "./InventoryBtn";
-import UploadModule from "../uploadModule/uploadModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
 import {NewTableModule} from "./newTableModule";
@@ -28,6 +27,7 @@ import {FormCom} from "../../../global/components/form/basic";
 import {EditModule} from "../edit/editModule";
 import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import {BwUploader} from "../uploadModule/bwUploader";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -667,7 +667,7 @@ export class BwTableModule extends Component {
         // 点击显示图片， 判断是否存在缩略图
         let hasThumbnail = this.cols.some(col => {
             let dataType = col.atrrs && col.atrrs.dataType;
-            return !col.noShow && [BwRule.DT_IMAGE, BwRule.DT_MUL_IMAGE].includes(dataType);
+            return !col.noShow && [BwRule.DT_IMAGE, BwRule.DT_SIGN, BwRule.DT_MUL_IMAGE].includes(dataType);
         });
 
         let imgHandler = function (e: MouseEvent, isTd = true) {
@@ -1351,7 +1351,7 @@ export class BwTableModule extends Component {
             classes: string[] = [];         // 类名
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
-                isImg = dataType === BwRule.DT_IMAGE;
+                isImg = dataType === BwRule.DT_IMAGE ||dataType === BwRule.DT_SIGN;
 
             if (isImg && field.link) {
                 // 缩略图
@@ -1472,7 +1472,7 @@ export class BwTableModule extends Component {
                 upVarList: R_VarList[] = editParam && editParam[editParam.updateType] || [],
                 updatable = upVarList.some(v => fieldName === v.varName),
                 handler = null,
-                uploadModule: UploadModule;
+                uploadModule: BwUploader;
 
             if (md5str && typeof md5str === 'string') {
                 md5Arr = md5str.split(',');
@@ -1530,22 +1530,28 @@ export class BwTableModule extends Component {
                         });
                 }
             };
+            let dataType = field.dataType || field.atrrs.dataType,
+                isSign = dataType === BwRule.DT_SIGN;
             if (updatable) {
                 let imgContainer = <div className="table-img-uploader"/>;
                 d.append(btnWrapper, imgContainer);
-                uploadModule = new UploadModule({
+                uploadModule = new BwUploader({
+                    uploadType: isSign ? 'sign' : 'file',
                     nameField: fieldName,
                     // thumbField: thumbField,
+                    loading: {
+                        msg: '图片上传中...'
+                    },
                     container: imgContainer,
-                    text: '添加图片',
+                    text: isSign ? '获取签名' : '添加图片',
                     accept: {
                         title: '图片'
-                        , extensions: 'jpg,png,gif'
+                        , extensions: 'jpg,png,gif,jpeg'
                         , mimeTypes: 'image/*'
                     },
                     uploadUrl: CONF.ajaxUrl.fileUpload,
-                    showNameOnComplete: false,
-                    onComplete: (response, file) => {
+                    isChangeText: false,
+                    onSuccess: (response, file) => {
                         let data = response.data,
                             newMd5s = [];
 
@@ -1657,23 +1663,29 @@ export class BwTableModule extends Component {
             }
 
             let btnWrapper = d.query('.table-img-wrapper-btns', wrapper),
-                img = d.query('img', wrapper) as HTMLImageElement;
+                img = d.query('img', wrapper) as HTMLImageElement,
+                dataType = field.dataType || field.atrrs.dataType,
+                isSign = dataType === BwRule.DT_SIGN;
             if (updatable) {
                 let imgContainer = <div className="table-img-uploader"></div>;
                 d.append(btnWrapper, imgContainer);
-                new UploadModule({
+                new BwUploader({
+                    uploadType: isSign ? 'sign' : 'file',
                     nameField,
+                    loading: {
+                        msg: '图片上传中...'
+                    },
                     thumbField: thumbField,
                     container: imgContainer,
-                    text: '选择图片',
+                    text: isSign ? '签名' :'选择图片',
                     accept: {
                         title: '图片'
-                        , extensions: 'jpg,png,gif'
+                        , extensions: 'jpg,png,gif,jpeg'
                         , mimeTypes: 'image/*'
                     },
                     uploadUrl: CONF.ajaxUrl.fileUpload,
-                    showNameOnComplete: false,
-                    onComplete: (response, file) => {
+                    isChangeText: false,
+                    onSuccess: (response, file) => {
                         let data = response.data,
                             md5Data = {};
                         for (let fieldKey in data) {

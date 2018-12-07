@@ -8,10 +8,12 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {User} from "../../../global/entity/User";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
+import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
 
-
+type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
     // uploadUrl?: string;
+    uploadType?: uploadType; // 默认file，file普通上传，sign获取签名图片上传，edit编辑完图片上传
     isChangeText?: boolean; // 默认false
     text?: string;
     nameField: string;
@@ -22,6 +24,7 @@ export interface IBwUploaderPara extends IFormComPara {
     multi?: boolean;
     onSuccess?: (...any) => void;
     uploadUrl?: string;
+    loading?: ILoadingPara;
 }
 interface FileType {
     title: string;
@@ -50,6 +53,8 @@ export class BwUploader extends FormCom {
     protected multi: boolean;
     protected isChangeText: boolean;
     protected text: string;
+    protected loading: Loading;
+    protected uploadType: uploadType;
 
     protected wrapperInit(para) {
         this.text = para.text;
@@ -62,6 +67,11 @@ export class BwUploader extends FormCom {
 
     constructor(para: IBwUploaderPara) {
         super(para);
+        if(tools.isNotEmpty(para.loading)){
+            this.loading = new Loading(para.loading);
+            this.loading.hide();
+        }
+        this.uploadType = para.uploadType || 'file';
         this.uploadUrl = para.uploadUrl;
         this.nameField = para.nameField;
         this.thumbField = para.thumbField;
@@ -83,7 +93,7 @@ export class BwUploader extends FormCom {
         });
 
         d.on(this.wrapper, 'click', () => {
-            sys.window.getFile((files: File[]) => {
+            this.getFile((files: File[]) => {
                 if(!this.multi){
                     this.temFiles = [];
                 }
@@ -100,10 +110,25 @@ export class BwUploader extends FormCom {
                     this.trigger(BwUploader.EVT_FILE_JOIN_QUEUE, this.temFiles);
                     autoUpload && this.upload();
                 }
-            }, this.multi, this.accept && this.accept.mimeTypes, () => {
+            }, () => {
                 Modal.alert('获取图片失败', '温馨提示');
-            })
+            });
         });
+    }
+
+    protected getFile(callback: (file: File[]) => void , error?: Function){
+        switch (this.uploadType){
+            case "file":
+                sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                break;
+            case 'sign':
+                if(sys.window.getSign){
+                    sys.window.getSign(callback, error);
+                }else{
+                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                }
+                break;
+        }
     }
 
     protected acceptVerify(file: File){
@@ -149,6 +174,7 @@ export class BwUploader extends FormCom {
 
     // 调用方法上传暂存文件
     upload(){
+        this.loading && this.loading.show();
         this._isFinish = false;
         this.wrapper.classList.remove('error');
         this.setInputValue('上传中...');
@@ -171,6 +197,7 @@ export class BwUploader extends FormCom {
             }))
         });
         Promise.all(promises).then(() => {}).finally(() => {
+            this.loading && this.loading.hide();
             this._isFinish = true;
         })
     }
