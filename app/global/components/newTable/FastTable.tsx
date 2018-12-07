@@ -1249,6 +1249,7 @@ export class FastTable extends Component {
                     if (this.editor.rowCanInit(this.rows[rowIndex]) &&
                         this.editor.cellCanInit(editingCell.column as FastTableColumn,
                             isInsert ? 1 : 0)) {
+
                         editingCell.editing = true;
                     }
                 }

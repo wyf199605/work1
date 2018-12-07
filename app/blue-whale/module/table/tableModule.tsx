@@ -353,7 +353,7 @@ export abstract class TableModule {
                 let text:string,
                     tdDate = trData[col.name];
 
-                if(col.dataType === BwRule.DT_IMAGE && col.link){
+                if((col.dataType === BwRule.DT_IMAGE || col.dataType === BwRule.DT_SIGN) && col.link){
 
                     // 缩略图
                     text = self.imgHtmlGet(

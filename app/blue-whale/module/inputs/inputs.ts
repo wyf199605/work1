@@ -22,7 +22,7 @@ interface InputsPara {
     queryModule? : Function
 }
 interface IKeyStepPara{
-    callback(text : string, input? : R_Input) : Promise<any>
+    callback(text : string, input? : R_Input, open? : Function) : Promise<any>
     container? : HTMLElement
     inputs? : R_Input[]
     locationLine? : string
@@ -35,6 +35,7 @@ export class Inputs {
     private m: Toast;
     private isProcess : boolean = false;
     private url: string;  //记录当前请求的url步骤,每次请求从该步骤开始
+    private keyStep : KeyStep;
     constructor(private para: InputsPara) {
         this.p = para;
         para.container.tabIndex = parseInt(G.tools.getGuid());
@@ -45,8 +46,9 @@ export class Inputs {
      * 匹配成功
      * @param data
      * @param text
+     * @param open
      */
-    private matchPass(data: R_Input, text: string) {
+    private matchPass(data: R_Input, text: string, open? : Function) {
         let newUrl = this.url ? this.url : data.dataAddr.dataAddr;
         if (newUrl.indexOf('?') > -1) {
             newUrl += '&';
@@ -54,24 +56,24 @@ export class Inputs {
             newUrl += '?';
         }
         let ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
-        return this.ajax(ajaxUrl);
+        return this.ajax(ajaxUrl, open);
     }
 
-    private ajax(aUrl : string){
+    private ajax(aUrl : string, open : Function){
         this.isProcess = true;
         return BwRule.Ajax.fetch(aUrl)
             .then(({response}) => {
-                this.condition(response,aUrl);
+                this.condition(response,aUrl, open);
                 return response;
             }).catch(() => {
                 this.isProcess = false;
             })
     }
 
-    private condition(response : obj, aUrl : string){
+    private condition(response : obj, aUrl : string, open : Function){
         let elements = response.body && response.body.elements && response.body.elements[0] && response.body.elements[0];
         if(elements){
-            this.atvarParams(elements.atvarparams, elements.subButtons, aUrl);
+            this.atvarParams(elements.atvarparams, elements.subButtons, aUrl, open);
             return;
         }
         let body = response.body && response.body.bodyList && response.body.bodyList[0],
@@ -82,26 +84,34 @@ export class Inputs {
             showText = category.showText,
             ftable : FastBtnTable = tools.isFunction(this.p.table) && this.p.table();
 
+        if(atvarObj){
+            this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl, open);
+            return;
+        }
+
         this.url = category.url;
         switch (catType) {
             case 0:
                 // 数据覆盖
                 this.isProcess = false;
+                this.reOpen(open);
                 break;
             case 1:
                 // 标签打印
                 let tableModule = this.p.tableModule();
                 tableModule.labelPrint.show(tableModule.labelBtn.wrapper, category.printList, () => {
-                    this.ajax(CONF.siteUrl + this.url);
+                    this.ajax(CONF.siteUrl + this.url, open);
                 });
                 break;
             case 2:
                 // 提示错误信息
                 let m = Modal.alert(showText, '提示', () => {
                     this.isProcess = false;
+                    this.reOpen(open);
                 });
                 m.onClose = () => {
                     this.isProcess = false;
+                    this.reOpen(open);
                 };
                 break;
             case 3:
@@ -109,30 +119,39 @@ export class Inputs {
                 let c = Modal.confirm({
                     msg: showText,
                     btns: ['取消', '确定'],
+                    noHide : true,
                     callback: (index) => {
                         if (index === true) {
-                            this.ajax(CONF.siteUrl + this.url);
+                            this.ajax(CONF.siteUrl + this.url, open);
                         } else {
                             this.url = null;
+                            this.reOpen(open);
                         }
                         this.isProcess = false;
+                        c.destroy();
                     }
                 });
                 c.onClose = () => {
                     this.isProcess = false;
+                    this.reOpen(open);
                 };
                 break;
             case 4:
                 // 提示信息,自动下一步
-                this.ajax(CONF.siteUrl + this.url);
+                this.ajax(CONF.siteUrl + this.url, open);
                 break;
             default :
                 this.isProcess = false;
+                this.reOpen(open);
         }
 
         dataType === 0 && this.dataCover(ftable, response);
         ![2,3].includes(catType) && this.logTip(showText);
-        atvarObj && this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl);
+
+    }
+
+    private reOpen(open : Function){
+        typeof open === 'function' && open();
     }
 
     private dataCover(ftable : FastBtnTable, response : obj){
@@ -166,7 +185,7 @@ export class Inputs {
         });
     }
 
-    private atvarParams(atvarparams : obj, subButtons : obj[], aUrl : string){
+    private atvarParams(atvarparams : obj, subButtons : obj[], aUrl : string, open : Function){
         this.isProcess = true;
         let atv, modal =  new Modal({
             header : {
@@ -196,7 +215,7 @@ export class Inputs {
                 BwRule.Ajax.fetch(url,{
                     type : 'get',
                 }).then(({response}) => {
-                    this.condition(response, aUrl);
+                    this.condition(response, aUrl, open);
                 }).catch(() => {
                     this.isProcess = false;
                 })
@@ -204,6 +223,7 @@ export class Inputs {
         });
         modal.onClose = () => {
             this.isProcess = false;
+            this.reOpen(open);
         };
 
         require(['QueryBuilder'], (q) => {
@@ -229,11 +249,11 @@ export class Inputs {
      */
     private eventInit(para: InputsPara) {
         if(G.tools.isMb){
-            new KeyStep({
+           this.keyStep = new KeyStep({
                 inputs : para.inputs,
-                callback : (ajaxData, input) => {
+                callback : (ajaxData, input, open) => {
                     if(input && !this.isProcess){
-                        return this.matchPass(input, ajaxData);
+                        return this.matchPass(input, ajaxData, open);
                     }else if(para.locationLine){
                         return this.rowSelect(para.locationLine, ajaxData);
                     }else {
@@ -364,20 +384,10 @@ export class KeyStep{
                                     let reg = regExpMatch(input, text),
                                         conScan = tools.isMb && type === '2';
 
-                                    this.p.callback(text, reg).then((response) => {
-                                        let body = response && response.body && response.body.bodyList && response.body.bodyList[0] || {},
-                                            category = body.category || {},
-                                            catType = category.type,
-                                            dataType = body.dataType; // 0：表格数据覆盖
+                                    this.p.callback(text, reg, conScan && open);
 
-                                        if(conScan && dataType === 0 && ![1,2,3,4].includes(catType)){
-                                            open();
-                                        }
-                                    });
-
-                                    if(!reg && conScan){
-                                        open();
-                                    }
+                                    // 没有通过正则匹配
+                                    !reg && conScan && open();
                                 });
                             };
                             open();
@@ -410,6 +420,8 @@ export class KeyStep{
             }
         }
     }
+
+
 
     scanOpen(){
         return new Promise((resolve, reject) => {

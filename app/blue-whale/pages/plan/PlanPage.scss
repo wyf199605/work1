@@ -104,7 +104,8 @@
         margin: 0 auto;
         display: block;
         g {
-          touch-action: auto;
+          //touch-action: auto;
+          -webkit-overflow-scrolling: auto;
           image{
             image-rendering: auto;
           }
@@ -182,7 +183,7 @@
         .draw-point-wrapper{
           height: 100%;
           width: 100%;
-          overflow: auto;
+          overflow: hidden;
           transition: padding 0.2s ease 0s;
           &::-webkit-scrollbar{
             display: none;

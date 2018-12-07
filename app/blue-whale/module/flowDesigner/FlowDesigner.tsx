@@ -69,7 +69,7 @@ Raphael.fn.connection = function (obj1, obj2, line, bg) {
                 fill: "none",
                 "stroke-width": bg.split("|")[1] || 2
             }),
-            line: this.path(path).attr({stroke: color, fill: "none", 'arrow-end': 'block-wide-long', 'stroke-width': 2}),
+            line: this.path(path).attr({stroke: color, fill: "none", 'arrow-end': 'block-wide-long', 'stroke-width': 2.5}),
             from: obj1,
             to: obj2
         };
@@ -210,10 +210,12 @@ export class FlowDesigner {
                 if(child.nodeType === 1){
                     let layout = child.attributes.layout && child.attributes.layout.value.split(',')
                         .map(item => parseInt(item));
-                    maxWidth = Math.max(layout[0], maxWidth);
-                    maxHeight = Math.max(layout[1], maxHeight);
-                    maxItemWidth = Math.max(layout[2], maxItemWidth);
-                    maxItemHeight = Math.max(layout[3], maxItemHeight);
+                    if(tools.isNotEmptyArray(layout)){
+                        maxWidth = Math.max(layout[0], maxWidth);
+                        maxHeight = Math.max(layout[1], maxHeight);
+                        maxItemWidth = Math.max(layout[2], maxItemWidth);
+                        maxItemHeight = Math.max(layout[3], maxItemHeight);
+                    }
                 }
             });
             FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
@@ -229,9 +231,6 @@ export class FlowDesigner {
                     // 存在xml中没有isComplete属性情况
                     'isComplete' in child.attributes && (
                         isComplete = child.attributes.isComplete.value === 'true'
-                    );
-                    'name' in child.attributes && (
-                        FlowEditor.EXIST_NAME.push(child.attributes.name.value)
                     );
                     let shape: FlowItem = null;
                     layout && (shape = new FlowItem({

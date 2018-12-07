@@ -61,7 +61,7 @@ export class LineItem extends Component {
         let line = FlowDesigner.PAPER.connection(this.from, this.to);
         FlowDesigner.connections = arr.concat([line]);
         line && (this.line = line.line);
-        this.wrapper.innerText = para.fields.displayName || '';
+        this.wrapper.innerText = (para.fields && para.fields.displayName) || '';
         this.setTextWrapperPosition();
         this.isComplete && this.line.attr({stroke: '#31ccff'});
         let _this = this;
@@ -77,7 +77,7 @@ export class LineItem extends Component {
         });
 
         para.fields && para.fields.name && para.fields.name.indexOf('path') > -1 &&
-                (LineItem.counter = parseInt(para.fields.name[para.fields.name.length - 1]));
+                (LineItem.counter = parseInt(para.fields.name.slice(4)));
         this.flowEditor = new FlowEditor({
             type: 'transition',
             container: d.query('#design-canvas'),
