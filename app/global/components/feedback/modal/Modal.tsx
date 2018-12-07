@@ -54,6 +54,7 @@ interface IConfirm {
     title?: string,
     btns?: string[],
     callback?: (flag: boolean) => void;
+    noHide? : boolean // 点击确认不主动关闭模态框
 }
 
 let allModalArr: Modal[] = [];
@@ -912,9 +913,12 @@ export class Modal extends Component {
                 if (confirm && confirm.callback && typeof  confirm.callback === 'function') {
                     confirm.callback(true);
                 }
-                m.isShow = false;
+                if(!(confirm && confirm.noHide)){
+                    m.isShow = false
+                }
             }
         }));
+
         let m = new Modal({
             isOnceDestroy: true,
             isMb: false,
@@ -925,7 +929,7 @@ export class Modal extends Component {
             body: document.createTextNode(msg),
             footer: {
                 rightPanel: inputBox
-            }
+            },
         });
         m.modalScreen.style.zIndex = '1001';
         return m;
