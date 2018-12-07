@@ -4,12 +4,10 @@
 import d = G.d;
 import tools = G.tools;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {BwRule} from "../../common/rule/BwRule";
 import {FlowItem} from "./FlowItem";
 import {LineItem} from "./LineItem";
-import {FlowEditor, IFieldPara} from "./FlowEditor";
+import {FlowEditor} from "./FlowEditor";
 import {Tips} from "./Tips";
-import Component = G.Component;
 
 declare const Raphael;
 

@@ -332,8 +332,17 @@ export class FlowEditor extends FormCom {
     set(fields: IFieldPara) {
         for (let attr in fields) {
             let attrEditorWrapper = d.queryAll('.attr-editor-wrapper', this.wrapper)
-                .filter(item => item.dataset.attr === attr)[0];
-            d.query('input', attrEditorWrapper)['value'] = fields[attr];
+                .filter(item => item.dataset.attr === attr)[0],
+                text:string = fields[attr]
+            if(attr === 'expr'){
+                text = text.replace(/(\&gt;)/g,'>')
+                    .replace(/(\&lt;)/g,'<')
+                    .replace(/(\&eq;)/g,'=')
+                    .replace(/(\&gte;)/g,'>=')
+                    .replace(/(\&lte;)/g,'<=')
+                    .replace(/(\&ne;)/g,'!=');
+            }
+            d.query('input', attrEditorWrapper)['value'] = text;
         }
     }
 
