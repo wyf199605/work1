@@ -159,7 +159,7 @@ export class FlowDesigner {
             body: body,
             header: {
                 title: '流程设计',
-                rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}></i>
+                rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}/>
             },
             className: 'flow-modal',
             width: '90%',

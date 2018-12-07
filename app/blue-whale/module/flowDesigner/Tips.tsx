@@ -64,14 +64,14 @@ export class Tips extends Component {
                         className="appcommon app-decision1"/>decision
                     </div>
                 </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="fork"><i className="appcommon app-fork"/>fork
-                    </div>
-                </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="join"><i className="appcommon app-join"/>join
-                    </div>
-                </div>
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="fork"><i className="appcommon app-fork"/>fork*/}
+                    {/*</div>*/}
+                {/*</div>*/}
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="join"><i className="appcommon app-join"/>join*/}
+                    {/*</div>*/}
+                {/*</div>*/}
             </div>
         </div>;
     }
@@ -177,7 +177,9 @@ export class Tips extends Component {
                         }else{
                             // 如果没有选择，则用原来的值
                             if(attr === 'assignee'){
-                                dropdownField[attr] = item.flowEditor.value[attr];
+                                tools.isNotEmpty(item.flowEditor.value[attr]) ?
+                                    (dropdownField[attr] = item.flowEditor.value[attr]) :
+                                    (dropdownField[attr] = item.flowEditor.get()[attr]);
                             }else {
                                 let valueText = FlowEditor.DROPDOWN_KEYVALUE[attr].filter(valueText => valueText.text === item.flowEditor.value[attr])[0];
                                 dropdownField[attr] = valueText && valueText.value;
