@@ -26,7 +26,7 @@ namespace BW {
             personPassword: `commonui/pageroute?page=changePassword`,
             test: `commonui/pageroute?page=test`,
 
-            home: `ui/menu?page=static%2Fhome`,
+            home: `commonui/pageroute?page=static%2Fhome`,
             contact: `ui/pick/system/pick-4?page=static%2Fcontacts`,
             myself: `ui/view/n1093_data-30?page=static%2Fmyself`,
             bugList: `commonui/pageroute?page=bugList`,

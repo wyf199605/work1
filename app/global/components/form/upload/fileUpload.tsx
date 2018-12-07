@@ -10,7 +10,7 @@ export interface IFileUpload{
         beforeSendBlock: (block: IFileBlock, ...any) => Promise<any>;
         afterSendFile: (file: File, ...any) => Promise<any>;
         chunkSize: number;  // 分块大小
-    }
+    },
 }
 
 export interface IFileBlock {
@@ -78,7 +78,7 @@ export class FileUpload{
     abort(){
         this.xhrs.forEach((xhr) => {
             xhr.abort();
-        })
+        });
     }
 
     // 分片验证逻辑

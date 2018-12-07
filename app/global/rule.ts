@@ -19,6 +19,8 @@ namespace G{
 
         static DT_IMAGE = '20'; // 图片
 
+        static DT_SIGN = '26'; // 签名图片
+
         static DT_MUL_IMAGE = '22'; // 多图
 
         static DT_HTML = '30'; // 超文本

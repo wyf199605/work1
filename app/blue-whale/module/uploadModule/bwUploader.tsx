@@ -8,10 +8,12 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {User} from "../../../global/entity/User";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
+import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
 
-
+type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
     // uploadUrl?: string;
+    uploadType?: uploadType; // 默认file，file普通上传，sign获取签名图片上传，edit编辑完图片上传
     isChangeText?: boolean; // 默认false
     text?: string;
     nameField: string;
@@ -21,8 +23,8 @@ export interface IBwUploaderPara extends IFormComPara {
     accept?: FileType;
     multi?: boolean;
     onSuccess?: (...any) => void;
-    onFailure?: (...any) => void;
     uploadUrl?: string;
+    loading?: ILoadingPara;
 }
 interface FileType {
     title: string;
@@ -31,6 +33,10 @@ interface FileType {
 }
 
 export class BwUploader extends FormCom {
+
+    static EVT_FILE_JOIN_QUEUE = '__event_file_join_the_queue__'; // 文件加入上传队列是调用
+    static EVT_UPLOAD_ERROR = '__event_file_upload_error__';    // 文件上传失败时调用
+
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
     protected maxSize: number;  // 上传文件大小，-1为不限制
     protected chunkSize = 5000 * 1024;  // 分块大小 5M
@@ -38,7 +44,6 @@ export class BwUploader extends FormCom {
     protected thumbField: string;
     // protected formData: () => obj;  // 上传附带数据
     protected onSuccess: (...any) => void;
-    protected onFailure: (...any) => void;
     protected filename: string; // 当前上传成功文件的名称
     protected files: File[] = [];   // 上传成功文件
     protected temFiles: File[] = []; // 暂存文件，等待上传
@@ -48,6 +53,8 @@ export class BwUploader extends FormCom {
     protected multi: boolean;
     protected isChangeText: boolean;
     protected text: string;
+    protected loading: Loading;
+    protected uploadType: uploadType;
 
     protected wrapperInit(para) {
         this.text = para.text;
@@ -60,12 +67,16 @@ export class BwUploader extends FormCom {
 
     constructor(para: IBwUploaderPara) {
         super(para);
+        if(tools.isNotEmpty(para.loading)){
+            this.loading = new Loading(para.loading);
+            this.loading.hide();
+        }
+        this.uploadType = para.uploadType || 'file';
         this.uploadUrl = para.uploadUrl;
         this.nameField = para.nameField;
         this.thumbField = para.thumbField;
         this.maxSize = para.maxSize || -1;
         this.onSuccess = para.onSuccess;
-        this.onFailure = para.onFailure;
         this.accept = para.accept;
         this.multi = para.multi || false;
         this.isChangeText = para.isChangeText || false;
@@ -82,7 +93,7 @@ export class BwUploader extends FormCom {
         });
 
         d.on(this.wrapper, 'click', () => {
-            sys.window.getFile((files: File[]) => {
+            this.getFile((files: File[]) => {
                 if(!this.multi){
                     this.temFiles = [];
                 }
@@ -96,12 +107,28 @@ export class BwUploader extends FormCom {
                             this.temFiles.push(file);
                         }
                     });
+                    this.trigger(BwUploader.EVT_FILE_JOIN_QUEUE, this.temFiles);
                     autoUpload && this.upload();
                 }
-            }, this.multi, this.accept && this.accept.mimeTypes, () => {
+            }, () => {
                 Modal.alert('获取图片失败', '温馨提示');
-            })
+            });
         });
+    }
+
+    protected getFile(callback: (file: File[]) => void , error?: Function){
+        switch (this.uploadType){
+            case "file":
+                sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                break;
+            case 'sign':
+                if(sys.window.getSign){
+                    sys.window.getSign(callback, error);
+                }else{
+                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                }
+                break;
+        }
     }
 
     protected acceptVerify(file: File){
@@ -133,7 +160,7 @@ export class BwUploader extends FormCom {
     }
 
     protected setInputValue(value: string){
-        this.isChangeText && (this.input.value = value || this.text);
+        this.isChangeText && this.input && (this.input.value = value || this.text);
     }
 
     destroy(){
@@ -147,24 +174,31 @@ export class BwUploader extends FormCom {
 
     // 调用方法上传暂存文件
     upload(){
+        this.loading && this.loading.show();
+        this._isFinish = false;
         this.wrapper.classList.remove('error');
         this.setInputValue('上传中...');
         if(!this.multi){
             this.files = [];
         }
-        let files = this.multi ? this.temFiles : this.temFiles[0];
+        let files = this.multi ? this.temFiles : this.temFiles[0],
+            promises: Promise<any>[] = [];
         files && tools.toArray(files).forEach((file) => {
-            this.fileUpload.upload(file).then((data) => {
+            promises.push(this.fileUpload.upload(file).then((data) => {
                 console.log(data);
                 this.files.push(file);
                 this.temFiles = [];
                 this.onSuccess && this.onSuccess(data, file);
                 this.value = file.name;
             }).catch(() => {
-                this.wrapper.classList.add('error');
+                this.wrapper && this.wrapper.classList.add('error');
                 this.setInputValue('上传失败');
-                this.onFailure && this.onFailure(file);
-            })
+                this.trigger(BwUploader.EVT_UPLOAD_ERROR, file);
+            }))
+        });
+        Promise.all(promises).then(() => {}).finally(() => {
+            this.loading && this.loading.hide();
+            this._isFinish = true;
         })
     }
 

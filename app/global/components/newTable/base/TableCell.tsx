@@ -81,7 +81,7 @@ export abstract class TableCell {
     protected format(data: any) {
         let format = this.table.cellFormat,
             formated = format && format(data, this);
-            // formated = format && format(this.column, (this.row as TableDataRow).data || {[this.name]: data});
+        // formated = format && format(this.column, (this.row as TableDataRow).data || {[this.name]: data});
         // if(this instanceof TableFooterCell){
         //     console.log(this.column)
         // }
@@ -410,6 +410,10 @@ export class TableDataCell extends TableCell {
     protected input: FormCom = null;
     protected blurHandler = null;
 
+    get inputFinish(){
+        return this.input ? this.input.isFinish : true;
+    }
+
     public isChecked = false;
     protected _editing: boolean = false;
     get editing(){
@@ -452,24 +456,37 @@ export class TableDataCell extends TableCell {
                         if(td !== this.wrapper){
                             // d.off(d.query('input', this.input.wrapper), 'focus');
                             // console.log(this.editing);
-                            this.editing = false;
+                            if(!this.inputFinish){
+                                ev.stopPropagation();
+                                Modal.confirm({
+                                    msg: '文件正在上传，是否要停止上传？',
+                                    callback: (flag) => {
+                                        if(flag){
+                                            this.editing = false;
+                                            td.click();
+                                        }
+                                    }
+                                })
+                            }else{
+                                this.editing = false;
+                            }
                         }
                     });
-                   /* d.on(d.query('input', this.input.wrapper), 'focus', () => clearTimeout(timer));
-                    d.on(d.query('input', this.input.wrapper), 'blur', () => {
-                        timer = setTimeout(() => {
-                            d.off(d.query('input', this.input.wrapper), 'blur');
-                            // d.off(d.query('input', this.input.wrapper), 'focus');
-                            // console.log(this.editing);
-                            this.editing = false;
+                    /* d.on(d.query('input', this.input.wrapper), 'focus', () => clearTimeout(timer));
+                     d.on(d.query('input', this.input.wrapper), 'blur', () => {
+                         timer = setTimeout(() => {
+                             d.off(d.query('input', this.input.wrapper), 'blur');
+                             // d.off(d.query('input', this.input.wrapper), 'focus');
+                             // console.log(this.editing);
+                             this.editing = false;
 
-                            let rowsData = this.table.tableData.edit.getOriginalData()[this.row.index];
-                            // console.log(rowsData);
-                            let originalCellData = tools.isEmpty(rowsData) ? null : rowsData[this.name];
-                            // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
-                            this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
-                        }, 100);
-                    });*/
+                             let rowsData = this.table.tableData.edit.getOriginalData()[this.row.index];
+                             // console.log(rowsData);
+                             let originalCellData = tools.isEmpty(rowsData) ? null : rowsData[this.name];
+                             // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
+                             this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
+                         }, 100);
+                     });*/
                 }else{
                     // 设置新的值
                     if(tools.isNotEmpty(this.input) && this.input instanceof FormCom) {
