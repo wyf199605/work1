@@ -26,6 +26,7 @@ export class MbListModule extends Component{
     private imgLabelColor: string = '';
     private isMulti: boolean = false;
     private defaultData:obj[] = [];
+
     constructor(private para: IMbListModule) {
         super(para);
         let tableListEl = para.ui.body.elements[0];

@@ -24,7 +24,8 @@ export interface IMbListPara extends IComponentPara {
         render: (start: number, length: number, data: obj[], isRefresh: boolean) => void;
         ajaxFun?: (status: IDataManagerAjaxStatus) => Promise<{ data: obj[]; total: number; }>,
         isPulldownRefresh?: boolean,
-        ajaxData?: obj;
+        ajaxData?: obj
+
     };
 }
 
