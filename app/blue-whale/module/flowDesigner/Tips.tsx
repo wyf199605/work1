@@ -144,7 +144,7 @@ export class Tips extends Component {
             target.classList.add('active');
         };
 
-        let saveFlowHandler = (e) => {
+        let saveFlowHandler = () => {
             let allItems = [].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems),
                 allNames = [];
             if(allItems.some(item => tools.isEmpty(item.flowEditor.get().name))){
