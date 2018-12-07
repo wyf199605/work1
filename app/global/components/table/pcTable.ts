@@ -297,7 +297,7 @@ export class PcTable extends BasicTable {
     //
     //                 hide();
     //
-    //                 // TODO 数据更新
+    //                 //
     //                 break;
     //             case 'cancel':
     //                 hide();
