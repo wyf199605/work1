@@ -223,7 +223,7 @@ export class FlowEditor extends FormCom {
                 d.queryAll('.attr-editor-wrapper', this.wrapper).filter((item, index) =>
                     item === d.closest(e.target, '.attr-editor-wrapper', this.wrapper) && (targetIndex = index));
                 let dropdownHeight = d.queryAll('.drop-item', dropdown.ulDom).length *
-                            parseInt(window.getComputedStyle(d.query('.drop-item', dropdown.ulDom)).height) + 8;
+                    parseInt(window.getComputedStyle(d.query('.drop-item', dropdown.ulDom)).height) + 8;
                 let bottom = (wrapperLength - targetIndex) * wrapperHeight - dropdownHeight - 26;
                 if(bottom < 0){
                     d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom =
@@ -332,8 +332,17 @@ export class FlowEditor extends FormCom {
     set(fields: IFieldPara) {
         for (let attr in fields) {
             let attrEditorWrapper = d.queryAll('.attr-editor-wrapper', this.wrapper)
-                .filter(item => item.dataset.attr === attr)[0];
-            d.query('input', attrEditorWrapper)['value'] = fields[attr];
+                    .filter(item => item.dataset.attr === attr)[0],
+                text:string = fields[attr]
+            if(attr === 'expr'){
+                text = text.replace(/(\&gt;)/g,'>')
+                    .replace(/(\&lt;)/g,'<')
+                    .replace(/(\&eq;)/g,'=')
+                    .replace(/(\&gte;)/g,'>=')
+                    .replace(/(\&lte;)/g,'<=')
+                    .replace(/(\&ne;)/g,'!=');
+            }
+            d.query('input', attrEditorWrapper)['value'] = text;
         }
     }
 

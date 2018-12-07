@@ -200,7 +200,7 @@ export class FlowDesigner {
                 rootElement = Method.loadXMLStr(xmlStr).documentElement;
             // console.log('xml initial: ');
             // console.log(xmlStr);
-            
+
             // 在绘制前，需要根据layout重设画布的大小
             let maxWidth = 0,
                 maxHeight = 0,
@@ -209,7 +209,7 @@ export class FlowDesigner {
             rootElement.childNodes.forEach((child) => {
                 if(child.nodeType === 1){
                     let layout = child.attributes.layout && child.attributes.layout.value.split(',')
-                            .map(item => parseInt(item));
+                        .map(item => parseInt(item));
                     maxWidth = Math.max(layout[0], maxWidth);
                     maxHeight = Math.max(layout[1], maxHeight);
                     maxItemWidth = Math.max(layout[2], maxItemWidth);
@@ -217,13 +217,13 @@ export class FlowDesigner {
                 }
             });
             FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
-                    Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
-            
+                Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
+
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
                 if (child.nodeType === 1) {
                     let layout = child.attributes.layout && child.attributes.layout.value.split(',')
-                                    .map(item => parseInt(item)),
+                            .map(item => parseInt(item)),
                         isComplete: boolean = false,
                         fields = Method.getFields(child);
                     // 存在xml中没有isComplete属性情况
@@ -275,7 +275,7 @@ export class FlowDesigner {
                     let transitions = d.queryAll('transition', child);
                     transitions.forEach(transition => {
                         if (tools.isNotEmpty(transition) && transition.attributes['to'] &&
-                                tools.isNotEmpty(transition.attributes['to'].value)) {
+                            tools.isNotEmpty(transition.attributes['to'].value)) {
                             let start = Method.searchFlowItem(child.attributes.name.value),
                                 end = Method.searchFlowItem(transition.attributes['to'].value) || null;
 
@@ -316,9 +316,9 @@ export class FlowDesigner {
                 d.queryAll('input').forEach(input => {
                     (input as HTMLInputElement).readOnly = true;
                 }),
-                [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS)
+                    [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS)
                         .forEach(item => item.flowEditor && item.flowEditor.initEvents.off()),
-                d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item))
+                    d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item))
             );
         }
     }
