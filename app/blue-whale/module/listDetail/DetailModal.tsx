@@ -50,6 +50,7 @@ export class DetailModal {
                 fieldsArr = result.fields;
             })
         }
+        let modal: Modal;
         let footButtons = {
             leftPanel: {
                 content: '取消',
@@ -59,7 +60,7 @@ export class DetailModal {
                         msg: '确定取消编辑吗?',
                         callback: (flag) => {
                             if (flag) {
-                                modal.isShow = false;
+                                modal && (modal.isShow = false);
                             }
                         }
                     })
@@ -81,9 +82,8 @@ export class DetailModal {
             }
         };
 
-        let modal: Modal;
         if (tools.isMb) {
-            new Modal({
+            modal = new Modal({
                 header: para.fm.caption + ' - 编辑',
                 isMb: tools.isMb,
                 className: 'detail-modal',
