@@ -173,7 +173,6 @@ export class FlowEditor extends FormCom {
                                         });
                                     }).catch(err => {
                                         console.log(err);
-                                        flag = 0;
                                     });
                                 }
                             }else {
@@ -290,7 +289,7 @@ export class FlowEditor extends FormCom {
         this._type = type;
     }
 
-    private _selectKeyValue: {value: string, text: string} = {value: '', text: ''};
+    private _selectKeyValue = {value: '', text: ''};
     get selectKeyValue(){
         return this._selectKeyValue;
     }
