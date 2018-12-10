@@ -151,23 +151,30 @@ export class ListItemDetail {
 
     // 上一页下一页加载数据
     changePage(page?: number) {
-        if (tools.isNotEmpty(page)) {
-            if (page > 0) {
-                if (page > this.totalNumber) {
-                    this.currentPage = this.totalNumber;
+        if(this.para.uiType === 'detail'){
+            if (tools.isNotEmpty(page)) {
+                if (page > 0) {
+                    if (page > this.totalNumber) {
+                        this.currentPage = this.totalNumber;
+                    } else {
+                        this.currentPage = page;
+                    }
                 } else {
-                    this.currentPage = page;
+                    this.totalNumber = 0;
+                    this.currentPage = 1;
                 }
-            } else {
-                this.totalNumber = 0;
-                this.currentPage = 1;
             }
+            this.checkPageButtonDisabled();
+            this.scrollToTop();
+            this.initDetailData().then(data => {
+                this.render(data);
+            });
+        }else{
+            this.scrollToTop();
+            this.initDetailData().then(data => {
+                this.render(data);
+            });
         }
-        this.checkPageButtonDisabled();
-        this.scrollToTop();
-        this.initDetailData().then(data => {
-            this.render(data);
-        });
     }
 
     // 设置详情数据
@@ -296,7 +303,7 @@ export class ListItemDetail {
                 case 'update_save' :
                 case 'insert_save':
                     let isAdd = btn.subType === 'update_save' ? false : true;
-                    if (!isAdd && self.totalNumber === 0) {
+                    if (!isAdd && self.totalNumber === 0 && self.para.uiType === 'detail') {
                         Modal.alert('没有数据可以编辑!');
                         return;
                     }

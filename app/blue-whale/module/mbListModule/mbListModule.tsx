@@ -152,7 +152,7 @@ export class MbListModule extends Component{
                 },
                 ajaxData: null
             }
-        })
+        });
     }
 
     // 处理按钮，数组一：无数据按钮，数组二：单选数据按钮，数组三：多选按钮
