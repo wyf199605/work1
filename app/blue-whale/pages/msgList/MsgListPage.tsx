@@ -23,13 +23,13 @@ interface IDataMapPara {
 }
 
 export class MsgListPage extends BasicPage {
+    private modal : Modal;
     constructor(para: BasicPagePara) {
         super(para);
         this.readDom = this.listCreate(1);
         this.unReadDom = this.listCreate(0);
         this.allMsgDom = this.listCreate();
         this.initTab();
-
     }
 
     /**
@@ -56,7 +56,6 @@ export class MsgListPage extends BasicPage {
                         });
                         resolve()
                     })
-
                 }
             });
             pag.total = len;
@@ -75,11 +74,13 @@ export class MsgListPage extends BasicPage {
     }
 
     private listCreate(read?: number): HTMLElement {
+        this.modal = null;
+
         let html = <ul class="msg-list"></ul>,
             data = localMsg.get(),
-            arr = [];
+            arr = [],
+            dom = this.getDom(read);
 
-        let dom = this.getDom(read);
         dom && (dom.innerHTML = null);
 
         data.forEach(obj => {
@@ -116,8 +117,8 @@ export class MsgListPage extends BasicPage {
                 </div>
             </li>;
 
-        d.on(li, 'click', function () {
-            sys.window.open({url: CONF.siteUrl + obj.content.link});
+        d.on(li, 'click',  () => {
+            this.msgDetail(li, obj);
             if (read !== 1) {
                 li.classList.add('opacity-6');
             }
@@ -139,8 +140,41 @@ export class MsgListPage extends BasicPage {
         return li;
     };
 
+    private msgDetail( li : HTMLElement, obj : IDataMapPara){
+        let link, close,
+            url = obj.content.link,
+            body = <div>
+            <div className="msg-detail-title">{obj.content.caption || '消息提示'} {close = <span className="close">×</span>}</div>
+            <div className="margin-bottom-8">时间：{obj.createDate}</div>
+            <div className="margin-bottom-8">发送人：{obj.sender}</div>
+            {url ? <div className="margin-bottom-8">链接：{link = <a>查看详情</a>}</div> : null}
+            <div className="msg-detail-content">{obj.content.content}</div>
+        </div>;
+
+        url && d.on(link, 'click', () => {
+            sys.window.open({url: CONF.siteUrl + url});
+        });
+        d.on(close, 'click', () => {
+            this.modal.isShow = false;
+        });
+        if(!this.modal){
+            this.modal = new Modal({
+                position : 'right',
+                className : 'msg-detail',
+                body : body,
+                isAnimate : false,
+                isBackground : false,
+                container : li.parentElement.parentElement,
+            });
+        }else {
+            this.modal.isShow = true;
+            this.modal.body = body;
+        }
+    }
+
+    private tab : Tab;
     private initTab() {
-        new Tab({
+        this.tab = new Tab({
             tabParent: this.pageWrapper,
             panelParent: this.pageWrapper,
             className : 'msg-tab',
@@ -177,7 +211,7 @@ export class MsgListPage extends BasicPage {
     private _readDom: HTMLElement;
     get readDom() {
         if (!this._readDom) {
-            this._readDom = <div class="read-msg"></div>;
+            this._readDom = <div className="read-msg"></div>;
         }
         return this._readDom;
     }

@@ -36,13 +36,14 @@ export class MailPage extends BasicPage{
         }
 
         // 去除链接
-        // for(let col of uiBody.elements[0].cols){
-        //     if(col.name === 'READSTATE'){
-        //         col.noShow = true;
-        //     }else if(tools.isNotEmpty(col.link)){
-        //         delete col.link;
-        //     }
-        // }
+        for(let col of uiBody.elements[0].cols){
+            if(col.name === 'READSTATE'){
+                col.noShow = true;
+            }
+            // else if(tools.isNotEmpty(col.link)){
+            //     delete col.link;
+            // }
+        }
 
         this.tableModule = new NewTableModule({
             bwEl: uiBody.elements[0],

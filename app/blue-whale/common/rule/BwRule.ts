@@ -53,7 +53,7 @@ export class BwRule extends Rule {
     }
 
     static isImage(dataType: string) {
-        return dataType === BwRule.DT_MUL_IMAGE || dataType === BwRule.DT_IMAGE
+        return dataType === BwRule.DT_MUL_IMAGE || dataType === BwRule.DT_IMAGE || dataType === BwRule.DT_SIGN;
     }
 
     static Ajax = class extends Ajax {

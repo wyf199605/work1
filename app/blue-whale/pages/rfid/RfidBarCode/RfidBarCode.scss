@@ -70,6 +70,12 @@
 
     .rfid-barCode-nums {
       margin-top: 7.777px;
+      .shelf-nums{
+        input:focus{
+          position: relative;
+          top: -30px;
+        }
+      }
       .rfid-barCode-set {
         display: flex;
         .set-row{

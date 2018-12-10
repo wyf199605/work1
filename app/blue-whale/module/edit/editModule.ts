@@ -3,7 +3,6 @@ import tools = G.tools;
 import CONF = BW.CONF;
 import sys = BW.sys;
 import AssignModule from "assignModule/assignModule";
-import UploadModule from '../uploadModule/uploadModule';
 import {AssignTextModule} from "./assignModule/assignTextModule";
 import {PickModule} from "./pickModule";
 import {FormCom} from "../../../global/components/form/basic";
@@ -22,6 +21,8 @@ import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/vali
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
+import {BwUploader} from "../uploadModule/bwUploader";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 interface ComInitFun{
     (para: ComInitP): FormCom
@@ -158,12 +159,14 @@ export class EditModule {
         },
 
         file: (p): FormCom => {
-            let com =  new UploadModule({
+            let com =  new BwUploader({
                 nameField: p.field.name,
                 custom: p.field,
                 container: p.dom,
+                text: '点击上传',
+                isChangeText: true,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-                onComplete: (response) => {
+                onSuccess: (response) => {
                     let data = response.data;
                     // if(!this.para.fields.some(f => f.field.name.toLowerCase() === data['md5Field'].key.toLowerCase())) {
                     //     Modal.alert('无法找到附件，附件是否进行过改造');
@@ -268,7 +271,7 @@ export class EditModule {
                     custom: p.field,
                     useInputVal : true
 
-                // readonly: field.noEdit
+                    // readonly: field.noEdit
                 });
             }
         },
@@ -637,8 +640,8 @@ export class EditModule {
 
     static checkValue(field: R_Field, rowData: obj, clear:Function, name = field.name): Promise<CheckValueResult> {
         let chkAddr = field.chkAddr;
-            // checkCols = field.chkAddr.varList.map(v => v.varName),
-            // emptyCheckResult: CheckValueResult = {errors:[], okNames:[]};
+        // checkCols = field.chkAddr.varList.map(v => v.varName),
+        // emptyCheckResult: CheckValueResult = {errors:[], okNames:[]};
 
         // for (let colName of checkCols){
         //     if(rowData[colName] === null || (typeof rowData[colName]) === 'undefined'){

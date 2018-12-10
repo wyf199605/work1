@@ -50,7 +50,11 @@ export class ContactsModule {
         this.contactModal = new Modal({
             body: iframe,
             className: 'contact-modal',
-            zIndex: 2000
+            isOnceDestroy: true,
+            zIndex: 2000,
+            onClose:()=>{
+                this.destroy();
+            }
         });
 
         iframe.onload = () => {
@@ -60,4 +64,8 @@ export class ContactsModule {
         }
     }
 
+    destroy(){
+        this.iframe = null;
+        this.contactModal.destroy();
+    }
 }

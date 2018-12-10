@@ -49,29 +49,29 @@ export class Tips extends Component {
                         className="appcommon app-task"/>task
                     </div>
                 </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="custom"><i
-                        className="appcommon app-custom"/>custom
-                    </div>
-                </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="subprocess"><i
-                        className="appcommon app-subprocess"/>subprocess
-                    </div>
-                </div>
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="custom"><i*/}
+                        {/*className="appcommon app-custom"/>custom*/}
+                    {/*</div>*/}
+                {/*</div>*/}
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="subprocess"><i*/}
+                        {/*className="appcommon app-subprocess"/>subprocess*/}
+                    {/*</div>*/}
+                {/*</div>*/}
                 <div className="tip-item">
                     <div className="tip-item-inner drag-item" data-name="decision"><i
                         className="appcommon app-decision1"/>decision
                     </div>
                 </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="fork"><i className="appcommon app-fork"/>fork
-                    </div>
-                </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="join"><i className="appcommon app-join"/>join
-                    </div>
-                </div>
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="fork"><i className="appcommon app-fork"/>fork*/}
+                    {/*</div>*/}
+                {/*</div>*/}
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="join"><i className="appcommon app-join"/>join*/}
+                    {/*</div>*/}
+                {/*</div>*/}
             </div>
         </div>;
     }
@@ -144,7 +144,7 @@ export class Tips extends Component {
             target.classList.add('active');
         };
 
-        let saveFlowHandler = (e) => {
+        let saveFlowHandler = () => {
             let allItems = [].concat(FlowDesigner.ALLITEMS).concat(FlowDesigner.AllLineItems),
                 allNames = [];
             if(allItems.some(item => tools.isEmpty(item.flowEditor.get().name))){
@@ -173,10 +173,18 @@ export class Tips extends Component {
                     // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
                     Object.keys(dropdowns).forEach((attr) => {
                         if(dropdowns[attr].selectIndex >= 0){
-                            dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value;
+                            attr === 'assignee' && (dropdownField[attr] = item.flowEditor.selectKeyValue.value);
+                            !(attr === 'assignee') && (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value);
                         }else{
                             // 如果没有选择，则用原来的值
-                            dropdownField[attr] = item.flowEditor.value[attr];
+                            if(attr === 'assignee'){
+                                tools.isNotEmpty(item.flowEditor.value[attr]) ?
+                                    (dropdownField[attr] = item.flowEditor.value[attr]) :
+                                    (dropdownField[attr] = item.flowEditor.get()[attr]);
+                            }else {
+                                let valueText = FlowEditor.DROPDOWN_KEYVALUE[attr].filter(valueText => valueText.text === item.flowEditor.value[attr])[0];
+                                dropdownField[attr] = valueText && valueText.value;
+                            }
                         }
                     });
                     // Object.keys(dropdowns).forEach(attr => dropdowns[attr].selectIndex >= 0 &&
