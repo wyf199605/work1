@@ -98,7 +98,7 @@ export class MbList extends Component {
             this.wrapper.classList.toggle('button-wrapper', this.multiple);
             !this.multiple && (this.checkBox.checked = false);
         };
-        let moreBtnClick = (e) => {
+        let moreBtnClick = () => {
             this.multiActionSheet.isShow = true;
         };
         let multiBtnClick = (e) => {
@@ -189,7 +189,6 @@ export class MbList extends Component {
         }else{
             this.multiButtonsWrapper = <div className="list-batch-wrapper">
                 <div className="select-all">{this.checkBox = <CheckBox text="全选" onClick={(isChecked) => {
-                    let count = isChecked ? this.listItems.length : 0;
                     this._listItems.forEach(item => {
                         item.selected = isChecked;
                     })
@@ -197,7 +196,6 @@ export class MbList extends Component {
                 }/>}</div>
             </div>;
             this.wrapper.appendChild(this.multiButtonsWrapper);
-            let buttonHtml = [];
             if (tools.isNotEmptyArray(multiButtons)) {
                 let buttons = [];
                 multiButtons.forEach((item, index) => {
@@ -270,7 +268,7 @@ export class MbList extends Component {
                 o.destroy();
                 let index = this._listItems.indexOf(o);
                 if (index > -1)
-                    delete this._listItems[index]
+                    delete this._listItems[index];
             }
         });
         this._listItems = this._listItems.filter((item) => item);
@@ -301,7 +299,7 @@ export class MbList extends Component {
     set multiple(flag: boolean) {
         if (this._multiple !== flag) {
             this._multiple = flag;
-            this._listItems.forEach((item, index) => {
+            this._listItems.forEach((item) => {
                 item.isShowCheckBox = flag;
                 tools.isMb && (item.isShowBtns = flag);
             });
