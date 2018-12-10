@@ -98,16 +98,20 @@ export class RangeInputItem extends FormCom {
 
     constructor(private para: IRangeInputItem) {
         super(para);
-        this.initEvents.on();
+        if (para.interval === 0 || para.interval === 5){
+            this.initEvents.on();
+        }
     }
 
     private initEvents = (() => {
         let audio = () => {
             Shell.base.speak(0, null, (e) => {
-
+                this.set(e.data || '');
             });
             this.createSpeakModal(() => {
+                Shell.base.speak(1, null, (e) => {
 
+                })
             });
         };
         return {
@@ -145,7 +149,9 @@ export class RangeInputItem extends FormCom {
 
     destroy() {
         this.input = null;
-        this.initEvents.off();
+        if (this.para.interval === 0 || this.para.interval === 5){
+            this.initEvents.off();
+        }
         this.para = null;
         super.destroy();
     }

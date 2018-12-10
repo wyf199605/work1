@@ -3,8 +3,6 @@
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import d = G.d;
 import {FormCom} from "../../../global/components/form/basic";
-import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
-import {Loading} from "../../../global/components/ui/loading/loading";
 import {IUploadImagesItem, UploadImagesItem} from "./uploadImagesItem";
 import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
@@ -110,7 +108,6 @@ export class UploadImages extends FormCom {
     private imgType: string = '';
 
     protected wrapperInit(para: IUploadImages): HTMLElement {
-        let type = para.field.dataType || para.field.atrrs.dataType;
         return <div className="accessory-wrapper">
             <div className="accessory-title">{para.field.caption || '图片'}</div>
             <div className="images-wrapper">
@@ -153,7 +150,7 @@ export class UploadImages extends FormCom {
                     unique: '',
                     isError: false,
                     isOnLine: false,
-                    localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
+                    localUrl: (window.URL) ? window.URL.createObjectURL(file) : window['webkitURL'].createObjectURL(file)
                 };
                 if (tools.isNotEmpty(res.ifExist)) {
                     Modal.toast('图片已存在!');
@@ -221,7 +218,7 @@ export class UploadImages extends FormCom {
             let imageObj: IImage = {
                 unique: '',
                 isError: true,
-                localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
+                localUrl: (window.URL) ? window.URL.createObjectURL(file) : window['webkitURL'].createObjectURL(file)
             };
             switch (this.imgType) {
                 case '20':
