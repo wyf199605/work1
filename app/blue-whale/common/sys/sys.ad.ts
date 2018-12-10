@@ -229,7 +229,6 @@ namespace BW{
                 getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__';
                     d.once(window, event, function (response : CustomEvent) {
-                        alert(response.detail);
                         try{
                             let detail = JSON.parse(response.detail);
 
@@ -241,7 +240,6 @@ namespace BW{
                                 error && error(detail);
                             }
                         }catch (e){
-                            alert(e);
                             error && error();
                         }
                     });
@@ -273,7 +271,6 @@ namespace BW{
                                 error && error(detail);
                             }
                         }catch (e){
-                            alert(e);
                             error && error();
                         }
                     });
