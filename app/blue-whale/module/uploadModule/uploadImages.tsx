@@ -37,6 +37,7 @@ export class UploadImages extends FormCom {
             finalVal = '';
         switch (this.imgType) {
             case '20':
+            case '26':
             case '27': {
                 let uniArr = value.reverse().filter(v => v.isError === false),
                     uni = uniArr.filter(u => tools.isNotEmpty(u.unique))[0];
@@ -73,6 +74,7 @@ export class UploadImages extends FormCom {
                     }];
                 }
                     break;
+                case  '26':
                 case  '27':
                 case  '28': {
                     // 第一次设置值
@@ -167,7 +169,8 @@ export class UploadImages extends FormCom {
                             this.imgs = [imageObj];
                         }
                             break;
-                        case '27': {
+                        case '27':
+                        case '26': {
                             imageObj.unique = res.data.unique;
                             this.imgs = [imageObj];
                         }
@@ -207,6 +210,7 @@ export class UploadImages extends FormCom {
                 }
                 switch (this.imgType) {
                     case '20':
+                    case '26':
                     case '27': {
                         if (files.length = 1) {
                             this.uploader.upload(this.typeUnique);
@@ -240,6 +244,7 @@ export class UploadImages extends FormCom {
                 };
                 switch (this.imgType) {
                     case '20':
+                    case '26':
                     case '27': {
                         this.imgs = [imageObj];
                     }
@@ -291,7 +296,7 @@ export class UploadImages extends FormCom {
     render(data: IImage[]) {
         if (tools.isEmpty(data)) {
             this.listItems.forEach(item => {
-               item.destroy();
+                item.destroy();
             });
             this._imgs = [];
             this._listItems = [];

@@ -66,6 +66,7 @@ namespace G{
                                 if (val) {
                                     this['_body'] = current;
                                 }
+                                break;
                         }
                     }
                 }
