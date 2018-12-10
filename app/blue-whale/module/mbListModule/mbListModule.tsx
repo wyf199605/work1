@@ -110,10 +110,13 @@ export class MbListModule extends Component{
             },
             itemClick: (index) => {
                 let data = this.defaultData[index],
-                    url = BW.CONF.siteUrl + BwRule.reqAddr(this.para.ui.body.elements[0].subTableAddr,data);
-                sys.window.open({
-                    url:url
-                })
+                    addr:R_ReqAddr = this.para.ui.body.elements[0].subTableAddr;
+                if (tools.isNotEmpty(addr)){
+                    let url = BW.CONF.siteUrl + BwRule.reqAddr(addr,data);
+                    sys.window.open({
+                        url:url
+                    })
+                }
             },
             multiClick:(btnIndex, itemsIndexes) => {
                 let buttons = this.allButtons[1] || [],
