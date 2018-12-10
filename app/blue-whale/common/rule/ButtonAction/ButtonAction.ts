@@ -458,7 +458,7 @@ export class ButtonAction {
                                 }
                             }
                         } else {
-                            Modal.alert('调用接口失败，请重试！');
+                            Modal.alert(event && typeof event.mag === 'string' ? event.msg : '调用接口失败，请重试！');
                         }
 
                     } else {
