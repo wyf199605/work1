@@ -145,11 +145,9 @@ export class DrawPoint extends Component {
               let slate = [];
               slate.push(pos[0])
               slate.push(pos[1])
-            tools.pattern.throttling(()=>{
-                _this.g.attr('transform', "translate(" + touhs+ ")");
-            },500)
-
-
+           setTimeout(()=>{
+               _this.g.attr('transform', "translate(" + touhs+ ")");
+           },45)
 
         }).on('touchend',function () {
             let ob = D3.event.changedTouches;
@@ -260,7 +258,9 @@ export class DrawPoint extends Component {
             this.g.selectAll('g').remove();
             this.g.selectAll('circle').remove();
         }
-
+        this.zoom.scale(1);
+        this.zoom.translate([0,0]);
+        this.g.attr('transform',  "scale(" + 1 + ")");
         this.renderData = data;
         this.index = data.length || 0;//初始化index
 
@@ -304,16 +304,6 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
-         // let tranData =  this.format(d)
-         //        .sort((a, b) => {
-         //            if (!a.isPoint && !b.isPoint) {
-         //                return 0;
-         //            } else if(a.isPoint) {
-         //                return -1;
-         //            } else{
-         //                return 1;
-         //            }
-         //        })
           let tranData = this.changeArr(this.format(d))
              tranData.forEach((data) => {
                 //console.log(data);
@@ -369,8 +359,9 @@ export class DrawPoint extends Component {
                         .attr('dy', 15 )
                         .text(function (d) {
                             data.data && toolData.push(data.data)
-                            return  detail[d];
-
+                            if(I <=2 ){
+                                return  detail[d];
+                            }
                         }).attr('font-size', function (d) {
                             let w = group.select('path').node().getBBox().width,
                                 g = group.select('path').node().getBBox().height;
@@ -450,11 +441,10 @@ export class DrawPoint extends Component {
        })
     }
 
+    private wrapTime:boolean = false;
     //字体换行
     private wrapWord(text, width, centerX, centerY,I) {
-        // if(I !==2 ){
-        //     return
-        // }
+        let _this = this;
         text.each(function () {
             let text = D3.select(this),
                 words = text.text().split('').reverse(),
@@ -469,12 +459,17 @@ export class DrawPoint extends Component {
             } else {
                 lineHeight = 5.3
             }
+            if(I == 2 &&  _this.wrapTime){
+                I = 2.90;
+                _this.wrapTime = false;
+            }
             let tspan = text.text(null).append('tspan').attr('dy', lineHeight + (lineHeight * I)).attr('dx', 5).attr('x', centerX - 5.3).attr('y', centerY - 12);
             while (word = words.pop()) {
                 line.push(word);
                 const dash = lineNumber > 0 ? '-' : '';
                 tspan.text(dash + line.join(''));
                 if (tspan.node().getComputedTextLength() > width) {
+                    _this.wrapTime = true;
                     line.pop();
                     tspan.text(line.join(''));
                     line = [word];
