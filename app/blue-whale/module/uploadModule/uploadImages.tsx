@@ -6,7 +6,6 @@ import {FormCom} from "../../../global/components/form/basic";
 import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {IUploadImagesItem, UploadImagesItem} from "./uploadImagesItem";
-import UploadModule from "./uploadModule";
 import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
 
@@ -19,10 +18,6 @@ export interface IImage {
 
 interface IUploadImages extends IUploaderPara {
     unique?: string;
-
-    onComplete?(this: UploadModule, ...any); // 上传完成回调
-    onError?(file: obj); // 上传失败回调
-    onChange?: Function; // 上传成功回调
     field?: R_Field; //字段
     pageData?: obj;//页面数据
 }
@@ -199,7 +194,6 @@ export class UploadImages extends FormCom {
         // 文件加入到上传队列，开始上传
         this.uploader.on('filesQueued', (files: File[]) => {
             if (files.length > 0) {
-                this.para.onChange && this.para.onChange();
                 //开始上传
                 if (!this.loading) {
                     this.loading = new Loading({
@@ -255,7 +249,6 @@ export class UploadImages extends FormCom {
                         break;
                 }
             }
-            this.para.onError && this.para.onError.call(this, file);
         });
         // 所有文件上传成功时调用
         uploader.on('uploadFinished', () => {

@@ -6,7 +6,6 @@ import d = G.d;
 import {AccessoryItem, IAccessoryItem} from "./accessoryItem";
 import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import UploadModule from "./uploadModule";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {BwRule} from "../../common/rule/BwRule";
 
@@ -20,7 +19,7 @@ export interface IFileInfo {
 export interface IAccessory extends IUploaderPara {
     uniques?: string;
 
-    onComplete?(this: UploadModule, ...any); // 上传完成回调
+    onComplete?(...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
     onChange?: Function; // 上传成功回调
     field?: R_Field; //文件字段
@@ -108,7 +107,7 @@ export class Accessory extends FormCom {
     private accessoryBodyWrapper: HTMLElement;
 
     protected wrapperInit(para: IAccessory): HTMLElement {
-        let wrapper =tools.isMb ? <div className="accessory-wrapper">
+        let wrapper = tools.isMb ? <div className="accessory-wrapper">
             <div className="accessory-title">{para.field.caption || '附件'}</div>
             {
                 this.accessoryBodyWrapper = <div className="accessory-body">
@@ -173,7 +172,7 @@ export class Accessory extends FormCom {
                                     filesize: file.size,
                                     addr: ''
                                 }];
-                                this.para.onComplete && this.para.onComplete.call(this, res, file);
+                                this.para.onComplete && this.para.onComplete(res, file);
                             }
                                 break;
                             case '47': {
@@ -195,7 +194,7 @@ export class Accessory extends FormCom {
                                 break;
                         }
                     } else {
-                        this.para.onError && this.para.onError.call(this, file);
+                        this.para.onError && this.para.onError(file);
                         Modal.alert(res.msg || res.errorMsg);
                     }
                 }
@@ -221,7 +220,7 @@ export class Accessory extends FormCom {
                 }
             }
         });
-        this.uploader.on("uploadError", (file, res) => {
+        this.uploader.on("uploadError", () => {
             if (this.loading) {
                 this.loading.hide();
                 this.loading.destroy();
