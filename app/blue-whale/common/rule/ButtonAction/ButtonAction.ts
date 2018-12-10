@@ -265,7 +265,8 @@ export class ButtonAction {
         }
         let USER = User.get().userid,
             SHO = User.get().are_id,
-            can2dScan = Shell.inventory.can2dScan;
+            can2dScan = G.Shell.inventory.can2dScan;
+
         if(can2dScan){
             require(['RfidBarCode'], (p) => {
                 new p.RfidBarCode({
