@@ -165,7 +165,8 @@ export class FlowEditor extends FormCom {
                                                     data['GROUP_ID'] && (groupId = '_' + data['GROUP_ID'].toLowerCase());
                                                     data['ASSIGN_ID'] && (assignId = '#' + data['ASSIGN_ID'].toLowerCase());
                                                 });
-                                                index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
+                                                // index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
+                                                index >= 0 && (this.selectKeyValue.value = userId.join(',') || groupId || assignId);
                                                 this.set({[attr]: userName.join(',') || groupId || assignId});
                                                 flag = 0;
                                             }
@@ -287,6 +288,14 @@ export class FlowEditor extends FormCom {
 
     set type(type: string) {
         this._type = type;
+    }
+
+    private _selectKeyValue: {value: string, text: string} = {value: '', text: ''};
+    get selectKeyValue(){
+        return this._selectKeyValue;
+    }
+    set selectKeyValue(keyValue: {value: string, text: string}){
+        this._selectKeyValue = keyValue;
     }
 
     // 存放当前flowEditor的下拉列表

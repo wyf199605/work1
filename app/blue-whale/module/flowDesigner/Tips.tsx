@@ -49,16 +49,16 @@ export class Tips extends Component {
                         className="appcommon app-task"/>task
                     </div>
                 </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="custom"><i
-                        className="appcommon app-custom"/>custom
-                    </div>
-                </div>
-                <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="subprocess"><i
-                        className="appcommon app-subprocess"/>subprocess
-                    </div>
-                </div>
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="custom"><i*/}
+                        {/*className="appcommon app-custom"/>custom*/}
+                    {/*</div>*/}
+                {/*</div>*/}
+                {/*<div className="tip-item">*/}
+                    {/*<div className="tip-item-inner drag-item" data-name="subprocess"><i*/}
+                        {/*className="appcommon app-subprocess"/>subprocess*/}
+                    {/*</div>*/}
+                {/*</div>*/}
                 <div className="tip-item">
                     <div className="tip-item-inner drag-item" data-name="decision"><i
                         className="appcommon app-decision1"/>decision
@@ -173,7 +173,8 @@ export class Tips extends Component {
                     // 对于下拉选择的属性，因为要传给后台的数据和input里的值不同，所以要根据DROPDOWN_KEYVALUE进行转换，将'真'数据传给后台
                     Object.keys(dropdowns).forEach((attr) => {
                         if(dropdowns[attr].selectIndex >= 0){
-                            dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value;
+                            attr === 'assignee' && (dropdownField[attr] = item.flowEditor.selectKeyValue.value);
+                            !(attr === 'assignee') && (dropdownField[attr] = dropdowns[attr].data[dropdowns[attr].selectIndex].value);
                         }else{
                             // 如果没有选择，则用原来的值
                             if(attr === 'assignee'){
