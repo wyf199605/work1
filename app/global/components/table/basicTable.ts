@@ -3474,7 +3474,7 @@ export abstract class BasicTable {
     }(this));
 
 
-    //TODO
+    //
     // _initLockThead(){
     //
     // }
@@ -4101,7 +4101,7 @@ export abstract class BasicTable {
                 break;
             case 'display':
 
-                //TODO 将display的数据保存起来
+                //
                 tData = this.tableData;
                 break;
         }
@@ -4808,7 +4808,7 @@ export abstract class BasicTable {
     }
 
     /**
-     * TODO 销毁此表
+     *
      */
     public destroy() {
         this.theadLock.destroy();

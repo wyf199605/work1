@@ -70,15 +70,12 @@ export class ButtonAction {
             });
 
             //TODO 将UploadModule过程效果整合到upload组件
-            require(['UploadModule'], function (upload) {
+            require(['BwUploader'], function (BwUploader) {
                 let loadUrl = CONF.siteUrl + btn.actionAddr.dataAddr;
-                com = new upload.default({
+                com = new BwUploader.BwUploader({
                     container: <HTMLElement>uploderModal.body,
                     uploadUrl: loadUrl + (loadUrl.indexOf('?') > -1 ? '&' : '?') + "item_id=" + itemId,
-                    onChange: () => {
-
-                    },
-                    onComplete: (resuult) => {
+                    onSuccess: (result) => {
                         // console.log(data);
                         //后台表格数据返回
                         // tableData = resuult.data;

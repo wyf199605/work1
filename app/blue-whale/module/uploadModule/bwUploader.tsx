@@ -16,7 +16,7 @@ export interface IBwUploaderPara extends IFormComPara {
     uploadType?: uploadType; // 默认file，file普通上传，sign获取签名图片上传，edit编辑完图片上传
     isChangeText?: boolean; // 默认false
     text?: string;
-    nameField: string;
+    nameField?: string;
     thumbField?: string;
     maxSize?: number;
     autoUpload?: boolean; // 自动上传，默认true
@@ -58,7 +58,7 @@ export class BwUploader extends FormCom {
 
     protected wrapperInit(para) {
         this.text = para.text;
-        this.input = <input className="file-input" type="text" value={para.text || ''}/>;
+        this.input = <input className="file-input" type="text" value={para.text || '点击上传'}/>;
         this.input.readOnly = true;
         return <div className="bw-upload-wrapper">
             {this.input}
@@ -73,7 +73,7 @@ export class BwUploader extends FormCom {
         }
         this.uploadType = para.uploadType || 'file';
         this.uploadUrl = para.uploadUrl;
-        this.nameField = para.nameField;
+        this.nameField = para.nameField || 'FILE_ID';
         this.thumbField = para.thumbField;
         this.maxSize = para.maxSize || -1;
         this.onSuccess = para.onSuccess;

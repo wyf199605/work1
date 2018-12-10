@@ -19,7 +19,7 @@ export interface IUploaderPara extends IFormComPara {
     accept?: obj;
 }
 
-// TODO 使用完该控件需销毁，否则后续上传会多次
+//  使用完该控件需销毁，否则后续上传会多次
 export class Uploader extends FormCom {
     onSet: (val) => void;
     private com;
@@ -120,7 +120,7 @@ export class Uploader extends FormCom {
                                 , traditional: true
                                 , data: ajaxData
                                 // , cache: false
-                                , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
+                                , timeout: 1000 // 超时的话，只能认为该文件不曾上传过
                                 , dataType: "json"
 
                             }).then(function ({response}) {
@@ -158,7 +158,7 @@ export class Uploader extends FormCom {
                             , size: block.end - block.start
                         }
                         // , cache: false
-                        , timeout: 1000 //todo 超时的话，只能认为该分片未上传过
+                        , timeout: 1000 // 超时的话，只能认为该分片未上传过
                         , dataType: "json"
                     }).then(({response}) => {
                         if (response.ifExist) {   //若存在，返回失败给WebUploader，表明该分块不需要上传
@@ -199,7 +199,7 @@ export class Uploader extends FormCom {
                             , dataType: "json"
                         }).then(({response}) => {
 
-                            //todo 检查响应是否正常
+                            // 检查响应是否正常
                             task.resolve();
                             self.fileName = file.name;
                             self.para.onComplete(response, file, Uploader.type);

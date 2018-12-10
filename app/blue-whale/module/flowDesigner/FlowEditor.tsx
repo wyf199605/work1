@@ -83,7 +83,7 @@ export class FlowEditor extends FormCom {
     protected wrapperInit(para: IFlowEditorPara): HTMLElement {
         return <div className="flow-editor">
             <div className="tip-header">属性</div>
-            <div className="tip-body"></div>
+            <div className="tip-body"/>
         </div>;
     }
 
@@ -133,10 +133,11 @@ export class FlowEditor extends FormCom {
             if (attr in FlowEditor.DROPDOWN_KEYVALUE) {
                 // 添加下拉按钮
                 d.append(d.query('.attr-editor-input', attrEditorWrapper),
-                    <i className="floweditor-dropdown appcommon app-xiala"></i>);
+                    <i className="floweditor-dropdown appcommon app-xiala"/>);
                 let dropdownWrapper = <div className="dropdown-wrapper" data-attr={attr}>
                     {/*<div className="dropdown-title"></div>*/}
                 </div>;
+                let flag = 0;
                 let dropdown = new DropDown({
                     data: FlowEditor.DROPDOWN_KEYVALUE[attr],
                     el: dropdownWrapper,
@@ -145,30 +146,37 @@ export class FlowEditor extends FormCom {
                         // 在选中时，判断该项是否含有地址(address)，有的话从地址中获取数据，没有就直接回显
                         FlowEditor.hideAllDropdown();
                         if(FlowEditor.DROPDOWN_KEYVALUE[attr].some(valueText => 'address' in valueText)){
-                            for(let hasAddressItem of FlowEditor.DROPDOWN_KEYVALUE[attr].filter(item => 'address' in item)){
-                                hasAddressItem === item && BwRule.Ajax.fetch(hasAddressItem.address).then(({response}) => {
-                                    let field = response.body.elements[0].cols[0];
-                                    new ContactsModule({
-                                        field: field,
-                                        onGetData: (datas) => {
-                                            FlowEditor.DROPDOWN_KEYVALUE[attr].forEach((valueText, current, arr) => current !== index && (arr[current].value = ''));
-                                            let userName = [],
-                                                userId = [],
-                                                groupId = '',
-                                                assignId = '';
-                                            datas.forEach(data => {
-                                                data['USERNAME'] && userName.push(data['USERNAME']);
-                                                data['USERID'] && userId.push(data['USERID'].toLowerCase());
-                                                data['GROUP_ID'] && (groupId = '_' + data['GROUP_ID'].toLowerCase());
-                                                data['ASSIGN_ID'] && (assignId = '#' + data['ASSIGN_ID'].toLowerCase());
-                                            });
-                                            index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
-                                            this.set({[attr]: userName.join(',') || groupId || assignId});
-                                        }
+                            if (flag === 0){
+                                flag = 1;
+                                for(let hasAddressItem of FlowEditor.DROPDOWN_KEYVALUE[attr].filter(item => 'address' in item)){
+                                    hasAddressItem === item && BwRule.Ajax.fetch(hasAddressItem.address).then(({response}) => {
+                                        let field = response.body.elements[0].cols[0];
+                                        new ContactsModule({
+                                            field: field,
+                                            onGetData: (datas) => {
+                                                FlowEditor.DROPDOWN_KEYVALUE[attr].forEach((valueText, current, arr) => current !== index && (arr[current].value = ''));
+                                                let userName = [],
+                                                    userId = [],
+                                                    groupId = '',
+                                                    assignId = '';
+                                                datas.forEach(data => {
+                                                    data['USERNAME'] && userName.push(data['USERNAME']);
+                                                    data['USERID'] && userId.push(data['USERID'].toLowerCase());
+                                                    data['GROUP_ID'] && (groupId = '_' + data['GROUP_ID'].toLowerCase());
+                                                    data['ASSIGN_ID'] && (assignId = '#' + data['ASSIGN_ID'].toLowerCase());
+                                                });
+                                                index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
+                                                this.set({[attr]: userName.join(',') || groupId || assignId});
+                                                flag = 0;
+                                            }
+                                        });
+                                    }).catch(err => {
+                                        console.log(err);
+                                        flag = 0;
                                     });
-                                }).catch(err => {
-                                    console.log(err);
-                                });
+                                }
+                            }else {
+                                Modal.alert('正在加载，请稍候...');
                             }
                         }else{
                             this.set({[attr]: item.text});
@@ -232,7 +240,7 @@ export class FlowEditor extends FormCom {
                 d.queryAll('.attr-editor-wrapper', this.wrapper).filter((item, index) =>
                     item === d.closest(e.target, '.attr-editor-wrapper', this.wrapper) && (targetIndex = index));
                 let dropdownHeight = d.queryAll('.drop-item', dropdown.ulDom).length *
-                            parseInt(window.getComputedStyle(d.query('.drop-item', dropdown.ulDom)).height) + 8;
+                    parseInt(window.getComputedStyle(d.query('.drop-item', dropdown.ulDom)).height) + 8;
                 let bottom = (wrapperLength - targetIndex) * wrapperHeight - dropdownHeight - 26;
                 if(bottom < 0){
                     d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom =
@@ -341,8 +349,17 @@ export class FlowEditor extends FormCom {
     set(fields: IFieldPara) {
         for (let attr in fields) {
             let attrEditorWrapper = d.queryAll('.attr-editor-wrapper', this.wrapper)
-                .filter(item => item.dataset.attr === attr)[0];
-            d.query('input', attrEditorWrapper)['value'] = fields[attr];
+                    .filter(item => item.dataset.attr === attr)[0],
+                text:string = fields[attr];
+            if(attr === 'expr'){
+                text = text.replace(/(&gt;)/g,'>')
+                    .replace(/(&lt;)/g,'<')
+                    .replace(/(&eq;)/g,'=')
+                    .replace(/(&gte;)/g,'>=')
+                    .replace(/(&lte;)/g,'<=')
+                    .replace(/(&ne;)/g,'!=');
+            }
+            d.query('input', attrEditorWrapper)['value'] = text;
         }
     }
 

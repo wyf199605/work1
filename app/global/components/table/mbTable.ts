@@ -238,7 +238,6 @@ export class MbTable extends BasicTable{
     private static calcReorderColsPos(allCol:HTMLElement[], stopCol: HTMLLIElement = null, noWidth:boolean = false){
         for(let i = 0, col:HTMLElement; col = allCol[i]; i++){
 
-            // TODO 判断仅计算移动过的col
             if(col.isEqualNode(stopCol)){
                 break;
             }
@@ -437,7 +436,7 @@ export class MbTable extends BasicTable{
         function calcReorderColsPos(allCol:HTMLElement[], stopCol: HTMLLIElement = null, noWidth:boolean = false){
             for(let i = 0, col:HTMLElement; col = allCol[i]; i++){
 
-                // TODO 判断仅计算移动过的col
+                //
                 if(col.isEqualNode(stopCol)){
                     break;
                 }
