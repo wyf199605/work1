@@ -73,7 +73,7 @@ export class BwTableModule extends Component {
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
         this.isPivot = ui.relateType === 'P';
-        if(this.tableModule && !this.tableModule.editable && !this.isPivot){
+        if (this.tableModule && !this.tableModule.editable && !this.isPivot) {
             this.editParam = null;
         }
 
@@ -119,10 +119,11 @@ export class BwTableModule extends Component {
     }
 
     protected _btnShow: boolean = true;
-    get btnShow(){
+    get btnShow() {
         return this._btnShow;
     }
-    set btnShow(flag: boolean){
+
+    set btnShow(flag: boolean) {
         this._btnShow = flag;
         this.ftable && (this.ftable.btnShow = flag);
     }
@@ -236,7 +237,7 @@ export class BwTableModule extends Component {
         }
     }
 
-    private addOldData(data: obj[]): obj[]{
+    private addOldData(data: obj[]): obj[] {
         let res = data;
         if (data) {
 
@@ -412,7 +413,7 @@ export class BwTableModule extends Component {
         return colsPara;
     }
 
-    private pivotRefresh(ajaxData: obj = {}): Promise<any>{
+    private pivotRefresh(ajaxData: obj = {}): Promise<any> {
         return new Promise((resolve, reject) => {
             let loading = new Loading({
                 msg: '加载中...',
@@ -431,6 +432,7 @@ export class BwTableModule extends Component {
         })
 
     }
+
     /**
      * 初始化交叉制表
      * @param ajaxData - 查询参数
@@ -615,7 +617,7 @@ export class BwTableModule extends Component {
         }
         let link = field.link;
 
-        if(tools.isEmpty(rowData[field.name])){
+        if (tools.isEmpty(rowData[field.name])) {
             return;
         }
 
@@ -702,10 +704,10 @@ export class BwTableModule extends Component {
     }
 
     refresh(data?: obj) {
-        if(this.isPivot){
+        if (this.isPivot) {
             this.ftable && this.ftable.destroy();
             return this.pivotInit(data);
-        }else{
+        } else {
             return this.ftable.tableData.refresh(data).then(() => {
                 this.aggregate.get(data);
             });
@@ -968,7 +970,7 @@ export class BwTableModule extends Component {
         let getCols = () => {
             let cols = [];
             this.ftable && this.ftable.columns.forEach((col) => {
-                if(col && col.show && !col.isVirtual){
+                if (col && col.show && !col.isVirtual) {
                     cols.push({
                         name: col.name,
                         title: col.title,
@@ -1351,7 +1353,7 @@ export class BwTableModule extends Component {
             classes: string[] = [];         // 类名
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
-                isImg = dataType === BwRule.DT_IMAGE ||dataType === BwRule.DT_SIGN;
+                isImg = dataType === BwRule.DT_IMAGE || dataType === BwRule.DT_SIGN;
 
             if (isImg && field.link) {
                 // 缩略图
@@ -1437,8 +1439,8 @@ export class BwTableModule extends Component {
 
             // 后台计算规则
             let when = field.backWhen;
-            if(when){
-                if(eval(tools.str.parseTpl(when, rowData))){
+            if (when) {
+                if (eval(tools.str.parseTpl(when, rowData))) {
                     let {r, g, b} = tools.val2RGB(field.backColor);
                     bgColor = `rgb(${r},${g},${b})`
                 }
@@ -1677,7 +1679,7 @@ export class BwTableModule extends Component {
                     },
                     thumbField: thumbField,
                     container: imgContainer,
-                    text: isSign ? '签名' :'选择图片',
+                    text: isSign ? '签名' : '选择图片',
                     accept: {
                         title: '图片'
                         , extensions: 'jpg,png,gif,jpeg'
@@ -1797,7 +1799,15 @@ export class BwTableModule extends Component {
                 isResponsive: !tools.isMb,
                 className: !tools.isMb ? 'more-btns' : ''
             });
-
+            // TODO: 移动端未实现流程设计功能。
+            if (tools.isMb && this.ui.caption === '流程设计') {
+                for (let i = 0,len = btnsUi.length; i < len; i++) {
+                    let btn = btnsUi[i];
+                    if (btn.openType === 'flow-design') {
+                        btnsUi.splice(i, 1);
+                    }
+                }
+            }
             Array.isArray(btnsUi) && btnsUi.forEach((btnUi) => {
                 let btn = new Button({
                     icon: btnUi.icon,
@@ -1809,14 +1819,14 @@ export class BwTableModule extends Component {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
 
-                        } else if(btn.data.openType === 'passwd'){
+                        } else if (btn.data.openType === 'passwd') {
                             let selectData = ftable.selectedRowsData[0];
-                            if(selectData){
+                            if (selectData) {
                                 let res = G.Rule.varList(btn.data.actionAddr.varList, selectData, true),
                                     data = [];
-                                for(let key in res){
-                                    for(let col of this.ui.cols){
-                                        if(col.name.toLowerCase() === key){
+                                for (let key in res) {
+                                    for (let col of this.ui.cols) {
+                                        if (col.name.toLowerCase() === key) {
                                             data.push({
                                                 title: col.caption,
                                                 name: key,
@@ -1830,10 +1840,10 @@ export class BwTableModule extends Component {
                                     data,
                                     confirm: (res) => {
                                         let ajaxData = {};
-                                        for(let key in res){
-                                            if(key === 'new_password'){
+                                        for (let key in res) {
+                                            if (key === 'new_password') {
                                                 ajaxData[key] = res[key];
-                                            }else{
+                                            } else {
                                                 ajaxData['up' + key] = res[key];
                                             }
                                         }
@@ -1842,12 +1852,12 @@ export class BwTableModule extends Component {
                                             data: JSON.stringify([ajaxData])
                                         }).then(({response}) => {
                                             return new Promise((resolve) => {
-                                                if(response.errorCode === 0){
+                                                if (response.errorCode === 0) {
                                                     resolve(true);
                                                     Modal.alert(response.msg, '温馨提示', () => {
                                                         ButtonAction.get().btnRefresh(btn.data.refresh, this.pageUrl);
                                                     })
-                                                }else{
+                                                } else {
                                                     resolve(false);
                                                     Modal.alert(response.msg);
                                                 }
@@ -1856,7 +1866,7 @@ export class BwTableModule extends Component {
                                     }
                                 })
                             }
-                        }else if (btn.data.openType.indexOf('flow') > -1) {
+                        } else if (btn.data.openType.indexOf('flow') > -1) {
                             // 流程引擎操作按钮
                             let btnUi = btn.data as R_Button,
                                 {multiselect, selectionFlag} = btnUi,
@@ -1865,14 +1875,14 @@ export class BwTableModule extends Component {
                             let select = multiselect === 1 ? selectedData[0] : selectedData,
                                 dataAddr = BW.CONF.siteUrl + btnUi.actionAddr.dataAddr,
                                 varList = btnUi.actionAddr.varList;
-                            if (tools.isNotEmpty(varList)){
-                                varList.forEach((li,index)=>{
+                            if (tools.isNotEmpty(varList)) {
+                                varList.forEach((li, index) => {
                                     let name = li.varName;
-                                    for (let key in select){
-                                        if (key === name){
-                                            if (index === 0){
+                                    for (let key in select) {
+                                        if (key === name) {
+                                            if (index === 0) {
                                                 dataAddr += '?';
-                                            }else{
+                                            } else {
                                                 dataAddr += '&';
                                             }
                                             dataAddr = dataAddr + `${key.toLowerCase()}=${select[key]}`
@@ -1881,8 +1891,8 @@ export class BwTableModule extends Component {
                                 })
                             }
                             let field = btn.data.openType.split('-')[1];
-                            switch (field){
-                                case 'look':{
+                            switch (field) {
+                                case 'look': {
                                     BwRule.Ajax.fetch(dataAddr).then(({response}) => {
                                         new FlowDesigner(response, field);
                                     }).catch(err => {
@@ -1890,7 +1900,7 @@ export class BwTableModule extends Component {
                                     });
                                 }
                                     break;
-                                case 'design':{
+                                case 'design': {
                                     BwRule.Ajax.fetch(dataAddr, {
                                         type: 'GET'
                                     }).then(({response}) => {
@@ -1996,13 +2006,13 @@ export class BwTableModule extends Component {
                     } else if (selectedLen === 1) {
                         btn.isDisabled = false;
                         // 根据表格行数据判断按钮是否可点击
-                        if(tools.isNotEmpty(btnField.judgefield) && rowData){
+                        if (tools.isNotEmpty(btnField.judgefield) && rowData) {
                             let judges = btnField.judgefield.split(','),
                                 flag = judges.every((judge) => tools.isNotEmpty(rowData[judge]) ? rowData[judge] === 1 : true);
                             btn.isDisabled = !flag;
                         }
                     } else {
-                        btn.isDisabled =  btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
+                        btn.isDisabled = btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
                     }
 
                 });
@@ -2023,7 +2033,7 @@ export class BwTableModule extends Component {
             box: InputBox,
             isEdit = true;
         let start = () => {
-            if(!isEdit){
+            if (!isEdit) {
                 return Promise.reject();
             }
             btnStatus.start();
@@ -2062,19 +2072,19 @@ export class BwTableModule extends Component {
             }
         })();
         return {
-            set isCanEdit(flag: boolean){
+            set isCanEdit(flag: boolean) {
                 isEdit = flag;
                 isEdit ? dbclick.on() : dbclick.off();
             },
             insert: () => {
-                if(!isEdit){
+                if (!isEdit) {
                     return;
                 }
                 btnStatus.start();
                 this.edit.insert();
             },
             delete: () => {
-                if(!isEdit){
+                if (!isEdit) {
                     return;
                 }
                 btnStatus.start();
@@ -2090,11 +2100,11 @@ export class BwTableModule extends Component {
             save: () => {
                 return this.edit.save();
             },
-            init(inputBox: InputBox, isChangeBtnStatus = true){
+            init(inputBox: InputBox, isChangeBtnStatus = true) {
                 box = inputBox;
                 isChangeBtnStatus && this.end();
             },
-            get box(){
+            get box() {
                 return box;
             }
         }
@@ -2111,8 +2121,8 @@ export class BwTableModule extends Component {
                 d.append(this.wrapper, this._btnWrapper);
                 if (this.tableModule && ((this.tableModule.editType === 'linkage'
                         && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
-                    || (this.tableModule.editType === 'self')
-                    && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
+                        || (this.tableModule.editType === 'self')
+                        && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
                     let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({
@@ -2211,7 +2221,7 @@ export class BwTableModule extends Component {
                                 }
                             }
                             let content = cell.column.content as R_Field;
-                            if(isValid && content.assignSelectFields && content.assignSelectFields[0]){
+                            if (isValid && content.assignSelectFields && content.assignSelectFields[0]) {
                                 validate(editModule, cell);
                             }
                             if (field.elementType === 'lookup') {
@@ -2320,7 +2330,7 @@ export class BwTableModule extends Component {
                         field = lookUpCell.column.content;
                         result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
                     }
-                } else if(field.assignSelectFields && field.assignSelectFields[0]){
+                } else if (field.assignSelectFields && field.assignSelectFields[0]) {
                     lookUpCell = fastRow.cellGet(field.assignSelectFields[0]);
                     if (lookUpCell && lookUpCell.column) {
                         field = lookUpCell.column.content;
@@ -2432,9 +2442,9 @@ export class BwTableModule extends Component {
 
         let cellCheckValue = () => {
             return Promise.all(this.ftable.editedCells.map((cell) => {
-                if(!cell.isChecked && !cell.isVirtual && cell.show && !cell.disabled){
+                if (!cell.isChecked && !cell.isVirtual && cell.show && !cell.disabled) {
                     return validate(editModule, cell);
-                }else{
+                } else {
                     return Promise.resolve();
                 }
             }));
@@ -2457,7 +2467,8 @@ export class BwTableModule extends Component {
                     setTimeout(() => {
                         Promise.all(validList).then(() => {
                         }).catch().finally(() => {
-                            cellCheckValue().then(() => {}).finally(() => {
+                            cellCheckValue().then(() => {
+                            }).finally(() => {
                                 validList = [];
                                 loading && loading.hide();
                                 loading = null;
@@ -2471,7 +2482,7 @@ export class BwTableModule extends Component {
                         })
                     }, 100)
 
-                }): resolve();
+                }) : resolve();
             })
         };
 

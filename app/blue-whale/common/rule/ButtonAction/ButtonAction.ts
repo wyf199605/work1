@@ -264,17 +264,24 @@ export class ButtonAction {
 
         }
         let USER = User.get().userid,
-            SHO = User.get().are_id;
-        require(['RfidBarCode'], (p) => {
-            new p.RfidBarCode({
-                codeStype: codeStype,
-                SHO_ID: SHO,
-                USERID: USER,
-                uploadUrl: uploadUrl,
-                downUrl: url,
-                uniqueFlag: uniqueFlag
+            SHO = User.get().are_id,
+            can2dScan = G.Shell.inventory.can2dScan;
+
+        if(can2dScan){
+            require(['RfidBarCode'], (p) => {
+                new p.RfidBarCode({
+                    codeStype: codeStype,
+                    SHO_ID: SHO,
+                    USERID: USER,
+                    uploadUrl: uploadUrl,
+                    downUrl: url,
+                    uniqueFlag: uniqueFlag
+                })
             })
-        })
+        }else {
+            Modal.alert('只支持手持机');
+        }
+
     }
 
     /**
