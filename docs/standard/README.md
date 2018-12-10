@@ -8,7 +8,7 @@ js每行的缩进由4个空格组成。
 sass每行得缩进由2个空格组成。  
 可修改编译器设置来修改制表符空格长度。
 
-javascript
+`javascript`
 
 ```js
 for(let a = 0; a < 10; a ++){
@@ -16,7 +16,7 @@ for(let a = 0; a < 10; a ++){
 }
 ```
 
-css
+`css`
 
 ```css
 .table{
@@ -50,7 +50,7 @@ let str = '<div class="box"></div>';
 + 当函数的参数期望是对象时，被当做参数使用；
 + 当函数返回值期望为对象时，被用作返回值传出。
 
-### 5.undefined
+### 5.undefined值的使用
 
 避免使用undefined判断一个变量是否定义，应当使用typeof操作符。
 
