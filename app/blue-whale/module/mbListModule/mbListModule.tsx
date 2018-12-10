@@ -23,7 +23,6 @@ export class MbListModule extends Component{
     private isImgTpl: boolean = false;
     private layout: obj = {};
     private captions: string[] = [];
-    private imgLabelColor: string = '';
     private isMulti: boolean = false;
     private defaultData:obj[] = [];
 
@@ -260,7 +259,7 @@ export class MbListModule extends Component{
                         let imgLabelColor = layout['imgLabelColor'];
                         if (tools.isNotEmpty(imgLabelColor)) {
                             let {r, g, b} = tools.val2RGB(item[imgLabelColor]);
-                            this.imgLabelColor = '#' + parseInt(r.toString(), 16) + parseInt(g.toString(), 16) + parseInt(b.toString(), 16) + '';
+                            itemObj['imgLabelColor']  = '#' + r.toString(16) +g.toString(16) + b.toString(16);
                         }
                     }
                         break;
