@@ -6,9 +6,9 @@ import {FormCom} from "../../../global/components/form/basic";
 import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {IUploadImagesItem, UploadImagesItem} from "./uploadImagesItem";
-import UploadModule from "./uploadModule";
 import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
+import {BwUploader, IBwUploaderPara} from "./bwUploader";
 
 export interface IImage {
     unique?: string;
@@ -17,12 +17,11 @@ export interface IImage {
     isOnLine?: boolean;
 }
 
-interface IUploadImages extends IUploaderPara {
+interface IUploadImages extends IBwUploaderPara {
     unique?: string;
 
-    onComplete?(this: UploadModule, ...any); // 上传完成回调
+    onComplete?(...any); // 上传完成回调
     onError?(file: obj); // 上传失败回调
-    onChange?: Function; // 上传成功回调
     field?: R_Field; //字段
     pageData?: obj;//页面数据
 }
@@ -125,7 +124,7 @@ export class UploadImages extends FormCom {
         </div>;
     }
 
-    public uploader: Uploader = null;
+    public uploader: BwUploader = null;
     private loading: Loading = null;
 
     constructor(private para: IUploadImages) {
@@ -138,7 +137,7 @@ export class UploadImages extends FormCom {
     }
 
     private createUploader() {
-        let uploader = new Uploader({
+        let uploader = new BwUploader({
             uploadUrl: this.para.uploadUrl || BW.CONF.ajaxUrl.fileUpload,
             accept: this.para.accept || {
                 title: 'Images',
@@ -147,59 +146,57 @@ export class UploadImages extends FormCom {
             },
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
-            typeUnique: this.typeUnique,
             // 上传成功
-            onComplete: (res, file, type) => {
-                if (type === this.typeUnique) {
-                    let data = res;
-                    let imageObj: IImage = {
-                        unique: '',
-                        isError: false,
-                        isOnLine: false,
-                        localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
-                    };
-                    if (tools.isNotEmpty(res.ifExist)) {
-                        Modal.toast('图片已存在!');
-                    } else {
-                        Modal.toast('上传成功!');
+            onSuccess: (res, file) => {
+                let data = res;
+                let imageObj: IImage = {
+                    unique: '',
+                    isError: false,
+                    isOnLine: false,
+                    localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
+                };
+                if (tools.isNotEmpty(res.ifExist)) {
+                    Modal.toast('图片已存在!');
+                } else {
+                    Modal.toast('上传成功!');
+                }
+                switch (this.imgType) {
+                    case '20': {
+                        imageObj.unique = res.data.blobField.value;
+                        this.imgs = [imageObj];
                     }
-                    switch (this.imgType) {
-                        case '20': {
-                            imageObj.unique = res.data.blobField.value;
-                            this.imgs = [imageObj];
-                        }
-                            break;
-                        case '27':
-                        case '26': {
-                            imageObj.unique = res.data.unique;
-                            this.imgs = [imageObj];
-                        }
-                            break;
-                        case '28': {
-                            let imageId = res.data.unique;
-                            imageObj.unique = imageId;
-                            if (tools.isNotEmpty(data.ifExist)) {
-                                let imgs = this._imgs.filter(img => img.unique === imageId);
-                                if (tools.isEmpty(imgs)) {
-                                    this.addItem(imageObj);
-                                }
-                            } else {
+                        break;
+                    case '27':
+                    case '26': {
+                        imageObj.unique = res.data.unique;
+                        this.imgs = [imageObj];
+                    }
+                        break;
+                    case '28': {
+                        let imageId = res.data.unique;
+                        imageObj.unique = imageId;
+                        if (tools.isNotEmpty(data.ifExist)) {
+                            let imgs = this._imgs.filter(img => img.unique === imageId);
+                            if (tools.isEmpty(imgs)) {
                                 this.addItem(imageObj);
                             }
-
+                        } else {
+                            this.addItem(imageObj);
                         }
-                            break;
+
                     }
+                        break;
                 }
+
             },
             container: this.addImg,
             text: ''
         });
         this.uploader = uploader;
         // 文件加入到上传队列，开始上传
-        this.uploader.on('filesQueued', (files: File[]) => {
+        this.uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: File[]) => {
             if (files.length > 0) {
-                this.para.onChange && this.para.onChange();
+
                 //开始上传
                 if (!this.loading) {
                     this.loading = new Loading({
@@ -213,14 +210,14 @@ export class UploadImages extends FormCom {
                     case '26':
                     case '27': {
                         if (files.length = 1) {
-                            this.uploader.upload(this.typeUnique);
+                            this.uploader.upload();
                         } else {
                             Modal.alert('请只上传一张图片!');
                         }
                     }
                         break;
                     case '28': {
-                        this.uploader.upload(this.typeUnique);
+                        this.uploader.upload();
                     }
                         break;
                 }
