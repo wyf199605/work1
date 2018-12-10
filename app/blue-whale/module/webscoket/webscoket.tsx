@@ -128,7 +128,11 @@ export = class webscoket {
                                 if (sysPcHistory.indexOf(url) >= 0) {
                                     sys.window.refresh(url);
                                 }
-                                sys.window.open({url})
+
+                                sys.window.open({
+                                    url: url ? url : CONF.url.msgList,
+                                    title : '消息'
+                                });
                             }
                         })
                     });
