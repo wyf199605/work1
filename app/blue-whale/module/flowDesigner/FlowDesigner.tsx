@@ -6,7 +6,7 @@ import tools = G.tools;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {FlowItem} from "./FlowItem";
 import {LineItem} from "./LineItem";
-import {FlowEditor, IFieldPara} from "./FlowEditor";
+import {FlowEditor} from "./FlowEditor";
 import {Tips} from "./Tips";
 
 declare const Raphael;

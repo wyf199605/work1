@@ -1,5 +1,9 @@
 .fl-pc {
-  .list-item-detail-pc {
+  .list-item-detail-pc{
+    background-color: #ffffff;
+  }
+  .list-item-detail-wrapper {
+    background-color: #ffffff;
     .list-item-detail-buttons {
       display: flex;
       align-items: center;
@@ -24,11 +28,23 @@
       }
     }
     .list-detail-cells-wrapper {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
+      &.no-group{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
       .detail-cell {
         width: 33.33%;
+        &.three-column{
+          width: 33.33%;
+        }
+        &.two-column{
+          width: 50%;
+        }
+        &.one-column{
+          width: 100%;
+        }
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -68,6 +84,9 @@
         align-items: center;
         justify-content: flex-start;
         border: solid 1px #e2e2e2;
+        &.one-column{
+          width: 100%;
+        }
         .detail-cell-imgs-title{
           flex-shrink: 0;
           flex-grow: 0;
@@ -147,6 +166,21 @@
           font-size: 55px;
         }
       }
+      .group-wrapper{
+        .group-title{
+          font-size: 18px;
+          color: #000000;
+          padding-left: 5px;
+        }
+        .group-cells-wrapper{
+          display: flex;
+          display: -webkit-flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+          padding: 20px 0 ;
+        }
+      }
     }
   }
   .detail-modal {
@@ -157,47 +191,69 @@
     .form-wrapper {
       background-color: #ffffff;
       padding-left: 16px;
-      .detail-cell {
-        height: 50px;
-        width: 300px;
+      .group-title{
+        font-size: 18px;
+        color: #000000;
+        padding-left: 5px;
+      }
+      .group-cells-wrapper{
         display: flex;
         display: -webkit-flex;
-        justify-content: space-between;
         align-items: center;
-        background-color: #ffffff;
-        padding-right: 16px;
-        //border-bottom: 1px solid #e2e2e2;
-        &.disabled {
-          .detail-cell-title[data-input-type="input"] ~ .text-input > input {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        padding: 20px 0 ;
+        .detail-cell {
+          height: 50px;
+          width: 300px;
+          display: flex;
+          display: -webkit-flex;
+          justify-content: space-between;
+          align-items: center;
+          background-color: #ffffff;
+          padding-right: 16px;
+          &.three-column{
+            width: 33.33%;
           }
-        }
-        .text-input {
-          color: #666666;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          & > .btn-group .icon {
-            display: flex;
-            display: -webkit-flex;
-            align-items: center;
+          &.two-column{
+            width: 50%;
           }
-          & > input {
-            height: 100%;
-            margin-bottom: 0;
+          &.one-column{
+            width: 100%;
+          }
+          //border-bottom: 1px solid #e2e2e2;
+          &.disabled {
+            .detail-cell-title[data-input-type="input"] ~ .text-input > input {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+          .text-input {
+            color: #666666;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            & > .btn-group .icon {
+              display: flex;
+              display: -webkit-flex;
+              align-items: center;
+            }
+            & > input {
+              height: 100%;
+              margin-bottom: 0;
+              font-size: 14px;
+            }
+          }
+          .detail-cell-title {
+            color: #333333;
+            flex: 0 0 auto;
+            margin-right: 20px;
+            max-width: 180px;
             font-size: 14px;
           }
-        }
-        .detail-cell-title {
-          color: #333333;
-          flex: 0 0 auto;
-          margin-right: 20px;
-          max-width: 180px;
-          font-size: 14px;
-        }
-        .detail-cell-title[data-input-type="datetime"] ~ .text-input > input {
-          pointer-events: none;
+          .detail-cell-title[data-input-type="datetime"] ~ .text-input > input {
+            pointer-events: none;
+          }
         }
       }
     }
@@ -209,9 +265,6 @@
       }
       .form-wrapper{
         background-color: #ffffff;
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
         height: 100%;
         padding-left: 0;
         height: auto;

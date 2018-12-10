@@ -68,6 +68,7 @@
     border-bottom: 1px solid #ccc;
     margin: 0;
     padding: 0;
+    position: fixed;
     & > li {
       height: 44px;
       text-align: center;
@@ -96,8 +97,8 @@
     }
   }
   .tab-content {
-    padding: 0;
-    height: calc(100% - 44px);
+    padding: 44px 0 0 0;
+    //height: calc(100% - 44px);
     .tab-pane {
       height: 100%;
     }

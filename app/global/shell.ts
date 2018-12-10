@@ -40,6 +40,12 @@ namespace G{
                     return response;
                 });
 
+            },
+            speak(type : number, text: string, back : IShellEventHandler){
+                return ShellBase.handler('speak', {
+                    type : type,
+                    text : text
+                }, back)
             }
         };
 

@@ -258,12 +258,22 @@ gulp.task('js', function () {
     gulpTsModule('menuMrg/menuMrg', 'menu.mrg.js');
 
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
-    gulpTsModule('mbListModule/mbListModule','MbListModule.js');
-    gulpTsModule('mbListModule/mbListView','MbListView.js');
+    gulpTsModule('mbListModule/mbListModule', 'MbListModule.js');
+    gulpTsModule('mbListModule/mbListView', 'MbListView.js');
+
+    // 客户化查询器
+    gulpTsModule([
+        'newQuery/NewQueryModalMb',
+        'newQuery/NewQueryItem',
+        'newQuery/OptionItem',
+        'newQuery/Options',
+        'newQuery/RangeInputItem',
+        'newQuery/RangeInput'
+    ], 'newQueryModule.js');
 
     /*page*/
 
-    gulpTsPage('index/password','personPassword.js');
+    gulpTsPage('index/password', 'personPassword.js');
     gulpTsPage('form/formPage', 'form-page.js');
     gulpTsPage('rfid/RfidBing/RfidBing', 'rfidbing.js');
     gulpTsPage('helper/HelperEdit', 'HelperEdit.js');

@@ -89,8 +89,7 @@ export class MbListView extends Component {
         let lis = d.queryAll('li.mbListView', this.tab.getTab()),
             width: number = 0;
         lis.forEach(li => {
-            let li_width = getWidth(window.getComputedStyle(li).width);
-            width += li_width;
+            width += getWidth(window.getComputedStyle(li).width);
         });
 
         function getWidth(width: string) {

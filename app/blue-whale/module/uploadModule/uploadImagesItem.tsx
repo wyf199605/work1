@@ -34,7 +34,7 @@ export class UploadImagesItem extends Component {
         if (!this._errorWrapper) {
             this._errorWrapper = <div className="img-error">
                 <div className="error-text">
-                    <i className="appcommon app-shibai"></i>
+                    <i className="appcommon app-shibai"/>
                     传输失败
                 </div>
             </div>;

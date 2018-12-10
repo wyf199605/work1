@@ -99,6 +99,7 @@ namespace BW {
             useAddressList_user: 'ui/select/n3023_data-3023?output=json',
             useAddressList_userGroup: 'ui/select/n3024_data-3024?output=json',
             useAddressList_scriptSetting: 'ui/select/n3022_data-3022?output=json',
+            queryTest:'ui/select/node_nobugs?output=json'
         },
 
         init(siteUrl: string, appid: string, version: string, webscoket) {

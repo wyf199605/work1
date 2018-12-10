@@ -18,6 +18,12 @@ interface DetailPagePara extends BasicPagePara{
     ajaxUrl:string;
 }
 
+interface IGroupInfo{
+    groupName?:string;
+    cloNames?:string;
+    columnNumber?:string;
+}
+
 interface EditPagePara extends BasicPagePara{
     uiType: string;
     fm: {
@@ -27,5 +33,6 @@ interface EditPagePara extends BasicPagePara{
         defDataAddrList? : R_ReqAddr[];//默认值获取地址列表
         dataAddr : R_ReqAddr;//获取数据后台地址
         updatefileData? : R_ReqAddr;
+        groupInfo?:IGroupInfo[];
     }
 }
