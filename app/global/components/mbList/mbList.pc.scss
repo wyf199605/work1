@@ -33,9 +33,26 @@
           height: 60px;
           margin-right: 20px;
           flex-shrink: 0;
+          position: relative;
+          overflow: hidden;
           img{
             width: 100%;
             height: 100%;
+          }
+          .img-label {
+            width: 60px;
+            height: 60px;
+            font-size: 12px;
+            background-color: #f5956b;
+            color: #ffffff;
+            position: absolute;
+            top: -30px;
+            left: -30px;
+            line-height: 104px;
+            transform-origin: 50% 50%;
+            transform: rotate(-45deg);
+            text-align: center;
+            opacity: 0.8;
           }
         }
         .list-item-details{

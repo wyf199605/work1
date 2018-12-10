@@ -1,11 +1,13 @@
 .mb-list-page {
   width: 100%;
   height: 100%;
-  overflow: hidden;
   background-color: #f8f8f8;
 }
 
 .fl-pc {
+  .mb-list-page{
+    overflow: hidden;
+  }
   .mb-list-page-pc {
     width: 100%;
     height: calc(100% - 23px);

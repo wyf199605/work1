@@ -44,26 +44,27 @@ export class ListItemDetailCell extends Component {
     }
 
     protected wrapperInit(para: IDetailCell): HTMLElement {
-        let wrapper: HTMLElement = null;
+        let wrapper: HTMLElement = null,
+            className = tools.isNotEmpty(para.className) ? para.className : '';
         switch (para.type) {
             case 'date':
             case 'datetime':
             case 'text': {
-                wrapper = <div className={"detail-cell " + para.className || ''}>
+                wrapper = <div className={"detail-cell " +  className}>
                     <div c-var="title" className="detail-cell-title">{para.caption}</div>
                     <div c-var="content" className="detail-cell-content"/>
                 </div>;
             }
                 break;
             case 'img': {
-                wrapper = <div className={"detail-cell-img-wrapper " + para.className || ''}>
+                wrapper = <div className={"detail-cell-img-wrapper " + className}>
                     <div c-var="title" className="detail-cell-imgs-title">{para.caption}</div>
                     <div c-var="imgs" className="detail-cell-imgs"/>
                 </div>;
             }
                 break;
             case 'textarea': {
-                wrapper = <div className={"detail-cell-textarea-wrapper " + para.className || ''}>
+                wrapper = <div className={"detail-cell-textarea-wrapper " + className}>
                     <div c-var="title" className="detail-cell-imgs-title">{para.caption || '图片'}</div>
                     <div className="detail-cell-mutil-content">
                         <div c-var="content" className="detail-cell-textarea"/>
@@ -72,7 +73,7 @@ export class ListItemDetailCell extends Component {
             }
                 break;
             case 'file': {
-                wrapper = <div className={"detail-cell-file-wrapper " + para.className || ''}>
+                wrapper = <div className={"detail-cell-file-wrapper " + className}>
                     <div c-var="title" className="detail-cell-imgs-title">{para.caption || '附件'}</div>
                     <div c-var="files" className="detail-cell-files"/>
                 </div>;
