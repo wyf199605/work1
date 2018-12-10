@@ -1245,10 +1245,13 @@ export class BwTableModule extends Component {
                                     break;
                                 }
                             }
-                            return {
-                                field: cell,
-                                count: count
+                            if(count !== 0){
+                                return {
+                                    field: cell,
+                                    count: count
+                                }
                             }
+
                         });
                     ontimeRefresh(initColData, this, rfidCols);
 
