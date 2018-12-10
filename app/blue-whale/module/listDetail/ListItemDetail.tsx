@@ -417,7 +417,7 @@ export class ListItemDetail {
         let type: DetailCellType;
         if (t === '18') {
             type = 'textarea';
-        } else if (t === '20' || t === '27' || t === '28') {
+        } else if (t === '20' || t ==='26' || t === '27' || t === '28') {
             type = 'img';
         } else if (t === '43' || t === '47' || t === '48') {
             type = 'file';
@@ -443,8 +443,8 @@ export class ListItemDetail {
                 v = text;
             } else if (type === '20') {
                 v = tools.isNotEmpty(format.link) ? [BW.CONF.siteUrl + BwRule.reqAddr(format.link, this.defaultData)] : '';
-            } else if (type === '27' || type === '28') {
-                // 单图和多图（唯一值） 单文件和多文件(唯一值)
+            } else if (type === '26' || type === '27' || type === '28') {
+                // 单图和多图（唯一值）
                 if (tools.isNotEmpty(text)) {
                     let addrArr = text.split(','),
                         arr = [];
