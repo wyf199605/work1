@@ -557,7 +557,8 @@ export class NewTableModule {
 
     protected editInit(bwTable: BwTableModule){
         let time = 500;
-        if(tools.isNotEmpty(bwTable.editParam)){
+        if((this.editType === 'self' && tools.isNotEmpty(bwTable.editParam))
+            || (this.editType === 'linkage' && this.editable)){
             let editBtnData = [
                 {
                     key: 'edit',

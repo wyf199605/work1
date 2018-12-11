@@ -420,11 +420,11 @@ export = class FormPage extends BasicPage {
                     let options = this.lookUpData[name] || [];
                     for (let opt of options) {
                         if (opt.value == data[field.lookUpKeyField]) {
-                            com.set(opt);
+                            com.set(opt || '');
                         }
                     }
                 }else{
-                    com.set(data[name]);
+                    com.set(data[name] || '');
                 }
             }
         });

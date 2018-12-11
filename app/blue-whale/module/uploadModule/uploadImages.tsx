@@ -141,6 +141,7 @@ export class UploadImages extends FormCom {
                 extensions: 'gif,jpg,jpeg,bmp,png',
                 mimeTypes: 'image/*'
             },
+            autoUpload: false,
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             // 上传成功
