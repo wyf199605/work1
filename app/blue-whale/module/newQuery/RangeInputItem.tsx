@@ -4,7 +4,7 @@ import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import tools = G.tools;
 import d = G.d;
 import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
-import {IModal, Modal} from "../../../global/components/feedback/modal/Modal";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Button} from "../../../global/components/general/button/Button";
 import Shell = G.Shell;
 
@@ -98,20 +98,19 @@ export class RangeInputItem extends FormCom {
 
     constructor(private para: IRangeInputItem) {
         super(para);
-        if (para.interval === 0 || para.interval === 5){
+        if (para.interval === 0 || para.interval === 5) {
             this.initEvents.on();
         }
     }
 
     private initEvents = (() => {
         let audio = () => {
-            Shell.base.speak(0, null, (e) => {
-                this.set(e.data || '');
+            Shell.base.speak(0, '', () => {
             });
             this.createSpeakModal(() => {
-                Shell.base.speak(1, null, (e) => {
-
-                })
+                Shell.base.speak(1, '', (e) => {
+                    this.set(e.data || '');
+                });
             });
         };
         return {
@@ -130,6 +129,7 @@ export class RangeInputItem extends FormCom {
                     modal.isShow = false;
                 }} className="speak-cancel"/>
                 <Button content="说完了" onClick={() => {
+                    console.log('说完了');
                     callback && callback();
                     modal.isShow = false;
                 }} className="speak-done"/>
@@ -149,7 +149,7 @@ export class RangeInputItem extends FormCom {
 
     destroy() {
         this.input = null;
-        if (this.para.interval === 0 || this.para.interval === 5){
+        if (this.para.interval === 0 || this.para.interval === 5) {
             this.initEvents.off();
         }
         this.para = null;

@@ -41,6 +41,7 @@ interface SYS_Window{
     editImgGet?(image: string, callback: Function, error?: Function);
     editImgGet?(callback: Function, error?: Function);
     getSign?(callback: Function, error?: Function);
+    // speak?(type:number,text?:string,callback?:Function,error?:Function);
 }
 
 interface SYS_UI{

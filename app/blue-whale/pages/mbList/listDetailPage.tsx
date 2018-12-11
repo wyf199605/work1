@@ -2,10 +2,6 @@
 
 import BasicPage from "../basicPage";
 import {ListItemDetail} from "../../module/listDetail/ListItemDetail";
-import {Button} from "../../../global/components/general/button/Button";
-import {BwRule} from "../../common/rule/BwRule";
-import {NewQueryModalMb} from "../../module/newQuery/NewQueryModalMb";
-import tools = G.tools;
 
 export class ListDetailPage extends BasicPage {
     constructor(private para: EditPagePara) {
