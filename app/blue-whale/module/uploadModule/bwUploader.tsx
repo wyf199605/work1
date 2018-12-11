@@ -57,8 +57,8 @@ export class BwUploader extends FormCom {
     protected uploadType: uploadType;
 
     protected wrapperInit(para) {
-        this.text = para.text;
-        this.input = <input className="file-input" type="text" value={para.text || '点击上传'}/>;
+        this.text = typeof para.text === 'string' ? para.text : '点击上传';
+        this.input = <input className="file-input" type="text" value={this.text}/>;
         this.input.readOnly = true;
         return <div className="bw-upload-wrapper">
             {this.input}

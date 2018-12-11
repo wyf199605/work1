@@ -92,7 +92,8 @@ export class ButtonAction {
                             com && com.destroy();
                             com = null;
                             self.btnRefresh(btn.refresh, url);
-                        }, 100)
+                        }, 100);
+                        callback(result);
                         // G.tools.event.fire(NewTableModule.EVT_EXPORT_DATA, data);
                     }
                 })

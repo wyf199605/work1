@@ -25,6 +25,12 @@
       background-color: #f8f8f8;
       border: 1px solid #e2e2e2;
       position: relative;
+      .bw-upload-wrapper{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
       .app-jia {
         margin-right: 10px;
       }

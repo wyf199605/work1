@@ -145,6 +145,7 @@ export class Accessory extends FormCom {
                 container: document.body,
                 disableEl: document.body
             },
+            autoUpload: false,
             container: this.innerEl.uploader,
             uploadUrl: this.para.uploadUrl || BW.CONF.ajaxUrl.fileUpload,
             accept: this.para.accept,
@@ -189,7 +190,7 @@ export class Accessory extends FormCom {
                     }
                 } else {
                     this.para.onError && this.para.onError(file);
-                    Modal.alert(res.msg || res.errorMsg);
+                    Modal.alert(res.msg || res.errorMsg || res.message);
                 }
             }
         });

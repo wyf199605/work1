@@ -23,6 +23,7 @@ import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
 import {BwUploader} from "../uploadModule/bwUploader";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {UploadImages} from "../uploadModule/uploadImages";
 
 interface ComInitFun{
     (para: ComInitP): FormCom
@@ -108,6 +109,16 @@ export class EditModule {
     }
 
     private comTnit:objOf<ComInitFun> = {
+        image: (p) => {
+            return new UploadImages({
+                container: p.dom,
+                nameField: p.field.name,
+                uploadUrl: BW.CONF.ajaxUrl.fileUpload,
+                pageData: p.data,
+                field: p.field
+            })
+        },
+
         pickInput: (p) => {
             // console.log(dom,field,6)
             return new PickModule({
@@ -134,7 +145,7 @@ export class EditModule {
                     name: p.field.name,
                     pickerUrl: p.field.dataAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr) : '',
                     ajaxUrl: p.field.assignAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.assignAddr) : '',
-                    multi: p.field.atrrs ? p.field.atrrs.multiValueFlag === 1 : true, //field.multiValue,
+                    multi: p.field.atrrs && p.field.atrrs.multiValueFlag ? p.field.atrrs.multiValueFlag === 1 : true, //field.multiValue,
                     sepValue: sepValue,
                     onSet: this.getAssignSetHandler(p.field),
                     onGetData: (dataArr: obj[], otherField: string) => {
@@ -345,6 +356,8 @@ export class EditModule {
                 type = 'pickInput';
             } else if(field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
                 type = 'selectInput';
+            }else if(BwRule.isImage(field.dataType) || BwRule.isImage(field.atrrs.dataType)){
+                type = 'image';
             }
         }
 
