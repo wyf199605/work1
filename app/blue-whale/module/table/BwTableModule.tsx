@@ -1085,7 +1085,7 @@ export class BwTableModule extends Component {
                     if(rule.slice(0,3) == 'SUM'){
                         let sum =  this.countCalcSum(ftable,rule),
                             el = countElements[field];
-                        el && (el.innerHTML = el + '');
+                        el && (el.innerHTML = sum + '');
                     }else {
                         if (field && rule) {
                             let diffValue = tools.str.parseTpl(rule, colHeadStr),
@@ -1166,7 +1166,7 @@ export class BwTableModule extends Component {
                     if(rule.slice(0,3) == 'SUM'){
                         let sum =  this.countCalcSum(ftable,rule),
                             el = countElements[field];
-                        el && (el.innerHTML = el + '');
+                        el && (el.innerHTML = sum + '');
                     }else {
                         if (field && rule) {
                             let diffValue = tools.str.parseTpl(rule, colHeadStr),
@@ -1353,7 +1353,7 @@ export class BwTableModule extends Component {
                         if(rule.slice(0,3) == 'SUM'){
                            let sum =  this.countCalcSum(ftable,rule),
                                 el = countElements[field];
-                                 el && (el.innerHTML = el + '');
+                                 el && (el.innerHTML = sum + '');
                         }else {
                             if (field && rule) {
                                 let diffValue = tools.str.parseTpl(rule, colHeadStr),
