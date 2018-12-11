@@ -342,6 +342,7 @@ gulp.task('js', function () {
     gulpTsPage('mbList/listDetailPage', 'ListDetailPage.js');
 
     gulpTsPage('msgList/MsgListPage', 'MsgListPage.js');
+    gulpTsPage('mbList/newQueryTest', 'NewQueryTest.js');
 });
 
 /**

@@ -4,7 +4,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import tools = G.tools;
 import {NewFormEdit, NewFormFactory} from "./NewFormFactory";
-import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
+import {DetailCellType} from "./ListItemDetailCell";
 import {ListItemDetail} from "./ListItemDetail";
 
 interface IDetailModal extends EditPagePara {
@@ -34,7 +34,7 @@ export class DetailModal {
                     continue;
                 }
                 let field = {
-                    dom: this.createFormWrapper(f, formWrapper),
+                    dom: DetailModal.createFormWrapper(f, formWrapper),
                     field: f
                 };
                 emPara.fields.push(field);
@@ -45,7 +45,7 @@ export class DetailModal {
         } else {
             let fieldsArr = [...fields];
             groupInfo.forEach(group => {
-                let result = this.getGroupFormPara(group,fieldsArr,formWrapper);
+                let result = this.getGroupFormPara(group, fieldsArr, formWrapper);
                 emPara.fields = emPara.fields.concat(result.para);
                 fieldsArr = result.fields;
             })
@@ -179,7 +179,7 @@ export class DetailModal {
         for (let i = 0; i < groupFields.length; i++) {
             let f = groupFields[i],
                 className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber) - 1],
-                type = this.getType(f.dataType || f.atrrs.dataType || '');
+                type = DetailModal.getType(f.dataType || f.atrrs.dataType || '');
             if (~['textarea', 'file', 'img'].indexOf(type)) {
                 className = 'one-column';
             }
@@ -187,7 +187,7 @@ export class DetailModal {
                 continue;
             }
             let field = {
-                dom: this.createFormWrapper(f, cellsWrapper,className),
+                dom: DetailModal.createFormWrapper(f, cellsWrapper, className),
                 field: f
             };
             emPara.push(field);
@@ -196,12 +196,12 @@ export class DetailModal {
             }
         }
         return {
-            fields:fieldsArr,
-            para:emPara
+            fields: fieldsArr,
+            para: emPara
         };
     }
 
-    private createFormWrapper(field: R_Field, wrapper: HTMLElement, className?: string): HTMLElement {
+    static createFormWrapper(field: R_Field, wrapper: HTMLElement, className?: string): HTMLElement {
         if (field.comType === 'file' || field.comType === 'img') {
             return wrapper;
         } else {
@@ -241,7 +241,7 @@ export class DetailModal {
         }
     }
 
-    private getType(t: string): DetailCellType {
+    static getType(t: string): DetailCellType {
         let type: DetailCellType;
         if (t === '18') {
             type = 'textarea';

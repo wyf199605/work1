@@ -544,6 +544,7 @@ export class Modal extends Component {
                 }
                 if (tools.isMb && this.isModal) {
                     setTimeout(() => {
+                        this.wrapper.classList.remove('modal-animate-down-mb');
                         this.wrapper.style.display = 'none';
                         this.wrapper.style['display'] = 'none';
                     }, 300);

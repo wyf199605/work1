@@ -1,9 +1,14 @@
 .fl-pc {
-  .list-item-detail-pc{
+  .list-item-detail-pc {
     background-color: #ffffff;
   }
   .list-item-detail-wrapper {
     background-color: #ffffff;
+    .bw-upload-wrapper {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
     .list-item-detail-buttons {
       display: flex;
       align-items: center;
@@ -28,7 +33,7 @@
       }
     }
     .list-detail-cells-wrapper {
-      &.no-group{
+      &.no-group {
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -36,13 +41,13 @@
       }
       .detail-cell {
         width: 33.33%;
-        &.three-column{
+        &.three-column {
           width: 33.33%;
         }
-        &.two-column{
+        &.two-column {
           width: 50%;
         }
-        &.one-column{
+        &.one-column {
           width: 100%;
         }
         display: flex;
@@ -63,8 +68,9 @@
           display: flex;
           align-items: center;
           padding-left: 22px;
+          font-size: 14px;
         }
-        .detail-cell-content{
+        .detail-cell-content {
           background-color: #ffffff;
           padding-left: 22px;
           width: calc(100% - 170px);
@@ -73,9 +79,10 @@
           white-space: nowrap;
           height: 100%;
           line-height: 43px;
+          font-size: 14px;
         }
       }
-      .detail-cell-file-wrapper,.detail-cell-img-wrapper{
+      .detail-cell-file-wrapper, .detail-cell-img-wrapper {
         width: 100%;
         height: 80px;
         background-color: #ffffff;
@@ -84,10 +91,10 @@
         align-items: center;
         justify-content: flex-start;
         border: solid 1px #e2e2e2;
-        &.one-column{
+        &.one-column {
           width: 100%;
         }
-        .detail-cell-imgs-title{
+        .detail-cell-imgs-title {
           flex-shrink: 0;
           flex-grow: 0;
           width: 170px;
@@ -101,7 +108,7 @@
           align-items: center;
           padding-left: 22px;
         }
-        .detail-cell-files{
+        .detail-cell-files {
           background-color: #ffffff;
           height: 100%;
           display: flex;
@@ -112,7 +119,7 @@
           width: calc(100% - 170px);
           overflow-y: auto;
           overflow-x: hidden;
-          .detail-cell-file-item{
+          .detail-cell-file-item {
             display: flex;
             display: -webkit-flex;
             justify-content: flex-start;
@@ -120,7 +127,7 @@
             height: 30px;
             width: 100%;
             flex: 0 0 30px;
-            .file-name{
+            .file-name {
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -141,7 +148,7 @@
             }
           }
         }
-        .detail-cell-imgs{
+        .detail-cell-imgs {
           background-color: #ffffff;
           height: 100%;
           width: calc(100% - 170px);
@@ -152,33 +159,33 @@
           align-items: center;
           overflow-x: auto;
           overflow-y: hidden;
-          img{
+          img {
             width: 60px;
             height: 60px;
             margin-right: 20px;
             flex-shrink: 0;
-            &:first-child{
+            &:first-child {
               margin-left: 7px;
             }
           }
         }
-        .appcommon.app-zanwushuju{
+        .appcommon.app-zanwushuju {
           font-size: 55px;
         }
       }
-      .group-wrapper{
-        .group-title{
+      .group-wrapper {
+        .group-title {
           font-size: 18px;
           color: #000000;
           padding-left: 5px;
         }
-        .group-cells-wrapper{
+        .group-cells-wrapper {
           display: flex;
           display: -webkit-flex;
           align-items: center;
           justify-content: flex-start;
           flex-wrap: wrap;
-          padding: 20px 0 ;
+          padding: 20px 0;
         }
       }
     }
@@ -191,18 +198,18 @@
     .form-wrapper {
       background-color: #ffffff;
       padding-left: 16px;
-      .group-title{
+      .group-title {
         font-size: 18px;
         color: #000000;
         padding-left: 5px;
       }
-      .group-cells-wrapper{
+      .group-cells-wrapper {
         display: flex;
         display: -webkit-flex;
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
-        padding: 20px 0 ;
+        padding: 20px 0;
         .detail-cell {
           height: 50px;
           width: 300px;
@@ -212,13 +219,13 @@
           align-items: center;
           background-color: #ffffff;
           padding-right: 16px;
-          &.three-column{
+          &.three-column {
             width: 33.33%;
           }
-          &.two-column{
+          &.two-column {
             width: 50%;
           }
-          &.one-column{
+          &.one-column {
             width: 100%;
           }
           //border-bottom: 1px solid #e2e2e2;
@@ -257,18 +264,25 @@
         }
       }
     }
-    &.detail-edit{
-      .modal-body{
+    &.detail-edit {
+      .modal-body {
         padding: 10px;
         max-height: 100%;
         //height: calc(100% - 93px) !important;
       }
-      .form-wrapper{
+      .bw-upload-wrapper {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .form-wrapper {
         background-color: #ffffff;
         height: 100%;
         padding-left: 0;
         height: auto;
-        .accessory-wrapper{
+        .accessory-wrapper {
           width: 100%;
           height: 80px;
           background-color: #ffffff;
@@ -526,8 +540,9 @@
             align-items: center;
             padding-left: 22px;
             margin-right: 0;
+            font-size: 14px;
           }
-          .detail-cell-content{
+          .detail-cell-content {
             background-color: #ffffff;
             padding-left: 22px;
             width: calc(100% - 170px);
@@ -537,18 +552,21 @@
             height: 100%;
             line-height: 43px;
           }
+          .text-input {
+            font-size: 14px;
+          }
         }
       }
-      .modal-footer{
+      .modal-footer {
         display: flex;
         display: -webkit-flex;
         align-items: center;
         justify-content: flex-end;
         padding-right: 20px;
-        .left-plane,.right-plane{
+        .left-plane, .right-plane {
           position: static;
         }
-        .right-plane{
+        .right-plane {
           margin-left: 20px;
         }
       }

@@ -189,7 +189,6 @@ export class ListItemDetail {
     initDetailButtons() {
         let buttons: R_Button[] = this.para.fm.subButtons,
             self = this;
-
         // 更多按钮
         function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement, isPage: boolean) {
             new Button({
@@ -312,7 +311,7 @@ export class ListItemDetail {
                         isAdd: isAdd,
                         isPC: !tools.isMb,
                         confirm(data) {
-                            return new Promise((resolve, reject) => {
+                            return new Promise((resolve) => {
                                 ButtonAction.get().clickHandle(btn, data, () => {
                                     switch (btn.subType) {
                                         case 'insert_save': {
