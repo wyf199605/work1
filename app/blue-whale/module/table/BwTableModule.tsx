@@ -1083,7 +1083,7 @@ export class BwTableModule extends Component {
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
                     if(rule.slice(0,3) == 'SUM'){
-                        let sum =  this.countCalcSum(ftable,rule),
+                        let sum =  this.countCalcSum(ftable,field),
                             el = countElements[field];
                         el && (el.innerHTML = sum + '');
                     }else {
@@ -1164,7 +1164,7 @@ export class BwTableModule extends Component {
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
                     if(rule.slice(0,3) == 'SUM'){
-                        let sum =  this.countCalcSum(ftable,rule),
+                        let sum =  this.countCalcSum(ftable,field),
                             el = countElements[field];
                         el && (el.innerHTML = sum + '');
                     }else {
@@ -1184,18 +1184,14 @@ export class BwTableModule extends Component {
 }
 
    public countCalcSum(ft,str){
-        let st = str.split('');
-        st.splice(0,6);
-        st.splice(-3);
-        let ob = st.join('');
-        let column = ft.columnGet(ob),
+
+        let column = ft.columnGet(str),
             sum = 0;
         column.data.forEach((col)=>{
           sum += col;
         })
        return sum;
     }
-
     public rfidColInit() {
         let rfidCols = this.ui.rfidCols,
             ftable = this.ftable,
@@ -1282,7 +1278,6 @@ export class BwTableModule extends Component {
 
                 })
             }
-
             //}
 
         });
@@ -1348,21 +1343,22 @@ export class BwTableModule extends Component {
                         colHeadStr['SCANAMOUNT'] = ((resData.Calculate === undefined) ? "0" : resData.CalculateScan);
                     }
                     colHeadStr['OLD_DIFFAMOUNT'] = this.OLD_DIFFAMOUNT;
-                    calcRule.forEach(calc => {
-                        let {field, rule} = calc;
-                        if(rule.slice(0,3) == 'SUM'){
-                           let sum =  this.countCalcSum(ftable,rule),
-                                el = countElements[field];
-                                 el && (el.innerHTML = sum + '');
-                        }else {
-                            if (field && rule) {
-                                let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                    setTimeout(()=>{
+                        calcRule.forEach(calc => {
+                            let {field, rule} = calc;
+                            if(rule.slice(0,3) == 'SUM'){
+                                let sum =  this.countCalcSum(ftable,field),
                                     el = countElements[field];
-                                el && (el.innerHTML = tools.calc(diffValue));
+                                el && (el.innerHTML = sum + '');
+                            }else {
+                                if (field && rule) {
+                                    let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                                        el = countElements[field];
+                                    el && (el.innerHTML = tools.calc(diffValue));
+                                }
                             }
-                        }
-                    });
-
+                        });
+                    },980)
                     Shell.inventory.columnCountOff(when, 1, inventory, (res) => {
                     })
                 })
