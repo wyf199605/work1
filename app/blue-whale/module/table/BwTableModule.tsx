@@ -1600,7 +1600,7 @@ export class BwTableModule extends Component {
 
         let init = () => {
             this.cols.forEach(col => {
-                if (col.atrrs && col.atrrs.dataType === '20') {
+                if (col.atrrs && (col.atrrs.dataType === '20' || col.atrrs.dataType === '26')) {
                     if (col.noShow) {
                         fields.push(col);
                     } else {

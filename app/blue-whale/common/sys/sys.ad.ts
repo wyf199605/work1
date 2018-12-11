@@ -259,7 +259,7 @@ namespace BW {
                     });
                     self.handle('getSignImg', JSON.stringify({event, type: 1, image}));
                 },
-                getSign(callback: Function, error?: Function) {
+                getSign(callback: Function, error?: (msg?: string) => void) {
                     let event = '__EVT_GET_SIGN_BY_DEVICE__';
                     d.once(window, event, (response: CustomEvent) => {
                         try {
@@ -270,10 +270,10 @@ namespace BW {
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
                             } else {
-                                error && error(detail);
+                                error && error(detail || '');
                             }
                         } catch (e) {
-                            error && error();
+                            error && error('获取图片失败');
                         }
                     });
                     self.handle('getSignImg', JSON.stringify({event, type: 0}));

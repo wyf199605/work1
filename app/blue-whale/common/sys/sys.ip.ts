@@ -238,7 +238,7 @@ namespace BW{
                     });
                     self.handle('getSignImg', {event, type: 1, image});
                 },
-                getSign(callback: Function, error?: Function){
+                getSign(callback: Function, error?: (msg?: string) => void){
                     let event = '__EVT_GET_SIGN_BY_DEVICE__';
                     d.once(window, event, (response : CustomEvent) => {
                         try{
@@ -249,10 +249,10 @@ namespace BW{
                                 let file: File = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
                             }else{
-                                error && error(detail);
+                                error && error(detail.msg || '');
                             }
                         }catch (e){
-                            error && error();
+                            error && error('获取图片失败');
                         }
                     });
                     self.handle('getSignImg', {event, type: 0});
