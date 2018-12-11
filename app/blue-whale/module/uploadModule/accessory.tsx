@@ -4,10 +4,9 @@ import {FormCom} from "../../../global/components/form/basic";
 import tools = G.tools;
 import d = G.d;
 import {AccessoryItem, IAccessoryItem} from "./accessoryItem";
-import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {Loading} from "../../../global/components/ui/loading/loading";
 import {BwRule} from "../../common/rule/BwRule";
+import {BwUploader, IBwUploaderPara} from "./bwUploader";
 
 export interface IFileInfo {
     unique?: string;
@@ -16,7 +15,7 @@ export interface IFileInfo {
     addr?: string;
 }
 
-export interface IAccessory extends IUploaderPara {
+export interface IAccessory extends IBwUploaderPara {
     uniques?: string;
 
     onComplete?(...any); // 上传完成回调
@@ -29,7 +28,7 @@ export interface IAccessory extends IUploaderPara {
 
 export class Accessory extends FormCom {
 
-    public uploader: Uploader;
+    public uploader: BwUploader;
     private fileType: string = '';
     private typeUnique: string = '';
 
@@ -135,112 +134,86 @@ export class Accessory extends FormCom {
         this.initEvent.on();
     }
 
-    private loading: Loading = null;
-
     private createUploader() {
         if (tools.isEmpty(this.para.uploadUrl)) {
             Modal.alert('附件上传地址不能为空!');
             return;
         }
-        this.uploader = new Uploader({
+        this.uploader = new BwUploader({
+            loading: {
+                msg: '上传中',
+                container: document.body,
+                disableEl: document.body
+            },
             container: this.innerEl.uploader,
             uploadUrl: this.para.uploadUrl || BW.CONF.ajaxUrl.fileUpload,
             accept: this.para.accept,
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
-            typeUnique: this.typeUnique,
             text: '',
-            onComplete: (res, file, type) => {
-                if (type === this.typeUnique) {
-                    if (this.loading) {
-                        this.loading.hide();
-                        this.loading.destroy();
-                        this.loading = null;
-                        document.body.classList.remove('up-disabled');
+            onSuccess: (res, file, type) => {
+                if (res.code == 200 || res.errorCode === 0) {
+                    if (tools.isNotEmpty(res.ifExist)) {
+                        Modal.toast('附件已存在!');
+                    } else {
+                        Modal.toast('上传成功!');
                     }
-                    if (res.code == 200 || res.errorCode === 0) {
-                        if (tools.isNotEmpty(res.ifExist)) {
-                            Modal.toast('附件已存在!');
-                        } else {
-                            Modal.toast('上传成功!');
+                    switch (this.fileType) {
+                        case '43': {
+                            this.files = [{
+                                unique: file.name,
+                                filename: file.name,
+                                filesize: file.size,
+                                addr: ''
+                            }];
+                            this.para.onComplete && this.para.onComplete(res, file);
                         }
-                        switch (this.fileType) {
-                            case '43': {
-                                this.files = [{
-                                    unique: file.name,
-                                    filename: file.name,
-                                    filesize: file.size,
-                                    addr: ''
-                                }];
-                                this.para.onComplete && this.para.onComplete(res, file);
-                            }
-                                break;
-                            case '47': {
-                                this.value = res.data.unique;
-                            }
-                                break;
-                            case '48': {
-                                let v = this.get() || '',
-                                    unique = res.data.unique;
-                                if (tools.isNotEmpty(res.ifExist)) {
-                                    let files = this._files.filter(file => file.unique === unique);
-                                    if (tools.isEmpty(files)) {
-                                        this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
-                                    }
-                                } else {
+                            break;
+                        case '47': {
+                            this.value = res.data.unique;
+                        }
+                            break;
+                        case '48': {
+                            let v = this.get() || '',
+                                unique = res.data.unique;
+                            if (tools.isNotEmpty(res.ifExist)) {
+                                let files = this._files.filter(file => file.unique === unique);
+                                if (tools.isEmpty(files)) {
                                     this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
                                 }
+                            } else {
+                                this.value = tools.isNotEmpty(v) ? v + ',' + unique : unique;
                             }
-                                break;
                         }
-                    } else {
-                        this.para.onError && this.para.onError(file);
-                        Modal.alert(res.msg || res.errorMsg);
+                            break;
                     }
+                } else {
+                    this.para.onError && this.para.onError(file);
+                    Modal.alert(res.msg || res.errorMsg);
                 }
             }
         });
 
         // 有文件被选中时
-        this.uploader.on('filesQueued', (files: File[]) => {
+        this.uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: File[]) => {
             if ((this.fileType === '43' || this.fileType === '47') && files.length > 1) {
                 Modal.alert('一次只能上传一个附件!');
             } else {
                 if (files.length > 0) {
                     this.para.onChange && this.para.onChange();
                     //开始上传
-                    if (!this.loading) {
-                        this.loading = new Loading({
-                            msg: '上传中...',
-                            container: document.body
-                        });
-                        document.body.classList.add('up-disabled');
-                    }
-                    this.uploader.upload(this.typeUnique);
+                    this.uploader.upload();
                 }
             }
         });
-        this.uploader.on("uploadError", () => {
-            if (this.loading) {
-                this.loading.hide();
-                this.loading.destroy();
-                this.loading = null;
-                document.body.classList.remove('up-disabled');
-            }
-        });
-        this.uploader.on("error", (type) => {
-            const msg = {
-                'Q_TYPE_DENIED': '文件类型有误',
-                'F_EXCEED_SIZE': '文件大小不能超过4M',
-            };
-            if (this.loading) {
-                this.loading.hide();
-                this.loading.destroy();
-                this.loading = null;
-                document.body.classList.remove('up-disabled');
-            }
-            Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
-        });
+
+        // this.uploader.on("error", (type) => {
+        //     const msg = {
+        //         'Q_TYPE_DENIED': '文件类型有误',
+        //         'F_EXCEED_SIZE': '文件大小不能超过4M',
+        //     };
+        //     Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
+        // });
     }
 
     protected _listItems: AccessoryItem[] = [];
