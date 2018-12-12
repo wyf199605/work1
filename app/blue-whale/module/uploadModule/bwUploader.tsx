@@ -150,6 +150,20 @@ export class BwUploader extends FormCom {
         this.value = value;
     }
 
+    set disabled(e: boolean){
+        if (this._disabled !== e) {
+            if (tools.isNotEmpty(e)) {
+                this._disabled = e;
+                if (this._disabled) {
+                    this.wrapper && this.wrapper.classList.add('disabled');
+                } else {
+                    this.wrapper && this.wrapper.classList.remove('disabled');
+                }
+            }
+        }
+        this.input && (this.input.disabled = e);
+    }
+
     get value(){
         return this.filename;
     }
