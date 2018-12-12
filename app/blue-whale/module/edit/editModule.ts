@@ -233,7 +233,7 @@ export class EditModule {
                                     [p.field.name]: item.text,
                                     [p.field.lookUpKeyField]: item.value
                                 };
-                                p.onExtra(data, [p.field.lookUpKeyField])
+                                p.onExtra && p.onExtra(data, [p.field.lookUpKeyField])
                             }, 100)
                         }
                     }
