@@ -1,5 +1,14 @@
 .formPage{
 
+  .accessory-wrapper{
+    padding: 0;
+    .accessory-title{
+      display: none;
+    }
+    .images-wrapper{
+      padding: 6px 7px;
+    }
+  }
   .form{
     width: 100%;
   }
