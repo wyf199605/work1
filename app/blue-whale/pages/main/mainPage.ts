@@ -357,8 +357,9 @@ export = class MainPage {
 
 
         function myselfMenu() {
+            let wrapper = d.query('.popover-toggle');
             let popover = new Popover({
-                target: d.query('.popover-toggle'),
+                target: wrapper,
                 // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
                 isWatch: true,
                 items,
@@ -367,6 +368,7 @@ export = class MainPage {
                     hide();
                 }
             });
+            popover.wrapper.classList.add('home-self-menu');
 
             function hide() {
                 popover.show = false;
