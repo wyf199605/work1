@@ -2,6 +2,7 @@
   width: 100%;
   height: 100%;
   background-color: #f8f8f8;
+  overflow: hidden;
 }
 .edit-overflow-hidden{
   overflow: hidden !important;
@@ -9,11 +10,15 @@
 .list-item-detail-wrapper {
   background-color: #f8f8f8;
   width: 100%;
-  padding-bottom: 70px;
+  //padding-bottom: 70px;
+  height: 100%;
   //height: calc(100% - 114px);
   .list-detail-cells-wrapper {
     background-color: #ffffff;
     padding-left: 16px;
+    height: calc(100% - 70px);
+    overflow-y: scroll;
+    overflow-x: hidden;
     .detail-cell {
       height: 50px;
       width: 100%;
@@ -96,6 +101,7 @@
           justify-content: flex-start;
           padding: 15px 0;
           height: 80px;
+          position: relative;
           .file-icon {
             width: 50px;
             height: 50px;

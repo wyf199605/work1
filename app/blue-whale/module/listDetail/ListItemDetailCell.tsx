@@ -8,6 +8,8 @@ import d = G.d;
 import {ActionSheet} from "../../../global/components/ui/actionSheet/actionSheet";
 import {ListItemDetail} from "./ListItemDetail";
 import sys = BW.sys;
+import {ImgModalMobile} from "../../common/ImgModalMobile";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
 
@@ -31,6 +33,7 @@ interface IDetailCell extends IComponentPara {
 export class ListItemDetailCell extends Component {
     private para: IDetailCell;
     private files: IFile[] = [];
+    private imgs: string[] = [];
     private actionSheet: ActionSheet;
     private _currentFile: IFile;
     private fileType: string = '';
@@ -102,17 +105,18 @@ export class ListItemDetailCell extends Component {
         }
         if (Array.isArray(value) && tools.isNotEmpty(value)) {
             let imgHtml = [];
-            value.forEach((v) => {
-                imgHtml.push(`<img src=${v} alt=${this.para.caption}/>`);
+            value.forEach((v, i) => {
+                imgHtml.push(`<img src=${v} alt=${this.para.caption} data-index=${i}/>`);
             });
             imgsWrapper.innerHTML = imgHtml.join();
+            this.imgEvent.on();
         }
     }
 
     createAllFiles(value: IFile[], fileWrapper: HTMLElement) {
         fileWrapper.innerHTML = '';
         if (tools.isNotEmpty(value)) {
-            this.initEvent.on();
+            this.fileEvent.on();
             if (!this.actionSheet) {
                 this.actionSheet = new ActionSheet({
                     buttons: [
@@ -169,8 +173,8 @@ export class ListItemDetailCell extends Component {
         }
     }
 
-    private initEvent = (() => {
-        let option = (e) => {
+    private fileEvent = (() => {
+        let fileOption = (e) => {
             let index = parseInt(d.closest(e.target, '.detail-cell-file-item').dataset.index),
                 files = this.files || [];
             this.currentFile = files[index];
@@ -178,10 +182,37 @@ export class ListItemDetailCell extends Component {
         };
         return {
             on: () => {
-                d.on(this.wrapper, 'click', '.file-option', option);
+                d.on(this.wrapper, 'click', '.file-option', fileOption);
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.file-option', option);
+                d.off(this.wrapper, 'click', '.file-option', fileOption);
+            }
+        }
+    })();
+
+    private imgEvent = (() => {
+        let imgOption = (e) => {
+            let imgs = this.imgs || [];
+            let imgData: ImgModalPara = {
+                img: ListItemDetailCell.getBigPicture(imgs),
+                onDownload:function (url:string) {
+                    sys.window.download(url);
+                }
+            };
+            ImgModal.show(imgData);
+            if (tools.isMb) {
+                document.body.style.overflow = 'hidden';
+                setTimeout(()=>{
+                    d.query('.pswp',document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
+                },200);
+            }
+        };
+        return {
+            on: () => {
+                d.on(this.wrapper, 'click', '.detail-cell-imgs img', imgOption);
+            },
+            off: () => {
+                d.off(this.wrapper, 'click', '.detail-cell-imgs img', imgOption);
             }
         }
     })();
@@ -194,6 +225,7 @@ export class ListItemDetailCell extends Component {
             }
                 break;
             case 'img': {
+                this.imgs = data as string[] || [];
                 this.createImgs(data, this.innerEl.imgs);
             }
                 break;
@@ -261,10 +293,22 @@ export class ListItemDetailCell extends Component {
         return size;
     }
 
+    static getBigPicture(imgs: string[]): string[] {
+        let result = [];
+        imgs.forEach(img => {
+            result.push(tools.url.addObj(img, {
+                imagetype: 'picture',
+            },true,true));
+        });
+        return result;
+    };
+
     destroy() {
         this.para = null;
-        this.files && this.initEvent.off();
+        this.files && this.fileEvent.off();
         this.files = null;
+        this.imgs && this.imgEvent.off();
+        this.imgs = null;
         this.actionSheet && this.actionSheet.destroy();
         this.actionSheet = null;
         this.currentFile = null;

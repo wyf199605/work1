@@ -65,6 +65,7 @@
   }
 }
 .mb-list-view{
+  height: 100%;
   ul.nav.nav-tabs.nav-tabs-line{
     &.space-around{
       justify-content: space-around;
@@ -111,8 +112,8 @@
     }
   }
   .tab-content {
+    height: 100%;
     padding: 44px 0 0 0;
-    //height: calc(100% - 44px);
     .tab-pane {
       height: 100%;
     }

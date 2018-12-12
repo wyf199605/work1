@@ -56,8 +56,8 @@ export class MbListModule extends Component {
                 globalButtons.forEach((btn) => {
                     btnArr.push({
                         content: btn.caption,
-                        icon: btn.icon ? btn.icon.split(' ')[1] : '',
-                        iconPre: btn.icon ? btn.icon.split(' ')[0] : '',
+                        // icon: btn.icon ? btn.icon.split(' ')[1] : '',
+                        // iconPre: btn.icon ? btn.icon.split(' ')[0] : '',
                         onClick: () => {
                             ButtonAction.get().clickHandle(btn, {});
                             sliderPopover.modal.isShow = false;
@@ -92,6 +92,7 @@ export class MbListModule extends Component {
      * @Description: 初始化列表
      */
     private mbList: MbList = null;
+
     private initMbList() {
         let multiButtons = [], itemButtons = [];
         this.allButtons[1] && this.allButtons[1].forEach(btn => {
@@ -142,7 +143,7 @@ export class MbListModule extends Component {
                 pageSize: tools.isMb ? 10 : 4,
                 isPulldownRefresh: true,
                 render: (start: number, length: number, data: obj[]) => {
-                    this.mbList.wrapper.classList.toggle('no-data',tools.isEmpty(data));
+                    this.mbList.wrapper.classList.toggle('no-data', tools.isEmpty(data));
                     this.defaultData = data;
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
@@ -150,9 +151,9 @@ export class MbListModule extends Component {
                     return new Promise<{ data: obj[], total: number }>((resolve) => {
                         let dataAddr: R_ReqAddr = this.para.ui.body.elements[0].dataAddr,
                             url = BW.CONF.siteUrl + BwRule.reqAddr(dataAddr);
-                        url = tools.url.addObj(url, Object.assign({},{
+                        url = tools.url.addObj(url, Object.assign({}, {
                             pageparams: '{"index"=' + (current + 1) + ', "size"=' + pageSize + ',"total"=1}'
-                        },custom));
+                        }, custom));
                         BwRule.Ajax.fetch(url).then(({response}) => {
                             let body = response.body,
                                 head = response.head;
@@ -260,7 +261,11 @@ export class MbListModule extends Component {
                     }
                         break;
                     case 'countDown': {
-                        itemObj['countDown'] = new Date(item[layout['countDown']]).getTime();
+                        let time: string = item[layout['countDown']];
+                        if (tools.isNotEmpty(time)){
+                            time = time.replace(/\-/g, '/');
+                            itemObj['countDown'] = new Date(time).getTime();
+                        }
                     }
                         break;
                     case 'status': {
