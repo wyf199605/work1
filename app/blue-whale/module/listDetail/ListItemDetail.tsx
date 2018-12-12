@@ -46,7 +46,7 @@ export class ListItemDetail {
                 if (!field.noShow) {
                     this.cells[field.name] = new ListItemDetailCell({
                         caption: field.caption,
-                        type: this.getType(field.dataType || field.atrrs.dataType || ''),
+                        type: DetailModal.getType(field.dataType || field.atrrs.dataType || ''),
                         container: cellsWrapper,
                         detailPage: this,
                         field: field
@@ -85,7 +85,7 @@ export class ListItemDetail {
         wrapper.appendChild(groupWrapper);
         groupFields.forEach(field => {
             let className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber)-1],
-                type = this.getType(field.dataType || field.atrrs.dataType || '');
+                type = DetailModal.getType(field.dataType || field.atrrs.dataType || '');
             if (~['textarea', 'file', 'img'].indexOf(type)) {
                 className = 'one-column';
             }
@@ -106,7 +106,7 @@ export class ListItemDetail {
     // 初始化详情数据
     initDetailData(): Promise<obj> {
         let fields: R_Field[] = this.para.fm.fields;
-        return new Promise<obj>((resolve, reject) => {
+        return new Promise<obj>((resolve) => {
             let data: obj = {};
             if (tools.isNotEmpty(this.ajaxUrl)) {
                 let url = tools.url.addObj(this.ajaxUrl, {
@@ -411,24 +411,6 @@ export class ListItemDetail {
                 window.scrollTo(0, currentScroll - (currentScroll / 5));
             }
         })();
-    }
-
-    private getType(t: string): DetailCellType {
-        let type: DetailCellType;
-        if (t === '18') {
-            type = 'textarea';
-        } else if (t === '20' || t ==='26' || t === '27' || t === '28') {
-            type = 'img';
-        } else if (t === '43' || t === '47' || t === '48') {
-            type = 'file';
-        } else if (t === '12') {
-            type = 'date';
-        } else if (t === '13') {
-            type = 'datetime';
-        } else {
-            type = 'text';
-        }
-        return type;
     }
 
     handlerValue(text, format: R_Field): string | string[] {

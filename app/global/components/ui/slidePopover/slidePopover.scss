@@ -40,9 +40,19 @@
     padding-left: 16px;
     button {
       margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       span {
         line-height: 30px;
         margin-right: 0;
+      }
+      i{
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        height: 100%;
+        line-height: 2.5;
       }
       &:active {
         border: solid 1px #005bac !important;
@@ -96,6 +106,13 @@
             display: block;
             line-height: 30px;
             margin-right: 0;
+          }
+          i{
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+            height: 100%;
+            line-height: 2.5;
           }
           &:active {
             border: solid 1px #005bac !important;
