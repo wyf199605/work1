@@ -70,15 +70,12 @@ export class ButtonAction {
             });
 
             //TODO 将UploadModule过程效果整合到upload组件
-            require(['UploadModule'], function (upload) {
+            require(['BwUploader'], function (BwUploader) {
                 let loadUrl = CONF.siteUrl + btn.actionAddr.dataAddr;
-                com = new upload.default({
+                com = new BwUploader.BwUploader({
                     container: <HTMLElement>uploderModal.body,
                     uploadUrl: loadUrl + (loadUrl.indexOf('?') > -1 ? '&' : '?') + "item_id=" + itemId,
-                    onChange: () => {
-
-                    },
-                    onComplete: (resuult) => {
+                    onSuccess: (result) => {
                         // console.log(data);
                         //后台表格数据返回
                         // tableData = resuult.data;
@@ -267,17 +264,24 @@ export class ButtonAction {
 
         }
         let USER = User.get().userid,
-            SHO = User.get().are_id;
-        require(['RfidBarCode'], (p) => {
-            new p.RfidBarCode({
-                codeStype: codeStype,
-                SHO_ID: SHO,
-                USERID: USER,
-                uploadUrl: uploadUrl,
-                downUrl: url,
-                uniqueFlag: uniqueFlag
+            SHO = User.get().are_id,
+            can2dScan = G.Shell.inventory.can2dScan;
+
+        if(can2dScan){
+            require(['RfidBarCode'], (p) => {
+                new p.RfidBarCode({
+                    codeStype: codeStype,
+                    SHO_ID: SHO,
+                    USERID: USER,
+                    uploadUrl: uploadUrl,
+                    downUrl: url,
+                    uniqueFlag: uniqueFlag
+                })
             })
-        })
+        }else {
+            Modal.alert('只支持手持机');
+        }
+
     }
 
     /**
@@ -461,7 +465,7 @@ export class ButtonAction {
                                 }
                             }
                         } else {
-                            Modal.alert('调用接口失败，请重试！');
+                            Modal.alert(event && typeof event.mag === 'string' ? event.msg : '调用接口失败，请重试！');
                         }
 
                     } else {

@@ -130,26 +130,35 @@ export class DrawPoint extends Component {
                 this.redraw();
             })
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
+
         this.g.on('touchstart',function (ev) {
+            // D3.event.stopPropagation();
         }).on('touchmove',function (ev) {
             let ob = D3.event.changedTouches;
             let touhs = [];
-             touhs.push(ob[0].clientX)
+            touhs.push(ob[0].clientX)
             touhs.push(ob[0].clientY)
-            touhs.push(ob[1].clientX)
-            touhs.push(ob[1].clientY)
-              let pos = D3.touches(this)[0];
-              let slate = [];
-              slate.push(pos[0])
-              slate.push(pos[1])
-              _this.svg.attr('x',slate[0]).attr('y',slate[1])
+            //touhs.push(ob[1].clientX)
+            //touhs.push(ob[1].clientY)
+            //alert(touhs + 'move');
+            let pos = D3.touches(this)[0];
+            let slate = [];
+            slate.push(pos[0])
+            slate.push(pos[1])
+            setTimeout(()=>{
+                _this.g.attr('transform', "translate(" + touhs+ ")");
+            },45)
+
         }).on('touchend',function () {
             let ob = D3.event.changedTouches;
             let touhs = [];
             touhs.push(ob[0].clientX)
             touhs.push(ob[0].clientY)
+            //touhs.push(ob[1].clientX)
+            //touhs.push(ob[1].clientY)
+            //alert(touhs + 'end');
         })
-       let img = this.g.append('image').attr('xlink:href', () => {
+        let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
@@ -249,7 +258,9 @@ export class DrawPoint extends Component {
             this.g.selectAll('g').remove();
             this.g.selectAll('circle').remove();
         }
-
+        this.zoom.scale(1);
+        this.zoom.translate([0,0]);
+        this.g.attr('transform',  "scale(" + 1 + ")");
         this.renderData = data;
         this.index = data.length || 0;//初始化index
 
@@ -293,18 +304,8 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
-         // let tranData =  this.format(d)
-         //        .sort((a, b) => {
-         //            if (!a.isPoint && !b.isPoint) {
-         //                return 0;
-         //            } else if(a.isPoint) {
-         //                return -1;
-         //            } else{
-         //                return 1;
-         //            }
-         //        })
-          let tranData = this.changeArr(this.format(d))
-             tranData.forEach((data) => {
+            let tranData = this.changeArr(this.format(d))
+            tranData.forEach((data) => {
                 //console.log(data);
                 //  需要用到有point的data
                 if (data.isPoint && data.data && tools.isNotEmpty(data.data)) {
@@ -358,8 +359,9 @@ export class DrawPoint extends Component {
                         .attr('dy', 15 )
                         .text(function (d) {
                             data.data && toolData.push(data.data)
-                            return  detail[d];
-
+                            if(I <=2 ){
+                                return  detail[d];
+                            }
                         }).attr('font-size', function (d) {
                             let w = group.select('path').node().getBBox().width,
                                 g = group.select('path').node().getBBox().height;
@@ -421,29 +423,28 @@ export class DrawPoint extends Component {
     }
 
     private changeArr(arr){
-       let index = 0;
-       for(let i= 0;i < arr.length;i++){
-           if(arr[i].isPoint){
-               index = i;
-           }
-       }
-       if(index == 0){ return}
+        let index = 0;
+        for(let i= 0;i < arr.length;i++){
+            if(arr[i].isPoint){
+                index = i;
+            }
+        }
+        if(index == 0){ return}
         let str = arr.splice(index,1);
         arr.unshift(str[0]);
         return arr;
     }
     //区域显示颜色
     private AreaColor( color:string){
-       this.g.selectAll('g').selectAll('path').attr('fill-opacity',function (d) {
-           return color;
-       })
+        this.g.selectAll('g').selectAll('path').attr('fill-opacity',function (d) {
+            return color;
+        })
     }
 
+    private wrapTime:boolean = false;
     //字体换行
     private wrapWord(text, width, centerX, centerY,I) {
-        // if(I !==2 ){
-        //     return
-        // }
+        let _this = this;
         text.each(function () {
             let text = D3.select(this),
                 words = text.text().split('').reverse(),
@@ -458,12 +459,17 @@ export class DrawPoint extends Component {
             } else {
                 lineHeight = 5.3
             }
+            if(I == 2 &&  _this.wrapTime){
+                I = 2.90;
+                _this.wrapTime = false;
+            }
             let tspan = text.text(null).append('tspan').attr('dy', lineHeight + (lineHeight * I)).attr('dx', 5).attr('x', centerX - 5.3).attr('y', centerY - 12);
             while (word = words.pop()) {
                 line.push(word);
                 const dash = lineNumber > 0 ? '-' : '';
                 tspan.text(dash + line.join(''));
                 if (tspan.node().getComputedTextLength() > width) {
+                    _this.wrapTime = true;
                     line.pop();
                     tspan.text(line.join(''));
                     line = [word];
@@ -1034,16 +1040,16 @@ export class DrawPoint extends Component {
 
         if(tools.isMb){
             let scale = 1;
-           //  d.on(this.wrapper, 'touchzoom', (ev) => {
-           //      //
-           //      scale = ev.scale;
-           //      scale = Math.min(ev.scale, 5);
-           //      scale = Math.max(0.5, ev.scale);
-           //      // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
-           //      _this.g.attr('transform', "scale(" + scale + ")");
-           //      _this.svg.attr('width', scale * 1200);
-           //      _this.svg.attr('height', scale * 800);
-           // })
+            //  d.on(this.wrapper, 'touchzoom', (ev) => {
+            //      //
+            //      scale = ev.scale;
+            //      scale = Math.min(ev.scale, 5);
+            //      scale = Math.max(0.5, ev.scale);
+            //      // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
+            //      _this.g.attr('transform', "scale(" + scale + ")");
+            //      _this.svg.attr('width', scale * 1200);
+            //      _this.svg.attr('height', scale * 800);
+            // })
         }else{
             this.zoom = D3.behavior.zoom()
                 .x(X)
