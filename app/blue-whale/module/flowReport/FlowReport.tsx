@@ -221,6 +221,7 @@ export class FlowReport extends BasicPage {
                     }, self.url);
                     break;
                 case 'agree': {
+                    btn.actionAddr.dataAddr += '&audit_memo=同意';
                     btn.hintAfterAction = true;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
                         // sys.window.close();
