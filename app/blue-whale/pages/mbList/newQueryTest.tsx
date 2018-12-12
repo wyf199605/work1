@@ -10,7 +10,8 @@ import {NewTableModule} from "../../module/table/newTableModule";
 
 export class NewQueryTest extends BasicPage {
     private query: NewQueryModalMb;
-    private tableModule : NewTableModule;
+    private tableModule: NewTableModule;
+
     constructor(para: ITablePagePara) {
         super(para);
         let bwTableEl = para.ui.body.elements[0];
@@ -20,20 +21,21 @@ export class NewQueryTest extends BasicPage {
         });
         let dataStr = bwTableEl.querier.mobileSetting.settingValue.replace(/\s*/g, '').replace(/\\*/g, '');
         d.on(d.query('body > header [data-action="new-query"]'), 'click', () => {
-            if (this.query){
+            if (this.query) {
                 this.query.isShow = true;
-            }else{
+            } else {
                 this.query = new NewQueryModalMb({
                     queryItems: JSON.parse(dataStr),
+                    advanceSearch: bwTableEl.querier,
                     search: (data) => {
-                        let url = BW.CONF.siteUrl + '/app_sanfu_retail/null/list/node_nobugs?pageparams=%7B%22index%22%3D1%2C%22size%22%3D50%2C%22total%22%3D1%7D';
-                        url = tools.url.addObj(url, {
-                            mqueryparams: JSON.stringify(data)
-                        });
-                        BwRule.Ajax.fetch(url).then(({response}) => {
-                            // this.tableModule
+
+                    },
+                    cols: bwTableEl.cols,
+                    refresher: (obj => {
+                        return new Promise((resolve, reject) => {
+
                         })
-                    }
+                    })
                 });
             }
         });

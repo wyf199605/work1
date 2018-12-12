@@ -38,7 +38,7 @@ export class MbList extends Component {
         super(para);
         this._isImg = tools.isEmpty(para.isImg) ? true : para.isImg;
         // 批量选择按钮
-        if (para.isMulti){
+        if (para.isMulti) {
             tools.isMb && this.createMultiIcon();
             !tools.isMb && (this.multiple = para.isMulti);
         }
@@ -139,7 +139,7 @@ export class MbList extends Component {
 
     // 创建多选按钮
     protected createMultiButtons(multiButtons: string[]) {
-        if(tools.isMb){
+        if (tools.isMb) {
             let buttonsWrapper: HTMLElement;
             this.multiButtonsWrapper = <div className="list-batch-wrapper hide">
                 {this.statisticWrapper = <div className="statistic">
@@ -186,7 +186,7 @@ export class MbList extends Component {
             } else {
                 buttonsWrapper.classList.add('hide');
             }
-        }else{
+        } else {
             this.multiButtonsWrapper = <div className="list-batch-wrapper">
                 <div className="select-all">{this.checkBox = <CheckBox text="全选" onClick={(isChecked) => {
                     this._listItems.forEach(item => {
@@ -199,17 +199,17 @@ export class MbList extends Component {
             if (tools.isNotEmptyArray(multiButtons)) {
                 let buttons = [];
                 multiButtons.forEach((item, index) => {
-                   buttons.push({
-                       content:item,
-                       onClick:()=>{
-                           tools.isFunction(this.para.multiClick) && this.para.multiClick(index,this.getSelectIndexes());
-                       }
-                   })
+                    buttons.push({
+                        content: item,
+                        onClick: () => {
+                            tools.isFunction(this.para.multiClick) && this.para.multiClick(index, this.getSelectIndexes());
+                        }
+                    })
                 });
                 new ButtonBox({
-                    children:buttons,
-                    container:this.multiButtonsWrapper,
-                    limitCount:5
+                    children: buttons,
+                    container: this.multiButtonsWrapper,
+                    limitCount: 5
                 });
                 this.wrapper.classList.add('padding-bottom');
             }
@@ -230,24 +230,31 @@ export class MbList extends Component {
         this.countWrapper.innerText = count.toString();
     }
 
+    private  _dataManager: DataManager;
+    set dataManager(dataManager:DataManager){
+        this._dataManager = dataManager;
+    }
+    get dataManager(){
+        return this._dataManager;
+    }
     protected initDataManager() {
-        let page = this.para.dataManager,
-            dataManager = new DataManager({
-                page: {
-                    size: page.pageSize,
-                    container: this.wrapper.parentElement,
-                    isPulldownRefresh: page.isPulldownRefresh || false,
-                    options: [10, 20, 50]
-                },
-                render: (start, length, isRefresh) => {
-                    typeof page.render === 'function' && page.render(start, length, dataManager.data, isRefresh);
-                },
-                ajax: {
-                    fun: page.ajaxFun,
-                    ajaxData: page.ajaxData,
-                    auto: true
-                }
-            });
+        let page = this.para.dataManager;
+        this.dataManager = new DataManager({
+            page: {
+                size: page.pageSize,
+                container: this.wrapper.parentElement,
+                isPulldownRefresh: page.isPulldownRefresh || false,
+                options: [10, 20, 50]
+            },
+            render: (start, length, isRefresh) => {
+                typeof page.render === 'function' && page.render(start, length, this.dataManager.data, isRefresh);
+            },
+            ajax: {
+                fun: page.ajaxFun,
+                ajaxData: page.ajaxData,
+                auto: true
+            }
+        });
     }
 
     protected _isImg: boolean;
@@ -336,6 +343,7 @@ export class MbList extends Component {
         d.remove(this.multiButtonsWrapper);
         d.remove(this.statisticWrapper);
         d.remove(this.countWrapper);
+        this.dataManager.destroy();
         this.multiButtonsWrapper = null;
         this.statisticWrapper = null;
         this.countWrapper = null;

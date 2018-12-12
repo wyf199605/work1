@@ -45,6 +45,20 @@
     width: 100%;
     flex: 0 0 auto;
     overflow-y: auto;
+    .mb-list-wrapper.no-data{
+      &::after{
+        font-family: "appcommon" !important;
+        font-style: normal;
+        -webkit-font-smoothing: antialiased;
+        content: "\e62b";
+        display: block;
+        font-size: 150px;
+        text-align: center;
+        padding: 20px 0;
+        line-height: 200px;
+        color: #666;
+      }
+    }
     &.global-buttons-height{
       height: calc(100% - 50px) !important;
     }

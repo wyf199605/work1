@@ -8,8 +8,11 @@ import {QueryModule, QueryModulePara} from "../query/queryModule";
 
 interface INewQueryPara {
     queryItems?: IQueryItem[];
-    search?: (data: IResult[]) => void;
+    search?: (data: obj) => void;
     advanceSearch?:QueryModulePara;
+    cols?:R_Field[];
+    url?:string;
+    refresher?:(obj?:obj) => Promise<any>;
 }
 
 export class NewQueryModalMb {
@@ -51,13 +54,20 @@ export class NewQueryModalMb {
                     content: '高级搜索',
                     className: 'advance-search',
                     onClick: () => {
-                        Modal.alert('暂不支持高级搜索!');
                         let advanceSearch = this.para.advanceSearch;
                         if (tools.isNotEmpty(advanceSearch)){
                             require([NewQueryModalMb.QUERY_MODULE_NAME],(Query) => {
-                                let query:QueryModule = new Query(advanceSearch);
+                                let query:QueryModule = new Query({
+                                    qm: advanceSearch,
+                                    container: document.body,
+                                    refresher : this.para.refresher,
+                                    cols : this.para.cols,
+                                    url : this.para.url
+                                });
                                 query.show();
                             })
+                        }else{
+                            Modal.alert('暂不支持高级搜索!');
                         }
                     },
                 }).wrapper
@@ -85,7 +95,10 @@ export class NewQueryModalMb {
                             // 校验
                             if (this.validate()) {
                                 this.isShow = false;
-                                tools.isFunction(this.para.search) && this.para.search(this.json);
+                                let data = tools.isNotEmpty(this.json) ? JSON.stringify(this.json) : '';
+                                tools.isFunction(this.para.search) && this.para.search({
+                                    mqueryparams: data
+                                });
                             }
                         }
                     }
