@@ -1,58 +1,13 @@
 namespace G{
-    // export let localUser = (function () {
-    //     let u = window.localStorage.getItem('local_uuid_info');
-    //     let uu = window.localStorage.getItem('local_user_info');
-    //     let autoFillInput = window.localStorage.getItem('local_autoFillInput');
-    //     try{
-    //         u = u ? JSON.parse(u) : {};
-    //         uu = uu ? JSON.parse(uu) : {};
-    //     }catch(e){
-    //     }
-    //     return {
-    //         /**
-    //          * 获取用户资料
-    //          * @param {string }[field]
-    //          * @return {*}
-    //          */
-    //         getUser: function (field) {
-    //             return typeof field === 'undefined' ? u : u[field.toUpperCase()];
-    //         },
-    //         setUser: function (user) {
-    //             u = user;
-    //             window.localStorage.setItem('local_uuid_info', JSON.stringify(user));
-    //         },
-    //         getUUser: function (field?) {
-    //             return typeof field === 'undefined' ? uu : uu[field.toUpperCase()];
-    //         },
-    //         setUUser: function (user) {
-    //             uu = user;
-    //             window.localStorage.setItem('local_user_info', JSON.stringify(user));
-    //         },
-    //         isSavePassword: autoFillInput,
-    //         setSavePassword: function (state) {
-    //             if (state) {
-    //                 window.localStorage.setItem('local_autoFillInput', '1');
-    //             } else {
-    //                 window.localStorage.removeItem('local_autoFillInput');
-    //             }
-    //         },
-    //
-    //         /**
-    //          *
-    //          * @param type 1指纹登录 0 密码登录
-    //          */
-    //         setLoginMethod: function (type) {
-    //             window.localStorage.setItem('TouchIdLogin', type);
-    //         },
-    //         getCurrentUserId: function () {
-    //             return this.getUser('userid');
-    //         }
-    //     }
-    // })();
+    let _storage = window.localStorage;
+    let user = JSON.parse(_storage.getItem("userInfo"));
+    if(tools.isEmpty(user))
+        user = {};
+    if(typeof user === 'string')
+        user = JSON.parse(<string>user);
 
+    let LOCAL_MSG_ID = 'local_msg_' + user.userid;
     export let localMsg = (function () {
-        let _storage = window.localStorage;
-
         let _notify = function(){
             if(G.tools.isPc){
                 let unreadMsgNum = d.query('#unreadMsgNum'),
@@ -66,14 +21,14 @@ namespace G{
             }
         };
         let _get = function () {
-            let s = _storage.getItem('local_msg');
+            let s = _storage.getItem(LOCAL_MSG_ID);
             return s ? JSON.parse(s) : [];
         };
         let _save = function (array) {
             if (!Array.isArray(array)) {
                 array = [];
             }
-            _storage.setItem('local_msg', JSON.stringify(array));
+            _storage.setItem(LOCAL_MSG_ID, JSON.stringify(array));
 
             _notify();
         };
