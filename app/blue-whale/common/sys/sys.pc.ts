@@ -291,12 +291,20 @@ namespace BW {
                 },
                 wake: function (event, data) {
                 },
-                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
+                getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let input = <HTMLInputElement>d.create('<input type="file" class="hide"/>');
                     input.multiple = multi;
                     accpet && (input.accept = accpet);
                     d.on(input, 'change', () => {
-                        callback && callback(Array.prototype.slice.call(input.files));
+                        callback && callback(Array.prototype.slice.call(input.files).map((file: File): CustomFile => {
+                            return {
+                                blob: file,
+                                name: file.name,
+                                lastModifiedDate: file.lastModifiedDate,
+                                type: file.type,
+                                size: file.size
+                            }
+                        }));
                         input = null;
                     });
                     input.click();
