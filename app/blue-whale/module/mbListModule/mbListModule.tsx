@@ -119,12 +119,6 @@ export class MbListModule extends Component {
             },
             itemClick: (index) => {
                 let data = this.defaultData[index],
-<<<<<<< Updated upstream
-                    url = BW.CONF.siteUrl + BwRule.reqAddr(this.para.ui.body.elements[0].subTableAddr,data);
-                sys.window.open({
-                    url:url
-                })
-=======
                     addr: R_ReqAddr = this.para.ui.body.elements[0].subTableAddr;
                 if (tools.isNotEmpty(addr)) {
                     let url = BW.CONF.siteUrl + BwRule.reqAddr(addr, data);
@@ -132,7 +126,6 @@ export class MbListModule extends Component {
                         url: url
                     })
                 }
->>>>>>> Stashed changes
             },
             multiClick: (btnIndex, itemsIndexes) => {
                 let buttons = this.allButtons[1] || [],
