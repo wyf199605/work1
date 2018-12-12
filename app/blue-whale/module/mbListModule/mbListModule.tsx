@@ -12,19 +12,21 @@ import {SlidePopover} from "../../../global/components/ui/slidePopover/slidePopo
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
-export interface IMbListModule extends IComponentPara{
+
+export interface IMbListModule extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
 }
 
-export class MbListModule extends Component{
+export class MbListModule extends Component {
     protected wrapperInit(para: IMbListModule): HTMLElement {
         return <div className="mb-list-module"/>;
     }
+
     private isImgTpl: boolean = false;
     private layout: obj = {};
     private captions: string[] = [];
     private isMulti: boolean = false;
-    private defaultData:obj[] = [];
+    private defaultData: obj[] = [];
 
     constructor(private para: IMbListModule) {
         super(para);
@@ -38,40 +40,44 @@ export class MbListModule extends Component{
         this.initEvents.on();
     }
 
+    refresh(ajaxData: obj) {
+        return this.mbList.dataManager.refresh(ajaxData);
+    }
+
     // 创建全局按钮
     private initGlobalButtons() {
         let globalButtons = this.allButtons[0] || [];
         if (tools.isNotEmpty(globalButtons)) {
-            if (tools.isMb){
+            if (tools.isMb) {
                 let sliderPopover = new SlidePopover({
-                    container:this.wrapper
+                    container: this.wrapper
                 });
-                let btnArr:IButton[] = [];
+                let btnArr: IButton[] = [];
                 globalButtons.forEach((btn) => {
                     btnArr.push({
-                        content:btn.caption,
-                        icon:btn.icon ? btn.icon.split(' ')[1] : '',
-                        iconPre:btn.icon ? btn.icon.split(' ')[0] : '',
-                        onClick:()=>{
-                            ButtonAction.get().clickHandle(btn,{});
+                        content: btn.caption,
+                        icon: btn.icon ? btn.icon.split(' ')[1] : '',
+                        iconPre: btn.icon ? btn.icon.split(' ')[0] : '',
+                        onClick: () => {
+                            ButtonAction.get().clickHandle(btn, {});
                             sliderPopover.modal.isShow = false;
                         }
                     })
                 });
                 sliderPopover.buttons = btnArr;
-            }else{
+            } else {
                 let globalButtonWrapper = <div className="global-button-wrapper"/>;
                 this.wrapper.appendChild(globalButtonWrapper);
-                let buttons:Button[] = [];
+                let buttons: Button[] = [];
                 let box = new InputBox({
-                    container:globalButtonWrapper
+                    container: globalButtonWrapper
                 });
                 globalButtons.forEach((btn) => {
                     buttons.push(new Button({
-                        content:btn.caption,
-                        container:box.wrapper,
-                        onClick:()=>{
-                            ButtonAction.get().clickHandle(btn,{});
+                        content: btn.caption,
+                        container: box.wrapper,
+                        onClick: () => {
+                            ButtonAction.get().clickHandle(btn, {});
                         }
                     }))
                 });
@@ -80,9 +86,12 @@ export class MbListModule extends Component{
         }
     }
 
-    // 创建列表
+    /**
+     * @author WUML
+     * @date 2018/12/11
+     * @Description: 初始化列表
+     */
     private mbList: MbList = null;
-
     private initMbList() {
         let multiButtons = [], itemButtons = [];
         this.allButtons[1] && this.allButtons[1].forEach(btn => {
@@ -106,23 +115,33 @@ export class MbListModule extends Component{
                     btn = buttons[btnIndex],
                     data = this.defaultData[itemIndex];
                 console.log(data);
-                ButtonAction.get().clickHandle(btn,data);
+                ButtonAction.get().clickHandle(btn, data);
             },
             itemClick: (index) => {
                 let data = this.defaultData[index],
+<<<<<<< Updated upstream
                     url = BW.CONF.siteUrl + BwRule.reqAddr(this.para.ui.body.elements[0].subTableAddr,data);
                 sys.window.open({
                     url:url
                 })
+=======
+                    addr: R_ReqAddr = this.para.ui.body.elements[0].subTableAddr;
+                if (tools.isNotEmpty(addr)) {
+                    let url = BW.CONF.siteUrl + BwRule.reqAddr(addr, data);
+                    sys.window.open({
+                        url: url
+                    })
+                }
+>>>>>>> Stashed changes
             },
-            multiClick:(btnIndex, itemsIndexes) => {
+            multiClick: (btnIndex, itemsIndexes) => {
                 let buttons = this.allButtons[1] || [],
                     btn = buttons[btnIndex],
                     data = [];
-                this.defaultData.forEach((da,index) => {
+                this.defaultData.forEach((da, index) => {
                     itemsIndexes.indexOf(index) > -1 && data.push(da);
                 });
-                ButtonAction.get().clickHandle(btn,data);
+                ButtonAction.get().clickHandle(btn, data);
                 console.log(data);
             },
             container: wrapper,
@@ -130,16 +149,17 @@ export class MbListModule extends Component{
                 pageSize: tools.isMb ? 10 : 4,
                 isPulldownRefresh: true,
                 render: (start: number, length: number, data: obj[]) => {
+                    this.mbList.wrapper.classList.toggle('no-data',tools.isEmpty(data));
                     this.defaultData = data;
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
                 ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
                     return new Promise<{ data: obj[], total: number }>((resolve) => {
                         let dataAddr: R_ReqAddr = this.para.ui.body.elements[0].dataAddr,
-                            url = BW.CONF.siteUrl + BwRule.reqAddr(dataAddr, custom);
-                        url = tools.url.addObj(url, {
+                            url = BW.CONF.siteUrl + BwRule.reqAddr(dataAddr);
+                        url = tools.url.addObj(url, Object.assign({},{
                             pageparams: '{"index"=' + (current + 1) + ', "size"=' + pageSize + ',"total"=1}'
-                        });
+                        },custom));
                         BwRule.Ajax.fetch(url).then(({response}) => {
                             let body = response.body,
                                 head = response.head;
@@ -259,7 +279,7 @@ export class MbListModule extends Component{
                         let imgLabelColor = layout['imgLabelColor'];
                         if (tools.isNotEmpty(imgLabelColor)) {
                             let {r, g, b} = tools.val2RGB(item[imgLabelColor]);
-                            itemObj['imgLabelColor']  = '#' + r.toString(16) +g.toString(16) + b.toString(16);
+                            itemObj['imgLabelColor'] = '#' + r.toString(16) + g.toString(16) + b.toString(16);
                         }
                     }
                         break;
@@ -275,7 +295,7 @@ export class MbListModule extends Component{
             let index = parseInt(d.closest(e.target, '.global-btn-item').dataset.index),
                 buttons = this.allButtons[0] || [];
             // 全局按钮不需要数据
-            ButtonAction.get().clickHandle(buttons[index],{});
+            ButtonAction.get().clickHandle(buttons[index], {});
         };
         return {
             on: () => {

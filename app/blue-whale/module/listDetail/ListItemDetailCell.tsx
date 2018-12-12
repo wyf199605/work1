@@ -148,13 +148,13 @@ export class ListItemDetailCell extends Component {
                     <div class="file-icon"><i class="appcommon app-wenjian"></i></div>
                     <div class="file-info">
                         <div class="file-name">${f.filename}</div>
-                        <div class="file-size">${this.calcFileSize(f.filesize)}</div>
+                        <div class="file-size">${ListItemDetailCell.calcFileSize(f.filesize)}</div>
                     </div>
                     <i class="file-option appcommon app-gengduo1"></i>
                 </div>` : `<div class="detail-cell-file-item" data-index=${index}>
                     <i class="iconfont icon-annex"></i>
                     <div class="file-name" title="${f.filename}">${f.filename}</div>
-                    <div class="file-size">(${this.calcFileSize(f.filesize)})</div>
+                    <div class="file-size">(${ListItemDetailCell.calcFileSize(f.filesize)})</div>
                     <i class="file-option appcommon app-gengduo1"></i>
                 </div>`;
                 htmlArr.push(wrapper);
@@ -235,7 +235,7 @@ export class ListItemDetailCell extends Component {
     }
 
     // 计算文件大小
-    private calcFileSize(limit: number): string {
+    static calcFileSize(limit: number): string {
         if (limit <= 0) {
             return '未知';
         }
