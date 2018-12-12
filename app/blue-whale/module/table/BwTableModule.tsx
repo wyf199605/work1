@@ -73,7 +73,7 @@ export class BwTableModule extends Component {
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
         this.isPivot = ui.relateType === 'P';
-        if(!this.tableModule.editable && !this.isPivot){
+        if(this.tableModule && !this.tableModule.editable && !this.isPivot){
             this.editParam = null;
         }
 
@@ -1439,21 +1439,8 @@ export class BwTableModule extends Component {
             let when = field.backWhen;
             if(when){
                 if(eval(tools.str.parseTpl(when, rowData))){
-                    // debugger;
-                    let {r, g, b} = tools.val2RGB(field.backColor),
-                        style = {
-                            background: `rgb(${r},${g},${b})`,
-                            position: `absolute`,
-                            left: 0,
-                            right: 0,
-                            display: 'flex',
-                            top: 0,
-                            bottom: 0,
-                            padding: "6px 7px"
-                        };
-                    text = <div style={style}>
-                        <div style={{"margin-top" : "auto", "margin-bottom" : "auto"}}>{text}</div>
-                    </div>;
+                    let {r, g, b} = tools.val2RGB(field.backColor);
+                    bgColor = `rgb(${r},${g},${b})`
                 }
             }
         }
@@ -2034,7 +2021,6 @@ export class BwTableModule extends Component {
         let btnStatus = {
             end: () => {
                 let status = this.edit.editBtnStateInit(box, false);
-
                 if (status.edit) {
                     dbclick.on();
                 } else {
@@ -2050,16 +2036,16 @@ export class BwTableModule extends Component {
         let dbclick = (() => {
             let selector = '.section-inner-wrapper:not(.pseudo-table) tbody td:not(.cell-img)',
                 handler = function () {
-                    self.tableModule.editManage.start(self).then(() => {
+                    self.tableModule && self.tableModule.editManage.start(self).then(() => {
                         this.click();
                     });
                 };
             return {
                 on: () => {
-                    d.on(this.container, 'dblclick', selector, handler);
+                    d.on(this.wrapper, 'dblclick', selector, handler);
                 },
                 off: () => {
-                    d.off(this.container, 'dblclick', selector, handler);
+                    d.off(this.wrapper, 'dblclick', selector, handler);
                 }
             }
         })();
@@ -2111,10 +2097,10 @@ export class BwTableModule extends Component {
                 this._btnWrapper = <footer className="mui-bar mui-bar-footer"/>;
                 //
                 d.append(this.wrapper, this._btnWrapper);
-                if ((this.tableModule.editType === 'linkage'
+                if (this.tableModule && ((this.tableModule.editType === 'linkage'
                         && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
                     || (this.tableModule.editType === 'self')
-                    && this.editParam && tools.isNotEmpty(this.ui.subButtons)) {
+                    && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
                     let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({
@@ -2146,12 +2132,12 @@ export class BwTableModule extends Component {
 
 
         let cancel = () => {
-            this.ftable.editorCancel();
+            this.ftable && this.ftable.editorCancel();
         };
 
         let start = (): Promise<void> => {
             // debugger;
-            if (this.ftable.editing) {
+            if (this.ftable && this.ftable.editing) {
                 return Promise.resolve();
             }
 
@@ -2195,7 +2181,7 @@ export class BwTableModule extends Component {
                         dom: cell.wrapper,
                         data: row.data,
                         field,
-                        onExtra: (data, relateCols, isEmptyClear = false) => {
+                        onExtra: (data, relateCols, isEmptyClear = false, isValid = true) => {
                             if (tools.isEmpty(data) && isEmptyClear) {
                                 // table.edit.modifyTd(td, '');
                                 cell.data = '';
@@ -2204,13 +2190,17 @@ export class BwTableModule extends Component {
                             //TODO 给row.data赋值会销毁当前cell的input
                             // row.data = Object.assign({}, row.data, data);
                             for (let key in data) {
-                                let hCell = row.cellGet(key) as TableDataCell;
+                                let hCell = row.cellGet(key);
                                 if (hCell && hCell !== cell) {
                                     let cellData = data[key];
                                     if (hCell.data != cellData) {
                                         hCell.data = cellData || '';
                                     }
                                 }
+                            }
+                            let content = cell.column.content as R_Field;
+                            if(isValid && content.assignSelectFields && content.assignSelectFields[0]){
+                                validate(editModule, cell);
                             }
                             if (field.elementType === 'lookup') {
                                 let lookUpKeyField = field.lookUpKeyField,
@@ -2222,11 +2212,10 @@ export class BwTableModule extends Component {
                                     if (hField.assignSelectFields && hField.assignAddr) {
                                         BwTableModule.initAssignData(hField.assignAddr, row ? row.data : {})
                                             .then(({response}) => {
-
                                                 let data = response.data;
                                                 if (data && data[0]) {
                                                     hField.assignSelectFields.forEach((name) => {
-                                                        let assignCell = row.cellGet(name) as TableDataCell;
+                                                        let assignCell = row.cellGet(name);
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];
                                                         }
@@ -2319,12 +2308,20 @@ export class BwTableModule extends Component {
                         field = lookUpCell.column.content;
                         result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
                     }
+                } else if(field.assignSelectFields && field.assignSelectFields[0]){
+                    lookUpCell = fastRow.cellGet(field.assignSelectFields[0]);
+                    if (lookUpCell && lookUpCell.column) {
+                        field = lookUpCell.column.content;
+                        result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
+                    }
                 } else {
                     result = editModule.validate.start(name, cell.data);
                 }
 
-                if (result && result[name]) {
-                    cell.errorMsg = result[name].errMsg;
+                let errorMsg = result && (result[name] || result[field.name]);
+                if (errorMsg) {
+                    cell.errorMsg = errorMsg.errMsg;
+                    // lookUpCell && (lookUpCell.errorMsg = errorMsg.errMsg);
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
@@ -2351,6 +2348,7 @@ export class BwTableModule extends Component {
                         });
                 } else {
                     cell.errorMsg = '';
+                    // lookUpCell && (lookUpCell.errorMsg = '');
                     resolve();
                     // callback(td, true);
                 }
@@ -2391,7 +2389,7 @@ export class BwTableModule extends Component {
         let editDataGet = () => {
             let bwTable = this;
 
-            if (!bwTable) {
+            if (!bwTable || !bwTable.ftable || !bwTable.ftable.editedData) {
                 return;
             }
 
@@ -2422,7 +2420,7 @@ export class BwTableModule extends Component {
 
         let cellCheckValue = () => {
             return Promise.all(this.ftable.editedCells.map((cell) => {
-                if(!cell.isChecked && !cell.isVirtual && cell.show){
+                if(!cell.isChecked && !cell.isVirtual && cell.show && !cell.disabled){
                     return validate(editModule, cell);
                 }else{
                     return Promise.resolve();
@@ -2438,7 +2436,7 @@ export class BwTableModule extends Component {
 
         let save: () => Promise<obj> = () => {
             return new Promise((resolve, reject) => {
-                editModule.assignPromise.then(() => {
+                editModule && editModule.assignPromise ? editModule.assignPromise.then(() => {
                     closeCellInput();
                     let loading = new Loading({
                         msg: '验证中...',
@@ -2461,7 +2459,7 @@ export class BwTableModule extends Component {
                         })
                     }, 100)
 
-                });
+                }): resolve();
             })
         };
 

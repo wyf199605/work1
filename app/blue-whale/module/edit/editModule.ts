@@ -423,6 +423,13 @@ export class EditModule {
          */
         let assignSend = (field: R_Field, val, data: obj, onExtra: Function) => {
             if(tools.isEmpty(val) || tools.isEmpty(field.assignAddr)) {
+                if(field.assignSelectFields){
+                    let assignData = {};
+                    field.assignSelectFields.forEach((name) => {
+                        assignData[name] = null;
+                    });
+                    onExtra && onExtra(assignData, field.assignSelectFields, false, false);
+                }
                 return;
             }
             this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.assignAddr, data), {

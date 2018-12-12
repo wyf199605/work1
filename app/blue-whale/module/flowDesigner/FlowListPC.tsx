@@ -6,6 +6,8 @@ import tools = G.tools;
 import d = G.d;
 import {BwRule} from "../../common/rule/BwRule";
 import {BwTableElement} from "../../pages/table/newTablePage";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import sys = BW.sys;
 interface MenuPara{
     menuIcon : string,
     menuName : string,
@@ -30,6 +32,7 @@ export class FlowListPC extends BasicPage{
     private currentIndex:string = '0';
     constructor(para:FlowListPara){
         super(para);
+
         if (tools.isNotEmpty(para.elements)){
             let elements = para.elements,
                 tabsTitle = [];

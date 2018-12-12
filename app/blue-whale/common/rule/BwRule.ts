@@ -373,6 +373,7 @@ export class BwRule extends Rule {
                         }
 
                         // para.callback(action, rData, _linkAct);
+                        let filename = rData.FILENAME || '附件';
                         switch (action) {
                             case _linkAct.OPEN_WIN :
                                 sys.window.open({url: rData.url}, para.openUrl);
@@ -391,7 +392,7 @@ export class BwRule extends Rule {
                                     title: rData.FILENAME,
                                     img: img,
                                     onDownload(url) {
-                                        sys.window.download(url);
+                                        sys.window.download(url, filename);
                                     }
                                 };
                                 // ImgModalMb.show(imgData);
@@ -405,11 +406,11 @@ export class BwRule extends Rule {
                                 if (sys.os === 'ad' || sys.os === 'ip') {
                                     sys.window.openImg(rData.DOWNADDR);
                                 } else {
-                                    sys.window.download(rData.DOWNADDR);
+                                    sys.window.download(rData.DOWNADDR, filename);
                                 }
                                 break;
                             case _linkAct.DOWNLOAD :
-                                sys.window.download(rData.DOWNADDR, rData.FILENAME);
+                                sys.window.download(rData.DOWNADDR, filename);
                                 break;
                             default:
                         }

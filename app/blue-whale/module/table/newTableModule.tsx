@@ -579,6 +579,13 @@ export class NewTableModule {
                     key: 'del',
                     content: '删除',
                     onClick: tools.pattern.throttling(() => {
+                        if(this.active.isMain && this.bwEl.subTableList && this.bwEl.subTableList.length === 1){
+                            let sub = this.sub[0];
+                            if(sub && sub.ftable.data.length !== 0){
+                                Modal.alert('不能删除有子表明细的数据');
+                                return;
+                            }
+                        }
                         this.editManage.del(bwTable);
                     }, time),
                     icon: 'app-shanchu',
@@ -670,7 +677,6 @@ export class NewTableModule {
                 let saveData = {
                     param: [] as obj[]
                 };
-                console.log(data);
                 data.forEach((d) => {
                     if(tools.isNotEmpty(d)){
                         saveData.param.push(d);
