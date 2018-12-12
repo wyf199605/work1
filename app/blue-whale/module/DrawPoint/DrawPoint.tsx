@@ -131,33 +131,33 @@ export class DrawPoint extends Component {
             })
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
 
-        this.g.on('touchstart',function (ev) {
-            // D3.event.stopPropagation();
-        }).on('touchmove',function (ev) {
-            let ob = D3.event.changedTouches;
-            let touhs = [];
-            touhs.push(ob[0].clientX)
-            touhs.push(ob[0].clientY)
-            //touhs.push(ob[1].clientX)
-            //touhs.push(ob[1].clientY)
-            //alert(touhs + 'move');
-            let pos = D3.touches(this)[0];
-            let slate = [];
-            slate.push(pos[0])
-            slate.push(pos[1])
-            setTimeout(()=>{
-                _this.g.attr('transform', "translate(" + touhs+ ")");
-            },45)
-
-        }).on('touchend',function () {
-            let ob = D3.event.changedTouches;
-            let touhs = [];
-            touhs.push(ob[0].clientX)
-            touhs.push(ob[0].clientY)
-            //touhs.push(ob[1].clientX)
-            //touhs.push(ob[1].clientY)
-            //alert(touhs + 'end');
-        })
+        // this.g.on('touchstart',function (ev) {
+        //     // D3.event.stopPropagation();
+        // }).on('touchmove',function (ev) {
+        //     let ob = D3.event.changedTouches;
+        //     let touhs = [];
+        //     touhs.push(ob[0].clientX)
+        //     touhs.push(ob[0].clientY)
+        //     //touhs.push(ob[1].clientX)
+        //     //touhs.push(ob[1].clientY)
+        //     //alert(touhs + 'move');
+        //     let pos = D3.touches(this)[0];
+        //     let slate = [];
+        //     slate.push(pos[0])
+        //     slate.push(pos[1])
+        //     setTimeout(()=>{
+        //         _this.g.attr('transform', "translate(" + touhs+ ")");
+        //     },45)
+        //
+        // }).on('touchend',function () {
+        //     let ob = D3.event.changedTouches;
+        //     let touhs = [];
+        //     touhs.push(ob[0].clientX)
+        //     touhs.push(ob[0].clientY)
+        //     //touhs.push(ob[1].clientX)
+        //     //touhs.push(ob[1].clientY)
+        //     //alert(touhs + 'end');
+        // })
         let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
