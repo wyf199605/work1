@@ -15,6 +15,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {PickModule} from "../edit/pickModule";
+import {HorizontalQueryModule} from "../query/horizontalFormFactory";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -64,13 +65,10 @@ export class PlanModule extends Component{
     initScale(){
         if(tools.isMb){
             let div = <div class="initScale">
-                <div class="narrow" onclick={()=>{
-                  this.draw.svgScal(false)
+                <div class="search iconfont icon-sousuo" onclick={()=>{
+
                 }
-                }> 缩小</div>
-                <div class="enlarge" onclick={()=>{
-                    this.draw.svgScal(true)}
-                }>放大</div>
+                }></div>
             </div>
             d.append(this.container,div)
         }
