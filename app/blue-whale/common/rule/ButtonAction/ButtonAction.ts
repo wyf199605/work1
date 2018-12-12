@@ -76,6 +76,7 @@ export class ButtonAction {
                     container: <HTMLElement>uploderModal.body,
                     uploadUrl: loadUrl + (loadUrl.indexOf('?') > -1 ? '&' : '?') + "item_id=" + itemId,
                     onSuccess: (result) => {
+                        console.log(result);
                         // console.log(data);
                         //后台表格数据返回
                         // tableData = resuult.data;

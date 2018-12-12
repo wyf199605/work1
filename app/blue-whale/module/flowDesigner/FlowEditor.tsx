@@ -261,6 +261,14 @@ export class FlowEditor extends FormCom {
             }
         }
     })();
+    
+    private _selectKeyValue = {value: '', text: ''};
+    get selectKeyValue(){
+        return this._selectKeyValue;
+    }
+    set selectKeyValue(keyValue: {value: string, text: string}){
+        this._selectKeyValue = keyValue;
+    }
 
     // 节点类型
     private _type: string;

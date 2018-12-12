@@ -110,13 +110,13 @@ export class BwUploader extends FormCom {
                     this.trigger(BwUploader.EVT_FILE_JOIN_QUEUE, this.temFiles);
                     autoUpload && this.upload();
                 }
-            }, () => {
-                Modal.alert('获取图片失败', '温馨提示');
+            }, (msg) => {
+                tools.isNotEmpty(msg) && Modal.alert(msg, '温馨提示');
             });
         });
     }
 
-    protected getFile(callback: (file: File[]) => void , error?: Function){
+    protected getFile(callback: (file: File[]) => void , error?: (msg) => void){
         switch (this.uploadType){
             case "file":
                 sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
