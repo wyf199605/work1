@@ -25,6 +25,11 @@ export = class FormPage extends BasicPage {
         let nameFields : {[name : string] : R_Field} = {};
         this.fields = para.fm.fields;
 
+        d.queryAll('.list-left', form).forEach((el) => {
+            let label = d.query('label', el);
+            label && el && (el.title = label.innerText);
+        });
+
         para.fm.fields.forEach((f) => {
             nameFields[f.name] = f;
 
