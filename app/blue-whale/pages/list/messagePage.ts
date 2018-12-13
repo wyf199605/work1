@@ -95,6 +95,7 @@ export = class messagePage {
                     right: {
                         content : '删除',
                         className : 'mui-btn mui-btn-red',
+                        type : 'none',
                         onClick : () => {
                             Modal.confirm({
                                 msg : '确定要删除？',
