@@ -93,51 +93,61 @@ export class FastTableColumn extends TableColumn {
     }
 
     get sortState() {
-        return this._sortState;
+        if(this.sortName){
+            let column = this.ftable.columnGet(this.sortName);
+            return column ? column.sortState : this._sortState;
+        }else{
+            return this._sortState;
+        }
     }
 
     sort(order: SortType) {
         // 清除其他列的状态 并设置本列状态
-        if(!this.isCanSort){
-            Modal.toast('该列无排序功能');
-            return null;
-        }
-        this.ftable.columns.forEach((col) => {
-            col._sortState = col === this ? order : 'NO';
-            let sortCol = col.cells[0][0],
-                wrapper = sortCol && sortCol.wrapper;
+        if(this.sortName){
+            let column = this.ftable.columnGet(this.sortName);
+            return column ? column.sort(order) : null;
+        }else{
+            if(!this.isCanSort){
+                Modal.toast('该列无排序功能');
+                return null;
+            }
+            this.ftable.columns.forEach((col) => {
+                col._sortState = col === this ? order : 'NO';
+                let sortCol = col.cells[0][0],
+                    wrapper = sortCol && sortCol.wrapper;
 
-            if(wrapper){
-                if (col._sortState === 'NO') {
-                    d.classRemove(wrapper, 'sort-desc sort-asc');
-                } else {
-                    let isDesc = col._sortState === 'DESC';
-                    d.classToggle(wrapper, 'sort-desc', isDesc);
-                    d.classToggle(wrapper, 'sort-asc', !isDesc);
+                if(wrapper){
+                    if (col._sortState === 'NO') {
+                        d.classRemove(wrapper, 'sort-desc sort-asc');
+                    } else {
+                        let isDesc = col._sortState === 'DESC';
+                        d.classToggle(wrapper, 'sort-desc', isDesc);
+                        d.classToggle(wrapper, 'sort-asc', !isDesc);
+                    }
                 }
+
+            });
+            let indexes = null,
+                ftableData = this.ftable.tableData;
+            // debugger;
+            // console.log(this.ftable.tableData.getServerMode())
+            if (ftableData.serverMode) {
+                ftableData.sortState = [[this.name, this.sortState]];
+                ftableData.refresh();
+            } else {
+                let leftTable = this.ftable.leftTable,
+                    mainTable = this.ftable.mainTable,
+                    table = leftTable ? ((leftTable.columns.length - 1 >= this.ftable.columns.indexOf(this)) ? leftTable : mainTable) : mainTable,
+                    otherTable = leftTable ? (table === leftTable ? mainTable : leftTable) : mainTable;
+                indexes = table.tableData.sort(this.name, order);
+                table !== otherTable && otherTable.sortByIndex(indexes);
+                // table.render(0, table.tableData.get().length);
+                this.ftable.render(0, this.ftable.data.length);
             }
 
-        });
-        let indexes = null,
-            ftableData = this.ftable.tableData;
-        // debugger;
-        // console.log(this.ftable.tableData.getServerMode())
-        if (ftableData.serverMode) {
-            ftableData.sortState = [[this.name, this.sortState]];
-            ftableData.refresh();
-        } else {
-            let leftTable = this.ftable.leftTable,
-                mainTable = this.ftable.mainTable,
-                table = leftTable ? ((leftTable.columns.length - 1 >= this.ftable.columns.indexOf(this)) ? leftTable : mainTable) : mainTable,
-                otherTable = leftTable ? (table === leftTable ? mainTable : leftTable) : mainTable;
-            indexes = table.tableData.sort(this.name, order);
-            table !== otherTable && otherTable.sortByIndex(indexes);
-            // table.render(0, table.tableData.get().length);
-            this.ftable.render(0, this.ftable.data.length);
+
+            return indexes
         }
-
-
-        return indexes
     }
 
     // get maxWidth(){
