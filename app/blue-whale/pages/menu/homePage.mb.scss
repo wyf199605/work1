@@ -55,6 +55,36 @@
   //  color: #999;
   //}
 
+  .home-load-error{
+    &::before{
+      font-family: "appcommon" !important;
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+      content: "\e657";
+      display: block;
+      font-size: 150px;
+      text-align: center;
+      padding: 20px 0 0;
+      line-height: 200px;
+      color: $text;
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      background-color: transparent;
+    }
+    &::after{
+      content: "数据加载错误, 点击重新加载";
+      display: block;
+      font-size: 20px;
+      text-align: center;
+      padding: 0 0 20px;
+      color: $text;
+      line-height: 20px;
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      background-color: transparent;
+    }
+  }
+
   .no-data{
     &::after{
       font-family: "appcommon" !important;
