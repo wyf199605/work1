@@ -28,7 +28,7 @@ export = class mainMbPage {
             createIframes : function (pageName) {
                 if(this.pages.hasOwnProperty(pageName)){
                     let pageUrl = this.pages[pageName];
-                    let iframe = d.create('<iframe data-page-name="' + pageName + '" class="full-height has-footer-tab hide" src="' + pageUrl + '"> </iframe>');
+                    let iframe = d.create('<iframe data-page-name="' + pageName + '" class="full-height has-footer-tab" src="' + pageUrl + '"> </iframe>');
                     SUB_PAGE.pagesContainer.appendChild(iframe);
                 }
             },
@@ -36,7 +36,6 @@ export = class mainMbPage {
                 this.pagesContainer.classList.remove('has-spinner');
                 let firstIframe = this.pagesContainer.querySelector('[src="' + this.pages.home + '"]');
                 this.lastShowPage = firstIframe;
-                firstIframe.classList.remove('hide');
             },
             showIframe : function (pageName) {
                 let iframe = this.pagesContainer.querySelector('[data-page-name="' + pageName + '"]');
@@ -66,7 +65,7 @@ export = class mainMbPage {
                         el.classList.remove('mui-active');
                     });
                     d.closest((e.target as HTMLElement), '[data-page-name]').classList.add('mui-active');
-                    SUB_PAGE.showIframe(this.dataset.pageName);
+                    SUB_PAGE.showIframe(name);
                 });
 
             }
