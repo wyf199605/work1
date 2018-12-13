@@ -81,6 +81,7 @@ export class PlanPage extends BasicPage {
         });
     }
 
+
     getUi(ui: IBW_UI<IBW_Plan_Table>): Promise<obj>{
         return new Promise((resolve, reject) => {
             let qData = ui.body.elements[0];

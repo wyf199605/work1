@@ -131,34 +131,34 @@ export class DrawPoint extends Component {
             })
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
 
-        this.g.on('touchstart',function (ev) {
-           // D3.event.stopPropagation();
-        }).on('touchmove',function (ev) {
-            let ob = D3.event.changedTouches;
-            let touhs = [];
-             touhs.push(ob[0].clientX)
-            touhs.push(ob[0].clientY)
-            //touhs.push(ob[1].clientX)
-            //touhs.push(ob[1].clientY)
-            //alert(touhs + 'move');
-              let pos = D3.touches(this)[0];
-              let slate = [];
-              slate.push(pos[0])
-              slate.push(pos[1])
-           setTimeout(()=>{
-               _this.g.attr('transform', "translate(" + touhs+ ")");
-           },45)
-
-        }).on('touchend',function () {
-            let ob = D3.event.changedTouches;
-            let touhs = [];
-            touhs.push(ob[0].clientX)
-            touhs.push(ob[0].clientY)
-            //touhs.push(ob[1].clientX)
-            //touhs.push(ob[1].clientY)
-            //alert(touhs + 'end');
-        })
-       let img = this.g.append('image').attr('xlink:href', () => {
+        // this.g.on('touchstart',function (ev) {
+        //     // D3.event.stopPropagation();
+        // }).on('touchmove',function (ev) {
+        //     let ob = D3.event.changedTouches;
+        //     let touhs = [];
+        //     touhs.push(ob[0].clientX)
+        //     touhs.push(ob[0].clientY)
+        //     //touhs.push(ob[1].clientX)
+        //     //touhs.push(ob[1].clientY)
+        //     //alert(touhs + 'move');
+        //     let pos = D3.touches(this)[0];
+        //     let slate = [];
+        //     slate.push(pos[0])
+        //     slate.push(pos[1])
+        //     setTimeout(()=>{
+        //         _this.g.attr('transform', "translate(" + touhs+ ")");
+        //     },45)
+        //
+        // }).on('touchend',function () {
+        //     let ob = D3.event.changedTouches;
+        //     let touhs = [];
+        //     touhs.push(ob[0].clientX)
+        //     touhs.push(ob[0].clientY)
+        //     //touhs.push(ob[1].clientX)
+        //     //touhs.push(ob[1].clientY)
+        //     //alert(touhs + 'end');
+        // })
+        let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
@@ -306,8 +306,8 @@ export class DrawPoint extends Component {
             let point = [],
                 I = 0,
                 toolData = [];
-          let tranData = this.changeArr(this.format(d))
-             tranData.forEach((data) => {
+            let tranData = this.changeArr(this.format(d))
+            tranData.forEach((data) => {
                 //console.log(data);
                 //  需要用到有point的data
                 if (data.isPoint && data.data && tools.isNotEmpty(data.data)) {
@@ -360,7 +360,7 @@ export class DrawPoint extends Component {
                         .attr('dx', 5 )
                         .attr('dy', 15 )
                         .text(function (d) {
-                            data.data && toolData.push(data.data)
+                            data.data && toolData.push(data.data);
                             if(I <=2 ){
                                 return  detail[d];
                             }
@@ -425,22 +425,22 @@ export class DrawPoint extends Component {
     }
 
     private changeArr(arr){
-       let index = 0;
-       for(let i= 0;i < arr.length;i++){
-           if(arr[i].isPoint){
-               index = i;
-           }
-       }
-       if(index == 0){ return}
+        let index = 0;
+        for(let i= 0;i < arr.length;i++){
+            if(arr[i].isPoint){
+                index = i;
+            }
+        }
+        if(index == 0){ return}
         let str = arr.splice(index,1);
         arr.unshift(str[0]);
         return arr;
     }
     //区域显示颜色
     private AreaColor( color:string){
-       this.g.selectAll('g').selectAll('path').attr('fill-opacity',function (d) {
-           return color;
-       })
+        this.g.selectAll('g').selectAll('path').attr('fill-opacity',function (d) {
+            return color;
+        })
     }
 
     private wrapTime:boolean = false;
@@ -1042,16 +1042,16 @@ export class DrawPoint extends Component {
 
         if(tools.isMb){
             let scale = 1;
-           //  d.on(this.wrapper, 'touchzoom', (ev) => {
-           //      //
-           //      scale = ev.scale;
-           //      scale = Math.min(ev.scale, 5);
-           //      scale = Math.max(0.5, ev.scale);
-           //      // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
-           //      _this.g.attr('transform', "scale(" + scale + ")");
-           //      _this.svg.attr('width', scale * 1200);
-           //      _this.svg.attr('height', scale * 800);
-           // })
+            //  d.on(this.wrapper, 'touchzoom', (ev) => {
+            //      //
+            //      scale = ev.scale;
+            //      scale = Math.min(ev.scale, 5);
+            //      scale = Math.max(0.5, ev.scale);
+            //      // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
+            //      _this.g.attr('transform', "scale(" + scale + ")");
+            //      _this.svg.attr('width', scale * 1200);
+            //      _this.svg.attr('height', scale * 800);
+            // })
         }else{
             this.zoom = D3.behavior.zoom()
                 .x(X)

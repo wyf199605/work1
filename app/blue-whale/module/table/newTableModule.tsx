@@ -494,12 +494,12 @@ export class NewTableModule {
                 subWrapper = this.subWrapper;
                 mainHeight = mainWrapper.offsetHeight;
                 subHeight = subWrapper.offsetHeight;
-                d.on(this.main.container, 'mousedown', '.drag-line', mouseDownHandler = (ev: MouseEvent) => {
-                    document.body.style.cssText = 'cursor: n-resize!important';
+                d.on(this.dragLine, 'mousedown', mouseDownHandler = (ev: MouseEvent) => {
+                    d.off(document.body, 'mousemove', mouseMoveHandler);
+                    d.off(document.body, 'mouseup', mouseUpHandler);
+                    document.body.style.cursor = 'n-resize';
                     let disY = ev.clientY;
-                    d.off(document, 'mousemove', mouseMoveHandler);
-                    d.off(document, 'mouseup', mouseUpHandler);
-                    d.on(document, 'mousemove', mouseMoveHandler = (ev) => {
+                    d.on(document.body, 'mousemove', mouseMoveHandler = (ev) => {
                         let translate = ev.clientY - disY;
                         if (mainHeight + translate > 0 && subHeight - translate > 0) {
                             disY = ev.clientY;
@@ -509,14 +509,16 @@ export class NewTableModule {
                             subWrapper.style.height = subHeight + 'px';
                         }
                     });
-                    d.on(document, 'mouseup', mouseUpHandler = () => {
-                        d.off(document, 'mousemove', mouseMoveHandler);
-                        d.off(document, 'mouseup', mouseUpHandler);
+                    d.on(document.body, 'mouseup', mouseUpHandler = () => {
+                        d.off(document.body, 'mousemove', mouseMoveHandler);
+                        d.off(document.body, 'mouseup', mouseUpHandler);
                         document.body.style.removeProperty('cursor');
                     })
                 })
             },
             off: () => {
+                d.off(document.body, 'mousemove', mouseMoveHandler);
+                d.off(document.body, 'mouseup', mouseUpHandler);
                 d.off(this.dragLine, 'mousedown', mouseDownHandler);
             }
         }
