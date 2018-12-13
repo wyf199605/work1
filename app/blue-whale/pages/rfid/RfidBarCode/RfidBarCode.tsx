@@ -110,7 +110,7 @@ export class RfidBarCode extends Component {
                                 let val = d.query('.set-rfid-shelf')['value'];
                                 //console.log(d.query('.set-rfid-code').value);
                                 let optionStype,
-                                category = [];
+                                    category = [];
                                 category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
 
                                 let key = this.stepByone + this.accumulation;
@@ -128,14 +128,14 @@ export class RfidBarCode extends Component {
                                     if(res.success){
                                         d.query('.rfid-shelf-number>.shelf-number').innerText = val;
                                     }else {
-                                         Modal.toast(res.msg);
+                                        Modal.toast(res.msg);
                                     }
 
                                 })
                                 mode.destroy();
                             },
                             onClose: () => {
-                               // Modal.toast('输入成功');
+                                // Modal.toast('输入成功');
                             }
 
                         })
@@ -647,11 +647,11 @@ export class RfidBarCode extends Component {
                             console.log(para.codeStype)
                             let str = [];
                             for(let i=0,data = para.codeStype;i<data.length;i++){
-                               let obj = {};
-                                 for(let s in data[i]){
-                                         obj['value'] = data[i][s];
-                                         obj['text'] = data[i][s];
-                                 }
+                                let obj = {};
+                                for(let s in data[i]){
+                                    obj['value'] = data[i][s];
+                                    obj['text'] = data[i][s];
+                                }
                                 str.push(obj);
                             }
 
@@ -730,10 +730,10 @@ export class RfidBarCode extends Component {
                             value:'条码' + this.domHash['barcode'].innerText,
                             text: '条码' + this.domHash['barcode'].innerText
                         }],modeldata1 = [
-                         {
-                            value:'条码' + this.domHash['barcode'].innerText,
-                            text: '条码' + this.domHash['barcode'].innerText
-                        }]
+                            {
+                                value:'条码' + this.domHash['barcode'].innerText,
+                                text: '条码' + this.domHash['barcode'].innerText
+                            }]
                         let tempCateGory = this.domHash['categoryVal'].innerText;
                         let stepStatus = this.stepStatus;
                         if(tools.isEmpty(tempCateGory)){
@@ -823,7 +823,7 @@ export class RfidBarCode extends Component {
 
         </div>
     }
- private stepStatus:boolean = false;
+    private stepStatus:boolean = false;
     private replaceVal:number;
     private InitRfidBarCode(para) {
         //初始化监听输入框的值
@@ -865,12 +865,12 @@ export class RfidBarCode extends Component {
                     barcode: this.domHash['barcode'].innerText || ''
                 }
 
-             let s =  G.Shell.inventory.dealbarcode(2,params,(res)=>{
-                 //alert(JSON.stringify(res.data))
-                   if(res.success){
-                       this.domHash['scanamout'].innerText = res.data.scanNum;
-                       this.refreshCount(para);
-                   }
+                let s =  G.Shell.inventory.dealbarcode(2,params,(res)=>{
+                    //alert(JSON.stringify(res.data))
+                    if(res.success){
+                        this.domHash['scanamout'].innerText = res.data.scanNum;
+                        this.refreshCount(para);
+                    }
                 })
 
             } else if (this.mode[key] == "替换" && modeVal['value'] !== "") {
@@ -987,9 +987,9 @@ export class RfidBarCode extends Component {
                 this.fields = pageName.fields;
                 //判断如果为空
                 if(tools.isEmpty(pageName.fields) && pageName.countName == "无数量标题"){
-                   this.stepStatus = true;
-                   d.query('.rfid-barCode-nums').style.display = 'none';
-                   d.query('.total-rfid>.bar-code-amount').style.display = 'none';
+                    this.stepStatus = true;
+                    d.query('.rfid-barCode-nums').style.display = 'none';
+                    d.query('.total-rfid>.bar-code-amount').style.display = 'none';
                 }
                 if(this.stepStatus){
                     let optionStype, Where = {};
@@ -1120,7 +1120,7 @@ export class RfidBarCode extends Component {
         }
         if(!this.stepStatus){
             G.Shell.inventory.getCountData(para.uniqueFlag,where,(res)=>{
-               // alert(JSON.stringify(res))
+                // alert(JSON.stringify(res))
                 if(res.success){
                     this.domHash['count'].innerText = res.data;
                     let num = d.query('.total-nums>span');
@@ -1132,8 +1132,7 @@ export class RfidBarCode extends Component {
                 }
             })
         }
-
+        
     }
-
 }
 
