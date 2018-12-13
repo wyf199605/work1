@@ -2,6 +2,8 @@ import localMsg = G.localMsg;
 import sys = BW.sys;
 import tools = G.tools;
 import d = G.d;
+import {SwipeOut} from "../../../global/components/other/SwipeOut/SwipeOut";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 /**
  * 设置角标，数字为0时，则不显示角标
  * @param {Element} badge
@@ -19,25 +21,11 @@ function setBadge(badge, num) {
 
 export = class messagePage {
     constructor(private para) {
-        // mui.init();
-        // mui('.mui-scroll-wrapper').scroll();
+
         let listDOM = document.querySelector('ul.mui-table-view');
         let unreadNum = document.querySelector('[data-field=badge]');
-        console.log(localMsg.get());
-        //debugger
 
         showList(localMsg.get(), false);
-      /*  mui('ul.mui-table-view').on('tap', '.mui-table-view-cell .inner-padding-row .mui-slider-handle', function () {
-            let tapThis = this;
-            read(tapThis);
-            sys.window.open({url:para.mgrPath+tapThis.dataset.url});
-//             Array.prototype.forEach.call(tapThis.querySelectorAll('[data-field]'), function (el) {
-//                 data[el.dataset.field] = el.textContent;
-//             });
-            //   data.badge = parseInt(unreadNum.textContent);
-            //   mui.fire(msgDetailView, 'msgRead', JSON.stringify(data));
-            //   plus.webview.show(msgDetailView, 'slide-in-right');
-        });*/
 
         d.on(listDOM, 'click', '[data-action]', function () {
             switch (this.dataset.action) {
@@ -81,10 +69,11 @@ export = class messagePage {
             }
             for(let i = 0; i < len; i++){
                 html='';
-                html +='<li class="mui-table-view-cell">' +
-                    '<div class="mui-slider-right mui-disabled" data-action="del"><a class="mui-btn mui-btn-red">删除</a></div>' +
+                let li = '<li class="mui-table-view-cell">' +
+                    // '<div class="mui-slider-right mui-disabled" data-action="del"><a class="mui-btn mui-btn-red">删除</a></div>' +
                     '<div class="mui-slider-handle inner-padding-row">' +
                     '<div data-action="read" data-url="'+list[i].content.link+'" class="mui-slider-handle" data-notify-id="' + list[i].notifyId + '"><a href="#msgDetail">';
+                html += li;
                 if (list[i].isread === 0){
                     html += '<span class="mui-badge badge-dot mui-badge-primary unread"></span>';
                     unreadCount ++;
@@ -94,11 +83,34 @@ export = class messagePage {
                     '<span data-field="createDate">' + list[i].createDate + '</span><span class="mui-icon mui-icon-arrowright"></span></span></h5>';
                 html += '<p class="mui-h6 ellipsis-row2" data-field="content">' + list[i].content.content + '</p>';
                 html += '</a></div></div></li>';
+                let dom = d.create(html);
                 if(isAppend) {
-                    listDOM.insertBefore(d.create(html), listDOM.firstChild);
+                    listDOM.insertBefore(dom, listDOM.firstChild);
                 }else{
-                    listDOM.appendChild(d.create(html));
+                    listDOM.appendChild(dom);
                 }
+
+                new SwipeOut({
+                    target: dom as any,
+                    right: {
+                        content : '删除',
+                        className : 'mui-btn mui-btn-red',
+                        type : 'none',
+                        onClick : () => {
+                            Modal.confirm({
+                                msg : '确定要删除？',
+                                callback : flag => {
+                                    if(flag){
+                                        localMsg.remove(list[i].notifyId);
+                                        d.remove(dom as any);
+                                    }
+                                }
+                            });
+
+                        }
+                    },
+                });
+
             }
             if(isAppend){
                 let badgeNum = parseInt(unreadNum.textContent);
