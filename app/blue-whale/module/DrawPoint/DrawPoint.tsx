@@ -258,8 +258,10 @@ export class DrawPoint extends Component {
             this.g.selectAll('g').remove();
             this.g.selectAll('circle').remove();
         }
-        this.zoom.scale(1);
-        this.zoom.translate([0,0]);
+        if(!tools.isMb){
+            this.zoom.scale(1);
+            this.zoom.translate([0,0]);
+        }
         this.g.attr('transform',  "scale(" + 1 + ")");
         this.renderData = data;
         this.index = data.length || 0;//初始化index
