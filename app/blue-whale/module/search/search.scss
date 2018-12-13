@@ -1,6 +1,8 @@
 .modal-mobile{
-  .modal-body.modal-search{
-    max-height: 92vh;
+  .modal-search{
+    .modal-body{
+      max-height: 92vh;
+    }
   }
   .search-content{
     position: relative;
@@ -10,6 +12,9 @@
   }
   .search-input{
     margin-top: 3px;
+    .icon-huatong{
+      font-size: 22px;
+    }
     .searchInput{
       padding : 0;
     }
@@ -19,5 +24,25 @@
     font-size: 12px;
     padding: 5px;
     background: white;
+  }
+
+  @supports (display:none) {
+    .dot {
+      display: inline-block;
+      width: 3ch;
+      text-indent: -1ch;
+      vertical-align: bottom;
+      overflow: hidden;
+      bottom: 0;
+      left: 11px;
+      position: absolute;
+      animation: dot 1s infinite step-start both;
+      font-family: Consolas, Monaco, monospace;
+    }
+  }
+
+  @keyframes dot {
+    33% { text-indent: 0; }
+    66% { text-indent: -2ch; }
   }
 }
