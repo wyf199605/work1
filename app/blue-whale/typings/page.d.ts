@@ -25,13 +25,13 @@ interface IGroupInfo{
 }
 
 interface EditPagePara extends BasicPagePara{
-    uiType: string;
+    uiType?: string;
     fm: {
-        caption : string;//panel 标题，有可能为空
-        fields : R_Field [];//面板中元素列表  input date 下拉等
+        caption? : string;//panel 标题，有可能为空
+        fields? : R_Field [];//面板中元素列表  input date 下拉等
         subButtons? : R_Button[];//操作按钮列表
         defDataAddrList? : R_ReqAddr[];//默认值获取地址列表
-        dataAddr : R_ReqAddr;//获取数据后台地址
+        dataAddr? : R_ReqAddr;//获取数据后台地址
         updatefileData? : R_ReqAddr;
         groupInfo?:IGroupInfo[];
     }

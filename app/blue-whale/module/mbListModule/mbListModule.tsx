@@ -12,6 +12,7 @@ import {SlidePopover} from "../../../global/components/ui/slidePopover/slidePopo
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {DetailModal} from "../listDetail/DetailModal";
 
 export interface IMbListModule extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
@@ -40,11 +41,20 @@ export class MbListModule extends Component {
         this.initEvents.on();
     }
 
-    refresh(ajaxData: obj) {
-        return this.mbList.dataManager.refresh(ajaxData);
+    /**
+     * @author WUML
+     * @date 2018/12/12
+     * @Description: 刷新
+     */
+    refresh(ajaxData?: obj) {
+        return this.mbList.dataManager.refresh(ajaxData || {});
     }
 
-    // 创建全局按钮
+    /**
+     * @author WUML
+     * @date 2018/12/12
+     * @Description: 初始化全局按钮
+     */
     private initGlobalButtons() {
         let globalButtons = this.allButtons[0] || [];
         if (tools.isNotEmpty(globalButtons)) {
@@ -59,8 +69,18 @@ export class MbListModule extends Component {
                         // icon: btn.icon ? btn.icon.split(' ')[1] : '',
                         // iconPre: btn.icon ? btn.icon.split(' ')[0] : '',
                         onClick: () => {
-                            ButtonAction.get().clickHandle(btn, {});
-                            sliderPopover.modal.isShow = false;
+                            switch (btn.subType) {
+                                case 'insert_save': {
+                                    getFormFields(tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr), {
+                                        output: 'json'
+                                    }));
+                                }
+                                    break;
+                                default:
+                                    ButtonAction.get().clickHandle(btn, {});
+                                    sliderPopover.modal.isShow = false;
+                                    break;
+                            }
                         }
                     })
                 });
@@ -77,12 +97,50 @@ export class MbListModule extends Component {
                         content: btn.caption,
                         container: box.wrapper,
                         onClick: () => {
-                            ButtonAction.get().clickHandle(btn, {});
+                            switch (btn.subType) {
+                                case 'insert_save': {
+                                    getFormFields(tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr), {
+                                        output: 'json'
+                                    }));
+                                }
+                                    break;
+                                default:
+                                    ButtonAction.get().clickHandle(btn, {});
+                                    break;
+                            }
                         }
                     }))
                 });
                 box.children = buttons;
             }
+        }
+
+        function getFormFields(url: string) {
+            BwRule.Ajax.fetch(url, {
+                loading: {
+                    msg: '加载中,请稍后...',
+                    disableEl: document.body
+                }
+            }).then(({response}) => {
+                let element = response.body.elements[0];
+                new DetailModal(Object.assign({}, {
+                    fm: {
+                        caption: element.caption,
+                        fields: Form.Cols.colTransfor(response.uiType, element.fields)
+                    }
+                }, {
+                    defaultData: {},
+                    isAdd: false,
+                    isPC: !tools.isMb,
+                    confirm(data) {
+                        return new Promise((resolve) => {
+                            ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
+                                resolve();
+                            });
+                        })
+                    }
+                }))
+            })
         }
     }
 
@@ -115,8 +173,41 @@ export class MbListModule extends Component {
                 let buttons = this.allButtons[1] || [],
                     btn = buttons[btnIndex],
                     data = this.defaultData[itemIndex];
-                console.log(data);
-                ButtonAction.get().clickHandle(btn, data);
+                switch (btn.subType) {
+                    case 'update_save': {
+                        BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr), {
+                            output: 'json'
+                        }),{
+                            loading: {
+                                msg: '加载中,请稍后...',
+                                disableEl: document.body
+                            }
+                        }).then(({response}) => {
+                            let element = response.body.elements[0];
+                            new DetailModal(Object.assign({}, {
+                                fm: {
+                                    caption: element.caption,
+                                    fields: Form.Cols.colTransfor(response.uiType, element.fields)
+                                }
+                            }, {
+                                defaultData: data,
+                                isAdd: false,
+                                isPC: !tools.isMb,
+                                confirm(data) {
+                                    return new Promise((resolve) => {
+                                        ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
+                                            resolve();
+                                        });
+                                    })
+                                }
+                            }))
+                        })
+                    }
+                        break;
+                    default:
+                        ButtonAction.get().clickHandle(btn, data);
+                        break;
+                }
             },
             itemClick: (index) => {
                 let data = this.defaultData[index],
@@ -262,7 +353,7 @@ export class MbListModule extends Component {
                         break;
                     case 'countDown': {
                         let time: string = item[layout['countDown']];
-                        if (tools.isNotEmpty(time)){
+                        if (tools.isNotEmpty(time)) {
                             time = time.replace(/\-/g, '/');
                             itemObj['countDown'] = new Date(time).getTime();
                         }

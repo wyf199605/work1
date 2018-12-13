@@ -174,6 +174,7 @@ gulp.task('js', function () {
         'listDetail/ListItemDetailCell',
         'listDetail/NewFormFactory',
         'listDetail/DetailModal',
+        'listDetail/form.transfor'
     ], 'listDetail.js');
 
     //process模块

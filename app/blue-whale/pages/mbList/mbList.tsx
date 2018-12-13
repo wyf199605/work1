@@ -30,6 +30,9 @@ export class BwMbList extends BasicPage {
                     });
                    this.queryEvent(ui);
                 }
+                this.on(BwRule.EVT_REFRESH, () => {
+                    this.mbListModule.refresh();
+                })
             }
                 break;
             case 'view': {
