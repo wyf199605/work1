@@ -98,8 +98,10 @@ export class HorizontalQueryModule extends Component {
 
     public autoTag() {
         typeof this.search === 'function' && this.search(this.json);
+        if(tools.isMb){
+            this.modal.show = false;
+        }
     }
-
     // 获取默认数据
     private getDefaultData(data: QueryConf[]): obj {
         let obj: obj = {};
