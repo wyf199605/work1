@@ -92,7 +92,6 @@ namespace BW{
 
                         return;
                     }
-
                     close();
                     function close(){
                         self.handle('close', '{event:"' + event + '",data:"' + data + '"}');

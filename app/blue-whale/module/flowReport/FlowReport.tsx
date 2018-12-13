@@ -182,9 +182,11 @@ export class FlowReport extends BasicPage {
                     btn.hintAfterAction = true;
                     self.save(btn, pageData, function () {
                         if (tools.isMb){
-                            sys.window.open({
-                                url: BW.CONF.url.myApplication
-                            });
+                            if(tools.url.getPara('page', document.referrer) !== 'myApplication'){
+                                sys.window.open({
+                                    url: BW.CONF.url.myApplication
+                                });
+                            }
                         }else{
                             sys.window.open({
                                 url: BW.CONF.url.myApplicationPC
@@ -204,9 +206,15 @@ export class FlowReport extends BasicPage {
                         ButtonAction.get().clickHandle(btn, pageData, () => {
                             // 提交成功回退到上一页
                             if (tools.isMb){
-                                sys.window.open({
-                                    url: BW.CONF.url.myApplication
-                                });
+                                /*
+                                * 如果是从myApplication跳转过来的，就直接关闭当前界面，并刷新已有的myApplication；
+                                * 否则就是没有打开过myApplication，那么就打开一个新的myApplication，save同理。
+                                * */
+                                if(tools.url.getPara('page', document.referrer) !== 'myApplication'){
+                                    sys.window.open({
+                                        url: BW.CONF.url.myApplication
+                                    });
+                                }
                             }else{
                                 sys.window.open({
                                     url: BW.CONF.url.myApplicationPC

@@ -101,7 +101,7 @@ $scrren-width: 100%;
         font-size: 18px;
         position: relative;
         height: 100%;
-        $data-type-list: ("input", "datetime", "richText", "tagsInput");
+        $data-type-list: ("input", "datetime", "richText", "tagsInput", "selectInput");
 
         .disabled {
             pointer-events: none !important;
@@ -144,7 +144,7 @@ $scrren-width: 100%;
 
                                 input {
                                     text-align: right;
-                                    @if $data-type == 'datetime' {
+                                    @if $data-type == 'datetime' or $data-type == 'selectInput' {
                                         pointer-events: none;
                                     }
                                 }
@@ -221,7 +221,7 @@ $scrren-width: 100%;
                 height: $sub-btn-item-height;
                 text-align: center;
                 border-radius: 5px;
-                letter-spacing: 0px;
+                letter-spacing: 0;
 
                 &[data-index="0"] {
                     border: solid 1px #e2e2e2;
