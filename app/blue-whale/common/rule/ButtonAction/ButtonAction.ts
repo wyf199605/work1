@@ -231,6 +231,7 @@ export class ButtonAction {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
+                addr = tools.url.addObj(addr, {output: 'json'});
                 let can2dScan = G.Shell.inventory.can2dScan;
 
                 if(can2dScan){
@@ -243,9 +244,9 @@ export class ButtonAction {
                         callback(response);
                     }, () => callback(null))
                 }else {
-                    callback(null);
-                    Modal.alert('目前只支持手机功能');
-                }
+                   callback(null);
+                   Modal.alert('目前只支持手机功能');
+               }
                 break;
             case 'newwin':
             default:
@@ -280,10 +281,8 @@ export class ButtonAction {
 
         }
         let USER = User.get().userid,
-            SHO = User.get().are_id,
-            can2dScan = G.Shell.inventory.can2dScan;
+            SHO = User.get().are_id;
 
-        if(can2dScan){
             require(['RfidBarCode'], (p) => {
                 new p.RfidBarCode({
                     codeStype: codeStype,
@@ -294,9 +293,7 @@ export class ButtonAction {
                     uniqueFlag: uniqueFlag
                 })
             })
-        }else {
-            Modal.alert('只支持手持机');
-        }
+
 
     }
 
