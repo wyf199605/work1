@@ -195,16 +195,16 @@ export class ListItemDetailCell extends Component {
             let imgs = this.imgs || [];
             let imgData: ImgModalPara = {
                 img: ListItemDetailCell.getBigPicture(imgs),
-                onDownload:function (url:string) {
+                onDownload: function (url: string) {
                     sys.window.download(url);
                 }
             };
             ImgModal.show(imgData);
             if (tools.isMb) {
                 document.body.style.overflow = 'hidden';
-                setTimeout(()=>{
-                    d.query('.pswp',document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
-                },200);
+                setTimeout(() => {
+                    d.query('.pswp', document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
+                }, 200);
             }
         };
         return {
@@ -298,7 +298,7 @@ export class ListItemDetailCell extends Component {
         imgs.forEach(img => {
             result.push(tools.url.addObj(img, {
                 imagetype: 'picture',
-            },true,true));
+            }, true, true));
         });
         return result;
     };

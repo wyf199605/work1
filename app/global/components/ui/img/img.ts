@@ -77,7 +77,7 @@ export const ImgModal = (()=>{
                 });
                 gallery.init();
                 gallery.listen('close', function () {
-                    gallery.close();
+                    gallery && gallery.close();
                     gallery = null;
                     if (tools.isMb){
                         document.body.style.overflow = '';

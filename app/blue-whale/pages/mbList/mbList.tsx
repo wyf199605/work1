@@ -17,18 +17,20 @@ export interface IBwMbList extends IComponentPara {
 
 export class BwMbList extends BasicPage {
 
-    private mbListModule:MbListModule;
+    private mbListModule: MbListModule;
+
     constructor(private para: IBwMbList) {
         super(para);
         switch (para.ui.uiType) {
             case 'layout': {
                 let ui = para.ui as IBW_UI<IBW_Table>;
                 if (tools.isNotEmpty(ui) && tools.isNotEmpty(ui.body.elements[0].layout)) {
-                   this.mbListModule =  new MbListModule({
+                    this.mbListModule = new MbListModule({
                         ui: ui,
-                        container: para.dom
+                        container: para.dom,
+                        url: this.url
                     });
-                   this.queryEvent(ui);
+                    this.queryEvent(ui);
                 }
                 this.on(BwRule.EVT_REFRESH, () => {
                     this.mbListModule.refresh();
@@ -49,27 +51,28 @@ export class BwMbList extends BasicPage {
 
     private newQuery: NewQueryModalMb;
     private oldQuery: QueryModule;
+
     private queryEvent(ui: IBW_UI<IBW_Table>) {
         d.on(d.query('body > header [data-action="layout-query"]'), 'click', () => {
             let bwTableEl = ui.body.elements[0], mobileSetting = bwTableEl.querier.mobileSetting;
-            if (tools.isEmpty(mobileSetting) || tools.isEmpty(mobileSetting.settingValue)){
+            if (tools.isEmpty(mobileSetting) || tools.isEmpty(mobileSetting.settingValue)) {
                 if (this.oldQuery) {
                     this.oldQuery.show();
                 } else {
-                    require([NewQueryModalMb.QUERY_MODULE_NAME],(Query) => {
-                        let query:QueryModule = new Query({
-                            qm:  bwTableEl.querier,
+                    require([NewQueryModalMb.QUERY_MODULE_NAME], (Query) => {
+                        let query: QueryModule = new Query({
+                            qm: bwTableEl.querier,
                             container: document.body,
-                            refresher : (data:obj) => {
+                            refresher: (data: obj) => {
                                 return this.mbListModule.refresh(data);
                             },
-                            cols :  bwTableEl.cols,
-                            url : BW.CONF.siteUrl + BwRule.reqAddr(bwTableEl.dataAddr)
+                            cols: bwTableEl.cols,
+                            url: BW.CONF.siteUrl + BwRule.reqAddr(bwTableEl.dataAddr)
                         });
                         query.show();
                     })
                 }
-            }else{
+            } else {
                 let dataStr = mobileSetting.settingValue.replace(/\s*/g, '').replace(/\\*/g, '');
                 if (this.newQuery) {
                     this.newQuery.isShow = true;
@@ -84,7 +87,7 @@ export class BwMbList extends BasicPage {
                             });
                         },
                         cols: bwTableEl.cols,
-                        refresher: (data:obj) => {
+                        refresher: (data: obj) => {
                             return this.mbListModule.refresh(data);
                         }
                     });

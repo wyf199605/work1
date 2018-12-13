@@ -16,6 +16,7 @@ import {DetailModal} from "../listDetail/DetailModal";
 
 export interface IMbListModule extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
+    url?: string;
 }
 
 export class MbListModule extends Component {
@@ -116,6 +117,7 @@ export class MbListModule extends Component {
         }
 
         function getFormFields(url: string) {
+            let self = this;
             BwRule.Ajax.fetch(url, {
                 loading: {
                     msg: '加载中,请稍后...',
@@ -136,7 +138,7 @@ export class MbListModule extends Component {
                         return new Promise((resolve) => {
                             ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
                                 resolve();
-                            });
+                            },self.para.url || '');
                         })
                     }
                 }))
@@ -172,12 +174,13 @@ export class MbListModule extends Component {
             buttonsClick: (btnIndex, itemIndex) => {
                 let buttons = this.allButtons[1] || [],
                     btn = buttons[btnIndex],
-                    data = this.defaultData[itemIndex];
+                    data = this.defaultData[itemIndex],
+                    self = this;
                 switch (btn.subType) {
                     case 'update_save': {
                         BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr), {
                             output: 'json'
-                        }),{
+                        }), {
                             loading: {
                                 msg: '加载中,请稍后...',
                                 disableEl: document.body
@@ -197,7 +200,7 @@ export class MbListModule extends Component {
                                     return new Promise((resolve) => {
                                         ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
                                             resolve();
-                                        });
+                                        },self.para.url || '');
                                     })
                                 }
                             }))
@@ -245,7 +248,12 @@ export class MbListModule extends Component {
                         url = tools.url.addObj(url, Object.assign({}, {
                             pageparams: '{"index"=' + (current + 1) + ', "size"=' + pageSize + ',"total"=1}'
                         }, custom));
-                        BwRule.Ajax.fetch(url).then(({response}) => {
+                        BwRule.Ajax.fetch(url,{
+                            loading:{
+                                msg:'加载中，请稍后...',
+                                disableEl:document.body
+                            }
+                        }).then(({response}) => {
                             let body = response.body,
                                 head = response.head;
                             resolve({

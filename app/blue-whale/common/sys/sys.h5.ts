@@ -102,7 +102,7 @@ namespace BW{
 
                 },
                 openImg: function (url: string) {
-
+                    self.window.download(url);
                 },
                 download: function (url: string, fileName: string = '') {
                     let a = d.create(`<a href="${url}" download="${fileName}"></a>`);

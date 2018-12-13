@@ -111,6 +111,8 @@ export class RangeInputItem extends FormCom {
                 Shell.base.speak(1, '', (e) => {
                     this.set(e.data || '');
                 });
+            },() => {
+                Shell.base.speak(1, '', () => {});
             });
         };
         return {
@@ -119,7 +121,7 @@ export class RangeInputItem extends FormCom {
         }
     })();
 
-    private createSpeakModal(callback: () => void) {
+    private createSpeakModal(callback: () => void,cancel?:() => void) {
         let bodyWrapper = <div className="speak-modal-body-wrapper">
             <i className="appcommon app-maikefeng"/>
             <div className="please-speak">请说话</div>
@@ -129,9 +131,8 @@ export class RangeInputItem extends FormCom {
                     modal.isShow = false;
                 }} className="speak-cancel"/>
                 <Button content="说完了" onClick={() => {
-                    console.log('说完了');
                     callback && callback();
-                    modal.isShow = false;
+                    modal.destroy();
                 }} className="speak-done"/>
             </div>
         </div>;
@@ -143,7 +144,10 @@ export class RangeInputItem extends FormCom {
             isMb: false,
             className: 'speak-modal',
             position: 'center',
-            zIndex: 10000
+            zIndex: 10000,
+            onClose(){
+                cancel && cancel();
+            }
         });
     }
 
