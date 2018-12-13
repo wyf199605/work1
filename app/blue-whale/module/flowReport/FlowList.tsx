@@ -191,7 +191,7 @@ export class FlowList {
                 }
                     break;
                 case 90: {
-                    state = '已结案';
+                    state = '已同意';  // 原本是已结案
                     stateClass = 'close'
                 }
                     break;
@@ -205,13 +205,17 @@ export class FlowList {
                 }
                     break;
                 case 1: {
-                    state = taskName + '-' +  '已审批';
-                    stateClass = 'agree';
+                    if(data.operMemo === '同意'){
+                        state = taskName + '-' +  '已同意';
+                        stateClass = 'agree';
+                    }else {
+                        state = taskName + '-' +  '已退回';
+                        stateClass = 'sendBack';
+                    }
                 }
                     break;
             }
         }
-
 
         return <div className="item-wrapper" data-url={tools.url.addObj(BW.CONF.siteUrl + data.auditUrl, {page: 'flowReport'})} data-instance={data.instanceState}>
             <div className="item-title"><span>{data.processName}-{data.createUserName}</span><i

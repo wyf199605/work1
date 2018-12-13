@@ -67,6 +67,7 @@ export class FlowReport extends BasicPage {
             }
             return muiContent;
         } else {
+            // debugger
             let formWrapper = d.query('#flowForm', this.para.dom);
             for (let i = 0; i < fields.length; i++) {
                 let field = fields[i];
@@ -76,7 +77,8 @@ export class FlowReport extends BasicPage {
                 let formGroupWrapper: HTMLElement = null;
                 let isHide = ((this.para.uiType == 'insert' || this.para.uiType == 'associate') && field.noAdd) || (this.para.uiType == 'update' && field.noShow);
                 switch (field.comType) {
-                    case 'input': {
+                    case 'input':
+                    case 'selectInput':{
                         formGroupWrapper =
                             <div className={'list-group-item col-xs-12 col-md-4 col-sm-6 ' + (isHide ? 'hide' : '')}
                                  data-name={field.name}>
@@ -197,7 +199,7 @@ export class FlowReport extends BasicPage {
                     saveBtn.hintAfterAction = false;
                     // 先保存再发送
                     self.save(saveBtn, pageData, function () {
-                        saveBtn.hintAfterAction = true;
+                        btn.hintAfterAction = true;
                         ButtonAction.get().clickHandle(btn, self.dataGet(), () => {
                             // 提交成功回退到上一页
                             if (tools.isMb){
@@ -221,6 +223,7 @@ export class FlowReport extends BasicPage {
                     }, self.url);
                     break;
                 case 'agree': {
+                    btn.actionAddr.dataAddr += '&audit_memo=同意';
                     btn.hintAfterAction = true;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
                         // sys.window.close();

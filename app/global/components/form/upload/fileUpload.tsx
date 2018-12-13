@@ -3,12 +3,12 @@
 import tools = G.tools;
 
 export interface IFileUpload{
-    beforeSendFile?: (file: File) => Promise<any>; // promise返回的数据会在beforeSendBlock，afterSendFile方法中作为参数
+    beforeSendFile?: (file: CustomFile) => Promise<any>; // promise返回的数据会在beforeSendBlock，afterSendFile方法中作为参数
     formData?: () => obj;   // 上传附带数据
     uploadUrl: string;  // 上传地址
     chunk?: {//是否分块
         beforeSendBlock: (block: IFileBlock, ...any) => Promise<any>;
-        afterSendFile: (file: File, ...any) => Promise<any>;
+        afterSendFile: (file: CustomFile, ...any) => Promise<any>;
         chunkSize: number;  // 分块大小
     },
 }
@@ -22,9 +22,9 @@ export interface IFileBlock {
 export class FileUpload{
     protected chunkSize: number;
     protected chunked: boolean;
-    protected beforeSendFile: (file: File) => Promise<any>;
+    protected beforeSendFile: (file: CustomFile) => Promise<any>;
     protected beforeSendBlock: (block: IFileBlock, ...any) => Promise<any>;
-    protected afterSendFile: (file: File, ...any) => Promise<any>;
+    protected afterSendFile: (file: CustomFile, ...any) => Promise<any>;
     protected uploadUrl: string;
     constructor(para: IFileUpload){
         this.uploadUrl = para.uploadUrl;
@@ -41,7 +41,7 @@ export class FileUpload{
     formData: () => obj;
 
     // 验证并上传文件
-    upload(file: File): Promise<any>{
+    upload(file: CustomFile): Promise<any>{
         return new Promise((resolve, reject) => {
             // 秒传验证
             this.beforeSendFile(file).then((...any) => {
@@ -61,7 +61,7 @@ export class FileUpload{
                         reject(); // 表示分片上传失败
                     })
                 }else{
-                    this.uploadFile(file, file.name).then((response) => {
+                    this.uploadFile(file.blob, file.name).then((response) => {
                         // 成功返回
                         resolve(response);
                     }).catch(() => {
@@ -82,18 +82,19 @@ export class FileUpload{
     }
 
     // 分片验证逻辑
-    protected chunkUpload(file: File, ...any) {
+    protected chunkUpload(file: CustomFile, ...any) {
         let totalSize = file.size,
             totalPieces = Math.ceil(totalSize / this.chunkSize),
             list: Promise<any>[] = [],
             startSize = 0,
             endSize = 0,
             chunkIndex = 0,
+            fileBlob: Blob = file.blob,
             blob: Blob;
         this.xhrs = [];
         while (totalPieces --) {
             endSize = startSize + this.chunkSize;
-            blob = file.slice(startSize, endSize); // 切片
+            blob = fileBlob.slice(startSize, endSize); // 切片
 
             list.push(new Promise((resolve, reject) => {
                 this.beforeSendBlock({

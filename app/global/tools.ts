@@ -674,7 +674,7 @@ namespace G {
          * @param filename 文件名称
          * @param [lastModify] 最后编辑时间
          */
-        base64ToFile(dataurl: string, filename: string, lastModify?: number){
+        base64ToFile(dataurl: string, filename: string, lastModify?: number): CustomFile{
             let arr = dataurl.split(',');
             if(arr.length === 2){
                 let mime = arr[0].match(/:(.*?);/)[1],
@@ -684,7 +684,14 @@ namespace G {
                 while (n--) {
                     u8arr[n] = bstr.charCodeAt(n);
                 }
-                return new File([u8arr], filename, {type: mime, lastModified: lastModify});
+                let blob = new Blob([u8arr], {type: mime});
+                return {
+                    blob,
+                    type: blob.type,
+                    name: filename,
+                    lastModifiedDate: lastModify || new Date().getTime(),
+                    size: blob.size
+                };
             }else{
                 return null;
             }

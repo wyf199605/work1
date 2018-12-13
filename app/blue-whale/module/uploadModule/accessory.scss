@@ -203,6 +203,12 @@
 }
 
 .bw-upload-wrapper{
+  &.disabled{
+    input{
+      cursor: not-allowed!important;
+    }
+  }
+
   height: 100%;
   &.error{
     input.file-input{

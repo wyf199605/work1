@@ -226,7 +226,7 @@ namespace BW{
                 whiteBat: function () {
                     this.adHandle('whiteBat', '');
                 },
-                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
+                getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__';
                     d.once(window, event, function (response : CustomEvent) {
                         try{
@@ -237,10 +237,10 @@ namespace BW{
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
                             }else{
-                                error && error(detail);
+                                error && error(detail.msg || '');
                             }
                         }catch (e){
-                            error && error();
+                            error && error('获取图片失败');
                         }
                     });
                     self.handle('getImg', '{event:"' + event + '"}');

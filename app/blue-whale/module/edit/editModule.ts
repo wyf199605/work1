@@ -134,7 +134,7 @@ export class EditModule {
                     name: p.field.name,
                     pickerUrl: p.field.dataAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr) : '',
                     ajaxUrl: p.field.assignAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.assignAddr) : '',
-                    multi: p.field.atrrs ? p.field.atrrs.multiValueFlag === 1 : true, //field.multiValue,
+                    multi: p.field.atrrs && p.field.atrrs.multiValueFlag ? p.field.atrrs.multiValueFlag === 1 : true, //field.multiValue,
                     sepValue: sepValue,
                     onSet: this.getAssignSetHandler(p.field),
                     onGetData: (dataArr: obj[], otherField: string) => {
@@ -233,7 +233,7 @@ export class EditModule {
                                     [p.field.name]: item.text,
                                     [p.field.lookUpKeyField]: item.value
                                 };
-                                p.onExtra(data, [p.field.lookUpKeyField])
+                                p.onExtra && p.onExtra(data, [p.field.lookUpKeyField])
                             }, 100)
                         }
                     }

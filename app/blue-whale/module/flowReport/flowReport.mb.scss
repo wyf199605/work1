@@ -96,7 +96,7 @@ $scrren-width: 100%;
         font-size: 18px;
         position: relative;
         height: 100%;
-        $data-type-list: ("input", "datetime", "richText");
+        $data-type-list: ("input", "datetime", "richText", "selectInput");
 
         .disabled {
             pointer-events: none !important;
@@ -118,7 +118,7 @@ $scrren-width: 100%;
             }
 
             @each $data-type in $data-type-list {
-                @if $data-type == 'input' or $data-type == 'datetime' {
+                @if $data-type == 'input' or $data-type == 'datetime' or $data-type == 'selectInput' {
                     div[data-type=#{$data-type}] {
                         background-color: #ffffff;
                         border-bottom: 1px solid #e2e2e2;

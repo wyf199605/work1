@@ -10,6 +10,14 @@ interface objOf<T> {
 //     tabIndex? : boolean;
 //     tabIndexKey? : number
 // }
+interface CustomFile {
+    blob: Blob;
+    name: string;
+    lastModifiedDate: any;
+    type: string;
+    size: number;
+}
+
 type Primitive = string | number | boolean
 
 interface COL{

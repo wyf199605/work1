@@ -68,6 +68,9 @@
         width: calc((100% - #{$total-width}) / 2 );
       }
     }
+    &[data-type="input2"] {
+      max-width: calc(100% - #{$total-width});
+    }
     input{
       overflow: hidden;
       white-space: nowrap;
