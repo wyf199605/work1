@@ -600,7 +600,7 @@ let event = (function () {
                     let isImmediateStop = false,
                         isDocWin = target === window || target === document,
                         el = <Element>target;
-                    if (isDocWin || (!el.classList.contains('disabled') && handlers && handlers[0])) {
+                    if (isDocWin || (el.classList && !el.classList.contains('disabled') && handlers && handlers[0])) {
                         for (let handler of handlers) {
                             handler.call(target, evt);
 
