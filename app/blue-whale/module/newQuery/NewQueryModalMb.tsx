@@ -56,6 +56,7 @@ export class NewQueryModalMb {
                     onClick: () => {
                         let advanceSearch = this.para.advanceSearch;
                         if (tools.isNotEmpty(advanceSearch)){
+                            this.isShow = false;
                             require([NewQueryModalMb.QUERY_MODULE_NAME],(Query) => {
                                 let query:QueryModule = new Query({
                                     qm: advanceSearch,
