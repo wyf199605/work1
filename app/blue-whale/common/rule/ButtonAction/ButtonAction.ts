@@ -231,15 +231,22 @@ export class ButtonAction {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
-                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
-                    //创建条码扫码页面
-                    if (response.uiType === 'inventory' && tools.isMb) {
-                        this.initBarCode(response, data, dataObj);
-                        self.btnRefresh(btn.refresh, url);
-                    }
-                    callback(response);
-                }, () => callback(null))
+                let can2dScan = G.Shell.inventory.can2dScan;
 
+                if(can2dScan){
+                    self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                        //创建条码扫码页面
+                        if (response.uiType === 'inventory' && tools.isMb) {
+                            this.initBarCode(response, data, dataObj);
+                            self.btnRefresh(btn.refresh, url);
+                        }
+                        callback(response);
+                    }, () => callback(null))
+                }else {
+                    callback(null);
+                    Modal.alert('目前只支持手机功能');
+                }
+                break;
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
