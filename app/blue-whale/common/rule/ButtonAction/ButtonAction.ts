@@ -220,17 +220,26 @@ export class ButtonAction {
                 addr = tools.url.addObj(addr, {output: 'json'});
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     //创建条码扫码页面
-                    if (response.uiType === 'inventory' && tools.isMb) {
-                        this.initBarCode(response, data, dataObj);
-                        self.btnRefresh(btn.refresh, url);
-                    } else {
                         self.btnPopup(response, () => {
                             self.btnRefresh(btn.refresh, url);
                         }, url);
-                    }
                     callback(response);
                 }, () => callback(null))
                 break;
+            case  'barcode_inventory':
+                if (!ajaxType) {
+                    Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
+                    return;
+                }
+                self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                    //创建条码扫码页面
+                    if (response.uiType === 'inventory' && tools.isMb) {
+                        this.initBarCode(response, data, dataObj);
+                        self.btnRefresh(btn.refresh, url);
+                    }
+                    callback(response);
+                }, () => callback(null))
+
             case 'newwin':
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);

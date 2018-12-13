@@ -119,19 +119,19 @@ export class NewFinger {
                 }).then((data) => {
                     if(typeof this.fingerFinish === 'function'){
                         this.fingerFinish(data).then(() => {
-                            this.autoCache && this.addFinger(data).finally(() => {
-                                this.initFingerOpen();
-                            }).catch((e) => {
+                            this.autoCache && this.addFinger(data).catch((e) => {
                                 console.log(e);
+                            }).finally(() => {
+                                this.initFingerOpen();
                             });
                         }).catch(() => {
                             this.initFingerOpen();
                         });
                     }else{
-                        this.autoCache && this.addFinger(data).finally(() => {
-                            this.initFingerOpen();
-                        }).catch((e) => {
+                        this.autoCache && this.addFinger(data).catch((e) => {
                             console.log(e);
+                        }).finally(() => {
+                            this.initFingerOpen();
                         });
                     }
                 }).catch((e) => {
