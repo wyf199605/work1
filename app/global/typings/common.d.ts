@@ -10,6 +10,14 @@ interface objOf<T> {
 //     tabIndex? : boolean;
 //     tabIndexKey? : number
 // }
+interface CustomFile {
+    blob: Blob;
+    name: string;
+    lastModifiedDate: any;
+    type: string;
+    size: number;
+}
+
 type Primitive = string | number | boolean
 
 interface COL{
@@ -128,6 +136,7 @@ interface R_Field extends COL {
     }
     chkAddr?: R_ReqAddr;
     isCanSort?: boolean;
+    sortName?: string;
     fileInfo?:R_ReqAddr; // 文件信息地址
     backWhen? : string   // 后台计算规则表格单元格显示 true：显示backColor颜色
     backColor? : number  // 色码
