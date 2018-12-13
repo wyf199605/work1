@@ -749,9 +749,14 @@ export class LoginPage{
         }
 
         if(props.wxButton) {
-            d.on(props.wxButton, 'click', () => {
-                loginPage.wechatChick()
-            });
+            if(tools.isEmpty(this.device.auth_code)){
+                d.remove(props.wxButton);
+                props.wxButton = null;
+            }else{
+                d.on(props.wxButton, 'click', () => {
+                    loginPage.wechatChick()
+                });
+            }
         }
         if(props.fingerMbBtn){
             d.on(props.fingerMbBtn, 'click', () => {
