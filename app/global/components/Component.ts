@@ -52,7 +52,6 @@ namespace G{
                     {cmd, childs} = data;
 
                 if(cmd) {
-                    debugger
                     for (let key in cmd) {
                         let val = cmd[key];
                         switch (key) {
