@@ -1,20 +1,8 @@
 import CONF = BW.CONF;
-import tools = G.tools;
 import sys = BW.sys;
 import d = G.d;
 export = class mainMbPage {
-    constructor(private para) {
-//         mui.init({
-//             swipeBack: false
-//         });
-//         mui.plusReady(function () {
-//             //iOS防止回退
-// //        if (mui.os.ios) {
-//             let currentWebview = plus.webview.currentWebview();
-//             // 关闭侧滑返回功能
-//             currentWebview.setStyle({'popGesture':'none'});
-// //        }
-//         });
+    constructor() {
         let pages = {
             home : CONF.url.home,
             message : CONF.url.message,
@@ -37,19 +25,12 @@ export = class mainMbPage {
             pagesContainer : document.getElementById('pagesContainer'),
             pages,
             lastShowPage : null,
-            createIframes : function () {
-                let pageName ,
-                    iframes = [],
-                    thisSubPage = this;
-                for(pageName in this.pages){
-                    if(this.pages.hasOwnProperty(pageName)){
-                        let pageUrl = this.pages[pageName];
-                        let iframe = d.create('<iframe data-page-name="' + pageName + '" class="full-height has-footer-tab hide" src="' + pageUrl + '"> </iframe>');
-                        iframes.push(iframe);
-                        thisSubPage.pagesContainer.appendChild(iframe);
-                    }
+            createIframes : function (pageName) {
+                if(this.pages.hasOwnProperty(pageName)){
+                    let pageUrl = this.pages[pageName];
+                    let iframe = d.create('<iframe data-page-name="' + pageName + '" class="full-height has-footer-tab hide" src="' + pageUrl + '"> </iframe>');
+                    SUB_PAGE.pagesContainer.appendChild(iframe);
                 }
-                return iframes;
             },
             autoShow : function () {
                 this.pagesContainer.classList.remove('has-spinner');
@@ -66,25 +47,31 @@ export = class mainMbPage {
                 this.lastShowPage = iframe;
             },
             initPages : function () {
-                let thisSubPage = this;
-                let iframes = thisSubPage.createIframes();
                 setTimeout(function () {
-                    thisSubPage.autoShow();
+                    SUB_PAGE.autoShow();
                 }, 500);
 
-                let list = d.query('.mui-bar.mui-bar-tab');
+                let list = d.query('.mui-bar.mui-bar-tab'),
+                    page = {
+                        home : SUB_PAGE.createIframes('home')
+                    };
                 d.on(list, 'click', '[data-page-name]', function (e) {
+                    let el = d.closest((e.target as HTMLElement), '[data-page-name]'),
+                        name = el.dataset.pageName;
+                    if(!page[name]){
+                        page[name] = SUB_PAGE.createIframes(name);
+                    }
+
                     d.queryAll('[data-page-name]', list).forEach((el) => {
                         el.classList.remove('mui-active');
                     });
                     d.closest((e.target as HTMLElement), '[data-page-name]').classList.add('mui-active');
-                    thisSubPage.showIframe(this.dataset.pageName);
+                    SUB_PAGE.showIframe(this.dataset.pageName);
                 });
 
-                return iframes;
             }
         };
-        let iframes = SUB_PAGE.initPages();
+        SUB_PAGE.initPages();
         sys.window.close = double_back;
     }
 }
