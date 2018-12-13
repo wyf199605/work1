@@ -1920,7 +1920,12 @@ export class BwTableModule extends Component {
                             let linkedData = this.linkedData || {};
                             let select = multiselect === 1
                                 ? Object.assign({}, linkedData, selectedData[0] || {})
-                                : selectedData.map((o) => Object.assign({}, linkedData || {}, o));
+                                : (
+                                    multiselect === 2
+                                    ? selectedData.map((o) =>
+                                        Object.assign({}, linkedData || {}, o))
+                                    : null
+                                );
                             select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
 
                             let tData = ftable.tableData.data;
