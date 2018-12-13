@@ -20,7 +20,7 @@ export = class FormPage extends BasicPage {
     constructor(form: HTMLElement, private para: EditPagePara) {
         super(para);
         console.log(para);
-        let isInsert = para.uiType === 'insert';
+        let isInsert = para.uiType === 'insert' || para.uiType === 'associate';
         let emPara: EditModulePara = {fields : []};
         let nameFields : {[name : string] : R_Field} = {};
         this.fields = para.fm.fields;
