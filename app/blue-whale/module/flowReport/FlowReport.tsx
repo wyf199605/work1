@@ -198,9 +198,10 @@ export class FlowReport extends BasicPage {
                     }
                     saveBtn.hintAfterAction = false;
                     // 先保存再发送
+                    saveBtn.refresh = 1;
                     self.save(saveBtn, pageData, function () {
                         btn.hintAfterAction = true;
-                        ButtonAction.get().clickHandle(btn, self.dataGet(), () => {
+                        ButtonAction.get().clickHandle(btn, pageData, () => {
                             // 提交成功回退到上一页
                             if (tools.isMb){
                                 sys.window.open({
