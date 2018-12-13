@@ -118,22 +118,26 @@ export class NewFinger {
                     }
                 }).then((data) => {
                     if(typeof this.fingerFinish === 'function'){
-                        this.fingerFinish(data).then(() => {
-                            this.autoCache && this.addFinger(data).finally(() => {
-                                this.initFingerOpen();
-                            }).catch((e) => {
-                                console.log(e);
-                            });
+                        this.fingerFinish(data).then((print) => {
+                            if(data.verify === '1'){
+                                let printData = Object.assign({}, data, {print});
+                                this.autoCache && this.addFinger(printData).finally(() => {
+                                    this.initFingerOpen();
+                                }).catch((e) => {
+                                    console.log(e);
+                                });
+                            }
                         }).catch(() => {
                             this.initFingerOpen();
                         });
-                    }else{
-                        this.autoCache && this.addFinger(data).finally(() => {
-                            this.initFingerOpen();
-                        }).catch((e) => {
-                            console.log(e);
-                        });
                     }
+                    // else{
+                    //     this.autoCache && this.addFinger(data).finally(() => {
+                    //         this.initFingerOpen();
+                    //     }).catch((e) => {
+                    //         console.log(e);
+                    //     });
+                    // }
                 }).catch((e) => {
                     console.log(e);
                     Modal.toast('请重新获取指纹');
