@@ -347,6 +347,9 @@ namespace BW {
                         }
                     }
 
+                },
+                reOpen: function (o: winOpen){
+                    sys.window.open(o);
                 }
             };
         }(this));

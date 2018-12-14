@@ -180,19 +180,7 @@ export class FlowReport extends BasicPage {
                         return false;
                     }
                     btn.hintAfterAction = true;
-                    self.save(btn, pageData, function () {
-                        if (tools.isMb){
-                            if(tools.url.getPara('page', document.referrer) !== 'myApplication'){
-                                sys.window.open({
-                                    url: BW.CONF.url.myApplication
-                                });
-                            }
-                        }else{
-                            sys.window.open({
-                                url: BW.CONF.url.myApplicationPC
-                            });
-                        }
-                    });
+                    self.save(btn, pageData);
                     break;
                 case 'submit':
                     if (!self.validate(pageData)) {
@@ -205,22 +193,7 @@ export class FlowReport extends BasicPage {
                         btn.hintAfterAction = true;
                         ButtonAction.get().clickHandle(btn, pageData, () => {
                             // 提交成功回退到上一页
-                            if (tools.isMb){
-                                /*
-                                * 如果是从myApplication跳转过来的，就直接关闭当前界面，并刷新已有的myApplication；
-                                * 否则就是没有打开过myApplication，那么就打开一个新的myApplication，save同理。
-                                * */
-                                if(tools.url.getPara('page', document.referrer) !== 'myApplication'){
-                                    sys.window.open({
-                                        url: BW.CONF.url.myApplication
-                                    });
-                                }
-                            }else{
-                                sys.window.open({
-                                    url: BW.CONF.url.myApplicationPC
-                                });
-                            }
-                        }, self.url);
+                        }, tools.isMb ? BW.CONF.url.myApplication : BW.CONF.url.myApplicationPC);
                     });
                     break;
                 case 'with_draw':
@@ -312,7 +285,7 @@ export class FlowReport extends BasicPage {
                 this.editModule.set(data);
             }
             typeof callback === 'function' && callback(response);
-        }, this.url);
+        }, tools.isMb ? BW.CONF.url.myApplication : BW.CONF.url.myApplicationPC);
     }
 
     /**

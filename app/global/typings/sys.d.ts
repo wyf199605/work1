@@ -3,6 +3,8 @@ interface SYS_Type {
     ui :SYS_UI;
     os : string;
     isMb: boolean;
+
+
 }
 interface SYS_Window{
     open( obj:winOpen, refer? : string) :void;
@@ -11,6 +13,7 @@ interface SYS_Window{
     back( event:string, data?:obj) :void;
     logout(url?:string) :void;
     backHome?(): void;
+    reOpen?(obj:winOpen) :void;
 
     copy( text:string) :void;
     getGps(callback:Function) :void;
