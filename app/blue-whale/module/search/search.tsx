@@ -65,26 +65,28 @@ export class Search {
      */
     private evenInit() {
         let debounce = G.tools.pattern.debounce(this.search, 300);
-        d.on(this.inputEl, 'input', () => {
-            if (this.inputEl.value !== '') {
+        let query = () => {
+            if (this.input !== '') {
                 this.closeEl.classList.remove('hide');
             } else {
                 this.closeEl.classList.add('hide');
             }
             debounce();
-        });
+        };
+        d.on(this.inputEl, 'input', () => query());
 
         d.on(this.closeEl, 'click', () => {
-            this.inputEl.value = '';
+            this.input = '';
             this.closeEl.classList.add('hide');
         });
 
         d.on(this.voiceEl, 'click', () => {
             this.dotEl.classList.remove('hide');
             Shell.base.speak(3, null, result => {
-                this.inputEl.value = result.data;
+                this.dotEl.classList.add('hide');
             }, result => {
-                this.inputEl.value = result.data;
+                this.input = result.data;
+                query();
             })
         });
 
@@ -116,9 +118,8 @@ export class Search {
      * @param value
      */
     private ajax = new BwRule.Ajax();
-
     private search = () => {
-        if (this.inputEl.value !== '') {
+        if (this.input !== '') {
             this.menuEl.innerHTML = null;
 
             if (!this.spinner) {
@@ -128,7 +129,7 @@ export class Search {
                 });
             }
             this.spinner.show();
-            let url = CONF.siteUrl + this.para.baseUrl + 'currentNode=' + this.para.nodeId + '&keywords=' + this.inputEl.value;
+            let url = CONF.siteUrl + this.para.baseUrl + 'currentNode=' + this.para.nodeId + '&keywords=' + this.input;
             this.ajax.fetch(url, {
                 type: 'POST',
                 cache: true
@@ -139,6 +140,14 @@ export class Search {
             });
         }
     };
+
+    set input(value : string){
+        this.inputEl.value = value;
+    }
+
+    get input(){
+        return this.inputEl.value;
+    }
 
     /**
      * 初始化搜索框
@@ -168,12 +177,13 @@ export class Search {
     }
     
     private liTpl(obj: MenuItemPara): HTMLElement {
-        let menuPath = obj.menuItem.menuPath;
-        return <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" data-href={menuPath.dataAddr} data-gps={menuPath.needGps} data-favid={obj.menuItem.favid}>
+        let menuItem = obj.menuItem,
+            menuPath = menuItem.menuPath;
+        return <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" data-href={menuPath.dataAddr} data-gps={menuPath.needGps} data-favid={menuItem.favid}>
             <a href="javascript:void(0)">
-                    <span class={"mui-icon " + obj.menuItem.menuIcon}>
+                    <span class={"mui-icon " + menuItem.menuIcon}>
                     </span>
-                <div class="mui-media-body">{obj.menuItem.menuName}</div>
+                <div class="mui-media-body">{menuItem.menuName}</div>
             </a>
         </li>;
     }
