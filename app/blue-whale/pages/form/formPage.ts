@@ -92,7 +92,7 @@ export = class FormPage extends BasicPage {
             //     }
             // }
 
-            if(field.field && field.field.noShow){
+            if(field.field && (isInsert ? field.field.noAdd : field.field.noShow)){
                 let dom = d.query(`[data-name="${f.name}"]`, form);
                 dom && dom.classList.add('hide');
             }
