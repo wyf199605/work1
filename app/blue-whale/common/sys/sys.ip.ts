@@ -208,14 +208,24 @@ namespace BW{
                     tools.event.fire(type, data, window);
                 },
                 getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
-                    let input = <HTMLInputElement>d.create('<input type="file" class="hide"/>');
-                    input.multiple = multi;
-                    accpet && (input.accept = accpet);
-                    d.on(input, 'change', () => {
-                        callback && callback(Array.prototype.slice.call(input.files));
-                        input = null;
+                    let event = '__EVT_GET_IMG_BY_DEVICE__';
+                    self.handle('getImg', {event});
+                    d.once(window, event, function (response : CustomEvent) {
+                        try{
+                            let detail = JSON.parse(response.detail);
+
+                            if(detail.success && detail.msg){
+                                let data = detail.msg;
+                                let file: File = tools.base64ToFile(data.dataurl, data.filename);
+                                callback && callback([file]);
+                            }else{
+                                error && error(detail);
+                            }
+                        }catch (e){
+                            error && error();
+                        }
                     });
-                    input.click();
+                    self.handle('getImg', {event});
                 },
                 getEditImg(image: string | Function, callback?: Function){
                     if(typeof image === 'function'){
