@@ -41,37 +41,48 @@ export class ButtonBox extends Component {
                 })
             });
         } else {
-            let showButtons = buttons.slice(0,limitNumer),
-                hideButtons = buttons.slice(limitNumer);
-            showButtons.forEach((btn,index) => {
-                new Button({
-                    content: btn.content,
-                    onClick: btn.onClick || null,
+            if (buttons.length <= limitNumer){
+                buttons.forEach((btn,index) => {
+                    new Button({
+                        content: btn.content,
+                        onClick: btn.onClick || null,
+                        container:this.wrapper,
+                        className:index === 1 ? 'first-btn' : ''
+                    })
+                });
+            }else{
+                let showButtons = buttons.slice(0,limitNumer),
+                    hideButtons = buttons.slice(limitNumer);
+                showButtons.forEach((btn,index) => {
+                    new Button({
+                        content: btn.content,
+                        onClick: btn.onClick || null,
+                        container:this.wrapper,
+                        className:index === 1 ? 'first-btn' : ''
+                    })
+                });
+                let moreBtn = new Button({
+                    content:'更多',
                     container:this.wrapper,
-                    className:index === 1 ? 'first-btn' : ''
-                })
-            });
-            let moreBtn = new Button({
-                content:'更多',
-                container:this.wrapper,
-                className:'more-button'
-            });
-            moreBtn.dropDown = new DropDown({
-                el: moreBtn.wrapper,
-                inline: false,
-                data: [],
-                multi: null,
-                className: "input-box-morebtn"
-            });
-            hideButtons.forEach((btn) => {
-                if (moreBtn.dropDown) {
-                    let dropBtn = new Button({
-                        content:btn.content,
-                        onClick:btn.onClick || null
-                    });
-                    moreBtn.dropDown.getUlDom().appendChild(dropBtn.wrapper);
-                }
-            });
+                    className:'more-button'
+                });
+                moreBtn.dropDown = new DropDown({
+                    el: moreBtn.wrapper,
+                    inline: false,
+                    data: [],
+                    multi: null,
+                    className: "input-box-morebtn"
+                });
+                hideButtons.forEach((btn) => {
+                    if (moreBtn.dropDown) {
+                        let dropBtn = new Button({
+                            content:btn.content,
+                            onClick:btn.onClick || null
+                        });
+                        moreBtn.dropDown.getUlDom().appendChild(dropBtn.wrapper);
+                    }
+                });
+            }
         }
     }
 }

@@ -83,6 +83,7 @@ interface IBW_Table{
     showSubField?:string;
     layout?:IBW_Layout; // 移动化
     subTableAddr?:R_ReqAddr; //移动化
+    layoutDrill?:R_ReqAddr; // 下钻地址
 }
 
 interface IBW_Layout{

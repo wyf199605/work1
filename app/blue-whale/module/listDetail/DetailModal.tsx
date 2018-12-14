@@ -26,7 +26,8 @@ export class DetailModal {
         let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData},
             formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
-            groupInfo = para.fm.groupInfo;
+            groupInfo = para.fm.groupInfo,
+            self = this;
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
@@ -35,7 +36,48 @@ export class DetailModal {
                 }
                 let field = {
                     dom: DetailModal.createFormWrapper(f, formWrapper),
-                    field: f
+                    field: f,
+                    onExtra: (data, relateCols, isEmptyClear = false) => {
+                        let com = self.editModule.getDom(f.name);
+                        for(let key of relateCols){
+                            let hCom = self.editModule.getDom(key);
+                            if(hCom && hCom !== com){
+                                let hField = hCom.custom as R_Field;
+                                hCom.set(data[key] || '');
+
+                                if (tools.isNotEmpty(hField) && hField.assignSelectFields && hField.assignAddr) {
+                                    BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                        cache: true,
+                                    }).then(({response}) => {
+                                        let res = response.data;
+                                        if (res && res[0]) {
+                                            hField.assignSelectFields.forEach((name) => {
+                                                let assignCom = self.editModule.getDom(name);
+                                                assignCom && assignCom.set(res[0][name]);
+                                            });
+                                            let data = this.dataGet();
+                                            fields.forEach((fi) => {
+                                                if(fi.elementType === 'lookup'){
+                                                    let lCom = self.editModule.getDom(fi.name);
+                                                    if(!data[fi.lookUpKeyField]){
+                                                        lCom.set('');
+                                                    }else{
+                                                        let options = self.lookUpData[fi.name] || [];
+                                                        for (let opt of options) {
+                                                            if (opt.value == data[fi.lookUpKeyField]) {
+                                                                lCom.set(opt.value);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })
+                                        }
+
+                                    })
+                                }
+                            }
+                        }
+                    }
                 };
                 emPara.fields.push(field);
                 if ((['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {
@@ -155,13 +197,21 @@ export class DetailModal {
         }
     }
 
+
+    private _lookUpData: objOf<ListItem[]> = {};
+    get lookUpData() {
+        return this._lookUpData || {};
+    }
+
+
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
         if (tools.isEmpty(groupInfo.cloNames)) {
             return fields;
         }
         let groupsArr = groupInfo.cloNames.split(','),
             groupFields: R_Field[] = [],
-            fieldsArr = [...fields];
+            fieldsArr = [...fields],
+            self = this;
         groupsArr.forEach(field => {
             let gFields = fieldsArr.filter(f => f.name === field);
             if (tools.isNotEmptyArray(gFields)) {
@@ -188,7 +238,48 @@ export class DetailModal {
             }
             let field = {
                 dom: DetailModal.createFormWrapper(f, cellsWrapper, className),
-                field: f
+                field: f,
+                onExtra: (data, relateCols, isEmptyClear = false) => {
+                    let com = self.editModule.getDom(f.name);
+                    for(let key of relateCols){
+                        let hCom = self.editModule.getDom(key);
+                        if(hCom && hCom !== com){
+                            let hField = hCom.custom as R_Field;
+                            hCom.set(data[key] || '');
+
+                            if (tools.isNotEmpty(hField) && hField.assignSelectFields && hField.assignAddr) {
+                                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                    cache: true,
+                                }).then(({response}) => {
+                                    let res = response.data;
+                                    if (res && res[0]) {
+                                        hField.assignSelectFields.forEach((name) => {
+                                            let assignCom = self.editModule.getDom(name);
+                                            assignCom && assignCom.set(res[0][name]);
+                                        });
+                                        let data = this.dataGet();
+                                        fields.forEach((fi) => {
+                                            if(fi.elementType === 'lookup'){
+                                                let lCom = self.editModule.getDom(fi.name);
+                                                if(!data[fi.lookUpKeyField]){
+                                                    lCom.set('');
+                                                }else{
+                                                    let options = self.lookUpData[fi.name] || [];
+                                                    for (let opt of options) {
+                                                        if (opt.value == data[fi.lookUpKeyField]) {
+                                                            lCom.set(opt.value);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+
+                                })
+                            }
+                        }
+                    }
+                }
             };
             emPara.push(field);
             if ((['insert', 'associate'].indexOf(this.para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {

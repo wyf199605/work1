@@ -214,11 +214,10 @@ export class MbListModule extends Component {
             },
             itemClick: (index) => {
                 let data = this.defaultData[index],
-                    addr: R_ReqAddr = this.para.ui.body.elements[0].subTableAddr;
+                    addr: R_ReqAddr = this.para.ui.body.elements[0].layoutDrill;
                 if (tools.isNotEmpty(addr)) {
-                    let url = BW.CONF.siteUrl + BwRule.reqAddr(addr, data);
                     sys.window.open({
-                        url: url
+                        url: tools.url.addObj(BW.CONF.siteUrl + addr.dataAddr,G.Rule.parseVarList(addr.parseVarList,data))
                     })
                 }
             },
