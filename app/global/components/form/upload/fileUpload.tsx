@@ -55,7 +55,13 @@ export class FileUpload{
                             // anyData 为成功后返回的数据
                             resolve(...anyData); // 上传成功
                         }).catch(() => {
-                            reject();
+                            // 第一次合并请求失败时再次请求一次合并
+                            this.afterSendFile(file, ...any).then((...anyData) => {
+                                // anyData 为成功后返回的数据
+                                resolve(...anyData); // 上传成功
+                            }).catch(() => {
+                                reject();
+                            });
                         });
                     }).catch(() => {
                         reject(); // 表示分片上传失败

@@ -262,35 +262,41 @@ export class BwUploader extends FormCom {
     // 合并请求
     protected afterSendFile(file: File, data): Promise<any>{
         return new Promise((resolve, reject) => {
-            let chunksTotal = Math.ceil(file.size / this.chunkSize);
-            if(chunksTotal >= 1){
-                let userInfo = User.get().userid,
-                    ajaxData: obj = {
-                        status: "chunksMerge"
-                        , name: data.uniqueFileName
-                        , chunks: chunksTotal
-                        , md5: data.md5.toUpperCase()
-                        , file_name: file.name
-                        , userid: userInfo
-                        , nameField: this.nameField
-                    };
-                if (this.thumbField) {
-                    ajaxData.smallField = this.thumbField
-                }
-                Ajax.fetch(this.uploadUrl, {
-                    type: "POST"
-                    , traditional: true
-                    , data: ajaxData
-                    // , cache: false
-                    , dataType: "json"
-                }).then(({response}) => {
-                    resolve(response);
-                }).catch(() => {
+            setTimeout(() => {
+                let chunksTotal = Math.ceil(file.size / this.chunkSize);
+                if(chunksTotal >= 1){
+                    let userInfo = User.get().userid,
+                        ajaxData: obj = {
+                            status: "chunksMerge"
+                            , name: data.uniqueFileName
+                            , chunks: chunksTotal
+                            , md5: data.md5.toUpperCase()
+                            , file_name: file.name
+                            , userid: userInfo
+                            , nameField: this.nameField
+                        };
+                    if (this.thumbField) {
+                        ajaxData.smallField = this.thumbField
+                    }
+                    Ajax.fetch(this.uploadUrl, {
+                        type: "POST"
+                        , traditional: true
+                        , data: ajaxData
+                        // , cache: false
+                        , dataType: "json"
+                    }).then(({response}) => {
+                        if(response.code === '200'){
+                            resolve(response);
+                        }else{
+                            reject();
+                        }
+                    }).catch(() => {
+                        reject();
+                    })
+                }else{
                     reject();
-                })
-            }else{
-                reject();
-            }
+                }
+            }, 100);
         })
     }
 
