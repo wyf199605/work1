@@ -180,7 +180,13 @@ export class FlowReport extends BasicPage {
                         return false;
                     }
                     btn.hintAfterAction = true;
-                    self.save(btn, pageData);
+                    self.save(btn, pageData,()=>{
+                        if (tools.isPc){
+                            sys.window.open({
+                                url:BW.CONF.url.myApplicationPC
+                            })
+                        }
+                    });
                     break;
                 case 'submit':
                     if (!self.validate(pageData)) {
@@ -193,7 +199,12 @@ export class FlowReport extends BasicPage {
                         btn.hintAfterAction = true;
                         ButtonAction.get().clickHandle(btn, pageData, () => {
                             // 提交成功回退到上一页
-                        }, tools.isMb ? BW.CONF.url.myApplication : BW.CONF.url.myApplicationPC);
+                            if (tools.isPc){
+                                sys.window.open({
+                                    url:BW.CONF.url.myApplicationPC
+                                })
+                            }
+                        }, tools.isMb ? BW.CONF.url.myApplication : self.url);
                     });
                     break;
                 case 'with_draw':
@@ -285,7 +296,7 @@ export class FlowReport extends BasicPage {
                 this.editModule.set(data);
             }
             typeof callback === 'function' && callback(response);
-        }, tools.isMb ? BW.CONF.url.myApplication : BW.CONF.url.myApplicationPC);
+        }, tools.isMb ? BW.CONF.url.myApplication : this.url);
     }
 
     /**

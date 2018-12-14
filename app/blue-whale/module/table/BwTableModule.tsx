@@ -1831,10 +1831,10 @@ export class BwTableModule extends Component {
                 className: !tools.isMb ? 'more-btns' : ''
             });
             // TODO: 移动端未实现流程设计功能。
-            if (tools.isMb && this.ui.caption === '流程设计') {
+            if (tools.isMb && (this.ui.caption === '流程设计' || this.ui.caption === '流程制度')) {
                 for (let i = 0,len = btnsUi.length; i < len; i++) {
                     let btn = btnsUi[i];
-                    if (btn.openType === 'flow-design') {
+                    if (btn.openType === 'flow-design' || btn.openType === 'flow-look') {
                         btnsUi.splice(i, 1);
                     }
                 }
