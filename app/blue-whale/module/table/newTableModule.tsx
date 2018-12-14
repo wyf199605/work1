@@ -727,7 +727,7 @@ export class NewTableModule {
                 }
             }).catch((e) => {
                 console.log(e);
-                Modal.alert('表格中有错误，请改正后再提交！');
+                e !== 'noMessage' && Modal.alert('表格中有错误，请改正后再提交！');
             })
         };
 
