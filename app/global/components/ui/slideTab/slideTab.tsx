@@ -26,8 +26,25 @@ export class SlideTab extends Tab{
 
         this.width = this.panelContainer.offsetWidth;
 
+        this.resizeEvent.on();
+
         this.slideEvent.on();
     }
+
+    resizeEvent = (() => {
+        let handler = null;
+        return {
+            on: () => {
+                d.on(window, 'resize', handler = () => {
+                    this.width = this.panelContainer.offsetWidth;
+                    this.active(this.current);
+                })
+            },
+            off: () => {
+                d.off(window, 'resize', handler)
+            }
+        }
+    })();
 
     protected width: number;
 
@@ -219,5 +236,9 @@ export class SlideTab extends Tab{
         }else{
             this.dataManagers.push(null);
         }
+    }
+
+    destroy(){
+        this.resizeEvent.on();
     }
 }
