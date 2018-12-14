@@ -92,7 +92,7 @@ export = class FormPage extends BasicPage {
             //     }
             // }
 
-            if(field.field && field.field.noShow){
+            if(field.field && (isInsert ? field.field.noAdd : field.field.noShow)){
                 let dom = d.query(`[data-name="${f.name}"]`, form);
                 dom && dom.classList.add('hide');
             }
@@ -300,13 +300,15 @@ export = class FormPage extends BasicPage {
      */
     private save(btn:R_Button, pageData : obj, callback?){
         ButtonAction.get().clickHandle(btn, pageData, response => {
-            btn.buttonType = 2;
-            let data = response.data && response.data[0] ? response.data[0] : null;
-            if(data){
-                this.editModule.set(data);
-            }
+            if(response){
+                btn.buttonType = 2;
+                let data = response.data && response.data[0] ? response.data[0] : null;
+                if(data){
+                    this.editModule.set(data);
+                }
 
-            typeof callback === 'function' && callback(response);
+                typeof callback === 'function' && callback(response);
+            }
         },this.url);
     }
 
