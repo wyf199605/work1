@@ -2365,7 +2365,7 @@ export class BwTableModule extends Component {
                 }
             }).then(() => {
                 cell.isChecked = true;
-            }).catch(() => {}).finally(() => {
+            }).finally(() => {
                 let index = validList.indexOf(promise);
                 if(index > -1){
                     validList.splice(index, 1);
