@@ -20,12 +20,54 @@ export class FlowReport extends BasicPage {
         this.para = para;
         let emPara: EditModulePara = {fields: []};
         let nameFields: { [name: string]: R_Field } = {};
-        let form = this.createFormWrapper(para.fm.fields);
+        let form = this.createFormWrapper(para.fm.fields),
+            self = this;
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
             let field = {
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
-                field: nameFields[f.name]
+                field: nameFields[f.name],
+                onExtra: (data, relateCols, isEmptyClear = false) => {
+                    let com = self.editModule.getDom(f.name);
+                    for(let key of relateCols){
+                        let hCom = self.editModule.getDom(key);
+                        if(hCom && hCom !== com){
+                            let hField = hCom.custom as R_Field;
+                            hCom.set(data[key] || '');
+
+                            if (hField.assignSelectFields && hField.assignAddr) {
+                                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                    cache: true,
+                                }).then(({response}) => {
+                                    let res = response.data;
+                                    if (res && res[0]) {
+                                        hField.assignSelectFields.forEach((name) => {
+                                            let assignCom = self.editModule.getDom(name);
+                                            assignCom && assignCom.set(res[0][name]);
+                                        });
+                                        let data = this.dataGet();
+                                        this.fields.forEach((field) => {
+                                            if(field.elementType === 'lookup'){
+                                                let lCom = self.editModule.getDom(field.name);
+                                                if(!data[field.lookUpKeyField]){
+                                                    lCom.set('');
+                                                }else{
+                                                    let options = this.lookUpData[field.name] || [];
+                                                    for (let opt of options) {
+                                                        if (opt.value == data[field.lookUpKeyField]) {
+                                                            lCom.set(opt.value);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+
+                                })
+                            }
+                        }
+                    }
+                }
             };
             emPara.fields.push(field);
             if (['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit) {
