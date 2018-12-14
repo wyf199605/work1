@@ -67,7 +67,6 @@ export class EditModule {
             if (p && p.field) {
                 f = this.nameFields[name] = p;
             }
-
             // if(!this.coms[name]){
             this.coms[name] = this.initFactory(f.field.comType, f);
             // }else{
@@ -344,6 +343,13 @@ export class EditModule {
             if(field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
                 type = 'pickInput';
             } else if(field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
+                if (field.elementType === 'lookup') {
+                    initP.onExtra = (data: obj, relateCols: string[]) => {
+                        relateCols.forEach((relate, index) => {
+                            this.getDom(relate).set(data[relate]);
+                        })
+                    }
+                }
                 type = 'selectInput';
             }
         }

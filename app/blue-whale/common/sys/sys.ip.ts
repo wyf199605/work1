@@ -1,17 +1,17 @@
-namespace BW{
+namespace BW {
     import d = G.d;
     import tools = G.tools;
 
-    export class SYSIP implements SYS_Type{
+    export class SYSIP implements SYS_Type {
         public os: string;
-        public isMb : boolean;
-        public window = (function(self){
+        public isMb: boolean;
+        public window = (function (self) {
             return {
-                backHome: function (){
+                backHome: function () {
                     self.handle('backHome');
                 },
                 open: function (o: winOpen) {
-                    if(typeof o.data === "object"){
+                    if (typeof o.data === "object") {
                         o.data = JSON.stringify(o.data);
                     }
                     window.localStorage.setItem('viewData', JSON.stringify(o.extras));
@@ -20,7 +20,7 @@ namespace BW{
                         // header: o.header || {},
                         header: o.header,
                         event: "windowData",
-                        extras: {viewData:JSON.stringify(o.extras)},
+                        extras: {viewData: JSON.stringify(o.extras)},
                         data: o.data
                     };
                     // self.handle('open', dict);
@@ -35,61 +35,61 @@ namespace BW{
                     // })
 
                     new Promise(((resolve, reject) => {
-                        if(o.gps) {
+                        if (o.gps) {
                             self.window.getGps((gps) => {
-                                if(gps.success) {
+                                if (gps.success) {
                                     resolve(gps.gps)
-                                }else{
+                                } else {
                                     reject(gps.msg);
                                 }
                             })
-                        }else{
+                        } else {
                             resolve({})
                         }
                     })).then(gps => {
                         o.header = gps ? Object.assign(o.header || {}, {position: JSON.stringify(gps)}) : o.header;
                         self.handle('open', o);
-                    }).catch(reason =>{
+                    }).catch(reason => {
                         alert(reason)
                     });
 
                 },
-                close: function (event: string,data: obj) {
-                    let dict:obj = {};
+                close: function (event: string, data: obj) {
+                    let dict: obj = {};
                     dict.data = data;
                     dict.event = event;
                     self.handle('close', dict);
                 },
                 load: function (url: string, data?) {
-                    let dict:obj = {};
+                    let dict: obj = {};
                     dict.url = url;
                     dict.data = data;
                     dict.event = "windowData";
                     self.handle('load', dict);
                 },
-                back: function (event: string,data: obj) {
-                    let dict:obj = {};
+                back: function (event: string, data: obj) {
+                    let dict: obj = {};
                     dict.event = event;
                     dict.data = data;
                     self.handle('back', dict);
                 },
-                wake : function (event, data) {
-                    let dict:obj = {};
+                wake: function (event, data) {
+                    let dict: obj = {};
                     dict.data = data;
                     dict.event = event;
                     self.handle('wake', dict);
                 },
-                opentab : function (userid = '', accessToken = '', noShow?: string[]) {
+                opentab: function (userid = '', accessToken = '', noShow?: string[]) {
                     let ja = [
-                        {icon : "home", name : "首页", url : BW.CONF.url.home, show: 0},
-                        {icon : "contacts", name : "通讯", url : BW.CONF.url.contact, show: 0},
-                        {icon : "message", name : "消息", url : BW.CONF.url.message, show: 0},
-                        {icon : "myselfMenu", name : "我的", url : BW.CONF.url.myselfMenu, show: 0}
-                        ];
+                        {icon: "home", name: "首页", url: BW.CONF.url.home, show: 0},
+                        {icon: "contacts", name: "通讯", url: BW.CONF.url.contact, show: 0},
+                        {icon: "message", name: "消息", url: BW.CONF.url.message, show: 0},
+                        {icon: "myselfMenu", name: "我的", url: BW.CONF.url.myselfMenu, show: 0}
+                    ];
 
                     noShow && noShow.forEach((name) => {
-                        for(let key in ja){
-                            if(ja[key].icon === name){
+                        for (let key in ja) {
+                            if (ja[key].icon === name) {
                                 ja[key].show = 1;
                             }
                         }
@@ -101,31 +101,31 @@ namespace BW{
                     };
                     self.handle('opentab', dict);
                 },
-                logout: function (url:string = CONF.url.login) {
+                logout: function (url: string = CONF.url.login) {
 
                     this.getDevice("uuid");
-                    d.once(window, 'getDevice', function (e:CustomEvent) {
+                    d.once(window, 'getDevice', function (e: CustomEvent) {
                         let json = JSON.parse(e.detail);
-                        if(json.success){
+                        if (json.success) {
                             let uuid = json.msg.uuid;
                             url = tools.url.addObj(url, {uuid});
-                            self.handle('logout',{url:url});
+                            self.handle('logout', {url: url});
 
                         }
                     });
                 },
-                uploadVersion: function (version: string){
+                uploadVersion: function (version: string) {
                     self.handle('uploadVersion', {"url": BW.CONF.siteUrl, "code": version});
                 },
                 quit: function () {
                     self.handle('quit');
                 },
-                copy: function (text:string) {
+                copy: function (text: string) {
                     text = G.tools.str.toEmpty(text).trim();
-                    self.handle('copy', {data:text});
+                    self.handle('copy', {data: text});
                     toast('复制成功');
                 },
-                getGps: function (callback:Function) {
+                getGps: function (callback: Function) {
 
                     // self.handle('getGps',dict);
                     // d.once(window, 'putGps', function (e: CustomEvent) {
@@ -133,7 +133,7 @@ namespace BW{
                     //     callback(json);
                     // });
 
-                    self.handle('getGps', {type:1, event:"putGps"});
+                    self.handle('getGps', {type: 1, event: "putGps"});
 
                     let timer = setTimeout(() => {
                         d.off(window, 'putGps', handler);
@@ -143,24 +143,24 @@ namespace BW{
                     let handler = function (e: CustomEvent) {
                         d.off(window, 'putGps', handler);
                         clearTimeout(timer);
-                        try{
+                        try {
                             let data = JSON.parse(e.detail);
 
                             // alert(e.detail);
-                            if(data.success){
+                            if (data.success) {
                                 data.gps = data.msg
-                            }else{
+                            } else {
                                 data.msg = '定位服务未开启,请进入系统设置>隐私>定位服务中打开开关,并允许App使用定位服务';
                             }
                             callback(data);
-                        }catch (e) {
+                        } catch (e) {
                             callback({success: false, msg: '定位服务未开启,请进入系统设置>隐私>定位服务中打开开关,并允许App使用定位服务'});
                         }
 
                     };
                     d.on(window, 'putGps', handler);
                 },
-                openGps: function() {
+                openGps: function () {
                     self.handle('openGps');
                 },
                 update: function () {
@@ -170,109 +170,112 @@ namespace BW{
                     self.handle('clear');
                 },
                 getDevice: function (key) {
-                    let dict :obj = {};
-                    if(!G.tools.isEmpty(key)){
+                    let dict: obj = {};
+                    if (!G.tools.isEmpty(key)) {
                         dict.key = key;
                     }
                     dict.event = "getDevice";
                     self.handle('getDevice', dict);
                 },
-                openImg: function (url:string) {
-                    let dict:obj = {};
+                openImg: function (url: string) {
+                    let dict: obj = {};
                     dict.url = url;
                     self.handle('openImg', dict);
                 },
-                download: function (url:string) {
-                    let dict :obj= {};
+                download: function (url: string) {
+                    let dict: obj = {};
                     dict.url = url;
                     self.handle('download', dict);
                 },
-                touchid : function (callback) {
+                touchid: function (callback) {
                     let event = "touchidCallback";
-                    self.handle('touchid', {event : event});
+                    self.handle('touchid', {event: event});
                     d.once(window, event, function (e) {
                         callback(e);
                     });
                 },
-                wechatin : function (callback) {
+                wechatin: function (callback) {
                     let event = "wechatCallback";
-                    self.handle('wechatin', {event : event});
+                    self.handle('wechatin', {event: event});
                     d.once(window, event, function (e) {
                         callback(e);
                     });
                 },
-                firePreviousPage : function () {
-                  
+                firePreviousPage: function () {
+
                 },
-                fire : function (type : string, data? : obj,) {
+                fire: function (type: string, data?: obj,) {
                     tools.event.fire(type, data, window);
                 },
                 getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__';
-                    d.once(window, event, function (response : CustomEvent) {
-                        try{
+                    d.once(window, event, function (response: CustomEvent) {
+                        try {
                             let detail = JSON.parse(response.detail);
 
-                            if(detail.success && detail.msg){
+                            if (detail.success && detail.msg) {
                                 let data = detail.msg;
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
-                            }else{
+                            } else {
                                 error && error(detail);
                             }
-                        }catch (e){
+                        } catch (e) {
                             error && error();
                         }
                     });
                     self.handle('getImg', {event});
                 },
-                getEditImg(image: string | Function, callback?: Function){
-                    if(typeof image === 'function'){
+                getEditImg(image: string | Function, callback?: Function) {
+                    if (typeof image === 'function') {
                         callback = image;
                         image = '';
                     }
                     let event = '__EVT_GET_EDIT_IMG_BY_DEVICE__';
-                    d.once(window, event, (response : CustomEvent) => {
+                    d.once(window, event, (response: CustomEvent) => {
                         let detail = JSON.parse(response.detail);
 
                     });
                     self.handle('getSignImg', {event, type: 1, image});
                 },
-                getSign(callback: Function, error?: Function){
+                getSign(callback: Function, error?: Function) {
                     let event = '__EVT_GET_SIGN_BY_DEVICE__';
-                    d.once(window, event, (response : CustomEvent) => {
-                        try{
+                    d.once(window, event, (response: CustomEvent) => {
+                        try {
                             let detail = JSON.parse(response.detail);
 
-                            if(detail.success && detail.msg){
+                            if (detail.success && detail.msg) {
                                 let data = detail.msg;
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
-                            }else{
+                            } else {
                                 error && error(detail.msg || '');
                             }
-                        }catch (e){
+                        } catch (e) {
                             error && error('获取图片失败');
                         }
                     });
                     self.handle('getSignImg', {event, type: 0});
+                },
+                reOpen: function (o: winOpen) {
+                    self.handle('reOpen', o);
                 }
             }
         })(this);
 
 
-        public ui = (function(self){
+        public ui = (function (self) {
             return {
                 notice: function (obj) {
-                    let dict :obj= {};
+                    let dict: obj = {};
                     dict.data = obj.msg;
                     self.handle('callMsg', dict);
                 },
             }
         })(this);
 
-        private handle (action:string,dict?:obj) {
-            if(tools.isEmpty(dict)){
+        private handle(action: string, dict?: obj) {
+            if (tools.isEmpty(dict)) {
                 dict = {};
             }
             dict.action = action;

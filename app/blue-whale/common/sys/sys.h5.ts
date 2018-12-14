@@ -134,6 +134,9 @@ namespace BW{
                         input = null;
                     });
                     input.click();
+                },
+                reOpen: function (o: winOpen){
+                    sys.window.open(o);
                 }
             }
         })(this);

@@ -274,6 +274,9 @@ namespace BW{
                         }
                     });
                     self.handle('getSignImg', JSON.stringify({event, type: 0}));
+                },
+                reOpen:function (o: winOpen) {
+                    self.handle('reOpen', JSON.stringify(o));
                 }
             }
         })(this);

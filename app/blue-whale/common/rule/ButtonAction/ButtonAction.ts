@@ -142,7 +142,13 @@ export class ButtonAction {
                 break;
             case 3 :
                 setTimeout(function () {
-                    BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
+                    if (tools.isMb && tools.isEmpty(tools.url.getPara('instance')) && tools.url.getPara('page') === 'flowReport'){
+                        BW.sys.window.reOpen({
+                            url:url
+                        })
+                    } else{
+                        BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
+                    }
                 }, 1000);
                 break;
             case 4 :

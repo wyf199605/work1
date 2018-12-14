@@ -147,10 +147,10 @@ export class FlowList extends BasicPage {
                 }
             ]
         });
-       sys.window.wake('wake',null);
-       d.on(window,'wake',()=>{
-           tab.refresh();
-       })
+        sys.window.wake('wake', null);
+        d.on(window, 'wake', () => {
+            tab.refresh();
+        });
     }
 
     private initEvents = (() => {
@@ -163,12 +163,17 @@ export class FlowList extends BasicPage {
                 })
             })
         };
+        let back = () => {
+            sys.window.close(BwRule.EVT_REFRESH, null, this.url);
+        };
         return {
             on: () => {
                 d.on(d.query('.mui-content.flowList'), 'click', '.item-wrapper', clickHandler);
+                d.on(document.body, 'click', '.mui-icon.mui-icon-left-nav.mui-pull-left.sys-action-back', back);
             },
             off: () => {
                 d.off(d.query('.mui-content.flowList'), 'click', '.item-wrapper', clickHandler);
+                d.off(document.body, 'click', '.mui-icon.mui-icon-left-nav.mui-pull-left.sys-action-back', back);
             }
         }
     })();

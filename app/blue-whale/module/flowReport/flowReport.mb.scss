@@ -1,10 +1,27 @@
 $scrren-width: 100%;
 .ios-top .flowList .tab-pane {
+
     padding-top: 104px !important;
 }
 
 .mui-content {
     &.flowList {
+        width: 100%;
+
+        .tabParent, .panelParent {
+            width: 100%;
+            ul.nav{
+                width: 100%;
+            }
+        }
+
+        .tab-content {
+            width: 100%;
+        }
+        .tab-pane{
+            width: 100%;
+        }
+
         .tabParent .nav-tabs li:last-child {
             border-left: none;
         }
@@ -16,6 +33,7 @@ $scrren-width: 100%;
             text-overflow: ellipsis;
             border-bottom: 2px solid #005bac;
         }
+
         .tabParent .nav-tabs > li {
             overflow: hidden;
         }
@@ -153,19 +171,23 @@ $scrren-width: 100%;
                                     padding-top: 16px;
                                 }
                             }
-                            .mui-icon.mui-icon-plus{
+
+                            .mui-icon.mui-icon-plus {
                                 padding-top: 16px;
                                 float: right;
                             }
-                            .bootstrap-tagsinput{
+
+                            .bootstrap-tagsinput {
                                 padding-top: 6px;
                                 display: flex;
-                                justify-content: flex-start;
+                                justify-content: flex-end;
                                 align-items: center;
-                                .tag{
+
+                                .tag {
                                     margin-right: 3px;
                                 }
-                                input{
+
+                                input {
                                     padding: 0;
                                     margin-bottom: 0;
                                     padding-top: 5px;
