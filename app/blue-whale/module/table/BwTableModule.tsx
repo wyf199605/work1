@@ -2191,6 +2191,7 @@ export class BwTableModule extends Component {
 
         let cancel = () => {
             this.ftable && this.ftable.editorCancel();
+            validList = [];
         };
 
         let start = (): Promise<void> => {
@@ -2347,12 +2348,14 @@ export class BwTableModule extends Component {
             // 控件销毁时验证
             bwTable.ftable.off(FastTable.EVT_CELL_EDIT_CANCEL, handler);
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
-                validList.push(validate(editModule, cell));
+                if(cell.isEdited){
+                    validList.push(validate(editModule, cell));
+                }
             });
         };
 
         let validate = (editModule, cell: FastTableCell): Promise<any> => {
-            return new Promise((resolve, reject) => {
+            let promise: Promise<any> = new Promise((resolve, reject) => {
                 let name = cell.name,
                     field: R_Field = cell.column.content,
                     fastRow = cell.frow,
@@ -2384,8 +2387,10 @@ export class BwTableModule extends Component {
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
                     EditConstruct.checkValue(field, rowData, () => {
-                        lookUpCell && (lookUpCell.data = null);
-                        cell.data = null;
+                        if(this.ftable && this.ftable.editing){
+                            lookUpCell && (lookUpCell.data = null);
+                            cell.data = null;
+                        }
                     }, name)
                         .then((res) => {
                             let {errors, okNames} = res;
@@ -2401,18 +2406,24 @@ export class BwTableModule extends Component {
                             Array.isArray(okNames) && okNames.forEach(name => {
                                 cell.errorMsg = null;
                             });
-
                             resolve();
-                        });
+                        }).catch(() => reject());
                 } else {
                     cell.errorMsg = '';
                     // lookUpCell && (lookUpCell.errorMsg = '');
                     resolve();
                     // callback(td, true);
                 }
-            }).then(() => cell.isChecked = true)
+            }).then(() => {
+                cell.isChecked = true;
+            }).finally(() => {
+                let index = validList.indexOf(promise);
+                if(index > -1){
+                    validList.splice(index, 1);
+                }
+            });
             // debugger;
-
+            return promise
         };
 
         let editModuleLoad = (): Promise<typeof EditModule> => {
@@ -2502,19 +2513,23 @@ export class BwTableModule extends Component {
                     });
                     setTimeout(() => {
                         Promise.all(validList).then(() => {
-                        }).catch().finally(() => {
                             cellCheckValue().then(() => {
-                            }).finally(() => {
-                                validList = [];
-                                loading && loading.hide();
-                                loading = null;
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
                                         resolve(saveData);
                                     }).catch(() => reject());
                                 }, 100);
-                            })
+                            }).catch(() => reject('noMessage')).finally(() => {
+                                loading && loading.hide();
+                                loading = null;
+                            });
+                        }).catch(() => {
+                            loading && loading.hide();
+                            loading = null;
+                            reject('noMessage');
+                        }).finally(() => {
+                            validList = [];
                         })
                     }, 100)
 

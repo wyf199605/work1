@@ -6,15 +6,12 @@ import d = G.d;
 import {Modal} from "global/components/feedback/modal/Modal";
 import {User} from "../../../global/entity/User";
 import {Device} from "../../../global/entity/Device";
-import {Toast} from "../../../global/components/feedback/toast/Toast";
-import {Finger} from "../../module/fingerPrint/finger";
 import {BwRule} from "../../common/rule/BwRule";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {Button} from "../../../global/components/general/button/Button";
 import {UnBinding} from "../../module/unBinding/UnBinding";
 import {NewFinger} from "../../module/fingerPrint/NewFinger";
 import Shell = G.Shell;
-import {Loading} from "../../../global/components/ui/loading/loading";
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
 
 interface IProps {

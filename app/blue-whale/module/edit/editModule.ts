@@ -650,7 +650,7 @@ export class EditModule {
         //     }
         // }
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             // if(emptyCheckResult.errors[0]) {
             //     resolve(emptyCheckResult);
             //     return;
@@ -675,10 +675,12 @@ export class EditModule {
                         callback: (flag: boolean) => {
                             if (!flag) {
                                 clear();
+                                reject();
+                            }else{
+                                resolve({
+                                    okNames: chkAddr.varList.map(v => v.varName)
+                                });
                             }
-                            resolve({
-                                okNames: chkAddr.varList.map(v => v.varName)
-                            });
                         }
                     });
                 } else {
