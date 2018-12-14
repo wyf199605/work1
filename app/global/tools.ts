@@ -689,7 +689,7 @@ namespace G {
                     blob,
                     type: blob.type,
                     name: filename,
-                    lastModifiedDate: lastModify || new Date().getTime(),
+                    lastModifiedDate: new Date(lastModify) || new Date().getTime(),
                     size: blob.size
                 };
             }else{

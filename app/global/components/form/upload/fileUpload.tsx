@@ -2,7 +2,7 @@
 
 import tools = G.tools;
 
-export interface IFileUpload{
+export interface IFileUpload {
     beforeSendFile?: (file: CustomFile) => Promise<any>; // promise返回的数据会在beforeSendBlock，afterSendFile方法中作为参数
     formData?: () => obj;   // 上传附带数据
     uploadUrl: string;  // 上传地址
@@ -19,19 +19,20 @@ export interface IFileBlock {
     index: number;
 }
 
-export class FileUpload{
+export class FileUpload {
     protected chunkSize: number;
     protected chunked: boolean;
     protected beforeSendFile: (file: CustomFile) => Promise<any>;
     protected beforeSendBlock: (block: IFileBlock, ...any) => Promise<any>;
     protected afterSendFile: (file: CustomFile, ...any) => Promise<any>;
     protected uploadUrl: string;
-    constructor(para: IFileUpload){
+
+    constructor(para: IFileUpload) {
         this.uploadUrl = para.uploadUrl;
         this.beforeSendFile = para.beforeSendFile || Promise.resolve;
         this.formData = para.formData;
         this.chunked = tools.isNotEmpty(para.chunk);
-        if(this.chunked){
+        if (this.chunked) {
             this.beforeSendBlock = para.chunk.beforeSendBlock;
             this.chunkSize = para.chunk.chunkSize;
             this.afterSendFile = para.chunk.afterSendFile;
@@ -41,14 +42,14 @@ export class FileUpload{
     formData: () => obj;
 
     // 验证并上传文件
-    upload(file: CustomFile): Promise<any>{
+    upload(file: CustomFile): Promise<any> {
         return new Promise((resolve, reject) => {
             // 秒传验证
             this.beforeSendFile(file).then((...any) => {
                 // any是beforeSendFile函数中promise返回的数据，会带入到分块验证与合并请求中去。
 
                 // 分片验证
-                if(this.chunked){
+                if (this.chunked) {
                     this.chunkUpload(file, ...any).then(() => {
                         // 合并请求
                         this.afterSendFile(file, ...any).then((...anyData) => {
@@ -66,7 +67,7 @@ export class FileUpload{
                     }).catch(() => {
                         reject(); // 表示分片上传失败
                     })
-                }else{
+                } else {
                     this.uploadFile(file.blob, file.name).then((response) => {
                         // 成功返回
                         resolve(response);
@@ -81,7 +82,7 @@ export class FileUpload{
         })
     }
 
-    abort(){
+    abort() {
         this.xhrs.forEach((xhr) => {
             xhr.abort();
         });
@@ -89,49 +90,84 @@ export class FileUpload{
 
     // 分片验证逻辑
     protected chunkUpload(file: CustomFile, ...any) {
-        let totalSize = file.size,
+        let self = this,
+            totalSize = file.size,
             totalPieces = Math.ceil(totalSize / this.chunkSize),
+            total = totalPieces,
             list: Promise<any>[] = [],
             startSize = 0,
             endSize = 0,
             chunkIndex = 0,
-            fileBlob: Blob = file.blob,
-            blob: Blob;
+            fileBlob: Blob = file.blob;
         this.xhrs = [];
-        while (totalPieces --) {
-            endSize = startSize + this.chunkSize;
-            blob = fileBlob.slice(startSize, endSize); // 切片
 
+        return new Promise((resolve, reject) => {
+            upload(resolve);
+        });
+        function upload(callback: Function) {
+            totalPieces--;
+            let index = chunkIndex;
+            endSize = startSize + self.chunkSize;
+            if (totalPieces === 0) {
+                endSize = file.size;
+            }
+            let blob = fileBlob.slice(startSize, endSize); // 切片
             list.push(new Promise((resolve, reject) => {
-                this.beforeSendBlock({
+                self.beforeSendBlock({
                     end: endSize,
                     start: startSize,
                     index: chunkIndex,
                 }, ...any).then(() => {
                     // 调用文件上传
-                    this.uploadFile(blob, file.name).then(() => {
+                    let data = {
+                        chunk: index,
+                        chunks: total,
+                        name: file.name,
+                        size: file.size,
+                        type: file.type || '',
+                        lastModifiedDate: file.lastModifiedDate
+                    };
+                    if(total <= 1){
+                        delete data.chunk;
+                        delete data.chunks;
+                    }
+                    self.uploadFile(blob, file.name, data).then(() => {
                         resolve();
                     }).catch(() => {
                         reject();
+                    }).finally(() => {
+                        if(totalPieces){
+                            upload(callback);
+                        }else{
+                            callback();
+                        }
                     });
                 }).catch(() => {
                     resolve(); // 返回失败表示文件已存在后台
+                    if(totalPieces){
+                        upload(callback);
+                    }else{
+                        callback();
+                    }
                 });
             }));
+            chunkIndex++;
             startSize = endSize;
         }
-        return Promise.all(list);
+
     }
 
     // 文件上传方法
     protected xhrs: XMLHttpRequest[] = [];
-    protected uploadFile(file: Blob, filename: string): Promise<any> {
+
+    protected uploadFile(file: Blob, filename: string, ajaxData?: obj): Promise<any> {
         let url = this.uploadUrl;
         return new Promise<any>((resolve, reject) => {
             if (tools.isNotEmpty(file) && tools.isNotEmpty(url)) {
                 let formData = new FormData();
                 let data = this.formData ? this.formData() : null;
                 if (data) {
+                    data = Object.assign({}, data, ajaxData || {});
                     for (let key in data) {
                         formData.append(key, data[key]);
                     }
