@@ -57,8 +57,15 @@ export class FlowItem extends Component {
     constructor(para: IFlowItemPara) {
         super(para);
         this.para = para;
-        this.x = para.position.x;
-        this.y = para.position.y;
+        if(tools.isMb){
+            para.position.x = para.position.x - 170;
+            this.x = para.position.x;
+            this.y = para.position.y;
+        }else {
+            this.x = para.position.x;
+            this.y = para.position.y;
+        }
+
         this.isComplete = para.isComplete || false;
         if (para.type === 'start') {
             // 开始节点

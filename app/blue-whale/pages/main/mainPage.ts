@@ -397,7 +397,12 @@ export = class MainPage {
                 // console.log('in pc');
                 // console.log(menus);
                 menus && menus.forEach((menu) => {
-                    (menu.isPc === 1 || menu.isPc === 2) && items.push({
+                    /*
+                    *   0： pc和mb都显示
+                    *   1： 仅pc显示
+                    *   2： 仅mb显示
+                    * */
+                    (menu.isPc === 0 || menu.isPc === 1) && items.push({
                         title: `<a href="javascript:void(0)">${menu.menuName}</a>`,
                         onClick: () => {
                             let addr = <R_ReqAddr>menu.menuPath;

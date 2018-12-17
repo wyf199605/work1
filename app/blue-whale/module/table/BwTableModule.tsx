@@ -1834,7 +1834,8 @@ export class BwTableModule extends Component {
             if (tools.isMb && (this.ui.caption === '流程设计' || this.ui.caption === '流程制度')) {
                 for (let i = 0,len = btnsUi.length; i < len; i++) {
                     let btn = btnsUi[i];
-                    if (btn.openType === 'flow-design' || btn.openType === 'flow-look') {
+                    // if (btn.openType === 'flow-design' || btn.openType === 'flow-look') {
+                    if (btn.openType === 'flow-design') {
                         btnsUi.splice(i, 1);
                     }
                 }

@@ -143,6 +143,8 @@ export class FlowDesigner {
     static rootElement: Element;            // 当前流程的xml节点树
     static processId: number;               // 当前流程的id
     static FlowType: string;                // 当前操作的类型（设计design或查看状态look）
+    static MbWidth = 1000;
+    static MbHeight = 780;
     static removeAllActive() {
         FlowItem.removeAllActiveClass();
         LineItem.removeAllActive();
@@ -160,8 +162,9 @@ export class FlowDesigner {
                 rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}/>
             },
             className: 'flow-modal',
-            width: '90%',
-            height: '90%',
+            width: tools.isMb ? '100%' :'90%',
+            height: tools.isMb ? '100%' :'90%',
+            isMb:tools.isMb,
             onClose: () => {
                 this.destroy();
                 this.modal.destroy();
@@ -177,7 +180,12 @@ export class FlowDesigner {
         let paper = window.getComputedStyle(body),
             paperWidth = paper.width,
             paperHeight = paper.height;
-        FlowDesigner.PAPER = Raphael('design-canvas', parseInt(paperWidth.slice(0, paperWidth.length - 2)), parseInt(paperHeight.slice(0, paperHeight.length - 2)));
+        if (tools.isMb){
+            body.style.height = `${FlowDesigner.MbHeight}px`;
+            FlowDesigner.PAPER = Raphael('design-canvas', FlowDesigner.MbWidth,FlowDesigner.MbHeight);
+        } else{
+            FlowDesigner.PAPER = Raphael('design-canvas', parseInt(paperWidth.slice(0, paperWidth.length - 2)), parseInt(paperHeight.slice(0, paperHeight.length - 2)));
+        }
 
         this.initEvents.on();
         let _this = this;
@@ -188,7 +196,11 @@ export class FlowDesigner {
             if(FlowDesigner.FlowType === 'look'){
                 this.modal.modalHeader.title = '查看流程';
                 d.query('#design-canvas').style.left = '0px';
-                d.query('#design-canvas').style.width = '100%';
+                if (tools.isMb){
+                    d.query('#design-canvas').style.width = `${FlowDesigner.MbWidth}px`;
+                } else{
+                    d.query('#design-canvas').style.width = '100%';
+                }
                 d.query('#design-canvas').style.pointerEvents = 'none';
             }else{
                 FlowDesigner.processId = responseData.data[0]['process_id'];
