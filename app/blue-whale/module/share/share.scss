@@ -1,0 +1,25 @@
+.graffiti-btn{
+  position: absolute;
+  right: 20px;
+  bottom: 150px;
+  .icon-app-tuya{
+
+  }
+}
+.graffiti-header{
+
+}
+
+.share-container{
+  .share-background{
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    animation: lock-fadein 0.3s ease;
+  }
+}

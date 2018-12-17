@@ -15,3 +15,20 @@
         "success": "true"
     }
     ```
+    
+### getEditImg
+* 简述：开启涂鸦或签名
+* 参数：
+    ```js
+    {
+        "type" : number, // 0表示签名，!0表示涂鸦
+        "image": string, // 如果type=!0,image为base64图片格式，如果image为空，表示截取当前页面
+    }
+   ```
+   返回值：
+   ```js
+    {
+        "success": "true",
+        "data": "base64图片",
+        "uuid": "用户已经取消", // success为false
+    }
