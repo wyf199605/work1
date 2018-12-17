@@ -9,6 +9,7 @@ import {User} from "../../../global/entity/User";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
 import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
+import {G_MD5} from "../../../global/utils/md5";
 
 type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
@@ -223,7 +224,7 @@ export class BwUploader extends FormCom {
             let reader = new FileReader();
             reader.onload = (event) => {
                 let binary = (event.target as any).result;
-                resolve(tools.md5(binary).toString());
+                resolve(G_MD5(binary).toString());
             };
             reader.onerror = (e) => {
                 reject(e);
@@ -238,7 +239,11 @@ export class BwUploader extends FormCom {
             this.getFileMd5(file).then(md5 => {
                 let userid = User.get().userid,
                     md5Code = md5.toUpperCase(),
-                    uniqueFileName = tools.md5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
+                    uniqueFileName = G_MD5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
+                require(['md5'], md5 => {
+                    console.log(md5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size));
+                    console.log(uniqueFileName);
+                });
                 this.fileUpload.formData = () => {
                     return {
                         userId: userid,
