@@ -285,6 +285,7 @@ export class ListItemDetail {
             }
         } else {
             if (tools.isMb) {
+                d.query('.list-detail-cells-wrapper', this.wrapper).classList.add('full-height');
                 if (this.para.uiType === 'detail') {
                     let btnWrapper = <div className="list-item-detail-buttons"/>;
                     this.wrapper.appendChild(btnWrapper);

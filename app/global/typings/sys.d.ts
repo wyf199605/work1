@@ -43,7 +43,7 @@ interface SYS_Window{
     getFile(callback: (file: CustomFile[]) => void, multi: boolean, accept: string, error?: Function);
     editImgGet?(image: string, callback: Function, error?: Function);
     editImgGet?(callback: Function, error?: Function);
-    getSign?(callback: Function, error?: (msg?: string) => void);
+    getSign?(callback: Function, error?: Function);
     // speak?(type:number,text?:string,callback?:Function,error?:Function);
 }
 
