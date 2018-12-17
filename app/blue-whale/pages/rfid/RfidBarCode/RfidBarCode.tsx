@@ -658,7 +658,12 @@ export class RfidBarCode extends Component {
                     <button onclick={()=>{
 
                     }
-                    }>拍照上传</button>
+                    }>拍照</button>
+                    <button onClick={() => {
+
+                    }
+                    }>扫一扫
+                    </button>
 
                 </div>
 
