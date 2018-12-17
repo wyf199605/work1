@@ -30,6 +30,7 @@ export = class mainMbPage {
                     let pageUrl = this.pages[pageName];
                     let iframe = d.create('<iframe data-page-name="' + pageName + '" class="full-height has-footer-tab" src="' + pageUrl + '"> </iframe>');
                     SUB_PAGE.pagesContainer.appendChild(iframe);
+                    return iframe;
                 }
             },
             autoShow : function () {
