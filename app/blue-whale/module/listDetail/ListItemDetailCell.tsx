@@ -196,7 +196,7 @@ export class ListItemDetailCell extends Component {
             let imgData: ImgModalPara = {
                 img: ListItemDetailCell.getBigPicture(imgs),
                 onDownload: function (url: string) {
-                    sys.window.download(url);
+                    sys.window.openImg(url);
                 }
             };
             ImgModal.show(imgData);
