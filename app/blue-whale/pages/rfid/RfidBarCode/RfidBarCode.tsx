@@ -8,6 +8,7 @@ import {Modal} from "../../../../global/components/feedback/modal/Modal";
 import {SelectInput} from "../../../../global/components/form/selectInput/selectInput";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
 import {Loading} from "../../../../global/components/ui/loading/loading";
+import {UploadImages} from "../../../module/uploadModule/uploadImages";
 
 
 interface IRfidBarCode extends IComponentPara {
@@ -89,174 +90,12 @@ export class RfidBarCode extends Component {
                 </div>
                 <div className="rfid-shelf-number"><span
                     className="shelf-category"></span><span className="shelf-number"></span>
-                    <i className="iconfont icon-shuxie" onclick={() => {
-                        if(this.stepStatus){
-                            return
-                        }
-                        let mode = new Modal({
-                            isMb: false,
-                            position: "center",
-                            header: this.domHash['category'],
-                            isOnceDestroy: true,
-                            isBackground: true,
-                            body: d.create(`<div data-code="barcodeModal">
-                                        <form>
-                                            <label>请输入:</label>
-                                            <input type="text" class="set-rfid-shelf" style="height: 30px">
-                                        </form>
-                                    </div>`),
-                            footer: {},
-                            onOk: () => {
-                                let val = d.query('.set-rfid-shelf')['value'];
-                                //console.log(d.query('.set-rfid-code').value);
-                                let optionStype,
-                                    category = [];
-                                category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
-
-                                let key = this.stepByone + this.accumulation;
-                                if (this.mode[key] == '替换') {
-                                    optionStype = 0;
-                                } else if (this.mode[key] == '逐一') {
-                                    optionStype = 2;
-                                } else if (this.mode[key] == '累加') {
-                                    optionStype = 1;
-                                } else {
-                                    optionStype = 0;
-                                }
-                                let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                    let data = res.data;
-                                    if(res.success){
-                                        d.query('.rfid-shelf-number>.shelf-number').innerText = val;
-                                    }else {
-                                        Modal.toast(res.msg);
-                                    }
-
-                                })
-                                mode.destroy();
-                            },
-                            onClose: () => {
-                                // Modal.toast('输入成功');
-                            }
-
-                        })
-
-                    }}></i>
                 </div>
                 <div class="rfid-barCode-content">
                     <div class="rfid-barCode-left">
-                        <span class="title2"> </span><i className="iconfont icon-shuxie" onclick={
-                        () => {
-                            if(this.stepStatus){
-                                return
-                            }
-                            let s;
-
-                            let mode = new Modal({
-                                isMb: false,
-                                position: "center",
-                                header: this.domHash['category1'],
-                                isOnceDestroy: true,
-                                isBackground: true,
-                                body: d.create(`<div data-code="barcodeModal">
-                                        <form>
-                                            <label>请输入:</label>
-                                            <input type="text" class="set-rfid-shelf" style="height: 30px">
-                                        </form>
-                                    </div>`),
-                                footer: {},
-                                onOk: () => {
-                                    let val = d.query('.set-rfid-shelf')['value'];
-                                    //console.log(d.query('.set-rfid-code').value);
-                                    this.domHash['categoryVal1'].innerText = val;
-                                    let optionStype,
-                                        category = [];
-                                    category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
-                                    let key = this.stepByone + this.accumulation;
-                                    if (this.mode[key] == '替换') {
-                                        optionStype = 0;
-                                    } else if (this.mode[key] == '逐一') {
-                                        optionStype = 2;
-                                    } else if (this.mode[key] == '累加') {
-                                        optionStype = 1;
-                                    } else {
-                                        optionStype = 0;
-                                    }
-                                    let s =  G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                        let data = res.data;
-                                        if(res.success){
-                                            this.domHash['categoryVal1'].innerText = val;
-                                        }else {
-                                            Modal.toast(res.msg);
-                                        }
-
-                                    })
-
-                                    mode.destroy();
-                                },
-                                onClose: () => {
-
-                                }
-
-                            })
-
-                        }
-                    }></i>
-
+                        <span class="title2"> </span>
                         <p class="value2" style="color:rgb(0, 122, 255)"></p>
-                        <span className="title3"></span> <i className="iconfont icon-shuxie" onclick={() => {
-                        if(this.stepStatus){
-                            return
-                        }
-                        let mode = new Modal({
-                            isMb: false,
-                            position: "center",
-                            header: this.domHash['category2'],
-                            isOnceDestroy: true,
-                            isBackground: true,
-                            body: d.create(`<div data-code="barcodeModal">
-                                        <form>
-                                            <label>请输入:</label>
-                                            <input type="text" class="set-rfid-shelf" style="height: 30px">
-                                        </form>
-                                    </div>`),
-                            footer: {},
-                            onOk: () => {
-                                let val = d.query('.set-rfid-shelf')['value'];
-                                //console.log(d.query('.set-rfid-code').value);
-                                this.domHash['categoryVal2'].innerText = val;
-                                let optionStype,
-                                    category = [];
-                                category.push(d.query('.rfid-shelf-number>.shelf-number').innerText);
-                                let key = this.stepByone + this.accumulation;
-                                if (this.mode[key] == '替换') {
-                                    optionStype = 0;
-                                } else if (this.mode[key] == '逐一') {
-                                    optionStype = 2;
-                                } else if (this.mode[key] == '累加') {
-                                    optionStype = 1;
-                                } else {
-                                    optionStype = 0;
-                                }
-                                G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
-                                    let data = res.data;
-                                    if(res.success){
-                                        this.domHash['categoryVal2'].innerText = val;
-                                    }else {
-                                        Modal.toast(res.msg);
-                                    }
-
-                                })
-
-
-                                mode.destroy();
-                            },
-                            onClose: () => {
-                                Modal.toast('输入成功');
-                            }
-
-                        })
-
-                    }}></i>
+                        <span className="title3"></span>
                         <p class="value3" style="color:rgb(0, 122, 255)"></p>
                     </div>
                     <div class="rfid-barCode-right">
@@ -264,7 +103,7 @@ export class RfidBarCode extends Component {
                         <p class="value" style="color:red"></p>
                     </div>
                 </div>
-                <div class="rifd-bar-code-describe">卅达夏 包袋OL/明媚481 109 黑色</div>
+                <div class="rifd-bar-code-describe"></div>
                 <div class="rfid-barCode-nums">
                     <div class="shelf-nums">
                         数量(<span class="shelf-mode"></span>)<input type="number"/>
@@ -816,6 +655,10 @@ export class RfidBarCode extends Component {
                     }
                     }>删除数据
                     </button>
+                    <button onclick={()=>{
+
+                    }
+                    }>拍照上传</button>
 
                 </div>
 
