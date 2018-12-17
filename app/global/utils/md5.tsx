@@ -231,7 +231,7 @@ export const G_MD5 = (function ($) {
         return rstr2hex(raw_hmac_md5(k, d));
     }
 
-    function md5(string, key?, raw?) {
+    function md5(string, key?: boolean, raw?: boolean) {
         if (!key) {
             if (!raw) {
                 return hex_md5(string);

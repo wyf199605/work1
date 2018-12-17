@@ -40,7 +40,7 @@ export class BwUploader extends FormCom {
 
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
     protected maxSize: number;  // 上传文件大小，-1为不限制
-    protected chunkSize = 5 * 1024 * 1024;  // 分块大小 5M
+    protected chunkSize = 2 * 1024 * 1024;  // 分块大小 5M
     protected nameField: string;
     protected thumbField: string;
     // protected formData: () => obj;  // 上传附带数据
@@ -224,7 +224,7 @@ export class BwUploader extends FormCom {
             let reader = new FileReader();
             reader.onload = (event) => {
                 let binary = (event.target as any).result;
-                resolve(G_MD5(binary).toString());
+                resolve(tools.md5(binary));
             };
             reader.onerror = (e) => {
                 reject(e);

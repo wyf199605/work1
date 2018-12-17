@@ -134,7 +134,7 @@ export class FileUpload {
                     if(total <= 1){
                         delete data.chunks;
                         delete data.chunk;
-                        blob = fileBlob;
+                        blob = file.blob;
                     }
                     self.uploadFile(blob, file.name, data).then(() => {
                         resolve();
