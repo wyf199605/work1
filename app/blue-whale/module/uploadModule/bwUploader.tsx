@@ -236,51 +236,49 @@ export class BwUploader extends FormCom {
     protected beforeSendFile(file: CustomFile): Promise<obj> {
         return new Promise((resolve, reject) => {
             this.getFileMd5(file).then(md5 => {
-                require(['md5'],(md5Fn) => {
-                    let userid = User.get().userid,
-                        md5Code = md5,
-                        uniqueFileName = md5Fn('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
-                    this.fileUpload.formData = () => {
-                        return {
-                            userId: userid,
-                            md5: md5Code,
-                        }
-                    };
-                    let ajaxData: obj = {
-                        status: "md5Check"
-                        , md5: md5Code
-                        , nameField: this.nameField
-                        , file_name: file.name
-                        , name: uniqueFileName
-                    };
-
-                    if (this.thumbField) {
-                        ajaxData.smallField = this.thumbField;
+                let userid = User.get().userid,
+                    md5Code = md5.toUpperCase(),
+                    uniqueFileName = tools.md5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
+                this.fileUpload.formData = () => {
+                    return {
+                        userId: userid,
+                        md5: md5Code,
                     }
+                };
+                let ajaxData: obj = {
+                    status: "md5Check"
+                    , md5: md5Code
+                    , nameField: this.nameField
+                    , file_name: file.name
+                    , name: uniqueFileName
+                };
 
-                    Ajax.fetch(this.uploadUrl, {
-                        type: "POST"
-                        , traditional: true
-                        , data: ajaxData
-                        // , cache: false
-                        , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
-                        , dataType: "json"
+                if (this.thumbField) {
+                    ajaxData.smallField = this.thumbField;
+                }
 
-                    }).then(function ({response}) {
-                        if(response.ifExist){
-                            reject(response);
-                        }else{
-                            resolve({
-                                md5: md5Code,
-                                uniqueFileName,
-                            });
-                        }
-                    }).catch(() => {
+                Ajax.fetch(this.uploadUrl, {
+                    type: "POST"
+                    , traditional: true
+                    , data: ajaxData
+                    // , cache: false
+                    , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
+                    , dataType: "json"
+
+                }).then(function ({response}) {
+                    if(response.ifExist){
+                        reject(response);
+                    }else{
                         resolve({
                             md5: md5Code,
-                            uniqueFileName
+                            uniqueFileName,
                         });
-                    })
+                    }
+                }).catch(() => {
+                    resolve({
+                        md5: md5Code,
+                        uniqueFileName
+                    });
                 })
 
             }).catch(() => reject());
