@@ -1,5 +1,5 @@
 
-.fl-pc {
+//.fl-pc {
     $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767, decision1: #f8b14b, fork: #db7bd8, join: #f5896c);
     @mixin set-tip-color(){
         @each $item-type, $item-color in $tip-item__type-color-map{
@@ -329,4 +329,4 @@
             }
         }
     }
-}
+//}

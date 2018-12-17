@@ -93,7 +93,6 @@ namespace BW {
 
                         return;
                     }
-
                     close();
 
                     function close() {
@@ -228,7 +227,7 @@ namespace BW {
                 whiteBat: function () {
                     this.adHandle('whiteBat', '');
                 },
-                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
+                getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__';
                     d.once(window, event, function (response: CustomEvent) {
                         try {
@@ -238,11 +237,11 @@ namespace BW {
                                 let data = detail.msg;
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
-                            } else {
-                                error && error(detail);
+                            }else{
+                                error && error(detail.msg || '');
                             }
-                        } catch (e) {
-                            error && error();
+                        }catch (e){
+                            error && error('获取图片失败');
                         }
                     });
                     self.handle('getImg', '{event:"' + event + '"}');
@@ -278,33 +277,9 @@ namespace BW {
                     });
                     self.handle('getSignImg', JSON.stringify({event, type: 0}));
                 },
-                // speak(type: number, text?: string, callback?: Function, error?: Function) {
-                //     let event = '__EVT_SPEAK__';
-                //     d.once(window, event, (response: CustomEvent) => {
-                //         try {
-                //             let detail = JSON.parse(response.detail);
-                //             if (detail.success) {
-                //                 callback && callback(detail);
-                //             } else {
-                //                 error && error(detail.msg);
-                //             }
-                //         } catch (e) {
-                //             error && error('获取语音出错!');
-                //         }
-                //     });
-                //     switch (type) {
-                //         case 0:
-                //         case 1:
-                //         case 3:{
-                //             self.handle('speak', JSON.stringify({event, type: type}));
-                //         }
-                //             break;
-                //         default :
-                //             self.handle('speak', JSON.stringify({event, type: type, text: text}));
-                //             break;
-                //     }
-                //
-                // }
+                reOpen:function (o: winOpen) {
+                    self.handle('reOpen', JSON.stringify(o));
+                }
             }
         })(this);
 

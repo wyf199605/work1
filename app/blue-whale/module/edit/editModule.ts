@@ -68,7 +68,6 @@ export class EditModule {
             if (p && p.field) {
                 f = this.nameFields[name] = p;
             }
-
             // if(!this.coms[name]){
             this.coms[name] = this.initFactory(f.field.comType, f);
             // }else{
@@ -244,7 +243,7 @@ export class EditModule {
                                     [p.field.name]: item.text,
                                     [p.field.lookUpKeyField]: item.value
                                 };
-                                p.onExtra(data, [p.field.lookUpKeyField])
+                                p.onExtra && p.onExtra(data, [p.field.lookUpKeyField])
                             }, 100)
                         }
                     }
@@ -664,7 +663,7 @@ export class EditModule {
         //     }
         // }
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             // if(emptyCheckResult.errors[0]) {
             //     resolve(emptyCheckResult);
             //     return;
@@ -689,10 +688,12 @@ export class EditModule {
                         callback: (flag: boolean) => {
                             if (!flag) {
                                 clear();
+                                reject();
+                            }else{
+                                resolve({
+                                    okNames: chkAddr.varList.map(v => v.varName)
+                                });
                             }
-                            resolve({
-                                okNames: chkAddr.varList.map(v => v.varName)
-                            });
                         }
                     });
                 } else {

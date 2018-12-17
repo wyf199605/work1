@@ -392,7 +392,8 @@ export class BwTableModule extends Component {
                 colspan: hasSubCol ? subCols.length : 1, // 其他列有子列
                 rowspan: isAbsField && !hasSubCol ? 2 : 1,
                 maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
-                isCanSort: field.isCanSort // 是否可排序
+                isCanSort: field.isCanSort, // 是否可排序
+                sortName: field.sortName
             } as IFastTableCol);
 
             if (hasSubCol) {
@@ -487,7 +488,8 @@ export class BwTableModule extends Component {
                         isNumber: subName ? void 0 :
                             BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: subName ? void 0 : field.noShow,
-                        isCanSort: field.isCanSort
+                        isCanSort: field.isCanSort,
+                        sortName: field.sortName,
                     } as IFastTableCol);
 
                     currentOriginField = {
@@ -1015,7 +1017,8 @@ export class BwTableModule extends Component {
 //根据列头实时更新方法
     public rfidColthead() {
 
-        let rfidCols = this.ui.rfidCols;
+        let rfidCols = this.ui.rfidCols,
+            ftable = this.ftable;
         if (rfidCols.calc) {
             //调用接口 传rfid.amount
             let calcCols = rfidCols.calc.cols || {},
@@ -1081,10 +1084,16 @@ export class BwTableModule extends Component {
 
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
-                    if (field && rule) {
-                        let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                    if(rule.slice(0,3) == 'SUM'){
+                        let sum =  this.countCalcSum(ftable,field),
                             el = countElements[field];
-                        el && (el.innerHTML = tools.calc(diffValue));
+                        el && (el.innerHTML = sum + '');
+                    }else {
+                        if (field && rule) {
+                            let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                                el = countElements[field];
+                            el && (el.innerHTML = tools.calc(diffValue));
+                        }
                     }
                 });
 
@@ -1094,7 +1103,8 @@ export class BwTableModule extends Component {
 
 //下载更新后列统计
     public rfidDownAndUpInitHead() {
-        let rfidCols = this.ui.rfidCols;
+        let rfidCols = this.ui.rfidCols,
+            ftable = this.ftable;
 
         //Array.isArray(rfidCols.calcData) && rfidCols.calcData.map((val)=>{
 
@@ -1155,11 +1165,16 @@ export class BwTableModule extends Component {
                 }
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
-                    if (field && rule) {
-                        let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                    if(rule.slice(0,3) == 'SUM'){
+                        let sum =  this.countCalcSum(ftable,field),
                             el = countElements[field];
-
-                        el && (el.innerHTML = tools.calc(diffValue));
+                        el && (el.innerHTML = sum + '');
+                    }else {
+                        if (field && rule) {
+                            let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                                el = countElements[field];
+                            el && (el.innerHTML = tools.calc(diffValue));
+                        }
                     }
                 });
 
@@ -1168,13 +1183,21 @@ export class BwTableModule extends Component {
             })
         }
 
-    }
+}
 
+   public countCalcSum(ft,str){
+
+        let column = ft.columnGet(str),
+            sum = 0;
+        column.data.forEach((col)=>{
+          sum += col;
+        })
+       return sum;
+    }
     public rfidColInit() {
         let rfidCols = this.ui.rfidCols,
             ftable = this.ftable,
-            fields = this.ui.cols,
-            colfield: obj[];
+            fields = this.ui.cols;
         if (!tools.os.android || !this.isRfid || !rfidCols || !rfidCols.amountFlag) {
             return
         }
@@ -1245,16 +1268,18 @@ export class BwTableModule extends Component {
                                     break;
                                 }
                             }
-                            return {
-                                field: cell,
-                                count: count
+                            if(count !== 0){
+                                return {
+                                    field: cell,
+                                    count: count
+                                }
                             }
+
                         });
                     ontimeRefresh(initColData, this, rfidCols);
 
                 })
             }
-
             //}
 
         });
@@ -1320,16 +1345,22 @@ export class BwTableModule extends Component {
                         colHeadStr['SCANAMOUNT'] = ((resData.Calculate === undefined) ? "0" : resData.CalculateScan);
                     }
                     colHeadStr['OLD_DIFFAMOUNT'] = this.OLD_DIFFAMOUNT;
-
-                    calcRule.forEach(calc => {
-                        let {field, rule} = calc;
-                        if (field && rule) {
-                            let diffValue = tools.str.parseTpl(rule, colHeadStr),
-                                el = countElements[field];
-                            el && (el.innerHTML = tools.calc(diffValue));
-                        }
-                    });
-
+                    setTimeout(()=>{
+                        calcRule.forEach(calc => {
+                            let {field, rule} = calc;
+                            if(rule.slice(0,3) == 'SUM'){
+                                let sum =  this.countCalcSum(ftable,field),
+                                    el = countElements[field];
+                                el && (el.innerHTML = sum + '');
+                            }else {
+                                if (field && rule) {
+                                    let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                                        el = countElements[field];
+                                    el && (el.innerHTML = tools.calc(diffValue));
+                                }
+                            }
+                        });
+                    },980)
                     Shell.inventory.columnCountOff(when, 1, inventory, (res) => {
                     })
                 })
@@ -1800,9 +1831,10 @@ export class BwTableModule extends Component {
                 className: !tools.isMb ? 'more-btns' : ''
             });
             // TODO: 移动端未实现流程设计功能。
-            if (tools.isMb && this.ui.caption === '流程设计') {
+            if (tools.isMb && (this.ui.caption === '流程设计' || this.ui.caption === '流程制度')) {
                 for (let i = 0,len = btnsUi.length; i < len; i++) {
                     let btn = btnsUi[i];
+                    // if (btn.openType === 'flow-design' || btn.openType === 'flow-look') {
                     if (btn.openType === 'flow-design') {
                         btnsUi.splice(i, 1);
                     }
@@ -1940,7 +1972,12 @@ export class BwTableModule extends Component {
                             let linkedData = this.linkedData || {};
                             let select = multiselect === 1
                                 ? Object.assign({}, linkedData, selectedData[0] || {})
-                                : selectedData.map((o) => Object.assign({}, linkedData || {}, o));
+                                : (
+                                    multiselect === 2
+                                    ? selectedData.map((o) =>
+                                        Object.assign({}, linkedData || {}, o))
+                                    : null
+                                );
                             select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
 
                             let tData = ftable.tableData.data;
@@ -2155,6 +2192,7 @@ export class BwTableModule extends Component {
 
         let cancel = () => {
             this.ftable && this.ftable.editorCancel();
+            validList = [];
         };
 
         let start = (): Promise<void> => {
@@ -2311,12 +2349,14 @@ export class BwTableModule extends Component {
             // 控件销毁时验证
             bwTable.ftable.off(FastTable.EVT_CELL_EDIT_CANCEL, handler);
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
-                validList.push(validate(editModule, cell));
+                if(cell.isEdited){
+                    validList.push(validate(editModule, cell));
+                }
             });
         };
 
         let validate = (editModule, cell: FastTableCell): Promise<any> => {
-            return new Promise((resolve, reject) => {
+            let promise: Promise<any> = new Promise((resolve, reject) => {
                 let name = cell.name,
                     field: R_Field = cell.column.content,
                     fastRow = cell.frow,
@@ -2348,8 +2388,10 @@ export class BwTableModule extends Component {
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
                     EditConstruct.checkValue(field, rowData, () => {
-                        lookUpCell && (lookUpCell.data = null);
-                        cell.data = null;
+                        if(this.ftable && this.ftable.editing){
+                            lookUpCell && (lookUpCell.data = null);
+                            cell.data = null;
+                        }
                     }, name)
                         .then((res) => {
                             let {errors, okNames} = res;
@@ -2365,18 +2407,24 @@ export class BwTableModule extends Component {
                             Array.isArray(okNames) && okNames.forEach(name => {
                                 cell.errorMsg = null;
                             });
-
                             resolve();
-                        });
+                        }).catch(() => reject());
                 } else {
                     cell.errorMsg = '';
                     // lookUpCell && (lookUpCell.errorMsg = '');
                     resolve();
                     // callback(td, true);
                 }
-            }).then(() => cell.isChecked = true)
+            }).then(() => {
+                cell.isChecked = true;
+            }).finally(() => {
+                let index = validList.indexOf(promise);
+                if(index > -1){
+                    validList.splice(index, 1);
+                }
+            });
             // debugger;
-
+            return promise
         };
 
         let editModuleLoad = (): Promise<typeof EditModule> => {
@@ -2466,19 +2514,23 @@ export class BwTableModule extends Component {
                     });
                     setTimeout(() => {
                         Promise.all(validList).then(() => {
-                        }).catch().finally(() => {
                             cellCheckValue().then(() => {
-                            }).finally(() => {
-                                validList = [];
-                                loading && loading.hide();
-                                loading = null;
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
                                         resolve(saveData);
                                     }).catch(() => reject());
                                 }, 100);
-                            })
+                            }).catch(() => reject('noMessage')).finally(() => {
+                                loading && loading.hide();
+                                loading = null;
+                            });
+                        }).catch(() => {
+                            loading && loading.hide();
+                            loading = null;
+                            reject('noMessage');
+                        }).finally(() => {
+                            validList = [];
                         })
                     }, 100)
 

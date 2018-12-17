@@ -15,7 +15,10 @@ export = class homePage {
     protected favoritesList: HTMLElement;
     protected recentList: HTMLElement;
 
-    protected initHomeList(data){
+    protected initHomeList(data, isRefresh = false){
+        if(isRefresh){
+            this.homeList.innerHTML = '';
+        }
         data && tools.toArray(data).forEach((item) => {
             d.append(this.homeList, homePage.createHomeList(item));
         });
@@ -196,6 +199,17 @@ export = class homePage {
             });
         });
 
+        this.getHomeData(para);
+        d.on(content, 'click', '.home-load-error', () => {
+            this.getHomeData(para);
+        });
+
+        sys.window.close = double_back;
+        sys.window.wake("refreshHomeData", null);
+
+    }
+
+    protected getHomeData(para){
         BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.menu, {output: 'json'}), {
             loading: {
                 msg: '首页数据加载中...'
@@ -207,7 +221,7 @@ export = class homePage {
 
             if(data){
                 // 初始化首页数据
-                this.initHomeList(data);
+                this.initHomeList(data, true);
             }else{
                 Modal.alert('获取首页数据失败');
             }
@@ -218,12 +232,9 @@ export = class homePage {
                 searchBtn: para.searchBtn
             })
         }).catch(() => {
-            Modal.alert('获取首页数据失败');
+            this.homeList.innerHTML = '<div class="home-load-error"></div>';
+            // Modal.alert('获取首页数据失败');
         });
-
-        sys.window.close = double_back;
-        sys.window.wake("refreshHomeData", null);
-
     }
 
     protected static createHomeList(menu: obj): HTMLLIElement{

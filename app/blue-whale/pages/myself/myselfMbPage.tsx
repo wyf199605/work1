@@ -25,6 +25,11 @@ export = class myselfMbPage {
             // console.log('in mb');
             // console.log(menus);
             menus && menus.forEach((menu) => {
+                /*
+                *   0： pc和mb都显示
+                *   1： 仅pc显示
+                *   2： 仅mb显示
+                * */
                 (menu.isPc === 0 || menu.isPc === 2) && items.push({
                     content: menu.menuName,
                     icon: menu.menuIcon,

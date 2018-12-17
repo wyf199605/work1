@@ -15,12 +15,15 @@ export interface ITableColumnPara{
     isVirtual?: boolean;
     title: string;
     isCanSort?: boolean; // 是否可排序，默认true;
+    sortName?: string;
 }
 export class TableColumn{
     protected isCanSort: boolean;
+    protected sortName: string;
 
     constructor(para: ITableColumnPara){
         this.content = para.content;
+        this.sortName = para.sortName;
         this._isVirtual = tools.isEmpty(para.isVirtual) ? false : para.isVirtual;
         this.isCanSort = tools.isEmpty(para.isCanSort) ? true : para.isCanSort;
         this._table = para.table;
@@ -272,12 +275,16 @@ export class TableColumn{
 
     // 列排序
     sort(order: 'ASC' | 'DESC' = 'DESC'){
-        if(this.isCanSort){
+        if(tools.isNotEmpty(this.sortName)){
+            let column = this.table.columnsGet(this.sortName);
+            return column ? column.sort(order) : null;
+        }else if(this.isCanSort){
             let indexes = this.table.tableData.sort(this.name, order);
             // this.table.render(0, this.table.tableData.get().length);
             return indexes;
+        }else{
+            return null;
         }
-        return null;
     }
 
     destroy(isClear: boolean = true){

@@ -20,12 +20,54 @@ export class FlowReport extends BasicPage {
         this.para = para;
         let emPara: EditModulePara = {fields: []};
         let nameFields: { [name: string]: R_Field } = {};
-        let form = this.createFormWrapper(para.fm.fields);
+        let form = this.createFormWrapper(para.fm.fields),
+            self = this;
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
             let field = {
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
-                field: nameFields[f.name]
+                field: nameFields[f.name],
+                onExtra: (data, relateCols, isEmptyClear = false) => {
+                    let com = self.editModule.getDom(f.name);
+                    for(let key of relateCols){
+                        let hCom = self.editModule.getDom(key);
+                        if(hCom && hCom !== com){
+                            let hField = hCom.custom as R_Field;
+                            hCom.set(data[key] || '');
+
+                            if (hField.assignSelectFields && hField.assignAddr) {
+                                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                    cache: true,
+                                }).then(({response}) => {
+                                    let res = response.data;
+                                    if (res && res[0]) {
+                                        hField.assignSelectFields.forEach((name) => {
+                                            let assignCom = self.editModule.getDom(name);
+                                            assignCom && assignCom.set(res[0][name]);
+                                        });
+                                        let data = this.dataGet();
+                                        this.fields.forEach((field) => {
+                                            if(field.elementType === 'lookup'){
+                                                let lCom = self.editModule.getDom(field.name);
+                                                if(!data[field.lookUpKeyField]){
+                                                    lCom.set('');
+                                                }else{
+                                                    let options = this.lookUpData[field.name] || [];
+                                                    for (let opt of options) {
+                                                        if (opt.value == data[field.lookUpKeyField]) {
+                                                            lCom.set(opt.value);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+
+                                })
+                            }
+                        }
+                    }
+                }
             };
             emPara.fields.push(field);
             if (['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit) {
@@ -67,6 +109,7 @@ export class FlowReport extends BasicPage {
             }
             return muiContent;
         } else {
+            // debugger
             let formWrapper = d.query('#flowForm', this.para.dom);
             for (let i = 0; i < fields.length; i++) {
                 let field = fields[i];
@@ -76,7 +119,8 @@ export class FlowReport extends BasicPage {
                 let formGroupWrapper: HTMLElement = null;
                 let isHide = ((this.para.uiType == 'insert' || this.para.uiType == 'associate') && field.noAdd) || (this.para.uiType == 'update' && field.noShow);
                 switch (field.comType) {
-                    case 'input': {
+                    case 'input':
+                    case 'selectInput':{
                         formGroupWrapper =
                             <div className={'list-group-item col-xs-12 col-md-4 col-sm-6 ' + (isHide ? 'hide' : '')}
                                  data-name={field.name}>
@@ -178,15 +222,11 @@ export class FlowReport extends BasicPage {
                         return false;
                     }
                     btn.hintAfterAction = true;
-                    self.save(btn, pageData, function () {
-                        if (tools.isMb){
+                    self.save(btn, pageData,()=>{
+                        if (tools.isPc){
                             sys.window.open({
-                                url: BW.CONF.url.myApplication
-                            });
-                        }else{
-                            sys.window.open({
-                                url: BW.CONF.url.myApplicationPC
-                            });
+                                url:BW.CONF.url.myApplicationPC
+                            })
                         }
                     });
                     break;
@@ -196,20 +236,17 @@ export class FlowReport extends BasicPage {
                     }
                     saveBtn.hintAfterAction = false;
                     // 先保存再发送
+                    saveBtn.refresh = 1;
                     self.save(saveBtn, pageData, function () {
-                        saveBtn.hintAfterAction = true;
-                        ButtonAction.get().clickHandle(btn, self.dataGet(), () => {
+                        btn.hintAfterAction = true;
+                        ButtonAction.get().clickHandle(btn, pageData, () => {
                             // 提交成功回退到上一页
-                            if (tools.isMb){
+                            if (tools.isPc){
                                 sys.window.open({
-                                    url: BW.CONF.url.myApplication
-                                });
-                            }else{
-                                sys.window.open({
-                                    url: BW.CONF.url.myApplicationPC
-                                });
+                                    url:BW.CONF.url.myApplicationPC
+                                })
                             }
-                        }, self.url);
+                        }, tools.isMb ? BW.CONF.url.myApplication : self.url);
                     });
                     break;
                 case 'with_draw':
@@ -221,6 +258,7 @@ export class FlowReport extends BasicPage {
                     }, self.url);
                     break;
                 case 'agree': {
+                    btn.actionAddr.dataAddr += '&audit_memo=同意';
                     btn.hintAfterAction = true;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
                         // sys.window.close();
@@ -300,7 +338,7 @@ export class FlowReport extends BasicPage {
                 this.editModule.set(data);
             }
             typeof callback === 'function' && callback(response);
-        }, this.url);
+        }, tools.isMb ? BW.CONF.url.myApplication : this.url);
     }
 
     /**

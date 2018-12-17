@@ -4,22 +4,31 @@ import {SlideTab} from "../../../global/components/ui/slideTab/slideTab";
 import {BwRule} from "../../common/rule/BwRule";
 import sys = BW.sys;
 import tools = G.tools;
+import {DataManager} from "../../../global/components/DataManager/DataManager";
+import BasicPage from "../../pages/basicPage";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
-export class FlowList {
-    private flowType:string;
-    constructor(para) {
+interface IFlowList extends BasicPagePara {
+    flow: string;
+}
+
+export class FlowList extends BasicPage {
+    private flowType: string;
+
+    constructor(para: IFlowList) {
+        super(para);
         let flow = para.flow,
             titles = [],
             url = '';
         this.flowType = para.flow;
-        switch (flow){
-            case 'application':{
-                titles = ['全部','进行中','已完成'];
+        switch (flow) {
+            case 'application': {
+                titles = ['全部', '进行中', '已完成'];
                 url = BW.CONF.ajaxUrl.flowListApply;
             }
-            break;
-            case 'approval':{
-                titles = ['全部','待审批','已审批'];
+                break;
+            case 'approval': {
+                titles = ['全部', '待审批', '已审批'];
                 url = BW.CONF.ajaxUrl.flowListCheck;
             }
                 break;
@@ -60,8 +69,8 @@ export class FlowList {
                                     pageparams: ajaxPara
                                 }
                             }).then(({response}) => {
-                                if (current === 0){
-                                    d.query('a',d.queryAll('li',tab.getTab())[0]).innerText = `${titles[0]}(${response.head.totalNum}条)`;
+                                if (current === 0) {
+                                    d.query('a', d.queryAll('li', tab.getTab())[0]).innerText = `${titles[0]}(${response.head.totalNum}条)`;
                                 }
                                 return {data: response.data, total: response.head.totalNum}
                             });
@@ -71,7 +80,7 @@ export class FlowList {
                     }
                 },
                 {
-                    title:  titles[1],
+                    title: titles[1],
                     dom: dom2,
                     dataManager: {
                         render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
@@ -93,8 +102,8 @@ export class FlowList {
                                     pageparams: ajaxPara
                                 }
                             }).then(({response}) => {
-                                if (current === 0){
-                                    d.query('a',d.queryAll('li',tab.getTab())[1]).innerText = `${titles[1]}(${response.head.totalNum}条)`;
+                                if (current === 0) {
+                                    d.query('a', d.queryAll('li', tab.getTab())[1]).innerText = `${titles[1]}(${response.head.totalNum}条)`;
                                 }
                                 return {data: response.data, total: response.head.totalNum}
                             });
@@ -104,7 +113,7 @@ export class FlowList {
                     }
                 },
                 {
-                    title:  titles[2],
+                    title: titles[2],
                     dom: dom3,
                     dataManager: {
                         render: (start: number, length: number, data: obj[], isRefresh: boolean) => {
@@ -126,8 +135,8 @@ export class FlowList {
                                     pageparams: ajaxPara
                                 }
                             }).then(({response}) => {
-                                if (current === 0){
-                                    d.query('a',d.queryAll('li',tab.getTab())[2]).innerText = `${titles[2]}(${response.head.totalNum}条)`;
+                                if (current === 0) {
+                                    d.query('a', d.queryAll('li', tab.getTab())[2]).innerText = `${titles[2]}(${response.head.totalNum}条)`;
                                 }
                                 return {data: response.data, total: response.head.totalNum}
                             });
@@ -137,25 +146,34 @@ export class FlowList {
                     }
                 }
             ]
-        })
+        });
+        sys.window.wake('wake', null);
+        d.on(window, 'wake', () => {
+            tab.refresh();
+        });
     }
 
     private initEvents = (() => {
         let clickHandler = (e) => {
-            let url = d.closest(e.target,'.item-wrapper').dataset.url,
-                instance = d.closest(e.target,'.item-wrapper').dataset.instance;
+            let url = d.closest(e.target, '.item-wrapper').dataset.url,
+                instance = d.closest(e.target, '.item-wrapper').dataset.instance;
             sys.window.open({
-                url:tools.url.addObj(url,{
-                    instance:instance
+                url: tools.url.addObj(url, {
+                    instance: instance
                 })
             })
         };
+        let back = () => {
+            sys.window.close(BwRule.EVT_REFRESH, null, this.url);
+        };
         return {
             on: () => {
-                d.on(d.query('.mui-content.flowList'),'click','.item-wrapper',clickHandler);
+                d.on(d.query('.mui-content.flowList'), 'click', '.item-wrapper', clickHandler);
+                d.on(document.body, 'click', '.mui-icon.mui-icon-left-nav.mui-pull-left.sys-action-back', back);
             },
             off: () => {
-                d.off(d.query('.mui-content.flowList'),'click','.item-wrapper',clickHandler);
+                d.off(d.query('.mui-content.flowList'), 'click', '.item-wrapper', clickHandler);
+                d.off(document.body, 'click', '.mui-icon.mui-icon-left-nav.mui-pull-left.sys-action-back', back);
             }
         }
     })();
@@ -163,7 +181,7 @@ export class FlowList {
     private createItem(data?: obj) {
         let state = '',
             stateClass = '';
-        if (this.flowType === 'application'){
+        if (this.flowType === 'application') {
             switch (Number(data.instanceState)) {
                 case 0: {
                     state = '草稿';
@@ -191,34 +209,41 @@ export class FlowList {
                 }
                     break;
                 case 90: {
-                    state = '已结案';
+                    state = '已同意';  // 原本是已结案
                     stateClass = 'close'
                 }
                     break;
             }
-        }else{
-            let taskName =  data.taskName;
+        } else {
+            let taskName = data.taskName;
             switch (Number(data.taskState)) {
                 case 0: {
-                    state =  taskName + '-' + '待审批';
+                    state = taskName + '-' + '待审批';
                     stateClass = 'check';
                 }
                     break;
                 case 1: {
-                    state = taskName + '-' +  '已审批';
-                    stateClass = 'agree';
+                    if (data.operMemo === '同意') {
+                        state = taskName + '-' + '已同意';
+                        stateClass = 'agree';
+                    } else {
+                        state = taskName + '-' + '已退回';
+                        stateClass = 'sendBack';
+                    }
                 }
                     break;
             }
         }
 
-
-        return <div className="item-wrapper" data-url={tools.url.addObj(BW.CONF.siteUrl + data.auditUrl, {page: 'flowReport'})} data-instance={data.instanceState}>
+        return <div className="item-wrapper"
+                    data-url={tools.url.addObj(BW.CONF.siteUrl + data.auditUrl, {page: 'flowReport'})}
+                    data-instance={data.instanceState}>
             <div className="item-title"><span>{data.processName}-{data.createUserName}</span><i
                 className="iconfont icon-arrow-right"/></div>
             <div className="item-content">
                 <div class="item-info">
-                    <div className="item-time">{tools.isEmpty(data.lastUpdateTime) ? '' : this.handlerTime(data.lastUpdateTime)}</div>
+                    <div
+                        className="item-time">{tools.isEmpty(data.lastUpdateTime) ? '' : this.handlerTime(data.lastUpdateTime)}</div>
                     <div className={"item-state " + stateClass}>{state}</div>
                 </div>
             </div>
@@ -237,7 +262,7 @@ export class FlowList {
         return `${yearStr}/${monthStr}/${dayStr}`
     }
 
-    destroy(){
+    destroy() {
         this.initEvents.off();
     }
 }

@@ -603,7 +603,7 @@ export class BwRule extends Rule {
                 if (col.elementType == 'lookup') {
                     //look up
                     col.comType = 'selectInput';// --------------
-                    col.isCanSort = false;
+                    col.sortName = col.lookUpKeyField;
 
                 } else if ((col.elementType == 'treepick' || col.elementType == 'pick')) {
 
