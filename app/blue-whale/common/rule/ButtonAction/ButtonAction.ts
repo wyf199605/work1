@@ -235,7 +235,7 @@ export class ButtonAction {
                 addr = tools.url.addObj(addr, {output: 'json'});
                 let can2dScan = G.Shell.inventory.can2dScan;
 
-                if(can2dScan){
+                if(can2dScan || tools.isMb){
                     self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                         //创建条码扫码页面
                         if (response.uiType === 'inventory' && tools.isMb) {
@@ -246,7 +246,7 @@ export class ButtonAction {
                     }, () => callback(null))
                 }else {
                     callback(null);
-                    Modal.alert('目前只支持手机功能');
+                    Modal.alert('目前不支持PC端功能');
                 }
                 break;
             case 'newwin':
