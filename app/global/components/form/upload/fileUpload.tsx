@@ -68,7 +68,13 @@ export class FileUpload {
                         reject(); // 表示分片上传失败
                     })
                 } else {
-                    this.uploadFile(file.blob, file.name).then((response) => {
+                    let data = {
+                        name: file.name,
+                        size: file.size,
+                        type: file.type || '',
+                        lastModifiedDate: file.lastModifiedDate
+                    };
+                    this.uploadFile(file.blob, file.name, data).then((response) => {
                         // 成功返回
                         resolve(response);
                     }).catch(() => {
@@ -92,8 +98,8 @@ export class FileUpload {
     protected chunkUpload(file: CustomFile, ...any) {
         let self = this,
             totalSize = file.size,
-            totalPieces = Math.ceil(totalSize / this.chunkSize),
-            total = totalPieces,
+            total = Math.ceil(totalSize / this.chunkSize),
+
             list: Promise<any>[] = [],
             startSize = 0,
             endSize = 0,
@@ -101,17 +107,14 @@ export class FileUpload {
             fileBlob: Blob = file.blob;
         this.xhrs = [];
 
-        return new Promise((resolve, reject) => {
-            upload(resolve);
-        });
-        function upload(callback: Function) {
-            totalPieces--;
-            let index = chunkIndex;
+        let totalPieces = total;
+        while(totalPieces--){
             endSize = startSize + self.chunkSize;
             if (totalPieces === 0) {
                 endSize = file.size;
             }
-            let blob = fileBlob.slice(startSize, endSize); // 切片
+            let index = chunkIndex,
+                blob = fileBlob.slice(startSize, endSize); // 切片
             list.push(new Promise((resolve, reject) => {
                 self.beforeSendBlock({
                     end: endSize,
@@ -127,6 +130,7 @@ export class FileUpload {
                         type: file.type || '',
                         lastModifiedDate: file.lastModifiedDate
                     };
+                    // 当分块数量为1 时，上传数据无需传递分块参数
                     if(total <= 1){
                         delete data.chunk;
                         delete data.chunks;
@@ -135,50 +139,49 @@ export class FileUpload {
                         resolve();
                     }).catch(() => {
                         reject();
-                    }).finally(() => {
-                        if(totalPieces){
-                            upload(callback);
-                        }else{
-                            callback();
-                        }
                     });
                 }).catch(() => {
                     resolve(); // 返回失败表示文件已存在后台
-                    if(totalPieces){
-                        upload(callback);
-                    }else{
-                        callback();
-                    }
                 });
             }));
             chunkIndex++;
             startSize = endSize;
         }
-
+        return Promise.all(list);
     }
 
     // 文件上传方法
     protected xhrs: XMLHttpRequest[] = [];
 
-    protected uploadFile(file: Blob, filename: string, ajaxData?: obj): Promise<any> {
+    protected uploadFile(file: Blob, filename: string, ajaxData?: obj, isLoop: boolean = true): Promise<any> {
         let url = this.uploadUrl;
         return new Promise<any>((resolve, reject) => {
             if (tools.isNotEmpty(file) && tools.isNotEmpty(url)) {
                 let formData = new FormData();
-                let data = this.formData ? this.formData() : null;
-                if (data) {
-                    data = Object.assign({}, data, ajaxData || {});
-                    for (let key in data) {
-                        formData.append(key, data[key]);
-                    }
+                let data = Object.assign({},
+                    ajaxData || {},
+                    this.formData ? this.formData() : {}); // 合并数据时以ajaxData为主
+
+                for (let key in data) {
+                    formData.append(key, data[key]);
                 }
+
                 formData.append('file', file, filename);
                 let result = {success: false, uploading: false, progress: 0};
                 let xhr = new XMLHttpRequest();
                 this.xhrs.push(xhr);
                 xhr.open("post", url, true);
                 xhr.addEventListener('error', () => {
-                    reject();
+                    if(isLoop){
+                        // 第一次上传失败时会再上传一次
+                        this.uploadFile(file, filename, ajaxData, false).then(() => {
+                            resolve();
+                        }).catch(() => {
+                            reject();
+                        })
+                    }else{
+                        reject();
+                    }
                 });
                 xhr.addEventListener('progress', (evt) => {
                     if (evt.lengthComputable) {
