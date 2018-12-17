@@ -9,7 +9,7 @@ import {User} from "../../../global/entity/User";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
 import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
-import {G_MD5} from "../../../global/utils/md5";
+import {G_FILE_MD5, G_MD5} from "../../../global/utils/md5";
 
 type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
@@ -224,7 +224,7 @@ export class BwUploader extends FormCom {
             let reader = new FileReader();
             reader.onload = (event) => {
                 let binary = (event.target as any).result;
-                resolve(tools.md5(binary));
+                resolve(G_FILE_MD5(binary));
             };
             reader.onerror = (e) => {
                 reject(e);
