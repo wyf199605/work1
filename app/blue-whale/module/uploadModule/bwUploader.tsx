@@ -240,10 +240,6 @@ export class BwUploader extends FormCom {
                 let userid = User.get().userid,
                     md5Code = md5.toUpperCase(),
                     uniqueFileName = G_MD5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
-                require(['md5'], md5 => {
-                    console.log(md5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size));
-                    console.log(uniqueFileName);
-                });
                 this.fileUpload.formData = () => {
                     return {
                         userId: userid,
