@@ -959,105 +959,20 @@ export class FastTable extends Component {
 
                 }
             }
-            /*if(isScroll){
-                animationId = requestAnimationFrame(touchMoveHandler);
-            }else{
-                cancelAnimationFrame(animationId);
-            }*/
-        };/*
-        let isAnimation = false,
-            timer = null,
-            isRevert = true,
-            mainThead,
-            leftThead,
-            pseudoThead;
-
-        let createTHead = (scroll: number) => {
-            mainThead = this.mainTable.head.tableEl.cloneNode(true) as HTMLElement;
-            leftThead = this.leftTable.head.tableEl.cloneNode(true) as HTMLElement;
-            pseudoThead = this.pseudoTable.head.tableEl.cloneNode(true) as HTMLElement;
-            this.mainTable.body.innerWrapper.style.paddingTop = '41px';
-            this.leftTable.body.innerWrapper.style.paddingTop = '41px';
-            this.pseudoTable.body.innerWrapper.style.paddingTop = '41px';
-            // thead.style.cssText = 'position: absolute; left: 0; top: ' + (scroll - 40) + 'px';
-            this.mainTable.head.wrapper.classList.add('hide');
-            this.leftTable.head.wrapper.classList.add('hide');
-            this.pseudoTable.head.wrapper.classList.add('hide');
-            mainThead.style.top = scroll + 'px';
-            leftThead.style.top = scroll + 'px';
-            pseudoThead.style.top = scroll + 'px';
-            mainThead.style.transform = '';
-            leftThead.style.transform = '';
-            pseudoThead.style.transform = '';
-            mainThead.classList.add('stack-50');
-            leftThead.classList.add('stack-50');
-            pseudoThead.classList.add('stack-50');
-            d.prepend(this.mainTable.body.innerWrapper, mainThead);
-            d.prepend(this.leftTable.body.innerWrapper, leftThead);
-            d.prepend(this.pseudoTable.body.innerWrapper, pseudoThead);
         };
 
-        let revertTHead = (scroll: number) => {
-            this.mainTable.body.innerWrapper.style.paddingTop = '0';
-            this.leftTable.body.innerWrapper.style.paddingTop = '0';
-            this.pseudoTable.body.innerWrapper.style.paddingTop = '0';
-            d.query("table", this.mainTable.head.innerWrapper).style.webkitTransform = `translateX(${-scroll}px) translateZ(0)`;
-            d.query("table", this.mainTable.head.innerWrapper).style.transform = `translateX(${-scroll}px) translateZ(0)`;
-            this.mainTable.head.wrapper.classList.remove('hide');
-            this.leftTable.head.wrapper.classList.remove('hide');
-            this.pseudoTable.head.wrapper.classList.remove('hide');
-            mainThead && d.remove(mainThead);
-            leftThead && d.remove(leftThead);
-            pseudoThead && d.remove(pseudoThead);
-            mainThead = null;
-            leftThead = null;
-            pseudoThead = null;
+        let menuHidden = () => {
+            self.fastTableMenu && (self.fastTableMenu.show = false);
         };
-        let touchMoveHandler = (ev) => {
-            if(!(ev.isFinal || ev.isFirst)){
-                if(ev.direction === 'left' || ev.direction === 'right') {
-                    clearTimeout(timer);
-                    if (!isAnimation) {
-                        isRevert = true;
-                        isAnimation = true;
-                        let scroll = this.mainTable.body.wrapper.scrollTop === 0
-                            ? 0 : this.mainTable.body.wrapper.scrollTop;
-                        createTHead(scroll);
-                    }
-                }
-            }
-        };
-        let interval = () => {
-            clearTimeout(timer);
-            isScroll = true;
-            timer = setTimeout(() => {
-                isScroll = false;
-            }, 1000);
-        };
-        let scrollHandler = () => {
-            if(isRevert) {
-                isRevert = false;
-                isAnimation && (animationId = requestAnimationFrame(touchScrollHandler));
-                isAnimation && revertTHead(this.mainTable.body.innerWrapper.scrollLeft);
-                isAnimation = false;
-            }
-        };*/
 
         return {
             on: () => {
                 d.on(this.mainTable.body.innerWrapper, "scroll", touchMoveHandler);
-                /*d.on(this.mainTable.body.innerWrapper, "scroll", interval);
-                d.on(this.mainTable.body.wrapper, "scroll", scrollHandler);
-                d.on(document, "touchstart", (ev) => {
-                    if(!d.matches(ev.target as HTMLElement, 'tr>td')){
-                        isAnimation && (animationId = requestAnimationFrame(touchScrollHandler));
-                        isAnimation && revertTHead(this.mainTable.body.innerWrapper.scrollLeft);
-                        isAnimation = false;
-                    }
-                });*/
+                d.on(this.wrapper, "touchmove", menuHidden);
             },
             off: () => {
                 d.off(this.mainTable.body.innerWrapper, "scroll", touchMoveHandler);
+                d.off(this.wrapper, "touchmove", menuHidden);
             }
         }
     })();
@@ -1870,7 +1785,7 @@ export class FastTable extends Component {
         this.rows && this.rows.forEach((row) => {
             row.format();
         });
-        if (!tools.isMb) {
+        if (tools.isPc) {
             // PC端
             this.scrollEvent.off();
             this.changeScrollWidth(0);
