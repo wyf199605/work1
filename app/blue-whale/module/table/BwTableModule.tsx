@@ -392,7 +392,8 @@ export class BwTableModule extends Component {
                 colspan: hasSubCol ? subCols.length : 1, // 其他列有子列
                 rowspan: isAbsField && !hasSubCol ? 2 : 1,
                 maxWidth: field.atrrs && (field.atrrs.displayWidth ? field.atrrs.displayWidth * 6 : void 0),
-                isCanSort: field.isCanSort // 是否可排序
+                isCanSort: field.isCanSort, // 是否可排序
+                sortName: field.sortName
             } as IFastTableCol);
 
             if (hasSubCol) {
@@ -487,7 +488,8 @@ export class BwTableModule extends Component {
                         isNumber: subName ? void 0 :
                             BwRule.isNumber(field.atrrs && field.atrrs.dataType),
                         isVirtual: subName ? void 0 : field.noShow,
-                        isCanSort: field.isCanSort
+                        isCanSort: field.isCanSort,
+                        sortName: field.sortName,
                     } as IFastTableCol);
 
                     currentOriginField = {
@@ -1015,7 +1017,8 @@ export class BwTableModule extends Component {
 //根据列头实时更新方法
     public rfidColthead() {
 
-        let rfidCols = this.ui.rfidCols;
+        let rfidCols = this.ui.rfidCols,
+            ftable = this.ftable;
         if (rfidCols.calc) {
             //调用接口 传rfid.amount
             let calcCols = rfidCols.calc.cols || {},
@@ -1081,10 +1084,16 @@ export class BwTableModule extends Component {
 
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
-                    if (field && rule) {
-                        let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                    if(rule.slice(0,3) == 'SUM'){
+                        let sum =  this.countCalcSum(ftable,field),
                             el = countElements[field];
-                        el && (el.innerHTML = tools.calc(diffValue));
+                        el && (el.innerHTML = sum + '');
+                    }else {
+                        if (field && rule) {
+                            let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                                el = countElements[field];
+                            el && (el.innerHTML = tools.calc(diffValue));
+                        }
                     }
                 });
 
@@ -1094,7 +1103,8 @@ export class BwTableModule extends Component {
 
 //下载更新后列统计
     public rfidDownAndUpInitHead() {
-        let rfidCols = this.ui.rfidCols;
+        let rfidCols = this.ui.rfidCols,
+            ftable = this.ftable;
 
         //Array.isArray(rfidCols.calcData) && rfidCols.calcData.map((val)=>{
 
@@ -1155,11 +1165,16 @@ export class BwTableModule extends Component {
                 }
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
-                    if (field && rule) {
-                        let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                    if(rule.slice(0,3) == 'SUM'){
+                        let sum =  this.countCalcSum(ftable,field),
                             el = countElements[field];
-
-                        el && (el.innerHTML = tools.calc(diffValue));
+                        el && (el.innerHTML = sum + '');
+                    }else {
+                        if (field && rule) {
+                            let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                                el = countElements[field];
+                            el && (el.innerHTML = tools.calc(diffValue));
+                        }
                     }
                 });
 
@@ -1170,11 +1185,19 @@ export class BwTableModule extends Component {
 
     }
 
+    public countCalcSum(ft,str){
+
+        let column = ft.columnGet(str),
+            sum = 0;
+        column.data.forEach((col)=>{
+            sum += col;
+        })
+        return sum;
+    }
     public rfidColInit() {
         let rfidCols = this.ui.rfidCols,
             ftable = this.ftable,
-            fields = this.ui.cols,
-            colfield: obj[];
+            fields = this.ui.cols;
         if (!tools.os.android || !this.isRfid || !rfidCols || !rfidCols.amountFlag) {
             return
         }
@@ -1245,16 +1268,18 @@ export class BwTableModule extends Component {
                                     break;
                                 }
                             }
-                            return {
-                                field: cell,
-                                count: count
+                            if(count !== 0){
+                                return {
+                                    field: cell,
+                                    count: count
+                                }
                             }
+
                         });
                     ontimeRefresh(initColData, this, rfidCols);
 
                 })
             }
-
             //}
 
         });
@@ -1320,16 +1345,22 @@ export class BwTableModule extends Component {
                         colHeadStr['SCANAMOUNT'] = ((resData.Calculate === undefined) ? "0" : resData.CalculateScan);
                     }
                     colHeadStr['OLD_DIFFAMOUNT'] = this.OLD_DIFFAMOUNT;
-
-                    calcRule.forEach(calc => {
-                        let {field, rule} = calc;
-                        if (field && rule) {
-                            let diffValue = tools.str.parseTpl(rule, colHeadStr),
-                                el = countElements[field];
-                            el && (el.innerHTML = tools.calc(diffValue));
-                        }
-                    });
-
+                    setTimeout(()=>{
+                        calcRule.forEach(calc => {
+                            let {field, rule} = calc;
+                            if(rule.slice(0,3) == 'SUM'){
+                                let sum =  this.countCalcSum(ftable,field),
+                                    el = countElements[field];
+                                el && (el.innerHTML = sum + '');
+                            }else {
+                                if (field && rule) {
+                                    let diffValue = tools.str.parseTpl(rule, colHeadStr),
+                                        el = countElements[field];
+                                    el && (el.innerHTML = tools.calc(diffValue));
+                                }
+                            }
+                        });
+                    },980)
                     Shell.inventory.columnCountOff(when, 1, inventory, (res) => {
                     })
                 })
@@ -2120,9 +2151,9 @@ export class BwTableModule extends Component {
                 //
                 d.append(this.wrapper, this._btnWrapper);
                 if (this.tableModule && ((this.tableModule.editType === 'linkage'
-                        && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
-                        || (this.tableModule.editType === 'self')
-                        && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
+                    && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
+                    || (this.tableModule.editType === 'self')
+                    && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
                     let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({

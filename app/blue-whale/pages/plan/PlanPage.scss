@@ -183,7 +183,7 @@
         .draw-point-wrapper{
           height: 100%;
           width: 100%;
-          overflow: hidden;
+          overflow: auto;
           transition: padding 0.2s ease 0s;
           &::-webkit-scrollbar{
             display: none;

@@ -15,6 +15,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Loading} from "../../../global/components/ui/loading/loading";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {PickModule} from "../edit/pickModule";
+import {HorizontalQueryModule} from "../query/horizontalFormFactory";
 
 export interface IPlanModulePara extends IComponentPara{
     ui: IBW_Plan_Table;
@@ -64,13 +65,10 @@ export class PlanModule extends Component{
     initScale(){
         if(tools.isMb){
             let div = <div class="initScale">
-                <div class="narrow" onclick={()=>{
-                  this.draw.svgScal(false)
+                <div class="search iconfont icon-sousuo" onclick={()=>{
+
                 }
-                }> 缩小</div>
-                <div class="enlarge" onclick={()=>{
-                    this.draw.svgScal(true)}
-                }>放大</div>
+                }></div>
             </div>
             d.append(this.container,div)
         }
@@ -128,10 +126,10 @@ export class PlanModule extends Component{
         subButtons.forEach((btnUi) => {
             d.append(btnWrapper, <div className="form-com-item">
                 <Button icon={btnUi.icon} content={btnUi.title} data={btnUi}
-                    onClick={() => {
-                        ButtonAction.get().clickHandle(btnUi, void 0, (res) => {
-                        }, this.pageUrl , ui.itemId);
-                }}/>
+                        onClick={() => {
+                            ButtonAction.get().clickHandle(btnUi, void 0, (res) => {
+                            }, this.pageUrl , ui.itemId);
+                        }}/>
             </div>)
         })
     }
@@ -526,7 +524,7 @@ export class PlanModule extends Component{
                     className:'star-edit',
                     color: 'info',
                     onClick: () => {
-                         buttons.forEach((val)=>{
+                        buttons.forEach((val)=>{
                             if(val.content == '开始描点' || val.content == '结束描点'){
                                 plotBox.getItem('end-drawing').isDisabled = true;
                                 plotBox.getItem('star-drawing').isDisabled = true;
@@ -549,7 +547,7 @@ export class PlanModule extends Component{
                     className:'end-edit',
                     color: 'success',
                     onClick: () => {
-                       buttons.forEach((val)=>{
+                        buttons.forEach((val)=>{
                             if(val.content == '开始描点' || val.content == '结束描点'){
                                 plotBox.getItem('end-drawing').isDisabled = false;
                                 plotBox.getItem('star-drawing').isDisabled = false;
@@ -655,8 +653,8 @@ export class PlanModule extends Component{
             let ui = this.ui,
                 pointField: string,
                 postData = {
-                param: [] as obj[]
-            };
+                    param: [] as obj[]
+                };
             for(let col of ui.cols){
                 if(col.dataType === '77' || (col.atrrs && col.atrrs.dataType === '77')){
                     pointField = col.name;
@@ -665,13 +663,13 @@ export class PlanModule extends Component{
             }
             let editedData = this.draw.editedData,
                 getPointData = (data: obj): obj => {
-                let res = Object.assign({}, data);
-                if(pointField && res[DrawPoint.POINT_FIELD]){
-                    res[pointField] = res[DrawPoint.POINT_FIELD];
-                    delete res[DrawPoint.POINT_FIELD];
-                }
-                return res;
-            };
+                    let res = Object.assign({}, data);
+                    if(pointField && res[DrawPoint.POINT_FIELD]){
+                        res[pointField] = res[DrawPoint.POINT_FIELD];
+                        delete res[DrawPoint.POINT_FIELD];
+                    }
+                    return res;
+                };
 
             let data = editParamDataGet({
                 insert: editedData.insert.map(getPointData),

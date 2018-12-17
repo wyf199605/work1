@@ -3,6 +3,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {IFileInfo, Accessory} from "./accessory";
 import tools = G.tools;
+import {ListItemDetailCell} from "../listDetail/ListItemDetailCell";
 
 export interface IAccessoryItem extends IComponentPara {
     list?: Accessory;
@@ -14,7 +15,7 @@ export class AccessoryItem extends Component {
     protected list: Accessory;
 
     protected wrapperInit(para: IAccessoryItem): HTMLElement {
-        let wrapper =tools.isMb ? <div className="accessory-item" data-index={para.index}>
+        return tools.isMb ? <div className="accessory-item" data-index={para.index}>
             <div className="file-wrapper">
                 <div className="file-icon"><i className="appcommon app-wenjian"/></div>
                 <div className="file-info">
@@ -29,7 +30,6 @@ export class AccessoryItem extends Component {
             <div c-var="fileSize" className="file-size"/>
             <div className="deleteBtn">删除</div>
         </div>;
-        return wrapper;
     }
 
     constructor(private para: IAccessoryItem) {
@@ -43,9 +43,9 @@ export class AccessoryItem extends Component {
         this.innerEl.fileName.innerText = data.filename || '';
         !tools.isMb && (this.innerEl.fileName.title = data.filename || '');
         if (tools.isMb) {
-            this.innerEl.fileSize.innerText = data.filesize ? this.calcFileSize(data.filesize) : '0B';
+            this.innerEl.fileSize.innerText = data.filesize ? ListItemDetailCell.calcFileSize(data.filesize) : '0B';
         } else {
-            this.innerEl.fileSize.innerText = data.filesize ? `(${this.calcFileSize(data.filesize)})` : '(0B)';
+            this.innerEl.fileSize.innerText = data.filesize ? `(${ListItemDetailCell.calcFileSize(data.filesize)})` : '(0B)';
         }
     }
 
@@ -58,28 +58,6 @@ export class AccessoryItem extends Component {
     set index(index: number) {
         this._index = index;
         this.wrapper && (this.wrapper.dataset['index'] = index + '');
-    }
-
-    private calcFileSize(limit: number) {
-        if (limit <= 0) {
-            return '未知';
-        }
-        let size: string = "";
-        if (limit < 0.1 * 1024) { //如果小于0.1KB转化成B
-            size = limit.toFixed(2) + "B";
-        } else if (limit < 0.1 * 1024 * 1024) {//如果小于0.1MB转化成KB
-            size = (limit / 1024).toFixed(2) + "KB";
-        } else if (limit < 0.1 * 1024 * 1024 * 1024) { //如果小于0.1GB转化成MB
-            size = (limit / (1024 * 1024)).toFixed(2) + "MB";
-        } else { //其他转化成GB
-            size = (limit / (1024 * 1024 * 1024)).toFixed(2) + "GB";
-        }
-
-        let len = size.indexOf("\."), dec = size.substr(len + 1, 2);
-        if (dec == "00") {//当小数点后为00时 去掉小数部分
-            return size.substring(0, len) + size.substr(len + 3, 2);
-        }
-        return size;
     }
 
     destroy() {

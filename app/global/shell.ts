@@ -41,11 +41,11 @@ namespace G{
                 });
 
             },
-            speak(type : number, text: string, back : IShellEventHandler){
+            speak(type : number, text: string, back : IShellEventHandler,  info? : IShellEventHandler){
                 return ShellBase.handler('speak', {
-                    type : type,
-                    text : text
-                }, back)
+                    type : type, // 0语音识别 1停止语音识别 2语音播放（文字转语音） 3语音识别实时获取
+                    text : text, // type=2需要传入文字
+                }, back, info)
             }
         };
 

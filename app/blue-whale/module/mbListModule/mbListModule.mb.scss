@@ -45,12 +45,27 @@
     width: 100%;
     flex: 0 0 auto;
     overflow-y: auto;
+    .mb-list-wrapper.no-data{
+      &::after{
+        font-family: "appcommon" !important;
+        font-style: normal;
+        -webkit-font-smoothing: antialiased;
+        content: "\e62b";
+        display: block;
+        font-size: 150px;
+        text-align: center;
+        padding: 20px 0;
+        line-height: 200px;
+        color: #666;
+      }
+    }
     &.global-buttons-height{
       height: calc(100% - 50px) !important;
     }
   }
 }
 .mb-list-view{
+  height: 100%;
   ul.nav.nav-tabs.nav-tabs-line{
     &.space-around{
       justify-content: space-around;
@@ -97,8 +112,8 @@
     }
   }
   .tab-content {
+    height: 100%;
     padding: 44px 0 0 0;
-    //height: calc(100% - 44px);
     .tab-pane {
       height: 100%;
     }

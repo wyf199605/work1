@@ -1,7 +1,8 @@
 /// <amd-module name="ImgModal"/>
-import tools = G.tools;
 // import sys = G.sys;
 import d = G.d;
+import tools = G.tools;
+
 import {Modal} from "../../feedback/modal/Modal";
 export interface ImgModalPara{
     downAddr?: string;
@@ -76,7 +77,11 @@ export const ImgModal = (()=>{
                 });
                 gallery.init();
                 gallery.listen('close', function () {
+                    gallery.close();
                     gallery = null;
+                    if (tools.isMb){
+                        document.body.style.overflow = '';
+                    }
                 })
             });
         }
