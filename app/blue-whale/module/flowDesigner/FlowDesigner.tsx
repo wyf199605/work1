@@ -228,8 +228,23 @@ export class FlowDesigner {
                     }
                 }
             });
-            FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
-                Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
+            if(tools.isMb && type === 'look'){
+                let MbFullHeight = document.documentElement.clientHeight - 44,
+                    MbFullWidth = document.documentElement.clientWidth;
+                if(maxHeight + maxItemHeight <= MbFullHeight){
+                    FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth), MbFullHeight);
+                    body.style.height = `${MbFullHeight}px`;
+                    d.query('.modal-body.modal-body-mobile').style.height = `${MbFullHeight}px`;
+                }
+                if(maxWidth + maxItemWidth <= MbFullWidth){
+                    FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth), MbFullWidth);
+                    body.style.height = `${MbFullWidth}px`;
+                    d.query('.modal-body.modal-body-mobile').style.height = `${MbFullWidth}px`;
+                }
+            }else {
+                FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
+                    Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
+            }
 
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
