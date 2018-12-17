@@ -122,7 +122,7 @@ export class FileUpload {
                     index: chunkIndex,
                 }, ...any).then(() => {
                     // 调用文件上传
-                    let data = {
+                    let data: obj = {
                         chunk: index,
                         chunks: total,
                         name: file.name,
@@ -132,8 +132,9 @@ export class FileUpload {
                     };
                     // 当分块数量为1 时，上传数据无需传递分块参数
                     if(total <= 1){
-                        delete data.chunk;
                         delete data.chunks;
+                        delete data.chunk;
+                        blob = fileBlob;
                     }
                     self.uploadFile(blob, file.name, data).then(() => {
                         resolve();
