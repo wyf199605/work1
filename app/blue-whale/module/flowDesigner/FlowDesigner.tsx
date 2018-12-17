@@ -197,6 +197,8 @@ export class FlowDesigner {
                 this.modal.modalHeader.title = '查看流程';
                 d.query('#design-canvas').style.left = '0px';
                 if (tools.isMb){
+                    d.query('.modal-title').style.color = '#000000';
+                    d.remove(d.query('.header-btn-right'));
                     d.query('#design-canvas').style.width = `${FlowDesigner.MbWidth}px`;
                 } else{
                     d.query('#design-canvas').style.width = '100%';
@@ -228,8 +230,21 @@ export class FlowDesigner {
                     }
                 }
             });
-            FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
-                Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
+            if(tools.isMb && type === 'look'){
+                let MbFullHeight = document.documentElement.clientHeight - 44,
+                    MbFullWidth = document.documentElement.clientWidth;
+                if(maxHeight + maxItemHeight <= MbFullHeight){
+                    FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth), MbFullHeight);
+                    body.style.height = `${MbFullHeight}px`;
+                }
+                if(maxWidth + maxItemWidth <= MbFullWidth){
+                    FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth), MbFullWidth);
+                    body.style.height = `${MbFullWidth}px`;
+                }
+            }else {
+                FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
+                    Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
+            }
 
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
