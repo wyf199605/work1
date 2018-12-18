@@ -410,6 +410,10 @@ namespace G{
             inputcodedata(optionStype:number,uniqueFlag:string,value:string,category:string[],back:IShellEventHandler){
                 return ShellBase.handler('inputcodedata',{uniqueFlag:uniqueFlag,value:value,category:category,optionStype:optionStype},back)
             },
+            //移动端打开摄像头扫码
+            openScanCode(type:number,back:IShellEventHandler){
+                return ShellBase.handler('scanCode',{type:type},back)
+            },
             scan2dOn(back: IShellEventHandler) {
                 return ShellBase.handler('startScan2DResult', '', back, null, false);
             },

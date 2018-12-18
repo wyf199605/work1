@@ -659,8 +659,12 @@ export class RfidBarCode extends Component {
 
                     }
                     }>拍照</button>
-                    <button onClick={() => {
-
+                    <button onclick={() => {
+                        tools.pattern.throttling(()=>{
+                            G.Shell.inventory.openScanCode(0,(res)=>{
+                                alert(JSON.stringify(res));
+                            })
+                        },50)
                     }
                     }>扫一扫
                     </button>
