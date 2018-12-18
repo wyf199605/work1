@@ -89,12 +89,6 @@ export = class myselfMbPage {
         //         sys.window.whiteBat();
         //     });
         // }
-        if (CONF.appid === 'app_fastlion_retail') {
-            let li = <li className="mui-table-view-cell" id="changePassword">
-                <a href="#" className="mui-navigate-right"> <i className="iconfont icon-renyuan" style="color:#FFB741;margin-right:10px"></i>密码修改</a>
-            </li>;
-            d.append(list, li);
-        }
 
         d.on(d.query('.selfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
             let dataset = d.closest(e.target as HTMLElement,'.mui-table-view-cell[data-page-name]').dataset.pageName;
@@ -124,11 +118,6 @@ export = class myselfMbPage {
                     });
                 }
             }
-        });
-        d.on(d.query('#changPassword'), 'click', () => {
-            sys.window.open({
-                url: CONF.url.changePassword
-            });
         });
         d.on(d.query('#check'), 'click', function () {
             sys.window.update();
