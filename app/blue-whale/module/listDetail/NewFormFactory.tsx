@@ -361,27 +361,18 @@ export class NewFormFactory {
                 return;
             }
             com.onSet = (val) => {
-                // debugger;
-                // setTimeout(() => {
-                //     if(val == com.get()){
-                //         return;
-                //     }
                 data = data || {};
                 if (data[field.name] != val) {
                     assignSend(field, val, Object.assign({}, data, {[field.name]: val}), onExtra);
                 }
-
-                // }, 30);
             };
         };
 
 
         let assign2extra = (field: R_Field, assignData: objOf<any[]>) => {
             // assign 设置
-            let sepValue = ';',
-                selectFields = field.assignSelectFields,
+            let selectFields = field.assignSelectFields,
                 fieldName = field.name;
-            // debugger;
             Array.isArray(selectFields) && selectFields.forEach((key) => {
                 let data = assignData[key];
                 if (key === fieldName) {
@@ -389,9 +380,7 @@ export class NewFormFactory {
                 }
 
                 if (this.coms[key]) {
-
                     this.set({[key]: data});
-
                 } else {
                     //assign 值加入额外数据中
                     if (!this.comsExtraData[fieldName]) {
@@ -419,20 +408,16 @@ export class NewFormFactory {
             }).then(({response}) => {
                 let resData = tools.keysVal(response, 'data', 0),
                     assignData = assignDataGet(val, resData);
-
                 for (let key in assignData) {
                     assignData[key] = Array.isArray(assignData[key]) ? assignData[key].join(';') : ''
                 }
-
                 assign2extra(field, assignData);
-                // debugger;
                 onExtra && onExtra(assignData, field.assignSelectFields, true);
             })
         };
 
 
         let checkAssign = (data: obj, onExtra: Function) => {
-
             for (let fieldName in data) {
                 let field = this.nameFields[fieldName];
                 if (field && field.field && field.field.assignAddr) {
@@ -447,17 +432,14 @@ export class NewFormFactory {
 
     private getAssignSetHandler(field: R_Field) {
         let sepValue = ';';
-
         return (assignData: objOf<any[]>) => {
             // assign 设置
             if (typeof assignData !== 'object') {
                 return;
             }
-
             let selectFields = field.assignSelectFields;
             Array.isArray(selectFields) && selectFields.forEach((key) => {
                 let data = assignData && Array.isArray(assignData[key]) ? assignData[key].join(sepValue) : '';
-
                 if (this.coms[key]) {
                     if (key !== field.name) {
                         this.set({[key]: data});
@@ -618,7 +600,6 @@ function assignDataGet(data, resData): obj {
         if (tools.isEmpty(v)) {
             return;
         }
-        // let assignD : obj = {};
         keyArr.forEach((key) => {
             if (!assignData[key]) {
                 assignData[key] = [];
