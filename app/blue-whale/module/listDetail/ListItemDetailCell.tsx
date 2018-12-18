@@ -170,7 +170,6 @@ export class ListItemDetailCell extends Component {
                                             type: this.para.field.link.type
                                         });
                                     } else {
-                                        // this.downloadFile(BW.CONF.siteUrl + this.currentFile.addr);
                                         let fileName = this.currentFile.filename,
                                             fileAddr = this.currentFile.addr,
                                             nameArr = fileName.split('.'),

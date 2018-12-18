@@ -361,7 +361,7 @@ export class MbListModule extends Component {
                     case 'countDown': {
                         let time: string = item[layout['countDown']];
                         if (tools.isNotEmpty(time)) {
-                            time = time.replace(/\-/g, '/');
+                            time = time.replace(/-/g, '/');
                             itemObj['countDown'] = new Date(time).getTime();
                         }
                     }
