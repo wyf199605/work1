@@ -39,7 +39,7 @@ export class ListItemDetail {
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
-            if (!tools.isMb){
+            if (!tools.isMb) {
                 cellsWrapper.classList.add('no-group');
             }
             fields.forEach(field => {
@@ -84,7 +84,7 @@ export class ListItemDetail {
         </div>;
         wrapper.appendChild(groupWrapper);
         groupFields.forEach(field => {
-            let className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber)-1],
+            let className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber) - 1],
                 type = DetailModal.getType(field.dataType || field.atrrs.dataType || '');
             if (~['textarea', 'file', 'img'].indexOf(type)) {
                 className = 'one-column';
@@ -151,7 +151,7 @@ export class ListItemDetail {
 
     // 上一页下一页加载数据
     changePage(page?: number) {
-        if(this.para.uiType === 'detail'){
+        if (this.para.uiType === 'detail') {
             if (tools.isNotEmpty(page)) {
                 if (page > 0) {
                     if (page > this.totalNumber) {
@@ -169,7 +169,7 @@ export class ListItemDetail {
             this.initDetailData().then(data => {
                 this.render(data);
             });
-        }else{
+        } else {
             this.scrollToTop();
             this.initDetailData().then(data => {
                 this.render(data);
@@ -189,6 +189,7 @@ export class ListItemDetail {
     initDetailButtons() {
         let buttons: R_Button[] = this.para.fm.subButtons,
             self = this;
+
         // 更多按钮
         function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement, isPage: boolean) {
             new Button({
@@ -459,6 +460,10 @@ export class ListItemDetail {
             }
         }
         return v;
+    }
+
+    getCells(): ListItemDetailCell[] {
+        return [...Object.values(this.cells)];
     }
 
     destroy() {
