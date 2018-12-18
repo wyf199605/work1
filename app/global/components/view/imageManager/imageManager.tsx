@@ -38,32 +38,94 @@ export class ImageManager extends Component{
 
     protected imgShowEvent = (() => {
         let handler = null,
+            width = 100,
             current = -1,
             img = <img src="" alt=""/>,
+            inputBox = new InputBox({}),
+            leftCount = <span>{current}</span>,
+            scaleEl = <span>{width}%</span>,
             delEl = <i className="app-shanchu appcommon"/>;
 
-        let modal = new Modal({
-            header: {
-                title: '图片预览',
-                rightPanel: delEl
-            },
-            isShow: false,
-            body: <div className="img-manager-show">
-                {img}
-            </div>
-        });
+        if(tools.isPc){
+            inputBox.addItem(<Button tip="上一页" icon="arrow-left" onClick={() => {
+                showImg(current - 1);
+            }}/>);
+            inputBox.addItem(<Button tip="下一页" icon="arrow-right" onClick={() => {
+                showImg(current + 1);
+            }}/>);
+            inputBox.addItem(<Button tip="放大" icon="unie038" color="info" onClick={() => {
+                imgScale(width + 10);
+            }}/>);
+            inputBox.addItem(<Button tip="缩小" icon="suoxiao" color="info" onClick={() => {
+                imgScale(width - 10);
+            }}/>);
+            inputBox.addItem(<Button tip="删除" icon="app-shanchu" iconPre="appcommon" color="error" onClick={() => {
+                delImg(false, () => {
+                    let index = current > 0 ? current - 1 : current + 1;
+                    if(this.images.length === 0){
+                        modal.isShow = false;
+                    }else{
+                        showImg(index);
+                    }
+                });
+            }}/>);
+        }else{
+            d.on(delEl, 'click', () => {
+                delImg();
+            });
+        }
 
-        d.on(delEl, 'click', () => {
+        let delImg = (isHide = true, callback?: Function) => {
             Modal.confirm({
                 msg: '是否删除该图片',
                 callback: (flag) => {
                     if(flag){
-                        modal.isShow = false;
+                        isHide && (modal.isShow = false);
                         this.delImg(current);
                         this.trigger(ImageManager.EVT_IMG_DELETE, current);
+                        callback && callback();
                     }
                 }
             })
+        };
+
+        let imgScale = (scale: number) => {
+            width = scale;
+            width = Math.max(width, 30);
+            width = Math.min(width, 200);
+            img.style.width = width + '%';
+            scaleEl.innerHTML = width + '%';
+        };
+        let showImg = (index: number) => {
+            if(index < 0){
+                Modal.toast('已经是第一张了');
+                return
+            }
+            if(index >= this.images.length){
+                Modal.toast('已经是最后一张了');
+                return
+            }
+            current = index;
+            leftCount.innerHTML = current + 1;
+            img.setAttribute('src', this.images[current]);
+        };
+
+        let modal = new Modal({
+            header: {
+                title: '图片预览',
+                rightPanel: tools.isPc ? null : delEl.constructor
+            },
+            container: document.body,
+            isShow: false,
+            className: tools.isPc ? 'full-screen-fixed img-manager-show-modal' : 'img-manager-show-modal',
+            isBackground: false,
+            body: <div className="img-manager-show">
+                {img}
+            </div>,
+            footer: {
+                rightPanel: tools.isPc ? inputBox : null,
+                leftPanel: <span>第 {leftCount} 张，放大比例{scaleEl}</span>
+            }
         });
         return {
             on: () => {
@@ -71,9 +133,8 @@ export class ImageManager extends Component{
                     let el = ev.target as HTMLElement,
                         parent = d.closest(el, '.manager-img-item'),
                         url = parent.dataset['url'];
-                    current = parseInt(parent.dataset['index']);
                     modal.isShow = true;
-                    img.setAttribute('src', url);
+                    showImg(parseInt(parent.dataset['index']));
                 });
             },
             off: () => {

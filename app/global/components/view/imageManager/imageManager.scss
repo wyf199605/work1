@@ -51,9 +51,17 @@
     }
   }
 }
+.fl-pc{
+  .img-manager-show-modal{
+    .modal-body{
+      padding-bottom: 100px!important;
+    }
+  }
+}
 
 .img-manager-show{
   width: 100%;
+  height: 100%;
   overflow: auto;
 
   img{

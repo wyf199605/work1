@@ -68,7 +68,13 @@ export class Modal extends Component {
     private modalScreen: HTMLElement;   //模态框背景层
     private drag: Drag; //控制拖拉开关
     private _modalHeader: ModalHeader; // 模态框头部
-    private closeMsg: string;
+    private _closeMsg: string;
+    get closeMsg(){
+        return this._closeMsg;
+    }
+    set closeMsg(closeMsg: string){
+        this._closeMsg = closeMsg;
+    }
     get modalHeader() {
         return this._modalHeader
     }
@@ -96,7 +102,7 @@ export class Modal extends Component {
         let keyCode = e.keyCode || e.which || e.charCode;
 
         if (keyCode === 27) {
-            this.isShow = false;
+            this.modalHidden();
         }
     };
 
@@ -208,18 +214,22 @@ export class Modal extends Component {
         // 为头部关闭按钮绑定事件
         let close = this._modalHeader.modalCloseEl;
         close && d.on(close, 'click', () => {
-            if(this.closeMsg){
-                Modal.confirm({
-                    msg: this.closeMsg,
-                    callback: (flag) => {
-                        flag && (this.isShow = false);
-                    }
-                })
-            }else{
-                this.isShow = false;
-            }
+            this.modalHidden();
         });
         this._header = header;
+    }
+
+    protected modalHidden(){
+        if(this.closeMsg){
+            Modal.confirm({
+                msg: this.closeMsg,
+                callback: (flag) => {
+                    flag && (this.isShow = false);
+                }
+            })
+        }else{
+            this.isShow = false;
+        }
     }
 
     // private get header() {
@@ -686,7 +696,7 @@ export class Modal extends Component {
         //为遮罩层设置点击后的关闭事件，如果没有遮罩层，则不关闭
         if (this._isBackground) {
             d.on(this.modalScreen, 'click', () => {
-                this.isShow = false;
+                this.modalHidden();
             });
         }
     }
@@ -787,7 +797,7 @@ export class Modal extends Component {
             cancelBtn.onClick = callback;
         } else {
             cancelBtn.onClick = () => {
-                this.isShow = false;
+                this.modalHidden()
             };
         }
         this._onCancel = callback;

@@ -1,10 +1,11 @@
 /// <amd-module name="BwLayoutImg"/>
 
 import {ImageManager} from "../../../global/components/view/imageManager/imageManager";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {IModal, Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwUploader, IBwUploaderPara} from "./bwUploader";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {Button} from "../../../global/components/general/button/Button";
+import tools = G.tools;
 
 export interface IBwLayoutImgPara extends IBwUploaderPara{
     onFinish?: (files: File[]) => Promise<any>;
@@ -68,19 +69,28 @@ export class BwLayoutImg{
                 this.modalShow = false;
             });
         }}/>);
-        this.modal = new Modal({
+        let para: IModal = {
             body: <div className="bw-image-layout-wrapper"/>,
             header: {
                 title: '图片管理',
-                rightPanel: inputBox
+                rightPanel: tools.isPc ? null : inputBox,
+                isFullScreen: tools.isPc
             },
             isShow: false,
             closeMsg: '是否放弃选中的图片？',
             onClose: () => {
                 this.files = [];
                 this.imgManager.set([]);
+            },
+            footer:{
+                rightPanel: tools.isPc ? inputBox : null
             }
-        });
+        };
+        if(tools.isPc){
+            para.width = '700px';
+            para.height = '550px';
+        }
+        this.modal = new Modal(para);
     }
 
     protected initImgManager(){
