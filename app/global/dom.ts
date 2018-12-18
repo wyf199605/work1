@@ -1208,7 +1208,7 @@ export const d = {
     //     destroy?(old: K): void
     // });
 
-    diff<T, K>(newSet: T[], oldSet: K[], operate: { create?(now: T): void, replace?(now: T, old: K): void, destroy?(old: K): void }){
+    diff<T, K>(newSet: T[], oldSet: K[], operate: { create?(now: T, index: number): void, replace?(now: T, old: K, index: number): void, destroy?(old: K, index: number): void }){
         let i = 0,
             {create, replace, destroy} = operate;
 
@@ -1223,12 +1223,12 @@ export const d = {
                 o: K = oldSet[i];
 
             if(hasNew && hasOld) {
-                replace && replace(n, o);
+                replace && replace(n, o, i);
 
             }else if(hasNew && !hasOld) {
-                create && create(n);
+                create && create(n, i);
             }else if(!hasNew && hasOld) {
-                destroy && destroy(o);
+                destroy && destroy(o, i);
             }
 
             i++;

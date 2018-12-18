@@ -116,6 +116,10 @@ export class BwUploader extends FormCom {
         });
     }
 
+    click(){
+        this.wrapper && this.wrapper.click();
+    }
+
     protected getFile(callback: (file: File[]) => void , error?: Function){
         switch (this.uploadType){
             case "file":
@@ -173,7 +177,7 @@ export class BwUploader extends FormCom {
     }
 
     // 调用方法上传暂存文件
-    upload(){
+    upload(files: File[] = this.temFiles){
         this.loading && this.loading.show();
         this._isFinish = false;
         this.wrapper.classList.remove('error');
@@ -181,9 +185,9 @@ export class BwUploader extends FormCom {
         if(!this.multi){
             this.files = [];
         }
-        let files = this.multi ? this.temFiles : this.temFiles[0],
-            promises: Promise<any>[] = [];
-        files && tools.toArray(files).forEach((file) => {
+        let promises: Promise<any>[] = [];
+        files = this.multi ? files : tools.toArray(files[0]);
+        files && files.forEach((file) => {
             promises.push(this.fileUpload.upload(file).then((data) => {
                 console.log(data);
                 this.files.push(file);
