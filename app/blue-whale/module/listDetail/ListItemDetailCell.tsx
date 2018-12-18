@@ -8,9 +8,7 @@ import d = G.d;
 import {ActionSheet} from "../../../global/components/ui/actionSheet/actionSheet";
 import {ListItemDetail} from "./ListItemDetail";
 import sys = BW.sys;
-import {ImgModalMobile} from "../../common/ImgModalMobile";
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
-import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 import {ContextMenu} from "../../../global/components/ui/actionSheet/contextMenu";
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
@@ -246,7 +244,7 @@ export class ListItemDetailCell extends Component {
     })();
 
     private imgEvent = (() => {
-        let imgOption = (e) => {
+        let imgOption = () => {
             let imgs = this.imgs || [];
             let imgData: ImgModalPara = {
                 img: ListItemDetailCell.getBigPicture(imgs),

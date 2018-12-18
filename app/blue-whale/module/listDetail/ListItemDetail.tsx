@@ -4,7 +4,7 @@ import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/act
 import {BwRule} from "../../common/rule/BwRule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
+import {ListItemDetailCell} from "./ListItemDetailCell";
 import {Button} from "../../../global/components/general/button/Button";
 import {DetailModal} from "./DetailModal";
 import tools = G.tools;
@@ -303,7 +303,7 @@ export class ListItemDetail {
             switch (btn.subType) {
                 case 'update_save' :
                 case 'insert_save':
-                    let isAdd = btn.subType === 'update_save' ? false : true;
+                    let isAdd = btn.subType !== 'update_save';
                     if (!isAdd && self.totalNumber === 0 && self.para.uiType === 'detail') {
                         Modal.alert('没有数据可以编辑!');
                         return;
