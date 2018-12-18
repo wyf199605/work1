@@ -529,7 +529,7 @@ export class Modal extends Component {
                 this.modalScreen.classList.add('lock-active-in');
             }
         } else {
-            this.wrapper.blur();
+            this.wrapper && this.wrapper.blur();
 
             if (this._onClose) {
                 this._onClose();
