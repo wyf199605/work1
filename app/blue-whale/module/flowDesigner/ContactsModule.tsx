@@ -9,13 +9,16 @@ import sys = BW.sys;
 interface IContactsModule {
     field: R_Field;
     onGetData: (data:obj[]) => void;
+    onDestroy?: () => void;
 }
 
 export class ContactsModule {
     protected contactModal: Modal;
     public iframe;
+    private para: IContactsModule = null;
 
     constructor(para: IContactsModule) {
+        this.para = para;
         let captionName = para.field.name,
             href = para.field.dataAddr ? BW.CONF.siteUrl + BwRule.reqAddr(para.field.dataAddr) : '';
         if (tools.isMb) {
@@ -53,6 +56,7 @@ export class ContactsModule {
             isOnceDestroy: true,
             zIndex: 2000,
             onClose:()=>{
+                this.para && this.para.onDestroy();
                 this.destroy();
             }
         });

@@ -9,6 +9,7 @@ import {User} from "../../../global/entity/User";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
 import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
+import {G_FILE_MD5, G_MD5} from "../../../global/utils/md5";
 
 type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
@@ -39,7 +40,7 @@ export class BwUploader extends FormCom {
 
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
     protected maxSize: number;  // 上传文件大小，-1为不限制
-    protected chunkSize = 1024 * 1024;  // 分块大小 5M
+    protected chunkSize = 2 * 1024 * 1024;  // 分块大小 5M
     protected nameField: string;
     protected thumbField: string;
     // protected formData: () => obj;  // 上传附带数据
@@ -223,7 +224,7 @@ export class BwUploader extends FormCom {
             let reader = new FileReader();
             reader.onload = (event) => {
                 let binary = (event.target as any).result;
-                resolve(tools.md5(binary).toString());
+                resolve(G_FILE_MD5(binary));
             };
             reader.onerror = (e) => {
                 reject(e);
@@ -236,51 +237,49 @@ export class BwUploader extends FormCom {
     protected beforeSendFile(file: CustomFile): Promise<obj> {
         return new Promise((resolve, reject) => {
             this.getFileMd5(file).then(md5 => {
-                require(['md5'],(md5Fn) => {
-                    let userid = User.get().userid,
-                        md5Code = md5,
-                        uniqueFileName = md5Fn('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
-                    this.fileUpload.formData = () => {
-                        return {
-                            userId: userid,
-                            md5: md5Code,
-                        }
-                    };
-                    let ajaxData: obj = {
-                        status: "md5Check"
-                        , md5: md5Code
-                        , nameField: this.nameField
-                        , file_name: file.name
-                        , name: uniqueFileName
-                    };
-
-                    if (this.thumbField) {
-                        ajaxData.smallField = this.thumbField;
+                let userid = User.get().userid,
+                    md5Code = md5.toUpperCase(),
+                    uniqueFileName = G_MD5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
+                this.fileUpload.formData = () => {
+                    return {
+                        userId: userid,
+                        md5: md5Code,
                     }
+                };
+                let ajaxData: obj = {
+                    status: "md5Check"
+                    , md5: md5Code
+                    , nameField: this.nameField
+                    , file_name: file.name
+                    , name: uniqueFileName
+                };
 
-                    Ajax.fetch(this.uploadUrl, {
-                        type: "POST"
-                        , traditional: true
-                        , data: ajaxData
-                        // , cache: false
-                        , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
-                        , dataType: "json"
+                if (this.thumbField) {
+                    ajaxData.smallField = this.thumbField;
+                }
 
-                    }).then(function ({response}) {
-                        if(response.ifExist){
-                            reject(response);
-                        }else{
-                            resolve({
-                                md5: md5Code,
-                                uniqueFileName,
-                            });
-                        }
-                    }).catch(() => {
+                Ajax.fetch(this.uploadUrl, {
+                    type: "POST"
+                    , traditional: true
+                    , data: ajaxData
+                    // , cache: false
+                    , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
+                    , dataType: "json"
+
+                }).then(function ({response}) {
+                    if(response.ifExist){
+                        reject(response);
+                    }else{
                         resolve({
                             md5: md5Code,
-                            uniqueFileName
+                            uniqueFileName,
                         });
-                    })
+                    }
+                }).catch(() => {
+                    resolve({
+                        md5: md5Code,
+                        uniqueFileName
+                    });
                 })
 
             }).catch(() => reject());
