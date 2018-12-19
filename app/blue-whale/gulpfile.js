@@ -119,7 +119,8 @@ gulp.task('js', function () {
         'query/queryModule.pc',
         'query/queryConfig',
         'query/asynQuery',
-        'query/horizontalFormFactory'
+        'query/horizontalFormFactory',
+        'query/customModule'
     ], 'query.pc.js');
 
     // mb编辑模块

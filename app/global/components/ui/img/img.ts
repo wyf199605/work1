@@ -27,7 +27,6 @@ export const ImgModal = (()=>{
             require(['photoSwipe','photoSwipeUi'], (photoSwipe, PhotoSwipeUI_Default) => {
                 downAddr = para.downAddr;
                 onDownload = para.onDownload ;
-
                 if (!wrapper) {
                     //加载tpl
                     wrapper  = d.create(imgModalTpl);
@@ -46,7 +45,6 @@ export const ImgModal = (()=>{
                 let pswpElement = d.query('.pswp', container),
                     items = [],
                     len = para.img.length;
-
                 for (let i = 0; i <= len - 1; i++) {
                     items.push({
                         src: para.img[i],
@@ -79,6 +77,8 @@ export const ImgModal = (()=>{
                 gallery.listen('close', function () {
                     gallery && gallery.close();
                     gallery = null;
+                    d.remove(d.query('.pswp'));
+                    wrapper = null;
                     if (tools.isMb){
                         document.body.style.overflow = '';
                     }
