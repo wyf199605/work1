@@ -9,6 +9,7 @@ import tools = G.tools;
 
 export interface IBwLayoutImgPara extends IBwUploaderPara{
     onFinish?: (files: File[]) => Promise<any>;
+    isShow?: boolean;
 }
 
 export class BwLayoutImg{
@@ -25,6 +26,7 @@ export class BwLayoutImg{
         this.initModal();
         this.initImgManager();
 
+        let isShow = tools.isEmpty(para.isShow) ? true : para.isShow;
         para.multi = false;
         para.autoUpload = false;
         para.accept = {
@@ -44,6 +46,11 @@ export class BwLayoutImg{
                 Modal.alert('获取图片失败');
             })
         });
+        !isShow && this.bwUpload.wrapper.classList.add('hide');
+    }
+
+    click(){
+        this.bwUpload && this.bwUpload.click();
     }
 
     getUrls(): string[]{
@@ -121,5 +128,14 @@ export class BwLayoutImg{
 
     upload(){
         this.bwUpload.upload();
+    }
+
+    destroy(){
+        this.bwUpload && this.bwUpload.destroy();
+        this.modal && this.modal.destroy();
+        this.imgManager && this.imgManager.destroy();
+        this.bwUpload = null;
+        this.modal = null;
+        this.imgManager = null;
     }
 }
