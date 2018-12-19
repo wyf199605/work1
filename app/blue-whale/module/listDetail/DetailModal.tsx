@@ -296,7 +296,7 @@ export class DetailModal {
     }
 
     static createFormWrapper(field: R_Field, wrapper: HTMLElement, className?: string): HTMLElement {
-        if (field.comType === 'file' || field.comType === 'img') {
+        if (field.comType === 'newFile' || field.comType === 'image') {
             return wrapper;
         } else {
             let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';

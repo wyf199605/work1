@@ -23,11 +23,19 @@ namespace G{
 
         static DT_MUL_IMAGE = '22'; // 多图
 
+        static DT_UNI_IMAGE = '27'; // 新单图
+
+        static DT_UNI_MUL_IMAGE = '28'; // 新多图
+
         static DT_HTML = '30'; // 超文本
 
         static DT_MULTI_TEXT = '31'; // 显示时保留空格与换行的文本
 
         static DT_FILE = '43'; // 文件
+
+        static DT_UNI_FILE = '47'; // 新单附件
+        
+        static DT_UNI_MUL_FILE = '48'; // 新多附件
 
         static isNumber(dataType: string) {
             return [Rule.DT_NUMBER, Rule.DT_MONEY, Rule.DT_PERCENT].indexOf(dataType) >= 0
