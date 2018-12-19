@@ -73,7 +73,7 @@ export class RangeInputItem extends FormCom {
             case 5: {
                 wrapper = <div className="query-range-input-item new-query-input-wrapper">
                     {this.input = <input type="text" placeholder={placeStr}/>}
-                    <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
+                    {tools.isMb && <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>}
                 </div>;
             }
                 break;

@@ -199,5 +199,6 @@ export class NewQueryModalMb {
         this.modal.destroy();
         this.para = null;
         this.queryWrapper = null;
+        this._items = null;
     }
 }
