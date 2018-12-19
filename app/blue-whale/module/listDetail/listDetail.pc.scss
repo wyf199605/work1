@@ -281,9 +281,15 @@
       }
       .form-wrapper {
         background-color: #ffffff;
-        height: 100%;
         padding-left: 0;
         height: auto;
+        &.no-group{
+          display: flex;
+          display: -webkit-flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+        }
         .accessory-wrapper {
           width: 100%;
           height: 80px;

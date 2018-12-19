@@ -47,7 +47,6 @@ export class BwMbList extends BasicPage {
             }
                 break;
         }
-
     }
 
 }

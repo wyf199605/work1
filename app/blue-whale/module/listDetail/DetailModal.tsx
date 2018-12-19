@@ -31,10 +31,14 @@ export class DetailModal {
             self = this;
         para.isNotDetail && BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
+            tools.isPc && formWrapper.classList.add('no-group');
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
                 if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
                     continue;
+                }
+                if (f.comType === 'file'){
+                    f.comType = 'newFile';
                 }
                 let field = {
                     dom: DetailModal.createFormWrapper(f, formWrapper),
@@ -238,6 +242,9 @@ export class DetailModal {
             }
             if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
                 continue;
+            }
+            if (f.comType === 'file'){
+                f.comType = 'newFile';
             }
             let field = {
                 dom: DetailModal.createFormWrapper(f, cellsWrapper, className),
