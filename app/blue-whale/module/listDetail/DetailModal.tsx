@@ -6,6 +6,7 @@ import tools = G.tools;
 import {NewFormEdit, NewFormFactory} from "./NewFormFactory";
 import {DetailCellType} from "./ListItemDetailCell";
 import {ListItemDetail} from "./ListItemDetail";
+import {EditModule} from "../edit/editModule";
 
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
@@ -19,15 +20,16 @@ interface IDetailModal extends EditPagePara {
 }
 
 export class DetailModal {
-    private editModule: NewFormFactory;
+    private editModule: EditModule;
 
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
-        let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData},
+        let emPara: EditModulePara = {fields: [], defaultData: this.para.defaultData},
             formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo,
             self = this;
+        BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
@@ -37,6 +39,7 @@ export class DetailModal {
                 let field = {
                     dom: DetailModal.createFormWrapper(f, formWrapper),
                     field: f,
+                    data: this.para.defaultData,
                     onExtra: (data, relateCols, isEmptyClear = false) => {
                         let com = self.editModule.getDom(f.name);
                         for(let key of relateCols){
@@ -171,7 +174,7 @@ export class DetailModal {
                 }
             });
         }
-        this.editModule = new NewFormFactory(emPara);
+        this.editModule = new EditModule(emPara);
         if (para.isAdd) {
             if (tools.isNotEmpty(para.fm.defDataAddrList)) {
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response}) => {

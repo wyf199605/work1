@@ -48,12 +48,33 @@ export class BwRule extends Rule {
     }
 
 
-    static isTime(dataType: string) {
+    static isTime(dataType: string): boolean {
         return dataType === BwRule.DT_DATETIME || dataType === BwRule.DT_TIME
     }
 
-    static isImage(dataType: string) {
-        return dataType === BwRule.DT_MUL_IMAGE || dataType === BwRule.DT_IMAGE || dataType === BwRule.DT_SIGN;
+    static isImage(dataType: string): boolean {
+        return [
+            BwRule.DT_MUL_IMAGE,
+            BwRule.DT_IMAGE,
+            BwRule.DT_SIGN,
+            BwRule.DT_UNI_IMAGE,
+            BwRule.DT_UNI_MUL_IMAGE
+        ].some((type) => dataType === type);
+    }
+
+    static isMulImage(dataType: string): boolean {
+        return [
+            BwRule.DT_MUL_IMAGE,
+            BwRule.DT_UNI_MUL_IMAGE
+        ].some((type) => dataType === type);
+    }
+
+    static isFile(dataType: string): boolean {
+        return [
+            BwRule.DT_FILE,
+            BwRule.DT_UNI_FILE,
+            BwRule.DT_UNI_MUL_FILE
+        ].some((type) => dataType === type);
     }
 
     static Ajax = class extends Ajax {
@@ -612,10 +633,14 @@ export class BwRule extends Rule {
                     col.multiValue = col.atrrs.multValue; //单选或多选
                     col.relateFields = col.assignSelectFields;
 
-                } else if (col.atrrs && col.atrrs.dataType == '43') {
+                } else if (col.atrrs && BwRule.isFile(col.atrrs.dataType)) {
                     //文件上传
-                    col.comType = 'file';// --------------
-                    col.relateFields = ['FILE_ID'];// --------------
+                    if(col.atrrs.dataType == '43'){
+                        col.comType = 'file';// --------------
+                        col.relateFields = ['FILE_ID'];// --------------
+                    }else{
+                        col.comType = 'newFile'
+                    }
 
                 } else if (col.atrrs && col.atrrs.dataType == '30') {
 
@@ -630,6 +655,8 @@ export class BwRule extends Rule {
                     //日期时间控件
                     col.comType = 'datetime';// --------------
 
+                } else if(col.atrrs && BwRule.isImage(col.atrrs.dataType)){
+                    col.comType = 'image';
                 } else {
                     col.comType = 'input';// --------------
                 }

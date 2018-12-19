@@ -22,8 +22,8 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
 import {BwUploader} from "../uploadModule/bwUploader";
-import {Loading} from "../../../global/components/ui/loading/loading";
 import {UploadImages} from "../uploadModule/uploadImages";
+import {Accessory} from "../uploadModule/accessory";
 
 interface ComInitFun{
     (para: ComInitP): FormCom
@@ -35,11 +35,13 @@ export class EditModule {
     private nameFields: objOf<ComInitP> = {};
 
     private ajax = new BwRule.Ajax();
+    protected defaultData: obj = {};
 
     get assignPromise() {
         return this.ajax.promise;
     }
     constructor(private para: EditModulePara) {
+        this.defaultData = para.defaultData || {};
         if (Array.isArray(para.fields)) {
             para.fields.forEach((f) => {
                 this.nameFields[f.field.name] = f;
@@ -164,6 +166,48 @@ export class EditModule {
                 onSet: this.getAssignSetHandler(p.field),
                 onGetData: (dataArr: obj[], otherField: string) => {
                     this.pickOnGet(p, dataArr, otherField);
+                }
+            });
+        },
+
+        newFile: (p): FormCom => {
+            let upperKeyData = {};
+            return new Accessory({
+                nameField: p.field.name,
+                container: p.dom,
+                uploadUrl: BW.CONF.ajaxUrl.fileUpload,
+                field: p.field,
+                pageData: p.data,
+                onComplete: (response) => {
+                    let data = response.data,
+                        type = p.field.dataType || p.field.atrrs.dataType;
+                    // fileId 值加入额外数据中
+                    if (type === '43') {
+                        for (let field in data) {
+                            let {key, value} = data[field];
+                            upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
+                        }
+                        p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
+                        this.comsExtraData[p.field.name] = {};
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: upperKeyData[name]});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = data[name];
+                            }
+                        }
+                    }
+                },
+                onDelete: () => {
+                    if (tools.isNotEmpty(upperKeyData)) {
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: ''});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = '';
+                            }
+                        }
+                    }
                 }
             });
         },
@@ -404,20 +448,17 @@ export class EditModule {
 
         let assign2extra = (field: R_Field, assignData: objOf<any[]>) => {
             // assign 设置
-            let sepValue = ';',
-                selectFields = field.assignSelectFields,
+            let selectFields = field.assignSelectFields,
                 fieldName = field.name;
             // debugger;
             Array.isArray(selectFields) && selectFields.forEach((key) => {
                 let data = assignData[key];
-                if( key === fieldName){
+                if (key === fieldName) {
                     return;
                 }
 
                 if (this.coms[key]) {
-
                     this.set({[key]: data});
-
                 } else {
                     //assign 值加入额外数据中
                     if (!this.comsExtraData[fieldName]) {
@@ -530,6 +571,7 @@ export class EditModule {
     public get(name?: string) {
         let pageData:obj = {},
             coms = this.coms,
+            nameField = this.nameFields,
             extras = this.comsExtraData;
 
         let allDateGet = (name: string) => {
@@ -562,8 +604,12 @@ export class EditModule {
         }
 
         // 返回所有数据
-        for (let n in coms) {
-            pageData = tools.obj.merge(pageData, allDateGet(n));
+        for (let name in nameField) {
+            if(coms[name]){
+                pageData = tools.obj.merge(pageData, allDateGet(name));
+            }else{
+                pageData = tools.obj.merge(pageData, {[name]: this.defaultData[name] || ''});
+            }
         }
         return pageData;
     }
