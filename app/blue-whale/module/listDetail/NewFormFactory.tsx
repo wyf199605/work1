@@ -152,7 +152,7 @@ export class NewFormFactory {
                 }
             });
         },
-        file: (p): FormCom => {
+        new_file: (p): FormCom => {
             let upperKeyData = {};
             return new Accessory({
                 nameField: p.field.name,
