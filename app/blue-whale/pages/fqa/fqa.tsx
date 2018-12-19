@@ -4,6 +4,8 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Panel} from "../../../global/components/view/panel/Panel";
 import tools = G.tools;
 import d = G.d;
+import {ShellAction} from "../../../global/action/ShellAction";
+import sys = BW.sys;
 
 export interface IFqaModalPara {
     container?: HTMLElement,
@@ -12,6 +14,7 @@ export interface IFqaModalPara {
 export class FqaModal {
     protected modal: Modal;
     constructor(para: IFqaModalPara) {
+        FqaModal.getDevice();
         let body = <div className="fqa-content"/>;
         FqaModal.initPanel(body);
         this.modal = new Modal({
@@ -57,6 +60,10 @@ export class FqaModal {
                 {
                     title: '遇到手机/手机号码更换导致登录失败？',
                     content: FqaModal.initLoginErrorTap(),
+                },
+                {
+                    title : '如果都无法解决注册问题，查看该选项',
+                    content : <div> </div>
                 }
             ],
             onChange: (data) => {
@@ -67,6 +74,9 @@ export class FqaModal {
                         img.src = img.dataset['src'];
                         img.removeAttribute('data-src');
                     });
+                }
+                if(data.index === 5){
+                    item.content = this.initDeviceMsg();
                 }
             }
         });
@@ -146,7 +156,46 @@ export class FqaModal {
             <p>需要找人事更改手机号码为1800000000，然后才能用1800000000去注册。</p>
         </div>;
     }
-    
+
+    static deviceData = {};
+    static getDevice() {
+        if (sys.os === 'ip') {
+            let shell:any = ShellAction.get();
+            shell.device().getInfo({callback:(e:CustomEvent) => {
+                    let json = JSON.parse(e.detail);
+                    if (json.success) {
+                        this.deviceData = json.msg;
+                    } else {
+                        Modal.toast(json.msg);
+                    }
+                }});
+        } else if (sys.os === 'ad') {
+            let shell:any = ShellAction.get();
+            let data = shell.device().getInfo().data;
+            if(data.success) {
+                this.deviceData = (data.msg);
+            } else {
+                Modal.toast(data.msg);
+            }
+        } else if('AppShell' in window) {
+            this.deviceData = G.Shell.base.device.data;
+        } else if ('BlueWhaleShell' in window) {
+            let shell:any = ShellAction.get();
+            this.deviceData = shell.device().getInfo().data;
+        }
+    }
+    static initDeviceMsg() : HTMLElement{
+        let device = this.deviceData as any;
+        return <div>
+            <p>请截图以下信息，发送给后台人员(QQ:303200649)或测试群</p>
+            <p>uuid：{device.uuid}</p>
+            <p>os_name：{device.name}</p>
+            <p>os_version：{device.version}</p>
+            <p>vendor：{device.vendor}</p>
+            <p>model：{device.model}</p>
+        </div>
+    }
+
     static initUrl(url){
         return G.requireBaseUrl + url;
     }
