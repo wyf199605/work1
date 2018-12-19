@@ -551,7 +551,19 @@ export class QueryBuilder {
         }
 
         if('input1' in control &&  'input2' in control){
-            containers.input1.classList[control.input1 && control.input2 ? 'add' : 'remove']('has-two-input')
+            containers.input1.classList[control.input1 && control.input2 ? 'add' : 'remove']('has-two-input');
+
+            if(!coms['input1']){
+                return;
+            }
+
+            if(BwRule.DT_NUMBER === conf.atrrs.dataType){
+                coms['input1'].inputType = 'number';
+                coms['input2'].inputType = 'number';
+            }else {
+                coms['input1'].inputType = 'text';
+                coms['input2'].inputType = 'text';
+            }
         }
     }
 
