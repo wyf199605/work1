@@ -4,6 +4,7 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {IQueryItem, IResult, NewQueryItem} from "../newQuery/NewQueryItem";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import tools = G.tools;
 
 interface ICustom extends IComponentPara {
     settingValue: string;

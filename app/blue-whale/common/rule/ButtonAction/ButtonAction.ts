@@ -382,8 +382,6 @@ export class ButtonAction {
         if (type === 3 || type === 5) {
             if (len > 6) {
                 width = 100 * 10;
-            } else {
-                width = 180 * len;
             }
         } else {
             width = 260;
