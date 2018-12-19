@@ -3,7 +3,6 @@
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import tools = G.tools;
-import {NewFormEdit, NewFormFactory} from "./NewFormFactory";
 import {DetailCellType} from "./ListItemDetailCell";
 import {ListItemDetail} from "./ListItemDetail";
 import {EditModule} from "../edit/editModule";
@@ -277,7 +276,6 @@ export class DetailModal {
                                             }
                                         })
                                     }
-
                                 })
                             }
                         }
@@ -339,7 +337,7 @@ export class DetailModal {
         let type: DetailCellType;
         if (t === '18') {
             type = 'textarea';
-        } else if (t === '20' || t === '27' || t === '28') {
+        } else if (t === '20' || t === '26' || t === '27' || t === '28') {
             type = 'img';
         } else if (t === '43' || t === '47' || t === '48') {
             type = 'file';

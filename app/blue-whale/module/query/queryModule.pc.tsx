@@ -14,7 +14,7 @@ export = class QueryModulePc extends QueryModule {
     private modal: Modal;
     private tab: Tab;
     private queryDom: HTMLElement;
-    private customModule:CustomModule;
+    private customModule: CustomModule;
     // private cols: R_Field[];
     // private optionDom: HTMLElement;
 
@@ -71,11 +71,24 @@ export = class QueryModulePc extends QueryModule {
                 rightPanel: rightBox
             }
         });
-
-        let tab = [{
-            title: '条件查询',
-            dom: this.queryDom
-        }];
+        let tab = [];
+        if (tools.isNotEmpty(para.qm.mobileSetting) && tools.isNotEmpty(para.qm.mobileSetting.settingValue)) {
+            this.customModule = new CustomModule({
+                settingValue: para.qm.mobileSetting.settingValue
+            });
+            tab = [{
+                title: '快速查询',
+                dom: this.customModule.wrapper
+            }, {
+                title: '条件查询',
+                dom: this.queryDom
+            }];
+        } else {
+            tab = [{
+                title: '条件查询',
+                dom: this.queryDom
+            }];
+        }
         //是否有选项
         if (para.qm.hasOption === true) {
             this.initQueryConf();
@@ -84,15 +97,7 @@ export = class QueryModulePc extends QueryModule {
                 dom: this.optionDom
             });
         }
-        if (tools.isNotEmpty(para.qm.mobileSetting) && tools.isNotEmpty(para.qm.mobileSetting.settingValue)) {
-            this.customModule = new CustomModule({
-                settingValue:para.qm.mobileSetting.settingValue
-            });
-            tab.push({
-                title: '快速查询',
-                dom: this.customModule.wrapper
-            });
-        }
+
         this.tab = new Tab({
             tabParent: this.modal.bodyWrapper,
             panelParent: this.modal.bodyWrapper,

@@ -635,13 +635,13 @@ export class BwRule extends Rule {
 
                 } else if (col.atrrs && BwRule.isFile(col.atrrs.dataType)) {
                     //文件上传
-                    if(col.atrrs.dataType == '43'){
+                    if(tools.isEmpty(col.fileInfo)){
                         col.comType = 'file';// --------------
                         col.relateFields = ['FILE_ID'];// --------------
                     }else{
-                        col.comType = 'newFile'
+                        col.comType = 'newFile';
+                        col.relateFields = ['FILE_ID'];// --------------
                     }
-
                 } else if (col.atrrs && col.atrrs.dataType == '30') {
 
                     //富文本

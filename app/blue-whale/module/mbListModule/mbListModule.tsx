@@ -115,9 +115,9 @@ export class MbListModule extends Component {
                 box.children = buttons;
             }
         }
+        let self = this;
 
         function getFormFields(url: string) {
-            let self = this;
             BwRule.Ajax.fetch(url, {
                 loading: {
                     msg: '加载中,请稍后...',
@@ -128,7 +128,7 @@ export class MbListModule extends Component {
                 new DetailModal(Object.assign({}, {
                     fm: {
                         caption: element.caption,
-                        fields: Form.Cols.colTransfor(response.uiType, element.fields)
+                        fields: element.fields
                     }
                 }, {
                     defaultData: {},
@@ -138,7 +138,7 @@ export class MbListModule extends Component {
                         return new Promise((resolve) => {
                             ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
                                 resolve();
-                            },self.para.url || '');
+                            }, self.para.url || '');
                         })
                     }
                 }))
@@ -190,7 +190,7 @@ export class MbListModule extends Component {
                             new DetailModal(Object.assign({}, {
                                 fm: {
                                     caption: element.caption,
-                                    fields: Form.Cols.colTransfor(response.uiType, element.fields)
+                                    fields: element.fields
                                 }
                             }, {
                                 defaultData: data,
@@ -200,7 +200,7 @@ export class MbListModule extends Component {
                                     return new Promise((resolve) => {
                                         ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
                                             resolve();
-                                        },self.para.url || '');
+                                        }, self.para.url || '');
                                     })
                                 }
                             }))
@@ -217,7 +217,7 @@ export class MbListModule extends Component {
                     addr: R_ReqAddr = this.para.ui.body.elements[0].layoutDrill;
                 if (tools.isNotEmpty(addr)) {
                     sys.window.open({
-                        url: tools.url.addObj(BW.CONF.siteUrl + addr.dataAddr,G.Rule.parseVarList(addr.parseVarList,data))
+                        url: tools.url.addObj(BW.CONF.siteUrl + addr.dataAddr, G.Rule.parseVarList(addr.parseVarList, data))
                     })
                 }
             },
@@ -247,10 +247,10 @@ export class MbListModule extends Component {
                         url = tools.url.addObj(url, Object.assign({}, {
                             pageparams: '{"index"=' + (current + 1) + ', "size"=' + pageSize + ',"total"=1}'
                         }, custom));
-                        BwRule.Ajax.fetch(url,{
-                            loading:{
-                                msg:'加载中，请稍后...',
-                                disableEl:document.body
+                        BwRule.Ajax.fetch(url, {
+                            loading: {
+                                msg: '加载中，请稍后...',
+                                disableEl: document.body
                             }
                         }).then(({response}) => {
                             let body = response.body,
