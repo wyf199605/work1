@@ -41,6 +41,7 @@ export class ImageManager extends Component{
             width = 100,
             current = -1,
             img = <img src="" alt=""/>,
+            body = <div className="img-manager-show">{img}</div>,
             inputBox = new InputBox({}),
             leftCount = <span>{current}</span>,
             scaleEl = <span>{width}%</span>,
@@ -119,9 +120,7 @@ export class ImageManager extends Component{
             isShow: false,
             className: tools.isPc ? 'full-screen-fixed img-manager-show-modal' : 'img-manager-show-modal',
             isBackground: false,
-            body: <div className="img-manager-show">
-                {img}
-            </div>,
+            body,
             footer: tools.isPc ? {
                 rightPanel: inputBox,
                 leftPanel: <span>第 {leftCount} 张，放大比例{scaleEl}</span>
@@ -132,7 +131,7 @@ export class ImageManager extends Component{
                 d.on(this.wrapper, 'click', '.img-wrapper', handler = (ev) => {
                     let el = ev.target as HTMLElement,
                         parent = d.closest(el, '.manager-img-item'),
-                        url = parent.dataset['url'];
+                        url = d.data(parent);
                     modal.isShow = true;
                     showImg(parseInt(parent.dataset['index']));
                 });
@@ -156,7 +155,7 @@ export class ImageManager extends Component{
                     this.trigger(ImageManager.EVT_IMG_DELETE, index);
                     d.remove(parent);
                     let items: HTMLElement[] = d.queryAll('.manager-img-item:not(.img-add)', this.wrapper);
-                    this.images = items.map(item => item.dataset['url']);
+                    this.images = items.map(item => d.data(item));
                 })
             },
             off: () => {
@@ -177,7 +176,7 @@ export class ImageManager extends Component{
                 let img = d.query('img', el) as HTMLImageElement;
                 if(img && img.src !== url){
                     img.setAttribute('src', url);
-                    el.dataset['url'] = url;
+                    d.data(el, url);
                 }
                 el.dataset['index'] = index + '';
             },
@@ -217,14 +216,16 @@ export class ImageManager extends Component{
     }
 
     static createImg(src: string, index: number){
-        return <div className="manager-img-item" data-url={src} data-index={index + ''}>
+        let div = <div className="manager-img-item" data-index={index + ''}>
             <div class="img-wrapper">
                 <img src={src} alt=""/>
             </div>
             <div className="img-close">
                 <i className="appcommon app-guanbi2"/>
             </div>
-        </div>
+        </div>;
+        d.data(div, src);
+        return div;
     }
 }
 
