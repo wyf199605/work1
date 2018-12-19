@@ -40,8 +40,9 @@ export class BwRule extends Rule {
     ];
 
     static SQL_SF = null;
-    static getSqlRandom(){
-        if(!this.SQL_SF){
+
+    static getSqlRandom() {
+        if (!this.SQL_SF) {
             this.SQL_SF = 'SQL_SF_' + new Date().getTime() + Math.random();
         }
         return this.SQL_SF;
@@ -106,14 +107,14 @@ export class BwRule extends Rule {
             }).then((gps: obj) => {
                 return new Promise<IAjaxSuccess>((resolve, reject) => {
                     let gpsObj = {
-                        latitude : gps.latitude,
-                        longitude : gps.longitude
+                        latitude: gps.latitude,
+                        longitude: gps.longitude
                     };
                     setting.headers = Object.assign(setting.headers || {}, {position: JSON.stringify(gpsObj)});
 
                     // 设置loading加载框
                     let loading: Loading;
-                    if(setting.loading){
+                    if (setting.loading) {
                         loading = new Loading(setting.loading);
                         loading.show();
                         delete setting.loading;
@@ -365,9 +366,9 @@ export class BwRule extends Rule {
         console.log(url);
         if (para.dataType === BwRule.DT_FILE) {
 
-            if(para.type === 'download'){
+            if (para.type === 'download') {
                 sys.window.download(url);
-            }else{
+            } else {
                 BwRule.Ajax.fetch(url)
                     .then(({response}) => {
                         rData = response.data[0];
@@ -493,9 +494,9 @@ export class BwRule extends Rule {
                     type: 'POST',
                     data: JSON.stringify(postData),
                 }).then(({response}) => {
-                    if(tools.keysVal(response, 'body', 'bodyList', 0)){
+                    if (tools.keysVal(response, 'body', 'bodyList', 0)) {
                         this.checkValue(response, postData, confirm)
-                    }else {
+                    } else {
                         typeof confirm === 'function' && confirm();
                     }
                 });
@@ -522,13 +523,13 @@ export class BwRule extends Rule {
         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.dataAddr, data), {
             needGps: field.dataAddr.needGps
         }).then(({response}) => {
-                return response.data.map(data => {
-                    return {
-                        text: data[field.name],
-                        value: data[field.lookUpKeyField]
-                    };
-                });
+            return response.data.map(data => {
+                return {
+                    text: data[field.name],
+                    value: data[field.lookUpKeyField]
+                };
             });
+        });
     }
 
     static getDefaultByFields(cols: R_Field[]): obj {
@@ -635,10 +636,10 @@ export class BwRule extends Rule {
 
                 } else if (col.atrrs && BwRule.isFile(col.atrrs.dataType)) {
                     //文件上传
-                    if(tools.isEmpty(col.fileInfo)){
+                    if (tools.isEmpty(col.fileInfo)) {
                         col.comType = 'file';// --------------
                         col.relateFields = ['FILE_ID'];// --------------
-                    }else{
+                    } else {
                         col.comType = 'newFile';
                         col.relateFields = ['FILE_ID'];// --------------
                     }
@@ -655,8 +656,10 @@ export class BwRule extends Rule {
                     //日期时间控件
                     col.comType = 'datetime';// --------------
 
-                } else if(col.atrrs && BwRule.isImage(col.atrrs.dataType)){
+                } else if (col.atrrs && BwRule.isImage(col.atrrs.dataType)) {
                     col.comType = 'image';
+                } else if (tools.isNotEmpty(col.atrrs.valueLists)) {
+                    col.comType = 'selectInput';
                 } else {
                     col.comType = 'input';// --------------
                 }

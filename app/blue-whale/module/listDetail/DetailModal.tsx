@@ -16,6 +16,7 @@ interface IDetailModal extends EditPagePara {
     width?: string;
     height?: string;
     isPC?: boolean;
+    isNotDetail?: boolean;
 }
 
 export class DetailModal {
@@ -28,7 +29,7 @@ export class DetailModal {
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo,
             self = this;
-        BwRule.beforeHandle.fields(fields, para.uiType);
+        para.isNotDetail && BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
@@ -41,9 +42,9 @@ export class DetailModal {
                     data: this.para.defaultData,
                     onExtra: (data, relateCols, isEmptyClear = false) => {
                         let com = self.editModule.getDom(f.name);
-                        for(let key of relateCols){
+                        for (let key of relateCols) {
                             let hCom = self.editModule.getDom(key);
-                            if(hCom && hCom !== com){
+                            if (hCom && hCom !== com) {
                                 let hField = hCom.custom as R_Field;
                                 hCom.set(data[key] || '');
 
@@ -59,11 +60,11 @@ export class DetailModal {
                                             });
                                             let data = this.dataGet();
                                             fields.forEach((fi) => {
-                                                if(fi.elementType === 'lookup'){
+                                                if (fi.elementType === 'lookup') {
                                                     let lCom = self.editModule.getDom(fi.name);
-                                                    if(!data[fi.lookUpKeyField]){
+                                                    if (!data[fi.lookUpKeyField]) {
                                                         lCom.set('');
-                                                    }else{
+                                                    } else {
                                                         let options = self.lookUpData[fi.name] || [];
                                                         for (let opt of options) {
                                                             if (opt.value == data[fi.lookUpKeyField]) {
@@ -243,9 +244,9 @@ export class DetailModal {
                 field: f,
                 onExtra: (data, relateCols, isEmptyClear = false) => {
                     let com = self.editModule.getDom(f.name);
-                    for(let key of relateCols){
+                    for (let key of relateCols) {
                         let hCom = self.editModule.getDom(key);
-                        if(hCom && hCom !== com){
+                        if (hCom && hCom !== com) {
                             let hField = hCom.custom as R_Field;
                             hCom.set(data[key] || '');
 
@@ -261,11 +262,11 @@ export class DetailModal {
                                         });
                                         let data = this.dataGet();
                                         fields.forEach((fi) => {
-                                            if(fi.elementType === 'lookup'){
+                                            if (fi.elementType === 'lookup') {
                                                 let lCom = self.editModule.getDom(fi.name);
-                                                if(!data[fi.lookUpKeyField]){
+                                                if (!data[fi.lookUpKeyField]) {
                                                     lCom.set('');
-                                                }else{
+                                                } else {
                                                     let options = self.lookUpData[fi.name] || [];
                                                     for (let opt of options) {
                                                         if (opt.value == data[fi.lookUpKeyField]) {
