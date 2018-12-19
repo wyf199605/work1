@@ -113,7 +113,7 @@ export class ImageManager extends Component{
         let modal = new Modal({
             header: {
                 title: '图片预览',
-                rightPanel: tools.isPc ? null : delEl.constructor
+                rightPanel: tools.isPc ? null : delEl
             },
             container: document.body,
             isShow: false,
@@ -122,10 +122,10 @@ export class ImageManager extends Component{
             body: <div className="img-manager-show">
                 {img}
             </div>,
-            footer: {
-                rightPanel: tools.isPc ? inputBox : null,
+            footer: tools.isPc ? {
+                rightPanel: inputBox,
                 leftPanel: <span>第 {leftCount} 张，放大比例{scaleEl}</span>
-            }
+            } : void 0
         });
         return {
             on: () => {

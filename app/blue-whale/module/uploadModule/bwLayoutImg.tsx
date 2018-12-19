@@ -89,9 +89,9 @@ export class BwLayoutImg{
                 this.files = [];
                 this.imgManager.set([]);
             },
-            footer:{
-                rightPanel: tools.isPc ? inputBox : null
-            }
+            footer: tools.isPc ? {
+                rightPanel: inputBox
+            } : void 0
         };
         if(tools.isPc){
             para.width = '700px';
