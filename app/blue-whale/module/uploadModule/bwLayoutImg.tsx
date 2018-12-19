@@ -137,5 +137,6 @@ export class BwLayoutImg{
         this.bwUpload = null;
         this.modal = null;
         this.imgManager = null;
+        this.files = null;
     }
 }
