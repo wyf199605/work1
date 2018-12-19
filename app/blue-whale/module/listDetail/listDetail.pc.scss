@@ -513,6 +513,10 @@
           height: 44px;
           border: solid 1px #e2e2e2;
           padding: 0;
+          &.disabled{
+            opacity: 0.5;
+            pointer-events: none !important;
+          }
           & > .text-input {
             height: 100%;
             background-color: #ffffff;

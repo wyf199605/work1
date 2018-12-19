@@ -5,6 +5,7 @@ import IComponentPara = G.IComponentPara;
 import {IQueryItem, IResult, NewQueryItem} from "../newQuery/NewQueryItem";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import tools = G.tools;
+import {Button} from "../../../global/components/general/button/Button";
 
 interface ICustom extends IComponentPara {
     settingValue: string;
@@ -35,7 +36,17 @@ export class CustomModule extends Component {
             this._items.push(new NewQueryItem(Object.assign({}, item, {
                 container: this.wrapper
             })));
-        })
+        });
+        new Button({
+            content: '重置',
+            className:'reset',
+            container: this.wrapper,
+            onClick: () => {
+                this.items.forEach(item => {
+                    item.set([]);
+                })
+            }
+        });
     }
 
     get json(): IResult[] {

@@ -7,6 +7,7 @@ import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Button} from "../../../global/components/general/button/Button";
 import Shell = G.Shell;
+import {Datetime} from "../../../global/components/form/datetime/datetime";
 
 interface IRangeInputItem extends IFormComPara {
     isFirst?: boolean;
@@ -25,7 +26,11 @@ export class RangeInputItem extends FormCom {
                 break;
             case 1:
             case 2: {
-                val = (this.innerCom.time as DatetimeMb).get();
+                if (tools.isMb){
+                    val = (this.innerCom.time as DatetimeMb).get();
+                }else{
+                    val = (this.innerCom.time as Datetime).get();
+                }
             }
         }
         return val;
@@ -40,7 +45,11 @@ export class RangeInputItem extends FormCom {
                 break;
             case 1:
             case 2: {
-                (this.innerCom.time as DatetimeMb).set(val);
+                if (tools.isMb){
+                    (this.innerCom.time as DatetimeMb).set(val);
+                }else{
+                    (this.innerCom.time as Datetime).set(val);
+                }
             }
         }
 
@@ -71,24 +80,28 @@ export class RangeInputItem extends FormCom {
         switch (para.interval) {
             case 0:
             case 5: {
-                wrapper = <div className="query-range-input-item new-query-input-wrapper">
+                wrapper = tools.isMb ? <div className="query-range-input-item new-query-input-wrapper">
                     {this.input = <input type="text" placeholder={placeStr}/>}
-                    {tools.isMb && <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>}
+                    <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
+                </div> : <div className="query-range-input-item new-query-input-wrapper">
+                    {this.input = <input type="text" placeholder={placeStr}/>}
                 </div>;
             }
                 break;
             case 1: {
                 wrapper = <div className="new-query-item-time new-query-input-wrapper">
-                    <DatetimeMb c-var="time" format="yyyy-MM-dd" placeholder={placeStr}/>
+                    {tools.isMb ? <DatetimeMb c-var="time" format="yyyy-MM-dd" placeholder={placeStr}/> : <Datetime c-var="time" format="yyyy-MM-dd" placeholder={placeStr}/>}
                 </div>;
             }
                 break;
             case 2: {
                 wrapper =
                     <div className="new-query-item-time new-query-input-wrapper">
-                        <DatetimeMb c-var="time"
-                                    format="yyyy-MM-dd HH:mm:ss"
-                                    placeholder={placeStr}/>
+                        {tools.isMb ? <DatetimeMb c-var="time"
+                                                  format="yyyy-MM-dd HH:mm:ss"
+                                                  placeholder={placeStr}/> : <Datetime c-var="time"
+                                                                                         format="yyyy-MM-dd HH:mm:ss"
+                                                                                         placeholder={placeStr}/>}
                     </div>;
             }
                 break;
@@ -111,8 +124,9 @@ export class RangeInputItem extends FormCom {
                 Shell.base.speak(1, '', (e) => {
                     this.set(e.data || '');
                 });
-            },() => {
-                Shell.base.speak(1, '', () => {});
+            }, () => {
+                Shell.base.speak(1, '', () => {
+                });
             });
         };
         return {
@@ -121,7 +135,7 @@ export class RangeInputItem extends FormCom {
         }
     })();
 
-    private createSpeakModal(callback: () => void,cancel?:() => void) {
+    private createSpeakModal(callback: () => void, cancel?: () => void) {
         let bodyWrapper = <div className="speak-modal-body-wrapper">
             <i className="appcommon app-maikefeng"/>
             <div className="please-speak">请说话</div>
@@ -145,7 +159,7 @@ export class RangeInputItem extends FormCom {
             className: 'speak-modal',
             position: 'center',
             zIndex: 10000,
-            onClose(){
+            onClose() {
                 cancel && cancel();
             }
         });

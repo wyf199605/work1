@@ -27,8 +27,8 @@ export class NewQueryItem extends Component {
 
     protected wrapperInit(para: IQueryItem): HTMLElement {
         return <div className="new-query-item">
-            <div className="new-query-item-title"><span>{para.caption}</span><i
-                className="iconfont icon-arrow-up"/></div>
+            {tools.isMb ? <div className="new-query-item-title"><span>{para.caption}</span><i
+                className="iconfont icon-arrow-up"/></div> : <div className="new-query-item-title"><span>{para.caption}</span></div>}
             {this.bodyWrapper = <div className="new-query-item-body"/>}
         </div>;
     }
@@ -68,7 +68,7 @@ export class NewQueryItem extends Component {
                     this.queryOptions = options;
                     height += options.getHeight();
                 }
-                this.bodyWrapper.style.height = height + 'px';
+                tools.isMb && (this.bodyWrapper.style.height = height + 'px');
             }
                 break;
             case 3:
@@ -83,7 +83,7 @@ export class NewQueryItem extends Component {
                     this.queryOptions = options;
                     height += options.getHeight();
                 }
-                this.bodyWrapper.style.height = height + 'px';
+                tools.isMb && (this.bodyWrapper.style.height = height + 'px');
             }
                 break;
             case 5: {
@@ -92,7 +92,7 @@ export class NewQueryItem extends Component {
                     caption: para.caption,
                     container:this.bodyWrapper
                 });
-                this.bodyWrapper.style.height = '52px';
+                tools.isMb && (this.bodyWrapper.style.height = '52px');
             }
                 break;
         }
@@ -111,11 +111,11 @@ export class NewQueryItem extends Component {
         };
         return {
             on: () => {
-                d.on(this.wrapper, 'click', '.new-query-item-title i.iconfont.icon-arrow-up', toggleArrow);
+                tools.isMb && d.on(this.wrapper, 'click', '.new-query-item-title i.iconfont.icon-arrow-up', toggleArrow);
                 d.on(this.bodyWrapper, 'input', '.new-query-input-wrapper input', tools.pattern.debounce(inputChange, 300));
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.new-query-item-title i.iconfont.icon-arrow-up', toggleArrow);
+                tools.isMb && d.off(this.wrapper, 'click', '.new-query-item-title i.iconfont.icon-arrow-up', toggleArrow);
                 d.on(this.bodyWrapper, 'input', '.new-query-input-wrapper input', tools.pattern.debounce(inputChange, 300));
             }
         }

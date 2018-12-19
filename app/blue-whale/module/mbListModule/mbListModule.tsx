@@ -17,6 +17,7 @@ import {DetailModal} from "../listDetail/DetailModal";
 export interface IMbListModule extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
     url?: string;
+    ajaxData?:obj;
 }
 
 export class MbListModule extends Component {
@@ -29,11 +30,14 @@ export class MbListModule extends Component {
     private captions: string[] = [];
     private isMulti: boolean = false;
     private defaultData: obj[] = [];
+    private hasQuery: boolean = false;
 
     constructor(private para: IMbListModule) {
         super(para);
         let tableListEl = para.ui.body.elements[0];
         tableListEl.subButtons = (tableListEl.subButtons || []).concat(para.ui.body.subButtons || []);
+        let querier = this.para.ui.body.elements[0].querier;
+        this.hasQuery = querier && ([3, 13].includes(querier.queryType)) || this.para.ui.body.elements[0].noQuery;
         this.getButtons(tableListEl.subButtons);
         this.initGlobalButtons();
         this.handlerLayout(tableListEl.layout);
@@ -50,6 +54,7 @@ export class MbListModule extends Component {
     refresh(ajaxData?: obj) {
         return this.mbList.dataManager.refresh(ajaxData || {});
     }
+
 
     /**
      * @author WUML
@@ -132,7 +137,7 @@ export class MbListModule extends Component {
                     }
                 }, {
                     defaultData: {},
-                    isAdd: false,
+                    isAdd: true,
                     isPC: !tools.isMb,
                     confirm(data) {
                         return new Promise((resolve) => {
@@ -141,9 +146,29 @@ export class MbListModule extends Component {
                             }, self.para.url || '');
                         })
                     },
-                    isNotDetail:true
+                    isNotDetail: true
                 }))
             })
+        }
+    }
+
+    /**
+     * @author WUML
+     * @date 2018/12/19
+     * @Description: 外部使用，添加查询按钮
+     */
+    queryBtnAdd(btn: IButton) {
+        let btnWrapper = d.query('.global-button-wrapper', this.wrapper);
+        if (tools.isNotEmpty(btnWrapper)){
+            new Button(Object.assign({},btn,{
+                container:btnWrapper
+            }));
+        }else{
+            let globalButtonWrapper = <div className="global-button-wrapper single-query"/>;
+            this.wrapper.appendChild(globalButtonWrapper);
+            new Button(Object.assign({},btn,{
+                container:globalButtonWrapper
+            }));
         }
     }
 
@@ -204,7 +229,7 @@ export class MbListModule extends Component {
                                         }, self.para.url || '');
                                     })
                                 },
-                                isNotDetail:true
+                                isNotDetail: true
                             }))
                         })
                     }
@@ -242,6 +267,7 @@ export class MbListModule extends Component {
                     this.defaultData = data;
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
+                auto: !this.hasQuery,
                 ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
                     return new Promise<{ data: obj[], total: number }>((resolve) => {
                         let dataAddr: R_ReqAddr = this.para.ui.body.elements[0].dataAddr,
@@ -264,7 +290,7 @@ export class MbListModule extends Component {
                         })
                     })
                 },
-                ajaxData: null
+                ajaxData: tools.isNotEmpty(this.para.ajaxData) ? this.para.ajaxData : null
             }
         });
     }

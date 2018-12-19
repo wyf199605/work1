@@ -33,7 +33,7 @@ export class DetailModal {
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
-                if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || (this.para.uiType == 'update' && f.noShow) || (this.para.uiType == 'flow' && f.noShow) || (this.para.uiType == 'detail' && f.noShow)) {
+                if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
                     continue;
                 }
                 let field = {
@@ -83,7 +83,7 @@ export class DetailModal {
                     }
                 };
                 emPara.fields.push(field);
-                if ((['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {
+                if (para.isAdd ? field.field.noModify : field.field.noEdit) {
                     field.dom && field.dom.classList.add('disabled');
                 }
             }
@@ -236,7 +236,7 @@ export class DetailModal {
             if (~['textarea', 'file', 'img'].indexOf(type)) {
                 className = 'one-column';
             }
-            if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || (this.para.uiType == 'update' && f.noShow) || (this.para.uiType == 'flow' && f.noShow) || (this.para.uiType == 'detail' && f.noShow)) {
+            if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
                 continue;
             }
             let field = {
@@ -284,7 +284,7 @@ export class DetailModal {
                 }
             };
             emPara.push(field);
-            if ((['insert', 'associate'].indexOf(this.para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {
+            if (this.para.isAdd ? field.field.noModify : field.field.noEdit) {
                 field.dom && field.dom.classList.add('disabled');
             }
         }
@@ -299,7 +299,8 @@ export class DetailModal {
             return wrapper;
         } else {
             let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
-            let formGroupWrapper = <div className={"detail-cell " + className || ''} data-name={field.name}
+            className = tools.isNotEmpty(className) ? "detail-cell " + className : 'detail-cell';
+            let formGroupWrapper = <div className={className} data-name={field.name}
                                         data-type={field.comType} data-element-type={elementType}>
                 <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
             </div>;

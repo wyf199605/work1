@@ -35,13 +35,23 @@ export = class QueryModulePc extends QueryModule {
                 content: '查询',
                 type: 'primary',
                 onClick: () => {
-                    self.search()
-                        .then(() => {
-                            self.modal.isShow = false;
-                        })
-                        .catch(() => {
-                            self.spinner && self.spinner.hide();
-                        });
+                    if (tools.isNotEmpty(para.qm.mobileSetting) && tools.isNotEmpty(para.qm.mobileSetting.settingValue) && this.tab.index === 0) {
+                        let json = this.customModule.json;
+                        if (CustomModule.validate(json)) {
+                            this.hide();
+                            return this.para.refresher({
+                                mqueryparams: JSON.stringify(json)
+                            });
+                        }
+                    } else {
+                        self.search()
+                            .then(() => {
+                                self.modal.isShow = false;
+                            })
+                            .catch(() => {
+                                self.spinner && self.spinner.hide();
+                            });
+                    }
                 },
                 key: 'queryBtn'
             });
@@ -66,6 +76,7 @@ export = class QueryModulePc extends QueryModule {
             className: 'queryBuilder',
             isBackground: false,
             isShow: this.para.qm.autTag !== 0,
+            height:tools.isNotEmpty(para.qm.mobileSetting) ? '500px' : 'auto',
             footer: {
                 leftPanel: leftBox,
                 rightPanel: rightBox
