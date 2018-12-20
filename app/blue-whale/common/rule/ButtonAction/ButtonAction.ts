@@ -272,13 +272,17 @@ export class ButtonAction {
             uniqueFlag: string,
             ajaxUrl: string,
             uploadUrl: string,
-            downUrl: string;
+            downUrl: string,
+            picAddr:string,
+            picFields:string;
 
         for (let i = 0; i < dataAddr.length; i++) {
             url = dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
+            picFields = dataAddr[i].picFields;
+            picAddr = dataAddr[i].dataAddr;
 
         }
         let USER = User.get().userid,
@@ -291,7 +295,9 @@ export class ButtonAction {
                     USERID: USER,
                     uploadUrl: uploadUrl,
                     downUrl: url,
-                    uniqueFlag: uniqueFlag
+                    uniqueFlag: uniqueFlag,
+                    picFields:picFields,
+                    picAddr:picAddr
                 })
             })
 
