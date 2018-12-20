@@ -21,6 +21,7 @@ export interface IBwMbList extends IComponentPara {
 
 export class BwMbList extends BasicPage {
     private bwMbList: BwMbListElement;
+
     constructor(private para: IBwMbList) {
         super(para);
         switch (para.ui.uiType) {
@@ -58,7 +59,7 @@ interface IBwMbListElementPara {
     url: string;
 }
 
-let queryModuleName = tools.isMb ? 'NewQueryModalMb' : 'QueryModulePc';
+let queryModuleName = 'QueryModulePc';
 
 class BwMbListElement {
 
@@ -239,7 +240,6 @@ class BwMbListElement {
                         this.queryModule = new Query({
                             qm: bwTableEl.querier,
                             refresher: (ajaxData) => {
-                                // debugger;
                                 return this.mbListModule.refresh(ajaxData);
                             },
                             cols: bwTableEl.cols,
