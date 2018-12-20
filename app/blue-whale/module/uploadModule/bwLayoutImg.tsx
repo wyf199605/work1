@@ -9,7 +9,8 @@ import tools = G.tools;
 
 export interface IBwLayoutImgPara extends IBwUploaderPara{
     onFinish?: (files: File[]) => Promise<any>;
-    isShow?: boolean;
+    isShow?: boolean;  // 是否显示上传控件，默认true
+    autoClear?: boolean; // 是否在模态框关闭清除file，默认true
 }
 
 export class BwLayoutImg{
@@ -18,10 +19,13 @@ export class BwLayoutImg{
     protected bwUpload: BwUploader;
     protected files: File[] = [];
     protected onFinish: (files: File[]) => Promise<any>;
+    protected autoClear: boolean;
+
     constructor(para: IBwLayoutImgPara){
         this.onFinish = para.onFinish || function(){
             return Promise.resolve();
         };
+        this.autoClear = tools.isEmpty(para.autoClear) ? true : para.autoClear;
 
         this.initModal();
         this.initImgManager();
@@ -69,6 +73,11 @@ export class BwLayoutImg{
         this.modal && (this.modal.isShow = flag);
     }
 
+    clear(){
+        this.files = [];
+        this.imgManager.set([]);
+    }
+
     protected initModal(){
         let inputBox = new InputBox({});
         inputBox.addItem(<Button content="完成" onClick={() => {
@@ -86,8 +95,7 @@ export class BwLayoutImg{
             isShow: false,
             closeMsg: '是否放弃选中的图片？',
             onClose: () => {
-                this.files = [];
-                this.imgManager.set([]);
+                this.autoClear && this.clear();
             },
             footer: tools.isPc ? {
                 rightPanel: inputBox
