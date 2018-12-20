@@ -119,7 +119,7 @@ export class EditModule {
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 pageData: p.data,
                 field: p.field,
-                unique: p.data[p.field.name]
+                unique: tools.isNotEmpty(p.data) ?  p.data[p.field.name] : ''
             })
         },
 
@@ -181,6 +181,7 @@ export class EditModule {
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 field: p.field,
                 pageData: p.data,
+                uniques:tools.isNotEmpty(p.data) ?  p.data[p.field.name] : '',
                 onComplete: (response) => {
                     let data = response.data,
                         type = p.field.dataType || p.field.atrrs.dataType;
