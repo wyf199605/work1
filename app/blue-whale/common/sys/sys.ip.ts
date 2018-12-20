@@ -208,8 +208,10 @@ namespace BW{
                     tools.event.fire(type, data, window);
                 },
                 getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
-                    let event = '__EVT_GET_IMG_BY_DEVICE__';
-                    d.once(window, event, function (response : CustomEvent) {
+                    let event = '__EVT_GET_IMG_BY_DEVICE__',
+                        handler = null;
+                    d.on(window, event, handler = tools.pattern.throttling(function (response : CustomEvent) {
+                        d.off(window, event, handler);
                         try{
                             let detail = JSON.parse(response.detail);
 
@@ -223,7 +225,7 @@ namespace BW{
                         }catch (e){
                             error && error();
                         }
-                    });
+                    },1000));
                     self.handle('getImg', {event});
                 },
                 getEditImg(image: string | Function, callback?: Function){

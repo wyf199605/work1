@@ -92,7 +92,7 @@ export class BwUploader extends FormCom {
             beforeSendFile: this.beforeSendFile.bind(this)
         });
 
-        d.on(this.wrapper, 'click', () => {
+        d.on(this.wrapper, 'click', tools.pattern.throttling( () => {
             this.getFile((files: File[]) => {
                 if(!this.multi){
                     this.temFiles = [];
@@ -113,7 +113,7 @@ export class BwUploader extends FormCom {
             }, () => {
                 Modal.alert('获取图片失败', '温馨提示');
             });
-        });
+        },1000));
     }
 
     click(){
