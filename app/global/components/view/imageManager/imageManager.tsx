@@ -241,7 +241,7 @@ function getBase64(url: string): Promise<string>{
 
             ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
 
-            console.log(url);
+            //console.log(url);
             let dataURL = canvas.toDataURL("image/png");
             console.log(dataURL);
             resolve(dataURL);
