@@ -4,6 +4,25 @@
 	Styles for basic PhotoSwipe functionality (sliding area, open/close transitions)
 */
 /* pswp = photoswipe */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  /*增加头部适配层*/
+  .pswp {
+    .pswp__top-bar {
+      padding-top: 44px;
+      height: 88px;
+      &:before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 44px;
+        background-color: #000000;
+        z-index: 9998;
+      }
+    }
+  }
+}
 .pswp {
   display: none;
   position: absolute;

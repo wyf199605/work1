@@ -72,7 +72,7 @@ export class Accessory extends FormCom {
                 case '43': {
                     this.files = [{
                         unique: value,
-                        filename: this.para.pageData[this.para.nameField],
+                        filename: this.para.pageData ? (this.para.pageData[this.para.nameField] || '') : '',
                         filesize: 0,
                         addr: ''
                     }];

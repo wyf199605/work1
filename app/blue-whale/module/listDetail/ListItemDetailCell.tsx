@@ -174,8 +174,8 @@ export class ListItemDetailCell extends Component {
                                             fileAddr = this.currentFile.addr,
                                             nameArr = fileName.split('.'),
                                             extensionName = nameArr[nameArr.length - 1],
-                                            imgs = ['jpg', 'png', 'jpeg', 'gif'];
-                                        if (~imgs.indexOf(extensionName)) {
+                                            imgs = ['jpg', 'png', 'jpeg', 'gif', 'bmp'];
+                                        if (~imgs.indexOf(extensionName.toLowerCase())) {
                                             sys.window.openImg(BW.CONF.siteUrl + fileAddr);
                                         } else {
                                             sys.window.download(BW.CONF.siteUrl + fileAddr);
@@ -246,10 +246,7 @@ export class ListItemDetailCell extends Component {
         let imgOption = () => {
             let imgs = this.imgs || [];
             let imgData: ImgModalPara = {
-                img: ListItemDetailCell.getBigPicture(imgs),
-                onDownload: function (url: string) {
-                    sys.window.openImg(url);
-                }
+                img: ListItemDetailCell.getBigPicture(imgs)
             };
             ImgModal.show(imgData);
             if (tools.isMb) {
