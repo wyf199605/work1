@@ -93,7 +93,7 @@ export class BwUploader extends FormCom {
             beforeSendFile: this.beforeSendFile.bind(this)
         });
 
-        d.on(this.wrapper, 'click', () => {
+        d.on(this.wrapper, 'click', tools.pattern.throttling(() => {
             this.getFile((files: CustomFile[]) => {
                 if(!this.multi){
                     this.temFiles = [];
@@ -114,7 +114,11 @@ export class BwUploader extends FormCom {
             }, (msg) => {
                 tools.isNotEmpty(msg) && Modal.alert(msg, '温馨提示');
             });
-        });
+        }, 1000));
+    }
+
+    click(){
+        this.wrapper && this.wrapper.click();
     }
 
     protected getFile(callback: (file: CustomFile[]) => void , error?: Function){
@@ -188,7 +192,7 @@ export class BwUploader extends FormCom {
     }
 
     // 调用方法上传暂存文件
-    upload(){
+    upload(files: CustomFile[] = this.temFiles){
         this.loading && this.loading.show();
         this._isFinish = false;
         this.wrapper.classList.remove('error');
@@ -196,9 +200,9 @@ export class BwUploader extends FormCom {
         if(!this.multi){
             this.files = [];
         }
-        let files = this.multi ? this.temFiles : this.temFiles[0],
-            promises: Promise<any>[] = [];
-        files && tools.toArray(files).forEach((file) => {
+        let promises: Promise<any>[] = [];
+        files = this.multi ? files : tools.toArray(files[0]);
+        files && files.forEach((file) => {
             promises.push(this.fileUpload.upload(file).then((data) => {
                 console.log(data);
                 this.files.push(file);
