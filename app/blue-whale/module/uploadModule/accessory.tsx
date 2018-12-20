@@ -154,11 +154,7 @@ export class Accessory extends FormCom {
             text: '',
             onSuccess: (res, file, type) => {
                 if (res.code == 200 || res.errorCode === 0) {
-                    if (tools.isNotEmpty(res.ifExist)) {
-                        Modal.toast('附件已存在!');
-                    } else {
-                        Modal.toast('上传成功!');
-                    }
+                    Modal.toast('上传成功!');
                     switch (this.fileType) {
                         case '43': {
                             this.files = [{
