@@ -189,7 +189,7 @@ export class MbListItem extends Component {
                 case 'body':
                     el.innerHTML = '';
                     content && content.forEach((arr) => {
-                        d.append(el, <p>
+                        d.append(el, <p title={arr[1]}>
                             {arr[0] + '：' + arr[1]}
                         </p>)
                     });
@@ -197,7 +197,7 @@ export class MbListItem extends Component {
                 case 'label':
                     el.innerHTML = '';
                     content && content.forEach((label) => {
-                        d.append(el, <span className="label">{label}</span>)
+                        d.append(el, <span className="label" title={label}>{label}</span>)
                     });
                     break;
                 case 'status':

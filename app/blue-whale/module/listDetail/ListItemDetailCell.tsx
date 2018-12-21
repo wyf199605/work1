@@ -140,7 +140,7 @@ export class ListItemDetailCell extends Component {
                                             type: this.para.field.link.type
                                         });
                                     } else {
-                                        if (tools.isEmpty(self.currentFile)){
+                                        if (tools.isNotEmpty(self.currentFile) && tools.isNotEmpty(self.currentFile.addr)){
                                             let fileName = self.currentFile.filename,
                                                 fileAddr = self.currentFile.addr,
                                                 nameArr = fileName.split('.'),

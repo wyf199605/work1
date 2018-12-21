@@ -249,7 +249,7 @@ export class MbListModule extends Component {
                 }
             },
             multiClick: (btnIndex, itemsIndexes) => {
-                let buttons = this.allButtons[1] || [],
+                let buttons = this.allButtons[2] || [],
                     btn = buttons[btnIndex],
                     data = [];
                 this.defaultData.forEach((da, index) => {
