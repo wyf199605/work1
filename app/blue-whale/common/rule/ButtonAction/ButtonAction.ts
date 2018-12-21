@@ -242,7 +242,7 @@ export class ButtonAction {
                 addr = tools.url.addObj(addr, {output: 'json'});
                 let can2dScan = G.Shell.inventory.can2dScan;
 
-                if(can2dScan){
+                if(can2dScan || tools.isMb){
                     self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                         //创建条码扫码页面
                         if (response.uiType === 'inventory' && tools.isMb) {
@@ -252,9 +252,9 @@ export class ButtonAction {
                         callback(response);
                     }, () => callback(null))
                 }else {
-                   callback(null);
-                   Modal.alert('目前只支持手机功能');
-               }
+                    callback(null);
+                    Modal.alert('目前不支持PC端功能');
+                }
                 break;
             case 'newwin':
             default:
@@ -279,29 +279,34 @@ export class ButtonAction {
             uniqueFlag: string,
             ajaxUrl: string,
             uploadUrl: string,
-            downUrl: string;
+            downUrl: string,
+            picAddr:string,
+            picFields:string;
 
         for (let i = 0; i < dataAddr.length; i++) {
             url = dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
+            picFields = dataAddr[i].picFields;
+            picAddr = dataAddr[i].dataAddr;
 
         }
         let USER = User.get().userid,
             SHO = User.get().are_id;
 
-            require(['RfidBarCode'], (p) => {
-                new p.RfidBarCode({
-                    codeStype: codeStype,
-                    SHO_ID: SHO,
-                    USERID: USER,
-                    uploadUrl: uploadUrl,
-                    downUrl: url,
-                    uniqueFlag: uniqueFlag
-                })
+        require(['RfidBarCode'], (p) => {
+            new p.RfidBarCode({
+                codeStype: codeStype,
+                SHO_ID: SHO,
+                USERID: USER,
+                uploadUrl: uploadUrl,
+                downUrl: url,
+                uniqueFlag: uniqueFlag,
+                picFields:picFields,
+                picAddr:picAddr
             })
-
+        })
 
     }
 
