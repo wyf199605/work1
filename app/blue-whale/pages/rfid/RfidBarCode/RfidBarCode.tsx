@@ -667,7 +667,6 @@ export class RfidBarCode extends Component {
                             })
                         }
                         this.photoImg.click();
-
                     }
                     }>拍照
                     </button>
