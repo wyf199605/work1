@@ -34,6 +34,10 @@ export abstract class FormCom extends Component{
     //     return this.valueSet();
     // }
 
+    click(){
+        this.wrapper && this.wrapper.click();
+    }
+
     private toolTips: Tooltip;
     error(isError: boolean, errorMsg: string = "", parentEle : HTMLElement = this.wrapper){
         if(!parentEle) {

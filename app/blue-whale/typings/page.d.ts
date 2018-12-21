@@ -34,5 +34,6 @@ interface EditPagePara extends BasicPagePara{
         dataAddr? : R_ReqAddr;//获取数据后台地址
         updatefileData? : R_ReqAddr;
         groupInfo?:IGroupInfo[];
+        signField?: string;
     }
 }
