@@ -710,7 +710,7 @@ export class RfidBarCode extends Component {
                            for(let i = 0 ,len = data.length;i<len; i++){
                                let obj = {};
                                obj['file_name'] = this.randNum();
-                               obj['file_data'] = data[i]
+                               obj['file_data'] = data[i].replace(/data:.+?,/, '')
                                this.photoImgData.push(obj);
                            }
                     })
