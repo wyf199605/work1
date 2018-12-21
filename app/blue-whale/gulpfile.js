@@ -184,6 +184,9 @@ gulp.task('js', function () {
     //search模块
     gulpTsModule(['search/search'], 'search.js');
 
+    //share模块
+    gulpTsModule(['share/Share'], 'share.js');
+
     //mail模块
     gulpTsModule(['mail/mail'], 'mail.js');
 

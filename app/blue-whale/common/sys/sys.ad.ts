@@ -228,8 +228,10 @@ namespace BW {
                     this.adHandle('whiteBat', '');
                 },
                 getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
-                    let event = '__EVT_GET_IMG_BY_DEVICE__';
-                    d.once(window, event, function (response: CustomEvent) {
+                    let event = '__EVT_GET_IMG_BY_DEVICE__',
+                        handler = null;
+                    d.once(window, event, handler = function (response: CustomEvent) {
+                        d.off(window, event, handler);
                         try {
                             let detail = JSON.parse(response.detail);
 

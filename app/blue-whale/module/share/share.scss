@@ -1,0 +1,106 @@
+.graffiti-btn{
+  position: fixed;
+  right: 20px;
+  z-index: 9999;
+  bottom: 200px;
+  width: 40px;
+  border-radius: 40px;
+  height: 40px;
+  border: 1px solid #dddddd;
+  -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  background: white;
+  .app-tuya{
+    font-size: 21px;
+    &:before{
+      margin: 10px 0 0 8px;
+      position: absolute;
+      color: #333333;
+    }
+  }
+}
+
+.share-container{
+  z-index: 9999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  .share-header{
+    background: #5c5c5c;
+    color: white;
+    height: 3.7rem;
+    width: 100%;
+    padding: 1rem;
+    transition: top .2s linear;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    &.share-hide{
+      top: -3.7rem;
+    }
+    .share-edit{
+      float: left;
+    }
+    .share-cancel{
+      float: right;
+    }
+  }
+
+  .share-img{
+    transition: opacity 0.3s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    animation: lock-fadein 0.3s ease;
+  }
+  .share-body{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 12rem;
+    display: flex;
+    background: white;
+    transition: bottom .2s linear;
+    &.share-hide{
+      bottom: -12rem;
+    }
+    .share-btnEl{
+      margin: auto;
+      float: left;
+      .share-text{
+        text-align: center;
+        padding-top: 20px;
+        font-size: 15px;
+      }
+      button{
+        color: white;
+        width: 5.5rem;
+        height: 5.5rem;
+        line-height: 5.5rem;
+        border: none;
+        border-radius: 5.5rem;
+        i{
+          font-size: 3.5rem;
+        }
+        &.bg-green{
+          background: #3bbb07;
+        }
+        &.bg-blue{
+          background: #3bb0fb;
+        }
+        &.bg-grey{
+          background: #666666;
+        }
+        &.bg-orange{
+          background: #f59778;
+        }
+      }
+    }
+
+  }
+}
