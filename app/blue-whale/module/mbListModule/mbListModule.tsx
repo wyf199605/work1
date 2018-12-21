@@ -13,11 +13,12 @@ import {Button, IButton} from "../../../global/components/general/button/Button"
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {DetailModal} from "../listDetail/DetailModal";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IMbListModule extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
     url?: string;
-    ajaxData?:obj;
+    ajaxData?: obj;
 }
 
 export class MbListModule extends Component {
@@ -159,15 +160,15 @@ export class MbListModule extends Component {
      */
     queryBtnAdd(btn: IButton) {
         let btnWrapper = d.query('.global-button-wrapper', this.wrapper);
-        if (tools.isNotEmpty(btnWrapper)){
-            new Button(Object.assign({},btn,{
-                container:btnWrapper
+        if (tools.isNotEmpty(btnWrapper)) {
+            new Button(Object.assign({}, btn, {
+                container: btnWrapper
             }));
-        }else{
+        } else {
             let globalButtonWrapper = <div className="global-button-wrapper single-query"/>;
             this.wrapper.appendChild(globalButtonWrapper);
-            new Button(Object.assign({},btn,{
-                container:globalButtonWrapper
+            new Button(Object.assign({}, btn, {
+                container: globalButtonWrapper
             }));
         }
     }
@@ -235,7 +236,8 @@ export class MbListModule extends Component {
                     }
                         break;
                     default:
-                        ButtonAction.get().clickHandle(btn, data,()=>{},self.para.url || '');
+                        ButtonAction.get().clickHandle(btn, data, () => {
+                        }, self.para.url || '');
                         break;
                 }
             },
@@ -249,13 +251,19 @@ export class MbListModule extends Component {
                 }
             },
             multiClick: (btnIndex, itemsIndexes) => {
+                if (itemsIndexes.length <= 0) {
+                    Modal.alert('请选择数据!');
+                    return;
+                }
                 let buttons = this.allButtons[2] || [],
                     btn = buttons[btnIndex],
                     data = [];
                 this.defaultData.forEach((da, index) => {
                     itemsIndexes.indexOf(index) > -1 && data.push(da);
                 });
-                ButtonAction.get().clickHandle(btn, data,()=>{},this.para.url || '');
+                ButtonAction.get().clickHandle(btn, data, () => {
+                    this.mbList.setSelectStatus(false);
+                }, this.para.url || '');
             },
             container: wrapper,
             dataManager: {

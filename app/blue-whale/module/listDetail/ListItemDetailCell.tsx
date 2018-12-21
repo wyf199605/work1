@@ -37,13 +37,7 @@ export class ListItemDetailCell extends Component {
     private contextMenu: ContextMenu;
     private _currentFile: IFile;
     private fileType: string = '';
-    private _files: IFile[];
-    get files(){
-        return [...this._files];
-    }
-    set files(files:IFile[]){
-        this._files = files;
-    }
+    private files: IFile[] = [];
     set currentFile(fileInfo: IFile) {
         this._currentFile = fileInfo;
     }
