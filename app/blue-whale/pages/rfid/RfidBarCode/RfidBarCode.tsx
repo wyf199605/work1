@@ -51,7 +51,7 @@ export class RfidBarCode extends Component {
     private params: registParams;
     //private regist;
     private fields: Ifiedls[];
-    private photoImg;
+    private photoImg: BwLayoutImg;
 
     constructor(para: IRfidBarCode) {
         super(para);
@@ -657,17 +657,7 @@ export class RfidBarCode extends Component {
                     }>删除数据
                     </button>
                     <button onclick={() => {
-                        this.photoImg.onFinish = ()=>{
-                            alert('开始')
-                            return new Promise((resolve)=>{
-                                let ss = this.photoImg.getBase64().then((data)=>{
-                                    console.log(data);
-                                })
-                                resolve();
-                            })
-                        }
                         this.photoImg.click();
-
                     }
                     }>拍照
                     </button>
@@ -694,7 +684,23 @@ export class RfidBarCode extends Component {
         //初始化监听输入框的值
         this.photoImg = new BwLayoutImg({
             isShow: false,
-            autoClear:false
+            autoClear:false,
+            onFinish: () => {
+
+                alert('开始')
+                return new Promise((resolve)=>{
+                    let ss = this.photoImg.getBase64().then((data)=>{
+                        console.log(data);
+                    })
+                    resolve();
+                })
+            },
+            buttons:[{
+                content:'图片管理',
+                onClick:() =>{
+                    this.photoImg.modalShow = true;
+                }
+            }]
         });
         let key = this.stepByone + this.accumulation;
         if (this.mode[key] == '(查询状态)') {
