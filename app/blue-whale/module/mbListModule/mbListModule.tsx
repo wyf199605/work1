@@ -235,7 +235,7 @@ export class MbListModule extends Component {
                     }
                         break;
                     default:
-                        ButtonAction.get().clickHandle(btn, data);
+                        ButtonAction.get().clickHandle(btn, data,()=>{},self.para.url || '');
                         break;
                 }
             },
@@ -255,8 +255,7 @@ export class MbListModule extends Component {
                 this.defaultData.forEach((da, index) => {
                     itemsIndexes.indexOf(index) > -1 && data.push(da);
                 });
-                ButtonAction.get().clickHandle(btn, data);
-                console.log(data);
+                ButtonAction.get().clickHandle(btn, data,()=>{},this.para.url || '');
             },
             container: wrapper,
             dataManager: {

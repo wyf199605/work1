@@ -10,6 +10,7 @@ import {ListItemDetail} from "./ListItemDetail";
 import sys = BW.sys;
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {ContextMenu} from "../../../global/components/ui/actionSheet/contextMenu";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
 
@@ -31,14 +32,18 @@ interface IDetailCell extends IComponentPara {
 }
 
 export class ListItemDetailCell extends Component {
-    private para: IDetailCell;
-    private files: IFile[] = [];
     private imgs: string[] = [];
     private actionSheet: ActionSheet;
     private contextMenu: ContextMenu;
     private _currentFile: IFile;
     private fileType: string = '';
-
+    private _files: IFile[];
+    get files(){
+        return [...this._files];
+    }
+    set files(files:IFile[]){
+        this._files = files;
+    }
     set currentFile(fileInfo: IFile) {
         this._currentFile = fileInfo;
     }
@@ -91,9 +96,8 @@ export class ListItemDetailCell extends Component {
         return wrapper;
     }
 
-    constructor(para: IDetailCell) {
+    constructor(private para: IDetailCell) {
         super(para);
-        this.para = para;
         this.fileType = para.field.dataType || para.field.atrrs.dataType;
         para.value && this.render(para.value);
     }
@@ -116,6 +120,7 @@ export class ListItemDetailCell extends Component {
 
     createAllFiles(value: IFile[], fileWrapper: HTMLElement) {
         fileWrapper.innerHTML = '';
+        let self = this;
         if (tools.isNotEmpty(value)) {
             this.fileEvent.on();
             if (tools.isMb) {
@@ -135,16 +140,19 @@ export class ListItemDetailCell extends Component {
                                             type: this.para.field.link.type
                                         });
                                     } else {
-                                        // this.downloadFile(BW.CONF.siteUrl + this.currentFile.addr);
-                                        let fileName = this.currentFile.filename,
-                                            fileAddr = this.currentFile.addr,
-                                            nameArr = fileName.split('.'),
-                                            extensionName = nameArr[nameArr.length - 1],
-                                            imgs = ['jpg', 'png', 'jpeg', 'gif'];
-                                        if (~imgs.indexOf(extensionName)) {
-                                            sys.window.openImg(BW.CONF.siteUrl + fileAddr);
-                                        } else {
-                                            sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                        if (tools.isEmpty(self.currentFile)){
+                                            let fileName = self.currentFile.filename,
+                                                fileAddr = self.currentFile.addr,
+                                                nameArr = fileName.split('.'),
+                                                extensionName = nameArr[nameArr.length - 1],
+                                                imgs = ['jpg', 'png', 'jpeg', 'gif'];
+                                            if (~imgs.indexOf(extensionName)) {
+                                                sys.window.openImg(BW.CONF.siteUrl + fileAddr);
+                                            } else {
+                                                sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                            }
+                                        }else{
+                                            Modal.toast('下载出错，请重试!');
                                         }
                                     }
                                 }
@@ -213,7 +221,7 @@ export class ListItemDetailCell extends Component {
 
     private fileEvent = (() => {
         let fileOption = (e) => {
-            e.stopImmediatePropagation();
+            e.stopPropagation();
             let index = parseInt(d.closest(e.target, '.detail-cell-file-item').dataset.index),
                 files = this.files || [];
             this.currentFile = files[index];
