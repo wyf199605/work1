@@ -45,6 +45,7 @@ export class BwLayoutImg{
                 this.modal.isShow = true;
                 this.files.push(files[0]);
                 this.imgManager.addImg(url);
+                this.modal && (this.modal.closeMsg = '是否放弃选中的图片？');
             }).catch((e) => {
                 console.log(e);
                 Modal.alert('获取图片失败');
@@ -93,7 +94,6 @@ export class BwLayoutImg{
                 isFullScreen: tools.isPc
             },
             isShow: false,
-            closeMsg: '是否放弃选中的图片？',
             onClose: () => {
                 this.autoClear && this.clear();
             },
@@ -119,6 +119,9 @@ export class BwLayoutImg{
         });
         this.imgManager.on(ImageManager.EVT_IMG_DELETE, (index) => {
             this.files.splice(index, 1);
+            if(this.files.length === 0){
+                this.modal && (this.modal.closeMsg = '');
+            }
         });
     }
 

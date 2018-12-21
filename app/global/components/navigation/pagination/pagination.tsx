@@ -203,7 +203,7 @@ export class Pagination extends Component {
             let scroll = this.scrollTop;
             clearTimeout(timer);
             if (isPulldownRefresh) {
-                if (scroll === 0) {
+                if (scroll <= 0) {
                     timer = setTimeout(() => {
                         self.paginationScrollSpinner.open();
                         clearTimeout(timer);
