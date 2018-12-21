@@ -451,7 +451,6 @@ class PaginationScrollSpinner {
                     }
                 }
             };
-
         let pan = (ev) => {
             ev.srcEvent.preventDefault();
             if (ev.isFirst) {
@@ -462,7 +461,6 @@ class PaginationScrollSpinner {
                 panmove(ev);
             }
         };
-        let handler;
         return {
             on() {
                 d.on(self.scrollEl, 'pandown panstart panend', pan);
