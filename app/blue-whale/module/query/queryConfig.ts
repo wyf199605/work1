@@ -607,7 +607,7 @@ export class QueryConfig {
             sortData.forEach(function (d,i) {
                 let para = d.value;
                 select.forEach(function (e) {
-                    if(i === e){
+                    if(d === e){
                         para = d.value + ',desc'
                     }
                 });
