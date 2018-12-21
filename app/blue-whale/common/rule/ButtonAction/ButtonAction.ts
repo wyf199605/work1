@@ -289,7 +289,7 @@ export class ButtonAction {
             uniqueFlag = dataAddr[i].uniqueFlag;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
             picFields = dataAddr[i].picFields;
-            picAddr = dataAddr[i].dataAddr;
+            picAddr = dataAddr[i].picAddr.dataAddr;
 
         }
         let USER = User.get().userid,
@@ -304,7 +304,7 @@ export class ButtonAction {
                 downUrl: url,
                 uniqueFlag: uniqueFlag,
                 picFields:picFields,
-                picAddr:picAddr
+                picAddr:CONF.siteUrl+picAddr
             })
         })
 
