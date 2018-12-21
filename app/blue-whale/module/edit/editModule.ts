@@ -117,7 +117,7 @@ export class EditModule {
                 container: p.dom,
                 nameField: p.field.name,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-                pageData: p.data,
+                pageData: this.defaultData,
                 field: p.field,
                 // unique: tools.isNotEmpty(p.data) ?  p.data[p.field.name] : ''
             })
@@ -180,7 +180,7 @@ export class EditModule {
                 container: p.dom,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 field: p.field,
-                pageData: p.data,
+                pageData: this.defaultData,
                 // uniques:tools.isNotEmpty(p.data) ?  p.data[p.field.name] : '',
                 onComplete: (response) => {
                     let data = response.data,
@@ -410,7 +410,6 @@ export class EditModule {
                 type = 'image';
             }
         }
-
         if (!(type in this.comTnit)) {
             type = 'text';
         }

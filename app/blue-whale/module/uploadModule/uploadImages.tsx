@@ -153,11 +153,7 @@ export class UploadImages extends FormCom {
                     isOnLine: false,
                     localUrl: (window.URL) ? window.URL.createObjectURL(file.blob) : window['webkitURL'].createObjectURL(file.blob)
                 };
-                if (tools.isNotEmpty(res.ifExist)) {
-                    Modal.toast('图片已存在!');
-                } else {
-                    Modal.toast('上传成功!');
-                }
+                Modal.toast('上传成功!');
                 switch (this.imgType) {
                     case '20': {
                         imageObj.unique = res.data.blobField.value;

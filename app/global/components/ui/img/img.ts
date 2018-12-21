@@ -28,18 +28,21 @@ export const ImgModal = (()=>{
                 downAddr = para.downAddr;
                 onDownload = para.onDownload ;
                 if (!wrapper) {
-                    //加载tpl
-                    wrapper  = d.create(imgModalTpl);
-                    container = para.container ? para.container : document.body;
-                    container.appendChild(wrapper);
-
                     //下载按钮
                     if(downAddr && onDownload){
+                        //加载tpl
+                        wrapper  = d.create(imgModalTpl);
+                        container = para.container ? para.container : document.body;
+                        container.appendChild(wrapper);
                         d.on(container, 'click', '.icon-download', () => {
                             onDownload(downAddr);
                         });
+                    }else{
+                        //加载tpl
+                        wrapper  = d.create(imgModalTplNoDownload);
+                        container = para.container ? para.container : document.body;
+                        container.appendChild(wrapper);
                     }
-
                     // ImgModal.initTag = false;
                 }
                 let pswpElement = d.query('.pswp', container),
@@ -163,3 +166,31 @@ const imgModalTpl = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="
         '<div class="pswp__caption"> ' +
         '<div class="pswp__caption__center"></div></div></div></div></div>';
 
+const imgModalTplNoDownload = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">' +
+    '<div class="pswp__bg"></div>' +
+    '<div class="pswp__scroll-wrap">' +
+    '<div class="pswp__container">' +
+    '<div class="pswp__item"></div>' +
+    '<div class="pswp__item"></div>' +
+    '<div class="pswp__item"></div>' +
+    '</div>' +
+    '<div class="pswp__ui pswp__ui--hidden">' +
+    '<div class="pswp__top-bar">' +
+    '<div class="pswp__counter"></div>' +
+    '<button class="pswp__button pswp__button--close iconfont icon-close"></button>' +
+    '<button class="pswp__button pswp__button--fs iconfont icon-maximize"></button>' +
+    '<button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button>' +
+    '<div class="pswp__preloader">' +
+    '<div class="pswp__preloader__icn">' +
+    '<div class="pswp__preloader__cut">' +
+    '<div class="pswp__preloader__donut"></div>' +
+    '</div></div></div></div>' +
+    '<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">' +
+    '<div class="pswp__share-tooltip"></div>' +
+    '</div>' +
+    '<button class="pswp__button pswp__button--arrow--left iconfont icon-arrow-left">' +
+    '<span class=" iconfont icon-arrow-left"></span> </button>' +
+    '<button class="pswp__button pswp__button--arrow--right">' +
+    '<span class=" iconfont icon-arrow-right"></span> </button>' +
+    '<div class="pswp__caption"> ' +
+    '<div class="pswp__caption__center"></div></div></div></div></div>';

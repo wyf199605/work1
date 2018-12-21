@@ -35,7 +35,7 @@ export class DetailModal {
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
                 if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
-                    continue;
+                    f.comType = 'virtual';
                 }
                 if (f.comType === 'file'){
                     f.comType = 'newFile';
@@ -51,37 +51,6 @@ export class DetailModal {
                             if (hCom && hCom !== com) {
                                 let hField = hCom.custom as R_Field;
                                 hCom.set(data[key] || '');
-
-                                if (tools.isNotEmpty(hField) && hField.assignSelectFields && hField.assignAddr) {
-                                    BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
-                                        cache: true,
-                                    }).then(({response}) => {
-                                        let res = response.data;
-                                        if (res && res[0]) {
-                                            hField.assignSelectFields.forEach((name) => {
-                                                let assignCom = self.editModule.getDom(name);
-                                                assignCom && assignCom.set(res[0][name]);
-                                            });
-                                            let data = this.dataGet();
-                                            fields.forEach((fi) => {
-                                                if (fi.elementType === 'lookup') {
-                                                    let lCom = self.editModule.getDom(fi.name);
-                                                    if (!data[fi.lookUpKeyField]) {
-                                                        lCom.set('');
-                                                    } else {
-                                                        let options = self.lookUpData[fi.name] || [];
-                                                        for (let opt of options) {
-                                                            if (opt.value == data[fi.lookUpKeyField]) {
-                                                                lCom.set(opt.value);
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            })
-                                        }
-
-                                    })
-                                }
                             }
                         }
                     }
@@ -241,7 +210,7 @@ export class DetailModal {
                 className = 'one-column';
             }
             if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
-                continue;
+                f.comType = 'virtual';
             }
             if (f.comType === 'file'){
                 f.comType = 'newFile';

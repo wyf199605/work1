@@ -13,7 +13,6 @@ export interface IActionSheetButton extends IButton {
 
 interface IActionSheet {
     buttons: IActionSheetButton[]; // 按钮数组
-    title?:string;
 }
 
 export class ActionSheet extends Modal {
