@@ -161,13 +161,18 @@ export class DetailModal {
                     this.editModule.set(res);
                 })
             } else {
-                this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+                let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
+                if (tools.isNotEmpty(para.defaultData)){
+                    defaultValue = Object.assign({}, defaultValue, para.defaultData);
+                }
+                this.editModule.set(defaultValue);
             }
         } else {
-            // 字段默认值
-            this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
-            // 修改时字段的值
-            tools.isNotEmpty(para.defaultData) && this.editModule.set(para.defaultData);
+            let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
+            if (tools.isNotEmpty(para.defaultData)){
+                defaultValue = Object.assign({}, defaultValue, para.defaultData);
+            }
+            this.editModule.set(defaultValue);
         }
     }
 
@@ -229,6 +234,7 @@ export class DetailModal {
             }
         };
     }
+
     private _lookUpData: objOf<ListItem[]> = {};
     get lookUpData() {
         return this._lookUpData || {};

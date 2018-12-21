@@ -110,33 +110,37 @@ export class MailPage extends BasicPage{
     }
 
     protected initMail(index: number, data){
-        let body = <div className="mail-body"/>,
-            ftable = this.tableModule.main.ftable,
-            pseudoTable = ftable.pseudoTable,
-            link = ftable.columnGet('READSTATE').content.link;
-        // 判断Modal是否存在，不存在重新初始化一个
-        if(this.modal && this.modal.isShow){
-            this.modal.body = body;
-        }else{
-            this.modal = this.initModal(body);
+        let ftable = this.tableModule.main.ftable,
+            col = ftable.columnGet('READSTATE');
+        if(col){
+            let body = <div className="mail-body"/>,
+                pseudoTable = ftable.pseudoTable,
+                link = col.content.link;
+            // 判断Modal是否存在，不存在重新初始化一个
+            if(this.modal && this.modal.isShow){
+                this.modal.body = body;
+            }else{
+                this.modal = this.initModal(body);
+            }
+
+            // 初始化邮件详情页内容
+            this.mail = new Mail({
+                link: BwRule.reqAddr(link, data[index]), // 邮件详情页链接
+                index: index,
+                container: body,
+                modal: this.modal,
+                table: this.tableModule.main,
+                onChange: (index) => {
+                    // 点击邮件详情页上一封、下一封，触发的事件
+                    ftable._clearAllSelectedCells();
+                    pseudoTable && pseudoTable.setPresentSelected(index);
+                    ftable.rows[index] &&(ftable.rows[index].selected = true);
+                    ftable._drawSelectedCells();
+                    this.initMail(index, data);
+                }
+            });
         }
 
-        // 初始化邮件详情页内容
-        this.mail = new Mail({
-            link: BwRule.reqAddr(link, data[index]), // 邮件详情页链接
-            index: index,
-            container: body,
-            modal: this.modal,
-            table: this.tableModule.main,
-            onChange: (index) => {
-                // 点击邮件详情页上一封、下一封，触发的事件
-                ftable._clearAllSelectedCells();
-                pseudoTable && pseudoTable.setPresentSelected(index);
-                ftable.rows[index] &&(ftable.rows[index].selected = true);
-                ftable._drawSelectedCells();
-                this.initMail(index, data);
-            }
-        });
         // !this.modal.isShow && (this.modal.isShow = true);
     }
 }

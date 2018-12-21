@@ -139,6 +139,16 @@ export = class FormPage extends BasicPage {
         // 编辑标识
         this.initData();
         this.initEvent();
+
+        setTimeout(() => {
+            let isPhone = sys.os === 'ad' || sys.os === 'ip',
+                signField = para.fm.signField;
+            if(isPhone && tools.isNotEmpty(signField)){
+                let com = editModule.getDom(signField);
+                com && com.click();
+                window['com'] = com;
+            }
+        }, 500);
         window['e'] = this;
         // this.initValidate();
     }
