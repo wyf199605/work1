@@ -9,6 +9,7 @@ interface EditModulePara{
     auto? : boolean; //是否自动初始化dom
     type? : string;
     container?: HTMLElement;
+    defaultData?: obj;
 }
 //
 // interface EditModuleSinglePara{

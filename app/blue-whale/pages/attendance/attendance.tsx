@@ -103,33 +103,13 @@ export = class AttendancePage extends BasicPage {
                     userid: e.userid,
                     fingerprint: e.print,
                     fingertype: e.type,
-                    verify: e.verify
+                    verify: e.verify // verfiy 为1时，后台需返回正确的指纹信息
                 });
             }
         });
 
         //根据获取的指纹信息通过Ajax验证
         function ajaxValid(data) {
-            // Rule.ajax(CONF.ajaxUrl.atdFingerAtd, {
-            //     type: 'POST',
-            //     data: '[' + JSON.stringify(data) + ']',
-            //     success: (response) => {
-            //         let result = response.body.bodyList[0];
-            //         self.addList(result);
-            //         fingerTitle.innerHTML = '<span class="green">' + result.userName + result.result + '</span>';
-            //         fingerObj.addFinger(result.fingerData);
-            //         fingerObj.againOpen();
-            //     },
-            //     error: () => {
-            //         Modal.toast('考勤失败请重试');
-            //         fingerTitle.innerHTML = '<span class="red">考勤失败，请重新录入</span>';
-            //         fingerObj.againOpen()
-            //     },
-            //     netError: () => {
-            //         Modal.toast('网络错误');
-            //         fingerObj.againOpen()
-            //     }
-            // });
             return new Promise((resolve, reject) => {
                 BwRule.Ajax.fetch(CONF.ajaxUrl.atdFingerAtd, {
                     type: 'POST',
@@ -139,14 +119,12 @@ export = class AttendancePage extends BasicPage {
                     self.addList(result);
                     fingerTitle.innerHTML = '<span class="green">' + result.userName + result.result + '</span>';
                     // fingerObj.addFinger(result.fingerData);
-                    resolve()
+                    resolve(result.fingerData)
                 }).catch(() => {
                     Modal.toast('考勤失败请重试');
                     fingerTitle.innerHTML = '<span class="red">考勤失败，请重新录入</span>';
                     reject();
-                }).finally(() => {
-                    // fingerObj.againOpen();
-                });
+                })
             })
 
         }

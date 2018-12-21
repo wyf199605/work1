@@ -27,7 +27,7 @@ export class MbListView extends Component {
         let listUi: R_SubTable_Field = para.ui.body.elements[0];
         let tabsTitle = ['详情'],
             listUIUrls = [];
-        listUi.subTableList.forEach(ele => {
+        tools.isNotEmpty(listUi.subTableList) && listUi.subTableList.forEach(ele => {
             listUIUrls.push(tools.url.addObj(BW.CONF.siteUrl + ele.uiAddr.dataAddr,{
                 output:"json"
             }));

@@ -3,8 +3,6 @@
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import d = G.d;
 import {FormCom} from "../../../global/components/form/basic";
-import {IUploaderPara, Uploader} from "../../../global/components/form/upload/uploader";
-import {Loading} from "../../../global/components/ui/loading/loading";
 import {IUploadImagesItem, UploadImagesItem} from "./uploadImagesItem";
 import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
@@ -19,9 +17,6 @@ export interface IImage {
 
 interface IUploadImages extends IBwUploaderPara {
     unique?: string;
-
-    onComplete?(...any); // 上传完成回调
-    onError?(file: obj); // 上传失败回调
     field?: R_Field; //字段
     pageData?: obj;//页面数据
 }
@@ -111,10 +106,8 @@ export class UploadImages extends FormCom {
     private addImg: HTMLElement;
     private imgWrapper: HTMLElement;
     private imgType: string = '';
-    private typeUnique: string = '';
 
     protected wrapperInit(para: IUploadImages): HTMLElement {
-        let type = para.field.dataType || para.field.atrrs.dataType;
         return <div className="accessory-wrapper">
             <div className="accessory-title">{para.field.caption || '图片'}</div>
             <div className="images-wrapper">
@@ -125,11 +118,9 @@ export class UploadImages extends FormCom {
     }
 
     public uploader: BwUploader = null;
-    private loading: Loading = null;
 
     constructor(private para: IUploadImages) {
         super(para);
-        this.typeUnique = new Date().getTime() + para.field.name;
         this.imgType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.unique;
         this.createUploader();
@@ -137,13 +128,20 @@ export class UploadImages extends FormCom {
     }
 
     private createUploader() {
-        let uploader = new BwUploader({
+        let uploader: BwUploader = new BwUploader({
+            loading: {
+                msg: '上传中...',
+                container: document.body,
+                disableEl: document.body
+            },
+            uploadType: this.imgType === '26' ? 'sign' : 'file',
             uploadUrl: this.para.uploadUrl || BW.CONF.ajaxUrl.fileUpload,
             accept: this.para.accept || {
                 title: 'Images',
                 extensions: 'gif,jpg,jpeg,bmp,png',
                 mimeTypes: 'image/*'
             },
+            autoUpload: false,
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             // 上传成功
@@ -153,13 +151,9 @@ export class UploadImages extends FormCom {
                     unique: '',
                     isError: false,
                     isOnLine: false,
-                    localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
+                    localUrl: (window.URL) ? window.URL.createObjectURL(file.blob) : window['webkitURL'].createObjectURL(file.blob)
                 };
-                if (tools.isNotEmpty(res.ifExist)) {
-                    Modal.toast('图片已存在!');
-                } else {
-                    Modal.toast('上传成功!');
-                }
+                Modal.toast('上传成功!');
                 switch (this.imgType) {
                     case '20': {
                         imageObj.unique = res.data.blobField.value;
@@ -198,13 +192,6 @@ export class UploadImages extends FormCom {
             if (files.length > 0) {
 
                 //开始上传
-                if (!this.loading) {
-                    this.loading = new Loading({
-                        msg: '上传中...',
-                        container: document.body
-                    });
-                    document.body.classList.add('up-disabled');
-                }
                 switch (this.imgType) {
                     case '20':
                     case '26':
@@ -224,58 +211,33 @@ export class UploadImages extends FormCom {
             }
         });
         // 上传错误时调用
-        uploader.on("uploadError", (file, res) => {
-            if (this.loading) {
-                this.loading.hide();
-                this.loading.destroy();
-                this.loading = null;
-                document.body.classList.remove('up-disabled');
-            }
-            if (res === 'ifExist') {
-
-            } else {
-                let imageObj: IImage = {
-                    unique: '',
-                    isError: true,
-                    localUrl: (window.URL) ? window.URL.createObjectURL(file.source.source) : window['webkitURL'].createObjectURL(file.source.source)
-                };
-                switch (this.imgType) {
-                    case '20':
-                    case '26':
-                    case '27': {
-                        this.imgs = [imageObj];
-                    }
-                        break;
-                    case '28': {
-                        this.addItem(imageObj);
-                    }
-                        break;
-                }
-            }
-            this.para.onError && this.para.onError.call(this, file);
-        });
-        // 所有文件上传成功时调用
-        uploader.on('uploadFinished', () => {
-            if (this.loading) {
-                this.loading.hide();
-                this.loading.destroy();
-                this.loading = null;
-                document.body.classList.remove('up-disabled');
-            }
-        });
-        uploader.on("error", (type) => {
-            const msg = {
-                'Q_TYPE_DENIED': '文件类型有误',
-                'F_EXCEED_SIZE': '文件大小不能超过4M',
+        uploader.on(BwUploader.EVT_UPLOAD_ERROR, (file) => {
+            let imageObj: IImage = {
+                unique: '',
+                isError: true,
+                localUrl: (window.URL) ? window.URL.createObjectURL(file.blob) : window['webkitURL'].createObjectURL(file.blob)
             };
-            if (this.loading) {
-                this.loading.hide();
-                this.loading.destroy();
-                this.loading = null;
-                document.body.classList.remove('up-disabled');
+            switch (this.imgType) {
+                case '20':
+                case '26':
+                case '27': {
+                    this.imgs = [imageObj];
+                }
+                    break;
+                case '28': {
+                    this.addItem(imageObj);
+                }
+                    break;
             }
-            Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
+
         });
+        // uploader.on("error", (type) => {
+        //     const msg = {
+        //         'Q_TYPE_DENIED': '文件类型有误',
+        //         'F_EXCEED_SIZE': '文件大小不能超过4M',
+        //     };
+        //     Modal.alert(msg[type] ? msg[type] : '文件出错, 类型:' + type)
+        // });
     }
 
     protected _listItems: UploadImagesItem[] = [];

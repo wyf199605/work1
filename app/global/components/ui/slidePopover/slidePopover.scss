@@ -95,6 +95,7 @@
       align-items: center;
       padding-bottom: 10px;
       padding-top: 10px;
+      padding-right: 16px;
       .btn-wrapper {
         display: flex;
         align-items: center;
@@ -102,6 +103,7 @@
         height: 50px;
         flex-basis: 33.33%;
         button {
+          flex: 1 1 auto;
           span {
             display: block;
             line-height: 30px;

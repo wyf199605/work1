@@ -91,9 +91,13 @@ export class FastTableMenu {
 
     }
 
+    set show(show: boolean){
+        this.ftableMenu && (this.ftableMenu.show = show);
+    }
+
     private mousedownEvent = (() => {
         let mousedownHandler = (e) => {
-            this.ftableMenu.show = false;
+            this.show = false;
         };
         return {
             on: () => d.on(document, 'click', mousedownHandler),
@@ -109,7 +113,7 @@ export class FastTableMenu {
             }
             let fm = this.ftableMenu;
             fm = tools.isMb ? fm as NewPopMenu : fm as FastTablePCMenu;
-            fm.show = false;
+            this.show = false;
             let tr = d.closest(e.target, 'tr'),
                 td = d.closest(e.target, 'td, th'),
                 isTh = d.matches(td, 'th'),
@@ -126,7 +130,7 @@ export class FastTableMenu {
             this.cell = cell;
             let children = fm.contextMenu.children;
             this.updateMenu();
-            fm.show = true;
+            this.show = true;
             let offsetLeft = tools.offset.left(this.ftable.wrapper),
                 offsetTop = tools.offset.top(this.ftable.wrapper),
                 scrollTop = tools.getScrollTop(this.ftable.wrapper);

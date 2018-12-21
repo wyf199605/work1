@@ -12,9 +12,12 @@ import {SlidePopover} from "../../../global/components/ui/slidePopover/slidePopo
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {DetailModal} from "../listDetail/DetailModal";
 
 export interface IMbListModule extends IComponentPara {
     ui: IBW_UI<IBW_Table>;
+    url?: string;
+    ajaxData?:obj;
 }
 
 export class MbListModule extends Component {
@@ -27,11 +30,14 @@ export class MbListModule extends Component {
     private captions: string[] = [];
     private isMulti: boolean = false;
     private defaultData: obj[] = [];
+    private hasQuery: boolean = false;
 
     constructor(private para: IMbListModule) {
         super(para);
         let tableListEl = para.ui.body.elements[0];
         tableListEl.subButtons = (tableListEl.subButtons || []).concat(para.ui.body.subButtons || []);
+        let querier = this.para.ui.body.elements[0].querier;
+        this.hasQuery = querier && ([3, 13].includes(querier.queryType)) || this.para.ui.body.elements[0].noQuery;
         this.getButtons(tableListEl.subButtons);
         this.initGlobalButtons();
         this.handlerLayout(tableListEl.layout);
@@ -40,11 +46,21 @@ export class MbListModule extends Component {
         this.initEvents.on();
     }
 
-    refresh(ajaxData: obj) {
-        return this.mbList.dataManager.refresh(ajaxData);
+    /**
+     * @author WUML
+     * @date 2018/12/12
+     * @Description: 刷新
+     */
+    refresh(ajaxData?: obj) {
+        return this.mbList.dataManager.refresh(ajaxData || {});
     }
 
-    // 创建全局按钮
+
+    /**
+     * @author WUML
+     * @date 2018/12/12
+     * @Description: 初始化全局按钮
+     */
     private initGlobalButtons() {
         let globalButtons = this.allButtons[0] || [];
         if (tools.isNotEmpty(globalButtons)) {
@@ -59,8 +75,18 @@ export class MbListModule extends Component {
                         // icon: btn.icon ? btn.icon.split(' ')[1] : '',
                         // iconPre: btn.icon ? btn.icon.split(' ')[0] : '',
                         onClick: () => {
-                            ButtonAction.get().clickHandle(btn, {});
-                            sliderPopover.modal.isShow = false;
+                            switch (btn.subType) {
+                                case 'insert_save': {
+                                    getFormFields(tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr), {
+                                        output: 'json'
+                                    }));
+                                }
+                                    break;
+                                default:
+                                    ButtonAction.get().clickHandle(btn, {});
+                                    sliderPopover.modal.isShow = false;
+                                    break;
+                            }
                         }
                     })
                 });
@@ -77,12 +103,72 @@ export class MbListModule extends Component {
                         content: btn.caption,
                         container: box.wrapper,
                         onClick: () => {
-                            ButtonAction.get().clickHandle(btn, {});
+                            switch (btn.subType) {
+                                case 'insert_save': {
+                                    getFormFields(tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr), {
+                                        output: 'json'
+                                    }));
+                                }
+                                    break;
+                                default:
+                                    ButtonAction.get().clickHandle(btn, {});
+                                    break;
+                            }
                         }
                     }))
                 });
                 box.children = buttons;
             }
+        }
+        let self = this;
+
+        function getFormFields(url: string) {
+            BwRule.Ajax.fetch(url, {
+                loading: {
+                    msg: '加载中,请稍后...',
+                    disableEl: document.body
+                }
+            }).then(({response}) => {
+                let element = response.body.elements[0];
+                new DetailModal(Object.assign({}, {
+                    fm: {
+                        caption: element.caption,
+                        fields: element.fields
+                    }
+                }, {
+                    defaultData: {},
+                    isAdd: true,
+                    isPC: !tools.isMb,
+                    confirm(data) {
+                        return new Promise((resolve) => {
+                            ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
+                                resolve();
+                            }, self.para.url || '');
+                        })
+                    },
+                    isNotDetail: true
+                }))
+            })
+        }
+    }
+
+    /**
+     * @author WUML
+     * @date 2018/12/19
+     * @Description: 外部使用，添加查询按钮
+     */
+    queryBtnAdd(btn: IButton) {
+        let btnWrapper = d.query('.global-button-wrapper', this.wrapper);
+        if (tools.isNotEmpty(btnWrapper)){
+            new Button(Object.assign({},btn,{
+                container:btnWrapper
+            }));
+        }else{
+            let globalButtonWrapper = <div className="global-button-wrapper single-query"/>;
+            this.wrapper.appendChild(globalButtonWrapper);
+            new Button(Object.assign({},btn,{
+                container:globalButtonWrapper
+            }));
         }
     }
 
@@ -114,17 +200,51 @@ export class MbListModule extends Component {
             buttonsClick: (btnIndex, itemIndex) => {
                 let buttons = this.allButtons[1] || [],
                     btn = buttons[btnIndex],
-                    data = this.defaultData[itemIndex];
-                console.log(data);
-                ButtonAction.get().clickHandle(btn, data);
+                    data = this.defaultData[itemIndex],
+                    self = this;
+                switch (btn.subType) {
+                    case 'update_save': {
+                        BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr), {
+                            output: 'json'
+                        }), {
+                            loading: {
+                                msg: '加载中,请稍后...',
+                                disableEl: document.body
+                            }
+                        }).then(({response}) => {
+                            let element = response.body.elements[0];
+                            new DetailModal(Object.assign({}, {
+                                fm: {
+                                    caption: element.caption,
+                                    fields: element.fields
+                                }
+                            }, {
+                                defaultData: data,
+                                isAdd: false,
+                                isPC: !tools.isMb,
+                                confirm(data) {
+                                    return new Promise((resolve) => {
+                                        ButtonAction.get().clickHandle(element.subButtons[0], data, () => {
+                                            resolve();
+                                        }, self.para.url || '');
+                                    })
+                                },
+                                isNotDetail: true
+                            }))
+                        })
+                    }
+                        break;
+                    default:
+                        ButtonAction.get().clickHandle(btn, data);
+                        break;
+                }
             },
             itemClick: (index) => {
                 let data = this.defaultData[index],
-                    addr: R_ReqAddr = this.para.ui.body.elements[0].subTableAddr;
+                    addr: R_ReqAddr = this.para.ui.body.elements[0].layoutDrill;
                 if (tools.isNotEmpty(addr)) {
-                    let url = BW.CONF.siteUrl + BwRule.reqAddr(addr, data);
                     sys.window.open({
-                        url: url
+                        url: tools.url.addObj(BW.CONF.siteUrl + addr.dataAddr, G.Rule.parseVarList(addr.parseVarList, data))
                     })
                 }
             },
@@ -147,6 +267,7 @@ export class MbListModule extends Component {
                     this.defaultData = data;
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
+                auto: !this.hasQuery,
                 ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
                     return new Promise<{ data: obj[], total: number }>((resolve) => {
                         let dataAddr: R_ReqAddr = this.para.ui.body.elements[0].dataAddr,
@@ -154,7 +275,12 @@ export class MbListModule extends Component {
                         url = tools.url.addObj(url, Object.assign({}, {
                             pageparams: '{"index"=' + (current + 1) + ', "size"=' + pageSize + ',"total"=1}'
                         }, custom));
-                        BwRule.Ajax.fetch(url).then(({response}) => {
+                        BwRule.Ajax.fetch(url, {
+                            loading: {
+                                msg: '加载中，请稍后...',
+                                disableEl: document.body
+                            }
+                        }).then(({response}) => {
                             let body = response.body,
                                 head = response.head;
                             resolve({
@@ -164,7 +290,7 @@ export class MbListModule extends Component {
                         })
                     })
                 },
-                ajaxData: null
+                ajaxData: tools.isNotEmpty(this.para.ajaxData) ? this.para.ajaxData : null
             }
         });
     }
@@ -262,8 +388,8 @@ export class MbListModule extends Component {
                         break;
                     case 'countDown': {
                         let time: string = item[layout['countDown']];
-                        if (tools.isNotEmpty(time)){
-                            time = time.replace(/\-/g, '/');
+                        if (tools.isNotEmpty(time)) {
+                            time = time.replace(/-/g, '/');
                             itemObj['countDown'] = new Date(time).getTime();
                         }
                     }

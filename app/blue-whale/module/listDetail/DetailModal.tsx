@@ -3,9 +3,9 @@
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import tools = G.tools;
-import {NewFormEdit, NewFormFactory} from "./NewFormFactory";
-import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
+import {DetailCellType} from "./ListItemDetailCell";
 import {ListItemDetail} from "./ListItemDetail";
+import {EditModule} from "../edit/editModule";
 
 interface IDetailModal extends EditPagePara {
     defaultData?: obj;
@@ -16,39 +16,38 @@ interface IDetailModal extends EditPagePara {
     width?: string;
     height?: string;
     isPC?: boolean;
+    isNotDetail?: boolean;
 }
 
 export class DetailModal {
-    private editModule: NewFormFactory;
+    private editModule: EditModule;
 
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
-        let emPara: NewFormEdit = {fields: [], defaultData: this.para.defaultData},
+        let emPara: EditModulePara = {fields: [], defaultData: this.para.defaultData},
             formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
+        para.isNotDetail && BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
+            tools.isPc && formWrapper.classList.add('no-group');
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
-                if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || (this.para.uiType == 'update' && f.noShow) || (this.para.uiType == 'flow' && f.noShow) || (this.para.uiType == 'detail' && f.noShow)) {
-                    continue;
-                }
-                let field = {
-                    dom: this.createFormWrapper(f, formWrapper),
-                    field: f
-                };
-                emPara.fields.push(field);
-                if ((['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {
-                    field.dom && field.dom.classList.add('disabled');
-                }
+                emPara.fields.push(this.handleField(f, formWrapper));
             }
         } else {
             let fieldsArr = [...fields];
             groupInfo.forEach(group => {
-                let result = this.getGroupFormPara(group,fieldsArr,formWrapper);
+                let result = this.getGroupFormPara(group, fieldsArr, formWrapper);
                 emPara.fields = emPara.fields.concat(result.para);
                 fieldsArr = result.fields;
-            })
+            });
+            // 不在组中的字段，一般为隐藏字段
+            if (tools.isNotEmpty(fieldsArr)) {
+                fieldsArr.forEach(f => {
+                    emPara.fields.push(this.handleField(f, formWrapper, '', true));
+                })
+            }
         }
         let modal: Modal;
         let footButtons = {
@@ -129,7 +128,7 @@ export class DetailModal {
                 }
             });
         }
-        this.editModule = new NewFormFactory(emPara);
+        this.editModule = new EditModule(emPara);
         if (para.isAdd) {
             if (tools.isNotEmpty(para.fm.defDataAddrList)) {
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response}) => {
@@ -155,13 +154,48 @@ export class DetailModal {
         }
     }
 
+    // 处理字段
+    private handleField(f: R_Field, wrapper: HTMLElement, className?: string, isVirtual = false): ComInitP {
+        let self = this;
+        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
+            f.comType = 'virtual';
+        }
+        if (f.comType === 'file') {
+            f.comType = 'newFile';
+        }
+        if (isVirtual === true){
+            f.comType = 'virtual';
+        }
+        let field = {
+            dom: DetailModal.createFormWrapper(f, wrapper, className || ''),
+            field: f,
+            data: this.para.defaultData,
+            onExtra: (data, relateCols) => {
+                let com = self.editModule.getDom(f.name);
+                for (let key of relateCols) {
+                    let hCom = self.editModule.getDom(key);
+                    if (hCom && hCom !== com) {
+                        hCom.set(data[key] || '');
+                    }
+                }
+            }
+        };
+        if (this.para.isAdd ? field.field.noModify : field.field.noEdit) {
+            field.dom && field.dom.classList.add('disabled');
+        }
+
+        return field;
+    }
+
+    // 处理分组
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
         if (tools.isEmpty(groupInfo.cloNames)) {
             return fields;
         }
         let groupsArr = groupInfo.cloNames.split(','),
             groupFields: R_Field[] = [],
-            fieldsArr = [...fields];
+            fieldsArr = [...fields],
+            self = this;
         groupsArr.forEach(field => {
             let gFields = fieldsArr.filter(f => f.name === field);
             if (tools.isNotEmptyArray(gFields)) {
@@ -179,34 +213,26 @@ export class DetailModal {
         for (let i = 0; i < groupFields.length; i++) {
             let f = groupFields[i],
                 className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber) - 1],
-                type = this.getType(f.dataType || f.atrrs.dataType || '');
+                type = DetailModal.getType(f.dataType || f.atrrs.dataType || '');
             if (~['textarea', 'file', 'img'].indexOf(type)) {
                 className = 'one-column';
             }
-            if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || (this.para.uiType == 'update' && f.noShow) || (this.para.uiType == 'flow' && f.noShow) || (this.para.uiType == 'detail' && f.noShow)) {
-                continue;
-            }
-            let field = {
-                dom: this.createFormWrapper(f, cellsWrapper,className),
-                field: f
-            };
-            emPara.push(field);
-            if ((['insert', 'associate'].indexOf(this.para.uiType) > -1 ? field.field.noModify : field.field.noEdit) && (['file', 'img'].indexOf(field.field.comType) < 0)) {
-                field.dom && field.dom.classList.add('disabled');
-            }
+            emPara.push(this.handleField(f, cellsWrapper, className));
         }
         return {
-            fields:fieldsArr,
-            para:emPara
+            fields: fieldsArr,
+            para: emPara
         };
     }
 
-    private createFormWrapper(field: R_Field, wrapper: HTMLElement, className?: string): HTMLElement {
-        if (field.comType === 'file' || field.comType === 'img') {
+    // 创建表单项wrappaer
+    static createFormWrapper(field: R_Field, wrapper: HTMLElement, className?: string): HTMLElement {
+        if (field.comType === 'newFile' || field.comType === 'image') {
             return wrapper;
         } else {
             let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
-            let formGroupWrapper = <div className={"detail-cell " + className || ''} data-name={field.name}
+            className = tools.isNotEmpty(className) ? "detail-cell " + className : 'detail-cell';
+            let formGroupWrapper = <div className={className} data-name={field.name}
                                         data-type={field.comType} data-element-type={elementType}>
                 <div className="detail-cell-title" data-input-type={field.comType}>{field.caption}</div>
             </div>;
@@ -241,11 +267,11 @@ export class DetailModal {
         }
     }
 
-    private getType(t: string): DetailCellType {
+    static getType(t: string): DetailCellType {
         let type: DetailCellType;
         if (t === '18') {
             type = 'textarea';
-        } else if (t === '20' || t === '27' || t === '28') {
+        } else if (t === '20' || t === '26' || t === '27' || t === '28') {
             type = 'img';
         } else if (t === '43' || t === '47' || t === '48') {
             type = 'file';

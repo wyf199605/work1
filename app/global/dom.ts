@@ -600,7 +600,7 @@ let event = (function () {
                     let isImmediateStop = false,
                         isDocWin = target === window || target === document,
                         el = <Element>target;
-                    if (isDocWin || (!el.classList.contains('disabled') && handlers && handlers[0])) {
+                    if (isDocWin || (el.classList && !el.classList.contains('disabled') && handlers && handlers[0])) {
                         for (let handler of handlers) {
                             handler.call(target, evt);
 
@@ -1208,7 +1208,9 @@ export const d = {
     //     destroy?(old: K): void
     // });
 
-    diff<T, K>(newSet: T[], oldSet: K[], operate: { create?(now: T, index: number): void, replace?(now: T, old: K, index: number): void, destroy?(old: K, index: number): void }){
+    diff<T, K>(newSet: T[], oldSet: K[], operate: { create?(now: T, index: number): void,
+        replace?(now: T, old: K, index: number): void,
+        destroy?(old: K, index: number): void }){
         let i = 0,
             {create, replace, destroy} = operate;
 

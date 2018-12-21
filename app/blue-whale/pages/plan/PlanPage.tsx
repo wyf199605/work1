@@ -31,15 +31,15 @@ export class PlanPage extends BasicPage {
             let query = <HorizontalQueryModule
                 container={this.wrapper}
                 qm={{
-                    autTag: qData['autTag'],
-                    hasOption: qData['hasOption'],
-                    queryType: qData['queryType'],
-                    atvarparams:qData['atvarparams'],
-                    queryparams1: qData['queryparams1'],
-                    scannableTime: 0,
-                    uiPath: qData['uiPath'],
-                    setting: null
-                }} search={(data) => {
+                autTag: qData['autTag'],
+                hasOption: qData['hasOption'],
+                queryType: qData['queryType'],
+                atvarparams:qData['atvarparams'],
+                queryparams1: qData['queryparams1'],
+                scannableTime: 0,
+                uiPath: qData['uiPath'],
+                setting: null
+            }} search={(data) => {
                 console.log(data)
                 let isEmpty = true;
                 for(let key in data){

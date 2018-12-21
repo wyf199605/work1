@@ -39,6 +39,10 @@ interface IBw_Query{
     scannableTime? : number
     autTag: number;
     uiPath: R_ReqAddr;
+    mobileSetting?:{
+        itemId:string;
+        settingValue:string;
+    }
     setting : {
         settingId: number;
         setContent : string;

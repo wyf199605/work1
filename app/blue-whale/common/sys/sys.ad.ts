@@ -1,26 +1,26 @@
 // import GLOBAL_CONF = require('conf.ts');
 // import tools = require('tools');
-
 interface ICloseConfirmPara {
     condition?: () => boolean | Promise<boolean>;
     msg?: string;
     btn?: string[],
     noHandler?: Function;
 }
-namespace BW{
+
+namespace BW {
     import d = G.d;
-    declare const AppShell :any;
+    declare const AppShell: any;
     import tools = G.tools;
 
 
-    export class SYSAD implements SYS_Type{
+    export class SYSAD implements SYS_Type {
         public os: string;
-        public isMb : boolean;
+        public isMb: boolean;
 
-        public window = (function(self) {
+        public window = (function (self) {
             let closeConfirmConfig: ICloseConfirmPara = null;
             return {
-                backHome: function (){
+                backHome: function () {
                     self.handle('backHome');
                 },
                 open: function (o: winOpen) {
@@ -30,22 +30,22 @@ namespace BW{
                     o.extras = {viewData: JSON.stringify(o.extras)};
 
                     new Promise(((resolve, reject) => {
-                        if(o.gps) {
+                        if (o.gps) {
                             self.window.getGps((gps) => {
-                                if(gps.success) {
+                                if (gps.success) {
                                     resolve(gps.gps)
-                                }else{
+                                } else {
                                     reject(gps);
                                 }
                             })
-                        }else{
+                        } else {
                             resolve({})
                         }
                     })).then(gps => {
                         o.header = gps ? Object.assign(o.header || {}, {position: gps}) : o.header;
                         self.handle('open', JSON.stringify(o));
-                    }).catch(reason =>{
-                        if(!reason.flag){
+                    }).catch(reason => {
+                        if (!reason.flag) {
                             alert('gps未打开, 点击确定去开启.');
                             self.window.openGps();
                         } else {
@@ -54,7 +54,7 @@ namespace BW{
                     });
                 },
                 set closeConfirm(obj: ICloseConfirmPara) {
-                    if(obj) {
+                    if (obj) {
                         closeConfirmConfig = Object.assign({msg: '是否关闭页面？'}, obj);
                     } else {
                         closeConfirmConfig = null;
@@ -62,28 +62,28 @@ namespace BW{
                 },
                 close: function (event: string, data: obj) {
                     closeConfirmConfig = closeConfirmConfig || {};
-                    let {msg, noHandler, btn, condition} = closeConfirmConfig ;
-                    if(msg && typeof condition !== 'function') {
+                    let {msg, noHandler, btn, condition} = closeConfirmConfig;
+                    if (msg && typeof condition !== 'function') {
                         condition = () => true;
                     }
-                    if(msg) {
-                        let flagPromise =  condition() ;
-                        if(!(flagPromise instanceof Promise)){
+                    if (msg) {
+                        let flagPromise = condition();
+                        if (!(flagPromise instanceof Promise)) {
                             flagPromise = Promise.resolve(!!flagPromise);
                         }
                         flagPromise.then(flag => {
-                            if(!flag){
+                            if (!flag) {
                                 close();
                                 return;
                             }
                             require(['Modal'], function (m) {
                                 m.Modal.confirm({
-                                    msg:  msg,
+                                    msg: msg,
                                     btns: btn ? btn : ['不关闭', '关闭'],
                                     callback: (flag: boolean) => {
-                                        if(flag){
+                                        if (flag) {
                                             tools.isFunction(noHandler) && noHandler();
-                                        }else{
+                                        } else {
                                             close();
                                         }
                                     }
@@ -93,9 +93,9 @@ namespace BW{
 
                         return;
                     }
-
                     close();
-                    function close(){
+
+                    function close() {
                         self.handle('close', '{event:"' + event + '",data:"' + data + '"}');
                     }
                 },
@@ -108,7 +108,7 @@ namespace BW{
                 wake: function (event, data) {
                     self.handle('wake', '{event:"' + event + '",data:"' + data + '"}');
                 },
-                uploadVersion: function (version: string){
+                uploadVersion: function (version: string) {
                     self.handle('uploadVersion', JSON.stringify({
                         event: "",
                         data: {
@@ -125,8 +125,8 @@ namespace BW{
                         {icon: "myselfMenu", name: "我的", url: CONF.url.myselfMenu, show: 0}
                     ];
                     noShow && noShow.forEach((name) => {
-                        for(let key in ja){
-                            if(ja[key].icon === name){
+                        for (let key in ja) {
+                            if (ja[key].icon === name) {
                                 ja[key].show = 1;
                             }
                         }
@@ -171,7 +171,7 @@ namespace BW{
 
 
                 },
-                openGps: function() {
+                openGps: function () {
                     self.handle('openGps');
                 },
                 update: function () {
@@ -227,77 +227,75 @@ namespace BW{
                 whiteBat: function () {
                     this.adHandle('whiteBat', '');
                 },
-                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
-                    let event = '__EVT_GET_IMG_BY_DEVICE__',
-                        handler = null;
-                    d.on(window, event, handler = tools.pattern.throttling(function (response : CustomEvent) {
-                        d.off(window, event, handler);
-                        require(['Modal'],(m)=>{
-                            m.Modal.alert('yici', 'tt提示')
-                        })
-                        try{
+                getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
+                    let event = '__EVT_GET_IMG_BY_DEVICE__';
+                    d.once(window, event, function (response: CustomEvent) {
+                        try {
                             let detail = JSON.parse(response.detail);
 
-                            if(detail.success && detail.msg){
+                            if (detail.success && detail.msg) {
                                 let data = detail.msg;
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
                             }else{
-                                error && error(detail);
+                                error && error(detail.msg || '');
                             }
                         }catch (e){
-                            error && error();
+                            error && error('获取图片失败');
                         }
-                    }, 1000));
+                    });
                     self.handle('getImg', '{event:"' + event + '"}');
                 },
-                getEditImg(image: string | Function, callback?: Function){
-                    if(typeof image === 'function'){
+                getEditImg(image: string | Function, callback?: Function) {
+                    if (typeof image === 'function') {
                         callback = image;
                         image = '';
                     }
                     let event = '__EVT_GET_EDIT_IMG_BY_DEVICE__';
-                    d.once(window, event, (response : CustomEvent) => {
+                    d.once(window, event, (response: CustomEvent) => {
                         let detail = JSON.parse(response.detail);
 
                     });
                     self.handle('getSignImg', JSON.stringify({event, type: 1, image}));
                 },
-                getSign(callback: Function, error?: Function){
+                getSign(callback: Function, error?: (msg?: string) => void) {
                     let event = '__EVT_GET_SIGN_BY_DEVICE__';
-                    d.once(window, event, (response : CustomEvent) => {
-                        try{
+                    d.once(window, event, (response: CustomEvent) => {
+                        try {
                             let detail = JSON.parse(response.detail);
 
-                            if(detail.success && detail.msg){
+                            if (detail.success && detail.msg) {
                                 let data = detail.msg;
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
-                            }else{
-                                error && error(detail);
+                            } else {
+                                error && error(detail || '');
                             }
-                        }catch (e){
-                            error && error();
+                        } catch (e) {
+                            error && error('获取图片失败');
                         }
                     });
                     self.handle('getSignImg', JSON.stringify({event, type: 0}));
+                },
+                reOpen:function (o: winOpen) {
+                    self.handle('reOpen', JSON.stringify(o));
                 }
             }
         })(this);
 
-        public ui = (function(self){
+        public ui = (function (self) {
             return {
                 notice: function (obj) {
-                    self.handle('callMsg',obj.msg);
+                    self.handle('callMsg', obj.msg);
                 }
             }
         })(this);
 
-        private handle (action:string,dict?:string) {
-            if(tools.isEmpty(dict)){
+        private handle(action: string, dict?: string) {
+            if (tools.isEmpty(dict)) {
                 return JSON.parse(AppShell.postMessage(action));
-            }else{
-                return JSON.parse(AppShell.postMessage(action,dict));
+            } else {
+                return JSON.parse(AppShell.postMessage(action, dict));
             }
         }
     }

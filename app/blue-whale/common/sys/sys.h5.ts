@@ -102,7 +102,7 @@ namespace BW{
 
                 },
                 openImg: function (url: string) {
-
+                    self.window.download(url);
                 },
                 download: function (url: string, fileName: string = '') {
                     let a = d.create(`<a href="${url}" download="${fileName}"></a>`);
@@ -117,15 +117,26 @@ namespace BW{
                 fire : function (type : string, data? : obj,) {
                     tools.event.fire(type, data, window);
                 },
-                getFile: function (callback: (file: File[]) => void, multi: boolean = false, accpet: string, error: Function) {
+                getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
                     let input = <HTMLInputElement>d.create('<input type="file" class="hide"/>');
                     input.multiple = multi;
                     accpet && (input.accept = accpet);
                     d.on(input, 'change', () => {
-                        callback && callback(Array.prototype.slice.call(input.files));
+                        callback && callback(Array.prototype.slice.call(input.files).map((file: File): CustomFile => {
+                            return {
+                                blob: file,
+                                name: file.name,
+                                lastModifiedDate: file.lastModifiedDate,
+                                type: file.type,
+                                size: file.size
+                            }
+                        }));
                         input = null;
                     });
                     input.click();
+                },
+                reOpen: function (o: winOpen){
+                    sys.window.open(o);
                 }
             }
         })(this);

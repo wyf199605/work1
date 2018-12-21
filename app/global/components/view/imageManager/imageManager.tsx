@@ -126,6 +126,7 @@ export class ImageManager extends Component{
                 leftPanel: <span>第 {leftCount} 张，放大比例{scaleEl}</span>
             } : void 0
         });
+
         return {
             on: () => {
                 d.on(this.wrapper, 'click', '.img-wrapper', handler = (ev) => {

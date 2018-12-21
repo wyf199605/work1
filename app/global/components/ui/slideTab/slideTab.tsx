@@ -5,10 +5,11 @@ import d = G.d;
 import tools = G.tools;
 import {DataManager, IDataManagerAjaxStatus, IDataManagerPara} from "../../DataManager/DataManager";
 
-export interface ISlideTabPara extends TabPara{
+export interface ISlideTabPara extends TabPara {
     tabs?: ISlideTab[];
 }
-export interface ISlideTab extends ITab{
+
+export interface ISlideTab extends ITab {
     dataManager?: {
         pageSize?: number;
         render: (start: number, length: number, data: obj[], isRefresh: boolean) => void;
@@ -19,15 +20,32 @@ export interface ISlideTab extends ITab{
 }
 
 
-export class SlideTab extends Tab{
-    constructor(para: ISlideTabPara){
+export class SlideTab extends Tab {
+    constructor(para: ISlideTabPara) {
         super(para);
         this.panelContainer.classList.add('slide-tab-wrapper');
 
         this.width = this.panelContainer.offsetWidth;
 
+        this.resizeEvent.on();
+
         this.slideEvent.on();
     }
+
+    resizeEvent = (() => {
+        let handler = null;
+        return {
+            on: () => {
+                d.on(window, 'resize', handler = () => {
+                    this.width = this.panelContainer.offsetWidth;
+                    this.active(this.current);
+                })
+            },
+            off: () => {
+                d.off(window, 'resize', handler)
+            }
+        }
+    })();
 
     protected width: number;
 
@@ -50,25 +68,25 @@ export class SlideTab extends Tab{
             d.on(this.panelContainer, 'touchmove', moveHandler = (e) => {
                 let currentX = e.changedTouches[0].clientX,
                     currentY = e.changedTouches[0].clientY;
-                if(isFirst){
+                if (isFirst) {
                     isFirst = false;
                     let angle = Math.atan2(disY - currentY, disX - currentX) / Math.PI * 180;
                     direction = getDirection(angle);
 
                 }
 
-                if(panel.scrollTop === 0 && direction !== 'down'){
+                if (panel.scrollTop === 0 && direction !== 'down') {
                     e.preventDefault();
                 }
 
-                if(direction === 'left' || direction === 'right'){
+                if (direction === 'left' || direction === 'right') {
                     let deltaX = currentX - disX;
                     disX = currentX;
-                    if((this.current === 0 && e.direction === 'right')
-                        || (this.current === this.len - 1 && e.direction === 'left')){
+                    if ((this.current === 0 && e.direction === 'right')
+                        || (this.current === this.len - 1 && e.direction === 'left')) {
                         scale *= .96;
                         deltaX *= scale;
-                    }else{
+                    } else {
                         deltaX = deltaX * 1.15;
                     }
                     translate += deltaX;
@@ -84,16 +102,16 @@ export class SlideTab extends Tab{
             })
         };
 
-        let getDirection = (angle: number) : 'up' | 'down' | 'left' | 'right' =>{
-            if (angle <= 45 && angle > -45){
+        let getDirection = (angle: number): 'up' | 'down' | 'left' | 'right' => {
+            if (angle <= 45 && angle > -45) {
                 return 'right';
-            }else if(angle <= 135 && angle > 45){
+            } else if (angle <= 135 && angle > 45) {
                 return 'down';
-            }else if(angle <= -45 && angle > -135){
+            } else if (angle <= -45 && angle > -135) {
                 return 'up';
-            }else if(angle > 135 || angle <= -135){
+            } else if (angle > 135 || angle <= -135) {
                 return 'left';
-            }else{
+            } else {
                 return null
             }
         };
@@ -129,33 +147,40 @@ export class SlideTab extends Tab{
         }
     })();
 
-    protected change(translate: number){
+    protected change(translate: number) {
         this.panelContainer.style.webkitTransform = 'translateX(' + translate + 'px)';
         this.panelContainer.style.transform = 'translateX(' + translate + 'px)';
     }
 
     protected _current: number = 0;
-    get current(){
+    get current() {
         return this._current;
     }
-    set current(index: number){
+
+    set current(index: number) {
         index = Math.max(0, index);
         index = Math.min(this.len - 1, index);
         this._current = index;
         this.selected(index);
     }
 
-    protected refreshData(index: number){
+    protected refreshData(index: number) {
         let dataManager = this.dataManagers[index],
             num = this.temDataManagers.indexOf(dataManager);
 
-        if(num > -1){
+        if (num > -1) {
             dataManager.refresh();
             this.temDataManagers.splice(num, 1);
         }
     }
 
-    selected(index: number){
+    refresh() {
+        this.dataManagers.forEach(dataManager => {
+            dataManager.refresh();
+        })
+    }
+
+    selected(index: number) {
         let translate = -index * this.width;
         this.panelContainer.style.transition = 'all 500ms';
         // this.panelContainer.style.transform = 'translateX(' + translate + 'px)';
@@ -164,7 +189,7 @@ export class SlideTab extends Tab{
         this.refreshData(index);
     }
 
-    active(index: number){
+    active(index: number) {
         super.active(index);
         let translate = -index * this.width;
         this._current = index;
@@ -173,15 +198,15 @@ export class SlideTab extends Tab{
         this.refreshData(index);
     }
 
-    addTab(tabs : ISlideTab[]){
+    addTab(tabs: ISlideTab[]) {
         super.addTab(tabs);
         Array.isArray(tabs) && tabs.forEach((tab) => {
             this.initDataManager(tab);
         })
     }
 
-    deleteTab(index :number){
-        if(index in this.dataManagers){
+    deleteTab(index: number) {
+        if (index in this.dataManagers) {
             this.dataManagers.splice(index, 1);
             // console.log(this.para.tabs[index]);
             super.deleteTab(index);
@@ -190,14 +215,15 @@ export class SlideTab extends Tab{
 
     dataManagers: DataManager[];
     temDataManagers: DataManager[];
-    protected initDataManager(tab: ISlideTab){
-        if(!Array.isArray(this.dataManagers)){
+
+    protected initDataManager(tab: ISlideTab) {
+        if (!Array.isArray(this.dataManagers)) {
             this.dataManagers = [];
         }
-        if(!Array.isArray(this.temDataManagers)){
+        if (!Array.isArray(this.temDataManagers)) {
             this.temDataManagers = [];
         }
-        if(tab.dataManager){
+        if (tab.dataManager) {
             let len = this.dataManagers.length,
                 page = tab.dataManager,
                 dataManager = new DataManager({
@@ -216,8 +242,12 @@ export class SlideTab extends Tab{
                 });
             this.dataManagers.push(dataManager);
             this.temDataManagers.push(dataManager);
-        }else{
+        } else {
             this.dataManagers.push(null);
         }
+    }
+
+    destroy(){
+        this.resizeEvent.on();
     }
 }

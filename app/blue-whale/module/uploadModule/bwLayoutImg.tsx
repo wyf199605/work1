@@ -8,7 +8,7 @@ import {Button} from "../../../global/components/general/button/Button";
 import tools = G.tools;
 
 export interface IBwLayoutImgPara extends IBwUploaderPara{
-    onFinish?: (files: File[]) => Promise<any>;
+    onFinish?: (files: CustomFile[]) => Promise<any>;
     isShow?: boolean;  // 是否显示上传控件，默认true
     autoClear?: boolean; // 是否在模态框关闭清除file，默认true
 }
@@ -17,8 +17,8 @@ export class BwLayoutImg{
     protected imgManager: ImageManager;
     protected modal: Modal;
     protected bwUpload: BwUploader;
-    protected files: File[] = [];
-    protected onFinish: (files: File[]) => Promise<any>;
+    protected files: CustomFile[] = [];
+    protected onFinish: (files: CustomFile[]) => Promise<any>;
     protected autoClear: boolean;
 
     constructor(para: IBwLayoutImgPara){
@@ -39,7 +39,7 @@ export class BwLayoutImg{
             mimeTypes: 'image/*'
         };
         this.bwUpload = new BwUploader(para);
-        this.bwUpload.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: File[]) => {
+        this.bwUpload.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: CustomFile[]) => {
             let file = files[0];
             BwLayoutImg.fileToImg(file).then((url) => {
                 this.modal.isShow = true;
@@ -61,7 +61,7 @@ export class BwLayoutImg{
         return this.imgManager ? this.imgManager.get() : [];
     }
 
-    getFiles(): File[]{
+    getFiles(): CustomFile[]{
         return this.files;
     }
 
@@ -108,6 +108,7 @@ export class BwLayoutImg{
         this.modal = new Modal(para);
     }
 
+
     protected initImgManager(){
         this.imgManager = new ImageManager({
             container: this.modal.bodyWrapper,
@@ -121,7 +122,7 @@ export class BwLayoutImg{
         });
     }
 
-    static fileToImg(file: File): Promise<string>{
+    static fileToImg(file: CustomFile): Promise<string>{
         return new Promise((resolve, reject) => {
             let reader = new FileReader();
             reader.onload = () => {
@@ -130,12 +131,12 @@ export class BwLayoutImg{
             reader.onerror = () => {
                 reject();
             };
-            file ? reader.readAsDataURL(file) : reject();
+            file ? reader.readAsDataURL(file.blob) : reject();
         })
     }
 
     upload(){
-        this.bwUpload.upload();
+        this.bwUpload.upload(this.files);
     }
 
     destroy(){

@@ -76,6 +76,7 @@ export class ButtonAction {
                     container: <HTMLElement>uploderModal.body,
                     uploadUrl: loadUrl + (loadUrl.indexOf('?') > -1 ? '&' : '?') + "item_id=" + itemId,
                     onSuccess: (result) => {
+                        console.log(result);
                         // console.log(data);
                         //后台表格数据返回
                         // tableData = resuult.data;
@@ -92,7 +93,8 @@ export class ButtonAction {
                             com && com.destroy();
                             com = null;
                             self.btnRefresh(btn.refresh, url);
-                        }, 100)
+                        }, 100);
+                        callback(result);
                         // G.tools.event.fire(NewTableModule.EVT_EXPORT_DATA, data);
                     }
                 })
@@ -142,7 +144,13 @@ export class ButtonAction {
                 break;
             case 3 :
                 setTimeout(function () {
-                    BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
+                    if (tools.isMb && tools.isEmpty(tools.url.getPara('instance')) && tools.url.getPara('page') === 'flowReport'){
+                        BW.sys.window.reOpen({
+                            url:url
+                        })
+                    } else{
+                        BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
+                    }
                 }, 1000);
                 break;
             case 4 :
@@ -226,7 +234,6 @@ export class ButtonAction {
                     callback(response);
                 }, () => callback(null))
                 break;
-
             case  'barcode_inventory':
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
@@ -235,7 +242,7 @@ export class ButtonAction {
                 addr = tools.url.addObj(addr, {output: 'json'});
                 let can2dScan = G.Shell.inventory.can2dScan;
 
-                if(can2dScan || tools.isMb){
+                if(can2dScan){
                     self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                         //创建条码扫码页面
                         if (response.uiType === 'inventory' && tools.isMb) {
@@ -245,9 +252,9 @@ export class ButtonAction {
                         callback(response);
                     }, () => callback(null))
                 }else {
-                    callback(null);
-                    Modal.alert('目前不支持PC端功能');
-                }
+                   callback(null);
+                   Modal.alert('目前只支持手机功能');
+               }
                 break;
             case 'newwin':
             default:
@@ -272,17 +279,13 @@ export class ButtonAction {
             uniqueFlag: string,
             ajaxUrl: string,
             uploadUrl: string,
-            downUrl: string,
-            picAddr:string,
-            picFields:string;
+            downUrl: string;
 
         for (let i = 0; i < dataAddr.length; i++) {
             url = dataAddr[i].downloadAddr.dataAddr;
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
-            picFields = dataAddr[i].picFields;
-            picAddr = dataAddr[i].dataAddr;
 
         }
         let USER = User.get().userid,
@@ -295,11 +298,10 @@ export class ButtonAction {
                     USERID: USER,
                     uploadUrl: uploadUrl,
                     downUrl: url,
-                    uniqueFlag: uniqueFlag,
-                    picFields:picFields,
-                    picAddr:picAddr
+                    uniqueFlag: uniqueFlag
                 })
             })
+
 
     }
 

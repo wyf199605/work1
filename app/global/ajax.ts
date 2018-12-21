@@ -1,4 +1,5 @@
 interface IAjaxSetting{
+    isLowCase?: boolean;
     type?: string;
     data?: obj | string | number;
     dataType?: string;
@@ -237,11 +238,11 @@ namespace G{
                     let sData = setting.data;
                     if (setting.processData && typeof sData === 'object') {
                         if (s.type === 'GET') {
-                            s.url = tools.url.addObj(url, sData);
+                            s.url = tools.url.addObj(url, sData, setting.isLowCase);
                             s.data = '';
                         } else if(s.contentType){
                             // 发送数据为json时将json转为字符串
-                            s.data = s.traditional ? tools.obj.toUri(sData) : JSON.stringify(sData);
+                            s.data = s.traditional ? tools.obj.toUri(sData, setting.isLowCase) : JSON.stringify(sData);
                         }
                     }else if( typeof sData === 'string'){
                         s.data = sData;

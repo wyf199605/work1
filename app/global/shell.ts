@@ -399,8 +399,8 @@ namespace G{
                 return ShellBase.handler('delInventoryData',{nameId:nameId,where:where},back);
             },
             //上传条码数据
-            uploadcodedata(nameId:string,uploadUrl:string,images:object, back:IShellEventHandler){
-                return ShellBase.handler('uploadcodedata',{nameId:nameId,uploadUrl:uploadUrl,images:images},back,null,false);
+            uploadcodedata(nameId:string,back:IShellEventHandler){
+                return ShellBase.handler('uploadcodedata',{nameId:nameId},back,null,false);
             },
             //获取盘点数据
             getTableInfo(uniqueFlag:string){
@@ -409,10 +409,6 @@ namespace G{
             //输入条码扫码查询
             inputcodedata(optionStype:number,uniqueFlag:string,value:string,category:string[],back:IShellEventHandler){
                 return ShellBase.handler('inputcodedata',{uniqueFlag:uniqueFlag,value:value,category:category,optionStype:optionStype},back)
-            },
-            //移动端打开摄像头扫码
-            openScanCode(type:number,back:IShellEventHandler){
-                return ShellBase.handler('scanCode',{type:type},back)
             },
             scan2dOn(back: IShellEventHandler) {
                 return ShellBase.handler('startScan2DResult', '', back, null, false);

@@ -40,20 +40,42 @@ export class BwRule extends Rule {
     ];
 
     static SQL_SF = null;
-    static getSqlRandom(){
-        if(!this.SQL_SF){
+
+    static getSqlRandom() {
+        if (!this.SQL_SF) {
             this.SQL_SF = 'SQL_SF_' + new Date().getTime() + Math.random();
         }
         return this.SQL_SF;
     }
 
 
-    static isTime(dataType: string) {
+    static isTime(dataType: string): boolean {
         return dataType === BwRule.DT_DATETIME || dataType === BwRule.DT_TIME
     }
 
-    static isImage(dataType: string) {
-        return dataType === BwRule.DT_MUL_IMAGE || dataType === BwRule.DT_IMAGE || dataType === BwRule.DT_SIGN;
+    static isImage(dataType: string): boolean {
+        return [
+            BwRule.DT_MUL_IMAGE,
+            BwRule.DT_IMAGE,
+            BwRule.DT_SIGN,
+            BwRule.DT_UNI_IMAGE,
+            BwRule.DT_UNI_MUL_IMAGE
+        ].some((type) => dataType === type);
+    }
+
+    static isMulImage(dataType: string): boolean {
+        return [
+            BwRule.DT_MUL_IMAGE,
+            BwRule.DT_UNI_MUL_IMAGE
+        ].some((type) => dataType === type);
+    }
+
+    static isFile(dataType: string): boolean {
+        return [
+            BwRule.DT_FILE,
+            BwRule.DT_UNI_FILE,
+            BwRule.DT_UNI_MUL_FILE
+        ].some((type) => dataType === type);
     }
 
     static Ajax = class extends Ajax {
@@ -85,14 +107,14 @@ export class BwRule extends Rule {
             }).then((gps: obj) => {
                 return new Promise<IAjaxSuccess>((resolve, reject) => {
                     let gpsObj = {
-                        latitude : gps.latitude,
-                        longitude : gps.longitude
+                        latitude: gps.latitude,
+                        longitude: gps.longitude
                     };
                     setting.headers = Object.assign(setting.headers || {}, {position: JSON.stringify(gpsObj)});
 
                     // 设置loading加载框
                     let loading: Loading;
-                    if(setting.loading){
+                    if (setting.loading) {
                         loading = new Loading(setting.loading);
                         loading.show();
                         delete setting.loading;
@@ -344,9 +366,9 @@ export class BwRule extends Rule {
         console.log(url);
         if (para.dataType === BwRule.DT_FILE) {
 
-            if(para.type === 'download'){
+            if (para.type === 'download') {
                 sys.window.download(url);
-            }else{
+            } else {
                 BwRule.Ajax.fetch(url)
                     .then(({response}) => {
                         rData = response.data[0];
@@ -472,9 +494,9 @@ export class BwRule extends Rule {
                     type: 'POST',
                     data: JSON.stringify(postData),
                 }).then(({response}) => {
-                    if(tools.keysVal(response, 'body', 'bodyList', 0)){
+                    if (tools.keysVal(response, 'body', 'bodyList', 0)) {
                         this.checkValue(response, postData, confirm)
-                    }else {
+                    } else {
                         typeof confirm === 'function' && confirm();
                     }
                 });
@@ -501,13 +523,13 @@ export class BwRule extends Rule {
         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.dataAddr, data), {
             needGps: field.dataAddr.needGps
         }).then(({response}) => {
-                return response.data.map(data => {
-                    return {
-                        text: data[field.name],
-                        value: data[field.lookUpKeyField]
-                    };
-                });
+            return response.data.map(data => {
+                return {
+                    text: data[field.name],
+                    value: data[field.lookUpKeyField]
+                };
             });
+        });
     }
 
     static getDefaultByFields(cols: R_Field[]): obj {
@@ -603,7 +625,7 @@ export class BwRule extends Rule {
                 if (col.elementType == 'lookup') {
                     //look up
                     col.comType = 'selectInput';// --------------
-                    col.isCanSort = false;
+                    col.sortName = col.lookUpKeyField;
 
                 } else if ((col.elementType == 'treepick' || col.elementType == 'pick')) {
 
@@ -612,11 +634,10 @@ export class BwRule extends Rule {
                     col.multiValue = col.atrrs.multValue; //单选或多选
                     col.relateFields = col.assignSelectFields;
 
-                } else if (col.atrrs && col.atrrs.dataType == '43') {
+                } else if (col.atrrs && BwRule.isFile(col.atrrs.dataType)) {
                     //文件上传
                     col.comType = 'file';// --------------
                     col.relateFields = ['FILE_ID'];// --------------
-
                 } else if (col.atrrs && col.atrrs.dataType == '30') {
 
                     //富文本
@@ -630,6 +651,10 @@ export class BwRule extends Rule {
                     //日期时间控件
                     col.comType = 'datetime';// --------------
 
+                } else if (col.atrrs && BwRule.isImage(col.atrrs.dataType)) {
+                    col.comType = 'image';
+                } else if (tools.isNotEmpty(col.atrrs.valueLists)) {
+                    col.comType = 'selectInput';
                 } else {
                     col.comType = 'input';// --------------
                 }

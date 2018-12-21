@@ -320,8 +320,10 @@
       .modal-footer {
         position: absolute;
       }
-      .modal-body{
-        max-height: none!important;
+      .modal-box{
+        .modal-body{
+          max-height: none;
+        }
       }
     }
     &.full-screen-fixed{

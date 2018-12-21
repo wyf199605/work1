@@ -4,6 +4,11 @@
   }
   .list-item-detail-wrapper {
     background-color: #ffffff;
+    .bw-upload-wrapper {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
     .list-item-detail-buttons {
       display: flex;
       align-items: center;
@@ -63,6 +68,7 @@
           display: flex;
           align-items: center;
           padding-left: 22px;
+          font-size: 14px;
         }
         .detail-cell-content {
           background-color: #ffffff;
@@ -73,6 +79,7 @@
           white-space: nowrap;
           height: 100%;
           line-height: 43px;
+          font-size: 14px;
         }
       }
       .detail-cell-file-wrapper, .detail-cell-img-wrapper {
@@ -84,6 +91,7 @@
         align-items: center;
         justify-content: flex-start;
         border: solid 1px #e2e2e2;
+        position: relative;
         &.one-column {
           width: 100%;
         }
@@ -264,11 +272,24 @@
         max-height: 100%;
         //height: calc(100% - 93px) !important;
       }
+      .bw-upload-wrapper {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
       .form-wrapper {
         background-color: #ffffff;
-        height: 100%;
         padding-left: 0;
         height: auto;
+        &.no-group{
+          display: flex;
+          display: -webkit-flex;
+          align-items: center;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+        }
         .accessory-wrapper {
           width: 100%;
           height: 80px;
@@ -279,6 +300,9 @@
           justify-content: flex-start;
           border: solid 1px #e2e2e2;
           padding: 0;
+          &[data-type="virtual"]{
+            display: none;
+          }
           .images-wrapper {
             background-color: #ffffff;
             display: flex;
@@ -498,6 +522,13 @@
           height: 44px;
           border: solid 1px #e2e2e2;
           padding: 0;
+          &[data-type="virtual"]{
+            display: none;
+          }
+          &.disabled{
+            opacity: 0.5;
+            pointer-events: none !important;
+          }
           & > .text-input {
             height: 100%;
             background-color: #ffffff;
@@ -527,6 +558,7 @@
             align-items: center;
             padding-left: 22px;
             margin-right: 0;
+            font-size: 14px;
           }
           .detail-cell-content {
             background-color: #ffffff;
@@ -537,6 +569,9 @@
             white-space: nowrap;
             height: 100%;
             line-height: 43px;
+          }
+          .text-input {
+            font-size: 14px;
           }
         }
       }

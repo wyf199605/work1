@@ -1183,16 +1183,16 @@ export class BwTableModule extends Component {
             })
         }
 
-    }
+}
 
-    public countCalcSum(ft,str){
+   public countCalcSum(ft,str){
 
         let column = ft.columnGet(str),
             sum = 0;
         column.data.forEach((col)=>{
-            sum += col;
+          sum += col;
         })
-        return sum;
+       return sum;
     }
     public rfidColInit() {
         let rfidCols = this.ui.rfidCols,
@@ -1631,7 +1631,7 @@ export class BwTableModule extends Component {
 
         let init = () => {
             this.cols.forEach(col => {
-                if (col.atrrs && col.atrrs.dataType === '20') {
+                if (col.atrrs && (col.atrrs.dataType === '20' || col.atrrs.dataType === '26')) {
                     if (col.noShow) {
                         fields.push(col);
                     } else {
@@ -1831,9 +1831,10 @@ export class BwTableModule extends Component {
                 className: !tools.isMb ? 'more-btns' : ''
             });
             // TODO: 移动端未实现流程设计功能。
-            if (tools.isMb && this.ui.caption === '流程设计') {
+            if (tools.isMb && (this.ui.caption === '流程设计' || this.ui.caption === '流程制度')) {
                 for (let i = 0,len = btnsUi.length; i < len; i++) {
                     let btn = btnsUi[i];
+                    // if (btn.openType === 'flow-design' || btn.openType === 'flow-look') {
                     if (btn.openType === 'flow-design') {
                         btnsUi.splice(i, 1);
                     }
@@ -1971,7 +1972,12 @@ export class BwTableModule extends Component {
                             let linkedData = this.linkedData || {};
                             let select = multiselect === 1
                                 ? Object.assign({}, linkedData, selectedData[0] || {})
-                                : selectedData.map((o) => Object.assign({}, linkedData || {}, o));
+                                : (
+                                    multiselect === 2
+                                    ? selectedData.map((o) =>
+                                        Object.assign({}, linkedData || {}, o))
+                                    : null
+                                );
                             select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
 
                             let tData = ftable.tableData.data;
@@ -2151,9 +2157,9 @@ export class BwTableModule extends Component {
                 //
                 d.append(this.wrapper, this._btnWrapper);
                 if (this.tableModule && ((this.tableModule.editType === 'linkage'
-                    && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
-                    || (this.tableModule.editType === 'self')
-                    && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
+                        && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
+                        || (this.tableModule.editType === 'self')
+                        && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
                     let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({
@@ -2186,6 +2192,7 @@ export class BwTableModule extends Component {
 
         let cancel = () => {
             this.ftable && this.ftable.editorCancel();
+            validList = [];
         };
 
         let start = (): Promise<void> => {
@@ -2342,12 +2349,14 @@ export class BwTableModule extends Component {
             // 控件销毁时验证
             bwTable.ftable.off(FastTable.EVT_CELL_EDIT_CANCEL, handler);
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
-                validList.push(validate(editModule, cell));
+                if(cell.isEdited){
+                    validList.push(validate(editModule, cell));
+                }
             });
         };
 
         let validate = (editModule, cell: FastTableCell): Promise<any> => {
-            return new Promise((resolve, reject) => {
+            let promise: Promise<any> = new Promise((resolve, reject) => {
                 let name = cell.name,
                     field: R_Field = cell.column.content,
                     fastRow = cell.frow,
@@ -2379,8 +2388,10 @@ export class BwTableModule extends Component {
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
                     EditConstruct.checkValue(field, rowData, () => {
-                        lookUpCell && (lookUpCell.data = null);
-                        cell.data = null;
+                        if(this.ftable && this.ftable.editing){
+                            lookUpCell && (lookUpCell.data = null);
+                            cell.data = null;
+                        }
                     }, name)
                         .then((res) => {
                             let {errors, okNames} = res;
@@ -2396,18 +2407,24 @@ export class BwTableModule extends Component {
                             Array.isArray(okNames) && okNames.forEach(name => {
                                 cell.errorMsg = null;
                             });
-
                             resolve();
-                        });
+                        }).catch(() => reject());
                 } else {
                     cell.errorMsg = '';
                     // lookUpCell && (lookUpCell.errorMsg = '');
                     resolve();
                     // callback(td, true);
                 }
-            }).then(() => cell.isChecked = true)
+            }).then(() => {
+                cell.isChecked = true;
+            }).finally(() => {
+                let index = validList.indexOf(promise);
+                if(index > -1){
+                    validList.splice(index, 1);
+                }
+            });
             // debugger;
-
+            return promise
         };
 
         let editModuleLoad = (): Promise<typeof EditModule> => {
@@ -2497,19 +2514,23 @@ export class BwTableModule extends Component {
                     });
                     setTimeout(() => {
                         Promise.all(validList).then(() => {
-                        }).catch().finally(() => {
                             cellCheckValue().then(() => {
-                            }).finally(() => {
-                                validList = [];
-                                loading && loading.hide();
-                                loading = null;
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
                                         resolve(saveData);
                                     }).catch(() => reject());
                                 }, 100);
-                            })
+                            }).catch(() => reject('noMessage')).finally(() => {
+                                loading && loading.hide();
+                                loading = null;
+                            });
+                        }).catch(() => {
+                            loading && loading.hide();
+                            loading = null;
+                            reject('noMessage');
+                        }).finally(() => {
+                            validList = [];
                         })
                     }, 100)
 

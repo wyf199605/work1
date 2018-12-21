@@ -62,7 +62,7 @@ export class RegPage {
                 Modal.alert('获取不到设备UUID');
                 return;
             }
-
+            
             BwRule.Ajax.fetch(CONF.ajaxUrl.register, {
                 type: 'POST',
                 data: {

@@ -790,6 +790,7 @@ export class DrawPoint extends Component {
             delete: delStr
         }
     }
+
     public editPoint() {
         //先把isdraline  打开
         //获取到当前的编辑path的下标
@@ -1078,5 +1079,7 @@ export class DrawPoint extends Component {
                 })
         }
 
+
     }
+
 }

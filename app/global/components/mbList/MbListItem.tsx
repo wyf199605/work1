@@ -44,8 +44,8 @@ export class MbListItem extends Component {
         this._index = para.index;
         if (tools.isNotEmptyArray(para.btns)) {
             this.initBtn(para.btns);
-            this.initEvents.on();
         }
+        this.initEvents.on();
         this.isShowCheckBox = para.isCheckBox || false;
         tools.isMb && (this.isShowBtns = para.isCheckBox || false);
         this.render(para.data || {});
@@ -168,7 +168,7 @@ export class MbListItem extends Component {
         // 渲染图片
         if (this.isImg && this.imgWrapper) {
             this.imgWrapper.innerHTML = '';
-            let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
+            let img = tools.isNotEmpty(data.img) ? data.img : G.requireBaseUrl + '../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
             if (tools.isNotEmpty(data.imgLabel)) {
                 let imgLabelColor = {

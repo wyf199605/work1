@@ -4,7 +4,7 @@ import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/act
 import {BwRule} from "../../common/rule/BwRule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {DetailCellType, ListItemDetailCell} from "./ListItemDetailCell";
+import {ListItemDetailCell} from "./ListItemDetailCell";
 import {Button} from "../../../global/components/general/button/Button";
 import {DetailModal} from "./DetailModal";
 import tools = G.tools;
@@ -39,7 +39,7 @@ export class ListItemDetail {
         let cellsWrapper = <div className="list-detail-cells-wrapper"/>;
         this.wrapper.appendChild(cellsWrapper);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
-            if (!tools.isMb){
+            if (!tools.isMb) {
                 cellsWrapper.classList.add('no-group');
             }
             fields.forEach(field => {
@@ -84,7 +84,7 @@ export class ListItemDetail {
         </div>;
         wrapper.appendChild(groupWrapper);
         groupFields.forEach(field => {
-            let className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber)-1],
+            let className = ListItemDetail.COLUMN_CLASS_ARR[parseInt(groupInfo.columnNumber) - 1],
                 type = DetailModal.getType(field.dataType || field.atrrs.dataType || '');
             if (~['textarea', 'file', 'img'].indexOf(type)) {
                 className = 'one-column';
@@ -151,7 +151,7 @@ export class ListItemDetail {
 
     // 上一页下一页加载数据
     changePage(page?: number) {
-        if(this.para.uiType === 'detail'){
+        if (this.para.uiType === 'detail') {
             if (tools.isNotEmpty(page)) {
                 if (page > 0) {
                     if (page > this.totalNumber) {
@@ -169,7 +169,7 @@ export class ListItemDetail {
             this.initDetailData().then(data => {
                 this.render(data);
             });
-        }else{
+        } else {
             this.scrollToTop();
             this.initDetailData().then(data => {
                 this.render(data);
@@ -286,6 +286,7 @@ export class ListItemDetail {
             }
         } else {
             if (tools.isMb) {
+                d.query('.list-detail-cells-wrapper', this.wrapper).classList.add('full-height');
                 if (this.para.uiType === 'detail') {
                     let btnWrapper = <div className="list-item-detail-buttons"/>;
                     this.wrapper.appendChild(btnWrapper);
@@ -302,7 +303,7 @@ export class ListItemDetail {
             switch (btn.subType) {
                 case 'update_save' :
                 case 'insert_save':
-                    let isAdd = btn.subType === 'update_save' ? false : true;
+                    let isAdd = btn.subType !== 'update_save';
                     if (!isAdd && self.totalNumber === 0 && self.para.uiType === 'detail') {
                         Modal.alert('没有数据可以编辑!');
                         return;
@@ -312,7 +313,7 @@ export class ListItemDetail {
                         isAdd: isAdd,
                         isPC: !tools.isMb,
                         confirm(data) {
-                            return new Promise((resolve, reject) => {
+                            return new Promise((resolve) => {
                                 ButtonAction.get().clickHandle(btn, data, () => {
                                     switch (btn.subType) {
                                         case 'insert_save': {
@@ -459,6 +460,10 @@ export class ListItemDetail {
             }
         }
         return v;
+    }
+
+    getCells(): ListItemDetailCell[] {
+        return [...Object.values(this.cells)];
     }
 
     destroy() {

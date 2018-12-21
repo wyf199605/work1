@@ -25,6 +25,12 @@
       background-color: #f8f8f8;
       border: 1px solid #e2e2e2;
       position: relative;
+      .bw-upload-wrapper{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
       .app-jia {
         margin-right: 10px;
       }
@@ -114,10 +120,7 @@
       input {
         display: none;
       }
-      .text-input {
-        display: none;
-      }
-      .webuploader-pick {
+      .bw-upload-wrapper {
         width: 100%;
         height: 100%;
         position: absolute;
@@ -131,7 +134,8 @@
           content: '+';
           color: #b0b0b0;
           font-weight: 200;
-          font-size: 48px;
+          font-size: 44px;
+          padding-bottom: 4px;
         }
       }
     }
@@ -203,6 +207,12 @@
 }
 
 .bw-upload-wrapper{
+  &.disabled{
+    input{
+      cursor: not-allowed!important;
+    }
+  }
+
   height: 100%;
   &.error{
     input.file-input{

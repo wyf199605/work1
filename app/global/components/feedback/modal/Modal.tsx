@@ -551,7 +551,7 @@ export class Modal extends Component {
                 this.modalScreen.classList.add('lock-active-in');
             }
         } else {
-            this.wrapper.blur();
+            this.wrapper && this.wrapper.blur();
 
             if (this._onClose) {
                 this._onClose();
@@ -566,6 +566,7 @@ export class Modal extends Component {
                 }
                 if (tools.isMb && this.isModal) {
                     setTimeout(() => {
+                        this.wrapper.classList.remove('modal-animate-down-mb');
                         this.wrapper.style.display = 'none';
                         this.wrapper.style['display'] = 'none';
                     }, 300);
@@ -1038,7 +1039,6 @@ export class Modal extends Component {
     // get className() {
     //     return this._className;
     // }
-
 
     constructor(para: IModal = {}) {
         super(para);
