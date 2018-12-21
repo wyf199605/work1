@@ -458,7 +458,7 @@ namespace G{
                 ShellBase.handler('getImg', {
                     type: type
                 }, (result: IShellResult) => {
-                    alert(JSON.stringify(result.data));
+                    //alert(JSON.stringify(result.data));
                     if(result.success){
                         let data = result.data;
                         let file = tools.base64ToFile(data.dataurl, data.filename);

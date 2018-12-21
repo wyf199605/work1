@@ -13,7 +13,6 @@ export interface IBwLayoutImgPara extends IBwUploaderPara{
     autoClear?: boolean; // 是否在模态框关闭清除file，默认true
 
 }
-
 export class BwLayoutImg{
     protected imgManager: ImageManager;
     protected modal: Modal;

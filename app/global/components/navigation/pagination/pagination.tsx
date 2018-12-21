@@ -424,7 +424,8 @@ interface IPageScrollSpinner {
 
 class PaginationScrollSpinner {
     events = (function (self) {
-        let isMove = false;
+        let isMove = false,
+            handler = null;
         let panstart = () => {
                 if (isMove) {
                     isMove = false;

@@ -204,6 +204,7 @@ gulp.task('js', function () {
         'uploadModule/uploadImages',
         'uploadModule/uploadImagesItem',
         'uploadModule/bwUploader',
+        'uploadModule/bwLayoutImg',
     ], 'uploadModule.js');
 
     //changePassword模块
