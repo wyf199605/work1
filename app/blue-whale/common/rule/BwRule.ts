@@ -757,4 +757,27 @@ export class BwRule extends Rule {
             imagetype: isThumb ? 'thumbnail' : 'picture'
         });
     }
+
+    static reqAddrMenu(menu: IBW_Menu){
+        let addr = menu.menuPath;
+        if (addr) {
+            if(addr.type === 'front_custom'){
+                if(addr.dataAddr === 'ChangeProject'){
+                    let currentProject = JSON.parse(localStorage.getItem('userInfo')).platformName;
+                    if(tools.isNotEmpty(currentProject)){
+                        require(['ChangeProject'], (c) => {
+                            new c.ChangeProject({
+                                current: currentProject
+                            });
+                        });
+                    }else {
+                        Modal.toast('当前用户无所属项目！');
+                    }
+                }
+            }else {
+                let url = CONF.siteUrl + BwRule.reqAddr(addr);
+                sys.window.open({url, title: menu.menuName})
+            }
+        }
+    }
 }

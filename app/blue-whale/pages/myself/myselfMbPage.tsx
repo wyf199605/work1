@@ -11,6 +11,7 @@ import {RfidSettingModal} from "../rfid/RfidSetting/RfidSetting";
 import Shell = G.Shell;
 import sysPcHistory = BW.sysPcHistory;
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {ChangeProject} from "../../module/changeProject/changeProject";
 
 export = class myselfMbPage {
     constructor() {
@@ -24,7 +25,7 @@ export = class myselfMbPage {
             let menus = response.body && response.body.elements;
             // console.log('in mb');
             // console.log(menus);
-            menus && menus.forEach((menu) => {
+            menus && menus.forEach((menu: IBW_Menu) => {
                 /*
                 *   0： pc和mb都显示
                 *   1： 仅pc显示
@@ -34,11 +35,7 @@ export = class myselfMbPage {
                     content: menu.menuName,
                     icon: menu.menuIcon,
                     onClick: () => {
-                        let addr = menu.menuPath as R_ReqAddr;
-                        if (addr) {
-                            let url = CONF.siteUrl + BwRule.reqAddr(addr);
-                            sys.window.open({url, title: menu.menuName})
-                        }
+                        BwRule.reqAddrMenu(menu);
                     }
                 })
             });

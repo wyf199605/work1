@@ -690,6 +690,8 @@ export class LoginPage{
                             loginPage.device.auth_code = col.VALUE;
                         } else if (col.NAME === 'hideBaseMenu'){
                             noShow = col.VALUE.split(',');
+                        }else if(col.NAME === 'PLATFORM_NAME'){
+                            user.platformName = col.VALUE;
                         }
                     });
                     // debugger;

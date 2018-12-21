@@ -1,0 +1,158 @@
+.modal-change-project:not(.modal-mobile) {
+    min-width: 250px;
+
+    .head-wrapper {
+        .modal-header {
+            background-color: #1d2b36;
+            height: 45px;
+
+            .close {
+                margin-top: 0;
+                line-height: 45px;
+            }
+
+            .modal-title {
+                font-size: 16px;
+                padding-left: 20px;
+                color: #ffffff;
+                line-height: 45px;
+            }
+        }
+    }
+
+    .modal-body {
+        font-size: 14px;
+        background-color: #ffffff;
+        box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.18);
+        padding: 10px 20px;
+        color: #333333;
+        min-height: 193px;
+
+        .change-project {
+            position: relative;
+
+            .description {
+                margin-right: 3px;
+            }
+
+            .current-project-wrapper {
+                height: auto;
+                margin-bottom: 20px;
+            }
+
+            .project-list-wrapper {
+                margin-bottom: 20px;
+                height: auto;
+                overflow: hidden;
+
+                .select-project {
+                    position: relative;
+                    float: left;
+                    overflow: hidden;
+
+                    .show-project {
+                        padding: 5px;
+                        background-color: #ffffff;
+                        border: solid 1px #e2e2e2;
+                    }
+
+                    .appcommon.app-xiala {
+                        position: absolute;
+                        right: 1px;
+                    }
+                }
+
+                .dropdown-menu {
+                    height: auto;
+                    margin-top: -2px;
+                    clear: both;
+
+                    .drop-item.list-item {
+                        padding: 3px 5px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.modal-change-project.modal-mobile {
+
+    .head-wrapper {
+        .modal-header {
+            height: 45px;
+
+            .close {
+                margin-top: 0;
+                line-height: 45px;
+            }
+
+            .modal-title {
+                font-size: 16px;
+                padding-left: 20px;
+                color: #333333;
+                line-height: 45px;
+            }
+        }
+    }
+
+    .modal-body {
+        height: calc(100% - 45px - 55px) !important;
+        font-size: 14px;
+        background-color: #ffffff;
+        box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.18);
+        padding: 10px 20px;
+        color: #333333;
+
+        .change-project {
+            position: relative;
+
+            .description {
+                margin-right: 3px;
+            }
+
+            .current-project-wrapper {
+                height: auto;
+                margin-bottom: 30px;
+            }
+
+            .project-list-wrapper {
+                margin-bottom: 20px;
+                height: auto;
+                overflow: hidden;
+
+                .select-project {
+                    position: relative;
+                    float: left;
+                    overflow: hidden;
+
+                    .show-project {
+                        width: 200px;
+                        margin-bottom: 0;
+                        background-color: #ffffff;
+                        border: solid 1px #e2e2e2;
+                    }
+
+                    .appcommon.app-xiala {
+                        position: absolute;
+                        right: 1px;
+                    }
+                }
+
+                .dropdown-menu {
+                    height: auto;
+                    margin-top: -2px;
+                    clear: both;
+
+                    .drop-item.list-item {
+                        padding: 3px 5px;
+                    }
+                }
+            }
+        }
+    }
+    .foot-wrapper .modal-footer {
+        border-top: none;
+        display: block;
+    }
+}

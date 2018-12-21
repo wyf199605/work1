@@ -274,6 +274,11 @@ gulp.task('js', function () {
         'newQuery/RangeInput'
     ], 'newQueryModule.js');
 
+    // 切换项目
+    gulpTsModule([
+        'changeProject/changeProject',
+    ], 'changeProject.js');
+
     /*page*/
 
     gulpTsPage('index/password', 'personPassword.js');

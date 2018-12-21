@@ -5,7 +5,8 @@ interface IUser {
     username?:string,
     department?:string,
     loginType?:number,
-    are_id?:string
+    are_id?:string,
+    platformName?: string,
 }
 /**
  * Created by zhengchao on 2017/11/13.
@@ -76,6 +77,16 @@ export class User implements IUser{
         return  tools.str.toEmpty(this._loginType);
     }
 
+    // 当前项目
+    private _platformName?: string;
+    set platformName(platformName: string){
+        this._platformName = platformName;
+        this.putStorage();
+    }
+    get platformName(){
+        return tools.str.toEmpty(this._platformName);
+    }
+
     putStorage(){
         localStorage.setItem('userInfo',this.toString());
     }
@@ -86,7 +97,8 @@ export class User implements IUser{
             'username':this.username,
             'department':this.department,
             'are_id':this.are_id,
-            'loginType':this.loginType
+            'loginType':this.loginType,
+            'platformName': this.platformName
         });
     }
 
@@ -102,6 +114,7 @@ export class User implements IUser{
         this.department = user.department;
         this.loginType = user.loginType;
         this.are_id = user.are_id;
+        this.platformName = user.platformName;
     }
 
     clearStorage(){
@@ -110,6 +123,7 @@ export class User implements IUser{
         this._department = '';
         this._loginType = undefined;
         this._are_id = '';
+        this._platformName = '';
         localStorage.setItem('userInfo',null);
     }
 

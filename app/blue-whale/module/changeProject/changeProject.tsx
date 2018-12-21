@@ -1,0 +1,146 @@
+/// <amd-module name="ChangeProject"/>
+
+import d = G.d;
+import tools = G.tools;
+import {IModal, Modal} from "../../../global/components/feedback/modal/Modal";
+import {DropDown, ListData} from "../../../global/components/ui/dropdown/dropdown";
+import {BwRule} from "../../common/rule/BwRule";
+
+interface IChangeProjectPara extends IModal {
+    current: string;
+}
+
+export class ChangeProject extends Modal {
+
+    private dropdown: DropDown = null;
+    private showProject: HTMLInputElement = null;
+    private projectList: ListData = null;
+
+    constructor(para?: IChangeProjectPara) {
+        super(Object.assign({
+            header: {
+                title: '切换项目'
+            },
+            footer: {
+
+            },
+            className: 'modal-change-project',
+            width: tools.isMb ? '100%' : '25%',
+            height: tools.isMb && '100%',
+            isAnimate: true,
+            position: 'center',
+        }, para));
+        this.current = para.current;
+        this.initBody();
+    }
+
+    private initBody = () => {
+        let content = <div className="change-project">
+            <div className="current-project-wrapper">
+                <span className="description">当前：</span>
+                <span type="text" id="current-project" className="current-project">
+                    {this.current}
+                </span>
+            </div>
+            <div className="project-list-wrapper">
+                <div className="select-project">
+                    <span className="description">切换：</span>
+                    <input type="text" className="show-project" readOnly/>
+                    <i className="appcommon app-xiala"/>
+                </div>
+            </div>
+        </div>;
+        this.showProject = d.query('input.show-project', content) as HTMLInputElement;
+        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.projectList, {
+            type: 'GET',
+        }).then(({response}) => {
+            // console.log('in getProjectList: ');
+            // console.log(response);
+            this.projectList = response.data.map(obj => ({value: parseInt(obj.PLATFORM_SEQ), text: obj.PLATFORM_NAME}));
+            this.dropdown = new DropDown({
+                el: d.query('.project-list-wrapper', content),
+                data: this.projectList,
+                inline: true,
+                onSelect: (item: ListItem, index: number)=> {
+                    this.showProject.value = item.text;
+                    this.dropdown.hideList();
+                }
+            });
+            this.dropdown.hideList();
+            d.append(this.bodyWrapper, content);
+            this.initStyle();
+            this.initEvent.on();
+        }).catch(err => {
+            console.log(err);
+        });
+    };
+
+    private initStyle = () => {
+        // 设置样式
+        this.dropdown.getUlDom().style.width = window.getComputedStyle(this.showProject).width;
+        d.query('.appcommon.app-xiala', this.wrapper) &&
+            (d.query('.appcommon.app-xiala', this.wrapper).style.lineHeight = window.getComputedStyle(this.showProject).height);
+        let descriptionWrapper = d.query('.project-list-wrapper .description', this.wrapper);
+        this.dropdown.getUlDom().style.left = parseInt(window.getComputedStyle(descriptionWrapper).marginRight) +
+            descriptionWrapper.offsetWidth + 'px';
+
+        // 移动端
+        if(tools.isMb){
+
+        }
+    };
+
+    private initEvent = (() => {
+        let toggleClickHandler = () => {
+            this.dropdown.toggle();
+        };
+
+        return {
+            on: () => {
+                d.on(d.query('.appcommon.app-xiala', this.bodyWrapper), 'click', toggleClickHandler);
+                this.onOk = () => {
+                    if(this.dropdown.selectedIndex >= 0){
+                        let selectItem = this.projectList[this.dropdown.selectedIndex];
+                        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.projectList, {
+                            type: 'PUT',
+                            data: {
+                                PLATFORM_SEQ: selectItem['value'],
+                                PLATFORM_NAME: selectItem['text'],
+                            }
+                        }).then(({response}) => {
+                            let prevUserInfo = JSON.parse(localStorage.getItem('userInfo'));
+                            localStorage.setItem('userInfo', JSON.stringify({...prevUserInfo, platformName: selectItem['text']}))
+                            Modal.toast(response.msg);
+                            location.reload();
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }
+                    this.destroy();
+                };
+                this.onCancel = () => this.destroy();
+                this.onClose = () => this.destroy();
+            },
+            off: () => {
+                d.off(d.query('.appcommon.app-xiala', this.bodyWrapper), 'click', toggleClickHandler);
+                this.onOk = null;
+                this.onCancel = null;
+                this.onClose = null;
+            }
+        }
+    })();
+
+    private _current: string = null;
+    get current() {
+        return this._current;
+    }
+
+    set current(current: string) {
+        this._current = current;
+    }
+
+    destroy() {
+        this.initEvent.off();
+        super.destroy();
+    }
+}
