@@ -41,9 +41,13 @@ export class BwMbList extends BasicPage {
                 break;
             case 'view': {
                 let ui = para.ui as IBW_UI<R_SubTable_Field>;
-                new MbListView({
+                let mbList = new MbListView({
                     ui: ui,
-                    container: para.dom
+                    container: para.dom,
+                    url: this.url
+                });
+                this.on(BwRule.EVT_REFRESH, () => {
+                    mbList.refresh();
                 })
             }
                 break;

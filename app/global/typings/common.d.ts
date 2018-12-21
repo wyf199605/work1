@@ -128,8 +128,8 @@ interface R_Field extends COL {
     lookUpKeyField?: string;
     comType?: string;
     displayFormat?: string;
-    dataType?: string
-    noSum?: number
+    dataType?: string;
+    noSum?: number;
     valueLists?: string;
     multiPick?: {
         dataAddr: R_ReqAddr;

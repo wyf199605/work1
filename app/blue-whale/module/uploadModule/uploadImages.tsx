@@ -124,6 +124,7 @@ export class UploadImages extends FormCom {
         this.imgType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.unique;
         this.createUploader();
+        this.uploader.disabled = this.disabled;
         this.initEvent.on();
     }
 
@@ -246,7 +247,7 @@ export class UploadImages extends FormCom {
 
     protected _listItems: UploadImagesItem[] = [];
     get listItems() {
-        return this._listItems.slice();
+        return tools.isNotEmpty(this._listItems) ? this._listItems.slice() : [];
     }
 
     private calcScrollLeft() {
@@ -333,6 +334,18 @@ export class UploadImages extends FormCom {
             this._imgs.splice(i, 1);
             this.refreshIndex();
         }
+    }
+
+    set disabled(disabled:boolean){
+        disabled = tools.isNotEmpty(disabled) ? disabled : false;
+        this._disabled =  disabled;
+        this.listItems.forEach(item => {
+            item.disabled =  disabled;
+        });
+        this.uploader && (this.uploader.disabled =  disabled);
+    }
+    get disabled(){
+        return this._disabled;
     }
 
     destroy() {

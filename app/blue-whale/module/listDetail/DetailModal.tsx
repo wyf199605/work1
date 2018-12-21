@@ -21,6 +21,7 @@ interface IDetailModal extends EditPagePara {
 
 export class DetailModal {
     private editModule: EditModule;
+    private fields: R_Field[] = [];
 
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
@@ -28,6 +29,7 @@ export class DetailModal {
             formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
+        this.fields = fields;
         para.isNotDetail && BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             tools.isPc && formWrapper.classList.add('no-group');
@@ -129,6 +131,21 @@ export class DetailModal {
             });
         }
         this.editModule = new EditModule(emPara);
+        emPara.fields.forEach((f) => {
+            let field = f.field,
+                name = field.name,
+                isNotEdit = para.isAdd ? field.noModify : field.noEdit;
+            if (isNotEdit && !field.noShow) {
+                let com = this.editModule.getDom(name);
+                com && (com.disabled = true);
+                if (tools.isMb) {
+                    let wrapper = com.wrapper || com.container;
+                    wrapper && wrapper.addEventListener('click', () => {
+                        Modal.toast(field.caption + '不可以修改～');
+                    });
+                }
+            }
+        });
         if (para.isAdd) {
             if (tools.isNotEmpty(para.fm.defDataAddrList)) {
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response}) => {
@@ -163,10 +180,10 @@ export class DetailModal {
         if (f.comType === 'file') {
             f.comType = 'newFile';
         }
-        if (isVirtual === true){
+        if (isVirtual === true) {
             f.comType = 'virtual';
         }
-        let field = {
+        return {
             dom: DetailModal.createFormWrapper(f, wrapper, className || ''),
             field: f,
             data: this.para.defaultData,
@@ -175,17 +192,48 @@ export class DetailModal {
                 for (let key of relateCols) {
                     let hCom = self.editModule.getDom(key);
                     if (hCom && hCom !== com) {
+                        let hField = hCom.custom as R_Field;
                         hCom.set(data[key] || '');
+                        if (hField.assignSelectFields && hField.assignAddr) {
+                            BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                cache: true,
+                            }).then(({response}) => {
+                                let res = response.data;
+                                if (res && res[0]) {
+                                    hField.assignSelectFields.forEach((name) => {
+                                        let assignCom = self.editModule.getDom(name);
+                                        assignCom && assignCom.set(res[0][name]);
+                                    });
+                                    let data = this.dataGet();
+                                    this.fields.forEach((field) => {
+                                        if (field.elementType === 'lookup') {
+                                            let lCom = self.editModule.getDom(field.name);
+                                            if (!data[field.lookUpKeyField]) {
+                                                lCom.set('');
+                                            } else {
+                                                let options = this.lookUpData[field.name] || [];
+                                                for (let opt of options) {
+                                                    if (opt.value == data[field.lookUpKeyField]) {
+                                                        lCom.set(opt.value);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    })
+                                }
+
+                            })
+                        }
                     }
                 }
             }
         };
-        if (this.para.isAdd ? field.field.noModify : field.field.noEdit) {
-            field.dom && field.dom.classList.add('disabled');
-        }
-
-        return field;
     }
+    private _lookUpData: objOf<ListItem[]> = {};
+    get lookUpData() {
+        return this._lookUpData || {};
+    }
+
 
     // 处理分组
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
@@ -194,8 +242,7 @@ export class DetailModal {
         }
         let groupsArr = groupInfo.cloNames.split(','),
             groupFields: R_Field[] = [],
-            fieldsArr = [...fields],
-            self = this;
+            fieldsArr = [...fields];
         groupsArr.forEach(field => {
             let gFields = fieldsArr.filter(f => f.name === field);
             if (tools.isNotEmptyArray(gFields)) {

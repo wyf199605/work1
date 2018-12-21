@@ -521,14 +521,19 @@ export class RfidBarCode extends Component {
                                 footer: {
                                     rightPanel: [{
                                         content: "上传",
-                                        onClick: function () {
-                                            console.log(updataEl.getText());
-                                            let images = [];
-                                            let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picFields, images, (res) => {
+                                        onClick:  ()=> {
+                                            let field = para.picFields,
+                                                IMAOBJ = {};
+                                            IMAOBJ[field] = this.photoImgData;
+                                            let IMA = [];
+                                            IMA.push(IMAOBJ);
+                                            let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picAddr,IMA, (res) => {
+                                                d.query('.total-rfid>.bar-code-scan>span').innerText = 0 + '';
+                                                this.stepArry = [];
                                                 if (!res.success) {
                                                     Modal.alert('上传失败');
                                                 } else {
-                                                    Modal.alert('上传成功')
+                                                    Modal.alert(res.msg);
                                                 }
                                             })
                                             mode.destroy();
@@ -662,14 +667,19 @@ export class RfidBarCode extends Component {
                     }>拍照
                     </button>
                     <button onclick={tools.pattern.debounce(() => {
-                        alert('L')
                         G.Shell.inventory.openScanCode(0, (res) => {
                             alert(JSON.stringify(res));
                         })
                     }, 50)
-                    }>扫一扫
+                    }>单扫
                     </button>
-
+                    <button onclick={tools.pattern.debounce(() => {
+                        G.Shell.inventory.openScanCode(1, (res) => {
+                            alert(JSON.stringify(res));
+                        })
+                    }, 50)
+                    }>连扫
+                    </button>
                 </div>
 
             </div>
@@ -679,18 +689,30 @@ export class RfidBarCode extends Component {
 
     private stepStatus: boolean = false;
     private replaceVal: number;
+    private photoImgData:obj = [];
+
+    private randNum(){
+        let d2 = new Date().getTime()+ '',
+            d1 = (Math.random()* 10),
+            rand = d2 + '.jpg';
+        return rand;
+    }
+
 
     private InitRfidBarCode(para) {
-        //初始化监听输入框的值
+        //拍照上传的数据
         this.photoImg = new BwLayoutImg({
             isShow: false,
             autoClear:false,
             onFinish: () => {
-
-                alert('开始')
                 return new Promise((resolve)=>{
                     let ss = this.photoImg.getBase64().then((data)=>{
-                        console.log(data);
+                           for(let i = 0 ,len = data.length;i<len; i++){
+                               let obj = {};
+                               obj['file_name'] = this.randNum();
+                               obj['file_data'] = data[i]
+                               this.photoImgData.push(obj);
+                           }
                     })
                     resolve();
                 })
@@ -701,13 +723,13 @@ export class RfidBarCode extends Component {
                     this.photoImg.modalShow = true;
                 }
             }]
-        });
+        })
         let key = this.stepByone + this.accumulation;
         if (this.mode[key] == '(查询状态)') {
             d.query('.shelf-nums>input')['disabled'] = true;
         }
-        ;
 
+        //初始化监听输入框的值
         let modeVal = d.query('.shelf-nums>input')
         console.log(modeVal);
         modeVal.onblur = () => {
