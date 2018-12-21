@@ -421,7 +421,8 @@ interface IPageScrollSpinner {
 
 class PaginationScrollSpinner {
     events = (function (self) {
-        let isMove = false;
+        let isMove = false,
+            handler = null;
         let panstart = () => {
                 if (isMove) {
                     isMove = false;
@@ -462,16 +463,14 @@ class PaginationScrollSpinner {
             on() {
                 d.on(self.scrollEl, 'pandown panstart panend', pan);
 
-                // d.on(document.body, 'touchmove', (e) => {
-                    // e.preventDefault();
-                // });
+                d.on(document.body, 'touchmove', handler = (e) => {
+                    e.preventDefault();
+                });
             },
             off() {
                 d.off(self.scrollEl, 'pandown panstart panend', pan);
 
-                d.off(document.body, 'touchmove', (e) => {
-                    e.preventDefault();
-                });
+                d.off(document.body, 'touchmove', handler);
             }
         }
     })(this);
