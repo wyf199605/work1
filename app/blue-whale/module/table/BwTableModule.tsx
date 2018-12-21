@@ -28,6 +28,7 @@ import {EditModule} from "../edit/editModule";
 import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {BwUploader} from "../uploadModule/bwUploader";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -682,7 +683,11 @@ export class BwTableModule extends Component {
                 index = parseInt(td.parentElement.dataset.index),
                 name = td.dataset.name;
 
-            if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
+            if(isTd && self.cols.some(col => col.name === name && BwRule.isNewImg(col.atrrs.dataType))){
+                let row = ftable.rows[index],
+                    cell = row ? row.cellGet(name) : null;
+                self.showImg(cell);
+            }else if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
                 self.multiImgEdit.show(name, index);
             } else {
                 self.imgEdit.showImg(index);
@@ -697,6 +702,35 @@ export class BwTableModule extends Component {
             ftable.click.add(trSelector, tools.pattern.throttling((e) => {
                 imgHandler(e, false);
             }, 1000));
+        }
+
+    }
+
+    protected showImg(cell: FastTableCell){
+        if(cell && cell.column){
+            let column = cell.column,
+                data = cell.data,
+                field = column.content as R_Field,
+                urls = [];
+
+            if(data){
+                urls = [tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                    "md5_field": field.name,
+                    [field.name]: data,
+                    down: 'allow'
+                })];
+            }
+
+            let imgData: ImgModalPara = {
+                img: urls
+            };
+            ImgModal.show(imgData);
+            if (tools.isMb) {
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    d.query('.pswp', document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
+                }, 200);
+            }
         }
 
     }
@@ -1384,7 +1418,7 @@ export class BwTableModule extends Component {
             classes: string[] = [];         // 类名
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
-                isImg = dataType === BwRule.DT_IMAGE || dataType === BwRule.DT_SIGN;
+                isImg = dataType === BwRule.DT_IMAGE;
 
             if (isImg && field.link) {
                 // 缩略图
@@ -1392,6 +1426,16 @@ export class BwTableModule extends Component {
                 text = <img src={url}/>;
                 classes.push('cell-img');
 
+            } else if(dataType === BwRule.DT_SIGN){
+                if(cellData){
+                    let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                        "md5_field": field.name,
+                        [field.name]: cellData,
+                        down: 'allow'
+                    });
+                    text = <img src={url}/>;
+                }
+                classes.push('cell-img');
             } else if (dataType === BwRule.DT_MUL_IMAGE) {
                 // 多图缩略图
                 if (typeof cellData === 'string' && cellData[0]) {
@@ -1631,7 +1675,7 @@ export class BwTableModule extends Component {
 
         let init = () => {
             this.cols.forEach(col => {
-                if (col.atrrs && (col.atrrs.dataType === '20' || col.atrrs.dataType === '26')) {
+                if (col.atrrs && (col.atrrs.dataType === '20')) {
                     if (col.noShow) {
                         fields.push(col);
                     } else {
@@ -1761,6 +1805,7 @@ export class BwTableModule extends Component {
         };
 
         let imgUrlCreate = (md5: string) => {
+            let dataObj: obj;
             return tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                 // name_field: nameField,
                 md5_field: 'FILE_ID',
@@ -2237,7 +2282,7 @@ export class BwTableModule extends Component {
                         value = cell ? cell.data : '';
                     }
 
-                    let com = BwRule.isImage(field.atrrs && field.atrrs.dataType) ? null : editModule.init(col.name, {
+                    let com = BwRule.isOldImg(field.atrrs && field.atrrs.dataType) ? null : editModule.init(col.name, {
                         dom: cell.wrapper,
                         data: row.data,
                         field,

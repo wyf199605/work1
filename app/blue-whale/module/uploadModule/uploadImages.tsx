@@ -127,6 +127,10 @@ export class UploadImages extends FormCom {
         this.initEvent.on();
     }
 
+    click(){
+        this.uploader && this.uploader.click();
+    }
+
     private createUploader() {
         let uploader: BwUploader = new BwUploader({
             loading: {
