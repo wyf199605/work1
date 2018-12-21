@@ -11,6 +11,7 @@ export interface IBwLayoutImgPara extends IBwUploaderPara{
     onFinish?: (files: CustomFile[]) => Promise<any>;
     isShow?: boolean;  // 是否显示上传控件，默认true
     autoClear?: boolean; // 是否在模态框关闭清除file，默认true
+
 }
 
 export class BwLayoutImg{

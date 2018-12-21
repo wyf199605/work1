@@ -10,6 +10,8 @@ import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
 import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
 import {G_FILE_MD5, G_MD5} from "../../../global/utils/md5";
+import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
+import Shell = G.Shell;
 
 type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
@@ -26,6 +28,7 @@ export interface IBwUploaderPara extends IFormComPara {
     onSuccess?: (...any) => void;
     uploadUrl?: string;
     loading?: ILoadingPara;
+    buttons?: IActionSheetButton[];
 }
 interface FileType {
     title: string;
@@ -56,6 +59,8 @@ export class BwUploader extends FormCom {
     protected text: string;
     protected loading: Loading;
     protected uploadType: uploadType;
+    protected actionSheet: ActionSheet;
+    protected autoUpload: boolean;
 
     protected wrapperInit(para) {
         this.text = typeof para.text === 'string' ? para.text : '点击上传';
@@ -81,8 +86,13 @@ export class BwUploader extends FormCom {
         this.accept = para.accept;
         this.multi = para.multi || false;
         this.isChangeText = para.isChangeText || false;
+        this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
 
-        let autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
+        // ios暂未支持新接口
+        if(/*sys.os === 'ip' || */sys.os === 'ad'){
+            this.initActionSheet(para.buttons || []);
+        }
+
         this.fileUpload = new FileUpload({
             chunk: {
                 chunkSize: this.chunkSize,
@@ -95,26 +105,55 @@ export class BwUploader extends FormCom {
 
         d.on(this.wrapper, 'click', tools.pattern.throttling(() => {
             this.getFile((files: CustomFile[]) => {
-                if(!this.multi){
-                    this.temFiles = [];
-                }
-                if(tools.isNotEmpty(files)){
-                    files.forEach((file) => {
-                        if(this.maxSize !== -1 && file.size > this.maxSize){
-                            Modal.alert('文件' + file.name + '大小超过限制');
-                        }else if(!this.acceptVerify(file)){
-                            Modal.alert('文件' + file.name + '类型有误');
-                        }else {
-                            this.temFiles.push(file);
-                        }
-                    });
-                    this.trigger(BwUploader.EVT_FILE_JOIN_QUEUE, this.temFiles);
-                    autoUpload && this.upload();
-                }
-            }, (msg) => {
-                tools.isNotEmpty(msg) && Modal.alert(msg, '温馨提示');
-            });
+                this.addFile(files);
+            }, BwUploader.hintMsg);
         }, 1000));
+    }
+
+    protected addFile(files: CustomFile[]){
+        if(!this.multi){
+            this.temFiles = [];
+        }
+        if(tools.isNotEmpty(files)){
+            files.forEach((file) => {
+                if(this.maxSize !== -1 && file.size > this.maxSize){
+                    Modal.alert('文件' + file.name + '大小超过限制');
+                }else if(!this.acceptVerify(file)){
+                    Modal.alert('文件' + file.name + '类型有误');
+                }else {
+                    this.temFiles.push(file);
+                }
+            });
+            this.trigger(BwUploader.EVT_FILE_JOIN_QUEUE, this.temFiles);
+            this.autoUpload && this.upload();
+        }
+    }
+
+    static hintMsg(msg: string){
+        tools.isNotEmpty(msg) && Modal.alert(msg, '温馨提示');
+    }
+
+    protected initActionSheet(buttons: IActionSheetButton[] = []){
+        this.actionSheet = new ActionSheet({
+            buttons: [
+                {
+                    content: '拍照',
+                    onClick: () => {
+                        Shell.image.photograph(((files) => {
+                            this.addFile(files);
+                        }), BwUploader.hintMsg);
+                    }
+                },
+                {
+                    content: '相册',
+                    onClick: () => {
+                        Shell.image.photoAlbum(((files) => {
+                            this.addFile(files);
+                        }), BwUploader.hintMsg);
+                    }
+                }
+            ].concat(buttons)
+        })
     }
 
     click(){
@@ -124,7 +163,11 @@ export class BwUploader extends FormCom {
     protected getFile(callback: (file: CustomFile[]) => void , error?: Function){
         switch (this.uploadType){
             case "file":
-                sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                if(this.actionSheet){
+                    this.actionSheet.isShow = true;
+                }else{
+                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                }
                 break;
             case 'sign':
                 if(sys.window.getSign){
