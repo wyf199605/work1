@@ -303,16 +303,14 @@ export class MbListItem extends Component {
 
     private initEvents = (() => {
         let buttonsEvent = (e) => {
-            e.stopPropagation();
             let index = parseInt(d.closest(e.target, '.item-button').dataset.index);
             tools.isFunction(this.para.buttonClick) && this.para.buttonClick(index, this.index);
         };
         let itemClick = (e) => {
-            e.stopPropagation();
+            // e.stopPropagation();
             tools.isFunction(this.para.itemClick) && this.para.itemClick(this.index);
         };
         let clickMore = (e) => {
-            e.stopPropagation();
             if (this.para.list) {
                 this.para.list.itemActionSheet.isShow = true;
                 this.para.list.currentSelectItemIndex = this.index;

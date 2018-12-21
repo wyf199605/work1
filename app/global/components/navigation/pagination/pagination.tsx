@@ -1,5 +1,6 @@
 /// <amd-module name="Pagination"/>
-import IComponentPara = G.IComponentPara; import Component = G.Component;
+import IComponentPara = G.IComponentPara;
+import Component = G.Component;
 import {Spinner} from "../../ui/spinner/spinner";
 import {Button} from "../../general/button/Button";
 import d = G.d;
@@ -28,7 +29,7 @@ interface IPagingState {
     pageSize: number;
 }
 
-interface IPaginationState extends IPagingState{
+interface IPaginationState extends IPagingState {
     // offset : number;
     // count : number;
     isRefresh: boolean;
@@ -62,13 +63,13 @@ export class Pagination extends Component {
 
         this.onChange = para.onChange;
 
-        if(tools.isNotEmpty(para.scroll)){
+        if (tools.isNotEmpty(para.scroll)) {
             this.wrapper.classList.add('pagination-wrapper');
 
             this.wrapper.appendChild(this.textEl =
                 <p className="pagination-nomore hide">{this.para.scroll.nomoreText || '已无更多'}</p>);
 
-            if(tools.isEmpty(para.scroll.isPulldownRefresh) ? true : para.scroll.isPulldownRefresh){
+            if (tools.isEmpty(para.scroll.isPulldownRefresh) ? true : para.scroll.isPulldownRefresh) {
                 this.paginationScrollSpinner = new PaginationScrollSpinner({
                     scrollEl: this.wrapper,
                     container: this.wrapper,
@@ -79,7 +80,7 @@ export class Pagination extends Component {
             }
 
             this.initSpinner();
-        }else{
+        } else {
             this.paging = new Paging({
                 container: para.container,
                 total: para.total,
@@ -90,7 +91,7 @@ export class Pagination extends Component {
         }
 
         this.events.on();
-        
+
     }
 
     protected initSpinner() {
@@ -197,23 +198,23 @@ export class Pagination extends Component {
         let autoLoading: boolean,
             loadingBtn: Button,
             isPulldownRefresh: boolean;
-        
+
         let timer = null;
         let scrollHandle = function () {
             let scroll = this.scrollTop;
             clearTimeout(timer);
             if (isPulldownRefresh) {
-                if (scroll === 0) {
+                if (scroll <= 0) {
                     timer = setTimeout(() => {
                         self.paginationScrollSpinner.open();
                         clearTimeout(timer);
-                    },10);
+                    }, 10);
                 } else {
                     self.paginationScrollSpinner.close();
                 }
             }
             if (Math.ceil(scroll) >= self.maxScrollTop) {
-                if(self.current + 1 < Math.ceil(self.total / self.pageSize)){
+                if (self.current + 1 < Math.ceil(self.total / self.pageSize)) {
                     if (tools.isNotEmpty(self.spinner) && !self.spinner.isVisible()) {
                         if (autoLoading) {
                             self.next();
@@ -221,7 +222,7 @@ export class Pagination extends Component {
                             loadingBtn.isShow = true;
                         }
                     }
-                }else{
+                } else {
                     !self.isEnd && (self.isEnd = true);
                 }
             }
@@ -229,7 +230,7 @@ export class Pagination extends Component {
 
         return {
             on() {
-                if(tools.isNotEmpty(self.para.scroll)){
+                if (tools.isNotEmpty(self.para.scroll)) {
                     autoLoading = tools.isEmpty(self.para.scroll.auto) ? true : self.para.scroll.auto;
                     isPulldownRefresh = tools.isEmpty(self.para.scroll.isPulldownRefresh) ?
                         true : self.para.scroll.isPulldownRefresh;
@@ -252,7 +253,7 @@ export class Pagination extends Component {
                         self.wrapper.appendChild(btnWrapper);
                     }
                 }
-                if(tools.isEmpty(self.paging)){
+                if (tools.isEmpty(self.paging)) {
                     if (isPulldownRefresh) {
                         self.paginationScrollSpinner && self.paginationScrollSpinner.open();
                     }
@@ -260,7 +261,7 @@ export class Pagination extends Component {
                 }
             },
             off() {
-                if(tools.isEmpty(self.paging)) {
+                if (tools.isEmpty(self.paging)) {
                     self.paginationScrollSpinner && self.paginationScrollSpinner.close();
                     d.off(self.wrapper, 'scroll', scrollHandle);
                 }
@@ -291,14 +292,14 @@ export class Pagination extends Component {
         }
     }
 
-    private changedPage(ifRefresh = false){
+    private changedPage(ifRefresh = false) {
         this.paging && this.paging.initItem(this._current);
         return this.onChange({
             current: this._current,
             pageSize: this.pageSize,
             isRefresh: ifRefresh
         }).then((isEnd = false) => {
-            if(tools.isEmpty(this.paging)){
+            if (tools.isEmpty(this.paging)) {
                 if (ifRefresh) {
                     this.initSpinner();
                     this.paginationScrollSpinner && this.paginationScrollSpinner.cancel();
@@ -308,7 +309,7 @@ export class Pagination extends Component {
                 }
                 this.spinner && this.spinner.hide();
                 this.totalHeight = this.wrapper.offsetHeight;
-            }else{
+            } else {
             }
 
         });
@@ -318,25 +319,27 @@ export class Pagination extends Component {
     get pageSize() {
         return this._pageSize;
     }
+
     set pageSize(num: number) {
-        if(this._pageSize !== num && num > 0){
+        if (this._pageSize !== num && num > 0) {
             this._pageSize = num;
             this.refresh();
         }
     }
 
     protected _disabled: boolean = false;
-    get disabled(){
+    get disabled() {
         return this._disabled;
     }
+
     set disabled(frag: boolean) {
         frag = !!frag;
-        if(frag !== this._disabled){
+        if (frag !== this._disabled) {
             this._disabled = frag;
-            if(this.para) {
-                if(tools.isEmpty(this.para.scroll)){
+            if (this.para) {
+                if (tools.isEmpty(this.para.scroll)) {
                     this.paging && (this.paging.disabled = frag);
-                }else{
+                } else {
                     frag ? this.events.off() : this.events.on();
                 }
             }
@@ -389,14 +392,14 @@ export class Pagination extends Component {
 
     destroy() {
         this.events.off();
-        if(tools.isEmpty(this.paging)){
+        if (tools.isEmpty(this.paging)) {
             d.remove(this.textEl);
             this.spinner && this.spinner.hide();
             this.paginationScrollSpinner && this.paginationScrollSpinner.destroy();
             this.wrapper.classList.remove('pagination-wrapper');
             this.paginationScrollSpinner = null;
             this.spinner = null;
-        }else{
+        } else {
             this.paging.destroy();
         }
     }
@@ -458,20 +461,19 @@ class PaginationScrollSpinner {
                 panmove(ev);
             }
         };
+        let handler;
         return {
             on() {
                 d.on(self.scrollEl, 'pandown panstart panend', pan);
 
-                // d.on(document.body, 'touchmove', (e) => {
-                    // e.preventDefault();
-                // });
+                d.on(document.body, 'touchmove', handler = (e) => {
+                    e.preventDefault();
+                });
             },
             off() {
                 d.off(self.scrollEl, 'pandown panstart panend', pan);
 
-                d.off(document.body, 'touchmove', (e) => {
-                    e.preventDefault();
-                });
+                d.off(document.body, 'touchmove', handler);
             }
         }
     })(this);
@@ -615,15 +617,16 @@ class PaginationScrollSpinner {
     }
 
     protected _onOff = false;
+
     open() {
-        if(!this._onOff){
+        if (!this._onOff) {
             this.events.on();
             this._onOff = true;
         }
     }
 
     close() {
-        if(this._onOff) {
+        if (this._onOff) {
             this.wrapper.style.display = 'none';
             this.events.off();
             this._onOff = false;
@@ -631,11 +634,12 @@ class PaginationScrollSpinner {
     }
 
     protected _disabled: boolean = false;
-    get disabled(){
+    get disabled() {
         return this._disabled
     }
-    set disable(frag: boolean){
-        if(frag !== this._disabled){
+
+    set disable(frag: boolean) {
+        if (frag !== this._disabled) {
             this._disabled = frag;
             frag ? this.events.off() : this.events.on();
         }
@@ -675,7 +679,7 @@ class PaginationScrollSpinner {
     }
 }
 
-interface IPagingPara extends IComponentPara{
+interface IPagingPara extends IComponentPara {
     pageOption?: number[],       // 单页条数可选项 //单页条数默认为单页条数可选项第一项
     total?: number,      // 总记录数
     mini?: boolean;     // mini 样式
@@ -683,7 +687,7 @@ interface IPagingPara extends IComponentPara{
     pagination: Pagination;
 }
 
-export class Paging extends Component{
+export class Paging extends Component {
     protected pagination: Pagination;
     protected items: HTMLElement[] = [];
     protected itemWrapper: HTMLElement; // 上下页按钮及其中间按钮的父级元素
@@ -691,13 +695,14 @@ export class Paging extends Component{
     protected selectEl: HTMLSelectElement; // 选择每页页数的选择框
     protected inputEl: HTMLInputElement; //输入第几页的输入框
     protected prevEl: HTMLElement; // 上一页按钮
-    protected nextEl: HTMLElement ; // 下一页按钮
+    protected nextEl: HTMLElement; // 下一页按钮
 
-    protected wrapperInit(para){
+    protected wrapperInit(para) {
         return <div className="paging-wrapper"></div>;
     }
+
     // 创建带页码的点击按钮
-    static createItem(index): HTMLElement{
+    static createItem(index): HTMLElement {
         return <a className="paging-number" title={index} data-index={index}>{index}</a>
     }
 
@@ -707,14 +712,14 @@ export class Paging extends Component{
     static readonly EVT_INDEX_CHANGED = '__EVENT_INDEX_CHANGED__'; // 改变页码时触发的事件名称
     static readonly EVT_PAGE_SIZE_CHANGED = '__EVENT_PAGE_SIZE_CHANGED__'; //改边每一页的页数时触发的事件名称
 
-    constructor(para: IPagingPara){
+    constructor(para: IPagingPara) {
         super(para);
         this.pagination = para.pagination;
 
         this.itemWrapper = <span className="paging-container"></span>;
         this.totalEl = <span className="paging-total">总共0条</span>;
         this.selectEl = <select></select>;
-        this.inputEl = <input type="text" name="paging-elevator" />;
+        this.inputEl = <input type="text" name="paging-elevator"/>;
         this.prevEl = <a className="paging-prev paging-disabled" title="上一页" data-index="prev">&lt;</a>;
         this.nextEl = <a className="paging-next" title="下一页" data-index="next">&gt;</a>;
 
@@ -722,18 +727,19 @@ export class Paging extends Component{
         this.total = para.total;
         this.pageOption = para.pageOption || [100, 200, 500];
 
-        this.wrapper.classList.toggle('mini', tools.isEmpty(para.mini)? true : para.mini);
+        this.wrapper.classList.toggle('mini', tools.isEmpty(para.mini) ? true : para.mini);
         this.init();
 
         this.event.on();
     }
 
     // 渲染整个paging控件
-    protected init(){
+    protected init() {
         const selectWrapper = <span className="paging-option"></span>,
-            inputWrapper = <span className="paging-elevator">跳至<span className="paging-elevator-wrapper"></span>页</span>;
+            inputWrapper = <span className="paging-elevator">跳至<span
+                className="paging-elevator-wrapper"></span>页</span>;
 
-        d.prepend(this.itemWrapper,this.prevEl);
+        d.prepend(this.itemWrapper, this.prevEl);
         d.append(this.itemWrapper, this.nextEl);
         this.initItem(0);
 
@@ -749,32 +755,32 @@ export class Paging extends Component{
     }
 
     // 渲染页码按钮
-    initItem(index: number){
+    initItem(index: number) {
         let totalPage = Math.ceil(this.total / this.pageSize),
             offset = Math.min(this.offset, totalPage);
         index = Math.min(totalPage - 1, index);
         index = Math.max(0, index);
 
-        for(let item of this.items){
+        for (let item of this.items) {
             tools.isNotEmpty(item) && item.classList.add('hide');
         }
 
         let center = Math.floor(offset / 2),
-            itemIndex = index - center - Math.max(0, index + 1 - (totalPage - center)) ;
+            itemIndex = index - center - Math.max(0, index + 1 - (totalPage - center));
         itemIndex = Math.max(0, itemIndex);
 
-        for(let i = 0, len = this.items.length; i < Math.max(offset, len); i ++){
+        for (let i = 0, len = this.items.length; i < Math.max(offset, len); i++) {
             let item = this.items[i];
-            if(i >= totalPage){
+            if (i >= totalPage) {
                 item && d.remove(item);
                 delete this.items[i];
-            }else{
-                if(item){
+            } else {
+                if (item) {
                     item.innerText = itemIndex + i + 1 + '';
                     item.title = itemIndex + i + 1 + '';
                     item.dataset.index = itemIndex + i + 1 + '';
                     item.classList.remove(Paging.__DISABLED_CLASS__)
-                }else{
+                } else {
                     let numPag = Paging.createItem(itemIndex + i + 1);
                     this.items[i] = numPag;
                     d.before(this.itemWrapper.lastChild, numPag);
@@ -787,38 +793,38 @@ export class Paging extends Component{
         this.nextEl.classList.remove(Paging.__DISABLED_CLASS__);
         this.inputEl.removeAttribute('disabled');
 
-        if(center === 0){
+        if (center === 0) {
             this.items[0] && this.items[0].classList.add(Paging.__SELECTED_CLASS__);
             this.prevEl.classList.add(Paging.__DISABLED_CLASS__);
             this.nextEl.classList.add(Paging.__DISABLED_CLASS__);
             this.inputEl.setAttribute('disabled', 'disabled');
-        }else{
+        } else {
             let endIndex = totalPage - 1 - index;
-            if(index < center){
+            if (index < center) {
                 this.items[index] && this.items[index].classList.add(Paging.__SELECTED_CLASS__);
                 index === 0 && this.prevEl.classList.add(Paging.__DISABLED_CLASS__);
-            }else if(endIndex < center){
+            } else if (endIndex < center) {
                 let i = offset - endIndex - 1;
                 this.items[i] && this.items[i].classList.add(Paging.__SELECTED_CLASS__);
                 index + 1 === totalPage && this.nextEl.classList.add(Paging.__DISABLED_CLASS__);
-            }else{
+            } else {
                 this.items[center] && this.items[center].classList.add(Paging.__SELECTED_CLASS__);
             }
         }
 
-        for(let item of this.items){
+        for (let item of this.items) {
             tools.isNotEmpty(item) && item.classList.remove('hide');
         }
     }
 
-    trigger(type){
+    trigger(type) {
         super.trigger(type, {
             current: this.pagination.current,
             pageSize: this.pageSize,
         });
     }
 
-    protected setCurrent(index){
+    protected setCurrent(index) {
         let totalPage = Math.ceil(this.total / this.pageSize);
         index = Math.min(totalPage - 1, index);
         index = Math.max(0, index);
@@ -828,47 +834,50 @@ export class Paging extends Component{
     // 控制事件
     protected event = ((self) => {
         let enter, blur;
+
         // 点击按钮时触发的事件
-        function itemClick(e: Event){
+        function itemClick(e: Event) {
             e.preventDefault();
             let index = this.dataset.index;
-            if(isNaN(index)){
-                if(index === 'prev'){
+            if (isNaN(index)) {
+                if (index === 'prev') {
                     self.pagination && self.setCurrent(self.pagination.current - 1);
-                }else if(index === 'next'){
+                } else if (index === 'next') {
                     self.pagination && self.setCurrent(self.pagination.current + 1);
                 }
-            }else{
+            } else {
                 self.setCurrent(parseInt(index) - 1);
             }
             self.trigger(Paging.EVT_INDEX_CHANGED);
         }
+
         // 选择框事件
-        function change(){
+        function change() {
             let val = parseInt(this.value);
-            if(self.pageSize !== val){
+            if (self.pageSize !== val) {
                 self.pageSize = val;
             }
         }
+
         return {
-            on(){
+            on() {
                 d.on(self.itemWrapper, 'click', 'a:not(.' + Paging.__DISABLED_CLASS__ + '):not(.' + Paging.__SELECTED_CLASS__ + ')', itemClick);
                 d.on(self.selectEl, 'change', change);
-                d.on(self.inputEl, 'blur', blur = function() {
+                d.on(self.inputEl, 'blur', blur = function () {
                     let val = this.value;
-                    if(tools.isNotEmpty(val) && !isNaN(val)){
+                    if (tools.isNotEmpty(val) && !isNaN(val)) {
                         self.setCurrent(parseInt(val) - 1);
                         self.trigger(Paging.EVT_INDEX_CHANGED);
                     }
                     self.inputEl.value = '';
                 });
                 d.on(self.inputEl, 'keyup', enter = function (ev) {
-                    if(ev.keyCode === 13){
+                    if (ev.keyCode === 13) {
                         self.inputEl.blur();
                     }
                 });
             },
-            off(){
+            off() {
                 d.off(self.itemWrapper, 'click', 'a:not(.' + Paging.__DISABLED_CLASS__ + ')', itemClick);
                 d.off(self.selectEl, 'change', change);
                 d.off(self.inputEl, 'blur', blur);
@@ -882,8 +891,8 @@ export class Paging extends Component{
 
     // 单页条数
     protected _pageSize: number = 50;
-    set pageSize(num: number){
-        if(typeof num === 'number' && this._pageSize !== num){
+    set pageSize(num: number) {
+        if (typeof num === 'number' && this._pageSize !== num) {
             this._pageSize = num;
             this.pagination.pageSize = num;
 
@@ -896,23 +905,25 @@ export class Paging extends Component{
             });
         }
     }
-    get pageSize(){
+
+    get pageSize() {
         return this._pageSize;
     }
 
     // 总条数
     protected _total: number = 0;
-    get total(){
+    get total() {
         return this._total;
     }
-    set total(total: number){
-        if(total > 0 && this._total !== total){
-            this.totalEl.innerText = '总共'+ total +'条';
+
+    set total(total: number) {
+        if (total > 0 && this._total !== total) {
+            this.totalEl.innerText = '总共' + total + '条';
             this._total = total;
             const selectEl = d.query('.' + Paging.__SELECTED_CLASS__, this.itemWrapper);
-            if(selectEl){
+            if (selectEl) {
                 this.initItem(0);
-            }else{
+            } else {
                 this.initItem(0);
             }
         }
@@ -920,14 +931,15 @@ export class Paging extends Component{
 
     // 选择框的单页条数可选项
     protected _pageOption: number[] = null;
-    get pageOption(){
+    get pageOption() {
         return this._pageOption;
     }
-    set pageOption(pageOption: number[]){
-        if(Array.isArray(pageOption) && this._pageOption !== pageOption && pageOption.length > 0){
+
+    set pageOption(pageOption: number[]) {
+        if (Array.isArray(pageOption) && this._pageOption !== pageOption && pageOption.length > 0) {
             this._pageOption = pageOption;
             const frag = document.createDocumentFragment();
-            for(let index of pageOption){
+            for (let index of pageOption) {
                 frag.appendChild(<option value={index}>{index} 条/页</option>);
             }
             d.setHTML(this.selectEl, '');
@@ -936,34 +948,35 @@ export class Paging extends Component{
         }
     }
 
-    get disabled(){
+    get disabled() {
         return this._disabled
     }
-    set disabled(frag: boolean){
+
+    set disabled(frag: boolean) {
         // if(this._disabled !== frag){
         this.selectEl && (this.selectEl.disabled = frag);
-        if(frag){
+        if (frag) {
             this.inputEl && this.inputEl.setAttribute('disabled', 'disabled');
             this.prevEl && this.prevEl.classList.add(Paging.__DISABLED_CLASS__);
             this.nextEl && this.nextEl.classList.add(Paging.__DISABLED_CLASS__);
             this.items && this.items.forEach((item, index) => {
-                if(index !== this.pagination.current){
+                if (index !== this.pagination.current) {
                     item.classList.add(Paging.__DISABLED_CLASS__);
                 }
             });
-        }else{
+        } else {
             this.pagination && this.initItem(this.pagination.current);
         }
         // }
     }
 
-    destroy(){
+    destroy() {
         super.destroy();
         this.event.off();
         this.pagination = null;
         this.items = null;
         this.itemWrapper = null;
-        this.totalEl= null;
+        this.totalEl = null;
         this.selectEl = null;
         this.inputEl = null;
         this.prevEl = null;
