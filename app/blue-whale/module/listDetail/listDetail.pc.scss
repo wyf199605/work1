@@ -300,6 +300,9 @@
           justify-content: flex-start;
           border: solid 1px #e2e2e2;
           padding: 0;
+          &[data-type="virtual"]{
+            display: none;
+          }
           .images-wrapper {
             background-color: #ffffff;
             display: flex;
@@ -519,6 +522,9 @@
           height: 44px;
           border: solid 1px #e2e2e2;
           padding: 0;
+          &[data-type="virtual"]{
+            display: none;
+          }
           &.disabled{
             opacity: 0.5;
             pointer-events: none !important;

@@ -27,38 +27,13 @@ export class DetailModal {
         let emPara: EditModulePara = {fields: [], defaultData: this.para.defaultData},
             formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
-            groupInfo = para.fm.groupInfo,
-            self = this;
+            groupInfo = para.fm.groupInfo;
         para.isNotDetail && BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             tools.isPc && formWrapper.classList.add('no-group');
             for (let i = 0, len = fields.length; i < len; i++) {
                 let f = fields[i];
-                if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
-                    f.comType = 'virtual';
-                }
-                if (f.comType === 'file'){
-                    f.comType = 'newFile';
-                }
-                let field = {
-                    dom: DetailModal.createFormWrapper(f, formWrapper),
-                    field: f,
-                    data: this.para.defaultData,
-                    onExtra: (data, relateCols, isEmptyClear = false) => {
-                        let com = self.editModule.getDom(f.name);
-                        for (let key of relateCols) {
-                            let hCom = self.editModule.getDom(key);
-                            if (hCom && hCom !== com) {
-                                let hField = hCom.custom as R_Field;
-                                hCom.set(data[key] || '');
-                            }
-                        }
-                    }
-                };
-                emPara.fields.push(field);
-                if (para.isAdd ? field.field.noModify : field.field.noEdit) {
-                    field.dom && field.dom.classList.add('disabled');
-                }
+                emPara.fields.push(this.handleField(f, formWrapper));
             }
         } else {
             let fieldsArr = [...fields];
@@ -66,7 +41,13 @@ export class DetailModal {
                 let result = this.getGroupFormPara(group, fieldsArr, formWrapper);
                 emPara.fields = emPara.fields.concat(result.para);
                 fieldsArr = result.fields;
-            })
+            });
+            // 不在组中的字段，一般为隐藏字段
+            if (tools.isNotEmpty(fieldsArr)) {
+                fieldsArr.forEach(f => {
+                    emPara.fields.push(this.handleField(f, formWrapper, '', true));
+                })
+            }
         }
         let modal: Modal;
         let footButtons = {
@@ -173,13 +154,40 @@ export class DetailModal {
         }
     }
 
+    // 处理字段
+    private handleField(f: R_Field, wrapper: HTMLElement, className?: string, isVirtual = false): ComInitP {
+        let self = this;
+        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
+            f.comType = 'virtual';
+        }
+        if (f.comType === 'file') {
+            f.comType = 'newFile';
+        }
+        if (isVirtual === true){
+            f.comType = 'virtual';
+        }
+        let field = {
+            dom: DetailModal.createFormWrapper(f, wrapper, className || ''),
+            field: f,
+            data: this.para.defaultData,
+            onExtra: (data, relateCols) => {
+                let com = self.editModule.getDom(f.name);
+                for (let key of relateCols) {
+                    let hCom = self.editModule.getDom(key);
+                    if (hCom && hCom !== com) {
+                        hCom.set(data[key] || '');
+                    }
+                }
+            }
+        };
+        if (this.para.isAdd ? field.field.noModify : field.field.noEdit) {
+            field.dom && field.dom.classList.add('disabled');
+        }
 
-    private _lookUpData: objOf<ListItem[]> = {};
-    get lookUpData() {
-        return this._lookUpData || {};
+        return field;
     }
 
-
+    // 处理分组
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
         if (tools.isEmpty(groupInfo.cloNames)) {
             return fields;
@@ -209,60 +217,7 @@ export class DetailModal {
             if (~['textarea', 'file', 'img'].indexOf(type)) {
                 className = 'one-column';
             }
-            if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
-                f.comType = 'virtual';
-            }
-            if (f.comType === 'file'){
-                f.comType = 'newFile';
-            }
-            let field = {
-                dom: DetailModal.createFormWrapper(f, cellsWrapper, className),
-                field: f,
-                onExtra: (data, relateCols, isEmptyClear = false) => {
-                    let com = self.editModule.getDom(f.name);
-                    for (let key of relateCols) {
-                        let hCom = self.editModule.getDom(key);
-                        if (hCom && hCom !== com) {
-                            let hField = hCom.custom as R_Field;
-                            hCom.set(data[key] || '');
-
-                            if (tools.isNotEmpty(hField) && hField.assignSelectFields && hField.assignAddr) {
-                                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
-                                    cache: true,
-                                }).then(({response}) => {
-                                    let res = response.data;
-                                    if (res && res[0]) {
-                                        hField.assignSelectFields.forEach((name) => {
-                                            let assignCom = self.editModule.getDom(name);
-                                            assignCom && assignCom.set(res[0][name]);
-                                        });
-                                        let data = this.dataGet();
-                                        fields.forEach((fi) => {
-                                            if (fi.elementType === 'lookup') {
-                                                let lCom = self.editModule.getDom(fi.name);
-                                                if (!data[fi.lookUpKeyField]) {
-                                                    lCom.set('');
-                                                } else {
-                                                    let options = self.lookUpData[fi.name] || [];
-                                                    for (let opt of options) {
-                                                        if (opt.value == data[fi.lookUpKeyField]) {
-                                                            lCom.set(opt.value);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        })
-                                    }
-                                })
-                            }
-                        }
-                    }
-                }
-            };
-            emPara.push(field);
-            if (this.para.isAdd ? field.field.noModify : field.field.noEdit) {
-                field.dom && field.dom.classList.add('disabled');
-            }
+            emPara.push(this.handleField(f, cellsWrapper, className));
         }
         return {
             fields: fieldsArr,
@@ -270,6 +225,7 @@ export class DetailModal {
         };
     }
 
+    // 创建表单项wrappaer
     static createFormWrapper(field: R_Field, wrapper: HTMLElement, className?: string): HTMLElement {
         if (field.comType === 'newFile' || field.comType === 'image') {
             return wrapper;
