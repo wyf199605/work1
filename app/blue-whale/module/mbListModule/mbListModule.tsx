@@ -124,6 +124,19 @@ export class MbListModule extends Component {
         let self = this;
 
         function getFormFields(url: string) {
+            let defaultValue: obj = {},
+                keyparam = tools.url.getPara('keyparam', url);
+            if (tools.isNotEmpty(keyparam)) {
+                let keyparamJson = JSON.parse(keyparam);
+                keyparamJson.forEach(keyObj => {
+                    let key = keyObj['keyField'],
+                        value = tools.url.getPara(key.toLowerCase(), url);
+                    if (tools.isNotEmpty(tools.str.toEmpty(value))) {
+                        defaultValue[key] = value;
+                    }
+                })
+            }
+            console.log(defaultValue);
             BwRule.Ajax.fetch(url, {
                 loading: {
                     msg: '加载中,请稍后...',
@@ -137,7 +150,7 @@ export class MbListModule extends Component {
                         fields: element.fields
                     }
                 }, {
-                    defaultData: {},
+                    defaultData: defaultValue,
                     isAdd: true,
                     isPC: !tools.isMb,
                     confirm(data) {
