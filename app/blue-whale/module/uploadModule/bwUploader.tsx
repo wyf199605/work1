@@ -9,6 +9,7 @@ import {User} from "../../../global/entity/User";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
 import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
+import {G_FILE_MD5, G_MD5} from "../../../global/utils/md5";
 
 type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
@@ -39,7 +40,7 @@ export class BwUploader extends FormCom {
 
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
     protected maxSize: number;  // 上传文件大小，-1为不限制
-    protected chunkSize = 1024 * 1024;  // 分块大小 5M
+    protected chunkSize = 2 * 1024 * 1024;  // 分块大小 5M
     protected nameField: string;
     protected thumbField: string;
     // protected formData: () => obj;  // 上传附带数据
@@ -92,7 +93,7 @@ export class BwUploader extends FormCom {
             beforeSendFile: this.beforeSendFile.bind(this)
         });
 
-        d.on(this.wrapper, 'click', () => {
+        d.on(this.wrapper, 'click', tools.pattern.throttling(() => {
             this.getFile((files: CustomFile[]) => {
                 if(!this.multi){
                     this.temFiles = [];
@@ -113,7 +114,11 @@ export class BwUploader extends FormCom {
             }, (msg) => {
                 tools.isNotEmpty(msg) && Modal.alert(msg, '温馨提示');
             });
-        });
+        }, 1000));
+    }
+
+    click(){
+        this.wrapper && this.wrapper.click();
     }
 
     protected getFile(callback: (file: CustomFile[]) => void , error?: Function){
@@ -187,7 +192,7 @@ export class BwUploader extends FormCom {
     }
 
     // 调用方法上传暂存文件
-    upload(){
+    upload(files: CustomFile[] = this.temFiles){
         this.loading && this.loading.show();
         this._isFinish = false;
         this.wrapper.classList.remove('error');
@@ -195,9 +200,9 @@ export class BwUploader extends FormCom {
         if(!this.multi){
             this.files = [];
         }
-        let files = this.multi ? this.temFiles : this.temFiles[0],
-            promises: Promise<any>[] = [];
-        files && tools.toArray(files).forEach((file) => {
+        let promises: Promise<any>[] = [];
+        files = this.multi ? files : tools.toArray(files[0]);
+        files && files.forEach((file) => {
             promises.push(this.fileUpload.upload(file).then((data) => {
                 console.log(data);
                 this.files.push(file);
@@ -223,7 +228,7 @@ export class BwUploader extends FormCom {
             let reader = new FileReader();
             reader.onload = (event) => {
                 let binary = (event.target as any).result;
-                resolve(tools.md5(binary).toString());
+                resolve(G_FILE_MD5(binary));
             };
             reader.onerror = (e) => {
                 reject(e);
@@ -236,51 +241,49 @@ export class BwUploader extends FormCom {
     protected beforeSendFile(file: CustomFile): Promise<obj> {
         return new Promise((resolve, reject) => {
             this.getFileMd5(file).then(md5 => {
-                require(['md5'],(md5Fn) => {
-                    let userid = User.get().userid,
-                        md5Code = md5,
-                        uniqueFileName = md5Fn('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
-                    this.fileUpload.formData = () => {
-                        return {
-                            userId: userid,
-                            md5: md5Code,
-                        }
-                    };
-                    let ajaxData: obj = {
-                        status: "md5Check"
-                        , md5: md5Code
-                        , nameField: this.nameField
-                        , file_name: file.name
-                        , name: uniqueFileName
-                    };
-
-                    if (this.thumbField) {
-                        ajaxData.smallField = this.thumbField;
+                let userid = User.get().userid,
+                    md5Code = md5.toUpperCase(),
+                    uniqueFileName = G_MD5('' + file.name + (file.type || '') + file.lastModifiedDate + file.size);
+                this.fileUpload.formData = () => {
+                    return {
+                        userId: userid,
+                        md5: md5Code,
                     }
+                };
+                let ajaxData: obj = {
+                    status: "md5Check"
+                    , md5: md5Code
+                    , nameField: this.nameField
+                    , file_name: file.name
+                    , name: uniqueFileName
+                };
 
-                    Ajax.fetch(this.uploadUrl, {
-                        type: "POST"
-                        , traditional: true
-                        , data: ajaxData
-                        // , cache: false
-                        , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
-                        , dataType: "json"
+                if (this.thumbField) {
+                    ajaxData.smallField = this.thumbField;
+                }
 
-                    }).then(function ({response}) {
-                        if(response.ifExist){
-                            reject(response);
-                        }else{
-                            resolve({
-                                md5: md5Code,
-                                uniqueFileName,
-                            });
-                        }
-                    }).catch(() => {
+                Ajax.fetch(this.uploadUrl, {
+                    type: "POST"
+                    , traditional: true
+                    , data: ajaxData
+                    // , cache: false
+                    , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
+                    , dataType: "json"
+
+                }).then(function ({response}) {
+                    if(response.ifExist){
+                        reject(response);
+                    }else{
                         resolve({
                             md5: md5Code,
-                            uniqueFileName
+                            uniqueFileName,
                         });
-                    })
+                    }
+                }).catch(() => {
+                    resolve({
+                        md5: md5Code,
+                        uniqueFileName
+                    });
                 })
 
             }).catch(() => reject());

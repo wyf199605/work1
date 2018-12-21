@@ -119,7 +119,8 @@ gulp.task('js', function () {
         'query/queryModule.pc',
         'query/queryConfig',
         'query/asynQuery',
-        'query/horizontalFormFactory'
+        'query/horizontalFormFactory',
+        'query/customModule'
     ], 'query.pc.js');
 
     // mb编辑模块
@@ -172,7 +173,6 @@ gulp.task('js', function () {
     gulpTsModule([
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
-        'listDetail/NewFormFactory',
         'listDetail/DetailModal'
     ], 'listDetail.js');
 
@@ -345,7 +345,6 @@ gulp.task('js', function () {
     gulpTsPage('mbList/listDetailPage', 'ListDetailPage.js');
 
     gulpTsPage('msgList/MsgListPage', 'MsgListPage.js');
-    gulpTsPage('mbList/newQueryTest', 'NewQueryTest.js');
 });
 
 /**

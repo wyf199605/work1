@@ -137,7 +137,7 @@ export class FlowEditor extends FormCom {
                 let dropdownWrapper = <div className="dropdown-wrapper" data-attr={attr}>
                     {/*<div className="dropdown-title"></div>*/}
                 </div>;
-                let flag = 0;
+                let isOpenAddressList = false;
                 let dropdown = new DropDown({
                     data: FlowEditor.DROPDOWN_KEYVALUE[attr],
                     el: dropdownWrapper,
@@ -146,8 +146,8 @@ export class FlowEditor extends FormCom {
                         // 在选中时，判断该项是否含有地址(address)，有的话从地址中获取数据，没有就直接回显
                         FlowEditor.hideAllDropdown();
                         if(FlowEditor.DROPDOWN_KEYVALUE[attr].some(valueText => 'address' in valueText)){
-                            if (flag === 0){
-                                flag = 1;
+                            if (!isOpenAddressList){
+                                isOpenAddressList = true;
                                 for(let hasAddressItem of FlowEditor.DROPDOWN_KEYVALUE[attr].filter(item => 'address' in item)){
                                     hasAddressItem === item && BwRule.Ajax.fetch(hasAddressItem.address).then(({response}) => {
                                         let field = response.body.elements[0].cols[0];
@@ -168,7 +168,10 @@ export class FlowEditor extends FormCom {
                                                 // index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
                                                 index >= 0 && (this.selectKeyValue.value = userId.join(',') || groupId || assignId);
                                                 this.set({[attr]: userName.join(',') || groupId || assignId});
-                                                flag = 0;
+                                                isOpenAddressList = false;
+                                            },
+                                            onDestroy: () => {
+                                                isOpenAddressList = false;
                                             }
                                         });
                                     }).catch(err => {

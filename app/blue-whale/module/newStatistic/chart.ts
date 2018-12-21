@@ -110,7 +110,8 @@ export = class NewChartBasic{
                             echartBody = document.createElement('div');
                             echartBody.className = 'Echart_body';
                             echartBody.style.height = sys.isMb ? '80vh' : '450px';
-                            echartBody.style.width = sys.isMb ? '700px' : wrapper.offsetWidth + 'px';
+                            echartBody.style.width = sys.isMb ? '100%' : wrapper.offsetWidth + 'px';
+                            sys.isMb && (echartBody.style.overflow = 'auto');
                             wrapper.style.display = 'none';
                             let hasChart = d.query('.Echart_body', wrapperParent);
                             if (tools.isNotEmpty(hasChart)) {

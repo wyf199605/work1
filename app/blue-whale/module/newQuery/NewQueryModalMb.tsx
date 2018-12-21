@@ -9,20 +9,25 @@ import {QueryModule, QueryModulePara} from "../query/queryModule";
 interface INewQueryPara {
     queryItems?: IQueryItem[];
     search?: (data: obj) => void;
-    advanceSearch?:QueryModulePara;
-    cols?:R_Field[];
-    url?:string;
-    refresher?:(obj?:obj) => Promise<any>;
+    advanceSearch?: QueryModulePara;
+    cols?: R_Field[];
+    url?: string;
+    refresher?: (ajaxData?: obj, noQuery?: boolean) => Promise<any>;
 }
 
 export class NewQueryModalMb {
 
     private queryWrapper: HTMLElement = <div className="new-query-wrapper"/>;
     private modal: Modal;
+    query: QueryModule;
 
     constructor(private para: INewQueryPara) {
-        this.initModal();
-        this.initItems(para.queryItems);
+        if (tools.isNotEmpty(para.queryItems)) {
+            this.initModal();
+            this.initItems(para.queryItems);
+        } else {
+            this.initQuery();
+        }
     }
 
     /**
@@ -33,7 +38,11 @@ export class NewQueryModalMb {
     private _isShow: boolean;
     set isShow(isShow: boolean) {
         this._isShow = isShow;
-        this.modal.isShow = isShow
+        if (tools.isNotEmpty(this.modal)) {
+            this.modal.isShow = isShow;
+        } else {
+            isShow ? this.query.show() : this.query.hide();
+        }
     }
 
     get isShow() {
@@ -46,28 +55,29 @@ export class NewQueryModalMb {
      * @Description: 初始化查询Modal
      */
     static QUERY_MODULE_NAME = 'QueryModuleMb';
+
     private initModal() {
         this.modal = new Modal({
             header: {
-                title:'搜索',
-                rightPanel:new Button({
+                title: '搜索',
+                rightPanel: new Button({
                     content: '高级搜索',
                     className: 'advance-search',
                     onClick: () => {
                         let advanceSearch = this.para.advanceSearch;
-                        if (tools.isNotEmpty(advanceSearch)){
+                        if (tools.isNotEmpty(advanceSearch)) {
                             this.isShow = false;
-                            require([NewQueryModalMb.QUERY_MODULE_NAME],(Query) => {
-                                let query:QueryModule = new Query({
+                            require([NewQueryModalMb.QUERY_MODULE_NAME], (Query) => {
+                                let query: QueryModule = new Query({
                                     qm: advanceSearch,
                                     container: document.body,
-                                    refresher : this.para.refresher,
-                                    cols : this.para.cols,
-                                    url : this.para.url
+                                    refresher: this.para.refresher,
+                                    cols: this.para.cols,
+                                    url: this.para.url
                                 });
                                 query.show();
                             })
-                        }else{
+                        } else {
                             Modal.alert('暂不支持高级搜索!');
                         }
                     },
@@ -78,6 +88,7 @@ export class NewQueryModalMb {
             isModal: tools.isMb,
             isOnceDestroy: false,
             body: this.queryWrapper,
+            isShow: false,
             footer: {
                 rightPanel: [
                     {
@@ -106,6 +117,22 @@ export class NewQueryModalMb {
                 ]
             }
         });
+    }
+
+    private initQuery() {
+        let advanceSearch = this.para.advanceSearch;
+        if (tools.isNotEmpty(advanceSearch)) {
+            require([NewQueryModalMb.QUERY_MODULE_NAME], (Query) => {
+                this.query = new Query({
+                    qm: advanceSearch,
+                    container: document.body,
+                    refresher: this.para.refresher,
+                    cols: this.para.cols,
+                    url: this.para.url
+                });
+                this.query.show();
+            })
+        }
     }
 
     private _items: NewQueryItem[] = [];
@@ -199,5 +226,6 @@ export class NewQueryModalMb {
         this.modal.destroy();
         this.para = null;
         this.queryWrapper = null;
+        this._items = null;
     }
 }

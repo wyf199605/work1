@@ -168,7 +168,7 @@ export class MbListItem extends Component {
         // 渲染图片
         if (this.isImg && this.imgWrapper) {
             this.imgWrapper.innerHTML = '';
-            let img = data.img || G.requireBaseUrl + '../img/fastlion_logo.png';
+            let img = tools.isNotEmpty(data.img) ? data.img : G.requireBaseUrl + '../img/fastlion_logo.png';
             d.append(this.imgWrapper, <img src={img} alt=""/>);
             if (tools.isNotEmpty(data.imgLabel)) {
                 let imgLabelColor = {

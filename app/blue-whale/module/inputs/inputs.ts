@@ -86,15 +86,14 @@ export class Inputs {
 
         if(atvarObj){
             this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl, open);
-            return;
         }
 
         this.url = category.url;
-        switch (catType) {
+        switch (catType) { // 有atvarObj时候只允许配置catType为0，否者会出现多个弹框问题及连续扫码bug
             case 0:
                 // 数据覆盖
                 this.isProcess = false;
-                this.reOpen(open);
+                !atvarObj && this.reOpen(open);
                 break;
             case 1:
                 // 标签打印
@@ -142,7 +141,7 @@ export class Inputs {
                 break;
             default :
                 this.isProcess = false;
-                this.reOpen(open);
+                !atvarObj && this.reOpen(open);
         }
 
         dataType === 0 && this.dataCover(ftable, response);

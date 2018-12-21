@@ -1,0 +1,73 @@
+//excel
+.upload-modal{
+  .modal-body{
+    width: 200px;
+  }
+  [id^="rt_rt"]{
+    width: 100%!important;
+    height: 100%!important;
+  }
+}
+//上传下载
+.avatar-load{
+  &>.select-box{
+    display: inline-block;
+    margin: 3px 6px;
+  }
+}
+.avatar-progress{
+
+}
+
+.action-type-5{
+  .btnsLeft{
+    display: none;
+  }
+  width: 600px;
+  .modal-body{
+    max-height: 75vh!important;
+  }
+}
+.mb-action-type-5{
+  top: 40px!important;
+  .modal-body{
+    max-width: 85vw;
+    max-height: 70vh;
+  }
+}
+.action-type-4{
+  top: 80px!important;
+  min-width: 200px;
+  .modal-body-mobile{
+    max-height: 300px;
+  }
+}
+.avatar-progress{
+  padding: 0 0 0 8px;
+  width: 250px;
+}
+.avatar-load{
+  width: 250px;
+  .conf-left{
+    width: 57%;
+    display: inline-block;
+    >.select-box{
+      padding: 4px;
+    }
+  }
+  .conf-right{
+    width: 43%;
+    display: inline-block;
+    .text-input{
+      width: 100px;
+      display: inline-block;
+    }
+  }
+  .atvarDom{
+    padding-left: 7px;
+    [data-type="input"]{
+      display: inline-block;
+      width: 125px;
+    }
+  }
+}

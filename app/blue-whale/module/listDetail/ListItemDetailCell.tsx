@@ -8,8 +8,8 @@ import d = G.d;
 import {ActionSheet} from "../../../global/components/ui/actionSheet/actionSheet";
 import {ListItemDetail} from "./ListItemDetail";
 import sys = BW.sys;
-import {ImgModalMobile} from "../../common/ImgModalMobile";
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {ContextMenu} from "../../../global/components/ui/actionSheet/contextMenu";
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
 
@@ -35,6 +35,7 @@ export class ListItemDetailCell extends Component {
     private files: IFile[] = [];
     private imgs: string[] = [];
     private actionSheet: ActionSheet;
+    private contextMenu: ContextMenu;
     private _currentFile: IFile;
     private fileType: string = '';
 
@@ -117,38 +118,75 @@ export class ListItemDetailCell extends Component {
         fileWrapper.innerHTML = '';
         if (tools.isNotEmpty(value)) {
             this.fileEvent.on();
-            if (!this.actionSheet) {
-                this.actionSheet = new ActionSheet({
-                    buttons: [
-                        {
-                            content: '下载至本地',
-                            icon: 'bg-download fg-white appcommon app-xiazaidaobendi',
-                            onClick: () => {
-                                if (this.fileType === '43') {
-                                    BwRule.link({
-                                        link: this.para.field.link.dataAddr,
-                                        varList: this.para.field.link.varList,
-                                        dataType: this.para.field.dataType || this.para.field.atrrs.dataType,
-                                        data: this.para.detailPage.defaultData,
-                                        type: this.para.field.link.type
-                                    });
-                                } else {
-                                    // this.downloadFile(BW.CONF.siteUrl + this.currentFile.addr);
-                                    let fileName = this.currentFile.filename,
-                                        fileAddr = this.currentFile.addr,
-                                        nameArr = fileName.split('.'),
-                                        extensionName = nameArr[nameArr.length - 1],
-                                        imgs = ['jpg', 'png', 'jpeg', 'gif'];
-                                    if (~imgs.indexOf(extensionName)) {
-                                        sys.window.openImg(BW.CONF.siteUrl + fileAddr);
+            if (tools.isMb) {
+                if (!this.actionSheet) {
+                    this.actionSheet = new ActionSheet({
+                        buttons: [
+                            {
+                                content: '下载至本地',
+                                icon: 'bg-download fg-white appcommon app-xiazaidaobendi',
+                                onClick: () => {
+                                    if (this.fileType === '43') {
+                                        BwRule.link({
+                                            link: this.para.field.link.dataAddr,
+                                            varList: this.para.field.link.varList,
+                                            dataType: this.para.field.dataType || this.para.field.atrrs.dataType,
+                                            data: this.para.detailPage.defaultData,
+                                            type: this.para.field.link.type
+                                        });
                                     } else {
-                                        sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                        // this.downloadFile(BW.CONF.siteUrl + this.currentFile.addr);
+                                        let fileName = this.currentFile.filename,
+                                            fileAddr = this.currentFile.addr,
+                                            nameArr = fileName.split('.'),
+                                            extensionName = nameArr[nameArr.length - 1],
+                                            imgs = ['jpg', 'png', 'jpeg', 'gif'];
+                                        if (~imgs.indexOf(extensionName)) {
+                                            sys.window.openImg(BW.CONF.siteUrl + fileAddr);
+                                        } else {
+                                            sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                        }
                                     }
                                 }
                             }
-                        }
-                    ]
-                });
+                        ]
+                    });
+                }
+            } else {
+                // 右键菜单
+                if (!this.contextMenu) {
+                    this.contextMenu = new ContextMenu({
+                        buttons: [
+                            {
+                                content: '下载至本地',
+                                icon: 'bg-download fg-white appcommon app-xiazaidaobendi',
+                                onClick: () => {
+                                    if (this.fileType === '43') {
+                                        BwRule.link({
+                                            link: this.para.field.link.dataAddr,
+                                            varList: this.para.field.link.varList,
+                                            dataType: this.para.field.dataType || this.para.field.atrrs.dataType,
+                                            data: this.para.detailPage.defaultData,
+                                            type: this.para.field.link.type
+                                        });
+                                    } else {
+                                        let fileName = this.currentFile.filename,
+                                            fileAddr = this.currentFile.addr,
+                                            nameArr = fileName.split('.'),
+                                            extensionName = nameArr[nameArr.length - 1],
+                                            imgs = ['jpg', 'png', 'jpeg', 'gif', 'bmp'];
+                                        if (~imgs.indexOf(extensionName.toLowerCase())) {
+                                            sys.window.openImg(BW.CONF.siteUrl + fileAddr);
+                                        } else {
+                                            sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                        }
+                                    }
+                                }
+                            }
+                        ],
+                        container: this.wrapper
+                    })
+                }
             }
             let htmlArr = [];
             Array.isArray(value) && value.forEach((f, index) => {
@@ -175,10 +213,24 @@ export class ListItemDetailCell extends Component {
 
     private fileEvent = (() => {
         let fileOption = (e) => {
+            e.stopImmediatePropagation();
             let index = parseInt(d.closest(e.target, '.detail-cell-file-item').dataset.index),
                 files = this.files || [];
             this.currentFile = files[index];
-            this.actionSheet.isShow = true;
+            if (tools.isMb) {
+                this.actionSheet.isShow = true;
+            } else {
+                this.para.detailPage.getCells().forEach(cell => {
+                    cell.contextMenu && (cell.contextMenu.isShow = false);
+                });
+                let offsetLeft = tools.offset.left(this.wrapper),
+                    offsetTop = tools.offset.top(this.wrapper),
+                    scrollTop = tools.getScrollTop(this.wrapper);
+                this.contextMenu.setPosition({
+                    x: e.clientX - offsetLeft,
+                    y: e.clientY - offsetTop + scrollTop
+                });
+            }
         };
         return {
             on: () => {
@@ -191,13 +243,10 @@ export class ListItemDetailCell extends Component {
     })();
 
     private imgEvent = (() => {
-        let imgOption = (e) => {
+        let imgOption = () => {
             let imgs = this.imgs || [];
             let imgData: ImgModalPara = {
-                img: ListItemDetailCell.getBigPicture(imgs),
-                onDownload: function (url: string) {
-                    sys.window.openImg(url);
-                }
+                img: ListItemDetailCell.getBigPicture(imgs)
             };
             ImgModal.show(imgData);
             if (tools.isMb) {
@@ -311,6 +360,8 @@ export class ListItemDetailCell extends Component {
         this.imgs = null;
         this.actionSheet && this.actionSheet.destroy();
         this.actionSheet = null;
+        this.contextMenu && this.contextMenu.destroy();
+        this.contextMenu = null;
         this.currentFile = null;
         super.destroy();
     }

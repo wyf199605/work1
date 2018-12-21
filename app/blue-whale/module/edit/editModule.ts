@@ -22,12 +22,13 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
 import {BwUploader} from "../uploadModule/bwUploader";
-import {Loading} from "../../../global/components/ui/loading/loading";
 import {UploadImages} from "../uploadModule/uploadImages";
+import {Accessory} from "../uploadModule/accessory";
 
-interface ComInitFun{
+interface ComInitFun {
     (para: ComInitP): FormCom
 }
+
 export class EditModule {
     private coms: objOf<FormCom> = {};
     private comsExtraData: objOf<obj> = {};
@@ -35,11 +36,14 @@ export class EditModule {
     private nameFields: objOf<ComInitP> = {};
 
     private ajax = new BwRule.Ajax();
+    protected defaultData: obj = {};
 
     get assignPromise() {
         return this.ajax.promise;
     }
+
     constructor(private para: EditModulePara) {
+        this.defaultData = para.defaultData || {};
         if (Array.isArray(para.fields)) {
             para.fields.forEach((f) => {
                 this.nameFields[f.field.name] = f;
@@ -79,8 +83,8 @@ export class EditModule {
     }
 
 
-    private pickOnGet(cip:ComInitP, dataArr: obj[], otherField: string) {
-        let name =  cip.field.name,
+    private pickOnGet(cip: ComInitP, dataArr: obj[], otherField: string) {
+        let name = cip.field.name,
             fieldNames = otherField ? otherField.split(',') : [];
 
         dataArr.forEach((data) => {
@@ -95,26 +99,27 @@ export class EditModule {
                 });
             }
         });
-        if(tools.isEmpty(dataArr)){
-            for(let key in this.comsExtraData[name]){
+        if (tools.isEmpty(dataArr)) {
+            for (let key in this.comsExtraData[name]) {
                 this.comsExtraData[name][key] = '';
             }
         }
-        if(this.comsExtraData[name] && cip.onExtra){
+        if (this.comsExtraData[name] && cip.onExtra) {
             cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames);
         }
 
         this.assign.checkAssign(this.comsExtraData[name], cip.onExtra);
     }
 
-    private comTnit:objOf<ComInitFun> = {
+    private comTnit: objOf<ComInitFun> = {
         image: (p) => {
             return new UploadImages({
                 container: p.dom,
                 nameField: p.field.name,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
-                pageData: p.data,
-                field: p.field
+                pageData: this.defaultData,
+                field: p.field,
+                // unique: tools.isNotEmpty(p.data) ?  p.data[p.field.name] : ''
             })
         },
 
@@ -168,8 +173,51 @@ export class EditModule {
             });
         },
 
+        newFile: (p): FormCom => {
+            let upperKeyData = {};
+            return new Accessory({
+                nameField: p.field.name,
+                container: p.dom,
+                uploadUrl: BW.CONF.ajaxUrl.fileUpload,
+                field: p.field,
+                pageData: this.defaultData,
+                // uniques:tools.isNotEmpty(p.data) ?  p.data[p.field.name] : '',
+                onComplete: (response) => {
+                    let data = response.data,
+                        type = p.field.dataType || p.field.atrrs.dataType;
+                    // fileId 值加入额外数据中
+                    if (type === '43') {
+                        for (let field in data) {
+                            let {key, value} = data[field];
+                            upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
+                        }
+                        p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
+                        this.comsExtraData[p.field.name] = {};
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: upperKeyData[name]});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = data[name];
+                            }
+                        }
+                    }
+                },
+                onDelete: () => {
+                    if (tools.isNotEmpty(upperKeyData)) {
+                        for (let name in upperKeyData) {
+                            if (this.coms[name]) {
+                                this.set({[name]: ''});
+                            } else {
+                                this.comsExtraData[p.field.name][name] = '';
+                            }
+                        }
+                    }
+                }
+            });
+        },
+
         file: (p): FormCom => {
-            let com =  new BwUploader({
+            let com = new BwUploader({
                 nameField: p.field.name,
                 custom: p.field,
                 container: p.dom,
@@ -186,14 +234,14 @@ export class EditModule {
 
                     //fileId 值加入额外数据中
                     let upperKeyData = {};
-                    for(let field in data){
+                    for (let field in data) {
                         let {key, value} = data[field];
                         upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
                     }
                     p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
 
                     this.comsExtraData[p.field.name] = {};
-                    for(let name in upperKeyData) {
+                    for (let name in upperKeyData) {
                         if (this.coms[name]) {
                             this.set({[name]: upperKeyData[name]});
                         } else {
@@ -237,7 +285,7 @@ export class EditModule {
                     custom: p.field,
                     rowData: p.data,
                     onExtra: (item) => {
-                        if(item) {
+                        if (item) {
                             setTimeout(() => {
                                 let data = {
                                     [p.field.name]: item.text,
@@ -249,8 +297,8 @@ export class EditModule {
                     }
                 })
             } else {
-                let ajaxFun = (url: string, value:string, cb: Function) => {
-                    BwRule.Ajax.fetch(url,{
+                let ajaxFun = (url: string, value: string, cb: Function) => {
+                    BwRule.Ajax.fetch(url, {
                         needGps: p.field.dataAddr.needGps
                     }).then(({response}) => {
                         let fields = [];
@@ -272,14 +320,17 @@ export class EditModule {
 
                 let valueList = p.field.atrrs.valueLists ? p.field.atrrs.valueLists.split(/,|;/) : null,
                     comData = Array.isArray(valueList) ? valueList : null,
-                    ajax = p.field.dataAddr ? {fun: ajaxFun, url: CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, p.data)} : null;
+                    ajax = p.field.dataAddr ? {
+                        fun: ajaxFun,
+                        url: CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, p.data)
+                    } : null;
 
                 return new (sys.isMb ? SelectInputMb : SelectInput)({
                     container: p.dom,
                     data: comData,
                     ajax,
                     custom: p.field,
-                    useInputVal : true
+                    useInputVal: true
 
                     // readonly: field.noEdit
                 });
@@ -350,21 +401,20 @@ export class EditModule {
 
         let field = initP ? initP.field : null;
 
-        if(field){
-            if(field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
+        if (field) {
+            if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
                 type = 'pickInput';
-            } else if(field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
+            } else if (field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
                 type = 'selectInput';
-            }else if(BwRule.isImage(field.dataType) || BwRule.isImage(field.atrrs.dataType)){
+            } else if (BwRule.isImage(field.dataType) || BwRule.isImage(field.atrrs.dataType)) {
                 type = 'image';
             }
         }
-
-        if(!(type in this.comTnit)) {
+        if (!(type in this.comTnit)) {
             type = 'text';
         }
 
-        if(!initP || !initP.dom){
+        if (!initP || !initP.dom) {
             type = 'virtual';
         }
 
@@ -377,12 +427,12 @@ export class EditModule {
 
     protected assign = (() => {
 
-        let init = (com:FormCom, p?: ComInitP) => {
-            if(!p){
+        let init = (com: FormCom, p?: ComInitP) => {
+            if (!p) {
                 return;
             }
             let {field, data, onExtra} = p;
-            if(field && (p.field.comType === 'tagsinput')){
+            if (field && (p.field.comType === 'tagsinput')) {
                 return;
             }
 
@@ -393,8 +443,8 @@ export class EditModule {
                 //         return;
                 //     }
                 data = data || {};
-                if(data[field.name] != val){
-                    assignSend(field, val, Object.assign({}, data, {[field.name] : val}), onExtra);
+                if (data[field.name] != val) {
+                    assignSend(field, val, Object.assign({}, data, {[field.name]: val}), onExtra);
                 }
 
                 // }, 30);
@@ -404,20 +454,17 @@ export class EditModule {
 
         let assign2extra = (field: R_Field, assignData: objOf<any[]>) => {
             // assign 设置
-            let sepValue = ';',
-                selectFields = field.assignSelectFields,
+            let selectFields = field.assignSelectFields,
                 fieldName = field.name;
             // debugger;
             Array.isArray(selectFields) && selectFields.forEach((key) => {
                 let data = assignData[key];
-                if( key === fieldName){
+                if (key === fieldName) {
                     return;
                 }
 
                 if (this.coms[key]) {
-
                     this.set({[key]: data});
-
                 } else {
                     //assign 值加入额外数据中
                     if (!this.comsExtraData[fieldName]) {
@@ -437,8 +484,8 @@ export class EditModule {
          * @param {Function} onExtra
          */
         let assignSend = (field: R_Field, val, data: obj, onExtra: Function) => {
-            if(tools.isEmpty(val) || tools.isEmpty(field.assignAddr)) {
-                if(field.assignSelectFields){
+            if (tools.isEmpty(val) || tools.isEmpty(field.assignAddr)) {
+                if (field.assignSelectFields) {
                     let assignData = {};
                     field.assignSelectFields.forEach((name) => {
                         assignData[name] = null;
@@ -453,7 +500,7 @@ export class EditModule {
                 let resData = tools.keysVal(response, 'data', 0),
                     assignData = assignDataGet(val, resData);
 
-                for(let key in assignData){
+                for (let key in assignData) {
                     assignData[key] = Array.isArray(assignData[key]) ? assignData[key].join(';') : ''
                 }
 
@@ -464,11 +511,11 @@ export class EditModule {
         };
 
 
-        let checkAssign = (data:obj, onExtra: Function) => {
+        let checkAssign = (data: obj, onExtra: Function) => {
 
-            for(let fieldName in data){
+            for (let fieldName in data) {
                 let field = this.nameFields[fieldName];
-                if(field && field.field && field.field.assignAddr) {
+                if (field && field.field && field.field.assignAddr) {
                     assignSend(field.field, data[fieldName], data, onExtra);
                 }
             }
@@ -483,7 +530,7 @@ export class EditModule {
 
         return (assignData: objOf<any[]>) => {
             // assign 设置
-            if(typeof assignData !== 'object'){
+            if (typeof assignData !== 'object') {
                 return;
             }
 
@@ -528,8 +575,9 @@ export class EditModule {
      * @return obj
      */
     public get(name?: string) {
-        let pageData:obj = {},
+        let pageData: obj = {},
             coms = this.coms,
+            nameField = this.nameFields,
             extras = this.comsExtraData;
 
         let allDateGet = (name: string) => {
@@ -537,15 +585,15 @@ export class EditModule {
                 dataObj = {[name]: coms[name].get()};
 
             // 字符串转数字
-            for(let name in dataObj){
+            for (let name in dataObj) {
                 let field = <R_Field>tools.keysVal(this.nameFields, name, 'field'),
                     data = dataObj[name];
 
-                if(!field){
+                if (!field) {
                     continue;
                 }
 
-                if(data && !isNaN(data) && BwRule.isNumber(field.dataType)){
+                if (data && !isNaN(data) && BwRule.isNumber(field.dataType)) {
                     data = Number(data);
                 }
 
@@ -562,8 +610,12 @@ export class EditModule {
         }
 
         // 返回所有数据
-        for (let n in coms) {
-            pageData = tools.obj.merge(pageData, allDateGet(n));
+        for (let name in nameField) {
+            if (coms[name]) {
+                pageData = tools.obj.merge(pageData, allDateGet(name));
+            } else {
+                pageData = tools.obj.merge(pageData, {[name]: this.defaultData[name] || ''});
+            }
         }
         return pageData;
     }
@@ -572,7 +624,7 @@ export class EditModule {
         let v: Validate = null;
 
         let init = () => {
-            if(v !== null){
+            if (v !== null) {
                 return;
             }
 
@@ -584,22 +636,22 @@ export class EditModule {
             // }
         };
 
-        let ruleAdd = (field:R_Field) => {
+        let ruleAdd = (field: R_Field) => {
 
             // 防止重复添加
-            if(v.get(field.name)){
+            if (v.get(field.name)) {
                 return;
             }
 
             let rules: ValidateRule[] = [];
 
-            if(BwRule.isNumber(field.dataType)){
-                if (tools.isNotEmpty(field.caption)){
+            if (BwRule.isNumber(field.dataType)) {
+                if (tools.isNotEmpty(field.caption)) {
                     rules.push({
                         rule: 'number',
                         title: field.caption
                     })
-                }else{
+                } else {
                     rules.push({
                         rule: 'number'
                     })
@@ -608,7 +660,7 @@ export class EditModule {
 
             ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'validChars'].forEach(ruleName => {
                 let ruleVal = field.atrrs[ruleName];
-                if(!tools.isEmpty(ruleVal)){
+                if (!tools.isEmpty(ruleVal)) {
                     rules.push({
                         rule: ruleName,
                         value: ruleVal,
@@ -620,25 +672,25 @@ export class EditModule {
             v.add(field.name, rules);
         };
 
-        let valid = (name: string, data?:any) => {
+        let valid = (name: string, data?: any) => {
             let com = this.coms[name],
                 f = this.nameFields[name];
 
-            if(f){
+            if (f) {
                 ruleAdd(f.field);
                 data = tools.isUndefined(data) ? (com ? this.get(f.field.name)[f.field.name] : null) : data;
-                return v.start({[name] : data});
+                return v.start({[name]: data});
             }
         };
 
-        let start = (name?: string, data?:any) => {
-            if(v === null){
+        let start = (name?: string, data?: any) => {
+            if (v === null) {
                 init();
             }
-            let result:ValidateResult = {};
-            if(name){
+            let result: ValidateResult = {};
+            if (name) {
                 result = valid(name, data);
-            }else{
+            } else {
                 this.para.fields.forEach(f => {
                     result = tools.obj.merge(valid(f.field.name), result);
                 })
@@ -650,7 +702,7 @@ export class EditModule {
         return {start};
     })();
 
-    static checkValue(field: R_Field, rowData: obj, clear:Function, name = field.name): Promise<CheckValueResult> {
+    static checkValue(field: R_Field, rowData: obj, clear: Function, name = field.name): Promise<CheckValueResult> {
         let chkAddr = field.chkAddr;
         // checkCols = field.chkAddr.varList.map(v => v.varName),
         // emptyCheckResult: CheckValueResult = {errors:[], okNames:[]};
@@ -689,7 +741,7 @@ export class EditModule {
                             if (!flag) {
                                 clear();
                                 reject();
-                            }else{
+                            } else {
                                 resolve({
                                     okNames: chkAddr.varList.map(v => v.varName)
                                 });
@@ -710,8 +762,8 @@ export class EditModule {
         });
     }
 
-    destroy(name:string){
-        if(this.coms[name]){
+    destroy(name: string) {
+        if (this.coms[name]) {
             this.coms[name].destroy();
             this.comsExtraData[name] = null;
             delete this.coms[name];
@@ -720,28 +772,28 @@ export class EditModule {
 }
 
 
-function assignDataGet(data, resData) : obj{
+function assignDataGet(data, resData): obj {
     let assignValueArr = {},
         assignData: obj = {};
 
-    if(typeof resData !== 'object' || !resData){
+    if (typeof resData !== 'object' || !resData) {
         return assignData;
     }
 
     let keyArr = Object.keys(resData);
 
-    keyArr.forEach( key => {
+    keyArr.forEach(key => {
         let data = resData[key];
         assignValueArr[key] = typeof data === 'string' ? data.split(';') : [data];
     });
 
-    (typeof data === 'string' ? data.split(';') : [data]).forEach( (v, i) => {
+    (typeof data === 'string' ? data.split(';') : [data]).forEach((v, i) => {
         if (tools.isEmpty(v)) {
             return;
         }
         // let assignD : obj = {};
         keyArr.forEach((key) => {
-            if(!assignData[key]){
+            if (!assignData[key]) {
                 assignData[key] = [];
             }
             assignData[key].push(assignValueArr[key][i])

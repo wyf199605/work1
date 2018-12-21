@@ -25,7 +25,7 @@ export interface IMbListPara extends IComponentPara {
         ajaxFun?: (status: IDataManagerAjaxStatus) => Promise<{ data: obj[]; total: number; }>,
         isPulldownRefresh?: boolean,
         ajaxData?: obj
-
+        auto?: boolean;
     };
 }
 
@@ -230,13 +230,15 @@ export class MbList extends Component {
         this.countWrapper.innerText = count.toString();
     }
 
-    private  _dataManager: DataManager;
-    set dataManager(dataManager:DataManager){
+    private _dataManager: DataManager;
+    set dataManager(dataManager: DataManager) {
         this._dataManager = dataManager;
     }
-    get dataManager(){
+
+    get dataManager() {
         return this._dataManager;
     }
+
     protected initDataManager() {
         let page = this.para.dataManager;
         this.dataManager = new DataManager({
@@ -252,7 +254,7 @@ export class MbList extends Component {
             ajax: {
                 fun: page.ajaxFun,
                 ajaxData: page.ajaxData,
-                auto: true
+                auto: page.auto
             }
         });
     }

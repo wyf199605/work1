@@ -13,7 +13,6 @@ export interface IActionSheetButton extends IButton {
 
 interface IActionSheet {
     buttons: IActionSheetButton[]; // 按钮数组
-    title?:string;
 }
 
 export class ActionSheet extends Modal {
@@ -21,17 +20,11 @@ export class ActionSheet extends Modal {
     private buttons: IActionSheetButton[] = [];
 
     constructor(para: IActionSheet) {
-        super(tools.isMb ? {
+        super({
             width: '100%',
             position: 'down',
             isBackground: true,
             isShow: false
-        } : {
-            header: para.title,
-            className: 'action-sheet-pc',
-            width:'144px',
-            isShow: false,
-            top:200
         });
         // 要给Modal.wrapper的的top属性设置important才能从下方弹出
         this.buttons = para.buttons;
