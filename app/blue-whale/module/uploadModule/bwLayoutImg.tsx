@@ -11,7 +11,7 @@ export interface IBwLayoutImgPara extends IBwUploaderPara{
     onFinish?: (files: CustomFile[]) => Promise<any>;
     isShow?: boolean;  // 是否显示上传控件，默认true
     autoClear?: boolean; // 是否在模态框关闭清除file，默认true
-
+    isCloseMsg?: boolean;
 }
 export class BwLayoutImg{
     protected imgManager: ImageManager;
@@ -20,12 +20,14 @@ export class BwLayoutImg{
     protected files: CustomFile[] = [];
     protected onFinish: (files: CustomFile[]) => Promise<any>;
     protected autoClear: boolean;
+    protected isCloseMsg: boolean;
 
     constructor(para: IBwLayoutImgPara){
         this.onFinish = para.onFinish || function(){
             return Promise.resolve();
         };
         this.autoClear = tools.isEmpty(para.autoClear) ? true : para.autoClear;
+        this.isCloseMsg = para.isCloseMsg || false;
 
         this.initModal();
         this.initImgManager();
@@ -45,7 +47,7 @@ export class BwLayoutImg{
                 this.modal.isShow = true;
                 this.files.push(files[0]);
                 this.imgManager.addImg(url);
-                this.modal && (this.modal.closeMsg = '是否放弃选中的图片？');
+                this.isCloseMsg && this.modal && (this.modal.closeMsg = '是否放弃选中的图片？');
             }).catch((e) => {
                 console.log(e);
                 Modal.alert('获取图片失败');
