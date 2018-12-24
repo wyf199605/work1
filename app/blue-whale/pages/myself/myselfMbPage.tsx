@@ -11,7 +11,6 @@ import {RfidSettingModal} from "../rfid/RfidSetting/RfidSetting";
 import Shell = G.Shell;
 import sysPcHistory = BW.sysPcHistory;
 import {Loading} from "../../../global/components/ui/loading/loading";
-import {ChangeProject} from "../../module/changeProject/changeProject";
 
 export = class myselfMbPage {
     constructor() {

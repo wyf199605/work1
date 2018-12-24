@@ -3,18 +3,29 @@
 import d = G.d;
 import tools = G.tools;
 import {IModal, Modal} from "../../../global/components/feedback/modal/Modal";
-import {DropDown, ListData} from "../../../global/components/ui/dropdown/dropdown";
+import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 import {BwRule} from "../../common/rule/BwRule";
 
-interface IChangeProjectPara extends IModal {
+export interface IChangeProjectPara extends IModal {   // 类构造函数的参数
     current: string;    // 当前项目
+}
+interface TResponseProjectItem {   // 后台响应的数据
+    PLATFORM_SEQ: string;
+    PLATFORM_NAME: string;
+    CAPTION: string;
+}
+interface IProjectListItem extends ListItem {   // 列表项的数据类型
+    caption?: string;
+}
+interface TProjectListData extends Array<IProjectListItem>{ // 传递给Dropdown的项目数据
+
 }
 
 export class ChangeProject extends Modal {
 
     private dropdown: DropDown = null;  // 下拉列表
     private showProject: HTMLInputElement = null;   // 显示当前选择的项目
-    private projectList: ListData = null;   // 项目列表
+    private projectList: TProjectListData = null;   // 项目列表
 
     constructor(para?: IChangeProjectPara) {
         super(Object.assign({
@@ -56,18 +67,16 @@ export class ChangeProject extends Modal {
         }).then(({response}) => {
             // console.log('in getProjectList: ');
             // console.log(response);
-            this.projectList = response.data.map(obj =>
+
+            this.projectList = response.data.map((obj: TResponseProjectItem)  =>
                 ({value: parseInt(obj.PLATFORM_SEQ), text: obj.PLATFORM_NAME, caption: obj.CAPTION || ''}));
             this.dropdown = new DropDown({
                 el: d.query('.project-list-wrapper', content),
                 data: this.projectList,
                 inline: true,
-                onSelect: (item: ListItem, index: number)=> {
-                    if(tools.isNotEmpty(item.caption)){
-                        this.showProject.value =  item.caption + " " + item.text;
-                    }else {
-                        this.showProject.value = item.text;
-                    }
+                onSelect: (item: IProjectListItem)=> {
+                    // item.caption = 'cms3';
+                    this.showProject.value = (tools.isNotEmpty(item.caption) ? item.caption + '  ' : '') + item.text;
                     this.dropdown.hideList();
                 }
             });
@@ -114,7 +123,7 @@ export class ChangeProject extends Modal {
                             }
                         }).then(({response}) => {
                             let prevUserInfo = JSON.parse(localStorage.getItem('userInfo'));
-                            localStorage.setItem('userInfo', JSON.stringify({...prevUserInfo, platformName: selectItem['text']}))
+                            localStorage.setItem('userInfo', JSON.stringify({...prevUserInfo, platformName: this.showProject.value}));
                             Modal.toast(response.msg);
                             location.reload();
                         }).catch(err => {
