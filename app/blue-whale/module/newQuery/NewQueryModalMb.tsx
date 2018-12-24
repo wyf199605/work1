@@ -9,7 +9,7 @@ import {QueryModule, QueryModulePara} from "../query/queryModule";
 interface INewQueryPara {
     queryItems?: IQueryItem[];
     search?: (data: obj) => void;
-    advanceSearch?: QueryModulePara;
+    advanceSearch?: IBw_Query;
     cols?: R_Field[];
     url?: string;
     refresher?: (ajaxData?: obj, noQuery?: boolean) => Promise<any>;
@@ -58,10 +58,8 @@ export class NewQueryModalMb {
 
     private initModal() {
         let advanceSearch = this.para.advanceSearch, isShow: boolean = false;
-        if (tools.isNotEmpty(advanceSearch) && tools.isNotEmpty(advanceSearch.qm)) {
-            if (tools.isNotEmpty(advanceSearch.qm.autTag) && advanceSearch.qm.autTag !== 0) {
-                isShow = true;
-            }
+        if (tools.isNotEmpty(advanceSearch) && tools.isNotEmpty(advanceSearch.autTag) && advanceSearch.autTag !== 0) {
+            isShow = true;
         }
         this.modal = new Modal({
             header: {
@@ -122,7 +120,7 @@ export class NewQueryModalMb {
                     }
                 ]
             },
-            isQuery:true
+            isQuery:!isShow
         });
     }
 
