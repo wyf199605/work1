@@ -57,6 +57,12 @@ export class NewQueryModalMb {
     static QUERY_MODULE_NAME = 'QueryModuleMb';
 
     private initModal() {
+        let advanceSearch = this.para.advanceSearch, isShow: boolean = false;
+        if (tools.isNotEmpty(advanceSearch) && tools.isNotEmpty(advanceSearch.qm)) {
+            if (tools.isNotEmpty(advanceSearch.qm.autTag) && advanceSearch.qm.autTag !== 0) {
+                isShow = true;
+            }
+        }
         this.modal = new Modal({
             header: {
                 title: '搜索',
@@ -88,7 +94,7 @@ export class NewQueryModalMb {
             isModal: tools.isMb,
             isOnceDestroy: false,
             body: this.queryWrapper,
-            isShow: false,
+            isShow: isShow,
             footer: {
                 rightPanel: [
                     {
@@ -115,7 +121,8 @@ export class NewQueryModalMb {
                         }
                     }
                 ]
-            }
+            },
+            isQuery:true
         });
     }
 
