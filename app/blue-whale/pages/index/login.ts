@@ -673,6 +673,8 @@ export class LoginPage{
             }).then(({response}) => {
                 result.success = true;
                 result.data = response;
+                // console.log(response);
+                // debugger
                 callback(result).then(() => {
                     loginPage.loginBtnState(10);
                     let user = User.get(),

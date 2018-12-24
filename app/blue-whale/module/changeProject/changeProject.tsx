@@ -7,14 +7,14 @@ import {DropDown, ListData} from "../../../global/components/ui/dropdown/dropdow
 import {BwRule} from "../../common/rule/BwRule";
 
 interface IChangeProjectPara extends IModal {
-    current: string;
+    current: string;    // 当前项目
 }
 
 export class ChangeProject extends Modal {
 
-    private dropdown: DropDown = null;
-    private showProject: HTMLInputElement = null;
-    private projectList: ListData = null;
+    private dropdown: DropDown = null;  // 下拉列表
+    private showProject: HTMLInputElement = null;   // 显示当前选择的项目
+    private projectList: ListData = null;   // 项目列表
 
     constructor(para?: IChangeProjectPara) {
         super(Object.assign({
@@ -56,13 +56,18 @@ export class ChangeProject extends Modal {
         }).then(({response}) => {
             // console.log('in getProjectList: ');
             // console.log(response);
-            this.projectList = response.data.map(obj => ({value: parseInt(obj.PLATFORM_SEQ), text: obj.PLATFORM_NAME}));
+            this.projectList = response.data.map(obj =>
+                ({value: parseInt(obj.PLATFORM_SEQ), text: obj.PLATFORM_NAME, caption: obj.CAPTION || ''}));
             this.dropdown = new DropDown({
                 el: d.query('.project-list-wrapper', content),
                 data: this.projectList,
                 inline: true,
                 onSelect: (item: ListItem, index: number)=> {
-                    this.showProject.value = item.text;
+                    if(tools.isNotEmpty(item.caption)){
+                        this.showProject.value =  item.caption + " " + item.text;
+                    }else {
+                        this.showProject.value = item.text;
+                    }
                     this.dropdown.hideList();
                 }
             });
