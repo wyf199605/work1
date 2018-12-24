@@ -13,6 +13,7 @@ import IComponentPara = G.IComponentPara; import Component = G.Component;
 import {BwTableModule} from "../../module/table/BwTableModule";
 import {FastTable} from "global/components/newTable/FastTable";
 import {Inputs} from "../../module/inputs/inputs";
+import {Graffiti} from "../../module/share/Share";
 
 export interface ITablePagePara extends BasicPagePara{
     ui: IBW_UI<IBW_Table>

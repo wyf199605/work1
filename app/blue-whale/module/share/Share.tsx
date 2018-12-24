@@ -3,6 +3,8 @@ import d = G.d;
 import Shell = G.Shell;
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {BwRule} from "../../common/rule/BwRule";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import sys = BW.sys;
 
 interface ISharePara {
     onClose? : () => void
@@ -39,23 +41,46 @@ let btnArr = [{
     }
 },];
 export class Graffiti {
-    private image : string;
+    private share : Share;
     constructor(){
         d.append(document.body, this.graffitiBtn());
         d.on(this._graffitiBtnEl, 'click', () => {
             this.hideBtn();
-            this.getEditImg(null, '');
+            setTimeout(() => {
+                this.getEditImg();
+            });
         });
     }
 
-    private getEditImg(type : number, img : string){
-        Shell.base.getEditImg(type, img, (result) => {
-            // this.image = result.data;
-            new Share({
-                btnArr : btnArr,
-                md5 : result.data,
-            });
-        })
+    private getEditImg(){
+       Shell.base.getEditImg(null, null, (e) => {
+           if(!this.share){
+               this.share = new Share({
+                   btnArr : btnArr,
+                   md5 : e.data,
+                   onClose : () => {
+                       this.showBtn();
+                   }
+               });
+           }else {
+               this.share.toggle();
+               this.share.setImg(e.data);
+           }
+       });
+        // sys.window.getSignImg(null,null, (e) => {
+        //     if(!this.share){
+        //         this.share = new Share({
+        //                 btnArr : btnArr,
+        //                 md5 : e.data,
+        //                 onClose : () => {
+        //                     this.showBtn();
+        //                 }
+        //             });
+        //         }else {
+        //             this.share.toggle();
+        //             this.share.setImg(e.data);
+        //         }
+        // });
     }
 
     private _graffitiBtnEl : HTMLElement;
@@ -77,35 +102,34 @@ export class Graffiti {
 }
 
 export class Share {
-
-    constructor(para : ISharePara){
-        d.append(document.body,  this.wrapperInit());
-        this.setImg(para.md5);
-        this.setBtn(para.btnArr);
-        this.evenInit();
-    }
-
-    // private _btnEl : HTMLElement;
     private _header : HTMLElement;
     private _edit : HTMLElement;
     private _img : HTMLImageElement;
     private _body : HTMLImageElement;
     private _cancel : HTMLElement;
+    private _wrapper : HTMLElement;
+    constructor(para : ISharePara){
+        d.append(document.body,  this.wrapperInit());
+        this.setImg(para.md5);
+        this.setBtn(para.btnArr);
+        this.evenInit(para);
+    }
+
     private wrapperInit(){
-        return <div className="share-container">
+        return this._wrapper = <div className="share-container">
             {this._header = <div className="share-header">
                 {this._edit = <div className="share-edit">编辑</div>}
                 {this._cancel = <div className="share-cancel">取消</div>}
             </div>}
             {this._img = <img src="" alt="" className="share-img"/>}
             {this._body = <div className="share-body">
-                {/*{this._btnEl = <div className="btnEl"></div>}*/}
             </div>}
-        </div>;
+        </div>
     }
 
+
     setImg(md5 : string){
-        this._img.src = BwRule.fileUrlGet(md5);
+        this._img.src = md5;
         this._img.dataset.md5 = md5;
     }
 
@@ -124,40 +148,32 @@ export class Share {
         })
     }
 
-    private evenInit(){
+    private evenInit(para : ISharePara){
         d.on(this._edit, 'click', () => {
-            Shell.base.getEditImg(1, this._img.dataset.md5, (result) => {
-
-            })
+            Shell.base.getEditImg(null, this._img.dataset.md5, (result) => {
+                this.toggle();
+                this.setImg(result.data)
+            });
+            // sys.window.getSignImg(this._img.dataset.md5,null, (result) => {
+            //     this.toggle();
+            //     this.setImg(result.data)
+            // });
         });
 
         d.on(this._img, 'click', () => {
             this._header.classList.toggle('share-hide');
             this._body.classList.toggle('share-hide');
+        });
+
+        d.on(this._cancel, 'click', () => {
+            this._wrapper.classList.toggle('hide');
+            G.tools.isFunction(para.onClose) && para.onClose();
         })
-
-        // d.on(this._share, "click", () => {
-            // if(!this.share){
-            //     this.share = new Share({
-            //         data : this.image,
-            //         onClose : () => {
-            //             this.showBtn();
-            //         }
-            //     });
-            // }else {
-            //     this.share.show(this.image);
-            // }
-        // });
-
     }
 
 
-    show(data : string){
-
-    }
-
-    hide(){
-
+    toggle(){
+        this._wrapper.classList.toggle('hide');
     }
 }
 

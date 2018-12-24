@@ -48,7 +48,7 @@ namespace G{
                 }, back, info)
             },
             getEditImg( type : number, image: string, back : IShellEventHandler){
-                return ShellBase.handler( 'getSignImg', {type, image}, back);
+                return ShellBase.handler('getSignImg', {type, image}, back);
             }
         };
 
