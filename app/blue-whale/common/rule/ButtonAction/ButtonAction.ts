@@ -403,7 +403,6 @@ export class ButtonAction {
                 header: caption,
                 isOnceDestroy: true,
                 width: width + 'px',
-                height: tools.isMb ? '300px': void 0,
                 isAdaptiveCenter: true,
                 isMb: false,
                 top: tools.isMb ? 80 : null,
