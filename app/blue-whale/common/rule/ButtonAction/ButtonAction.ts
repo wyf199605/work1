@@ -288,8 +288,8 @@ export class ButtonAction {
             codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
             uniqueFlag = dataAddr[i].uniqueFlag;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
-            picFields = dataAddr[i].picFields;
-            picAddr = dataAddr[i].picAddr.dataAddr;
+            picFields = dataAddr[i].picFields || '';
+            picAddr = dataAddr[i].picAddr ? dataAddr[i].picAddr.dataAddr : '';
 
         }
         let USER = User.get().userid,
