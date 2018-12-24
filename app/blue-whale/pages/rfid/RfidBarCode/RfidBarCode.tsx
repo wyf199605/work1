@@ -527,9 +527,14 @@ export class RfidBarCode extends Component {
                                             IMAOBJ[field] = this.photoImgData;
                                             let IMA = [];
                                             IMA.push(IMAOBJ);
+                                            let s = new Loading({
+                                                msg:'上传中'
+                                            })
+                                            s.show();
                                             let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picAddr,IMA, (res) => {
                                                 d.query('.total-rfid>.bar-code-scan>span').innerText = 0 + '';
                                                 this.stepArry = [];
+                                                s.destroy();
                                                 if (!res.success) {
                                                     Modal.alert('上传失败');
                                                 } else {
@@ -704,15 +709,17 @@ export class RfidBarCode extends Component {
         this.photoImg = new BwLayoutImg({
             isShow: false,
             autoClear:false,
+            isCloseMsg:true,
             onFinish: () => {
                 return new Promise((resolve)=>{
+                    this.photoImgData = [];
                     let ss = this.photoImg.getBase64().then((data)=>{
-                           for(let i = 0 ,len = data.length;i<len; i++){
-                               let obj = {};
-                               obj['file_name'] = this.randNum();
-                               obj['file_data'] = data[i].replace(/data:.+?,/, '')
-                               this.photoImgData.push(obj);
-                           }
+                        for(let i = 0 ,len = data.length;i<len; i++){
+                            let obj = {};
+                            obj['file_name'] = this.randNum();
+                            obj['file_data'] = data[i].replace(/data:.+?,/, '')
+                            this.photoImgData.push(obj);
+                        }
                     })
                     resolve();
                 })
