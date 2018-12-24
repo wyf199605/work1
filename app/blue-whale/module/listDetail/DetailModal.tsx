@@ -309,11 +309,14 @@ export class DetailModal {
 
     // 验证
     private validate() {
-        let result = this.editModule.validate.start();
+        let result:obj = this.editModule.validate.start();
         if (tools.isNotEmpty(result)) {
             for (let key in result) {
-                Modal.alert(result[key].errMsg);
-                return false;
+                let errMsg = result[key].errMsg;
+                if(tools.isNotEmpty(errMsg)){
+                    Modal.alert(result[key]);
+                    return false;
+                }
             }
         } else {
             return true;
