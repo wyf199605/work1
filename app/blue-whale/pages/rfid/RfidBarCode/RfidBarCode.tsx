@@ -667,7 +667,12 @@ export class RfidBarCode extends Component {
                     }>删除数据
                     </button>
                     <button onclick={() => {
-                        this.photoImg.click();
+                        if(tools.isEmpty(para.picAddr)){
+                            alert('不支持拍照功能')
+                        }else {
+                            this.photoImg.click();
+                        }
+
                     }
                     }>拍照
                     </button>
