@@ -129,6 +129,9 @@ class BwMbListElement {
                             loading.destroy();
                             loading = null;
                         });
+                    },
+                    search:(data:obj) => {
+                        return this.mbListModule.refresh(data);
                     }
                 });
                 d.on(d.query('body > header [data-action="layout-query"]'), 'click', () => {
@@ -233,6 +236,9 @@ class BwMbListElement {
                         advanceSearch: bwTableEl.querier,
                         cols: bwTableEl.cols,
                         refresher: (data: obj) => {
+                            return this.mbListModule.refresh(data);
+                        },
+                        search:(data:obj) => {
                             return this.mbListModule.refresh(data);
                         }
                     });
