@@ -179,17 +179,17 @@ export class DetailModal {
     // 处理字段
     private handleField(f: R_Field, wrapper: HTMLElement, className?: string, isVirtual = false): ComInitP {
         let self = this;
-        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
-            f.comType = 'virtual';
-        }
         if (f.comType === 'file') {
             f.comType = 'newFile';
         }
         if (isVirtual === true) {
             f.comType = 'virtual';
         }
+        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
+            f.comType = 'virtual';
+        }
         return {
-            dom: DetailModal.createFormWrapper(f, wrapper, className || ''),
+            dom: f.comType === 'virtual' ? null : DetailModal.createFormWrapper(f, wrapper, className || ''),
             field: f,
             data: this.para.defaultData,
             onExtra: (data, relateCols) => {
