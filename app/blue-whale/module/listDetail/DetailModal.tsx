@@ -16,7 +16,6 @@ interface IDetailModal extends EditPagePara {
     width?: string;
     height?: string;
     isPC?: boolean;
-    isNotDetail?: boolean;
 }
 
 export class DetailModal {
@@ -30,7 +29,7 @@ export class DetailModal {
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
         this.fields = fields;
-        para.isNotDetail && BwRule.beforeHandle.fields(fields, para.uiType);
+        BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             tools.isPc && formWrapper.classList.add('no-group');
             for (let i = 0, len = fields.length; i < len; i++) {

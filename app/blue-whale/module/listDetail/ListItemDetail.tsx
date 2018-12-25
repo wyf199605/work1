@@ -97,7 +97,8 @@ export class ListItemDetail {
                     container: cellsWrapper,
                     detailPage: this,
                     field: field,
-                    className: className
+                    className: className,
+                    link: field.supportLink === true ? field.link : null
                 });
             }
         });

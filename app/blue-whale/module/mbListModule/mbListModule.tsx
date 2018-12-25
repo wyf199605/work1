@@ -159,8 +159,7 @@ export class MbListModule extends Component {
                                 resolve();
                             }, self.para.url || '');
                         })
-                    },
-                    isNotDetail: true
+                    }
                 }))
             })
         }
@@ -242,8 +241,7 @@ export class MbListModule extends Component {
                                             resolve();
                                         }, self.para.url || '');
                                     })
-                                },
-                                isNotDetail: true
+                                }
                             }))
                         })
                     }

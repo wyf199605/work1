@@ -96,6 +96,7 @@ export class ListItemDetailCell extends Component {
         super(para);
         this.fileType = para.field.dataType || para.field.atrrs.dataType;
         para.value && this.render(para.value);
+        tools.isNotEmpty(para.link) && this.linkEvent.on();
     }
 
     createImgs(value: string | string[], imgsWrapper: HTMLElement) {
@@ -269,6 +270,30 @@ export class ListItemDetailCell extends Component {
             }
         }
     })();
+    private linkEvent = (() => {
+        let linkHandler = () => {
+            let link = this.para.link,
+                para = this.para,
+                data = para.detailPage.defaultData;
+            BwRule.link({
+                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, data)),
+                varList: link.varList,
+                dataType: para.field.atrrs.dataType,
+                data: data,
+                needGps: link.needGps === 1,
+                type: link.type
+            });
+        };
+        return {
+            on: () => {
+                d.on(this.wrapper, 'click', '.detail-cell-content .link', linkHandler);
+            },
+            off: () => {
+                d.off(this.wrapper, 'click', '.detail-cell-content .link', linkHandler);
+            }
+        }
+    })();
+
 
     render(data: string | string[]) {
         switch (this.para.type) {
@@ -277,9 +302,7 @@ export class ListItemDetailCell extends Component {
             case 'datetime':
             case 'textarea': {
                 if (tools.isNotEmpty(this.para.link)) {
-                    let link = this.para.link,
-                        linkUrl = tools.url.addObj(BW.CONF.siteUrl + link.dataAddr, G.Rule.parseVarList(link.parseVarList, this.para.detailPage.defaultData))
-                    this.innerEl.content.innerHTML = `<a href="${linkUrl}">${data}</a>`;
+                    this.innerEl.content.innerHTML = `<a href="#"" class="link" title="${data}">${data}</a>`;
                 } else {
                     this.innerEl.content.innerText = data as string || '';
                     this.innerEl.content.title = data as string || '';
@@ -354,8 +377,9 @@ export class ListItemDetailCell extends Component {
     };
 
     destroy() {
-        this.para = null;
+        tools.isNotEmpty(this.para.link) && this.linkEvent.off();
         this.files && this.fileEvent.off();
+        this.para = null;
         this.files = null;
         this.imgs && this.imgEvent.off();
         this.imgs = null;
