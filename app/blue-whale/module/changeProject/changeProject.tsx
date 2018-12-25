@@ -96,7 +96,8 @@ export class ChangeProject extends Modal {
             (d.query('.appcommon.app-xiala', this.wrapper).style.lineHeight = window.getComputedStyle(this.showProject).height);
 
         if(tools.isMb){
-            this.dropdown.getUlDom().style.width = '100%';
+            d.query('.current-project', this.wrapper).style.lineHeight = window.getComputedStyle(this.showProject).height;
+            this.dropdown.getUlDom().style.left = (d.query('.current-project', this.wrapper).offsetLeft - 18)+ 'px';
         }else {
             this.dropdown.getUlDom().style.width = window.getComputedStyle(this.showProject).width;
             this.dropdown.getUlDom().style.left = d.query('.show-project-wrapper', this.wrapper).offsetLeft + 'px';
@@ -153,6 +154,7 @@ export class ChangeProject extends Modal {
     }
 
     destroy() {
+        this.dropdown.destroy();
         this.initEvent.off();
         super.destroy();
     }

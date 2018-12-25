@@ -97,8 +97,9 @@
     }
 
     .modal-body {
+        $font-size__mobile-body: 15px;
         height: calc(100% - 45px) !important;
-        font-size: 15px;
+        font-size: $font-size__mobile-body;
         background-color: #ffffff;
         box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.18);
         padding: 0 20px;
@@ -116,13 +117,18 @@
                 height: auto;
                 border-bottom: 1px solid #e2e2e2;
                 padding: 10px 0;
+                .current-project {
+                    position: absolute;
+                    right: 30px;
+                }
             }
 
             .project-list-wrapper {
                 padding: 10px 0;
                 border-bottom: 1px solid #e2e2e2;
                 height: auto;
-                overflow: hidden;
+                position: relative;
+                display: flex;
 
                 .select-project {
                     position: relative;
@@ -142,6 +148,7 @@
                             background-color: #ffffff;
                             border: none;
                             float: right;
+                            font-size: $font-size__mobile-body;
                         }
 
                         .appcommon.app-xiala {
@@ -159,7 +166,7 @@
 
                     .drop-item.list-item {
                         padding: 3px 5px;
-                        font-size: 15px;
+                        font-size: $font-size__mobile-body;
                     }
                 }
             }
