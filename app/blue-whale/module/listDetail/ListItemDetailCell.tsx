@@ -279,7 +279,7 @@ export class ListItemDetailCell extends Component {
                 if (tools.isNotEmpty(this.para.link)) {
                     let link = this.para.link,
                         linkUrl = tools.url.addObj(BW.CONF.siteUrl + link.dataAddr, G.Rule.parseVarList(link.parseVarList, this.para.detailPage.defaultData))
-                    this.innerEl.content.innerHTML = `<a href="${linkUrl}">${data}</a>`;
+                    this.innerEl.content.innerHTML = `<a href="${linkUrl}" title="${data}">${data}</a>`;
                 } else {
                     this.innerEl.content.innerText = data as string || '';
                     this.innerEl.content.title = data as string || '';
