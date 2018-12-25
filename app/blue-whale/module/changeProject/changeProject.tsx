@@ -9,7 +9,7 @@ import {BwRule} from "../../common/rule/BwRule";
 export interface IChangeProjectPara extends IModal {   // 类构造函数的参数
     current: string;    // 当前项目
 }
-interface TResponseProjectItem {   // 后台响应的数据
+interface IResponseProjectItem {   // 后台响应的数据
     PLATFORM_SEQ: string;
     PLATFORM_NAME: string;
     CAPTION: string;
@@ -17,7 +17,7 @@ interface TResponseProjectItem {   // 后台响应的数据
 interface IProjectListItem extends ListItem {   // 列表项的数据类型
     caption?: string;
 }
-interface TProjectListData extends Array<IProjectListItem>{ // 传递给Dropdown的项目数据
+interface IProjectListData extends Array<IProjectListItem>{ // 传递给Dropdown的项目数据
 
 }
 
@@ -25,7 +25,7 @@ export class ChangeProject extends Modal {
 
     private dropdown: DropDown = null;  // 下拉列表
     private showProject: HTMLInputElement = null;   // 显示当前选择的项目
-    private projectList: TProjectListData = null;   // 项目列表
+    private projectList: IProjectListData = null;   // 项目列表
 
     constructor(para?: IChangeProjectPara) {
         super(Object.assign({
@@ -69,8 +69,7 @@ export class ChangeProject extends Modal {
         }).then(({response}) => {
             // console.log('in getProjectList: ');
             // console.log(response);
-
-            this.projectList = response.data.map((obj: TResponseProjectItem)  =>
+            this.projectList = response.data.map((obj: IResponseProjectItem)  =>
                 ({value: parseInt(obj.PLATFORM_SEQ), text: obj.PLATFORM_NAME, caption: obj.CAPTION || ''}));
             this.dropdown = new DropDown({
                 el: d.query('.project-list-wrapper', content),
