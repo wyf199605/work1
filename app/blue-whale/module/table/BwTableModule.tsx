@@ -1873,7 +1873,7 @@ export class BwTableModule extends Component {
             box && box.destroy();
             box = new InputBox({
                 container: wrapper,
-                isResponsive: !tools.isMb,
+                isResponsive: true,
                 className: !tools.isMb ? 'more-btns' : ''
             });
             // TODO: 移动端未实现流程设计功能。
