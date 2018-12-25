@@ -4,16 +4,16 @@ import {Mail} from "../../module/mail/mail";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import {FastTable} from "../../../global/components/newTable/FastTable";
-import {NewTableModule} from "../../module/table/newTableModule";
 import tools = G.tools;
 import d = G.d;
 import BasicPage from "../basicPage";
+import {BwTableElement} from "../table/newTablePage";
 
 interface IMailPagePara extends BasicPagePara{
 }
 
 export class MailPage extends BasicPage{
-    protected tableModule: NewTableModule;
+    protected TableElement: BwTableElement;
     protected mail: Mail;
     protected modal: Modal;
     protected wrapper: HTMLInputElement;
@@ -45,11 +45,11 @@ export class MailPage extends BasicPage{
             // }
         }
 
-        this.tableModule = new NewTableModule({
-            bwEl: uiBody.elements[0],
+        this.TableElement = new BwTableElement({
+            tableEl: uiBody.elements[0],
             container: this.wrapper
         });
-        let ftable = this.tableModule.main.ftable,
+        let ftable = this.TableElement.tableModule.main.ftable,
             pseudoTable = ftable.pseudoTable,
             self = this;
 
@@ -64,7 +64,7 @@ export class MailPage extends BasicPage{
         });
 
         this.on(BwRule.EVT_REFRESH, () => {
-            this.tableModule && this.tableModule.refresh();
+            this.TableElement && this.TableElement.tableModule.refresh();
         });
         
         // 初始化第一行的邮件详情页
@@ -110,7 +110,7 @@ export class MailPage extends BasicPage{
     }
 
     protected initMail(index: number, data){
-        let ftable = this.tableModule.main.ftable,
+        let ftable = this.TableElement.tableModule.main.ftable,
             col = ftable.columnGet('READSTATE');
         if(col){
             let body = <div className="mail-body"/>,
@@ -129,7 +129,7 @@ export class MailPage extends BasicPage{
                 index: index,
                 container: body,
                 modal: this.modal,
-                table: this.tableModule.main,
+                table: this.TableElement.tableModule.main,
                 onChange: (index) => {
                     // 点击邮件详情页上一封、下一封，触发的事件
                     ftable._clearAllSelectedCells();

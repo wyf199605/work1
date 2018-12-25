@@ -12,10 +12,10 @@ interface objOf<T> {
 // }
 interface CustomFile {
     blob: Blob;
-    name: string;
-    lastModifiedDate: any;
-    type: string;
-    size: number;
+    name?: string;
+    lastModifiedDate?: any;
+    type?: string;
+    size?: number;
 }
 
 type Primitive = string | number | boolean

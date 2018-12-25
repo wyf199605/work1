@@ -29,6 +29,7 @@ import {TableDataCell} from "../../../global/components/newTable/base/TableCell"
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {BwUploader} from "../uploadModule/bwUploader";
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -686,7 +687,11 @@ export class BwTableModule extends Component {
             if (isTd && self.cols.some(col => col.name === name && BwRule.isNewImg(col.atrrs.dataType))) {
                 let row = ftable.rows[index],
                     cell = row ? row.cellGet(name) : null;
-                self.showImg(cell);
+                if(self.ftable.editing){
+                    self.imgManager.open(cell);
+                }else{
+                    self.showImg(cell);
+                }
             } else if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
                 self.multiImgEdit.show(name, index);
             } else {
@@ -705,6 +710,53 @@ export class BwTableModule extends Component {
         }
 
     }
+
+    protected imgManager = (() => {
+        let layoutImg: BwLayoutImg,
+            images: string[] = [];
+
+        return {
+            open: (cell: FastTableCell) => {
+                layoutImg && layoutImg.destroy();
+                images = [];
+                if(cell && cell.column){
+                    let field = cell.column.content as R_Field;
+                    layoutImg = new BwLayoutImg({
+                        isCloseMsg: true,
+                        nameField: field.name,
+                        // thumbField: thumbField,
+                        loading: {
+                            msg: '图片上传中...'
+                        },
+                        autoUpload: true,
+                        onDelete: (index) => {
+                            images.splice(index, 1);
+                        },
+                        onSuccess: (res) => {
+                            images = [res.data.unique];
+                        },
+                        multi: false,
+                        onFinish: () => {
+                            return new Promise<any>((resolve) => {
+                                cell.data = images.join(',');
+                                resolve();
+                            });
+                        }
+                    });
+                    if(cell.data){
+                        let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                            "md5_field": field.name,
+                            [field.name]: cell.data,
+                            down: 'allow'
+                        });
+                        layoutImg.set([url])
+                    }
+                    images = [cell.data as string];
+                    layoutImg.modalShow = true;
+                }
+            }
+        }
+    })();
 
     protected showImg(cell: FastTableCell) {
         if (cell && cell.column) {
@@ -2283,7 +2335,7 @@ export class BwTableModule extends Component {
                         value = cell ? cell.data : '';
                     }
 
-                    let com = BwRule.isOldImg(field.atrrs && field.atrrs.dataType) ? null : editModule.init(col.name, {
+                    let com = BwRule.isImage(field.atrrs && field.atrrs.dataType) ? null : editModule.init(col.name, {
                         dom: cell.wrapper,
                         data: row.data,
                         field,
