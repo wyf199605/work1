@@ -206,13 +206,10 @@ export class InputBox extends Component {
         return this._isResponsive;
     }
 
-    protected actionSheet;
-
     responsive(){
         if(!this.isResponsive){
             return ;
         }
-        let buttons = [];
         let childrenWidth = 56, isFirst = true;
         let wrapperWidth = this.wrapper.offsetWidth;
         for(let c of this.children){
@@ -232,7 +229,7 @@ export class InputBox extends Component {
                     content: '更多',
                     size: this._size,
                 }));
-                if (tools.isPc && !this._moreBtn.dropDown) {
+                if (!this._moreBtn.dropDown) {
                     this.wrapper.appendChild(this.moreBtn.wrapper);
                     let self = this;
                     this.moreBtn.dropDown = new DropDown({
@@ -242,10 +239,6 @@ export class InputBox extends Component {
                         multi: null,
                         className: "input-box-morebtn"
                     });
-                }else if(tools.isMb && !this.actionSheet){
-                    this.moreBtn.onClick = () => {
-                        this.actionSheet && (this.actionSheet.isShow = true);
-                    }
                 }
             }else{
                 d.append(this.wrapper, c.wrapper);
@@ -260,26 +253,10 @@ export class InputBox extends Component {
                 this._moreBtn = null;
             }else {
                 this.children.slice(this._lastNotMoreIndex).forEach((btn) => {
-                    if (tools.isPc && this.moreBtn.dropDown) {
+                    if (this.moreBtn.dropDown) {
                         this.moreBtn.dropDown.getUlDom().appendChild(btn.wrapper);
-                    }else if(tools.isMb){
-                        d.remove(btn.wrapper);
-                        buttons.push({
-                            content: btn.content,
-                            onClick: () => {
-                                btn.click();
-                            }
-                        })
                     }
                 });
-                if(tools.isMb){
-                    this.actionSheet && this.actionSheet.destroy();
-                    require(['ActionSheet'], (a) => {
-                        this.actionSheet = new a.ActionSheet({
-                            buttons
-                        });
-                    });
-                }
             }
         }
     }
