@@ -4,6 +4,7 @@ import tools = G.tools;
 import IComponentPara = G.IComponentPara; import Component = G.Component;
 import {Button} from "../button/Button";
 import {DropDown} from "../../ui/dropdown/dropdown";
+import {ActionSheet, IActionSheetButton} from "../../ui/actionSheet/actionSheet";
 
 interface IInputBoxPara extends IComponentPara{
     //width?: string | number;//  ，则不支持响应式
@@ -206,10 +207,13 @@ export class InputBox extends Component {
         return this._isResponsive;
     }
 
+    protected actionSheet: ActionSheet;
+
     responsive(){
         if(!this.isResponsive){
             return ;
         }
+        let buttons: IActionSheetButton[] = [];
         let childrenWidth = 56, isFirst = true;
         let wrapperWidth = this.wrapper.offsetWidth;
         for(let c of this.children){
@@ -229,7 +233,7 @@ export class InputBox extends Component {
                     content: '更多',
                     size: this._size,
                 }));
-                if (!this._moreBtn || !this._moreBtn.dropDown) {
+                if (tools.isPc && !this._moreBtn.dropDown) {
                     this.wrapper.appendChild(this.moreBtn.wrapper);
                     let self = this;
                     this.moreBtn.dropDown = new DropDown({
@@ -239,6 +243,10 @@ export class InputBox extends Component {
                         multi: null,
                         className: "input-box-morebtn"
                     });
+                }else if(tools.isMb && !this.actionSheet){
+                    this.moreBtn.onClick = () => {
+                        this.actionSheet && (this.actionSheet.isShow = true);
+                    }
                 }
             }else{
                 d.append(this.wrapper, c.wrapper);
@@ -253,10 +261,24 @@ export class InputBox extends Component {
                 this._moreBtn = null;
             }else {
                 this.children.slice(this._lastNotMoreIndex).forEach((btn) => {
-                    if (this.moreBtn.dropDown) {
+                    if (tools.isPc && this.moreBtn.dropDown) {
                         this.moreBtn.dropDown.getUlDom().appendChild(btn.wrapper);
+                    }else if(tools.isMb){
+                        d.remove(btn.wrapper);
+                        buttons.push({
+                            content: btn.content,
+                            onClick: () => {
+                                btn.click();
+                            }
+                        })
                     }
                 });
+                if(tools.isMb){
+                    this.actionSheet && this.actionSheet.destroy();
+                    this.actionSheet = new ActionSheet({
+                        buttons
+                    });
+                }
             }
         }
     }

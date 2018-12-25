@@ -288,6 +288,10 @@ export class Button extends Component implements IButton{
         return this._onClick;
     }
 
+    click(){
+        this.wrapper.click();
+    }
+
     getDom() : HTMLElement{
         return this.wrapper;
     }
