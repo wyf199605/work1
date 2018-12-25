@@ -49,7 +49,8 @@ export class ListItemDetail {
                         type: DetailModal.getType(field.dataType || field.atrrs.dataType || ''),
                         container: cellsWrapper,
                         detailPage: this,
-                        field: field
+                        field: field,
+                        link: field.supportLink === true ? field.link : null
                     });
                 }
             });

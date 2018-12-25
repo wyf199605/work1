@@ -4,112 +4,126 @@ import d = G.d;
 import tools = G.tools;
 
 import {Modal} from "../../feedback/modal/Modal";
-export interface ImgModalPara{
+
+export interface ImgModalPara {
     downAddr?: string;
     title?: string;
     img: string[];
     page?: boolean; //是否显示页数
-    container? : HTMLElement;
+    container?: HTMLElement;
     isThumbnail?: boolean; // 默认false,
-    textArr?:string[];
-    onDownload?(url:string);
+    textArr?: string[];
+
+    onDownload?(url: string);
 }
-export const ImgModal = (()=>{
+
+export const ImgModal = (() => {
     let gallery = null,
         wrapper: HTMLElement,
         container: HTMLElement,
         downAddr: string,
         onDownload: Function;
 
-    function showPhotoSwipe(para: ImgModalPara, index = 0){
+    function showPhotoSwipe(para: ImgModalPara, index = 0) {
         if (gallery === null) {
             // let self = this;
-            require(['photoSwipe','photoSwipeUi'], (photoSwipe, PhotoSwipeUI_Default) => {
+            require(['photoSwipe', 'photoSwipeUi'], (photoSwipe, PhotoSwipeUI_Default) => {
                 downAddr = para.downAddr;
-                onDownload = para.onDownload ;
+                onDownload = para.onDownload;
                 if (!wrapper) {
                     //下载按钮
-                    if(downAddr && onDownload){
+                    if (downAddr && onDownload) {
                         //加载tpl
-                        wrapper  = d.create(imgModalTpl);
+                        wrapper = d.create(imgModalTpl);
                         container = para.container ? para.container : document.body;
                         container.appendChild(wrapper);
                         d.on(container, 'click', '.icon-download', () => {
                             onDownload(downAddr);
                         });
-                    }else{
+                    } else {
                         //加载tpl
-                        wrapper  = d.create(imgModalTplNoDownload);
+                        wrapper = d.create(imgModalTplNoDownload);
                         container = para.container ? para.container : document.body;
                         container.appendChild(wrapper);
                     }
                     // ImgModal.initTag = false;
                 }
                 let pswpElement = d.query('.pswp', container),
-                    items = [],
-                    len = para.img.length;
+                    len = para.img.length,
+                    pros = [];
                 for (let i = 0; i <= len - 1; i++) {
-                    items.push({
-                        src: para.img[i],
-                        w: 964,
-                        h: 1024
-                    });
+                    pros.push(new Promise((resolve) => {
+                        let imgTep = new Image();
+                        imgTep.src = para.img[i];
+                        imgTep.onload = function () {
+                            resolve({
+                                src: para.img[i],
+                                w: imgTep.width,
+                                h: imgTep.height
+                            });
+                        }
+                    }));
                 }
 
-                gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
-                    // history & focus options are disabled on CodePen
-                    history: false
-                    , focus: false
-                    , page: false
-                    , pinchToClose: false
-                    , closeOnScroll: false
-                    , closeOnVerticalDrag: false
-                    , mouseUsed: false
-                    , escKey: true
-                    , arrowKeys: true
-                    , modal: false
-                    , clickToCloseNonZoomable: false
-                    , closeElClasses: []
-                    // , fullscreenEl: false
-                    , shareEl: false
-                    , showAnimationDuration: 0
-                    , hideAnimationDuration: 0
-                    , index: index
-                });
-                gallery.init();
-                gallery.listen('close', function () {
-                    gallery && gallery.close();
-                    gallery = null;
-                    d.remove(d.query('.pswp'));
-                    wrapper = null;
-                    if (tools.isMb){
-                        document.body.style.overflow = '';
-                    }
+                Promise.all(pros).then(items => {
+                    gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                        // history & focus options are disabled on CodePen
+                        history: false
+                        , focus: false
+                        , page: false
+                        , pinchToClose: false
+                        , closeOnScroll: false
+                        , closeOnVerticalDrag: false
+                        , mouseUsed: false
+                        , escKey: true
+                        , arrowKeys: true
+                        , modal: false
+                        , clickToCloseNonZoomable: false
+                        , closeElClasses: []
+                        // , fullscreenEl: false
+                        , shareEl: false
+                        , showAnimationDuration: 0
+                        , hideAnimationDuration: 0
+                        , index: index
+                    });
+                    gallery.init();
+                    gallery.listen('close', function () {
+                        gallery && gallery.close();
+                        gallery = null;
+                        d.remove(d.query('.pswp'));
+                        wrapper = null;
+                        if (tools.isMb) {
+                            document.body.style.overflow = '';
+                        }
+                    })
                 })
             });
         }
     }
-    function show(para: ImgModalPara){
-        if (para.isThumbnail){
+
+    function show(para: ImgModalPara) {
+        if (para.isThumbnail) {
             //    显示缩略图
             showModalThumbnail(para);
-        }else{
+        } else {
             showPhotoSwipe(para);
         }
     }
-    function showModalThumbnail(para: ImgModalPara){
+
+    function showModalThumbnail(para: ImgModalPara) {
         let body = createImgThumbnail(para);
         let modal = new Modal({
-            body:body,
-            width:'750px',
-            header:'查看缩略图',
-            isOnceDestroy:true
+            body: body,
+            width: '750px',
+            header: '查看缩略图',
+            isOnceDestroy: true
         })
     }
-    function createImgThumbnail(para: ImgModalPara):HTMLElement{
+
+    function createImgThumbnail(para: ImgModalPara): HTMLElement {
         let div = document.createElement('div');
         div.classList.add('thumbnail-container');
-        para.img.forEach((value, index)=>{
+        para.img.forEach((value, index) => {
             let imgCon = document.createElement('div');
             imgCon.classList.add('img-container');
             let img = document.createElement('img');
@@ -117,9 +131,9 @@ export const ImgModal = (()=>{
             imgCon.appendChild(img);
             div.appendChild(imgCon);
         });
-        if (para.textArr){
-            let allImgContainer = d.queryAll('.img-container',div);
-            para.textArr.forEach((value,index)=>{
+        if (para.textArr) {
+            let allImgContainer = d.queryAll('.img-container', div);
+            para.textArr.forEach((value, index) => {
                 let p = document.createElement('p');
                 p.innerText = value;
                 allImgContainer[index].appendChild(p);
@@ -131,40 +145,41 @@ export const ImgModal = (()=>{
         });
         return div;
     }
+
     return {
         show
     }
 })();
 
 const imgModalTpl = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="pswp__bg"></div>' +
-        '<div class="pswp__scroll-wrap">' +
-        '<div class="pswp__container">' +
-        '<div class="pswp__item"></div>' +
-        '<div class="pswp__item"></div>' +
-        '<div class="pswp__item"></div>' +
-        '</div>' +
-        '<div class="pswp__ui pswp__ui--hidden">' +
-        '<div class="pswp__top-bar">' +
-        '<div class="pswp__counter"></div>' +
-        '<button class="pswp__button pswp__button--close iconfont icon-close"></button>' +
-        '<button class="pswp__button pswp__button--fs iconfont icon-maximize"></button>' +
-        '<button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button>' +
-        '<button class="pswp__button  iconfont icon-download"> </button>' +
-        '<div class="pswp__preloader">' +
-        '<div class="pswp__preloader__icn">' +
-        '<div class="pswp__preloader__cut">' +
-        '<div class="pswp__preloader__donut"></div>' +
-        '</div></div></div></div>' +
-        '<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">' +
-        '<div class="pswp__share-tooltip"></div>' +
-        '</div>' +
-        '<button class="pswp__button pswp__button--arrow--left iconfont icon-arrow-left">' +
-        '<span class=" iconfont icon-arrow-left"></span> </button>' +
-        '<button class="pswp__button pswp__button--arrow--right">' +
-        '<span class=" iconfont icon-arrow-right"></span> </button>' +
-        '<div class="pswp__caption"> ' +
-        '<div class="pswp__caption__center"></div></div></div></div></div>';
+    '<div class="pswp__bg"></div>' +
+    '<div class="pswp__scroll-wrap">' +
+    '<div class="pswp__container">' +
+    '<div class="pswp__item"></div>' +
+    '<div class="pswp__item"></div>' +
+    '<div class="pswp__item"></div>' +
+    '</div>' +
+    '<div class="pswp__ui pswp__ui--hidden">' +
+    '<div class="pswp__top-bar">' +
+    '<div class="pswp__counter"></div>' +
+    '<button class="pswp__button pswp__button--close iconfont icon-close"></button>' +
+    '<button class="pswp__button pswp__button--fs iconfont icon-maximize"></button>' +
+    '<button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button>' +
+    '<button class="pswp__button  iconfont icon-download"> </button>' +
+    '<div class="pswp__preloader">' +
+    '<div class="pswp__preloader__icn">' +
+    '<div class="pswp__preloader__cut">' +
+    '<div class="pswp__preloader__donut"></div>' +
+    '</div></div></div></div>' +
+    '<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">' +
+    '<div class="pswp__share-tooltip"></div>' +
+    '</div>' +
+    '<button class="pswp__button pswp__button--arrow--left iconfont icon-arrow-left">' +
+    '<span class=" iconfont icon-arrow-left"></span> </button>' +
+    '<button class="pswp__button pswp__button--arrow--right">' +
+    '<span class=" iconfont icon-arrow-right"></span> </button>' +
+    '<div class="pswp__caption"> ' +
+    '<div class="pswp__caption__center"></div></div></div></div></div>';
 
 const imgModalTplNoDownload = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">' +
     '<div class="pswp__bg"></div>' +
@@ -178,7 +193,6 @@ const imgModalTplNoDownload = '<div class="pswp" tabindex="-1" role="dialog" ari
     '<div class="pswp__top-bar">' +
     '<div class="pswp__counter"></div>' +
     '<button class="pswp__button pswp__button--close iconfont icon-close"></button>' +
-    '<button class="pswp__button pswp__button--fs iconfont icon-maximize"></button>' +
     '<button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button>' +
     '<div class="pswp__preloader">' +
     '<div class="pswp__preloader__icn">' +

@@ -29,6 +29,7 @@ interface IDetailCell extends IComponentPara {
     value?: string | string[];
     field?: R_Field;
     className?: string;
+    link?: R_ReqAddr;
 }
 
 export class ListItemDetailCell extends Component {
@@ -38,6 +39,7 @@ export class ListItemDetailCell extends Component {
     private _currentFile: IFile;
     private fileType: string = '';
     private files: IFile[] = [];
+
     set currentFile(fileInfo: IFile) {
         this._currentFile = fileInfo;
     }
@@ -134,7 +136,7 @@ export class ListItemDetailCell extends Component {
                                             type: this.para.field.link.type
                                         });
                                     } else {
-                                        if (tools.isNotEmpty(self.currentFile) && tools.isNotEmpty(self.currentFile.addr)){
+                                        if (tools.isNotEmpty(self.currentFile) && tools.isNotEmpty(self.currentFile.addr)) {
                                             let fileName = self.currentFile.filename,
                                                 fileAddr = self.currentFile.addr,
                                                 nameArr = fileName.split('.'),
@@ -145,7 +147,7 @@ export class ListItemDetailCell extends Component {
                                             } else {
                                                 sys.window.download(BW.CONF.siteUrl + fileAddr);
                                             }
-                                        }else{
+                                        } else {
                                             Modal.toast('下载出错，请重试!');
                                         }
                                     }
@@ -270,18 +272,23 @@ export class ListItemDetailCell extends Component {
 
     render(data: string | string[]) {
         switch (this.para.type) {
-            case 'text': {
-                this.innerEl.content.innerText = data as string || '';
-                this.innerEl.content.title = data as string || '';
+            case 'text':
+            case 'date':
+            case 'datetime':
+            case 'textarea': {
+                if (tools.isNotEmpty(this.para.link)) {
+                    let link = this.para.link,
+                        linkUrl = tools.url.addObj(BW.CONF.siteUrl + link.dataAddr, G.Rule.parseVarList(link.parseVarList, this.para.detailPage.defaultData))
+                    this.innerEl.content.innerHTML = `<a href="${linkUrl}">${data}</a>`;
+                } else {
+                    this.innerEl.content.innerText = data as string || '';
+                    this.innerEl.content.title = data as string || '';
+                }
             }
                 break;
             case 'img': {
                 this.imgs = data as string[] || [];
                 this.createImgs(data, this.innerEl.imgs);
-            }
-                break;
-            case 'textarea': {
-                this.innerEl.content.innerText = data as string || '';
             }
                 break;
             case 'file': {
@@ -308,14 +315,6 @@ export class ListItemDetailCell extends Component {
                     this.files = [];
                     this.createAllFiles([], this.innerEl.files);
                 }
-            }
-                break;
-            case 'date': {
-                this.innerEl.content.innerText = data as string || '';
-            }
-                break;
-            case 'datetime': {
-                this.innerEl.content.innerText = data as string || '';
             }
                 break;
         }
