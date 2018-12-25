@@ -4,7 +4,6 @@ import tools = G.tools;
 import IComponentPara = G.IComponentPara; import Component = G.Component;
 import {Button} from "../button/Button";
 import {DropDown} from "../../ui/dropdown/dropdown";
-import {ActionSheet, IActionSheetButton} from "../../ui/actionSheet/actionSheet";
 
 interface IInputBoxPara extends IComponentPara{
     //width?: string | number;//  ，则不支持响应式
@@ -207,13 +206,13 @@ export class InputBox extends Component {
         return this._isResponsive;
     }
 
-    protected actionSheet: ActionSheet;
+    protected actionSheet;
 
     responsive(){
         if(!this.isResponsive){
             return ;
         }
-        let buttons: IActionSheetButton[] = [];
+        let buttons = [];
         let childrenWidth = 56, isFirst = true;
         let wrapperWidth = this.wrapper.offsetWidth;
         for(let c of this.children){
@@ -275,8 +274,10 @@ export class InputBox extends Component {
                 });
                 if(tools.isMb){
                     this.actionSheet && this.actionSheet.destroy();
-                    this.actionSheet = new ActionSheet({
-                        buttons
+                    require(['ActionSheet'], (a) => {
+                        this.actionSheet = new a.ActionSheet({
+                            buttons
+                        });
                     });
                 }
             }
@@ -388,9 +389,9 @@ export class InputBox extends Component {
         if (!this.isVertical && this.isResponsive) {
             //第一个组件元素
             if (this.wrapper.children.length < 2) {
-                this.wrapper.style.width = com.wrapper.clientWidth + 2 + 'px';
+                // this.wrapper.style.width = com.wrapper.clientWidth + 2 + 'px';
             } else {
-                this.wrapper.style.width =parseInt(this.wrapper.style.width) + com.wrapper.clientWidth + 2 + 'px';
+                // this.wrapper.style.width =parseInt(this.wrapper.style.width) + com.wrapper.clientWidth + 2 + 'px';
             }
             this.responsive();
         }
