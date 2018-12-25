@@ -19,6 +19,7 @@ export class ListItemDetail {
     public totalNumber: number = 0;
     private ajaxUrl: string = '';
     private actionSheet: ActionSheet;
+    private editBtn: R_Button;
 
     constructor(private para: EditPagePara) {
         let wrapper = <div className="list-item-detail-wrapper"/>,
@@ -31,6 +32,7 @@ export class ListItemDetail {
             this.render(data);
             this.initDetailButtons();
         });
+        tools.isMb && this.dbClick.on();
     }
 
     // 初始化详情DOM
@@ -306,6 +308,9 @@ export class ListItemDetail {
                 case 'update_save' :
                 case 'insert_save':
                     let isAdd = btn.subType !== 'update_save';
+                    if (!isAdd){
+                        self.editBtn = btn;
+                    }
                     if (!isAdd && self.totalNumber === 0 && self.para.uiType === 'detail') {
                         Modal.alert('没有数据可以编辑!');
                         return;
@@ -468,7 +473,36 @@ export class ListItemDetail {
         return [...Object.values(this.cells)];
     }
 
+    private dbClick = (() => {
+        let dbEdit = () => {
+            let self = this,
+                btn = this.editBtn;
+            if (self.totalNumber === 0 && self.para.uiType === 'detail') {
+                Modal.alert('没有数据可以编辑!');
+                return;
+            }
+            new DetailModal(Object.assign({}, self.para, {
+                defaultData: self.defaultData,
+                isAdd: false,
+                isPC: false,
+                confirm(data) {
+                    return new Promise((resolve) => {
+                        ButtonAction.get().clickHandle(btn, data, () => {
+                            self.changePage();
+                            resolve();
+                        });
+                    })
+                }
+            }));
+        };
+        return {
+            on: () => d.on(this.para.dom, 'dblclick', '.list-item-detail-wrapper',dbEdit),
+            off: () => d.off(this.para.dom, 'dblclick','.list-item-detail-wrapper', dbEdit),
+        }
+    })();
+
     destroy() {
+        tools.isMb && this.dbClick.off();
         this.actionSheet.destroy();
         this.actionSheet = null;
         for (let key in this.cells) {

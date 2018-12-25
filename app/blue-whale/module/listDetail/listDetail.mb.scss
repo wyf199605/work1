@@ -10,9 +10,7 @@
 .list-item-detail-wrapper {
   background-color: #f8f8f8;
   width: 100%;
-  //padding-bottom: 70px;
   height: 100%;
-  //height: calc(100% - 114px);
   .list-detail-cells-wrapper {
     background-color: #ffffff;
     padding-left: 16px;
@@ -66,11 +64,12 @@
         align-items: center;
         justify-content: center;
         .detail-cell-textarea {
-          height: auto;
+          height: 100%;
           width: 100%;
           overflow-y: auto;
           word-wrap: break-word;
           line-height: 30px;
+          //text-indent: 2rem;
         }
       }
     }

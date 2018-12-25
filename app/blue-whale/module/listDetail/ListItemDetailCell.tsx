@@ -248,7 +248,8 @@ export class ListItemDetailCell extends Component {
     })();
 
     private imgEvent = (() => {
-        let imgOption = () => {
+        let imgOption = (e) => {
+            e.stopPropagation();
             let imgs = this.imgs || [];
             let imgData: ImgModalPara = {
                 img: ListItemDetailCell.getBigPicture(imgs)
@@ -271,7 +272,9 @@ export class ListItemDetailCell extends Component {
         }
     })();
     private linkEvent = (() => {
-        let linkHandler = () => {
+        let linkHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             let link = this.para.link,
                 para = this.para,
                 data = para.detailPage.defaultData;
