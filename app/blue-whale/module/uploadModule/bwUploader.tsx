@@ -40,6 +40,7 @@ export class BwUploader extends FormCom {
 
     static EVT_FILE_JOIN_QUEUE = '__event_file_join_the_queue__'; // 文件加入上传队列是调用
     static EVT_UPLOAD_ERROR = '__event_file_upload_error__';    // 文件上传失败时调用
+    static EVT_UPLOAD_SUCCESS = '__event_file_upload_success__';    // 文件上传成功时调用
 
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
     protected maxSize: number;  // 上传文件大小，-1为不限制
@@ -78,7 +79,7 @@ export class BwUploader extends FormCom {
             this.loading.hide();
         }
         this.uploadType = para.uploadType || 'file';
-        this.uploadUrl = para.uploadUrl;
+        this.uploadUrl = para.uploadUrl || BW.CONF.ajaxUrl.fileUpload;
         this.nameField = para.nameField || 'FILE_ID';
         this.thumbField = para.thumbField;
         this.maxSize = para.maxSize || -1;
@@ -251,6 +252,10 @@ export class BwUploader extends FormCom {
                 this.files.push(file);
                 this.temFiles = [];
                 this.onSuccess && this.onSuccess(data, file);
+                this.trigger(BwUploader.EVT_UPLOAD_SUCCESS, {
+                    data,
+                    file
+                });
                 this.value = file.name;
             }).catch(() => {
                 this.wrapper && this.wrapper.classList.add('error');
