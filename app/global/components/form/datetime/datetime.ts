@@ -129,10 +129,8 @@ export class Datetime extends TextInput {
     }
 
     public set(str: string) {
-        if (str) {
-            this.com && this.com.setDate(str);
-            this._value = str;
-        }
+        this.com && this.com.setDate(str || '');
+        this._value = str || '';
         typeof this.onSet === 'function' && this.onSet(str);
     }
 

@@ -161,30 +161,35 @@ export class DetailModal {
                     this.editModule.set(res);
                 })
             } else {
-                this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+                let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
+                if (tools.isNotEmpty(para.defaultData)){
+                    defaultValue = Object.assign({}, defaultValue, para.defaultData);
+                }
+                this.editModule.set(defaultValue);
             }
         } else {
-            // 字段默认值
-            this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
-            // 修改时字段的值
-            tools.isNotEmpty(para.defaultData) && this.editModule.set(para.defaultData);
+            let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
+            if (tools.isNotEmpty(para.defaultData)){
+                defaultValue = Object.assign({}, defaultValue, para.defaultData);
+            }
+            this.editModule.set(defaultValue);
         }
     }
 
     // 处理字段
     private handleField(f: R_Field, wrapper: HTMLElement, className?: string, isVirtual = false): ComInitP {
         let self = this;
-        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
-            f.comType = 'virtual';
-        }
         if (f.comType === 'file') {
             f.comType = 'newFile';
         }
         if (isVirtual === true) {
             f.comType = 'virtual';
         }
+        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
+            f.comType = 'virtual';
+        }
         return {
-            dom: DetailModal.createFormWrapper(f, wrapper, className || ''),
+            dom: f.comType === 'virtual' ? null : DetailModal.createFormWrapper(f, wrapper, className || ''),
             field: f,
             data: this.para.defaultData,
             onExtra: (data, relateCols) => {
@@ -229,6 +234,7 @@ export class DetailModal {
             }
         };
     }
+
     private _lookUpData: objOf<ListItem[]> = {};
     get lookUpData() {
         return this._lookUpData || {};
@@ -303,11 +309,14 @@ export class DetailModal {
 
     // 验证
     private validate() {
-        let result = this.editModule.validate.start();
+        let result:obj = this.editModule.validate.start();
         if (tools.isNotEmpty(result)) {
             for (let key in result) {
-                Modal.alert(result[key].errMsg);
-                return false;
+                let errMsg = result[key].errMsg;
+                if(tools.isNotEmpty(errMsg)){
+                    Modal.alert(result[key]);
+                    return false;
+                }
             }
         } else {
             return true;

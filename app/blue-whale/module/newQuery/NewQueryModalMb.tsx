@@ -9,7 +9,7 @@ import {QueryModule, QueryModulePara} from "../query/queryModule";
 interface INewQueryPara {
     queryItems?: IQueryItem[];
     search?: (data: obj) => void;
-    advanceSearch?: QueryModulePara;
+    advanceSearch?: IBw_Query;
     cols?: R_Field[];
     url?: string;
     refresher?: (ajaxData?: obj, noQuery?: boolean) => Promise<any>;
@@ -57,6 +57,10 @@ export class NewQueryModalMb {
     static QUERY_MODULE_NAME = 'QueryModuleMb';
 
     private initModal() {
+        let advanceSearch = this.para.advanceSearch, isShow: boolean = false;
+        if (tools.isNotEmpty(advanceSearch) && tools.isNotEmpty(advanceSearch.autTag) && advanceSearch.autTag !== 0) {
+            isShow = true;
+        }
         this.modal = new Modal({
             header: {
                 title: '搜索',
@@ -88,7 +92,7 @@ export class NewQueryModalMb {
             isModal: tools.isMb,
             isOnceDestroy: false,
             body: this.queryWrapper,
-            isShow: false,
+            isShow: isShow,
             footer: {
                 rightPanel: [
                     {
@@ -115,7 +119,8 @@ export class NewQueryModalMb {
                         }
                     }
                 ]
-            }
+            },
+            isQuery:!isShow
         });
     }
 
