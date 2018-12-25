@@ -56,8 +56,10 @@ export class ChangeProject extends Modal {
             <div className="project-list-wrapper">
                 <div className="select-project">
                     <span className="description">切换：</span>
-                    <input type="text" className="show-project" readOnly/>
-                    <i className="appcommon app-xiala"/>
+                    <div className="show-project-wrapper">
+                        <input type="text" className="show-project" readOnly/>
+                        <i className="appcommon app-xiala"/>
+                    </div>
                 </div>
             </div>
         </div>;
@@ -91,16 +93,14 @@ export class ChangeProject extends Modal {
 
     private initStyle = () => {
         // 设置样式
-        this.dropdown.getUlDom().style.width = window.getComputedStyle(this.showProject).width;
         d.query('.appcommon.app-xiala', this.wrapper) &&
             (d.query('.appcommon.app-xiala', this.wrapper).style.lineHeight = window.getComputedStyle(this.showProject).height);
-        let descriptionWrapper = d.query('.project-list-wrapper .description', this.wrapper);
-        this.dropdown.getUlDom().style.left = parseInt(window.getComputedStyle(descriptionWrapper).marginRight) +
-            descriptionWrapper.offsetWidth + 'px';
 
-        // 移动端
         if(tools.isMb){
-
+            this.dropdown.getUlDom().style.width = '100%';
+        }else {
+            this.dropdown.getUlDom().style.width = window.getComputedStyle(this.showProject).width;
+            this.dropdown.getUlDom().style.left = d.query('.show-project-wrapper', this.wrapper).offsetLeft + 'px';
         }
     };
 

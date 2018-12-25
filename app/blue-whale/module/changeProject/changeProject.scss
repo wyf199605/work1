@@ -43,22 +43,23 @@
             .project-list-wrapper {
                 margin-bottom: 20px;
                 height: auto;
-                overflow: hidden;
 
                 .select-project {
-                    position: relative;
-                    float: left;
-                    overflow: hidden;
+                    .show-project-wrapper {
+                        position: relative;
+                        width: 70%;
+                        display: inline-block;
+                        .show-project {
+                            width: 100%;
+                            padding: 5px;
+                            background-color: #ffffff;
+                            border: solid 1px #e2e2e2;
+                        }
 
-                    .show-project {
-                        padding: 5px;
-                        background-color: #ffffff;
-                        border: solid 1px #e2e2e2;
-                    }
-
-                    .appcommon.app-xiala {
-                        position: absolute;
-                        right: 1px;
+                        .appcommon.app-xiala {
+                            position: absolute;
+                            right: 1px;
+                        }
                     }
                 }
 
@@ -88,7 +89,7 @@
             }
 
             .modal-title {
-                font-size: 22px;
+                font-size: 18px;
                 color: #333333;
                 line-height: 45px;
             }
@@ -96,11 +97,11 @@
     }
 
     .modal-body {
-        height: calc(100% - 45px - 55px) !important;
-        font-size: 20px;
+        height: calc(100% - 45px) !important;
+        font-size: 15px;
         background-color: #ffffff;
         box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.18);
-        padding: 10px 20px;
+        padding: 0 20px;
         color: #333333;
 
         .change-project {
@@ -113,11 +114,13 @@
 
             .current-project-wrapper {
                 height: auto;
-                margin-bottom: 30px;
+                border-bottom: 1px solid #e2e2e2;
+                padding: 10px 0;
             }
 
             .project-list-wrapper {
-                margin-bottom: 20px;
+                padding: 10px 0;
+                border-bottom: 1px solid #e2e2e2;
                 height: auto;
                 overflow: hidden;
 
@@ -125,17 +128,26 @@
                     position: relative;
                     float: left;
                     overflow: hidden;
+                    width: 100%;
 
-                    .show-project {
-                        width: 200px;
-                        margin-bottom: 0;
-                        background-color: #ffffff;
-                        border: solid 1px #e2e2e2;
-                    }
+                    .show-project-wrapper {
+                        clear: both;
+                        overflow: hidden;
+                        float: right;
+                        width: 80%;
+                        input.show-project {
+                            padding: 0 30px 0 0;
+                            text-align: right;
+                            margin-bottom: 0;
+                            background-color: #ffffff;
+                            border: none;
+                            float: right;
+                        }
 
-                    .appcommon.app-xiala {
-                        position: absolute;
-                        right: 1px;
+                        .appcommon.app-xiala {
+                            position: absolute;
+                            right: 1px;
+                        }
                     }
                 }
 
@@ -143,17 +155,55 @@
                     height: auto;
                     margin-top: -2px;
                     clear: both;
+                    position: absolute;
 
                     .drop-item.list-item {
                         padding: 3px 5px;
-                        font-size: 20px;
+                        font-size: 15px;
                     }
                 }
             }
         }
     }
-    .foot-wrapper .modal-footer {
-        border-top: none;
-        display: block;
+    .foot-wrapper {
+        position: absolute;
+        min-width: 250px;
+        width: 66.7%;
+        left: 50%;
+        top: 45%;
+        transform: translate(-50%);
+        .modal-footer {
+            border-top: none;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            .right-plane {
+                float: none !important;
+                position: static;
+                display: block;
+                width: 100%;
+
+                .input-box {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    button {
+                        min-width: 96px;
+                        border-radius: 15px;
+                        &:first-child {
+                            border: solid 1px #005bac;
+                            background-color: #ffffff;
+                            color: #005bac;
+                        }
+                        &:last-child {
+                            background-color: #005bac;
+                            margin-left: 5.1%;
+                            color: #ffffff;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
