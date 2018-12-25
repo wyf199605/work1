@@ -154,9 +154,11 @@ export class RfidBarCode extends Component {
                                             params['optionStype'] = 2;
 
                                             //先关闭之前的监听重新开启
+                                            G.Shell.inventory.closeRegistInventory(2,params,()=>{
+
+                                            })
 
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                //alert(JSON.stringify(res.data));
                                                 // let data = res.data;
                                                 if (res.success) {
                                                     let num = d.query('.total-nums>span');
@@ -333,8 +335,10 @@ export class RfidBarCode extends Component {
                                             })
                                         } else if (this.mode[key] == '逐一') {
                                             params['optionStype'] = 2;
+                                            G.Shell.inventory.closeRegistInventory(2,params,()=>{
+
+                                            })
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                // alert(JSON.stringify(res.data));
                                                 if (res.success) {
                                                     let num = d.query('.total-nums>span');
                                                     num.innerText = (parseInt(num.innerText) + 1) + '';
