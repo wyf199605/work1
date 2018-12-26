@@ -764,24 +764,16 @@ export class BwTableModule extends Component {
                 data = cell.data,
                 field = column.content as R_Field,
                 urls = [];
-
             if (data) {
                 urls = [tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                     "md5_field": field.name,
                     [field.name]: data,
                     down: 'allow'
                 })];
-            }
-
-            let imgData: ImgModalPara = {
-                img: urls
-            };
-            ImgModal.show(imgData);
-            if (tools.isMb) {
-                document.body.style.overflow = 'hidden';
-                setTimeout(() => {
-                    d.query('.pswp', document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
-                }, 200);
+                let imgData: ImgModalPara = {
+                    img: urls
+                };
+                ImgModal.show(imgData);
             }
         }
 
