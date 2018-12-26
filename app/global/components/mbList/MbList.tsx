@@ -78,8 +78,12 @@ export class MbList extends Component {
         }
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 批量选择按钮
+     */
     private multiIcon: HTMLElement;
-
     protected createMultiIcon() {
         this.multiIcon = <div className="multi-icon"><span className="cancel-multi hide">取消</span><i
             className="appcommon app-piliang"/><span>批量</span></div>;
@@ -124,6 +128,11 @@ export class MbList extends Component {
     protected countWrapper: HTMLElement;
     private checkBox: CheckBox;
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 设置选择状态
+     */
     setSelectStatus(status: boolean) {
         if (status) {
             let result = this.listItems.filter(item => !item.selected);
@@ -134,10 +143,13 @@ export class MbList extends Component {
         tools.isMb && this.calcCount();
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 创建多选按钮
+     */
     private multiButtonsWrapper: HTMLElement;
     private multiActionSheet: ActionSheet = null;
-
-    // 创建多选按钮
     protected createMultiButtons(multiButtons: string[]) {
         if (tools.isMb) {
             let buttonsWrapper: HTMLElement;
@@ -216,6 +228,11 @@ export class MbList extends Component {
         }
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 获取当前所有选择项的index数组
+     */
     private getSelectIndexes() {
         let items = this.listItems || [],
             indexes = [];
@@ -225,11 +242,21 @@ export class MbList extends Component {
         return indexes;
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 批量时计算当前选择多少个项
+     */
     private calcCount() {
         let count = this.listItems.filter(item => item.selected).length;
         this.countWrapper.innerText = count.toString();
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 数据管理
+     */
     private _dataManager: DataManager;
     set dataManager(dataManager: DataManager) {
         this._dataManager = dataManager;
@@ -259,11 +286,21 @@ export class MbList extends Component {
         });
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 是否是图片模板
+     */
     protected _isImg: boolean;
     get isImg() {
         return this._isImg;
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 渲染
+     */
     render(data: MbListItemData[]) {
         d.diff(data, this.listItems, {
             create: (n) => {
@@ -284,26 +321,32 @@ export class MbList extends Component {
         this.refreshIndex();
     }
 
-    delItem(index) {
-        let item = this._listItems[index];
-        if (item) {
-            item.destroy();
-            this._listItems.splice(index, 1);
-        }
-    }
-
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 刷新项的index
+     */
     refreshIndex() {
         this._listItems.forEach((item, index) => {
             item.index = index;
         });
     }
 
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 获取所有的项
+     */
     protected _listItems: MbListItem[] = [];
     get listItems() {
         return this._listItems.slice();
     }
 
-    // 设置是否多选
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description: 设置全选/反选
+     */
     protected _multiple: boolean = false;
     set multiple(flag: boolean) {
         if (this._multiple !== flag) {
@@ -319,7 +362,11 @@ export class MbList extends Component {
         return this._multiple
     }
 
-    // 实例化MbListItem
+    /**
+     * @author WUML
+     * @date 2018/12/26
+     * @Description:实例化MbListItem
+     */
     protected createListItem(para: IMbListItemPara) {
         para = Object.assign({}, para, {
             container: this.wrapper,
@@ -333,7 +380,6 @@ export class MbList extends Component {
             itemClick: (index) => {
                 tools.isFunction(this.para.itemClick) && this.para.itemClick(index);
             }
-            // statusColor: this.para.statusColor
         });
         return new MbListItem(para);
     }
