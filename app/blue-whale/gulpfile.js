@@ -331,6 +331,8 @@ gulp.task('js', function () {
     gulpTsPage('index/register.pc', 'register.pc.js');
     gulpTsPage('index/exception', 'exception.js');
 
+    gulpTsPage('index/serverSelect', 'ServerSelect.js');
+
     gulpTsPage('attendance/attendance', 'attendance.js');
     gulpTsPage('attendance/checkIn', 'checkIn.js');
     gulpTsPage('attendance/changePassword', 'changePassword.js');

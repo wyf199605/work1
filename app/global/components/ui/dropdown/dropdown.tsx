@@ -38,6 +38,9 @@ export class DropDown {
     private list: List;
     private data: ListItem[];
 
+    get isShow(){
+        return this.isVisible;
+    }
 
     constructor(private para: DropDownPara) {
         this.ulDom = <ul className="dropdown-menu"></ul>;
@@ -136,6 +139,9 @@ export class DropDown {
             if(d.closest(target,'.dropdown-menu')){
                 return;
             }
+        }
+        if(this.para.el !== document.body && d.isParent(e.target as HTMLElement, this.para.el)){
+            return
         }
         this.hideList();
     };

@@ -1039,6 +1039,18 @@ export const d = {
         }
         return null;
     },
+    isParent(target: HTMLElement, parent: HTMLElement){
+        if(target instanceof HTMLElement && parent instanceof HTMLElement){
+            let tar = target;
+            while (tar){
+                if(tar.isSameNode(parent)){
+                    return true;
+                }
+                tar = tar.parentElement;
+            }
+        }
+        return false;
+    },
     /**
      * 查询匹配的集合
      * @param {string} selector
