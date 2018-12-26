@@ -136,6 +136,7 @@ export class QueryConfig {
                 dataType : ''
             });
             self.hasNumber = false;
+            self.setDisabled([sectionQuery]);
         }
 
         self.section = new CheckBox({
@@ -688,7 +689,7 @@ export class QueryConfig {
             data.sectionParams.leftOpenRightClose && (self.leftOpenRightClose.checked = true);
 
             //分段字段
-            self.sectionField.set(sectionField.sectionField);
+            sectionField.sectionField && self.sectionField.set(sectionField.sectionField);
             //分段标准
             self.sectionNorm && self.normField.forEach((n) => {
                 if (n.value === sectionField.sectionNorm) {
