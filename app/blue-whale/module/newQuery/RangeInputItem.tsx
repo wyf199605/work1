@@ -80,7 +80,7 @@ export class RangeInputItem extends FormCom {
         switch (para.interval) {
             case 0:
             case 5: {
-                wrapper = tools.isMb ? <div className="query-range-input-item new-query-input-wrapper">
+                wrapper = tools.isMb && tools.os.android ? <div className="query-range-input-item new-query-input-wrapper">
                     {this.input = <input type="text" placeholder={placeStr}/>}
                     <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
                 </div> : <div className="query-range-input-item new-query-input-wrapper">
