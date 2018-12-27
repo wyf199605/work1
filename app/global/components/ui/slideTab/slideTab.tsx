@@ -4,6 +4,7 @@ import {ITab, Tab, TabPara} from "../tab/tab";
 import d = G.d;
 import tools = G.tools;
 import {DataManager, IDataManagerAjaxStatus, IDataManagerPara} from "../../DataManager/DataManager";
+import {Modal} from "../../feedback/modal/Modal";
 
 export interface ISlideTabPara extends TabPara {
     tabs?: ISlideTab[];
