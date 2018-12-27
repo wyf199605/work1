@@ -231,17 +231,19 @@ class BwMbListElement {
                     if (tools.isNotEmpty(bwTableEl.querier.mobileSetting)) {
                         dataStr = bwTableEl.querier.mobileSetting.settingValue.replace(/\s*/g, '').replace(/\\*/g, '');
                     }
-                    this.queryModule = new NewQueryModalMb({
-                        queryItems: tools.isNotEmpty(dataStr) ? JSON.parse(dataStr) : [],
-                        advanceSearch: bwTableEl.querier,
-                        cols: bwTableEl.cols,
-                        refresher: (data: obj) => {
-                            return this.mbListModule.refresh(data);
-                        },
-                        search:(data:obj) => {
-                            return this.mbListModule.refresh(data);
-                        }
-                    });
+                    setTimeout(()=>{
+                        this.queryModule = new NewQueryModalMb({
+                            queryItems: tools.isNotEmpty(dataStr) ? JSON.parse(dataStr) : [],
+                            advanceSearch: bwTableEl.querier,
+                            cols: bwTableEl.cols,
+                            refresher: (data: obj) => {
+                                return this.mbListModule.refresh(data);
+                            },
+                            search:(data:obj) => {
+                                return this.mbListModule.refresh(data);
+                            }
+                        });
+                    },200);
                     d.on(d.query('body > header [data-action="layout-query"]'), 'click', () => {
                         (this.queryModule as NewQueryModalMb).isShow = true;
                     });

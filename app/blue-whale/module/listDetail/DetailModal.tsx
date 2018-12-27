@@ -173,6 +173,15 @@ export class DetailModal {
             }
             this.editModule.set(defaultValue);
         }
+        if (tools.os.android) {
+            window.addEventListener('resize', function () {
+                if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
+                    window.setTimeout(function () {
+                        document.activeElement.scrollIntoView();
+                    }, 0);
+                }
+            })
+        }
     }
 
     // 处理字段
