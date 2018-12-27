@@ -59,14 +59,18 @@ export class PlanModule extends Component{
         this.initDraw();
         tools.isPc && this.initSubBtn();
         this.initStatusBar();
-        //this.initScale();
+        this.initScale();
     }
 
     initScale(){
         if(tools.isMb){
             let div = <div class="initScale">
-                <div class="search iconfont icon-sousuo" onclick={()=>{
-
+                <div class="search iconfont icon-suoxiao" onclick={()=>{
+                    //alert('缩小')
+                }
+                }></div>
+                <div className="search iconfont icon-fangda" onclick={() => {
+                    //alert('放大')
                 }
                 }></div>
             </div>

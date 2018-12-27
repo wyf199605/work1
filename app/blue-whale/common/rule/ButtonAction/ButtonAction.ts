@@ -285,7 +285,9 @@ export class ButtonAction {
 
         for (let i = 0; i < dataAddr.length; i++) {
             url = dataAddr[i].downloadAddr.dataAddr;
-            codeStype = dataAddr[i].atvarparams[0].data;//可能需要做判断
+            if(dataAddr[i].atvarparams){
+                codeStype = dataAddr[i].atvarparams[0] ? dataAddr[i].atvarparams[0].data : [];//可能需要做判断
+            }
             uniqueFlag = dataAddr[i].uniqueFlag;
             uploadUrl = dataAddr[i].uploadAddr.dataAddr;
             picFields = dataAddr[i].picFields || '';
