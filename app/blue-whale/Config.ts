@@ -64,6 +64,8 @@ namespace BW {
             loginCode: 'login/message', // 手机短信验证码登录
             unBinding: 'commonsvc/alldevice', // 手机短信验证解绑
 
+            mailForward: 'tag/mail', // 邮件转发
+
             atdPwdReg: 'attendance/pwdregister/node_attend-3',
             atdFingerReg: 'attendance/fingerregister/node_attend-2',
             atdFingerAtd: 'attendance/fingerattend/node_attend-1',

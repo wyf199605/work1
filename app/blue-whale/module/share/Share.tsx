@@ -2,16 +2,23 @@
 import d = G.d;
 import Shell = G.Shell;
 import {Button, IButton} from "../../../global/components/general/button/Button";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import Ajax = G.Ajax;
+import CONF = BW.CONF;
+import sys = BW.sys;
 interface ISharePara {
     onClose? : Function
-    strArr? : string[]
+    strArr : string[]
     md5? : string
+    tagId? : string //
+    name? : string
+}
+interface IGraffitiPara {
+    tag : string[],
+    tagId : string,
+    name? : string
 }
 export class Graffiti {
     private share : Share;
-    constructor(para? : string[]){
+    constructor(para? : IGraffitiPara){
         d.append(document.body, this.graffitiBtn());
         d.on(this._graffitiBtnEl, 'click', () => {
             this.hideBtn();
@@ -21,12 +28,15 @@ export class Graffiti {
         });
     }
 
-    private getEditImg(para : string[]){
+    private getEditImg(para : IGraffitiPara){
+        let tag = para.tag;
         let even = G.tools.pattern.debounce((e) => {
             if(!this.share){
                 this.share = new Share({
-                    strArr : para ? para : ['weChat', 'mail', 'downLoad', 'print'],
+                    strArr : tag ? tag : ['weChat', 'mail', 'downLoad', 'print'],
                     md5 : e.data,
+                    tagId : para.tagId,
+                    name : para.name,
                     onClose : () => {
                         this.showBtn();
                     }
@@ -37,7 +47,7 @@ export class Graffiti {
                 this.share.setImg(e.data);
             }
         },1000);
-       Shell.base.getEditImg(null, null, even);
+        Shell.base.getEditImg(null, null, even);
     }
 
     private _graffitiBtnEl : HTMLElement;
@@ -69,8 +79,8 @@ export class Share {
     private btnArr : IButton[] = [];
     private p : ISharePara;
     constructor(para : ISharePara){
-        this.p = para;
         d.append(document.body,  this.wrapperInit());
+        this.p = para;
         this.initBtn();
         this.setImg(para.md5);
         this.setBtn();
@@ -81,7 +91,7 @@ export class Share {
         let btnPush = (icon : string, className : string, content : string, onClick : Function) => {
             this.btnArr.push({icon , className, content, onClick : () => onClick()});
         };
-        this.p.strArr.forEach(str => {
+        Array.isArray(this.p.strArr) && this.p.strArr.forEach(str => {
             switch (str) {
                 case 'weChat':
                     btnPush('app-weixin', 'bg-green', '微信转发', () => {
@@ -90,14 +100,19 @@ export class Share {
                     break;
                 case 'mail':
                     btnPush('app-youjian', 'bg-blue', '邮件转发', () => {
-                        Ajax.fetch('', {
-                            type : 'get'
-                        }).then(({response}) => {
-                            BW.sys.window.open({
-                                url : ''
-                            });
-                        });
+                        this.post(CONF.ajaxUrl.mailForward,{
+                            tag_id : this.p.tagId,
+                            file_name : this.p.name + '.' + this._img.src.substr(11, 3),
+                            content : this._img.src,
+                        })
 
+                        // sys.window.open({
+                        //     url: G.tools.url.addObj(CONF.ajaxUrl.mailForward, {
+                        //         tag_id : this.p.tagId,
+                        //         file_name : this.p.name + '.' + this._img.src.substr(11, 3),
+                        //         content : this._img.src,
+                        //     })
+                        // })
                     });
                     break;
                 case 'downLoad':
@@ -114,6 +129,22 @@ export class Share {
         });
     }
 
+    private post(url : string, params : obj) {
+        let temp = document.createElement("form");
+        temp.action = url;
+        temp.method = "post";
+        temp.style.display = "none";
+        temp.target="_blank";
+        for (let item in params) {
+            let opt = document.createElement("textarea");
+            opt.name = item;
+            opt.value = params[item];
+            temp.appendChild(opt);
+        }
+        document.body.appendChild(temp);
+        temp.submit();
+        return temp;
+    }
 
     private wrapperInit(){
         return this._wrapper = <div className="share-container">

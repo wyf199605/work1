@@ -1,14 +1,11 @@
 /// <amd-module name="BasicPage"/>
-
 import sys = BW.sys;
 import d = G.d;
 import tools = G.tools;
 import Gesture = require("../module/gesture/gesture");
 import {ButtonAction} from "../common/rule/ButtonAction/ButtonAction";
 import {Modal} from "../../global/components/feedback/modal/Modal";
-import {HelpMsg} from "../module/helpMsg/HelpMsg";
-import CONF = BW.CONF;
-
+import {Graffiti} from "../module/share/Share";
 
 export default class BasicPage{
     protected dom : HTMLElement;
@@ -68,7 +65,18 @@ export default class BasicPage{
         this.initHelpMsg(para);
 
         this._pageWrapper = this.wrapperInit();
-        this._pageWrapper && d.append(para.dom, this._pageWrapper)
+        this._pageWrapper && d.append(para.dom, this._pageWrapper);
+
+        let tag = para.ui && para.ui.tag;
+        if(tag && tools.isMb){
+            require(['Share'], (e) => {
+                new e.Graffiti({
+                    tag : tag,
+                    tagId : para.ui.tagId,
+                    name : para.ui.caption
+                });
+            })
+        }
     }
 
     protected wrapperInit() : HTMLElement{

@@ -49,6 +49,9 @@ namespace G{
             },
             getEditImg( type : number, image: string, back : IShellEventHandler){
                 return ShellBase.handler('getSignImg', {type, image}, back);
+            },
+            wxShare(data : string){
+                return ShellBase.handler('wxShare', {data});
             }
         };
 
@@ -467,6 +470,7 @@ namespace G{
     declare const AppShell: {
         syncFunction(name: string, data: string): string;
         asyncFunction(name: string, data: string, back: string, infor?:string): boolean;
+        postMessage(name: string, data: string, back: string, infor?:string): boolean;
     };
     enum ShellTypes {
         IOS,
