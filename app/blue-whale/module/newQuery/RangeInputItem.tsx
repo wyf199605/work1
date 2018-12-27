@@ -81,10 +81,10 @@ export class RangeInputItem extends FormCom {
             case 0:
             case 5: {
                 wrapper = tools.isMb && tools.os.android ? <div className="query-range-input-item new-query-input-wrapper">
-                    {this.input = <input type="text" placeholder={placeStr}/>}
+                    {this.input = <input type="number" placeholder={placeStr}/>}
                     <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
                 </div> : <div className="query-range-input-item new-query-input-wrapper">
-                    {this.input = <input type="text" placeholder={placeStr}/>}
+                    {this.input = <input class="input" type="number" placeholder={placeStr}/>}
                 </div>;
             }
                 break;
@@ -113,6 +113,16 @@ export class RangeInputItem extends FormCom {
         super(para);
         if (para.interval === 0 || para.interval === 5) {
             this.initEvents.on();
+            // if (tools.os.android){
+            //     let inputs = Array.prototype.slice.call(document.querySelectorAll('input.input'));
+            //     inputs.forEach(input => {
+            //         input.onclick = function (e) {
+            //             window.setTimeout(function () {
+            //                 e.target.scrollIntoViewIfNeeded();
+            //             }, 0);
+            //         }
+            //     })
+            // }
         }
     }
 

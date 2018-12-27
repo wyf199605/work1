@@ -1,0 +1,23 @@
+.edit-detail-module{
+  width: 100%;
+  height: 100%;
+  .page-buttons{
+    width: 100%;
+    height: 50px;
+    background-color: #f8f8f8;
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 16px;
+    .btn.list-detail-btn {
+      height: 30px;
+      border-radius: 30px;
+      margin-left: 15px;
+      padding-left: 17px;
+      padding-right: 17px;
+      border-color: #005bac;
+      color: #005bac;
+    }
+  }
+}

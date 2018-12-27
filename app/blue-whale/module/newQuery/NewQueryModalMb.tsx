@@ -25,6 +25,15 @@ export class NewQueryModalMb {
         if (tools.isNotEmpty(para.queryItems)) {
             this.initModal();
             this.initItems(para.queryItems);
+            if (tools.os.android) {
+                window.addEventListener('resize', function () {
+                    if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
+                        window.setTimeout(function () {
+                            document.activeElement.scrollIntoView();
+                        }, 0);
+                    }
+                })
+            }
         } else {
             this.initQuery();
         }
