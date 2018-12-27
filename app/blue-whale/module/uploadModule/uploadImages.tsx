@@ -282,6 +282,9 @@ export class UploadImages extends FormCom {
         });
         this._listItems = this._listItems.filter((item) => item);
         this.refreshIndex();
+        this.listItems.forEach(item => {
+            item.disabled =  this.disabled;
+        });
     }
 
     refreshIndex() {

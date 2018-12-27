@@ -11,6 +11,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Button} from "../../../global/components/general/button/Button";
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import d= G.d;
 
 interface IEditDetailPara extends IComponentPara {
     isEdit: boolean;
@@ -38,7 +39,9 @@ export class EditDetailModule extends Component {
     private ajaxUrl: string = '';
 
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
-        return <div className="edit-detail-module"/>;
+        return <div className="edit-detail-module">
+            <div className="edit-detail-content"/>
+        </div>;
     }
 
     constructor(private para: IEditDetailPara) {
@@ -48,7 +51,6 @@ export class EditDetailModule extends Component {
         this.getDefaultData().then((data) => {
             this.initAllButtons();
             this.initEditModule(para, data);
-            this.isEdit = para.isEdit;
         });
     }
 
@@ -93,6 +95,7 @@ export class EditDetailModule extends Component {
             formWrapper = <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
+        d.append(d.query('.edit-detail-content', this.wrapper), formWrapper);
         BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             tools.isPc && formWrapper.classList.add('no-group');
@@ -118,7 +121,7 @@ export class EditDetailModule extends Component {
         emPara.fields.forEach((f) => {
             let field = f.field,
                 name = field.name,
-                isNotEdit = para.isEdit;
+                isNotEdit = field.noEdit;
             if (isNotEdit && !field.noShow) {
                 let com = this.editModule.getDom(name);
                 com && (com.disabled = true);
@@ -133,7 +136,7 @@ export class EditDetailModule extends Component {
         if (tools.isNotEmpty(para.fm.defDataAddrList)) {
             BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response}) => {
                 // 字段默认值
-                this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+                let dafVal = BwRule.getDefaultByFields(this.para.fm.fields);
                 // 新增时的默认值
                 let res: obj = {};
                 let meta = response.body.bodyList[0].meta,
@@ -141,15 +144,19 @@ export class EditDetailModule extends Component {
                 for (let i = 0, len = meta.length; i < len; i++) {
                     res[meta[i]] = dataTab[i];
                 }
-                this.editModule.set(res);
+                if (tools.isNotEmpty(dafVal)) {
+                    dafVal = Object.assign({}, dafVal, defaultData, res);
+                }
+                this.editModule.set(dafVal);
             })
         } else {
-            let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
+            let dafVal = BwRule.getDefaultByFields(this.para.fm.fields);
             if (tools.isNotEmpty(defaultData)) {
-                defaultValue = Object.assign({}, defaultValue, defaultData);
+                dafVal = Object.assign({}, dafVal, defaultData);
             }
-            this.editModule.set(defaultValue);
+            this.editModule.set(dafVal);
         }
+        this.isEdit = para.isEdit;
     }
 
     private handleField(f: R_Field, wrapper: HTMLElement, className?: string, isVirtual = false): ComInitP {
@@ -418,9 +425,10 @@ export class EditDetailModule extends Component {
                 className: 'edit-btn',
                 container: wrapper,
                 onClick: () => {
-                    if (this.validate()) {
+                    if (self.validate()) {
                         // 验证成功
                         ButtonAction.get().clickHandle(self.updateBtnPara, self.editModule.get(), () => {
+                            self.isEdit = false;
                         }, self.para.url || '');
                     }
                 }
@@ -519,8 +527,8 @@ export class EditDetailModule extends Component {
             this.saveBtn.disabled = false;
             this.moreBtn.disabled = false;
             this.fields.forEach(f => {
-                if (!f.noShow && !f.noModify) {
-                    this.editModule.get(f.name).disabled = false;
+                if (!f.noShow && !f.noEdit) {
+                    this.editModule.getDom(f.name).disabled = false;
                 }
             });
             if (tools.isPc) {
@@ -539,8 +547,8 @@ export class EditDetailModule extends Component {
             this.saveBtn.disabled = !isEdit;
             this.moreBtn.disabled = isEdit;
             this.fields.forEach(f => {
-                if (!f.noShow && !f.noModify) {
-                    this.editModule.get(f.name).disabled = isEdit;
+                if (!f.noShow && !f.noEdit) {
+                    this.editModule.getDom(f.name).disabled = !isEdit;
                 }
             })
         }
