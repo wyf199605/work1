@@ -399,10 +399,10 @@ namespace G{
                 return ShellBase.handler('delInventoryData',{nameId:nameId,where:where},back);
             },
             //上传条码数据
-            uploadcodedata(nameId:string,uploadUrl:string,images:object, back:IShellEventHandler){
-                return ShellBase.handler('uploadcodedata',{nameId:nameId,uploadUrl:uploadUrl,images:images},back,null,false);
+            uploadcodedata(nameId:string,uploadUrl:string,images:any,typeName:string,typeValue:string, back:IShellEventHandler){
+                return ShellBase.handler('uploadcodedata',{nameId:nameId,uploadUrl:uploadUrl,images:images,typeName:typeName,typeValue:typeValue},back,null,false);
             },
-//移动端打开摄像头扫码
+               //移动端打开摄像头扫码
             openScanCode(type:number,back:IShellEventHandler){
                 return ShellBase.handler('scanCode',{type:type},back)
             },

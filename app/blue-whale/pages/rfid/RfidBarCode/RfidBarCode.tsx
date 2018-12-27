@@ -152,12 +152,6 @@ export class RfidBarCode extends Component {
                                         if (this.mode[key] == '逐一') {
 
                                             params['optionStype'] = 2;
-
-                                            //先关闭之前的监听重新开启
-                                            G.Shell.inventory.closeRegistInventory(2,params,()=>{
-
-                                            })
-
                                             let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
                                                 // let data = res.data;
                                                 if (res.success) {
@@ -335,9 +329,6 @@ export class RfidBarCode extends Component {
                                             })
                                         } else if (this.mode[key] == '逐一') {
                                             params['optionStype'] = 2;
-                                            G.Shell.inventory.closeRegistInventory(2,params,()=>{
-
-                                            })
                                             G.Shell.inventory.openRegistInventory(2, params, (res) => {
                                                 if (res.success) {
                                                     let num = d.query('.total-nums>span');
@@ -489,19 +480,28 @@ export class RfidBarCode extends Component {
                     <button onclick={
                         () => {
                             console.log(para.codeStype)
-                            let str = [];
-                            for (let i = 0, data = para.codeStype; i < data.length; i++) {
-                                let obj = {};
-                                for (let s in data[i]) {
-                                    obj['value'] = data[i][s];
-                                    obj['text'] = data[i][s];
+                            let str = [],typeName = '';
+                            if(tools.isNotEmpty(para.codeStype)){
+                                for (let i = 0, data = para.codeStype; i < data.length; i++) {
+                                    let obj = {};
+                                    for (let s in data[i]) {
+                                        typeName = s;
+                                        obj['value'] = data[i][s];
+                                        obj['text'] = data[i][s];
+                                    }
+                                    str.push(obj);
                                 }
-                                str.push(obj);
                             }
-
                             console.log(str);
                             let updataEl;
+                            let div = <div>
 
+                                <p>上传数据处理方式</p>
+                                {
+                                    updataEl = <SelectInputMb data={str}/>
+                                }
+
+                            </div>
 
                             let mode = new Modal({
                                 isMb: false,
@@ -515,12 +515,9 @@ export class RfidBarCode extends Component {
                                     <p>{this.domHash['inventory'].innerHTML}</p>
                                     <p>操作者信息:{para.USERID + "店" + para.SHO_ID}</p>
                                     <p>{'共扫描' + this.domHash['scanamout'].innerText + '项'}，{'总数量为' + this.domHash['count'].innerText}</p>
-                                    <div>
-                                        <p>上传数据处理方式</p>
-                                        {
-                                            updataEl = <SelectInputMb data={str}/>
-                                        }
-                                    </div>
+                                    {
+                                        tools.isNotEmpty(para.codeStype) ? div : ''
+                                    }
                                 </div>,
                                 footer: {
                                     rightPanel: [{
@@ -535,7 +532,9 @@ export class RfidBarCode extends Component {
                                                 msg:'上传中'
                                             })
                                             s.show();
-                                            let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picAddr,IMA, (res) => {
+                                            let typeValue = {};
+                                            typeValue[typeName] = updataEl.get();
+                                            let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picAddr,(tools.isNotEmpty(para.picFields)) ? IMA : '','atvarparams',JSON.stringify(typeValue),(res) => {
                                                 d.query('.total-rfid>.bar-code-scan>span').innerText = 0 + '';
                                                 this.stepArry = [];
                                                 s.destroy();
@@ -670,16 +669,17 @@ export class RfidBarCode extends Component {
                     }
                     }>删除数据
                     </button>
-                    <button onclick={() => {
-                        if(tools.isEmpty(para.picAddr)){
-                            alert('不支持拍照功能')
-                        }else {
-                            this.photoImg.click();
+                    {
+                        ( tools.isNotEmpty(para.picFields) ) ? (<button onclick={() => {
+                            if (tools.isEmpty(para.picFields)) {
+                                alert('不支持拍照功能')
+                            } else {
+                                this.photoImg.click();
+                            }
                         }
-
+                        }>拍照
+                        </button>): ''
                     }
-                    }>拍照
-                    </button>
                     <button onclick={tools.pattern.debounce(() => {
                         G.Shell.inventory.openScanCode(0, (res) => {
                             alert(JSON.stringify(res));
@@ -708,7 +708,7 @@ export class RfidBarCode extends Component {
     private randNum(){
         let d2 = new Date().getTime()+ '',
             d1 = (Math.random()* 10),
-            rand = d2 + '.jpg';
+            rand = d2 + d1 + '.jpg';
         return rand;
     }
 
@@ -885,6 +885,7 @@ export class RfidBarCode extends Component {
             num: 0,
             nameId: para.uniqueFlag,
         }
+        console.log(para.uniqueFlag);
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
             //alert(JSON.stringify(res) + '下载')
