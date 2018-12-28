@@ -1,4 +1,15 @@
 .myselfMenuPage{
+  .test-module-wrapper{
+    min-height: 500px;
+    .modal-body{
+      overflow: visible;
+      height: 500px!important;
+      .mui-content{
+        height: 500px;
+      }
+    }
+  }
+
   #setFontSize.active{
     &>a::after{
       transition: 0.2ms linear all;

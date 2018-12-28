@@ -36,8 +36,8 @@ export class ServerSelect extends BasicPage {
             }
         });
 
-        if(sys.window.toClient){
-            sys.window.toClient((html) => {
+        if(sys.window.clientCode){
+            sys.window.clientCode((html) => {
                 if(html){
                     select.innerHTML = html;
                 }

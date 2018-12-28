@@ -262,8 +262,12 @@ namespace BW {
                 reOpen: function (o: winOpen) {
                     self.handle('reOpen', o);
                 },
-                toClient: function(callback){
+                toClient: function (){
+                    self.handle('toClient');
+                },
+                clientCode: function(callback){
                     let event = '__EVT_TO_CLIENT__';
+                    alert('toClient');
                     d.once(window, event, (response: CustomEvent) => {
                         try {
                             let detail = JSON.parse(response.detail),
@@ -280,7 +284,7 @@ namespace BW {
                             alert("JSON解析出错")
                         }
                     });
-                    self.handle('toClient', {event});
+                    self.handle('clientCode', {event});
                 }
             }
         })(this);

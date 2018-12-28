@@ -99,6 +99,7 @@
   display: inline-block;
   height:auto;
   font-size: 12px;
+  position: relative;
   &.circle {
     .check-span {
       &.label-checkbox::before {
@@ -136,8 +137,8 @@
       top: 0;
       left: 0;
       display: inline-block;
-      width: 100%;
-      height: 100%;
+      width:20px;
+      height:20px;
       padding-top: 1px;
       font-weight: bold;
       color: #007AFF;
@@ -178,8 +179,8 @@
       position: absolute;
       left: 0;
       display: inline-block;
-      width: 100%;
-      height: 100%;
+      width:20px;
+      height:20px;
       content: "";
       background-color: #fff;
       border: 1px solid #ccc;
@@ -191,11 +192,11 @@
       border: 1px solid #ccc;
       content: "";
       display: inline-block;
-      height: 100%;
+      width:20px;
+      height:20px;
       left: 0;
       margin-right: 10px;
       position: absolute;
-      width: 100%;
       border-radius: 99px;
       top: 0;
       transition: all 0.1s cubic-bezier(0.455, 0.03, 0.215, 1.33) 0s;

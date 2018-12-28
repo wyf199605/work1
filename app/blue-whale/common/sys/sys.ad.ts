@@ -93,6 +93,8 @@ namespace BW {
 
                         return;
                     }
+                    let activeElement = document.activeElement as HTMLElement;
+                    activeElement && activeElement.blur();
                     close();
 
                     function close() {
@@ -282,7 +284,10 @@ namespace BW {
                 reOpen:function (o: winOpen) {
                     self.handle('reOpen', JSON.stringify(o));
                 },
-                toClient: function(callback){
+                toClient: function (){
+                    self.handle('toClient');
+                },
+                clientCode: function(callback){
                     let event = '__EVT_TO_CLIENT__';
                     d.once(window, event, (response: CustomEvent) => {
                         try {
@@ -300,7 +305,7 @@ namespace BW {
                             alert("JSON解析出错")
                         }
                     });
-                    self.handle('toClient', JSON.stringify({event}));
+                    self.handle('clientCode', JSON.stringify({event}));
                 }
             }
         })(this);

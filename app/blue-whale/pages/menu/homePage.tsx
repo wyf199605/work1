@@ -92,14 +92,27 @@ export = class homePage {
 
             });
         });
-        this.favoritesList.innerHTML === '';
         this.favoritesList.classList.toggle('no-data', this.favoritesList.innerHTML === '');
     }
 
     constructor(private para) {
         let content = <div class="slide-panel-wrapper"/>;
         d.append(para.container, content);
-
+        let isAndroid4 = false;
+        if(/(Android)/i.test(navigator.userAgent)){
+            let andrVersionArr = navigator.userAgent.match(/Android\s*(\d+)/);
+            //去除匹配的第一个下标的元素
+            let version = andrVersionArr && andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
+            isAndroid4 = version <= 4
+        }
+        let str = navigator.userAgent.toLowerCase();
+        let ver = str.match(/cpu iphone os (.*?) like mac os/);
+        if(ver && ver[1]){
+            let version = parseInt(ver[1]);
+            if(version <= 10){
+                document.documentElement.classList.add('no-overflow-scrolling');
+            }
+        }
         // 实例化Tab控件
         this.slideTab = new SlideTab({
             tabParent: content,
@@ -107,6 +120,7 @@ export = class homePage {
             onChange: (index) => {
                 console.log(index);
             },
+            isPulldownRefresh: isAndroid4 ? -1 : 0,
             tabs: [
                 {
                     title: '首页',
@@ -176,15 +190,15 @@ export = class homePage {
         // 添加样式
         let tabWrapper = this.slideTab.tabContainer,
             panelWrapper = this.slideTab.panelContainer;
-        tabWrapper.className = tabWrapper.className +
-            ' mui-slider-indicator mui-segmented-control mui-segmented-control-inverted';
-        d.queryAll('li', tabWrapper).forEach((li) => {
-            li.classList.add('mui-control-item');
-        });
-        panelWrapper.classList.add('mui-slider-group');
-        d.queryAll('.tab-pane', panelWrapper).forEach((el) => {
-            el.className = el.className + ' mui-slider-item mui-control-content mui-active';
-        });
+        // tabWrapper.className = tabWrapper.className +
+        //     ' mui-slider-indicator mui-segmented-control mui-segmented-control-inverted';
+        // d.queryAll('li', tabWrapper).forEach((li) => {
+        //     li.classList.add('mui-control-item');
+        // });
+        // panelWrapper.classList.add('mui-slider-group');
+        // d.queryAll('.tab-pane', panelWrapper).forEach((el) => {
+        //     el.className = el.className + ' mui-slider-item mui-control-content mui-active';
+        // });
 
 
         d.on(panelWrapper, 'click', 'li[data-href]', function () {

@@ -241,3 +241,20 @@ let __extends = (this && this.__extends) || (function () {
 })();
 
 let __assign = (this && this.__assign) || Object.assign;
+
+window.requestAnimationFrame = (function(){
+    return  window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window['mozRequestAnimationFrame']    ||
+        function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+        };
+})();
+window.cancelAnimationFrame = (function(){
+    return  window.cancelAnimationFrame ||
+        window.webkitCancelAnimationFrame ||
+        window['mozCancelAnimationFrame']    ||
+        function( id ){
+            window.clearTimeout(id);
+        };
+})();

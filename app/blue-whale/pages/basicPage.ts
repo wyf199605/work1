@@ -37,6 +37,15 @@ export default class BasicPage{
             this.destroy();
         });
 
+        let str = navigator.userAgent.toLowerCase();
+        let ver = str.match(/cpu iphone os (.*?) like mac os/);
+        if(ver && ver[1]){
+            let version = parseInt(ver[1]);
+            if(version <= 10){
+                document.documentElement.classList.add('no-overflow-scrolling');
+            }
+        }
+
         //判断是否是安卓5及以上版本才开启手势
         let version = 5;
         if(/(Android)/i.test(navigator.userAgent)){

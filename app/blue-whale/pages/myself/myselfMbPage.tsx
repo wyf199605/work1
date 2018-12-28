@@ -246,7 +246,6 @@ export = class myselfMbPage {
 
 
     private initModal() {
-        let wrapper = <div className="test-module-wrapper"></div>;
         let body = <div className="mui-content">
             <div className="mui-rotate-box">
                 <div className="box-content">点击测速</div>
@@ -259,11 +258,10 @@ export = class myselfMbPage {
         </div>;
 
         return new Modal({
-            container: d.closest(wrapper, '.page-container'),
+            className: 'test-module-wrapper',
             header: '网络测速',
             body: body,
             position: sys.isMb ? 'full' : '',
-            width: '730px',
             isShow: false
         });
     }
