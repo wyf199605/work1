@@ -319,19 +319,29 @@ export class BwUploader extends FormCom {
                     , dataType: "json"
 
                 }).then(function ({response}) {
-                    if(response.ifExist){
-                        reject(response);
+                    if(response.code === 200){
+                        if(response.ifExist){
+                            reject(response);
+                        }else{
+                            resolve({
+                                md5: md5Code,
+                                uniqueFileName,
+                            });
+                        }
+                    }else{
+                        reject();
+                        response.message && Modal.alert(response.message);
+                    }
+                }).catch((err: IAjaxError) => {
+                    if(err.statusText === 'error'){
+                        reject();
+                        Modal.alert(err.errorThrown);
                     }else{
                         resolve({
                             md5: md5Code,
-                            uniqueFileName,
+                            uniqueFileName
                         });
                     }
-                }).catch(() => {
-                    resolve({
-                        md5: md5Code,
-                        uniqueFileName
-                    });
                 })
 
             }).catch(() => reject());

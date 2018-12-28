@@ -355,6 +355,10 @@ export = class FormPage extends BasicPage {
 
             return data;
         };
+        console.log(this.param);
+        if(tools.isNotEmpty(this.param)){
+            this.setData(this.param);
+        }
 
         // url请求默认值
         if(form.dataAddr){
@@ -432,7 +436,7 @@ export = class FormPage extends BasicPage {
         this.fields.forEach((field) => {
             let name = field.name,
                 com = this.editModule.getDom(name);
-            if(com){
+            if(com && name in data){
                 if(field.elementType === 'lookup'){
                     let options = this.lookUpData[name] || [];
                     for (let opt of options) {
