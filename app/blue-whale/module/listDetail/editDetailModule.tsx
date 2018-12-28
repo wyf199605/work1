@@ -467,9 +467,7 @@ export class EditDetailModule extends Component {
                         createEditBtn(pcBtnWrapper);
                         createPcButtons(buttons, pcBtnWrapper);
                     }
-                    if (tools.isPc) {
-                        this.initPageButtons(pageBtnWrapper);
-                    }
+                    this.initPageButtons(pageBtnWrapper);
                     btnWrapper.appendChild(pageBtnWrapper);
                 }
             }
@@ -539,13 +537,13 @@ export class EditDetailModule extends Component {
         } else {
             if (tools.isPc) {
                 this.actionButtons.forEach(btn => {
-                    btn.disabled = true;
+                    btn.disabled = isEdit;
                 })
             }
             this.cancelBtn.disabled = !isEdit;
             this.updateBtn.disabled = isEdit;
             this.saveBtn.disabled = !isEdit;
-            this.moreBtn.disabled = isEdit;
+            tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = isEdit);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
                     this.editModule.getDom(f.name).disabled = !isEdit;
