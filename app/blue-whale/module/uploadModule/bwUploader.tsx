@@ -319,7 +319,7 @@ export class BwUploader extends FormCom {
                     , dataType: "json"
 
                 }).then(function ({response}) {
-                    if(response.code === 200){
+                    if(response.code == 200){
                         if(response.ifExist){
                             reject(response);
                         }else{

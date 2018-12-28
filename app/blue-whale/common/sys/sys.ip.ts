@@ -263,28 +263,31 @@ namespace BW {
                     self.handle('reOpen', o);
                 },
                 toClient: function (){
+                    alert('toClient');
                     self.handle('toClient');
                 },
                 clientCode: function(callback){
                     let event = '__EVT_TO_CLIENT__';
-                    alert('toClient');
                     d.once(window, event, (response: CustomEvent) => {
                         try {
-                            let detail = JSON.parse(response.detail),
-                                content = detail.conten;
-                            if(content && content.appUrls){
-                                let urls = content.appUrls,
-                                    html = '<option value="">-select-</option>';
-                                urls.forEach((item) => {
-                                    html += `<option value="${item.envUrl}">${item.envName}</option>`;
-                                });
-                                callback(html);
+                            let detail = JSON.parse(response.detail);
+                            if(detail.success){
+                                let data = detail.data,
+                                    content = data.content;
+                                if(content && content.appUrls){
+                                    let urls = content.appUrls,
+                                        html = '<option value="">-select-</option>';
+                                    urls.forEach((item) => {
+                                        html += `<option value="${item.envUrl}">${item.envName}</option>`;
+                                    });
+                                    callback(html);
+                                }
                             }
                         } catch (e) {
                             alert("JSON解析出错")
                         }
                     });
-                    self.handle('clientCode', {event});
+                    self.handle('clientCode', {back: event});
                 }
             }
         })(this);
