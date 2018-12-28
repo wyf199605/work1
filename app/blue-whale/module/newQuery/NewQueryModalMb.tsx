@@ -25,6 +25,23 @@ export class NewQueryModalMb {
         if (tools.isNotEmpty(para.queryItems)) {
             this.initModal();
             this.initItems(para.queryItems);
+            if (tools.os.android) {
+                window.addEventListener('resize', function () {
+                    if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
+                        window.setTimeout(function () {
+                            document.activeElement.scrollIntoView();
+                        }, 0);
+                    }
+                })
+            }
+            if (tools.os.ios) {
+                let inputs = Array.prototype.slice.call(document.querySelectorAll('input'));
+                inputs.forEach(input => {
+                    input.onblur = function (e) {
+                        document.body.scrollTop = 0;
+                    }
+                })
+            }
         } else {
             this.initQuery();
         }
@@ -90,7 +107,6 @@ export class NewQueryModalMb {
             isMb: tools.isMb,
             className: 'new-query-modal',
             isModal: tools.isMb,
-            isOnceDestroy: false,
             body: this.queryWrapper,
             isShow: isShow,
             footer: {
@@ -120,7 +136,7 @@ export class NewQueryModalMb {
                     }
                 ]
             },
-            isQuery:!isShow
+            isQuery: !isShow
         });
     }
 

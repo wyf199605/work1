@@ -173,7 +173,8 @@ gulp.task('js', function () {
     gulpTsModule([
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
-        'listDetail/DetailModal'
+        'listDetail/DetailModal',
+        'listDetail/editDetailModule'
     ], 'listDetail.js');
 
     //process模块

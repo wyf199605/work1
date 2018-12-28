@@ -241,7 +241,7 @@ export = class homePage {
             }
 
             new Search({
-                nodeId: para.nodeId,
+                nodeId: nodeId,
                 baseUrl: para.baseUrl,
                 searchBtn: para.searchBtn
             })

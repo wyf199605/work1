@@ -161,17 +161,26 @@ export class DetailModal {
                 })
             } else {
                 let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
-                if (tools.isNotEmpty(para.defaultData)){
+                if (tools.isNotEmpty(para.defaultData)) {
                     defaultValue = Object.assign({}, defaultValue, para.defaultData);
                 }
                 this.editModule.set(defaultValue);
             }
         } else {
             let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
-            if (tools.isNotEmpty(para.defaultData)){
+            if (tools.isNotEmpty(para.defaultData)) {
                 defaultValue = Object.assign({}, defaultValue, para.defaultData);
             }
             this.editModule.set(defaultValue);
+        }
+        if (tools.os.android) {
+            window.addEventListener('resize', function () {
+                if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
+                    window.setTimeout(function () {
+                        document.activeElement.scrollIntoView();
+                    }, 0);
+                }
+            })
         }
     }
 
@@ -308,11 +317,11 @@ export class DetailModal {
 
     // 验证
     private validate() {
-        let result:obj = this.editModule.validate.start();
+        let result: obj = this.editModule.validate.start();
         if (tools.isNotEmpty(result)) {
             for (let key in result) {
                 let errMsg = result[key].errMsg;
-                if(tools.isNotEmpty(errMsg)){
+                if (tools.isNotEmpty(errMsg)) {
                     Modal.alert(result[key]);
                     return false;
                 }
