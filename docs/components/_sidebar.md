@@ -20,6 +20,7 @@
   - [SlideUp ](/components/view/slideup/README.md)
 
 - UI
+  - [ActionSheet ](/components/ui/actionSheet/README.md)
   - [ContextMenu ](/components/ui/contextMenu/README.md)
 
 - Other
