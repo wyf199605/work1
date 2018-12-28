@@ -357,7 +357,11 @@ export = class FormPage extends BasicPage {
         };
         console.log(this.param);
         if(tools.isNotEmpty(this.param)){
-            this.setData(this.param);
+            let param = {};
+            for(let key in this.param){
+                param[key.toUpperCase()] = this.param[key];
+            }
+            this.setData(param);
         }
 
         // url请求默认值

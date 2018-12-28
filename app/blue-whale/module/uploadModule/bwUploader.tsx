@@ -335,7 +335,7 @@ export class BwUploader extends FormCom {
                 }).catch((err: IAjaxError) => {
                     if(err.statusText === 'error'){
                         reject();
-                        Modal.alert(err.errorThrown);
+                        err.errorThrown && Modal.alert(err.errorThrown);
                     }else{
                         resolve({
                             md5: md5Code,
