@@ -119,7 +119,15 @@ export class FlowEditor extends FormCom {
         FlowEditor.DropDowns.forEach(dropdown => dropdown.hideList());
     }
 
+    public refreshPosition(){
+        // 用于刷新flowEditor的位置（在边界刷新或窗口大小改变时调用）
+        let flowModalStyle = window.getComputedStyle(d.query('.modal-wrapper.flow-modal'));
+        this.wrapper.style.right = parseInt(flowModalStyle.right) + 25 + 'px';
+        this.wrapper.style.bottom = parseInt(flowModalStyle.bottom) + 25 + 'px';
+    }
+
     private initFlowEditor(para: IFlowEditorPara) {
+        this.refreshPosition();
         // 根据类型判断节点具有的属性(如果在类型属性限定表中没有该类型的话，则类型默认为other，只有name和displayName两个属性)
         FlowEditor.ATTR_LIMIT[para.type in FlowEditor.ATTR_LIMIT ? para.type : 'other'].forEach(attr => {
             // 初始化时将start和end节点的name设为start/end

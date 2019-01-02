@@ -5,7 +5,7 @@ import d = G.d;
 import tools = G.tools;
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
-import {FlowDesigner} from "./FlowDesigner";
+import {FlowDesigner, Method} from "./FlowDesigner";
 import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {Tips} from "./Tips";
 import {LineItem} from "./LineItem";
@@ -91,7 +91,7 @@ export class FlowItem extends Component {
             let diamondArr = ['decision', 'fork', 'join'];
             this.wrapper.style.left = para.position.x + 'px';
             this.wrapper.style.top = para.position.y + 'px';
-            this.width = para.width || 50;
+            this.width = para.width || 100;
             this.height = para.height || 50;
             if (diamondArr.indexOf(para.type) >= 0) {
                 this.isDiamond = true;
@@ -315,8 +315,8 @@ export class FlowItem extends Component {
                 _this.wrapper.style.top = this.oy + dy + 'px';
                 _this.wrapper.style.left = this.ox + dx + 'px';
             }
-            this.x = this.ox + dx;
-            this.y = this.oy + dy;
+            _this.x = this.ox + dx;
+            _this.y = this.oy + dy;
 
             // 移动flow-item
             FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
@@ -327,6 +327,9 @@ export class FlowItem extends Component {
     private draggerEndHandler(): () => void {
         let _this = this;
         return function () {
+            // 超出边界时刷新svg的宽高
+            let boundary = Method.getBoundary();
+            FlowDesigner.PAPER.setSize(boundary.width, boundary.height);
             let diamondArr = ['decision', 'fork', 'join'];
             if (diamondArr.indexOf(_this.para.type) >= 0) {
                 this.transform('r45');

@@ -132,6 +132,15 @@ export const Method = {
             },
         }
     })(),
+    getBoundary: () => {
+        let width = FlowDesigner.PAPER.width;
+        let height = FlowDesigner.PAPER.height;
+        FlowDesigner.ALLITEMS.forEach(item => {
+            width = Math.max(item.x + item.width, width);
+            height = Math.max(item.y + item.height, height);
+        });
+        return {width, height};
+    },
 };
 
 export class FlowDesigner {
@@ -365,7 +374,7 @@ export class FlowDesigner {
             }
         };
         let resizeHandler = () => {
-            // 窗口大小改变时需要重新设置paper的大小，并且重绘连接线
+            // 窗口大小改变时需要重新设置paper的大小，并且重绘连接线和flowEditor的位置
             FlowDesigner.PAPER.setSize(
                 Math.max(d.query('#design-canvas').clientWidth, FlowDesigner.PAPER.width),
                 Math.max(d.query('#design-canvas').clientHeight, FlowDesigner.PAPER.height)
@@ -373,6 +382,7 @@ export class FlowDesigner {
             FlowDesigner.ALLITEMS && FlowDesigner.ALLITEMS.forEach(item => item.calcWidthAndHeight());
             FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
             FlowDesigner.connections && FlowDesigner.connections.forEach(connection => FlowDesigner.PAPER.connection(connection));
+            FlowDesigner.ALLITEMS.forEach(item => item.flowEditor.refreshPosition());
         };
         let clickFullscreenHandler = () => {
             this.modal.wrapper.classList.toggle('full-screen');
