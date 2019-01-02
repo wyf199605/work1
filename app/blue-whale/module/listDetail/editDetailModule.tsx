@@ -318,8 +318,20 @@ export class EditDetailModule extends Component {
             container: btnWrapper,
             onClick: () => {
                 if (this.currentPage !== 1) {
-                    let current = this.currentPage - 1;
-                    this.changePage(current);
+                    if (this.isEdit && this.checkIsSave()) {
+                        Modal.confirm({
+                            msg: '还有数据未保存，确定跳转上一页吗?',
+                            callback: (flag) => {
+                                if (flag) {
+                                    let current = this.currentPage - 1;
+                                    this.changePage(current);
+                                }
+                            }
+                        })
+                    } else {
+                        let current = this.currentPage - 1;
+                        this.changePage(current);
+                    }
                 }
             }
         });
@@ -328,8 +340,20 @@ export class EditDetailModule extends Component {
             container: btnWrapper,
             onClick: () => {
                 if (this.currentPage !== this.totalNumber) {
-                    let current = this.currentPage + 1;
-                    this.changePage(current);
+                    if (this.isEdit && this.checkIsSave()) {
+                        Modal.confirm({
+                            msg: '还有数据未保存，确定跳转下一页吗?',
+                            callback: (flag) => {
+                                if (flag) {
+                                    let current = this.currentPage + 1;
+                                    this.changePage(current);
+                                }
+                            }
+                        })
+                    } else {
+                        let current = this.currentPage + 1;
+                        this.changePage(current);
+                    }
                 }
             },
             className: 'list-detail-btn'
@@ -337,27 +361,39 @@ export class EditDetailModule extends Component {
         this.checkPageButtonDisabled();
     }
 
+    private checkIsSave(): boolean {
+        let data = this.editModule.get(),
+            defaultData = this.defaultData;
+        for (let key in defaultData) {
+            if (tools.isNotEmpty(defaultData[key])) {
+                if (defaultData[key] != data[key]) {
+                    return true;
+                }
+            } else {
+                if (tools.isNotEmpty(data[key])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // 检测上一页下一页按钮是否可用
     private checkPageButtonDisabled = () => {
-        if (this.isEdit){
+        if (this.totalNumber === 1 || this.totalNumber === 0) {
             this.prev.disabled = true;
             this.next.disabled = true;
-        }else{
-            if (this.totalNumber === 1 || this.totalNumber === 0) {
-                this.prev.disabled = true;
-                this.next.disabled = true;
-                return;
-            }
-            if (this.currentPage === 1) {
-                this.prev.disabled = true;
-                this.next.disabled = false;
-            } else if (this.currentPage === this.totalNumber) {
-                this.next.disabled = true;
-                this.prev.disabled = false;
-            } else {
-                this.prev.disabled = false;
-                this.next.disabled = false;
-            }
+            return;
+        }
+        if (this.currentPage === 1) {
+            this.prev.disabled = true;
+            this.next.disabled = false;
+        } else if (this.currentPage === this.totalNumber) {
+            this.next.disabled = true;
+            this.prev.disabled = false;
+        } else {
+            this.prev.disabled = false;
+            this.next.disabled = false;
         }
     };
 
@@ -443,7 +479,10 @@ export class EditDetailModule extends Component {
                 className: 'edit-btn',
                 container: wrapper,
                 onClick: () => {
-                    self.isEdit = false;
+                    self.getDefaultData().then((data) => {
+                        self.editModule.set(data);
+                        self.isEdit = false;
+                    });
                 }
             })
         }
@@ -529,8 +568,6 @@ export class EditDetailModule extends Component {
             this.updateBtn.disabled = false;
             this.saveBtn.disabled = false;
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = false);
-            this.next.disabled = true;
-            this.prev.disabled = true;
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
                     this.editModule.getDom(f.name).disabled = false;
@@ -550,7 +587,6 @@ export class EditDetailModule extends Component {
             this.cancelBtn.disabled = !isEdit;
             this.updateBtn.disabled = isEdit;
             this.saveBtn.disabled = !isEdit;
-            this.checkPageButtonDisabled();
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = isEdit);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
