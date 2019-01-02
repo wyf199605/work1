@@ -59,7 +59,7 @@ export class PlanModule extends Component{
         this.initDraw();
         tools.isPc && this.initSubBtn();
         this.initStatusBar();
-        this.initScale();
+        //this.initScale();
     }
 
     initScale(){
