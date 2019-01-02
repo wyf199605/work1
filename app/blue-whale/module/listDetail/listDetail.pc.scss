@@ -180,7 +180,7 @@
             }
           }
         }
-        .detail-cell-mutil-content{
+        .detail-cell-mutil-content {
           width: 100%;
           height: 100px;
           display: flex;
@@ -250,6 +250,20 @@
           align-items: center;
           background-color: #ffffff;
           padding-right: 16px;
+          &.textarea {
+            height: 80px;
+            .textarea-input {
+              width: calc(100% - 170px);
+              height: 100%;
+              resize: none;
+              outline: none;
+              border: none;
+              padding: 6px 7px;
+              background-color: #FFFFFF;
+              font-size: 14px;
+            }
+          }
+
           &.three-column {
             width: 33.33%;
           }

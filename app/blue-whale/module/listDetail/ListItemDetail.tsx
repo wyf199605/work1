@@ -310,6 +310,7 @@ export class ListItemDetail {
                         Modal.alert('没有数据可以编辑!');
                         return;
                     }
+                    btn.refresh = 0;
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: btn.subType === 'update_save' ? self.defaultData : {},
                         isAdd: isAdd,
@@ -337,6 +338,7 @@ export class ListItemDetail {
                     break;
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
+                        btn.refresh = 0;
                         ButtonAction.get().clickHandle(btn, self.defaultData, () => {
                             if (self.para.uiType === 'detail') {
                                 // 删除后显示下一页，如果已是最后一页，则显示上一页

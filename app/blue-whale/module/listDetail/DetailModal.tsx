@@ -196,6 +196,9 @@ export class DetailModal {
         if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
             f.comType = 'virtual';
         }
+        if (f.comType === 'textarea'){
+            className = tools.isNotEmpty(className) ? className + ' textarea' : 'textarea';
+        }
         return {
             dom: f.comType === 'virtual' ? null : DetailModal.createFormWrapper(f, wrapper, className || ''),
             field: f,

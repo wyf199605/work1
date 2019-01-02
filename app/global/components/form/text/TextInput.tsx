@@ -202,14 +202,12 @@ export class TextAreaInput extends FormCom{
     set value(val) {
         // this.value = val;
         // this.inputEl.innerHTML = val;\
-        if(tools.isNotEmpty(val)){
-            this.textarea.value = val;
-        }
+        this.textarea.value = val || '';
     }
 
     set disabled(disabled){
-        this.textarea.disabled = disabled;
-        this.wrapper.classList.toggle('disabled', disabled);
+        this.textarea.disabled = tools.isNotEmpty(disabled) ? disabled : false;
+        this.wrapper.classList.toggle('disabled', tools.isNotEmpty(disabled) ? disabled : false);
     }
 
     get(): any {

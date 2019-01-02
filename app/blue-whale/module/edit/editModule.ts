@@ -24,6 +24,7 @@ import {RichTextModal} from "../../../global/components/form/richTextModal/richT
 import {BwUploader} from "../uploadModule/bwUploader";
 import {UploadImages} from "../uploadModule/uploadImages";
 import {Accessory} from "../uploadModule/accessory";
+import {TextAreaInput} from "../../../global/components/form/text/TextInput";
 
 interface ComInitFun {
     (para: ComInitP): FormCom
@@ -371,12 +372,11 @@ export class EditModule {
             });
         },
 
-        // 流程引擎附件
-        accessory: (p) => {
-            // return new Accessory({
-            //     container: p.dom
-            // });
-            return null;
+        textarea: (p) => {
+            return new TextAreaInput({
+                container: p.dom,
+                custom: p.field
+            });
         }
 
     };

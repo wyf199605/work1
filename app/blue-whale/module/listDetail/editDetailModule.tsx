@@ -170,6 +170,9 @@ export class EditDetailModule extends Component {
         if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
             f.comType = 'virtual';
         }
+        if (f.comType === 'textarea') {
+            className = tools.isNotEmpty(className) ? className + ' textarea' : 'textarea';
+        }
         return {
             dom: f.comType === 'virtual' ? null : DetailModal.createFormWrapper(f, wrapper, className || ''),
             field: f,
@@ -289,8 +292,16 @@ export class EditDetailModule extends Component {
         this.checkPageButtonDisabled();
         this.scrollToTop();
         this.getDefaultData().then(data => {
-            this.editModule.set(data);
-            this.isEdit = this.para.uiType === 'edit_detail';
+            if (tools.isEmpty(data)) {
+                this.fields.forEach(f => {
+                    if (!f.noShow) {
+                        this.editModule.getDom(f.name).set('');
+                    }
+                });
+            } else {
+                this.editModule.set(data);
+            }
+            this.isEdit = this.para.isEdit;
         });
     }
 
@@ -521,6 +532,7 @@ export class EditDetailModule extends Component {
         function subBtnEvent(btn: R_Button) {
             switch (btn.subType) {
                 case 'insert_save':
+                    btn.refresh = 0;
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: {},
                         isAdd: true,
@@ -529,7 +541,8 @@ export class EditDetailModule extends Component {
                             return new Promise((resolve) => {
                                 ButtonAction.get().clickHandle(btn, data, () => {
                                     self.totalNumber += 1;
-                                    self.changePage(1);
+                                    self.changePage();
+                                    self.isEdit = self.para.isEdit;
                                     resolve();
                                 });
                             })
@@ -538,13 +551,12 @@ export class EditDetailModule extends Component {
                     break;
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
+                        btn.refresh = 0;
                         ButtonAction.get().clickHandle(btn, self.defaultData, () => {
-                            if (self.para.uiType === 'detail') {
-                                // 删除后显示下一页，如果已是最后一页，则显示上一页
-                                let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
-                                self.totalNumber = self.totalNumber - 1;
-                                self.changePage(currentPage);
-                            }
+                            // 删除后显示下一页，如果已是最后一页，则显示上一页
+                            let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
+                            self.totalNumber = self.totalNumber - 1;
+                            self.changePage(currentPage);
                         });
                     } else {
                         Modal.alert('无数据可以删除!');
@@ -564,13 +576,13 @@ export class EditDetailModule extends Component {
     set isEdit(isEdit: boolean) {
         this._isEdit = isEdit;
         if (this.totalNumber === 0) {
-            this.cancelBtn.disabled = false;
-            this.updateBtn.disabled = false;
-            this.saveBtn.disabled = false;
+            this.cancelBtn.disabled = true;
+            this.updateBtn.disabled = true;
+            this.saveBtn.disabled = true;
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = false);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
-                    this.editModule.getDom(f.name).disabled = false;
+                    this.editModule.getDom(f.name).disabled = true;
                 }
             });
             if (tools.isPc) {

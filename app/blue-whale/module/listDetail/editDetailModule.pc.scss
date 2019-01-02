@@ -314,6 +314,28 @@
         height: 44px;
         border: solid 1px #e2e2e2;
         padding: 0;
+        &.three-column {
+          width: 33.33%;
+        }
+        &.two-column {
+          width: 50%;
+        }
+        &.one-column {
+          width: 100%;
+        }
+        &.textarea{
+          height: 80px;
+          .textarea-input{
+            width: calc(100% - 170px);
+            height: 100%;
+            resize: none;
+            outline: none;
+            border: none;
+            padding: 6px 7px;
+            background-color: #FFFFFF;
+            font-size: 14px;
+          }
+        }
         &[data-type="virtual"] {
           display: none;
         }
