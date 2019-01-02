@@ -2,12 +2,16 @@
 
 ### 概述
 
-> contextMenu是类似于右键菜单的弹出菜单，可以但不局限于右键弹出，也可点击弹出
-> 该控件基于绝对定位实现位置的变换，通过用户点击行为得到点击位置，进而设置控件位置
+* contextMenu是类似于右键菜单的弹出菜单，可以但不局限于右键弹出，也可点击弹出
+* 该控件基于绝对定位实现位置的变换，通过用户点击行为得到点击位置，进而设置控件位置
 
 ### 控件路径
 
 >  **global/components/ui/actionSheet**
+
+### 兼容性
+
+> 只支持PC端
 
 ### 继承性
 
@@ -24,11 +28,17 @@
 </div>
 ```
 
+### 主要参数
+
+* buttons 菜单项数组 content:菜单项名称,icon:图标,onClick:点击时触发的函数
+* container: 父容器元素 
+
 ### 示例
 
 ##### 初始化
-* buttons 菜单项数组 content:菜单项名称,icon:图标,onClick:点击时触发的函数
-* container: 父容器元素
+* content:菜单项名称
+* icon:图标
+* onClick:点击时触发的函数
 
 ```
 new ContextMenu({
@@ -58,6 +68,9 @@ contextMenu.setPosition({
 });
 ```
 
+### 效果图
+
+![效果图](/contextMenu.png)
 
 ### 属性
 

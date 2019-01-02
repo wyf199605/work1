@@ -111,104 +111,16 @@ export class Pagination extends Component {
         return extent;
     }
 
-    /* protected slide = ((self) => {
-         let autoLoading = tools.isEmpty(self.para.scroll.auto) ? true : self.para.scroll.auto,
-             loadingBtn: Button,
-             isPulldownRefresh = tools.isEmpty(self.para.scroll.isPulldownRefresh) ?
-             true : self.para.scroll.isPulldownRefresh;
-         if (!autoLoading) {
-             let btnWrapper = d.create('<div class="btn-wrapper"></div>'),
-                 loadingText = tools.isEmpty(this.para.scroll.loadingText)
-                     ? '点击加载' : this.para.scroll.loadingText;
-
-             loadingBtn = new Button({
-                 container: btnWrapper,
-                 content: loadingText,
-                 type: 'default',
-                 isShow: false,
-                 className: 'pagination-btn',
-                 onClick: () => {
-                     loadingBtn.isShow = false;
-                     self.next();
-                 }
-             });
-             self.wrapper.appendChild(btnWrapper);
-         }
-         let config = {
-             translate: 0,
-             paginationScrollSpinner: null,
-             animated_id: null,
-             loadingBtn
-         };
-
-         function restrictChange() {
-             if (config.translate > 0) {
-                 config.translate = 0;
-             }
-             if (Math.abs(config.translate) >= self.totalHeight - self.pageHeight + 35) {
-                 config.translate = -(self.totalHeight - self.pageHeight + 35);
-             }
-             self.wrapper.style.transform = 'translate3d(0,' + config.translate + 'px, 0)';
-             self.wrapper.style.webkitTransform = 'translate3d(0,' + config.translate + 'px, 0)';
-         }
-
-         return {
-             slideDown(change: number) {
-                 if (config.translate === 0) {
-                     if (isPulldownRefresh) {
-                         if (tools.isEmpty(config.paginationScrollSpinner)) {
-
-                         }
-                     } else {
-
-                         if (!isNaN(change))
-                             config.translate += change;
-                         restrictChange();
-
-                     }
-                 } else {
-                     if (!tools.isEmpty(config.paginationScrollSpinner) && isPulldownRefresh) {
-                         config.paginationScrollSpinner.destroy();
-                         config.paginationScrollSpinner = null;
-                     }
-
-                     if (!isNaN(change))
-                         config.translate += change;
-                     restrictChange();
-                 }
-             },
-             slideUp(change: number) {
-                 if (!isNaN(change))
-                     config.translate += change;
-                 if (Math.abs(config.translate) >= self.totalHeight - self.pageHeight + 10) {
-                     if (tools.isNotEmpty(self.spinner) && !self.spinner.isVisible()) {
-                         if (autoLoading) {
-                             self.next();
-                         } else {
-                             loadingBtn.isShow = true;
-                         }
-                     }
-                 }
-                 restrictChange();
-             }
-         }
-     })(this);*/
-
     protected events = ((self) => {
         let autoLoading: boolean,
             loadingBtn: Button,
             isPulldownRefresh: boolean;
 
-        let timer = null;
         let scrollHandle = function () {
             let scroll = this.scrollTop;
-            clearTimeout(timer);
             if (isPulldownRefresh) {
                 if (scroll <= 0) {
-                    timer = setTimeout(() => {
-                        self.paginationScrollSpinner.open();
-                        clearTimeout(timer);
-                    }, 10);
+                    self.paginationScrollSpinner.open();
                 } else {
                     self.paginationScrollSpinner.close();
                 }
@@ -257,13 +169,13 @@ export class Pagination extends Component {
                     if (isPulldownRefresh) {
                         self.paginationScrollSpinner && self.paginationScrollSpinner.open();
                     }
-                    d.on(self.wrapper, 'scroll', scrollHandle);
+                    d.on(self.wrapper, 'touchmove', scrollHandle);
                 }
             },
             off() {
                 if (tools.isEmpty(self.paging)) {
                     self.paginationScrollSpinner && self.paginationScrollSpinner.close();
-                    d.off(self.wrapper, 'scroll', scrollHandle);
+                    d.off(self.wrapper, 'touchmove', scrollHandle);
                 }
             }
         }
@@ -461,18 +373,29 @@ class PaginationScrollSpinner {
                 panmove(ev);
             }
         };
+        let isAndroid4 = false;
+        if(/(Android)/i.test(navigator.userAgent)){
+            let andrVersionArr = navigator.userAgent.match(/Android\s*(\d+)/);
+            //去除匹配的第一个下标的元素
+            let version = andrVersionArr && andrVersionArr[1] ? parseInt(andrVersionArr[1]) : 5;
+            isAndroid4 = version <= 4
+        }
         return {
             on() {
                 d.on(self.scrollEl, 'pandown panstart panend', pan);
 
-                d.on(document.body, 'touchmove', handler = (e) => {
-                    e.preventDefault();
-                });
+                if(!isAndroid4){
+                    // d.on(document.body, 'touchmove', handler = (e) => {
+                    //     e.preventDefault();
+                    // });
+                }
             },
             off() {
                 d.off(self.scrollEl, 'pandown panstart panend', pan);
 
-                d.off(document.body, 'touchmove', handler);
+                if(!isAndroid4) {
+                    // d.off(document.body, 'touchmove', handler);
+                }
             }
         }
     })(this);
@@ -540,14 +463,13 @@ class PaginationScrollSpinner {
                 self.animated.draw(config.translate);
             },
             endAnimated(t, duration, isRefresh = false) {
-                let This = this;
                 self.isAnimated = true;
                 t++;
                 let current = linear(t, config.translate, 0 - config.translate, duration);
                 self.wrapper.style.transform = 'translate3d(0px, ' + current + 'px, 0px)';
-                this.draw(current, false);
+                self.animated.draw(current, false);
                 config.id = window.requestAnimationFrame(() => {
-                    this.endAnimated(t, duration, isRefresh);
+                    self.animated.endAnimated(t, duration, isRefresh);
                 });
                 if ((current <= 80) && config.endOnce && isRefresh) {
                     config.endOnce = false;
@@ -562,12 +484,12 @@ class PaginationScrollSpinner {
                             decoration *= -1;
                         }
                         len += decoration;
-                        This.draw(len, false, deg / 180 * Math.PI);
+                        self.animated.draw(len, false, deg / 180 * Math.PI);
                         config.id2 = window.requestAnimationFrame(a);
                         if (self._cancel) {
                             self._cancel = false;
                             window.cancelAnimationFrame(config.id2);
-                            This.endAnimated(t, duration);
+                            self.animated.endAnimated(t, duration);
                         }
                     })();
                     self.onChange && self.onChange();

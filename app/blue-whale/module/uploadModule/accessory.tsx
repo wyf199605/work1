@@ -153,8 +153,8 @@ export class Accessory extends FormCom {
             nameField: this.para.nameField || 'FILE_ID',
             thumbField: this.para.thumbField,
             text: '',
-            onSuccess: (res, file, type) => {
-                if (res.code == 200 || res.errorCode === 0) {
+            onSuccess: (res, file) => {
+                if (res.code == 200 || res.errorCode == 0) {
                     Modal.toast('上传成功!');
                     switch (this.fileType) {
                         case '43': {
@@ -245,6 +245,9 @@ export class Accessory extends FormCom {
         });
         this._listItems = this._listItems.filter((item) => item);
         this.refreshIndex();
+        this.listItems.forEach(item => {
+            item.disabled =  this.disabled;
+        });
     }
 
     refreshIndex() {

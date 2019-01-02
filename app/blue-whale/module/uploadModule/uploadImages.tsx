@@ -7,6 +7,8 @@ import {IUploadImagesItem, UploadImagesItem} from "./uploadImagesItem";
 import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
 import {BwUploader, IBwUploaderPara} from "./bwUploader";
+import {ListItemDetailCell} from "../listDetail/ListItemDetailCell";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 
 export interface IImage {
     unique?: string;
@@ -126,9 +128,10 @@ export class UploadImages extends FormCom {
         this.createUploader();
         this.uploader.disabled = this.disabled;
         this.initEvent.on();
+        this.lookImgEve.on();
     }
 
-    click(){
+    click() {
         this.uploader && this.uploader.click();
     }
 
@@ -282,6 +285,9 @@ export class UploadImages extends FormCom {
         });
         this._listItems = this._listItems.filter((item) => item);
         this.refreshIndex();
+        this.listItems.forEach(item => {
+            item.disabled = this.disabled;
+        });
     }
 
     refreshIndex() {
@@ -336,19 +342,59 @@ export class UploadImages extends FormCom {
         }
     }
 
-    set disabled(disabled:boolean){
+    set disabled(disabled: boolean) {
         disabled = tools.isNotEmpty(disabled) ? disabled : false;
-        this._disabled =  disabled;
+        this._disabled = disabled;
         this.listItems.forEach(item => {
-            item.disabled =  disabled;
+            item.disabled = disabled;
         });
-        this.uploader && (this.uploader.disabled =  disabled);
+        this.uploader && (this.uploader.disabled = disabled);
     }
-    get disabled(){
+
+    get disabled() {
         return this._disabled;
     }
 
+    private lookImgEve = (() => {
+        let look = () => {
+            if (this.disabled) {
+                let imgs = this.getImgs();
+                let imgData: ImgModalPara = {
+                    img: imgs
+                };
+                ImgModal.show(imgData);
+                if (tools.isMb) {
+                    document.body.style.overflow = 'hidden';
+                    setTimeout(() => {
+                        d.query('.pswp', document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
+                    }, 200);
+                }
+            } else {
+                Modal.alert('编辑状态下不可查看，请退出编辑后查看！');
+            }
+        };
+        return {
+            on: () => d.on(this.wrapper, 'click', 'img', look),
+            off: () => d.off(this.wrapper, 'click', 'img', look)
+        }
+    })();
+
+    private getImgs(): string[] {
+        let imgs = this.imgs || [],
+            result: string[] = [];
+        imgs.forEach(img => {
+            if (img.isOnLine) {
+                result.push(BwRule.fileUrlGet(img.unique, this.para.nameField || 'FILE_ID', false));
+            } else {
+                result.push(img.localUrl);
+            }
+        });
+        return result;
+    }
+
+
     destroy() {
+        this.lookImgEve.off();
         this.initEvent.off();
         this.uploader.destroy();
         this.imgWrapper = null;

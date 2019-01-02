@@ -809,7 +809,8 @@ export class LoginPage{
             }, 1000);
         }
         let usertap = 0,maxtap = 5;
-        (tools.isMb ? d.query('.login-logo>img') :  d.query('[data-action="selectServer"]')).addEventListener('click',() => {
+        let type = tools.isMb ? 'touchstart' : 'click';
+        (tools.isMb ? d.query('.login-logo') :  d.query('[data-action="selectServer"]')).addEventListener(type,() => {
             usertap += 1 ;
             if(usertap === maxtap){
                 sys.window.load(CONF.url.selectServer);

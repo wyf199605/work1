@@ -2,55 +2,53 @@ $normal-font-size: 14px;
 $option-font-size: 13px;
 $icon-font-size: 18px;
 .new-query-modal {
-  height: 100% !important;
-  &.modal-mobile .modal-header .close{
+  &.modal-mobile .modal-header .close {
     font-size: 30px;
   }
 
   .modal-body {
-    height: calc(100% - 100px);
-    padding: 0px;
+    padding: 0 !important;
     background-color: #f2f2f2;
-    -webkit-overflow-scrolling: touch;
   }
-  .foot-wrapper{
-    height: 55px !important;
+  .foot-wrapper > .modal-footer {
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px !important;
     width: 100%;
-    .modal-footer {
-      display: flex;
-      display: -webkit-flex;
-      align-items: center;
-      justify-content: center;
-      height: 55px !important;
+    //position: absolute;
+    //bottom: 0;
+    //left: 0;
+    .left-plane, .right-plane {
+      position: static;
+    }
+    .right-plane {
+      margin-right: 16px;
       width: 100%;
-      .right-plane {
-        position: static;
-        margin-right: 16px;
+      height: 100%;
+      .input-box.input-box-horizontal.input-box-small {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
         width: 100%;
         height: 100%;
-        .input-box.input-box-horizontal.input-box-small {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          width: 100%;
-          height: 100%;
-          .btn.new-query-btn.button-type-primary.button-small {
-            height: 30px;
-            border-radius: 30px;
-            padding-left: 30px;
-            padding-right: 30px;
-            font-size: $normal-font-size;
-            margin-left: 10px;
-            &.confirm {
-              background-color: #005bac;
-              color: #ffffff;
-              border: none;
-            }
-            &.reset {
-              border: solid 1px #005bac;
-              background-color: #ffffff;
-              color: #005bac;
-            }
+        .btn.new-query-btn.button-type-primary.button-small {
+          height: 30px;
+          border-radius: 30px;
+          padding-left: 30px;
+          padding-right: 30px;
+          font-size: $normal-font-size;
+          margin-left: 10px;
+          &.confirm {
+            background-color: #005bac;
+            color: #ffffff;
+            border: none;
+          }
+          &.reset {
+            border: solid 1px #005bac;
+            background-color: #ffffff;
+            color: #005bac;
           }
         }
       }
@@ -60,8 +58,6 @@ $icon-font-size: 18px;
     padding: 0 16px;
     width: 100%;
     background-color: #ffffff;
-    min-height: 100%;
-    -webkit-overflow-scrolling: touch;
     .new-query-item:last-child {
       border-bottom: none;
     }
@@ -143,7 +139,7 @@ $icon-font-size: 18px;
       border-bottom-right-radius: 5px;
     }
   }
-  i.appcommon.app-gou{
+  i.appcommon.app-gou {
     position: absolute;
     bottom: 0;
     right: 0;

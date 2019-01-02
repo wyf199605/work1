@@ -27,9 +27,10 @@
   #pagesContainer {
     position: fixed;
     top: 0;
-    bottom: 50px;
+    bottom: 0;
     left: 0;
     right: 0;
+    padding-bottom: 50px;
   }
   #pagesContainer iframe {
     border: none;
@@ -44,8 +45,8 @@
     display: inline-block;
   }
   .full-height.has-footer-tab {
-    height: calc(100% - 50px);
-    min-height: calc(100% - 25px);
+    height: 100%;
+    min-height: 100%;
     text-align: center;
     width: 100%;
   }

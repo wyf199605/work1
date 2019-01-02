@@ -34,6 +34,14 @@ export class NewQueryModalMb {
                     }
                 })
             }
+            if (tools.os.ios) {
+                let inputs = Array.prototype.slice.call(document.querySelectorAll('input'));
+                inputs.forEach(input => {
+                    input.onblur = function (e) {
+                        document.body.scrollTop = 0;
+                    }
+                })
+            }
         } else {
             this.initQuery();
         }
@@ -99,7 +107,6 @@ export class NewQueryModalMb {
             isMb: tools.isMb,
             className: 'new-query-modal',
             isModal: tools.isMb,
-            isOnceDestroy: false,
             body: this.queryWrapper,
             isShow: isShow,
             footer: {
@@ -129,7 +136,7 @@ export class NewQueryModalMb {
                     }
                 ]
             },
-            isQuery:!isShow
+            isQuery: !isShow
         });
     }
 

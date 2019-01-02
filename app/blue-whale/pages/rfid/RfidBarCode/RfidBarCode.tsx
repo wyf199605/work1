@@ -534,7 +534,6 @@ export class RfidBarCode extends Component {
                                             s.show();
                                             let typeValue = {};
                                             typeValue[typeName] = updataEl.get();
-                                            alert(JSON.stringify(typeValue))
                                             let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picAddr,(tools.isNotEmpty(para.picFields)) ? IMA : '','atvarparams',JSON.stringify(typeValue),(res) => {
                                                 d.query('.total-rfid>.bar-code-scan>span').innerText = 0 + '';
                                                 this.stepArry = [];

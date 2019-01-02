@@ -4,6 +4,7 @@ import IComponentPara = G.IComponentPara;
 import {IFileInfo, Accessory} from "./accessory";
 import tools = G.tools;
 import {ListItemDetailCell} from "../listDetail/ListItemDetailCell";
+import d = G.d;
 
 export interface IAccessoryItem extends IComponentPara {
     list?: Accessory;
@@ -58,6 +59,11 @@ export class AccessoryItem extends Component {
     set index(index: number) {
         this._index = index;
         this.wrapper && (this.wrapper.dataset['index'] = index + '');
+    }
+
+    set disabled(disabled: boolean) {
+        this._disabled = disabled;
+        d.query('.deleteBtn', this.wrapper).classList.toggle('disabled', disabled === true);
     }
 
     destroy() {
