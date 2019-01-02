@@ -214,7 +214,6 @@ export class Pagination extends Component {
             if (tools.isEmpty(this.paging)) {
                 if (ifRefresh) {
                     this.initSpinner();
-                    this.paginationScrollSpinner && this.paginationScrollSpinner.cancel();
                 }
                 if (isEnd) {
                     this.isEnd = isEnd;
@@ -224,7 +223,9 @@ export class Pagination extends Component {
             } else {
             }
 
-        });
+        }).finally(() => {
+            this.paginationScrollSpinner && this.paginationScrollSpinner.cancel();
+        })
     }
 
     private _pageSize: number = 20;
