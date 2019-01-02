@@ -276,7 +276,7 @@ export class EditDetailModule extends Component {
     }
 
     // 上一页下一页加载数据
-    changePage(page?: number) {
+    changePage(page?: number):Promise<void> {
         if (tools.isNotEmpty(page)) {
             if (page > 0) {
                 if (page > this.totalNumber) {
@@ -291,7 +291,7 @@ export class EditDetailModule extends Component {
         }
         this.checkPageButtonDisabled();
         this.scrollToTop();
-        this.getDefaultData().then(data => {
+        return this.getDefaultData().then(data => {
             if (tools.isEmpty(data)) {
                 this.fields.forEach(f => {
                     if (!f.noShow) {
@@ -479,6 +479,7 @@ export class EditDetailModule extends Component {
                 onClick: () => {
                     if (self.validate()) {
                         // 验证成功
+                        self.updateBtnPara.refresh = 0;
                         ButtonAction.get().clickHandle(self.updateBtnPara, self.editModule.get(), () => {
                             self.isEdit = false;
                         }, self.para.url || '');
@@ -542,7 +543,6 @@ export class EditDetailModule extends Component {
                                 ButtonAction.get().clickHandle(btn, data, () => {
                                     self.totalNumber += 1;
                                     self.changePage();
-                                    self.isEdit = self.para.isEdit;
                                     resolve();
                                 });
                             })
