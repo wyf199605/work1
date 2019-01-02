@@ -290,7 +290,7 @@ export class EditDetailModule extends Component {
         this.scrollToTop();
         this.getDefaultData().then(data => {
             this.editModule.set(data);
-            this.isEdit = false;
+            this.isEdit = this.para.uiType === 'edit_detail';
         });
     }
 
