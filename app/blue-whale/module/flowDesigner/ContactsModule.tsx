@@ -28,14 +28,14 @@ export class ContactsModule {
         localStorage.setItem('fromPickData', JSON.stringify(tools.str.toEmpty({})));
         if (sys.os === 'pc') {
             this.initIframe(href);
-            this.contactModal.isShow = true;
+            this.contactModal && (this.contactModal.isShow = true);
         } else {
             this.iframe.show();
         }
 
         d.once(window, 'selectContact', (e: CustomEvent) => {
             if (this.contactModal) {
-                this.contactModal.isShow = false;
+                this.contactModal && (this.contactModal.isShow = false);
             }
             tools.isFunction(para.onGetData) && para.onGetData(e.detail.data);
             // onSelect(e.detail);

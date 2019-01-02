@@ -208,8 +208,10 @@ namespace BW {
                     tools.event.fire(type, data, window);
                 },
                 getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
-                    let event = '__EVT_GET_IMG_BY_DEVICE__';
-                    d.once(window, event, function (response: CustomEvent) {
+                    let event = '__EVT_GET_IMG_BY_DEVICE__',
+                        handler = null;
+                    d.on(window, event, handler = function (response: CustomEvent) {
+                        d.off(window, event, handler);
                         try {
                             let detail = JSON.parse(response.detail);
 
@@ -259,6 +261,33 @@ namespace BW {
                 },
                 reOpen: function (o: winOpen) {
                     self.handle('reOpen', o);
+                },
+                toClient: function (){
+                    alert('toClient');
+                    self.handle('toClient');
+                },
+                clientCode: function(callback){
+                    let event = '__EVT_TO_CLIENT__';
+                    d.once(window, event, (response: CustomEvent) => {
+                        try {
+                            let detail = JSON.parse(response.detail);
+                            if(detail.success){
+                                let data = detail.data,
+                                    content = data.content;
+                                if(content && content.appUrls){
+                                    let urls = content.appUrls,
+                                        html = '<option value="">-select-</option>';
+                                    urls.forEach((item) => {
+                                        html += `<option value="${item.envUrl}">${item.envName}</option>`;
+                                    });
+                                    callback(html);
+                                }
+                            }
+                        } catch (e) {
+                            alert("JSON解析出错")
+                        }
+                    });
+                    self.handle('clientCode', {back: event});
                 }
             }
         })(this);

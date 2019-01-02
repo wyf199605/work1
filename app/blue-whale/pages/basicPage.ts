@@ -11,6 +11,7 @@ export default class BasicPage{
     protected dom : HTMLElement;
     protected isMb : boolean;
     protected url : string;
+    protected param: obj = {};
     constructor(para? : BasicPagePara){
         // this.isMb = sys.os !== 'pc';
         this.isMb = tools.isMb;
@@ -29,10 +30,20 @@ export default class BasicPage{
                 this.url = d.closest(para.dom , '.page-container[data-src]').dataset.src;
             }
         }
+        this.param = tools.url.getObjPara(this.url);
 
         this.on('page.destroy', () => {
             this.destroy();
         });
+
+        let str = navigator.userAgent.toLowerCase();
+        let ver = str.match(/cpu iphone os (.*?) like mac os/);
+        if(ver && ver[1]){
+            let version = parseInt(ver[1]);
+            if(version <= 10){
+                document.documentElement.classList.add('no-overflow-scrolling');
+            }
+        }
 
         //判断是否是安卓5及以上版本才开启手势
         let version = 5;

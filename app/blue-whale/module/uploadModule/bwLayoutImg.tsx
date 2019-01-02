@@ -11,28 +11,33 @@ export interface IBwLayoutImgPara extends IBwUploaderPara{
     onFinish?: (files: CustomFile[]) => Promise<any>;
     isShow?: boolean;  // 是否显示上传控件，默认true
     autoClear?: boolean; // 是否在模态框关闭清除file，默认true
+    isCloseMsg?: boolean;
+    onDelete?: (index: number) => void;
 }
-
 export class BwLayoutImg{
     protected imgManager: ImageManager;
     protected modal: Modal;
     protected bwUpload: BwUploader;
+    protected onDelete?: (index: number) => void;
     protected files: CustomFile[] = [];
     protected onFinish: (files: CustomFile[]) => Promise<any>;
     protected autoClear: boolean;
+    protected isCloseMsg: boolean;
+    protected multi: boolean;
 
     constructor(para: IBwLayoutImgPara){
         this.onFinish = para.onFinish || function(){
             return Promise.resolve();
         };
+        this.onDelete = para.onDelete;
         this.autoClear = tools.isEmpty(para.autoClear) ? true : para.autoClear;
+        this.multi = tools.isEmpty(para.multi) ? true : para.multi;
+        this.isCloseMsg = para.isCloseMsg || false;
 
         this.initModal();
         this.initImgManager();
 
         let isShow = tools.isEmpty(para.isShow) ? true : para.isShow;
-        para.multi = false;
-        para.autoUpload = false;
         para.accept = {
             title: '图片',
             extensions: 'jpg,png,gif,jpeg',
@@ -43,8 +48,13 @@ export class BwLayoutImg{
             let file = files[0];
             BwLayoutImg.fileToImg(file).then((url) => {
                 this.modal.isShow = true;
+                if(!this.multi){
+                    this.files = [];
+                    this.imgManager.delImg();
+                }
                 this.files.push(files[0]);
                 this.imgManager.addImg(url);
+                this.isCloseMsg && this.modal && (this.modal.closeMsg = '是否放弃选中的图片？');
             }).catch((e) => {
                 console.log(e);
                 Modal.alert('获取图片失败');
@@ -55,6 +65,16 @@ export class BwLayoutImg{
 
     click(){
         this.bwUpload && this.bwUpload.click();
+    }
+
+    set(urls: string[]){
+        urls.forEach((url) => {
+            this.files.push({
+                blob: null
+            });
+            this.imgManager.addImg(url);
+        })
+
     }
 
     getUrls(): string[]{
@@ -93,7 +113,6 @@ export class BwLayoutImg{
                 isFullScreen: tools.isPc
             },
             isShow: false,
-            closeMsg: '是否放弃选中的图片？',
             onClose: () => {
                 this.autoClear && this.clear();
             },
@@ -119,6 +138,10 @@ export class BwLayoutImg{
         });
         this.imgManager.on(ImageManager.EVT_IMG_DELETE, (index) => {
             this.files.splice(index, 1);
+            this.onDelete && this.onDelete(index);
+            if(this.files.length === 0){
+                this.modal && (this.modal.closeMsg = '');
+            }
         });
     }
 

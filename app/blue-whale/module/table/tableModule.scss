@@ -143,6 +143,13 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
+  .table-body-wrapper{
+    td{
+      .accessory-wrapper{
+        overflow: visible;
+      }
+    }
+  }
 }
 
 .table-img-wrapper {
@@ -272,7 +279,7 @@
     }
     .mui-bar-footer {
       height: 39px;
-      overflow-y: hidden;
+      overflow: hidden;
       -webkit-box-shadow: none;
       box-shadow: none;
       border-top: 1px solid #e1e1e1;

@@ -34,6 +34,9 @@ export class BwSubTableModule extends BwTableModule{
                         onClick: (isChecked) => {
                             this.subBtns.box.isShow = !isChecked;
                             this.modify.box.isShow = isChecked;
+                            if(!isChecked){
+                                this.subBtns.box.responsive();
+                            }
                         }
                     });
 

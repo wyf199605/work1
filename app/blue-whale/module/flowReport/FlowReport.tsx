@@ -21,7 +21,8 @@ export class FlowReport extends BasicPage {
         let emPara: EditModulePara = {fields: []};
         let nameFields: { [name: string]: R_Field } = {};
         let form = this.createFormWrapper(para.fm.fields),
-            self = this;
+            self = this,
+            isInsert = tools.isNotEmpty(tools.url.getPara('instance')) ? false : true;
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
             let field = {
@@ -70,16 +71,33 @@ export class FlowReport extends BasicPage {
                 }
             };
             emPara.fields.push(field);
-            if (['insert', 'associate'].indexOf(para.uiType) > -1 ? field.field.noModify : field.field.noEdit) {
-                field.dom && field.dom.classList.add('disabled');
-            }
         });
         this.editModule = new EditModule(emPara);
-
+        emPara.fields.forEach((f) => {
+            let field = f.field,
+                name = field.name,
+                isNotEdit = isInsert ? field.noModify : field.noEdit;
+            if(isNotEdit && !field.noShow){
+                let com = this.editModule.getDom(name);
+                com && (com.disabled = true);
+                if(tools.isMb){
+                    let wrapper = com.wrapper || com.container;
+                    wrapper && wrapper.addEventListener('click', () => {
+                        Modal.toast(field.caption + '不可以修改～');
+                    });
+                }
+            }
+        });
         // 编辑标识
         this.initData();
         this.initEvent();
     }
+
+    private _lookUpData: objOf<ListItem[]> = {};
+    get lookUpData() {
+        return this._lookUpData || {};
+    }
+
 
     private createFormWrapper(fields: R_Field[]): HTMLElement {
         if (tools.isMb) {
@@ -260,7 +278,7 @@ export class FlowReport extends BasicPage {
                 case 'agree': {
                     btn.actionAddr.dataAddr += '&audit_memo=同意';
                     btn.hintAfterAction = true;
-                    ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
+                    ButtonAction.get().clickHandle(btn, self.dataGet(), () => {
                         // sys.window.close();
                     }, self.url);
                 }

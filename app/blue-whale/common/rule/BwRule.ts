@@ -53,6 +53,20 @@ export class BwRule extends Rule {
         return dataType === BwRule.DT_DATETIME || dataType === BwRule.DT_TIME
     }
 
+    static isOldImg(dataType: string): boolean {
+        return [
+            BwRule.DT_MUL_IMAGE,
+            BwRule.DT_IMAGE
+        ].some((type) => dataType === type);
+    }
+    static isNewImg(dataType: string): boolean {
+        return [
+            BwRule.DT_SIGN,
+            BwRule.DT_UNI_IMAGE,
+            BwRule.DT_UNI_MUL_IMAGE
+        ].some((type) => dataType === type);
+    }
+
     static isImage(dataType: string): boolean {
         return [
             BwRule.DT_MUL_IMAGE,

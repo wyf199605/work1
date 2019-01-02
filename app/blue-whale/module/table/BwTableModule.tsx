@@ -28,6 +28,8 @@ import {EditModule} from "../edit/editModule";
 import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {BwUploader} from "../uploadModule/bwUploader";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -682,7 +684,15 @@ export class BwTableModule extends Component {
                 index = parseInt(td.parentElement.dataset.index),
                 name = td.dataset.name;
 
-            if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
+            if (isTd && self.cols.some(col => col.name === name && BwRule.isNewImg(col.atrrs.dataType))) {
+                let row = ftable.rows[index],
+                    cell = row ? row.cellGet(name) : null;
+                if(self.ftable.editing){
+                    self.imgManager.open(cell);
+                }else{
+                    self.showImg(cell);
+                }
+            } else if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
                 self.multiImgEdit.show(name, index);
             } else {
                 self.imgEdit.showImg(index);
@@ -697,6 +707,74 @@ export class BwTableModule extends Component {
             ftable.click.add(trSelector, tools.pattern.throttling((e) => {
                 imgHandler(e, false);
             }, 1000));
+        }
+
+    }
+
+    protected imgManager = (() => {
+        let layoutImg: BwLayoutImg,
+            images: string[] = [];
+
+        return {
+            open: (cell: FastTableCell) => {
+                layoutImg && layoutImg.destroy();
+                images = [];
+                if(cell && cell.column){
+                    let field = cell.column.content as R_Field;
+                    layoutImg = new BwLayoutImg({
+                        isCloseMsg: true,
+                        nameField: field.name,
+                        // thumbField: thumbField,
+                        loading: {
+                            msg: '图片上传中...'
+                        },
+                        autoUpload: true,
+                        onDelete: (index) => {
+                            images.splice(index, 1);
+                        },
+                        onSuccess: (res) => {
+                            images = [res.data.unique];
+                        },
+                        multi: false,
+                        onFinish: () => {
+                            return new Promise<any>((resolve) => {
+                                cell.data = images.join(',');
+                                resolve();
+                            });
+                        }
+                    });
+                    if(cell.data){
+                        let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                            "md5_field": field.name,
+                            [field.name]: cell.data,
+                            down: 'allow'
+                        });
+                        layoutImg.set([url])
+                    }
+                    images = [cell.data as string];
+                    layoutImg.modalShow = true;
+                }
+            }
+        }
+    })();
+
+    protected showImg(cell: FastTableCell) {
+        if (cell && cell.column) {
+            let column = cell.column,
+                data = cell.data,
+                field = column.content as R_Field,
+                urls = [];
+            if (data) {
+                urls = [tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                    "md5_field": field.name,
+                    [field.name]: data,
+                    down: 'allow'
+                })];
+                let imgData: ImgModalPara = {
+                    img: urls
+                };
+                ImgModal.show(imgData);
+            }
         }
 
     }
@@ -1084,11 +1162,11 @@ export class BwTableModule extends Component {
 
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
-                    if(rule.slice(0,3) == 'SUM'){
-                        let sum =  this.countCalcSum(ftable,field),
+                    if (rule.slice(0, 3) == 'SUM') {
+                        let sum = this.countCalcSum(ftable, field),
                             el = countElements[field];
                         el && (el.innerHTML = sum + '');
-                    }else {
+                    } else {
                         if (field && rule) {
                             let diffValue = tools.str.parseTpl(rule, colHeadStr),
                                 el = countElements[field];
@@ -1165,11 +1243,11 @@ export class BwTableModule extends Component {
                 }
                 calcRule.forEach(calc => {
                     let {field, rule} = calc;
-                    if(rule.slice(0,3) == 'SUM'){
-                        let sum =  this.countCalcSum(ftable,field),
+                    if (rule.slice(0, 3) == 'SUM') {
+                        let sum = this.countCalcSum(ftable, field),
                             el = countElements[field];
                         el && (el.innerHTML = sum + '');
-                    }else {
+                    } else {
                         if (field && rule) {
                             let diffValue = tools.str.parseTpl(rule, colHeadStr),
                                 el = countElements[field];
@@ -1183,17 +1261,18 @@ export class BwTableModule extends Component {
             })
         }
 
-}
+    }
 
-   public countCalcSum(ft,str){
+    public countCalcSum(ft, str) {
 
         let column = ft.columnGet(str),
             sum = 0;
-        column.data.forEach((col)=>{
-          sum += col;
+        column.data.forEach((col) => {
+            sum += col;
         })
-       return sum;
+        return sum;
     }
+
     public rfidColInit() {
         let rfidCols = this.ui.rfidCols,
             ftable = this.ftable,
@@ -1268,7 +1347,7 @@ export class BwTableModule extends Component {
                                     break;
                                 }
                             }
-                            if(count !== 0){
+                            if (count !== 0) {
                                 return {
                                     field: cell,
                                     count: count
@@ -1345,14 +1424,14 @@ export class BwTableModule extends Component {
                         colHeadStr['SCANAMOUNT'] = ((resData.Calculate === undefined) ? "0" : resData.CalculateScan);
                     }
                     colHeadStr['OLD_DIFFAMOUNT'] = this.OLD_DIFFAMOUNT;
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         calcRule.forEach(calc => {
                             let {field, rule} = calc;
-                            if(rule.slice(0,3) == 'SUM'){
-                                let sum =  this.countCalcSum(ftable,field),
+                            if (rule.slice(0, 3) == 'SUM') {
+                                let sum = this.countCalcSum(ftable, field),
                                     el = countElements[field];
                                 el && (el.innerHTML = sum + '');
-                            }else {
+                            } else {
                                 if (field && rule) {
                                     let diffValue = tools.str.parseTpl(rule, colHeadStr),
                                         el = countElements[field];
@@ -1360,7 +1439,7 @@ export class BwTableModule extends Component {
                                 }
                             }
                         });
-                    },980)
+                    }, 980)
                     Shell.inventory.columnCountOff(when, 1, inventory, (res) => {
                     })
                 })
@@ -1384,7 +1463,7 @@ export class BwTableModule extends Component {
             classes: string[] = [];         // 类名
         if (field && !field.noShow && field.atrrs) {
             let dataType = field.atrrs.dataType,
-                isImg = dataType === BwRule.DT_IMAGE || dataType === BwRule.DT_SIGN;
+                isImg = dataType === BwRule.DT_IMAGE;
 
             if (isImg && field.link) {
                 // 缩略图
@@ -1392,6 +1471,16 @@ export class BwTableModule extends Component {
                 text = <img src={url}/>;
                 classes.push('cell-img');
 
+            } else if (dataType === BwRule.DT_SIGN) {
+                if (cellData) {
+                    let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                        "md5_field": field.name,
+                        [field.name]: cellData,
+                        down: 'allow'
+                    });
+                    text = <img src={url}/>;
+                }
+                classes.push('cell-img');
             } else if (dataType === BwRule.DT_MUL_IMAGE) {
                 // 多图缩略图
                 if (typeof cellData === 'string' && cellData[0]) {
@@ -1631,7 +1720,7 @@ export class BwTableModule extends Component {
 
         let init = () => {
             this.cols.forEach(col => {
-                if (col.atrrs && (col.atrrs.dataType === '20' || col.atrrs.dataType === '26')) {
+                if (col.atrrs && (col.atrrs.dataType === '20')) {
                     if (col.noShow) {
                         fields.push(col);
                     } else {
@@ -1761,6 +1850,7 @@ export class BwTableModule extends Component {
         };
 
         let imgUrlCreate = (md5: string) => {
+            let dataObj: obj;
             return tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                 // name_field: nameField,
                 md5_field: 'FILE_ID',
@@ -1827,12 +1917,12 @@ export class BwTableModule extends Component {
             box && box.destroy();
             box = new InputBox({
                 container: wrapper,
-                isResponsive: !tools.isMb,
+                isResponsive: true,
                 className: !tools.isMb ? 'more-btns' : ''
             });
             // TODO: 移动端未实现流程设计功能。
             if (tools.isMb && (this.ui.caption === '流程设计' || this.ui.caption === '流程制度')) {
-                for (let i = 0,len = btnsUi.length; i < len; i++) {
+                for (let i = 0, len = btnsUi.length; i < len; i++) {
                     let btn = btnsUi[i];
                     // if (btn.openType === 'flow-design' || btn.openType === 'flow-look') {
                     if (btn.openType === 'flow-design') {
@@ -1974,9 +2064,9 @@ export class BwTableModule extends Component {
                                 ? Object.assign({}, linkedData, selectedData[0] || {})
                                 : (
                                     multiselect === 2
-                                    ? selectedData.map((o) =>
-                                        Object.assign({}, linkedData || {}, o))
-                                    : null
+                                        ? selectedData.map((o) =>
+                                            Object.assign({}, linkedData || {}, o))
+                                        : null
                                 );
                             select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
 
@@ -2168,6 +2258,9 @@ export class BwTableModule extends Component {
                         onClick: (isChecked) => {
                             this.subBtns.box.isShow = !isChecked;
                             this.modify.box.isShow = isChecked;
+                            if(!isChecked){
+                                this.subBtns.box.responsive();
+                            }
                         }
                     });
 
@@ -2349,7 +2442,7 @@ export class BwTableModule extends Component {
             // 控件销毁时验证
             bwTable.ftable.off(FastTable.EVT_CELL_EDIT_CANCEL, handler);
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
-                if(cell.isEdited){
+                if (cell.isEdited) {
                     validList.push(validate(editModule, cell));
                 }
             });
@@ -2388,7 +2481,7 @@ export class BwTableModule extends Component {
                     // callback(td, false);
                 } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
                     EditConstruct.checkValue(field, rowData, () => {
-                        if(this.ftable && this.ftable.editing){
+                        if (this.ftable && this.ftable.editing) {
                             lookUpCell && (lookUpCell.data = null);
                             cell.data = null;
                         }
@@ -2419,7 +2512,7 @@ export class BwTableModule extends Component {
                 cell.isChecked = true;
             }).finally(() => {
                 let index = validList.indexOf(promise);
-                if(index > -1){
+                if (index > -1) {
                     validList.splice(index, 1);
                 }
             });

@@ -41,9 +41,13 @@ export class BwMbList extends BasicPage {
                 break;
             case 'view': {
                 let ui = para.ui as IBW_UI<R_SubTable_Field>;
-                new MbListView({
+                let mbList = new MbListView({
                     ui: ui,
-                    container: para.dom
+                    container: para.dom,
+                    url: this.url
+                });
+                this.on(BwRule.EVT_REFRESH, () => {
+                    mbList.refresh();
                 })
             }
                 break;
@@ -125,6 +129,9 @@ class BwMbListElement {
                             loading.destroy();
                             loading = null;
                         });
+                    },
+                    search: (data: obj) => {
+                        return this.mbListModule.refresh(data);
                     }
                 });
                 d.on(d.query('body > header [data-action="layout-query"]'), 'click', () => {
@@ -224,14 +231,33 @@ class BwMbListElement {
                     if (tools.isNotEmpty(bwTableEl.querier.mobileSetting)) {
                         dataStr = bwTableEl.querier.mobileSetting.settingValue.replace(/\s*/g, '').replace(/\\*/g, '');
                     }
-                    this.queryModule = new NewQueryModalMb({
-                        queryItems: tools.isNotEmpty(dataStr) ? JSON.parse(dataStr) : [],
-                        advanceSearch: bwTableEl.querier,
-                        cols: bwTableEl.cols,
-                        refresher: (data: obj) => {
-                            return this.mbListModule.refresh(data);
-                        }
-                    });
+                    if (tools.os.ios) {
+                        setTimeout(() => {
+                            this.queryModule = new NewQueryModalMb({
+                                queryItems: tools.isNotEmpty(dataStr) ? JSON.parse(dataStr) : [],
+                                advanceSearch: bwTableEl.querier,
+                                cols: bwTableEl.cols,
+                                refresher: (data: obj) => {
+                                    return this.mbListModule.refresh(data);
+                                },
+                                search: (data: obj) => {
+                                    return this.mbListModule.refresh(data);
+                                }
+                            });
+                        }, 200);
+                    } else {
+                        this.queryModule = new NewQueryModalMb({
+                            queryItems: tools.isNotEmpty(dataStr) ? JSON.parse(dataStr) : [],
+                            advanceSearch: bwTableEl.querier,
+                            cols: bwTableEl.cols,
+                            refresher: (data: obj) => {
+                                return this.mbListModule.refresh(data);
+                            },
+                            search: (data: obj) => {
+                                return this.mbListModule.refresh(data);
+                            }
+                        });
+                    }
                     d.on(d.query('body > header [data-action="layout-query"]'), 'click', () => {
                         (this.queryModule as NewQueryModalMb).isShow = true;
                     });

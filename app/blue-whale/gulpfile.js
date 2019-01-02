@@ -173,7 +173,8 @@ gulp.task('js', function () {
     gulpTsModule([
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
-        'listDetail/DetailModal'
+        'listDetail/DetailModal',
+        'listDetail/editDetailModule'
     ], 'listDetail.js');
 
     //process模块
@@ -204,6 +205,7 @@ gulp.task('js', function () {
         'uploadModule/uploadImages',
         'uploadModule/uploadImagesItem',
         'uploadModule/bwUploader',
+        'uploadModule/bwLayoutImg',
     ], 'uploadModule.js');
 
     //changePassword模块
@@ -334,6 +336,8 @@ gulp.task('js', function () {
     gulpTsPage('index/register.mb', 'register.mb.js');
     gulpTsPage('index/register.pc', 'register.pc.js');
     gulpTsPage('index/exception', 'exception.js');
+
+    gulpTsPage('index/serverSelect', 'ServerSelect.js');
 
     gulpTsPage('attendance/attendance', 'attendance.js');
     gulpTsPage('attendance/checkIn', 'checkIn.js');

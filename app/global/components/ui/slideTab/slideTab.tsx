@@ -4,9 +4,11 @@ import {ITab, Tab, TabPara} from "../tab/tab";
 import d = G.d;
 import tools = G.tools;
 import {DataManager, IDataManagerAjaxStatus, IDataManagerPara} from "../../DataManager/DataManager";
+import {Modal} from "../../feedback/modal/Modal";
 
 export interface ISlideTabPara extends TabPara {
     tabs?: ISlideTab[];
+    isPulldownRefresh?: number;
 }
 
 export interface ISlideTab extends ITab {
@@ -21,8 +23,10 @@ export interface ISlideTab extends ITab {
 
 
 export class SlideTab extends Tab {
-    constructor(para: ISlideTabPara) {
+    protected isPulldownRefresh: number = 0;
+    constructor(protected para: ISlideTabPara) {
         super(para);
+        this.isPulldownRefresh = tools.isNotEmpty(para.isPulldownRefresh) ? para.isPulldownRefresh : 0;
         this.panelContainer.classList.add('slide-tab-wrapper');
 
         this.width = this.panelContainer.offsetWidth;
@@ -51,6 +55,7 @@ export class SlideTab extends Tab {
 
     protected slideEvent = (() => {
         let translate = 0,
+            isPulldownRefresh = true,
             moveHandler = null,
             endHandler = null;
 
@@ -75,7 +80,7 @@ export class SlideTab extends Tab {
 
                 }
 
-                if (panel.scrollTop === 0 && direction !== 'down') {
+                if (isPulldownRefresh && panel.scrollTop === 0 && direction !== 'down') {
                     e.preventDefault();
                 }
 
@@ -117,6 +122,7 @@ export class SlideTab extends Tab {
         };
         return {
             on: () => {
+                isPulldownRefresh = this.isPulldownRefresh === 0 ? true : !!~this.isPulldownRefresh;
                 d.on(this.panelContainer, 'touchstart', startHandler);
                 // d.on(this.panelContainer, 'panleft panright panstart panend', handler = (e: any) => {
                 //     // e.srcEvent.preventDefault && e.srcEvent.preventDefault();
@@ -224,13 +230,14 @@ export class SlideTab extends Tab {
             this.temDataManagers = [];
         }
         if (tab.dataManager) {
+            let isPulldownRefresh = tools.isEmpty(this.para.isPulldownRefresh) ? 0 : this.para.isPulldownRefresh;
             let len = this.dataManagers.length,
                 page = tab.dataManager,
                 dataManager = new DataManager({
                     page: {
                         size: page.pageSize || 50,
                         container: d.query(`div.tab-pane[data-index="${len}"]`, this.panelContainer),
-                        isPulldownRefresh: page.isPulldownRefresh || false,
+                        isPulldownRefresh: isPulldownRefresh === 0 ? (page.isPulldownRefresh || false) : !!~isPulldownRefresh,
                     },
                     render: (start, length, isRefresh) => {
                         typeof page.render === 'function' && page.render(start, length, dataManager.data, isRefresh);

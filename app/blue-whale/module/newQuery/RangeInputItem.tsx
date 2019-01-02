@@ -26,9 +26,9 @@ export class RangeInputItem extends FormCom {
                 break;
             case 1:
             case 2: {
-                if (tools.isMb){
+                if (tools.isMb) {
                     val = (this.innerCom.time as DatetimeMb).get();
-                }else{
+                } else {
                     val = (this.innerCom.time as Datetime).get();
                 }
             }
@@ -45,9 +45,9 @@ export class RangeInputItem extends FormCom {
                 break;
             case 1:
             case 2: {
-                if (tools.isMb){
+                if (tools.isMb) {
                     (this.innerCom.time as DatetimeMb).set(val);
-                }else{
+                } else {
                     (this.innerCom.time as Datetime).set(val);
                 }
             }
@@ -78,19 +78,31 @@ export class RangeInputItem extends FormCom {
             placeStr = para.isFirst ? '最小时间' : '最大时间';
         }
         switch (para.interval) {
-            case 0:
+            case 0: {
+                wrapper = tools.isMb && tools.os.android ?
+                    <div className="query-range-input-item new-query-input-wrapper">
+                        {this.input = <input type="number" placeholder={placeStr}/>}
+                        <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
+                    </div> : <div className="query-range-input-item new-query-input-wrapper">
+                        {this.input = <input class="number" type="number" placeholder={placeStr}/>}
+                    </div>;
+
+            }
+                break;
             case 5: {
-                wrapper = tools.isMb ? <div className="query-range-input-item new-query-input-wrapper">
-                    {this.input = <input type="text" placeholder={placeStr}/>}
-                    <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
-                </div> : <div className="query-range-input-item new-query-input-wrapper">
-                    {this.input = <input type="text" placeholder={placeStr}/>}
-                </div>;
+                wrapper = tools.isMb && tools.os.android ?
+                    <div className="query-range-input-item new-query-input-wrapper">
+                        {this.input = <input type="text" placeholder={placeStr}/>}
+                        <div className="audio-icon"><i className="appcommon app-maikefeng"/></div>
+                    </div> : <div className="query-range-input-item new-query-input-wrapper">
+                        {this.input = <input type="text" placeholder={placeStr}/>}
+                    </div>;
             }
                 break;
             case 1: {
                 wrapper = <div className="new-query-item-time new-query-input-wrapper">
-                    {tools.isMb ? <DatetimeMb c-var="time" format="yyyy-MM-dd" placeholder={placeStr}/> : <Datetime c-var="time" format="yyyy-MM-dd" placeholder={placeStr}/>}
+                    {tools.isMb ? <DatetimeMb c-var="time" format="yyyy-MM-dd" placeholder={placeStr}/> :
+                        <Datetime c-var="time" format="yyyy-MM-dd" placeholder={placeStr}/>}
                 </div>;
             }
                 break;
@@ -100,8 +112,8 @@ export class RangeInputItem extends FormCom {
                         {tools.isMb ? <DatetimeMb c-var="time"
                                                   format="yyyy-MM-dd HH:mm:ss"
                                                   placeholder={placeStr}/> : <Datetime c-var="time"
-                                                                                         format="yyyy-MM-dd HH:mm:ss"
-                                                                                         placeholder={placeStr}/>}
+                                                                                       format="yyyy-MM-dd HH:mm:ss"
+                                                                                       placeholder={placeStr}/>}
                     </div>;
             }
                 break;
@@ -113,6 +125,16 @@ export class RangeInputItem extends FormCom {
         super(para);
         if (para.interval === 0 || para.interval === 5) {
             this.initEvents.on();
+            if (tools.os.android){
+                let inputs = Array.prototype.slice.call(document.querySelectorAll('input.input'));
+                inputs.forEach(input => {
+                    input.onclick = function (e) {
+                        window.setTimeout(function () {
+                            e.target.scrollIntoViewIfNeeded();
+                        }, 0);
+                    }
+                })
+            }
         }
     }
 

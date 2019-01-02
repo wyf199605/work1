@@ -81,6 +81,10 @@ export class Search {
         });
 
         d.on(this.voiceEl, 'click', () => {
+            if(G.tools.os.ios){
+                Modal.alert('IPhone暂不支持语音搜索功能');
+                return;
+            }
             this.dotEl.classList.remove('hide');
             Shell.base.speak(3, null, result => {
                 this.dotEl.classList.add('hide');

@@ -1,9 +1,9 @@
 /// <amd-module name="ActionSheet"/>
-
 import tools = G.tools;
 import d = G.d;
 import {Modal} from "../../feedback/modal/Modal";
 import {IButton} from "../../general/button/Button";
+
 
 export interface IActionSheetButton extends IButton {
     content: string;        // 内容（必须）
