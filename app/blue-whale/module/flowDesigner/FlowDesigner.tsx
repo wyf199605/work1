@@ -206,8 +206,8 @@ export class FlowDesigner {
                 this.modal.modalHeader.title = '查看流程';
                 d.query('#design-canvas').style.left = '0px';
                 if (tools.isMb){
-                    d.query('.modal-title').style.color = '#000000';
                     d.remove(d.query('.header-btn-right'));
+                    d.query('.modal-title').style.color = '#000000';
                     d.query('#design-canvas').style.width = `${FlowDesigner.MbWidth}px`;
                 } else{
                     d.query('#design-canvas').style.width = '100%';
@@ -343,16 +343,15 @@ export class FlowDesigner {
                 });
             });
 
-            // 所有的下拉列表都不可用
-            FlowDesigner.FlowType === 'look' && (
-                // 禁用所有input
+            if(FlowDesigner.FlowType === 'look'){
+                // 所有input、下拉列表设为只读
                 d.queryAll('input').forEach(input => {
                     (input as HTMLInputElement).readOnly = true;
-                }),
-                    [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS)
-                        .forEach(item => item.flowEditor && item.flowEditor.initEvents.off()),
-                    d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item))
-            );
+                });
+                d.queryAll('.floweditor-dropdown').forEach(item => d.remove(item));
+                [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS)
+                    .forEach(item => item.flowEditor && item.flowEditor.initEvents.off());
+            }
         }
     }
 
@@ -366,8 +365,7 @@ export class FlowDesigner {
 
     private initEvents = (() => {
         let clickSVG = (e) => {
-            let target = e.target;
-            if (target.tagName === 'svg') {
+            if (e.target.tagName === 'svg') {
                 FlowDesigner.removeAllActive();
                 Tips.removeActive();
                 FlowItem.toggleDisabledStartAndEnd();
@@ -382,12 +380,13 @@ export class FlowDesigner {
             FlowDesigner.ALLITEMS && FlowDesigner.ALLITEMS.forEach(item => item.calcWidthAndHeight());
             FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
             FlowDesigner.connections && FlowDesigner.connections.forEach(connection => FlowDesigner.PAPER.connection(connection));
-            FlowDesigner.ALLITEMS.forEach(item => item.flowEditor.refreshPosition());
+            FlowEditor.refreshAllPosition();
         };
         let clickFullscreenHandler = () => {
             this.modal.wrapper.classList.toggle('full-screen');
             d.query('.icon-fullscreen').classList.toggle('icon-zuidahua');
             d.query('.icon-fullscreen').classList.toggle('icon-chuangkouhua');
+            FlowEditor.refreshAllPosition();
         };
         let mouseWheelHandler = () => {
 

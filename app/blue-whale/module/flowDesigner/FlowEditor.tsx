@@ -118,9 +118,13 @@ export class FlowEditor extends FormCom {
     static hideAllDropdown() {
         FlowEditor.DropDowns.forEach(dropdown => dropdown.hideList());
     }
+    // 刷新所有flowEditor
+    static refreshAllPosition(){
+        FlowDesigner.ALLITEMS.forEach(item => item.flowEditor.refreshPosition());
+    }
 
+    // 刷新当前flowEditor的位置
     public refreshPosition(){
-        // 用于刷新flowEditor的位置（在边界刷新或窗口大小改变时调用）
         let flowModalStyle = window.getComputedStyle(d.query('.modal-wrapper.flow-modal'));
         this.wrapper.style.right = parseInt(flowModalStyle.right) + 25 + 'px';
         this.wrapper.style.bottom = parseInt(flowModalStyle.bottom) + 25 + 'px';
@@ -173,7 +177,6 @@ export class FlowEditor extends FormCom {
                                                     data['GROUP_ID'] && (groupId = '_' + data['GROUP_ID'].toLowerCase());
                                                     data['ASSIGN_ID'] && (assignId = '#' + data['ASSIGN_ID'].toLowerCase());
                                                 });
-                                                // index >= 0 && (FlowEditor.DROPDOWN_KEYVALUE[attr][index].value = userId.join(',') || groupId || assignId);
                                                 index >= 0 && (this.selectKeyValue.value = userId.join(',') || groupId || assignId);
                                                 this.set({[attr]: userName.join(',') || groupId || assignId});
                                                 isOpenAddressList = false;
@@ -209,7 +212,7 @@ export class FlowEditor extends FormCom {
         let clickHandler = (e) => {
                 // 点击文字描述也能使input获得焦点,并且记录当前input的值为旧值
                 let input;
-                if (e.target.className.split().includes('attr-editor-wrapper')) {
+                if (e.target.className.split(' ').includes('attr-editor-wrapper')) {
                     input = d.query('input', e.target) as HTMLInputElement;
                 } else {
                     input = d.query('input', e.target.parentElement) as HTMLInputElement;
@@ -394,13 +397,10 @@ export class FlowEditor extends FormCom {
     destroy() {
         this.initEvents.off();
         FlowEditor.DROPDOWN_KEYVALUE['assignee'].forEach(valueText => valueText.vlaue = '');
-        FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 &&
-        FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
-        FlowEditor.DropDowns.forEach(dropdown => {
-            Object.keys(this.dropdowns).forEach(attr => {
-                d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
-                this.dropdowns[attr].destroy();
-            });
+        FlowEditor.EXIST_NAME.indexOf(this.get().name) >= 0 && FlowEditor.EXIST_NAME.splice(FlowEditor.EXIST_NAME.indexOf(this.get().name), 1);
+        Object.keys(this.dropdowns).forEach(attr => {
+            d.remove(d.closest(this.dropdowns[attr].ulDom, '.dropdown-wrapper', d.query('#design-canvas')));
+            this.dropdowns[attr].destroy();
         });
         this.owner = null;
         super.destroy();

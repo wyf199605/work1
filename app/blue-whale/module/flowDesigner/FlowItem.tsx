@@ -330,6 +330,7 @@ export class FlowItem extends Component {
             // 超出边界时刷新svg的宽高
             let boundary = Method.getBoundary();
             FlowDesigner.PAPER.setSize(boundary.width, boundary.height);
+
             let diamondArr = ['decision', 'fork', 'join'];
             if (diamondArr.indexOf(_this.para.type) >= 0) {
                 this.transform('r45');
