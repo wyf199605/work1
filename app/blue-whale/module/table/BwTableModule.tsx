@@ -30,6 +30,7 @@ import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {BwUploader} from "../uploadModule/bwUploader";
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
+import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -684,19 +685,27 @@ export class BwTableModule extends Component {
                 index = parseInt(td.parentElement.dataset.index),
                 name = td.dataset.name;
 
-            if (isTd && self.cols.some(col => col.name === name && BwRule.isNewImg(col.atrrs.dataType))) {
-                let row = ftable.rows[index],
-                    cell = row ? row.cellGet(name) : null;
-                if(self.ftable.editing){
-                    self.imgManager.open(cell);
-                }else{
-                    self.showImg(cell);
-                }
-            } else if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
-                self.multiImgEdit.show(name, index);
-            } else {
-                self.imgEdit.showImg(index);
+            let row = ftable.rows[index],
+                cell = row ? row.cellGet(name) : null;
+            if(self.ftable.editing){
+                self.imgManager.open(cell);
+            }else{
+                console.log(self.imgManager.getImg(cell));
+                self.imgManager.showImg(self.imgManager.getImg(cell));
             }
+            // if (isTd && self.cols.some(col => col.name === name && BwRule.isNewImg(col.atrrs.dataType))) {
+            //     let row = ftable.rows[index],
+            //     cell = row ? row.cellGet(name) : null;
+            //     if(self.ftable.editing){
+            //         self.imgManager.open(cell);
+            //     }else{
+            //         self.imgManager.showImg(self.imgManager.getImg(cell));
+            //     }
+            // } else if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
+            //     self.multiImgEdit.show(name, index);
+            // } else {
+            //     self.imgEdit.showImg(index);
+            // }
         };
 
         if (hasThumbnail) {
@@ -712,19 +721,70 @@ export class BwTableModule extends Component {
     }
 
     protected imgManager = (() => {
-        let layoutImg: BwLayoutImg,
-            images: string[] = [];
+        let layoutImg: BwLayoutImg;
+
+        let getImg = (cell: FastTableCell) => {
+            let urls = [];
+            if (cell && cell.column) {
+                let column = cell.column,
+                    data = cell.data,
+                    row = cell.row,
+                    field = column.content as R_Field;
+                if(BwRule.isNewImg(field.atrrs.dataType)){
+                    if (data) {
+                        urls = [tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                            "md5_field": field.name,
+                            [field.name]: data,
+                            down: 'allow'
+                        })];
+                    }
+                }else if(BwRule.isOldImg(field.atrrs.dataType)){
+                    let picAddrList = this.ui.pictureAddrList;
+
+                    if (tools.isNotEmptyArray(picAddrList)) {
+
+                        let rowData = this.ftable.tableData.rowDataGet(row.index),
+                            url: string = '';
+                        if(rowData[field.name]){
+                            url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                                // name_field: nameField,
+                                md5_field: 'FILE_ID',
+                                file_id: rowData[field.name],
+                                // [nameField]: fileName,
+                                down: 'allow'
+
+                            });
+                        }else{
+                            url = picAddrList.map(addr =>
+                                tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData)
+                            )[0] || '';
+                        }
+
+                        urls = [url];
+                    }
+                }
+            }
+            return urls;
+        };
 
         return {
+            getImg,
+            showImg(urls: string[]) {
+                let imgData: ImgModalPara = {
+                    img: urls
+                };
+                ImgModal.show(imgData);
+            },
             open: (cell: FastTableCell) => {
                 layoutImg && layoutImg.destroy();
-                images = [];
+                let images = [];
                 if(cell && cell.column){
-                    let field = cell.column.content as R_Field;
+                    let field = cell.column.content as R_Field,
+                        row = this.ftable.rowGet(cell.row.index);
                     layoutImg = new BwLayoutImg({
                         isCloseMsg: true,
                         nameField: field.name,
-                        // thumbField: thumbField,
+                        thumbField: field.atrrs.dataType === '20' ? field.name : void 0,
                         loading: {
                             msg: '图片上传中...'
                         },
@@ -733,51 +793,35 @@ export class BwTableModule extends Component {
                             images.splice(index, 1);
                         },
                         onSuccess: (res) => {
-                            images = [res.data.unique];
+                            if(BwRule.isOldImg(field.atrrs.dataType)){
+
+                                let data = res.data,
+                                    md5Data = {};
+                                for (let fieldKey in data) {
+                                    md5Data[data[fieldKey].key] = data[fieldKey].value;
+                                }
+                                images = [md5Data[field.name]];
+                                row.data = Object.assign({}, row.data, md5Data);
+                            }else if(BwRule.isNewImg(field.atrrs.dataType)){
+                                images = [res.data.unique];
+                            }
                         },
                         multi: false,
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
-                                cell.data = images.join(',');
+                                BwRule.isNewImg(field.atrrs.dataType) && (cell.data = images.join(','));
                                 resolve();
                             });
                         }
                     });
-                    if(cell.data){
-                        let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                            "md5_field": field.name,
-                            [field.name]: cell.data,
-                            down: 'allow'
-                        });
-                        layoutImg.set([url])
-                    }
+
+                    layoutImg.set(getImg(cell));
                     images = [cell.data as string];
                     layoutImg.modalShow = true;
                 }
             }
         }
     })();
-
-    protected showImg(cell: FastTableCell) {
-        if (cell && cell.column) {
-            let column = cell.column,
-                data = cell.data,
-                field = column.content as R_Field,
-                urls = [];
-            if (data) {
-                urls = [tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                    "md5_field": field.name,
-                    [field.name]: data,
-                    down: 'allow'
-                })];
-                let imgData: ImgModalPara = {
-                    img: urls
-                };
-                ImgModal.show(imgData);
-            }
-        }
-
-    }
 
     get ajaxData() {
         return this.ftable.tableData.ajaxData;
@@ -1881,9 +1925,11 @@ export class BwTableModule extends Component {
                 let imgsUrl = picAddrList.map(addr =>
                     tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData)
                 );
+                console.log(imgsUrl);
                 // this.tableImgEdit.indexSet(rowIndex, urls);
                 // debugger;
                 imgs.forEach((img, i) => {
+                    console.log(md5s[i]);
                     img.src = md5s[i] ? imgUrlCreate(md5s[i]) : imgsUrl[i];
                     // img.src = md5s[i] ? this.imgUrlCreate(md5s[i]) : tools.url.addObj(urls[i], {'_': Date.now()});
                 })

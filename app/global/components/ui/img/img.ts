@@ -4,6 +4,7 @@ import d = G.d;
 import tools = G.tools;
 
 import {Modal} from "../../feedback/modal/Modal";
+import {Loading} from "../loading/loading";
 
 export interface ImgModalPara {
     downAddr?: string;
@@ -26,6 +27,10 @@ export const ImgModal = (() => {
 
     function showPhotoSwipe(para: ImgModalPara, index = 0) {
         if (gallery === null) {
+            let loading = new Loading({
+                msg: '图片加载中...'
+            });
+            loading.show();
             // let self = this;
             require(['photoSwipe', 'photoSwipeUi'], (photoSwipe, PhotoSwipeUI_Default) => {
                 downAddr = para.downAddr;
@@ -96,6 +101,9 @@ export const ImgModal = (() => {
                             document.body.style.overflow = '';
                         }
                     })
+                }).finally(() => {
+                    loading && loading.hide();
+                    loading = null;
                 })
             });
         }
