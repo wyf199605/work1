@@ -290,7 +290,7 @@ export class EditDetailModule extends Component {
         this.scrollToTop();
         this.getDefaultData().then(data => {
             this.editModule.set(data);
-            this.isEdit = false;
+            this.isEdit = this.para.uiType === 'edit_detail';
         });
     }
 
@@ -339,20 +339,25 @@ export class EditDetailModule extends Component {
 
     // 检测上一页下一页按钮是否可用
     private checkPageButtonDisabled = () => {
-        if (this.totalNumber === 1 || this.totalNumber === 0) {
+        if (this.isEdit){
             this.prev.disabled = true;
             this.next.disabled = true;
-            return;
-        }
-        if (this.currentPage === 1) {
-            this.prev.disabled = true;
-            this.next.disabled = false;
-        } else if (this.currentPage === this.totalNumber) {
-            this.next.disabled = true;
-            this.prev.disabled = false;
-        } else {
-            this.prev.disabled = false;
-            this.next.disabled = false;
+        }else{
+            if (this.totalNumber === 1 || this.totalNumber === 0) {
+                this.prev.disabled = true;
+                this.next.disabled = true;
+                return;
+            }
+            if (this.currentPage === 1) {
+                this.prev.disabled = true;
+                this.next.disabled = false;
+            } else if (this.currentPage === this.totalNumber) {
+                this.next.disabled = true;
+                this.prev.disabled = false;
+            } else {
+                this.prev.disabled = false;
+                this.next.disabled = false;
+            }
         }
     };
 
@@ -523,7 +528,9 @@ export class EditDetailModule extends Component {
             this.cancelBtn.disabled = false;
             this.updateBtn.disabled = false;
             this.saveBtn.disabled = false;
-            this.moreBtn.disabled = false;
+            tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = false);
+            this.next.disabled = true;
+            this.prev.disabled = true;
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
                     this.editModule.getDom(f.name).disabled = false;
@@ -543,6 +550,7 @@ export class EditDetailModule extends Component {
             this.cancelBtn.disabled = !isEdit;
             this.updateBtn.disabled = isEdit;
             this.saveBtn.disabled = !isEdit;
+            this.checkPageButtonDisabled();
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = isEdit);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
