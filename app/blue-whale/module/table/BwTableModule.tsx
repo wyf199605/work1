@@ -691,7 +691,7 @@ export class BwTableModule extends Component {
                 self.imgManager.open(cell);
             }else{
                 console.log(self.imgManager.getImg(cell));
-                self.imgManager.showImg(self.imgManager.getImg(cell));
+                self.imgManager.showImg(cell);
             }
             // if (isTd && self.cols.some(col => col.name === name && BwRule.isNewImg(col.atrrs.dataType))) {
             //     let row = ftable.rows[index],
@@ -769,10 +769,42 @@ export class BwTableModule extends Component {
 
         return {
             getImg,
-            showImg(urls: string[]) {
+            showImg(cell : FastTableCell) {
+                if(!cell || !cell.column){
+                    return;
+                }
+
                 let imgData: ImgModalPara = {
-                    img: urls
+                    img: getImg(cell)
                 };
+                let index = cell.row.index,
+                    field = cell.column.content as R_Field,
+                    name = field.name,
+                    len = cell.ftable.data.length;
+
+                if(len > 1){
+                    imgData.turnPage = (next) => {
+                        let getCell = (i) => {
+                            let rows = cell.ftable.rows,
+                                row = rows[i + 1];
+                            if(!next){
+                                row = rows[i - 1];
+                            }
+                            let curCell = row && row.cellGet(name);
+                            if(curCell){
+                                if(!getImg(curCell)[0]) {
+                                    getCell(next ? index ++ : index --);
+                                }else {
+                                    ImgModal.destroy();
+                                    this.showImg(curCell);
+                                    cell.selected = false;
+                                    curCell.selected = true;
+                                }
+                            }
+                        };
+                        getCell(index);
+                    }
+                }
                 ImgModal.show(imgData);
             },
             open: (cell: FastTableCell) => {
