@@ -14,8 +14,8 @@ export interface ImgModalPara {
     container?: HTMLElement;
     isThumbnail?: boolean; // 默认false,
     textArr?: string[];
-
     onDownload?(url: string);
+    turnPage?(next? : boolean)
 }
 
 export const ImgModal = (() => {
@@ -36,23 +36,38 @@ export const ImgModal = (() => {
                 downAddr = para.downAddr;
                 onDownload = para.onDownload;
                 if (!wrapper) {
+                    //加载tpl
+                    wrapper = d.create(imgModalTpl);
+                    container = para.container ? para.container : document.body;
+                    container.appendChild(wrapper);
+
                     //下载按钮
                     if (downAddr && onDownload) {
-                        //加载tpl
-                        wrapper = d.create(imgModalTpl);
-                        container = para.container ? para.container : document.body;
-                        container.appendChild(wrapper);
                         d.on(container, 'click', '.icon-download', () => {
                             onDownload(downAddr);
                         });
                     } else {
-                        //加载tpl
-                        wrapper = d.create(imgModalTplNoDownload);
-                        container = para.container ? para.container : document.body;
-                        container.appendChild(wrapper);
+                        d.query('.icon-download', wrapper).classList.add('hide');
                     }
                     // ImgModal.initTag = false;
                 }
+                let pre = d.query('.pre-page', wrapper),
+                    next = d.query('.next-page', wrapper);
+
+                if(typeof para.turnPage === 'function'){
+                    d.on(pre, 'click', () => {
+                        para.turnPage(false);
+                    });
+
+                    d.on(next, 'click', () => {
+                        para.turnPage(true);
+                    });
+                }else {
+                    pre.classList.add('hide');
+                    next.classList.add('hide');
+                }
+
+
                 let pswpElement = d.query('.pswp', container),
                     len = para.img.length,
                     pros = [];
@@ -93,19 +108,23 @@ export const ImgModal = (() => {
                     });
                     gallery.init();
                     gallery.listen('close', function () {
-                        gallery && gallery.close();
-                        gallery = null;
-                        d.remove(d.query('.pswp'));
-                        wrapper = null;
-                        if (tools.isMb) {
-                            document.body.style.overflow = '';
-                        }
+                        destroy();
                     })
                 }).finally(() => {
                     loading && loading.hide();
                     loading = null;
                 })
             });
+        }
+    }
+
+    function destroy() {
+        gallery && gallery.close();
+        gallery = null;
+        d.remove(d.query('.pswp'));
+        wrapper = null;
+        if (tools.isMb) {
+            document.body.style.overflow = '';
         }
     }
 
@@ -155,7 +174,8 @@ export const ImgModal = (() => {
     }
 
     return {
-        show
+        show,
+        destroy
     }
 })();
 
@@ -173,35 +193,9 @@ const imgModalTpl = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="
     '<button class="pswp__button pswp__button--close iconfont icon-close"></button>' +
     '<button class="pswp__button pswp__button--fs iconfont icon-maximize"></button>' +
     '<button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button>' +
-    '<button class="pswp__button  iconfont icon-download"> </button>' +
-    '<div class="pswp__preloader">' +
-    '<div class="pswp__preloader__icn">' +
-    '<div class="pswp__preloader__cut">' +
-    '<div class="pswp__preloader__donut"></div>' +
-    '</div></div></div></div>' +
-    '<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">' +
-    '<div class="pswp__share-tooltip"></div>' +
-    '</div>' +
-    '<button class="pswp__button pswp__button--arrow--left iconfont icon-arrow-left">' +
-    '<span class=" iconfont icon-arrow-left"></span> </button>' +
-    '<button class="pswp__button pswp__button--arrow--right">' +
-    '<span class=" iconfont icon-arrow-right"></span> </button>' +
-    '<div class="pswp__caption"> ' +
-    '<div class="pswp__caption__center"></div></div></div></div></div>';
-
-const imgModalTplNoDownload = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">' +
-    '<div class="pswp__bg"></div>' +
-    '<div class="pswp__scroll-wrap">' +
-    '<div class="pswp__container">' +
-    '<div class="pswp__item"></div>' +
-    '<div class="pswp__item"></div>' +
-    '<div class="pswp__item"></div>' +
-    '</div>' +
-    '<div class="pswp__ui pswp__ui--hidden">' +
-    '<div class="pswp__top-bar">' +
-    '<div class="pswp__counter"></div>' +
-    '<button class="pswp__button pswp__button--close iconfont icon-close"></button>' +
-    '<button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button>' +
+    '<button class="pswp__button iconfont icon-download"> </button>' +
+    '<button class="pswp__button next-page iconfont icon-arrow-right"></button>' +
+    '<button class="pswp__button pre-page iconfont icon-arrow-left"></button>' +
     '<div class="pswp__preloader">' +
     '<div class="pswp__preloader__icn">' +
     '<div class="pswp__preloader__cut">' +
