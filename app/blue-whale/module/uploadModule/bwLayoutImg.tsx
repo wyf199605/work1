@@ -13,6 +13,7 @@ export interface IBwLayoutImgPara extends IBwUploaderPara{
     autoClear?: boolean; // 是否在模态框关闭清除file，默认true
     isCloseMsg?: boolean;
     onDelete?: (index: number) => void;
+    isDelete?: boolean;
 }
 export class BwLayoutImg{
     protected imgManager: ImageManager;
@@ -24,11 +25,13 @@ export class BwLayoutImg{
     protected autoClear: boolean;
     protected isCloseMsg: boolean;
     protected multi: boolean;
+    protected isDel: boolean;
 
     constructor(para: IBwLayoutImgPara){
         this.onFinish = para.onFinish || function(){
             return Promise.resolve();
         };
+        this.isDel = tools.isEmpty(para.isDelete) ? true : para.isDelete;
         this.onDelete = para.onDelete;
         this.autoClear = tools.isEmpty(para.autoClear) ? true : para.autoClear;
         this.multi = tools.isEmpty(para.multi) ? true : para.multi;
@@ -132,6 +135,7 @@ export class BwLayoutImg{
         this.imgManager = new ImageManager({
             container: this.modal.bodyWrapper,
             isAdd: true,
+            isDelete: this.isDel
         });
         this.imgManager.on(ImageManager.EVT_ADD_IMG, () => {
             this.bwUpload && this.bwUpload.click();
