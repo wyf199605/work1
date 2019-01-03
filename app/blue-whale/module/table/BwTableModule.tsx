@@ -693,13 +693,20 @@ export class BwTableModule extends Component {
                 console.log(self.imgManager.getImg(cell));
                 self.imgManager.showImg(cell);
             }
+
+            // 旧的图片查看编辑
             // if (isTd && self.cols.some(col => col.name === name && BwRule.isNewImg(col.atrrs.dataType))) {
             //     let row = ftable.rows[index],
-            //     cell = row ? row.cellGet(name) : null;
-            // if(self.ftable.editing){
-            //     self.imgManager.open(cell);
-            // }else{
-            //     self.imgManager.showImg(self.imgManager.getImg(cell));
+            //         cell = row ? row.cellGet(name) : null;
+            //     if(self.ftable.editing){
+            //         self.imgManager.open(cell);
+            //     }else{
+            //         self.imgManager.showImg(cell);
+            //     }
+            // } else if (isTd && self.cols.some(col => col.name === name && col.atrrs.dataType === '22')) {
+            //     self.multiImgEdit.show(name, index);
+            // } else {
+            //     self.imgEdit.showImg(index);
             // }
         };
 
