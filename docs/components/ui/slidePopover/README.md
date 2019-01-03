@@ -24,7 +24,7 @@
 <div className="slide-popover-wrapper">
     <div className="slide-buttons"/>
     <div className="popover-toggle iconfont icon-arrow-down"/>
-</div>;
+</div>
 ```
 
 - 菜单详情
@@ -35,14 +35,14 @@
         <div className="slider-popover-modal-toggle iconfont icon-arrow-up"/>
     </div>
     {this.buttonsWrapper = <div className="buttons-wrapper"/>}
-</div>;
+</div>
 ```
 
 ### 主要参数
 
 * Component的参数
 * ISlidePopoverPara（默认菜单的参数）和ISlidePopoverModal（弹出菜单的参数）:
-    * buttons：IButton 
+    - buttons：IButton 
 
 ### 示例
 
@@ -85,9 +85,9 @@ let slidePopover = new SlidePopover({
 
 ### 效果图
 
-![效果图](/默认菜单.png)
+![默认菜单](/默认菜单.png)
 
-![效果图](/弹出菜单.png)
+![弹出菜单](/弹出菜单.png)
 
 ### 属性
 
@@ -97,7 +97,7 @@ let slidePopover = new SlidePopover({
 
   * SlidePopover：
 
-    - **private 属性**
+    - **private属性**
 
       + _buttons： 存放所有的button
 
@@ -107,7 +107,8 @@ let slidePopover = new SlidePopover({
 
   * SlidePopoverModal：
 
-    - private属性：
+    - **private属性**：
+    
       + _isShow：弹出菜单是否显示
       + buttonsWrapper：弹出菜单中的按钮组的包裹dom
 
@@ -118,23 +119,25 @@ let slidePopover = new SlidePopover({
   * **protected函数**
 
     > wrapperInit():
-
+    
     - para： 无
     - 作用：设置控件的包裹dom
 
   * **private 函数**
-
-    > 1. createButtons：根据para创建菜单（默认或弹出）
-
-    > 2. initEvents
-
+  
+    > createButtons：
+    
+    - 根据para创建菜单（默认或弹出）
+    
+    > initEvents
+    
     - 无参数
     - 匿名函数闭包，返回on和off两个函数。分别用于开启或关闭绑定的事件
 
   * **public 函数**
 
-    > 1. destroy()
-
+    > destroy()
+    
     - 无参数
     - 销毁该组件
 
@@ -146,7 +149,7 @@ let slidePopover = new SlidePopover({
 
       > buttons：getter获取所有的button；setter初始化时创建默认菜单和弹出菜单
 
-  * SlidePopoverModa：
+  * SlidePopoverModal：
 
     - **getter和setter：**
 

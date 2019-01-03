@@ -68,9 +68,9 @@ let actionSheet = new ActionSheet({
 
 ### 效果图
 
-![效果图](/actionSheet(9).png)
+![按钮数不大于9](/actionSheet(9).png)
 
-![效果图](/actionSheet(大于9).png)
+![按钮数大于9](/actionSheet(大于9).png)
 
 ### 属性
 
