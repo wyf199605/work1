@@ -20,7 +20,7 @@
 ### 结构
 
 - 默认菜单
-```typescript jsx
+```
 <div className="slide-popover-wrapper">
     <div className="slide-buttons"/>
     <div className="popover-toggle iconfont icon-arrow-down"/>
@@ -28,7 +28,7 @@
 ```
 
 - 菜单详情
-```typescript jsx
+```
 <div className="slider-popover-modal-wrapper">
     <div className="slider-title">
         <span>选择按钮</span>
@@ -38,6 +38,7 @@
 </div>
 ```
 
+
 ### 主要参数
 
 * Component的参数
@@ -46,7 +47,7 @@
 
 ### 示例
 
-```typescript jsx
+```
 let slidePopover = new SlidePopover({
     buttons: [
         {

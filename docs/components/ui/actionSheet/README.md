@@ -19,7 +19,7 @@
 
 ### 结构
 
-```typescript jsx
+```
 <div className="action-sheet-wrapper">
     <div className="action-sheet-buttons">
         <div className="btn-wrapper">
@@ -47,7 +47,7 @@
   * actionSheet默认设置**isShow为false**，即初始时不会弹出
   * 菜单默认每行**3**个按钮，**超过9个**时左右滑动显示
 
-```typescript jsx
+```
 let actionSheet = new ActionSheet({
     buttons: [
         {
