@@ -330,6 +330,9 @@
         background-color: #ffffff;
         padding-left: 0;
         height: auto;
+        .disabled, [disabled] {
+          opacity: 0.8 !important;
+        }
         &.no-group {
           display: flex;
           display: -webkit-flex;

@@ -53,6 +53,9 @@
       background-color: #ffffff;
       padding-left: 0;
       height: auto;
+      .disabled, [disabled] {
+        opacity: 0.8 !important;
+      }
       .bw-upload-wrapper {
         width: 100%;
         height: 100%;
