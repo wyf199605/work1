@@ -506,7 +506,7 @@ export class EditModule {
 
                 assign2extra(field, assignData);
                 // debugger;
-                onExtra && onExtra(assignData, field.assignSelectFields, true);
+                onExtra && onExtra(assignData, field.assignSelectFields, true, false, true);
             })
         };
 
