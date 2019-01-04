@@ -2334,7 +2334,7 @@ export class BwTableModule extends Component {
                         dom: cell.wrapper,
                         data: row.data,
                         field,
-                        onExtra: (data, relateCols, isEmptyClear = false, isValid = true) => {
+                        onExtra: (data, relateCols, isEmptyClear = false, isValid = true, isReplace = false) => {
                             if (tools.isEmpty(data) && isEmptyClear) {
                                 // table.edit.modifyTd(td, '');
                                 cell.data = '';
@@ -2344,7 +2344,7 @@ export class BwTableModule extends Component {
                             // row.data = Object.assign({}, row.data, data);
                             for (let key in data) {
                                 let hCell = row.cellGet(key);
-                                if (hCell && hCell !== cell) {
+                                if (hCell && (isReplace || hCell !== cell)) {
                                     let cellData = data[key];
                                     if (hCell.data != cellData) {
                                         hCell.data = cellData || '';

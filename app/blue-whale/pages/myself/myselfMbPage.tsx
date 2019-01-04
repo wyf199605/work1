@@ -105,7 +105,8 @@ export = class myselfMbPage {
                 <a href="#" className="mui-navigate-right">更改客户代码</a>
             </li>;
             d.append(list, li);
-            d.on(li, 'click', () => {
+            d.on(li, 'click', (e) => {
+                e.preventDefault();
                 sys.window.toClient();
             })
         }

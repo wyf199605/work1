@@ -3,7 +3,7 @@ interface ComInitP {
     field: R_Field;
     data?: obj;
 
-    onExtra?(data: obj, relateCols: string[]): void
+    onExtra?(data: obj, relateCols: string[], isEmptyClear?, isValid?, isReplace?): void
 }
 
 interface EditModulePara {

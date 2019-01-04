@@ -106,7 +106,7 @@ export class EditModule {
             }
         }
         if (this.comsExtraData[name] && cip.onExtra) {
-            cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames);
+            cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames, false, true, true);
         }
 
         this.assign.checkAssign(this.comsExtraData[name], cip.onExtra);
@@ -490,7 +490,7 @@ export class EditModule {
                     field.assignSelectFields.forEach((name) => {
                         assignData[name] = null;
                     });
-                    onExtra && onExtra(assignData, field.assignSelectFields, false, false);
+                    onExtra && onExtra(assignData, field.assignSelectFields, false, false, true);
                 }
                 return;
             }
@@ -562,6 +562,9 @@ export class EditModule {
         for (let name in data) {
             if (!coms[name]) {
                 //页面没有这个输入控件，则启用虚拟输入控件
+                if(!this.nameFields[name]){
+                    this.nameFields[name] = null;
+                }
                 coms[name] = this.initFactory('virtual', this.nameFields[name]);
             }
             //给控件赋值
