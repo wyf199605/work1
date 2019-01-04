@@ -148,10 +148,10 @@ export = class contactsPage {
                     page = 1;
 
                     list.querySelector('ul.mui-table-view').innerHTML = '<li class="mui-table-view-cell" style="text-align: center"> <span class="mui-spinner" style="vertical-align: bottom;"></span> </li>';
+                    dataManager && dataManager.destroy();
                     if (vLen === 0) {
                         // pullScroll.pullRefresh().disablePullupToRefresh();
                         queryData = {queryparam: '', pageparams: ''}
-                        dataManager && dataManager.destroy();
                         dataManager = null;
                         getList(ajaxUrl, queryData, function (response) {
                             let level = treeField.length - 1;
@@ -170,7 +170,6 @@ export = class contactsPage {
                             showList(list, level, response.data);
                         });
                     } else {
-                        // pullScroll.pullRefresh().enablePullupToRefresh();
                         queryData.queryparam = inputValue.toUpperCase().replace(/'/g, '');
                         dataManager = new DataManager({
                             isMb: true,
