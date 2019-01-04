@@ -4,9 +4,11 @@
   background-color: #f8f8f8;
   overflow: hidden;
 }
-.edit-overflow-hidden{
+
+.edit-overflow-hidden {
   overflow: hidden !important;
 }
+
 .list-item-detail-wrapper {
   background-color: #f8f8f8;
   width: 100%;
@@ -17,7 +19,7 @@
     height: calc(100% - 70px);
     overflow-y: scroll;
     overflow-x: hidden;
-    &.full-height{
+    &.full-height {
       height: 100%;
     }
     .detail-cell {
@@ -210,7 +212,7 @@
   .modal-body {
     padding-left: 16px;
   }
-  .bw-upload-wrapper{
+  .bw-upload-wrapper {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -220,6 +222,15 @@
   .form-wrapper {
     background-color: #ffffff;
     padding-left: 16px;
+    .disabled, [disabled] {
+      opacity: 0.8 !important;
+    }
+    &.ios-form {
+      .disabled, [disabled] {
+        opacity: 0.9 !important;
+        color: #333333;
+      }
+    }
     .detail-cell {
       height: 50px;
       width: 100%;
@@ -266,21 +277,21 @@
           margin: 0;
         }
       }
-      &.disabled{
-        .detail-cell-title[data-input-type="input"]~.text-input>input{
+      &.disabled {
+        .detail-cell-title[data-input-type="input"] ~ .text-input > input {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
       }
-      .text-input{
+      .text-input {
         color: #666666;
-        & > .btn-group .icon{
+        & > .btn-group .icon {
           display: flex;
           display: -webkit-flex;
           align-items: center;
         }
-        &>input{
+        & > input {
           height: 100%;
           margin-bottom: 0;
           text-align: right;
@@ -294,7 +305,7 @@
         max-width: 180px;
         font-size: 14px;
       }
-      .detail-cell-title[data-input-type="datetime"]~.text-input>input{
+      .detail-cell-title[data-input-type="datetime"] ~ .text-input > input {
         pointer-events: none;
       }
     }

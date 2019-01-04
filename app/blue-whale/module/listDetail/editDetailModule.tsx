@@ -92,7 +92,7 @@ export class EditDetailModule extends Component {
 
     private initEditModule(para: IEditDetailPara, defaultData: obj) {
         let emPara: EditModulePara = {fields: [], defaultData: defaultData},
-            formWrapper = <div className="form-wrapper"/>,
+            formWrapper = tools.os.ios ? <div className="form-wrapper ios-form"/> : <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
         d.append(d.query('.edit-detail-content', this.wrapper), formWrapper);

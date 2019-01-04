@@ -69,6 +69,15 @@
     .form-wrapper {
       background-color: #ffffff;
       padding-left: 16px;
+      .disabled, [disabled] {
+        opacity: 0.8 !important;
+      }
+      &.ios-form {
+        .disabled, [disabled] {
+          opacity: 0.9 !important;
+          color: #333333;
+        }
+      }
       .detail-cell {
         height: 50px;
         width: 100%;
@@ -124,6 +133,7 @@
         }
         .text-input {
           color: #666666;
+          flex: 1 1 auto;
           & > .btn-group .icon {
             display: flex;
             display: -webkit-flex;
