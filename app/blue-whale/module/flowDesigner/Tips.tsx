@@ -102,13 +102,15 @@ export class Tips extends Component {
                     // FlowDesigner.CURRENT_SELECT_TYPE = d.closest(e.target, '.drag-item').dataset.name;
                     FlowDesigner.CURRENT_SELECT_TYPE = '';
                     let top = Number(tools.offset.top(d.query('#design-canvas'))),
-                        left = Number(tools.offset.left(d.query('#design-canvas')));
+                        left = Number(tools.offset.left(d.query('#design-canvas'))),
+                        leftScroll = d.query('.modal-wrapper.flow-modal .modal-body').scrollLeft,
+                        topScroll = d.query('.modal-wrapper.flow-modal .modal-body').scrollTop;
                     let flowItem = new FlowItem({
                         type: d.closest(e.target, '.drag-item').dataset.name,
                         text: '',
                         position: {
-                            x: moveUpEvent.clientX - left + 15,
-                            y: moveUpEvent.clientY - top + 15
+                            x: leftScroll + moveUpEvent.clientX - left + 15,
+                            y: topScroll + moveUpEvent.clientY - top + 15
                         },
                         container: d.query('#design-canvas')
                     });
