@@ -3,8 +3,11 @@
     color: #929292;
   }
 
-  .mui-active .mui-icon-extra, .mui-active .mui-icon {
+  .mui-active .mui-icon-extra {
     color: #007aff;
+  }
+  .mui-active .mui-icon{
+    color: $org_green;
   }
 
   .mui-bar-tab .mui-tab-item .mui-icon-extra ~ .mui-tab-label {

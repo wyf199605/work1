@@ -43,6 +43,9 @@ html.super-fontsize{
   &.blue{
     color: $blue;
   }
+  &.org_green{
+    color: $org_green;
+  }
   &.green {
     color: $green;
   }
@@ -546,7 +549,9 @@ $footer-height : 35px;
     }
   }
 }
-
+.mui-bar-tab .mui-tab-item.mui-active{
+  color: $org_green;
+}
 .sub-page{
   position: fixed;
   bottom: 0;

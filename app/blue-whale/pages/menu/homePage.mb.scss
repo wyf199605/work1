@@ -7,7 +7,7 @@
   //  -webkit-overflow-scrolling: auto;
   //}
   .conFavGroup{
-    border-left:5px solid #007aff;
+    border-left:5px solid $org_green;
     margin-left:5px;
     margin-top:5px;
     color:inherit;
@@ -20,6 +20,7 @@
     font-size: 26px;
     padding-right: 1%;
     margin-top: -3px;
+    color: $org_green !important;
   }
   .mui-grid-view.mui-grid-9{
     background-color: #fff;
@@ -74,24 +75,10 @@
     }
   }
   .mui-bar.mui-bar-nav{
-    background: rgba(241,244,250,1);
-    background: -moz-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(241,244,250,1)), color-stop(100%, rgba(180,212,245,1)));
-    background: -webkit-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -o-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -ms-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: radial-gradient(ellipse at center, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=1 );
+    background-color: #FFFFFF;
   }
   .mui-content .mui-slider{
-    background: rgba(241,244,250,1);
-    background: -moz-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(241,244,250,1)), color-stop(100%, rgba(180,212,245,1)));
-    background: -webkit-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -o-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -ms-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: linear-gradient(to bottom, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=0 );
+    background-color: #FFFFFF;
   }
   .mui-grid-view.mui-grid-9{
     background: transparent;
@@ -108,6 +95,10 @@
     background: none;
     margin-top: -1px;
   }
+  .mui-segmented-control.mui-segmented-control-inverted li.mui-control-item.active > a{
+    color: $org_green;
+    border-bottom-color: $org_green;
+  }
   #favorites .mui-grid-view .mui-table-view-cell[data-favid=""]{
     display: none;
   }
@@ -122,6 +113,7 @@
     .icon-sousuo{
       float: right;
       left: 9px;
+      color: $org_green !important;
     }
   }
 }
