@@ -1,6 +1,6 @@
 .loginPage{
   .login-header{
-    background-color: transparent;
+    background-color: $org_green;
     box-shadow: none;
 
     .header-content{
@@ -18,7 +18,6 @@
   }
 
   .login-wrapper{
-    background-color: $org_green;
     width: 100%;
     position: relative;
 
@@ -55,7 +54,7 @@
 
     .login-logo{
       position: relative;
-      padding: 10px 0 50px;
+      padding: 40px 0 70px;
       background-color: $org_green;
       overflow: hidden;
       .logo{
@@ -65,7 +64,7 @@
       }
 
       .bg{
-        top: 120px;
+        top: 160px;
         left: 0;
         position: absolute;
         pointer-events: none;
@@ -75,7 +74,7 @@
 
     .login-form{
       background-color: #fff;
-      padding: 0 30px;
+      padding: 50px 30px 30px;
       .form-group{
         position: relative;
         border-bottom: 1px solid #ccc;
@@ -131,7 +130,7 @@
 
     .login-more{
       background-color: #fff;
-      padding: 12px 30px;
+      padding: 14px 30px;
       .login-tel-msg, .login-fqa{
         text-align: center;
         button{
