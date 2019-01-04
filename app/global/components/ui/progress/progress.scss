@@ -61,5 +61,15 @@
   }
 }
 
+.ring-progress-wrapper{
+  .ring-progress-circle2{
+    transform-origin: 55px 55px;
+    transform: rotate(-90deg);
+    transition-duration: .3s;
+    transition-property: stroke-dasharray;
+    transition-timing-function: ease-in;
+  }
+}
+
 
 

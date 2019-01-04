@@ -1549,7 +1549,7 @@ export class BwTableModule extends Component {
                 // 缩略图
                 let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData, true, true);
                 url = tools.url.addObj(url, {version: new Date().getTime()});
-                console.log(url);
+
                 text = <img src={url}/>;
                 classes.push('cell-img');
 

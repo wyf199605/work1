@@ -15,8 +15,8 @@ interface IFontPara{
     style?: string;     // 字体样式(normal / italic / oblique)
     variant?: string;   // 字体的变体(normal / small-caps)
     weight?: string;    // 字体粗细(normal / bold / bolder / lighter)
-    size: number;       // 字体大小
-    family: string;     // 字体系列
+    size?: number;       // 字体大小
+    family?: string;     // 字体系列
 }
 
 export interface IRingProgressPara extends IComponentPara{
@@ -170,7 +170,7 @@ export class RingProgress extends Component{
 
     protected _percent = 0;
     set percent(len: number){
-        this.isEnd = len > 100 ? true : false;
+        this.isEnd = len > 100;
         this._percent = len > 100 ? 100 : len;
     }
     get percent(){
@@ -187,7 +187,7 @@ export class RingProgress extends Component{
 
     protected _isEnd = false;
     set isEnd(isEnd: boolean){
-        this.isRun = this.isEnd? false: true;
+        this.isRun = !this.isEnd;
         this._isEnd = isEnd;
     }
     get isEnd(){
@@ -205,5 +205,99 @@ export class RingProgress extends Component{
     destroy(){
         //销毁
         super.destroy();
+    }
+}
+
+interface INewRingProgressPara extends IComponentPara{
+    strokeWidth?: number;
+    progressColor?: string;
+    ringColor?: string;
+}
+
+export class NewRingProgress extends Component{
+
+    protected wrapperInit(){
+        return <div className="ring-progress-wrapper"/>
+    }
+
+    protected radius = 50;
+
+    constructor(para: INewRingProgressPara){
+        super(para);
+        let {
+            strokeWidth,
+            ringColor,
+            progressColor
+        } = para;
+        this.wrapper.innerHTML = NewRingProgress.getSvgTmp(strokeWidth, progressColor, ringColor, this.radius);
+
+    }
+
+    protected percent = 0;
+    protected timer = null;
+
+    format(percent: number, isError: boolean = false, time: number = 300){
+        if(percent === this.percent){
+            return
+        }
+        clearInterval(this.timer);
+
+        let circle = this.wrapper.querySelector('.ring-progress-circle2'),
+            text = this.wrapper.querySelector('.ring-progress-text'),
+            circleLength = Math.floor(2 * Math.PI * this.radius),
+            progress = percent / 100,
+            diffVal = Math.abs(percent - this.percent),
+            isAdd = percent > this.percent;
+
+        circle.removeAttribute('style');
+        circle.setAttribute('stroke', NewRingProgress.progressColor);
+        circle.setAttribute('style', 'transition-duration: ' + time + 'ms');
+
+        circle.setAttribute('stroke-dasharray', (circleLength * progress) + ",10000");
+
+        isAdd ? this.percent ++ : this.percent --;
+        text.innerHTML = this.percent + '%';
+        this.timer = setInterval(() => {
+            isAdd ? this.percent ++ : this.percent --;
+            if(this.percent === percent){
+                clearInterval(this.timer);
+                circle.removeAttribute('style');
+                if(progress >= 1){
+                    circle.setAttribute('stroke', NewRingProgress.successColor);
+                }
+                if(isError){
+                    circle.setAttribute('stroke', NewRingProgress.errorColor);
+                }
+            }
+            text.innerHTML = this.percent + '%';
+        }, (time - 10) / diffVal);
+    }
+
+    protected _isEnd: boolean = false;
+    get isEnd(){
+        return this._isEnd;
+    }
+    set isEnd(isEnd: boolean){
+        this._isEnd = isEnd;
+    }
+
+    static errorColor = '#f04134';
+    static successColor = '#00a854';
+    static progressColor = '#108ee9';
+
+    static getSvgTmp(strokeWidth: number = 10, progressColor = NewRingProgress.progressColor, ringColor = '#fff', radius = 50){
+        let center = 55,
+            length = 120;
+
+        return `
+        <svg class="ring-progress-svg" xmlns="http://www.w3.org/200/svg" height="${length}" width="${length}">
+            <circle class="ring-progress-circle1" cx="${center}" cy="${center}" r="${radius}" 
+            fill="none" stroke="${ringColor}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
+            <circle class="ring-progress-circle2" cx="${center}" cy="${center}" r="${radius}" 
+            fill="none" stroke="${progressColor}" stroke-width="${strokeWidth}" stroke-dasharray="0,10000"/>
+            <text class="ring-progress-text" x="55" y="55"
+             text-anchor="middle" dominant-baseline="middle" font-size="18">0%</text>
+        </svg>
+        `
     }
 }
