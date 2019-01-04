@@ -22,7 +22,7 @@ export class FlowReport extends BasicPage {
         let nameFields: { [name: string]: R_Field } = {};
         let form = this.createFormWrapper(para.fm.fields),
             self = this,
-            isInsert = tools.isNotEmpty(tools.url.getPara('instance')) ? false : true;
+            isInsert = tools.isNotEmpty(tools.url.getPara('task_id')) ? false : true;
         para.fm.fields.forEach(function (f) {
             nameFields[f.name] = f;
             let field = {
