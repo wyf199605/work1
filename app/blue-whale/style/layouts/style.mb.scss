@@ -38,7 +38,7 @@ html.super-fontsize{
 
 /* ------ icon ------- */
 .mui-icon-extra, .mui-icon, [class*=" ti-"], [class^=ti-], .fa {
-  color: #007aff;
+  color: $org_green;
 
   &.blue{
     color: $blue;
@@ -357,6 +357,8 @@ $footer-height : 35px;
 .mui-grid-view.mui-grid-9 .mui-table-view-cell {
   height: 95px;
   padding: 10px;
+  border-right: none;
+  border-bottom: none;
 }
 .mui-grid-view.mui-grid-9 .mui-table-view-cell>a:not(.mui-btn){
   padding: 8px 0;

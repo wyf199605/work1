@@ -9,7 +9,9 @@
   .mui-active .mui-icon{
     color: $org_green;
   }
-
+  .mui-slider .mui-segmented-control.mui-segmented-control-inverted~.mui-slider-group .mui-slider-item{
+    border-top: none;
+  }
   .mui-bar-tab .mui-tab-item .mui-icon-extra ~ .mui-tab-label {
     font-size: 11px;
     display: block;
