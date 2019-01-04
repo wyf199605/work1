@@ -25,7 +25,7 @@ export class DetailModal {
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
         let emPara: EditModulePara = {fields: [], defaultData: this.para.defaultData},
-            formWrapper = <div className="form-wrapper"/>,
+            formWrapper = tools.os.ios ? <div className="form-wrapper ios-form"/> : <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
         this.fields = fields;
