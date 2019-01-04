@@ -14,7 +14,7 @@ export class RegisterMbPage extends RegPage{
             <a id="goLogin" className="mui-icon mui-pull-left mui-icon-left-nav"/>
         </header>;
         let body = <div className="register-content mui-content">
-            <div className="register-title">账号注册</div>
+            <div className="register-title">会员管理系统</div>
             <form className="register-form">
                 <div className="form-group">
                     <input id="tel" type="number" placeholder="输入手机号码"/>

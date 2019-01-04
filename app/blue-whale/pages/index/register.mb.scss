@@ -1,42 +1,4 @@
-//.regPage {
-//  .mui-content-padded {
-//    margin-top: 15px;
-//  }
-//  .mui-input-group:first-child {
-//    margin-top: 20px;
-//  }
-//  .mui-input-group label {
-//    width: 130px;
-//  }
-//  .mui-input-row label ~ input,
-//  .mui-input-row label ~ select,
-//  .mui-input-row label ~ textarea {
-//    width: calc(100% - 130px);
-//  }
-//  #sendVerify{
-//    position: absolute;
-//    text-align: center;
-//    right: 5px;
-//    top: 5px;
-//    padding: 6px 12px;
-//    width: auto;
-//  }
-//  #verifyELCode{
-//    position: absolute;
-//    text-align: left;
-//    right: 5px;
-//    top: 5px;
-//    padding: 6px 0 6px 0;
-//    width: auto;
-//    font-size: 0;
-//  }
-//  .verifyCodeItem{
-//    color: red;
-//    display: inline-block;
-//    font-size: 16px !important;
-//    margin-left: 1px;
-//  }
-//}
+
 .register-wrapper{
   min-height: 100%;
   width: 100%;
@@ -84,7 +46,7 @@
             height: 30px;
             border-radius: 15px;
             background-color: $default_5;
-            color: $primary;
+            color: $org_green;
             border: none;
             font-size: 12px;
           }
@@ -95,7 +57,7 @@
         .register-submit{
           display: block;
           height: 50px;
-          background-color: $primary;
+          background-color: $org_green;
           color: #fff;
           width: 100%;
           font-size: 16px;

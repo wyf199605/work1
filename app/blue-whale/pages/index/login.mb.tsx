@@ -10,7 +10,8 @@ export class LoginMbPage extends LoginPage {
     constructor(para) {
         // 初始化头部logo和注册按钮
         let logoWrapper = <div className="login-logo">
-            <img src={G.requireBaseUrl + "../img/fastlion_logo.png"} alt="fastlion"/>
+            <img class="logo" src={G.requireBaseUrl + "../img/fastlion-white.png"} alt="fastlion"/>
+            <img class="bg" src={G.requireBaseUrl + "../img/login-bg.png"} alt=""/>
         </div>;
         let header = <header className="login-header mui-bar mui-bar-nav ios-top"/>;
         let registerBtn = new Button({
@@ -71,16 +72,6 @@ export class LoginMbPage extends LoginPage {
         // 指纹和微信登录按钮
         let moreLogin = <div className="login-more">
             <div className="login-tel-msg"/>
-            <div className="login-link-list">
-                <a href="#" className="zhiwen">
-                    <i className="iconfont icon-zhiwen"/>
-                    指纹登录
-                </a>
-                <a href="#" className="weixin">
-                    <i className="iconfont icon-weixin"/>
-                    微信登录
-                </a>
-            </div>
             <div className="login-fqa"/>
         </div>;
 
@@ -110,8 +101,6 @@ export class LoginMbPage extends LoginPage {
             userId: document.getElementById('username') as HTMLInputElement,
             password: document.getElementById('password') as HTMLInputElement,
             saveButton: checkBox,
-            fingerMbBtn: d.query('.zhiwen', moreLogin),
-            wxButton: d.query('.weixin', moreLogin),
             regButton: registerBtn,
             utButton: untied,
             SMSBtn: smsBtn,
