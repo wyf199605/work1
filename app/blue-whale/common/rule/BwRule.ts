@@ -668,7 +668,7 @@ export class BwRule extends Rule {
 
                 } else if (col.atrrs && BwRule.isImage(col.atrrs.dataType)) {
                     col.comType = 'image';
-                } else if (tools.isNotEmpty(col.atrrs.valueLists)) {
+                } else if (col.atrrs && tools.isNotEmpty(col.atrrs.valueLists)) {
                     col.comType = 'selectInput';
                 } else if (col.atrrs && col.atrrs.dataType == '18') {
                     col.comType = 'textarea';
