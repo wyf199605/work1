@@ -132,7 +132,7 @@ export class FastBtnTable extends FastTable{
                 document.body.scrollTop = 0;
             });
 
-            d.on(input, 'keyup', tools.pattern.debounce(() => {
+            d.on(input, 'input', tools.pattern.debounce(() => {
                 let val = input.value;
                 if(val !== prevValue){
                     prevValue = val;

@@ -873,6 +873,10 @@ export class AtVarBuilder{
 
         row.dataset.index = index.toString();
 
+        if(conf.atrrs && conf.atrrs.readOnlyFlag === 1){
+            row.classList.add('disabled-none');
+        }
+
         d.queryAll('[data-type]', row).forEach((container) => {
             let type = container.dataset.type;
             if(type === 'title'){
