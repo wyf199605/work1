@@ -12,6 +12,7 @@ import {Loading} from "../../../../global/components/ui/loading/loading";
 import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
 import {User} from "../../../../global/entity/User";
+import {RingProgress} from "../../../../global/components/ui/progress/ringProgress";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -330,6 +331,9 @@ export class ButtonAction {
                 if (data && (data.type || data.type === 0)) {
                     if (data.type === 0) {
                         Modal.alert(data.showText);
+                    } else if(data.type === 2) {
+                        this.progressPopup(data.url, data.showText);
+                        resolve()
                     } else {
                         Modal.confirm({
                             msg: data.showText,
@@ -359,6 +363,68 @@ export class ButtonAction {
                 }
             });
         })
+
+    }
+
+    progressPopup(url: string, msg: string){
+        if(url){
+            let body = d.create(`<div style="padding: 4px 15px;"></div>`),
+                text = d.create(`<p>${msg}</p>`),
+                time = 5000;
+            let progress = new RingProgress({
+                container: body,
+                textColor: '#fff'
+            });
+            msg && d.append(body, text);
+            let modal = new Modal({
+                isMb: false,
+                isBackground: false,
+                body: body,
+                top: 200,
+                className: 'modal-toast'
+            });
+
+            let getProgress = () => {
+                let percent = 0;
+                return BwRule.Ajax.fetch(BW.CONF.siteUrl + url).then(({response}) => {
+                    let {
+                        allAccount: all,
+                        curAccount: current,
+                        message,
+                        errorCode
+                    } = response;
+                    if(errorCode === 0){
+                        percent = current / all * 100;
+                        if(percent >= 100){
+                            progress.format(percent, false, 250);
+                            setTimeout(() => {
+                                modal.destroy();
+                                Modal.alert(message);
+                            }, 500)
+                        }else{
+                            progress.format(percent, false, time - 300);
+                            setTimeout(() => {
+                                getProgress();
+                            }, time);
+                        }
+                    }else{
+                        modalDestroy(percent, msg);
+                    }
+                }).catch(() => {
+                    modalDestroy(percent, '执行操作失败');
+                })
+            };
+
+            let modalDestroy = (percent, msg) => {
+                text.innerText = msg;
+                progress.format(percent, true);
+                setTimeout(() => {
+                    modal.destroy();
+                }, time);
+            };
+
+            getProgress();
+        }
 
     }
 

@@ -10,6 +10,8 @@ interface IRingProgressPara extends IComponentPara{
     strokeWidth?: number;
     progressColor?: string;
     ringColor?: string;
+    textColor?: string;
+    msg?: string;
 }
 
 export class RingProgress extends Component{
@@ -25,9 +27,18 @@ export class RingProgress extends Component{
         let {
             strokeWidth,
             ringColor,
-            progressColor
+            progressColor,
+            textColor,
+            msg
         } = para;
-        this.wrapper.innerHTML = RingProgress.getSvgTmp(strokeWidth, progressColor, ringColor, this.radius);
+        this.wrapper.innerHTML = RingProgress.getSvgTmp(
+            strokeWidth,
+            progressColor,
+            ringColor,
+            textColor,
+            this.radius,
+            msg
+        );
 
     }
 
@@ -93,18 +104,27 @@ export class RingProgress extends Component{
     static successColor = '#00a854';
     static progressColor = '#108ee9';
 
-    static getSvgTmp(strokeWidth: number = 10, progressColor = RingProgress.progressColor, ringColor = '#fff', radius = 50){
-        let center = 55,
-            length = 120;
+    static getSvgTmp(strokeWidth: number = 10, progressColor = RingProgress.progressColor, ringColor = '#fff', textColor = "#000", radius = 50, msg?: string){
+        let center = 60,
+            w = 120,
+            h = 120;
+
+        if(msg){
+            h += 25;
+        }
 
         return `
-        <svg class="ring-progress-svg" xmlns="http://www.w3.org/200/svg" height="${length}" width="${length}">
+        <svg class="ring-progress-svg" xmlns="http://www.w3.org/200/svg" height="${h}" width="${w}">
             <circle class="ring-progress-circle1" cx="${center}" cy="${center}" r="${radius}" 
             fill="none" stroke="${ringColor}" stroke-width="${strokeWidth}" stroke-linecap="round"/>
             <circle class="ring-progress-circle2" cx="${center}" cy="${center}" r="${radius}" 
             fill="none" stroke="${progressColor}" stroke-width="${strokeWidth}" stroke-dasharray="0,10000"/>
-            <text class="ring-progress-text" x="55" y="55"
+            <text class="ring-progress-text" x="${center}" y="${center}" fill="${textColor}"
              text-anchor="middle" dominant-baseline="middle" font-size="18">0%</text>
+             ${msg ? `
+             <text class="ring-progress-msg"  x="${center}" y="${h - 5}" fill="${textColor}"
+             text-anchor="middle" font-size="16">${msg}</text>
+             ` : ''}
         </svg>
         `
     }
