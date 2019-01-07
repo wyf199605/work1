@@ -227,7 +227,8 @@ export = class homePage {
         BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.menu, {output: 'json'}), {
             loading: {
                 msg: '首页数据加载中...'
-            }
+            },
+            timeout: 10000 // 10秒
         }).then(({response}) => {
             console.log(response);
             let data = tools.keysVal(response, 'body', 'elements'),

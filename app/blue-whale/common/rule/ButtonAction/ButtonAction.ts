@@ -232,7 +232,7 @@ export class ButtonAction {
                             self.btnRefresh(btn.refresh, url);
                         }, url);
                     callback(response);
-                }, () => callback(null))
+                }, () => callback(null));
                 break;
             case  'barcode_inventory':
                 if (!ajaxType) {
