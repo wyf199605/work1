@@ -14,6 +14,7 @@ import {SelectInputMb} from "../../../global/components/form/selectInput/selectI
 import {FormCom} from "../../../global/components/form/basic";
 import {Modal} from 'global/components/feedback/modal/Modal';
 import {Picker, PickerList} from "../../../global/components/ui/picker/picker";
+import {TextAreaInput} from "../../../global/components/form/text/TextInput";
 
 interface QueryComs {
     field?: SelectInput;
@@ -80,6 +81,9 @@ function inputTransFactory(com: TextInput, para: obj, comType: string, container
             if ((com && com.constructor !== TextInput) || !(com instanceof TextInput)) {
                 reNew(TextInput, para);
             }
+            break;
+        case 'textarea':
+            reNew(TextAreaInput as any, para);
             break;
 
         case 'select':
@@ -849,6 +853,7 @@ export class AtVarBuilder{
                 return {format};
 
             case 'text':
+            case 'textarea':
                 return {isScan : hasScan, on2dScan: this.para.on2dScan};
 
             case 'select':
@@ -876,7 +881,6 @@ export class AtVarBuilder{
         if(conf.atrrs && conf.atrrs.readOnlyFlag === 1){
             row.classList.add('disabled-none');
         }
-
         d.queryAll('[data-type]', row).forEach((container) => {
             let type = container.dataset.type;
             if(type === 'title'){
@@ -890,6 +894,8 @@ export class AtVarBuilder{
                         return 'datetime'
                     }else if('data' in conf){
                         return 'select'
+                    }else if(conf.atrrs.dataType === '18'){
+                        return 'textarea'
                     }else{
                         return'text';
                     }
@@ -900,8 +906,11 @@ export class AtVarBuilder{
                 if(BwRule.DT_NUMBER === conf.atrrs.dataType){
                     para['type'] = 'number';
                 }
+                if(conf.atrrs.dataType === '18'){
+                    para['autoHeight'] = true;
+                    para['maxHeight'] = '90px';
+                }
                 let com = inputTransFactory(null, para, inputType, container, sys.isMb);
-
                 com.set(value);
 
                 this.coms[conf.field_name] = com;

@@ -12,10 +12,9 @@ export interface ITextInputPara extends IFormComPara{
     inputIcon?:string;
     leftIcons?: string;
     rightIcon?: ITextInputRightIcon[];
-
-
+    autoHeight? : boolean
+    maxHeight? : string
     // labelheight?:string | number
-
 }
 interface ITextInputRightIcon {
     icon: string,
@@ -185,24 +184,62 @@ export class TextInput1 extends FormCom{
 
 export class TextAreaInput extends FormCom{
     private textarea : HTMLFormElement;
+    private p : ITextInputPara;
      constructor (para:ITextInputPara) {
         super(para);
+        this.p = para;
+        this.autoHeight = para.autoHeight;
+        this.maxHeight = para.maxHeight;
         this.value = para.value;
      }
+
+     private _maxHeight : string;
+     set maxHeight(maxHeight : string){
+         this.textarea.style.maxHeight = maxHeight;
+         this._maxHeight = maxHeight;
+     }
+     get maxHeight(){
+         return this._maxHeight;
+     }
+
+     private _autoHeight : boolean;
+     set autoHeight(autoHeight : boolean){
+         if(autoHeight){
+             this.textarea.classList.add('height-auto');
+             d.on(this.textarea, 'input', this.even)
+         }else {
+             d.off(this.textarea, 'input', this.even)
+         }
+         this._autoHeight = autoHeight;
+     }
+     get autoHeight(){
+         return this._autoHeight;
+     }
+
+     private even = () => {
+         setTimeout(() => {
+             this.textarea.style.height = this.textarea.scrollTop + this.textarea.scrollHeight + 'px';
+         })
+     };
+
     protected wrapperInit(para: ITextInputPara): HTMLElement {
-        this.textarea = <textarea className="textarea-input" placeholder={para.placeholder}/>;
+        this.textarea = <textarea
+            type = "textarea"
+            readOnly={!!para.readonly}
+            disabled={!!para.disabled}
+            className= {para.className ? para.className : "textarea-input"}
+            placeholder={para.placeholder}
+        />;
         return this.textarea;
     }
 
     onSet: (val) => void;
     get value():string {
-        // return this.value;
         return this.textarea.value;
     }
     set value(val) {
-        // this.value = val;
-        // this.inputEl.innerHTML = val;\
         this.textarea.value = val || '';
+        this.autoHeight && this.even();
     }
 
     set disabled(disabled){
