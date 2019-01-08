@@ -1,5 +1,4 @@
 /// <amd-module name="ListDetailPage"/>
-
 import BasicPage from "../basicPage";
 import {ListItemDetail} from "../../module/listDetail/ListItemDetail";
 import {BwRule} from "../../common/rule/BwRule";

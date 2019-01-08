@@ -30,6 +30,7 @@ namespace G{
                 AceEditor: ['../plugin/aceEditor/ace'],
                 raphael:['../plugin/raphael/raphael.min'],
                 D3: ['../plugin/d3/d3.v3.min'],
+                hammer:['../plugin/hammer']
                 // picker: ['../web/plugin/mui/js/mui.picker.min']
             }, config.paths),
 
@@ -60,7 +61,7 @@ namespace G{
                 },
                 md5: {
                     exports: 'md5'
-                },
+                }
             },
             map: {
                 '*': {
