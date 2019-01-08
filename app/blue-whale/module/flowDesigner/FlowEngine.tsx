@@ -1,6 +1,5 @@
 /// <amd-module name="FlowEngine"/>
 
-import d = G.d;
 import BasicPage from "../../pages/basicPage";
 import {FlowDesigner} from "./FlowDesigner";
 import {Button} from "../../../global/components/general/button/Button";

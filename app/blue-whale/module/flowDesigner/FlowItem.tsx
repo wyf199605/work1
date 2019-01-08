@@ -9,7 +9,6 @@ import {FlowDesigner, Method} from "./FlowDesigner";
 import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {Tips} from "./Tips";
 import {LineItem} from "./LineItem";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IFlowItemPara extends IComponentPara {
     type?: string;      // 节点的类型
@@ -22,6 +21,8 @@ export interface IFlowItemPara extends IComponentPara {
     height?: number;    // 高
     isComplete?: boolean;   // 表示该节点是否已经完成
     fields?: IFieldPara;     // 用于初始化flowEditor
+    minTop?:number;
+    minLeft?:number;
 }
 
 export class FlowItem extends Component {
@@ -56,15 +57,16 @@ export class FlowItem extends Component {
 
     constructor(para: IFlowItemPara) {
         super(para);
-        this.para = para;
         if(tools.isMb){
-            para.position.x = para.position.x - 170;
+            para.position.x = para.position.x - (tools.isNotEmpty(para.minLeft) ? para.minLeft : 170);
+            para.position.y = para.position.y - (tools.isNotEmpty(para.minTop) ? para.minTop : 0);
             this.x = para.position.x;
             this.y = para.position.y;
         }else {
             this.x = para.position.x;
             this.y = para.position.y;
         }
+        this.para = para;
 
         this.isComplete = para.isComplete || false;
         if (para.type === 'start') {
@@ -223,11 +225,11 @@ export class FlowItem extends Component {
         return {
             on: () => {
                 this.rectNode.click(this.clickHandler());
-                this.rectNode.drag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
+                tools.isPc && this.rectNode.drag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
             },
             off: () => {
                 this.rectNode.unclick(this.clickHandler());
-                this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
+                tools.isPc && this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
             }
         }
     })();
@@ -393,7 +395,7 @@ export class FlowItem extends Component {
     set active(active: boolean) {
         this.wrapper.classList.toggle('active', active);
         this._active = active;
-        this.flowEditor.show = active;
+        tools.isPc && (this.flowEditor.show = active);
     }
 
     get active() {

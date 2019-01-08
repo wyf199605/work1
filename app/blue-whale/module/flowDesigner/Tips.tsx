@@ -1,5 +1,4 @@
 /// <amd-module name="Tips"/>
-/// <amd-dependency path="raphael" name="Raphael"/>
 
 import d = G.d;
 import tools = G.tools;
@@ -27,26 +26,26 @@ export class Tips extends Component {
                 <div className="tip-line"/>
                 <div className="tip-item">
                     <div className="tip-item-inner click-item" data-name="select"><i
-                        className="appcommon app-Select"/>Select
+                        className="appcommon app-Select"/>选择
                     </div>
                 </div>
                 <div className="tip-item">
                     <div className="tip-item-inner click-item" data-name="transition"><i
-                        className="appcommon app-transition"/>Transition
+                        className="appcommon app-transition"/>连线
                     </div>
                 </div>
                 <div className="tip-line"/>
                 <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="start"><i className="appcommon app-start"/>Start
+                    <div className="tip-item-inner drag-item" data-name="start"><i className="appcommon app-start"/>开始
                     </div>
                 </div>
                 <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="end"><i className="appcommon app-end"/>End
+                    <div className="tip-item-inner drag-item" data-name="end"><i className="appcommon app-end"/>结束
                     </div>
                 </div>
                 <div className="tip-item">
                     <div className="tip-item-inner drag-item task-item" data-name="task"><i
-                        className="appcommon app-task"/>task
+                        className="appcommon app-task"/>任务
                     </div>
                 </div>
                 {/*<div className="tip-item">*/}

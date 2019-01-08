@@ -67,7 +67,12 @@ Raphael.fn.connection = function (obj1, obj2, line, bg) {
                 fill: "none",
                 "stroke-width": bg.split("|")[1] || 2
             }),
-            line: this.path(path).attr({stroke: color, fill: "none", 'arrow-end': 'block-wide-long', 'stroke-width': 2.5}),
+            line: this.path(path).attr({
+                stroke: color,
+                fill: "none",
+                'arrow-end': 'block-wide-long',
+                'stroke-width': 2.5
+            }),
             from: obj1,
             to: obj2
         };
@@ -99,7 +104,7 @@ export const Method = {
         // 根据data-name寻找对应的节点
         return FlowDesigner.ALLITEMS.filter(item => item.wrapper.dataset.name === name)[0];
     },
-    getFields: function(node: Node, type: string = node['tagName']){
+    getFields: function (node: Node, type: string = node['tagName']) {
         // 根据类型属性限定表(ATTR_LIMIT)中的属性查找节点的所有属性值，返回该节点所有属性和值的集合
         let fields = {};
         FlowEditor.ATTR_LIMIT[type] && FlowEditor.ATTR_LIMIT[type].forEach(item => {
@@ -108,18 +113,18 @@ export const Method = {
         return fields;
     },
     parseToXml: (() => {
-        let xmlDoc=document.implementation.createDocument("","",null);
-        xmlDoc['async']="false";
+        let xmlDoc = document.implementation.createDocument("", "", null);
+        xmlDoc['async'] = "false";
         return {
             // 创建新的xml节点
             createXmlElement: (tagNames: string[] | string) => {
                 let elements;
-                if(tagNames instanceof Array){
+                if (tagNames instanceof Array) {
                     elements = {};
                     tagNames.forEach(tagName => {
                         elements[tagName] = xmlDoc.createElement(tagName);
                     });
-                }else{
+                } else {
                     elements = xmlDoc.createElement(tagNames);
                 }
                 return elements;
@@ -141,6 +146,7 @@ export const Method = {
         });
         return {width, height};
     },
+
 };
 
 export class FlowDesigner {
@@ -154,6 +160,7 @@ export class FlowDesigner {
     static FlowType: string;                // 当前操作的类型（设计design或查看状态look）
     static MbWidth = 1000;
     static MbHeight = 780;
+
     static removeAllActive() {
         FlowItem.removeAllActiveClass();
         LineItem.removeAllActive();
@@ -171,17 +178,16 @@ export class FlowDesigner {
                 rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}/>
             },
             className: 'flow-modal',
-            width: tools.isMb ? '100%' :'90%',
-            height: tools.isMb ? '100%' :'90%',
-            isMb:tools.isMb,
+            width: tools.isMb ? '100%' : '90%',
+            height: tools.isMb ? '100%' : '90%',
+            isMb: tools.isMb,
             onClose: () => {
                 this.destroy();
                 this.modal.destroy();
             }
         });
-        let Tip: Tips = null;
-        FlowDesigner.FlowType === 'design' && (
-            Tip = new Tips({
+        (FlowDesigner.FlowType === 'design' && tools.isPc) && (
+            new Tips({
                 container: this.modal.wrapper
             })
         );
@@ -189,70 +195,68 @@ export class FlowDesigner {
         let paper = window.getComputedStyle(body),
             paperWidth = paper.width,
             paperHeight = paper.height;
-        if (tools.isMb){
+        if (tools.isMb) {
             body.style.height = `${FlowDesigner.MbHeight}px`;
-            FlowDesigner.PAPER = Raphael('design-canvas', FlowDesigner.MbWidth,FlowDesigner.MbHeight);
-        } else{
+            FlowDesigner.PAPER = Raphael('design-canvas', FlowDesigner.MbWidth, FlowDesigner.MbHeight);
+        } else {
             FlowDesigner.PAPER = Raphael('design-canvas', parseInt(paperWidth.slice(0, paperWidth.length - 2)), parseInt(paperHeight.slice(0, paperHeight.length - 2)));
         }
 
         this.initEvents.on();
-        let _this = this;
 
         // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程；如果没有则需要自己绘制流程
-        if (tools.isNotEmpty(responseData)){
+        if (tools.isNotEmpty(responseData)) {
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
-            if(FlowDesigner.FlowType === 'look'){
+            if (FlowDesigner.FlowType === 'look') {
                 this.modal.modalHeader.title = '查看流程';
                 d.query('#design-canvas').style.left = '0px';
-                if (tools.isMb){
+                if (tools.isMb) {
                     d.remove(d.query('.header-btn-right'));
                     d.query('.modal-title').style.color = '#000000';
                     d.query('#design-canvas').style.width = `${FlowDesigner.MbWidth}px`;
-                } else{
+                } else {
                     d.query('#design-canvas').style.width = '100%';
                 }
                 d.query('#design-canvas').style.pointerEvents = 'none';
-            }else{
+            } else {
                 FlowDesigner.processId = responseData.data[0]['process_id'];
             }
 
             let xmlStr = responseData.data[0].process,
                 rootElement = Method.loadXMLStr(xmlStr).documentElement;
-            // console.log('xml initial: ');
-            // console.log(xmlStr);
 
             // 在绘制前，需要根据layout重设画布的大小
             let maxWidth = 0,
                 maxHeight = 0,
-                maxItemWidth = 0,
-                maxItemHeight = 0;
+                minTop = 1000,
+                minLeft = 1000;
             rootElement.childNodes.forEach((child) => {
-                if(child.nodeType === 1){
+                if (child.nodeType === 1) {
                     let layout = child.attributes.layout && child.attributes.layout.value.split(',')
                         .map(item => parseInt(item));
-                    if(tools.isNotEmptyArray(layout)){
-                        maxWidth = Math.max(layout[0], maxWidth);
-                        maxHeight = Math.max(layout[1], maxHeight);
-                        maxItemWidth = Math.max(layout[2], maxItemWidth);
-                        maxItemHeight = Math.max(layout[3], maxItemHeight);
+                    if (tools.isNotEmptyArray(layout)) {
+                        maxWidth = Math.max(layout[0] + layout[2], maxWidth);
+                        maxHeight = Math.max(layout[1] + layout[3], maxHeight);
+                        minTop = Math.min(layout[1], minTop);
+                        minLeft = Math.min(layout[0], minLeft);
                     }
                 }
             });
-            if(tools.isMb && type === 'look'){
-                let MbFullHeight = document.documentElement.clientHeight - 44,
+            if (tools.isMb) {
+                minTop = minTop > 60 ? minTop - 60 : 0;
+                minLeft = minLeft > 60 ? minLeft - 60 : 0;
+                let MbFullHeight = document.documentElement.clientHeight - (tools.os.ios ? 54 : 44),
                     MbFullWidth = document.documentElement.clientWidth;
-                if(maxHeight + maxItemHeight <= MbFullHeight){
-                    FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth), MbFullHeight);
-                    body.style.height = `${MbFullHeight}px`;
+                if (maxHeight - minTop > MbFullHeight) {
+                    MbFullHeight = maxHeight - minTop + 20;
+
                 }
-                if(maxWidth + maxItemWidth <= MbFullWidth){
-                    FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth), MbFullWidth);
-                    body.style.height = `${MbFullWidth}px`;
+                if (maxWidth - minLeft > MbFullWidth) {
+                    MbFullWidth = maxWidth - minLeft + 20;
                 }
-            }else {
-                FlowDesigner.PAPER.setSize(Math.max(FlowDesigner.PAPER.width, maxWidth + maxItemWidth),
-                    Math.max(FlowDesigner.PAPER.height, maxHeight + maxItemHeight));
+                FlowDesigner.PAPER.setSize(MbFullWidth, MbFullHeight);
+                body.style.height = `${MbFullHeight}px`;
+                body.style.width = `${MbFullWidth}px`;
             }
 
             // 绘制xml中的所有节点
@@ -276,25 +280,27 @@ export class FlowDesigner {
                         isComplete: isComplete,
                         container: d.query('#design-canvas'),
                         fields: fields,
+                        minTop: minTop,
+                        minLeft: minLeft
                     }));
 
-                    if(tools.isNotEmpty(shape)){
+                    if (tools.isNotEmpty(shape)) {
                         // 设置节点的data-name
                         let arr = FlowDesigner.ALLITEMS || [];
                         FlowDesigner.ALLITEMS = arr.concat([shape]);
                         shape.calcWidthAndHeight();
                         shape.wrapper.dataset.name = child.attributes.name.value;
 
-                        if(FlowDesigner.FlowType === 'look'){
-                            if(shape.isComplete){
+                        if (FlowDesigner.FlowType === 'look') {
+                            if (shape.isComplete) {
                                 shape.wrapper.style.color = 'white';
                                 shape.wrapper.style.backgroundColor = FlowItem.itemColor[child.tagName];
                             }
-                            else{
+                            else {
                                 shape.wrapper.style.backgroundColor = '#ffffff';
                                 shape.wrapper.style.borderColor = FlowItem.itemColor[child.tagName];
                             }
-                            if(shape.isStart && shape.isComplete){
+                            if (shape.isStart && shape.isComplete) {
                                 d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#ffffff';
                             }
                         }
@@ -343,7 +349,7 @@ export class FlowDesigner {
                 });
             });
 
-            if(FlowDesigner.FlowType === 'look'){
+            if (FlowDesigner.FlowType === 'look') {
                 // 所有input、下拉列表设为只读
                 d.queryAll('input').forEach(input => {
                     (input as HTMLInputElement).readOnly = true;
@@ -356,10 +362,11 @@ export class FlowDesigner {
     }
 
     private _modal = null;
-    get modal(){
+    get modal() {
         return this._modal;
     }
-    set modal(modal){
+
+    set modal(modal) {
         this._modal = modal;
     }
 

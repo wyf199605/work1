@@ -1,5 +1,4 @@
 /// <amd-module name="FlowEditor"/>
-/// <amd-dependency path="raphael" name="Raphael"/>
 
 import d = G.d;
 import tools = G.tools;
@@ -23,6 +22,9 @@ export interface IFieldPara {
     taskType?: string;      // 任务类型
     performType?: string;   // 参与类型
     processTypeId?: number; // 流程类型
+    numberAddr?:string; // 取数地址
+    adoptAddr?:string; // 通过回写地址
+    rejectAddr?:string; // 拒绝回写地址
 }
 
 export interface IFlowEditorPara extends IFormComPara {
@@ -44,7 +46,7 @@ export class FlowEditor extends FormCom {
         start: ['name', 'displayName'],
         end: ['name', 'displayName'],
         subprocess: ['name', 'displayName', 'processName'],
-        task: ['name', 'displayName', 'form', 'assignee', 'taskType', 'performType'],
+        task: ['name', 'displayName', 'form', 'assignee', 'taskType', 'performType','numberAddr','adoptAddr','rejectAddr'],
         transition: ['name', 'displayName'],
     };
 
@@ -58,6 +60,9 @@ export class FlowEditor extends FormCom {
         assignee: '参与者',
         taskType: '任务类型',
         performType: '参与类型',
+        numberAddr:'取数地址',
+        adoptAddr:'通过回写地址',
+        rejectAddr:'拒绝回写地址'
     };
 
     /*
