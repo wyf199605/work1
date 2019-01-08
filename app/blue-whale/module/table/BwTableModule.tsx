@@ -1920,16 +1920,7 @@ export class BwTableModule extends Component {
                 isResponsive: true,
                 className: !tools.isMb ? 'more-btns' : ''
             });
-            // TODO: 移动端未实现流程设计功能。
-            // if (tools.isMb && (this.ui.caption === '流程设计' || this.ui.caption === '流程制度')) {
-            //     for (let i = 0, len = btnsUi.length; i < len; i++) {
-            //         let btn = btnsUi[i];
-            //         // if (btn.openType === 'flow-design' || btn.openType === 'flow-look') {
-            //         if (btn.openType === 'flow-design') {
-            //             btnsUi.splice(i, 1);
-            //         }
-            //     }
-            // }
+
             Array.isArray(btnsUi) && btnsUi.forEach((btnUi) => {
                 let btn = new Button({
                     icon: btnUi.icon,
