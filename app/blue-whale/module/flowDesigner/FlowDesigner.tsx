@@ -257,6 +257,18 @@ export class FlowDesigner {
                 FlowDesigner.PAPER.setSize(MbFullWidth, MbFullHeight);
                 body.style.height = `${MbFullHeight}px`;
                 body.style.width = `${MbFullWidth}px`;
+            }else{
+                let PcFullHeight = FlowDesigner.PAPER.height,
+                    PcFullWidth = FlowDesigner.PAPER.width;
+                if (maxWidth > PcFullWidth) {
+                    PcFullWidth = maxWidth + 20;
+                }
+                if (maxHeight > PcFullHeight){
+                    PcFullHeight = maxHeight;
+                }
+                FlowDesigner.PAPER.setSize(PcFullWidth, PcFullHeight);
+                body.style.height = `${PcFullHeight}px`;
+                body.style.width = `${PcFullWidth}px`;
             }
 
             // 绘制xml中的所有节点
