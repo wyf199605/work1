@@ -9,7 +9,7 @@ interface PDFObject{
 }
 
 export interface IPDFPreviewPara{
-    url: string;
+    url: string; // pdf 文件地址
 }
 
 export class PDFPreview{
@@ -26,9 +26,13 @@ export class PDFPreview{
         });
         // if(G.tools.isMb){
         requirejs(['pdfjs', 'pdfh5'], (pdfjsLib, Pdfh5) => {
-            window['pdfjsLib'] = pdfjsLib;
+            window['pdfjsLib'] = pdfjsLib; // padh5需要使用作为全局变量的pdfjsLib
+
+            // 给pdfjsLib设置解析worker依赖配置
             pdfjsLib.GlobalWorkerOptions.workerSrc = requirejs.toUrl('../plugin/pdfjs/pdf.worker.js');
-            let pdfh5 = new Pdfh5(body, {
+
+            // 实例化pdf展示
+            new Pdfh5(body, {
                 scrollEnable: true,//是否允许pdf滚动
                 pdfurl: para.url
             });
