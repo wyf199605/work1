@@ -119,8 +119,8 @@ body.fl-mobile {
     font-size: 18px;
     position: relative;
     height: 100%;
-    $data-type-list: ("input", "datetime", "richText", "tagsInput", "selectInput");
-
+    overflow-y: auto;
+    $data-type-list: ("input", "datetime", "richText", "tagsInput", "selectInput", "file");
     .disabled {
       pointer-events: none !important;
     }
@@ -139,7 +139,6 @@ body.fl-mobile {
       div[data-element-type="value"] input {
         pointer-events: none;
       }
-
       @each $data-type in $data-type-list {
         @if $data-type != 'richText' {
           div[data-type=#{$data-type}] {
@@ -193,6 +192,13 @@ body.fl-mobile {
                   padding-top: 5px;
                 }
               }
+            }
+            div[data-input-type="file"] {
+              width: 59%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
             }
           }
         } @else if $data-type == 'richText' {

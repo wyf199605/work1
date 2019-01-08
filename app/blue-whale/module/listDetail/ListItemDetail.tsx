@@ -33,23 +33,23 @@ export class ListItemDetail {
         this.initDetailData().then(data => {
             this.render(data);
             this.initDetailButtons();
-            if (para.uiType === 'detail' && tools.isMb){
-                let hammertime = new Hammer(para.dom);
-                hammertime.on('swipeleft', function() {
-                    // 下一页
-                    if (self.currentPage !== self.totalNumber) {
-                        let current = self.currentPage + 1;
-                        self.changePage(current);
-                    }
-                });
-                hammertime.on('swiperight', function() {
-                    // 上一页
-                    if (self.currentPage !== 1) {
-                        let current = self.currentPage - 1;
-                        self.changePage(current);
-                    }
-                });
-            }
+            // if (para.uiType === 'detail' && tools.isMb){
+            //     let hammertime = new Hammer(para.dom);
+            //     hammertime.on('swipeleft', function() {
+            //         // 下一页
+            //         if (self.currentPage !== self.totalNumber) {
+            //             let current = self.currentPage + 1;
+            //             self.changePage(current);
+            //         }
+            //     });
+            //     hammertime.on('swiperight', function() {
+            //         // 上一页
+            //         if (self.currentPage !== 1) {
+            //             let current = self.currentPage - 1;
+            //             self.changePage(current);
+            //         }
+            //     });
+            // }
         });
     }
 

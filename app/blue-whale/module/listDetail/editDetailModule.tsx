@@ -148,6 +148,7 @@ export class EditDetailModule extends Component {
                     dafVal = Object.assign({}, dafVal, defaultData, res);
                 }
                 this.editModule.set(dafVal);
+                this.setLookUp(dafVal);
             })
         } else {
             let dafVal = BwRule.getDefaultByFields(this.para.fm.fields);
@@ -155,6 +156,7 @@ export class EditDetailModule extends Component {
                 dafVal = Object.assign({}, dafVal, defaultData);
             }
             this.editModule.set(dafVal);
+            this.setLookUp(dafVal);
         }
         this.isEdit = para.isEdit;
     }
@@ -224,7 +226,47 @@ export class EditDetailModule extends Component {
         return this._lookUpData || {};
     }
 
+    private get lookup(): Promise<void> {
+        if (tools.isEmpty(this._lookUpData)) {
+            let allPromise = this.para.fm.fields.filter(col => col.elementType === 'lookup')
+                .map(col => BwRule.getLookUpOpts(col).then((items) => {
+                    // debugger;
+                    this._lookUpData = this._lookUpData || {};
+                    this._lookUpData[col.name] = items;
+                }));
 
+            return Promise.all(allPromise).then(() => {
+            })
+        } else {
+            return Promise.resolve();
+        }
+    }
+
+    private setLookUp(data:obj){
+        if (tools.isEmpty(data)){
+            return;
+        }
+        this.lookup.then(()=>{
+            this.para.fm.fields.forEach((field) => {
+                if (field.elementType === 'lookup') {
+                    let lCom = this.editModule.getDom(field.name);
+                    if (field.elementType === 'lookup') {
+                        let lCom = this.editModule.getDom(field.name);
+                        if (!data[field.lookUpKeyField]) {
+                            lCom.set('');
+                        } else {
+                            let options = this.lookUpData[field.name] || [];
+                            for (let opt of options) {
+                                if (opt.value == data[field.lookUpKeyField]) {
+                                    lCom.set(opt.value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+    }
     // 处理分组
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
         if (tools.isEmpty(groupInfo.cloNames)) {
@@ -300,6 +342,7 @@ export class EditDetailModule extends Component {
                 });
             } else {
                 this.editModule.set(data);
+                this.setLookUp(data);
             }
             this.isEdit = this.para.isEdit;
         });
@@ -493,6 +536,7 @@ export class EditDetailModule extends Component {
                 onClick: () => {
                     self.getDefaultData().then((data) => {
                         self.editModule.set(data);
+                        self.setLookUp(data);
                         self.isEdit = false;
                     });
                 }
