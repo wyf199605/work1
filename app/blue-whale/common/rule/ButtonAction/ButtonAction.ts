@@ -319,10 +319,10 @@ export class ButtonAction {
     private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string): Promise<any> {
         let self = this;
         return new Promise((resolve, reject) => {
-            if(btn.actionAddr.type === 'pdf'){
+            if(btn.actionAddr && (btn.actionAddr.type === 'pdf')){
                 require(['PDFPreview'], (o) => {
                     new o.PDFPreview({
-                        url: BW.CONF.siteUrl + addr
+                        url: tools.url.addObj(BW.CONF.siteUrl + addr, ajaxData || {})
                     });
                     resolve();
                 })
@@ -340,8 +340,7 @@ export class ButtonAction {
                         if (data.type === 0) {
                             Modal.alert(data.showText);
                         } else if(data.type === 2) {
-                            this.progressPopup(data.url, data.showText);
-                            resolve()
+                            this.progressPopup(data.url, data.showText, resolve);
                         } else {
                             Modal.confirm({
                                 msg: data.showText,
@@ -376,7 +375,7 @@ export class ButtonAction {
 
     }
 
-    progressPopup(url: string, msg: string){
+    progressPopup(url: string, msg: string, callback?: Function){
         if(url){
             let body = d.create(`<div style="padding: 4px 15px;"></div>`),
                 text = d.create(`<p>${msg}</p>`),
@@ -394,6 +393,16 @@ export class ButtonAction {
                 className: 'modal-toast'
             });
 
+            let modalDestroy = (percent, msg) => {
+                // text.innerText = msg;
+                progress.format(percent, true);
+                callback && callback();
+                setTimeout(() => {
+                    modal.destroy();
+                    Modal.toast(msg);
+                }, 100);
+            };
+
             let getProgress = () => {
                 let percent = 0;
                 return BwRule.Ajax.fetch(BW.CONF.siteUrl + url).then(({response}) => {
@@ -410,6 +419,7 @@ export class ButtonAction {
                             setTimeout(() => {
                                 modal.destroy();
                                 Modal.alert(message);
+                                callback && callback();
                             }, 500)
                         }else{
                             progress.format(percent, false, time - 300);
@@ -423,14 +433,6 @@ export class ButtonAction {
                 }).catch(() => {
                     modalDestroy(percent, '执行操作失败');
                 })
-            };
-
-            let modalDestroy = (percent, msg) => {
-                text.innerText = msg;
-                progress.format(percent, true);
-                setTimeout(() => {
-                    modal.destroy();
-                }, time);
             };
 
             getProgress();

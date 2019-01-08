@@ -1,5 +1,6 @@
 .pdf-preview-modal {
   .modal-body{
+    position: relative;
     max-height: none!important;
     padding: 0;
     overflow: hidden;
@@ -66,7 +67,7 @@
     padding: 0px 7px;
     height: 26px;
     position: absolute;
-    top: 20px;
+    top: 30px;
     left: 15px;
     z-index: 997;
     border-radius: 8px;

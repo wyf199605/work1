@@ -30,6 +30,7 @@ namespace G{
                 AceEditor: ['../plugin/aceEditor/ace'],
                 raphael:['../plugin/raphael/raphael.min'],
                 D3: ['../plugin/d3/d3.v3.min'],
+                jquery: ['../plugin/jquery/jquery-3.2.1.min'],
                 pdfObject: ['../plugin/pdfObject/pdf-object'],
                 pdfh5: ['../plugin/pdfjs/pdfh5'],
                 pdfjs: ['../plugin/pdfjs/pdf']

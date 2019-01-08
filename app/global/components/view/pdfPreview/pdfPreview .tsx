@@ -25,14 +25,14 @@ export class PDFPreview{
             isOnceDestroy: true
         });
         // if(G.tools.isMb){
-            require(['pdfjs', 'pdfh5'], (pdfjsLib, Pdfh5) => {
-                window['pdfjsLib'] = pdfjsLib;
-                pdfjsLib.GlobalWorkerOptions.workerSrc = requirejs.toUrl('../plugin/pdfjs/pdf.worker.js');
-                let pdfh5 = new Pdfh5(body, {
-                    scrollEnable: true,//是否允许pdf滚动
-                    pdfurl: para.url
-                });
+        requirejs(['pdfjs', 'pdfh5'], (pdfjsLib, Pdfh5) => {
+            window['pdfjsLib'] = pdfjsLib;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = requirejs.toUrl('../plugin/pdfjs/pdf.worker.js');
+            let pdfh5 = new Pdfh5(body, {
+                scrollEnable: true,//是否允许pdf滚动
+                pdfurl: para.url
             });
+        });
         // }else{
         //     require(['pdfObject'], (pdfObject: PDFObject) => {
         //         if(pdfObject.supportsPDFs){
