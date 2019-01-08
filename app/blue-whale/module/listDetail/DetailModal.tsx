@@ -157,7 +157,7 @@ export class DetailModal {
                     for (let i = 0, len = meta.length; i < len; i++) {
                         res[meta[i]] = dataTab[i];
                     }
-                    this.editModule.set(res);
+                    this.editModule.set(DetailModal.removeEmptyContent(res));
                     fields.forEach((field) => {
                         if (field.elementType === 'lookup') {
                             let lCom = this.editModule.getDom(field.name);
@@ -182,7 +182,7 @@ export class DetailModal {
                 if (tools.isNotEmpty(para.defaultData)) {
                     defaultValue = Object.assign({}, defaultValue, para.defaultData);
                 }
-                this.editModule.set(defaultValue);
+                this.editModule.set(DetailModal.removeEmptyContent(defaultValue));
                 this.setLookUp(defaultValue);
             }
         } else {
@@ -190,7 +190,7 @@ export class DetailModal {
             if (tools.isNotEmpty(para.defaultData)) {
                 defaultValue = Object.assign({}, defaultValue, para.defaultData);
             }
-            this.editModule.set(defaultValue);
+            this.editModule.set(DetailModal.removeEmptyContent(defaultValue));
             this.setLookUp(defaultValue);
         }
         // 适配键盘遮挡输入区域问题
@@ -412,6 +412,15 @@ export class DetailModal {
             type = 'text';
         }
         return type;
+    }
+
+    static removeEmptyContent(data:obj){
+        for (let key in data){
+            if(tools.isEmpty(data[key])){
+                delete data[key];
+            }
+        }
+        return data || {};
     }
 
     destroy() {
