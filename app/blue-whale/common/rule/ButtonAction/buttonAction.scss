@@ -63,11 +63,11 @@
       display: inline-block;
     }
   }
-  .atvarDom{
-    padding-left: 7px;
-    [data-type="input"]{
-      display: inline-block;
-      width: 125px;
-    }
+}
+.atvarDom{
+  padding-left: 7px;
+  [data-type="input"]{
+    display: inline-block;
+    width: 120px;
   }
 }
