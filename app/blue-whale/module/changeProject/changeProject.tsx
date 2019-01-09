@@ -9,6 +9,7 @@ import {BwRule} from "../../common/rule/BwRule";
 export interface IChangeProjectPara extends IModal {   // 类构造函数的参数
     current: string;    // 当前项目
 }
+
 interface IResponseProjectItem {   // 后台响应的数据
     PLATFORM_SEQ: string;
     PLATFORM_NAME: string;
@@ -39,7 +40,7 @@ export class ChangeProject extends Modal {
             width: tools.isMb ? '100%' : '25%',
             height: tools.isMb && '100%',
             isAnimate: true,
-            position: 'center',
+            top: 100,
         }, para));
         this.current = para.current;
         this.initBody();
