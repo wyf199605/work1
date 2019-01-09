@@ -678,8 +678,8 @@ export class ButtonAction {
                 BwRule.atvar = new q.AtVarBuilder({
                     queryConfigs: res.atvarparams,
                     resultDom: avatarLoad,
-                    tpl: () => d.create(`<div class="atvarDom ${disabled}"><div style="display: inline-block;" data-type="title"></div>
-                    <span>：</span><div data-type="input"></div></div>`),
+                    tpl: () => d.create(`<div class="atvarDom atvar-auto ${disabled}"><div style="display: inline-block;" data-type="title"></div>
+                    <div data-type="input"></div></div>`),
                     setting: res.setting
                 });
                 let coms = BwRule.atvar.coms,
