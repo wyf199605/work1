@@ -57,16 +57,17 @@ export class SlideTab extends Tab {
         let translate = 0,
             isPulldownRefresh = true,
             moveHandler = null,
+            direction = 'down',
             endHandler = null;
 
         let startHandler = (e: TouchEvent) => {
+            d.off(document, 'touchend', endHandler);
+            d.off(this.panelContainer, 'touchmove', moveHandler);
             translate = -this.current * this.width;
             this.panelContainer.style.removeProperty('transition');
             let panel = d.closest(e.target as HTMLElement, '.tab-pane'),
                 disX = e.changedTouches[0].clientX,
                 disY = e.changedTouches[0].clientY,
-                direction,
-                scale = 1,
                 isFirst = true;
             // console.log(panel);
 
@@ -87,13 +88,13 @@ export class SlideTab extends Tab {
                 if (direction === 'left' || direction === 'right') {
                     let deltaX = currentX - disX;
                     disX = currentX;
-                    if ((this.current === 0 && e.direction === 'right')
-                        || (this.current === this.len - 1 && e.direction === 'left')) {
-                        scale *= .96;
-                        deltaX *= scale;
-                    } else {
-                        deltaX = deltaX * 1.15;
-                    }
+                    // if ((this.current === 0 && e.direction === 'right')
+                    //     || (this.current === this.len - 1 && e.direction === 'left')) {
+                    //     scale *= .96;
+                    //     deltaX *= scale;
+                    // } else {
+                    //     deltaX = deltaX * 1.1;
+                    // }
                     translate += deltaX;
                     // this.panelContainer.style.transform = 'translateX(' + translate + 'px)';
                     this.change(translate);
@@ -147,6 +148,8 @@ export class SlideTab extends Tab {
                 // });
             },
             off: () => {
+                d.off(document, 'touchend', endHandler);
+                d.off(this.panelContainer, 'touchmove', moveHandler);
                 // d.off(this.panelContainer, 'panleft panright panstart panend', handler);
                 d.off(this.panelContainer, 'touchstart', startHandler);
             }
@@ -240,6 +243,7 @@ export class SlideTab extends Tab {
                         isPulldownRefresh: isPulldownRefresh === 0 ? (page.isPulldownRefresh || false) : !!~isPulldownRefresh,
                     },
                     render: (start, length, isRefresh) => {
+                        this.current = this.current;
                         typeof page.render === 'function' && page.render(start, length, dataManager.data, isRefresh);
                     },
                     ajax: {

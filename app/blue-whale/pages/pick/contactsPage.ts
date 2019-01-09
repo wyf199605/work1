@@ -64,26 +64,9 @@ export = class contactsPage {
             getList(ajaxUrl, queryData, function (response) {
                 showList(list, 0, response.data);
             });
-            // pullScroll.pullRefresh({
-            //     auto: true,
-            //     height: 50,//可选.默认50.触发上拉加载拖动距离
-            //     contentrefresh: "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-            //     contentnomore: '',//可选，请求完毕若没有更多数据时显示的提醒内容；
-            //     up: {
-            //         callback: function () {
-            //             let self = this;
-            //             picker.up(function (isEnd) {
-            //                 self.endPullupToRefresh(isEnd);
-            //             });
-            //         }
-            //     }
-            // });
 
-            // console.log(sys.isMb, tools.isMb);
-            // debugger;
             let hasOpen;
             function hasShow(target : HTMLElement){
-                // debugger;
                 let tarPar = target;
                 if(tarPar.classList.contains('mui-active')){
                     tarPar.classList.remove('mui-active');
@@ -94,8 +77,6 @@ export = class contactsPage {
             }
 
             d.on(list, clickEvent, '.mui-table-view-cell.mui-collapse a', function (e) {
-                // !hasOpen && hasShow(<HTMLElement>e.target);
-                //  debugger;
                 setTimeout(() => {
                     if(typeof hasOpen === 'undefined') {
                         hasOpen = this.parentElement.classList.contains('mui-active');
@@ -167,10 +148,10 @@ export = class contactsPage {
                     page = 1;
 
                     list.querySelector('ul.mui-table-view').innerHTML = '<li class="mui-table-view-cell" style="text-align: center"> <span class="mui-spinner" style="vertical-align: bottom;"></span> </li>';
+                    dataManager && dataManager.destroy();
                     if (vLen === 0) {
                         // pullScroll.pullRefresh().disablePullupToRefresh();
                         queryData = {queryparam: '', pageparams: ''}
-                        dataManager && dataManager.destroy();
                         dataManager = null;
                         getList(ajaxUrl, queryData, function (response) {
                             let level = treeField.length - 1;
@@ -189,7 +170,6 @@ export = class contactsPage {
                             showList(list, level, response.data);
                         });
                     } else {
-                        // pullScroll.pullRefresh().enablePullupToRefresh();
                         queryData.queryparam = inputValue.toUpperCase().replace(/'/g, '');
                         dataManager = new DataManager({
                             isMb: true,
@@ -216,9 +196,6 @@ export = class contactsPage {
                                                 list.classList.remove('search');
                                             }
 
-                                            let isEnd = response.data.length < page;
-                                            // pullScroll.pullRefresh().endPullupToRefresh(isEnd);
-                                            // console.log(110)
                                             showList(list, level, response.data, obj.current !== 0);
                                             resolve({
                                                 data: response.data,
@@ -230,29 +207,25 @@ export = class contactsPage {
                             }
                         });
                     }
-
-
-//             console.log(queryData);
-
                 }
             });
 
 
             function getList(url, ajaxData, callback) {
-                // let loading = new Loading({
-                //     msg: '加载中...',
-                //     container: document.body,
-                // });
-                // loading.show();
+                let queryparam = ajaxData.queryparam;
                 BwRule.Ajax.fetch(url, {
                     cache: true,
                     data: ajaxData,
                 }).then(({response}) => {
-                    self.response = response;
                     /**
                      * 如果是搜索，则直接显示叶子，并且显示数据的前6项
                      */
-                        // debugger;
+                    let searchInput = document.getElementById('searchInput') as HTMLInputElement,
+                        value = searchInput.value;
+                    if(value !== queryparam && typeof queryparam !== 'undefined'){
+                        return;
+                    }
+                    self.response = response;
                     let res = G.tools.obj.merge(true, response);
                     if (ajaxData.queryparam) {
                         let level = treeField.length - 1,
@@ -284,7 +257,6 @@ export = class contactsPage {
                         });
                         res.data = tmpData;
                     }
-//                    console.log(res);
                     callback(res);
                 }).finally(() => {
                     // loading.hide();
@@ -312,7 +284,6 @@ export = class contactsPage {
 
                     isEnd = response.data.length < page;
 
-                    // console.log(response, 678)
                     showList(list, level, response.data, true);
                     callback(isEnd, response.data);
                 });

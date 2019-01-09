@@ -263,7 +263,6 @@ namespace BW {
                     self.handle('reOpen', o);
                 },
                 toClient: function (){
-                    alert('toClient');
                     self.handle('toClient');
                 },
                 clientCode: function(callback){

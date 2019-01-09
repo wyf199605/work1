@@ -92,7 +92,7 @@ export class EditDetailModule extends Component {
 
     private initEditModule(para: IEditDetailPara, defaultData: obj) {
         let emPara: EditModulePara = {fields: [], defaultData: defaultData},
-            formWrapper = <div className="form-wrapper"/>,
+            formWrapper = tools.os.ios ? <div className="form-wrapper ios-form"/> : <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
         d.append(d.query('.edit-detail-content', this.wrapper), formWrapper);
@@ -148,6 +148,7 @@ export class EditDetailModule extends Component {
                     dafVal = Object.assign({}, dafVal, defaultData, res);
                 }
                 this.editModule.set(dafVal);
+                this.setLookUp(dafVal);
             })
         } else {
             let dafVal = BwRule.getDefaultByFields(this.para.fm.fields);
@@ -155,6 +156,7 @@ export class EditDetailModule extends Component {
                 dafVal = Object.assign({}, dafVal, defaultData);
             }
             this.editModule.set(dafVal);
+            this.setLookUp(dafVal);
         }
         this.isEdit = para.isEdit;
     }
@@ -169,6 +171,9 @@ export class EditDetailModule extends Component {
         }
         if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
             f.comType = 'virtual';
+        }
+        if (f.comType === 'textarea') {
+            className = tools.isNotEmpty(className) ? className + ' textarea' : 'textarea';
         }
         return {
             dom: f.comType === 'virtual' ? null : DetailModal.createFormWrapper(f, wrapper, className || ''),
@@ -221,7 +226,47 @@ export class EditDetailModule extends Component {
         return this._lookUpData || {};
     }
 
+    private get lookup(): Promise<void> {
+        if (tools.isEmpty(this._lookUpData)) {
+            let allPromise = this.para.fm.fields.filter(col => col.elementType === 'lookup')
+                .map(col => BwRule.getLookUpOpts(col).then((items) => {
+                    // debugger;
+                    this._lookUpData = this._lookUpData || {};
+                    this._lookUpData[col.name] = items;
+                }));
 
+            return Promise.all(allPromise).then(() => {
+            })
+        } else {
+            return Promise.resolve();
+        }
+    }
+
+    private setLookUp(data:obj){
+        if (tools.isEmpty(data)){
+            return;
+        }
+        this.lookup.then(()=>{
+            this.para.fm.fields.forEach((field) => {
+                if (field.elementType === 'lookup') {
+                    let lCom = this.editModule.getDom(field.name);
+                    if (field.elementType === 'lookup') {
+                        let lCom = this.editModule.getDom(field.name);
+                        if (!data[field.lookUpKeyField]) {
+                            lCom.set('');
+                        } else {
+                            let options = this.lookUpData[field.name] || [];
+                            for (let opt of options) {
+                                if (opt.value == data[field.lookUpKeyField]) {
+                                    lCom.set(opt.value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+    }
     // 处理分组
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
         if (tools.isEmpty(groupInfo.cloNames)) {
@@ -273,7 +318,7 @@ export class EditDetailModule extends Component {
     }
 
     // 上一页下一页加载数据
-    changePage(page?: number) {
+    changePage(page?: number):Promise<void> {
         if (tools.isNotEmpty(page)) {
             if (page > 0) {
                 if (page > this.totalNumber) {
@@ -288,9 +333,18 @@ export class EditDetailModule extends Component {
         }
         this.checkPageButtonDisabled();
         this.scrollToTop();
-        this.getDefaultData().then(data => {
-            this.editModule.set(data);
-            this.isEdit = false;
+        return this.getDefaultData().then(data => {
+            if (tools.isEmpty(data)) {
+                this.fields.forEach(f => {
+                    if (!f.noShow) {
+                        this.editModule.getDom(f.name).set('');
+                    }
+                });
+            } else {
+                this.editModule.set(data);
+                this.setLookUp(data);
+            }
+            this.isEdit = this.para.isEdit;
         });
     }
 
@@ -318,8 +372,20 @@ export class EditDetailModule extends Component {
             container: btnWrapper,
             onClick: () => {
                 if (this.currentPage !== 1) {
-                    let current = this.currentPage - 1;
-                    this.changePage(current);
+                    if (this.isEdit && this.checkIsSave()) {
+                        Modal.confirm({
+                            msg: '还有数据未保存，确定跳转上一页吗?',
+                            callback: (flag) => {
+                                if (flag) {
+                                    let current = this.currentPage - 1;
+                                    this.changePage(current);
+                                }
+                            }
+                        })
+                    } else {
+                        let current = this.currentPage - 1;
+                        this.changePage(current);
+                    }
                 }
             }
         });
@@ -328,13 +394,42 @@ export class EditDetailModule extends Component {
             container: btnWrapper,
             onClick: () => {
                 if (this.currentPage !== this.totalNumber) {
-                    let current = this.currentPage + 1;
-                    this.changePage(current);
+                    if (this.isEdit && this.checkIsSave()) {
+                        Modal.confirm({
+                            msg: '还有数据未保存，确定跳转下一页吗?',
+                            callback: (flag) => {
+                                if (flag) {
+                                    let current = this.currentPage + 1;
+                                    this.changePage(current);
+                                }
+                            }
+                        })
+                    } else {
+                        let current = this.currentPage + 1;
+                        this.changePage(current);
+                    }
                 }
             },
             className: 'list-detail-btn'
         });
         this.checkPageButtonDisabled();
+    }
+
+    private checkIsSave(): boolean {
+        let data = this.editModule.get(),
+            defaultData = this.defaultData;
+        for (let key in defaultData) {
+            if (tools.isNotEmpty(defaultData[key])) {
+                if (defaultData[key] != data[key]) {
+                    return true;
+                }
+            } else {
+                if (tools.isNotEmpty(data[key])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     // 检测上一页下一页按钮是否可用
@@ -427,6 +522,7 @@ export class EditDetailModule extends Component {
                 onClick: () => {
                     if (self.validate()) {
                         // 验证成功
+                        self.updateBtnPara.refresh = 0;
                         ButtonAction.get().clickHandle(self.updateBtnPara, self.editModule.get(), () => {
                             self.isEdit = false;
                         }, self.para.url || '');
@@ -438,7 +534,11 @@ export class EditDetailModule extends Component {
                 className: 'edit-btn',
                 container: wrapper,
                 onClick: () => {
-                    self.isEdit = false;
+                    self.getDefaultData().then((data) => {
+                        self.editModule.set(data);
+                        self.setLookUp(data);
+                        self.isEdit = false;
+                    });
                 }
             })
         }
@@ -477,6 +577,7 @@ export class EditDetailModule extends Component {
         function subBtnEvent(btn: R_Button) {
             switch (btn.subType) {
                 case 'insert_save':
+                    btn.refresh = 0;
                     new DetailModal(Object.assign({}, self.para, {
                         defaultData: {},
                         isAdd: true,
@@ -485,7 +586,7 @@ export class EditDetailModule extends Component {
                             return new Promise((resolve) => {
                                 ButtonAction.get().clickHandle(btn, data, () => {
                                     self.totalNumber += 1;
-                                    self.changePage(1);
+                                    self.changePage();
                                     resolve();
                                 });
                             })
@@ -494,13 +595,12 @@ export class EditDetailModule extends Component {
                     break;
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
+                        btn.refresh = 0;
                         ButtonAction.get().clickHandle(btn, self.defaultData, () => {
-                            if (self.para.uiType === 'detail') {
-                                // 删除后显示下一页，如果已是最后一页，则显示上一页
-                                let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
-                                self.totalNumber = self.totalNumber - 1;
-                                self.changePage(currentPage);
-                            }
+                            // 删除后显示下一页，如果已是最后一页，则显示上一页
+                            let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
+                            self.totalNumber = self.totalNumber - 1;
+                            self.changePage(currentPage);
                         });
                     } else {
                         Modal.alert('无数据可以删除!');
@@ -520,13 +620,13 @@ export class EditDetailModule extends Component {
     set isEdit(isEdit: boolean) {
         this._isEdit = isEdit;
         if (this.totalNumber === 0) {
-            this.cancelBtn.disabled = false;
-            this.updateBtn.disabled = false;
-            this.saveBtn.disabled = false;
-            this.moreBtn.disabled = false;
+            this.cancelBtn.disabled = true;
+            this.updateBtn.disabled = true;
+            this.saveBtn.disabled = true;
+            tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = false);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
-                    this.editModule.getDom(f.name).disabled = false;
+                    this.editModule.getDom(f.name).disabled = true;
                 }
             });
             if (tools.isPc) {

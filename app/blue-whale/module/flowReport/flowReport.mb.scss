@@ -119,8 +119,8 @@ body.fl-mobile {
     font-size: 18px;
     position: relative;
     height: 100%;
-    $data-type-list: ("input", "datetime", "richText", "tagsInput", "selectInput");
-
+    overflow-y: auto;
+    $data-type-list: ("input", "datetime", "richText", "tagsInput", "selectInput", "file");
     .disabled {
       pointer-events: none !important;
     }
@@ -133,13 +133,12 @@ body.fl-mobile {
 
       label {
         width: 34.1%;
-        min-width: 108px;
+        white-space: nowrap;
       }
 
       div[data-element-type="value"] input {
         pointer-events: none;
       }
-
       @each $data-type in $data-type-list {
         @if $data-type != 'richText' {
           div[data-type=#{$data-type}] {
@@ -193,6 +192,13 @@ body.fl-mobile {
                   padding-top: 5px;
                 }
               }
+            }
+            div[data-input-type="file"] {
+              width: 59%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
             }
           }
         } @else if $data-type == 'richText' {
@@ -279,7 +285,6 @@ body.fl-mobile {
     width: 100%;
     height: 44px;
     background-color: #ffffff;
-    border: solid 1px #e9e9e9;
     border-radius: 5px;
     margin-bottom: 30px;
     font-size: 15px;
@@ -287,6 +292,17 @@ body.fl-mobile {
     & > input {
       height: calc(100% - 2px);
       margin-bottom: 0;
+    }
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .flowReport{
+    label{
+      width: 140px !important;
+    }
+    div[data-input-type]{
+      width: calc(100% - 150px) !important;
     }
   }
 }

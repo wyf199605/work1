@@ -224,7 +224,8 @@ export class Pagination extends Component {
             } else {
             }
 
-        });
+        }).finally(() => {
+        })
     }
 
     private _pageSize: number = 20;
@@ -365,12 +366,14 @@ class PaginationScrollSpinner {
             };
         let pan = (ev) => {
             ev.srcEvent.preventDefault();
-            if (ev.isFirst) {
-                panstart();
-            } else if (ev.isFinal) {
-                panend();
-            } else {
-                panmove(ev);
+            if(!self.isAnimated){
+                if (ev.isFirst) {
+                    panstart();
+                } else if (ev.isFinal) {
+                    panend();
+                } else {
+                    panmove(ev);
+                }
             }
         };
         let isAndroid4 = false;
@@ -497,11 +500,13 @@ class PaginationScrollSpinner {
                 if (t >= duration) {
                     self.wrapper.style.transform = 'translate3d(0px, 0px, 0px)';
                     window.cancelAnimationFrame(config.id);
-                    self.isAnimated = false;
-                    self.wrapper.style.display = 'none';
-                    config.translate = 0;
-                    config.endOnce = true;
-                    config.isMove = false;
+                    setTimeout(() => {
+                        self.isAnimated = false;
+                        self.wrapper.style.display = 'none';
+                        config.translate = 0;
+                        config.endOnce = true;
+                        config.isMove = false;
+                    }, 100);
                 }
             }
         }

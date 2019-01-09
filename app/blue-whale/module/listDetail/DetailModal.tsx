@@ -25,7 +25,7 @@ export class DetailModal {
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
         let emPara: EditModulePara = {fields: [], defaultData: this.para.defaultData},
-            formWrapper = <div className="form-wrapper"/>,
+            formWrapper = tools.os.ios ? <div className="form-wrapper ios-form"/> : <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
         this.fields = fields;
@@ -147,7 +147,7 @@ export class DetailModal {
         });
         if (para.isAdd) {
             if (tools.isNotEmpty(para.fm.defDataAddrList)) {
-                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response}) => {
+                Promise.all([BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])),this.lookup]).then(([{response}]) => {
                     // 字段默认值
                     this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
                     // 新增时的默认值
@@ -157,22 +157,43 @@ export class DetailModal {
                     for (let i = 0, len = meta.length; i < len; i++) {
                         res[meta[i]] = dataTab[i];
                     }
-                    this.editModule.set(res);
+                    this.editModule.set(DetailModal.removeEmptyContent(res));
+                    fields.forEach((field) => {
+                        if (field.elementType === 'lookup') {
+                            let lCom = this.editModule.getDom(field.name);
+                            if (field.elementType === 'lookup') {
+                                let lCom = this.editModule.getDom(field.name);
+                                if (!res[field.lookUpKeyField]) {
+                                    lCom.set('');
+                                } else {
+                                    let options = this.lookUpData[field.name] || [];
+                                    for (let opt of options) {
+                                        if (opt.value == res[field.lookUpKeyField]) {
+                                            lCom.set(opt.value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
                 })
             } else {
                 let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
                 if (tools.isNotEmpty(para.defaultData)) {
                     defaultValue = Object.assign({}, defaultValue, para.defaultData);
                 }
-                this.editModule.set(defaultValue);
+                this.editModule.set(DetailModal.removeEmptyContent(defaultValue));
+                this.setLookUp(defaultValue);
             }
         } else {
             let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
             if (tools.isNotEmpty(para.defaultData)) {
                 defaultValue = Object.assign({}, defaultValue, para.defaultData);
             }
-            this.editModule.set(defaultValue);
+            this.editModule.set(DetailModal.removeEmptyContent(defaultValue));
+            this.setLookUp(defaultValue);
         }
+        // 适配键盘遮挡输入区域问题
         if (tools.os.android) {
             window.addEventListener('resize', function () {
                 if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
@@ -195,6 +216,9 @@ export class DetailModal {
         }
         if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
             f.comType = 'virtual';
+        }
+        if (f.comType === 'textarea') {
+            className = tools.isNotEmpty(className) ? className + ' textarea' : 'textarea';
         }
         return {
             dom: f.comType === 'virtual' ? null : DetailModal.createFormWrapper(f, wrapper, className || ''),
@@ -248,6 +272,47 @@ export class DetailModal {
         return this._lookUpData || {};
     }
 
+    private get lookup(): Promise<void> {
+        if (tools.isEmpty(this._lookUpData)) {
+            let allPromise = this.para.fm.fields.filter(col => col.elementType === 'lookup')
+                .map(col => BwRule.getLookUpOpts(col).then((items) => {
+                    // debugger;
+                    this._lookUpData = this._lookUpData || {};
+                    this._lookUpData[col.name] = items;
+                }));
+
+            return Promise.all(allPromise).then(() => {
+            })
+        } else {
+            return Promise.resolve();
+        }
+    }
+
+    private setLookUp(data:obj){
+        if (tools.isEmpty(data)){
+            return;
+        }
+        this.lookup.then(()=>{
+            this.para.fm.fields.forEach((field) => {
+                if (field.elementType === 'lookup') {
+                    let lCom = this.editModule.getDom(field.name);
+                    if (field.elementType === 'lookup') {
+                        let lCom = this.editModule.getDom(field.name);
+                        if (!data[field.lookUpKeyField]) {
+                            lCom.set('');
+                        } else {
+                            let options = this.lookUpData[field.name] || [];
+                            for (let opt of options) {
+                                if (opt.value == data[field.lookUpKeyField]) {
+                                    lCom.set(opt.value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+    }
 
     // 处理分组
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
@@ -347,6 +412,15 @@ export class DetailModal {
             type = 'text';
         }
         return type;
+    }
+
+    static removeEmptyContent(data:obj){
+        for (let key in data){
+            if(tools.isEmpty(data[key])){
+                delete data[key];
+            }
+        }
+        return data || {};
     }
 
     destroy() {

@@ -19,6 +19,10 @@ body.fl-pc{
   opacity: .5;
   pointer-events: auto !important;
 }
+.disabled-none{
+  opacity: .5;
+  pointer-events: none !important;
+}
 .hide {
   display: none !important;
 }
