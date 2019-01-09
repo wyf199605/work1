@@ -133,7 +133,7 @@ body.fl-mobile {
 
       label {
         width: 34.1%;
-        min-width: 108px;
+        white-space: nowrap;
       }
 
       div[data-element-type="value"] input {
@@ -293,6 +293,17 @@ body.fl-mobile {
     & > input {
       height: calc(100% - 2px);
       margin-bottom: 0;
+    }
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .flowReport{
+    label{
+      width: 140px !important;
+    }
+    div[data-input-type]{
+      width: calc(100% - 150px) !important;
     }
   }
 }
