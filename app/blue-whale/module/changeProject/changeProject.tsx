@@ -118,8 +118,8 @@ export class ChangeProject extends Modal {
                         BwRule.Ajax.fetch(BW.CONF.ajaxUrl.projectList, {
                             type: 'PUT',
                             data: {
-                                PLATFORM_SEQ: selectItem['value'],
-                                PLATFORM_NAME: selectItem['text'],
+                                platform_seq: selectItem['value'],
+                                platform_name: selectItem['text'],
                             }
                         }).then(({response}) => {
                             let prevUserInfo = JSON.parse(localStorage.getItem('userInfo'));

@@ -413,7 +413,11 @@ export class ButtonAction {
                         errorCode
                     } = response;
                     if(errorCode === 0){
-                        percent = current / all * 100;
+                        if(all){
+                            percent = current / all * 100;
+                        }else{
+                            percent = 0
+                        }
                         if(percent >= 100){
                             progress.format(percent, false, 250);
                             setTimeout(() => {
@@ -435,7 +439,9 @@ export class ButtonAction {
                 })
             };
 
-            getProgress();
+            setTimeout(() => {
+                getProgress();
+            }, 500)
         }
 
     }
