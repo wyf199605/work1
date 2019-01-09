@@ -64,10 +64,19 @@
     }
   }
 }
-.atvarDom{
+.atvarDom.atvar-auto{
   padding-left: 7px;
   [data-type="input"]{
     display: inline-block;
-    width: 125px;
+  }
+  display: flex;
+  [data-type='title']{
+    margin: auto;
+  }
+  [data-type="input"]{
+    margin: auto;
+  }
+  .height-auto{
+    padding: 9px 26px 0 0;
   }
 }

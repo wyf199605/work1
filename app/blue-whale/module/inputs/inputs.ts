@@ -229,8 +229,8 @@ export class Inputs {
             atv = new q.AtVarBuilder({
                 queryConfigs: atvarparams,
                 resultDom: modal.body,
-                tpl: () => d.create(`<div class="atvarDom"><div style="display: inline-block;" data-type="title"></div>
-                <span>：</span><div data-type="input"></div></div>`),
+                tpl: () => d.create(`<div class="atvarDom atvar-auto"><div style="display: inline-block;" data-type="title"></div>
+                <div data-type="input"></div></div>`),
                 setting: null
             });
             let coms = atv.coms,

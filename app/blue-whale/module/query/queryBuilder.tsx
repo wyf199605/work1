@@ -884,7 +884,7 @@ export class AtVarBuilder{
         d.queryAll('[data-type]', row).forEach((container) => {
             let type = container.dataset.type;
             if(type === 'title'){
-                container.innerHTML = this.queryConfigs[index].caption;
+                container.innerHTML = this.queryConfigs[index].caption + '：';
             }else if (type === 'input'){
                 // 判断输入框的类型
                 let inputType = (function () {
@@ -910,6 +910,9 @@ export class AtVarBuilder{
                     para['autoHeight'] = true;
                     para['maxHeight'] = '90px';
                 }
+                let title = d.query('[data-type="title"]', row);
+                console.log(container, title, row)
+                debugger
                 let com = inputTransFactory(null, para, inputType, container, sys.isMb);
                 com.set(value);
 
