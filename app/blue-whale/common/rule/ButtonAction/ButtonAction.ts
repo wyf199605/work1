@@ -409,7 +409,7 @@ export class ButtonAction {
                     let {
                         allAccount: all,
                         curAccount: current,
-                        message,
+                        msg: message,
                         errorCode
                     } = response;
                     if(errorCode === 0){
@@ -428,7 +428,7 @@ export class ButtonAction {
                             }, time);
                         }
                     }else{
-                        modalDestroy(percent, msg);
+                        modalDestroy(percent, message);
                     }
                 }).catch(() => {
                     modalDestroy(percent, '执行操作失败');
