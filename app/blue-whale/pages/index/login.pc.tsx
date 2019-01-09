@@ -23,10 +23,12 @@ export class LoginPcPage extends LoginPage {
             </div>
             <div className="form-group checkbox-group"/>
             <div className="btn-group"/>
+            <button type="submit" className="hide"/>
         </form>;
 
         d.on(form, 'submit', (e) => {
             e.preventDefault();
+            loginBtn.wrapper.click();
         });
         // alert(2);
         let passwordInput = d.query('#password', form) as HTMLInputElement;
