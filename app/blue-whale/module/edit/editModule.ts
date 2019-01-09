@@ -426,6 +426,7 @@ export class EditModule {
 
 
     protected assign = (() => {
+        let assignData: obj = {};
 
         let init = (com: FormCom, p?: ComInitP) => {
             if (!p) {
@@ -444,7 +445,8 @@ export class EditModule {
                 //     }
                 data = data || {};
                 if (data[field.name] != val) {
-                    assignSend(field, val, Object.assign({}, data, {[field.name]: val}), onExtra);
+                    assignData = Object.assign({}, data, assignData, {[field.name]: val});
+                    assignSend(field, val, assignData, onExtra);
                 }
 
                 // }, 30);
@@ -562,7 +564,7 @@ export class EditModule {
         for (let name in data) {
             if (!coms[name]) {
                 //页面没有这个输入控件，则启用虚拟输入控件
-                if(!this.nameFields[name]){
+                if (!this.nameFields[name]) {
                     this.nameFields[name] = null;
                 }
                 coms[name] = this.initFactory('virtual', this.nameFields[name]);
