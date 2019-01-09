@@ -121,15 +121,17 @@ export class FlowReport extends BasicPage {
                 formWrapper = <div className="form-wrapper"/>;
             muiContent.appendChild(formWrapper);
             for (let i = 0; i < fields.length; i++) {
-                let field = fields[i];
-                let span = null;
+                let field = fields[i],
+                    isHide = ((this.para.uiType == 'insert' || this.para.uiType == 'associate') && field.noAdd) || (this.para.uiType == 'update' && field.noShow) || field.noShow,
+                    span = null;
                 if (field.comType == 'tagsInput') {
                     span = <span class="mui-icon mui-icon-plus" data-action="picker"/>;
                 } else if (field.comType == 'file') {
                     span = <span class="mui-icon mui-icon-paperclip"/>;
                 }
                 let elementType = tools.isNotEmpty(field.elementType) ? field.elementType : '';
-                let formGroupWrapper = <div class="mui-input-row label-input" data-name={field.name}
+                let formGroupWrapper = <div class={"mui-input-row label-input " + (isHide ? 'hide' : '')}
+                                            data-name={field.name}
                                             data-type={field.comType} data-element-type={elementType}>
                     <label>{field.caption}</label>
                     <div data-input-type={field.comType}>

@@ -72,11 +72,21 @@
   display: flex;
   [data-type='title']{
     margin: auto;
+    line-height: 16px;
+    white-space: nowrap;
   }
   [data-type="input"]{
     margin: auto;
   }
+
   .height-auto{
-    padding: 9px 26px 0 0;
+    padding: 9px 1px 0 0;
+  }
+}
+.fl-mobile{
+  .atvarDom.atvar-auto {
+    .height-auto{
+      padding: 9px 26px 0 0;
+    }
   }
 }

@@ -910,9 +910,6 @@ export class AtVarBuilder{
                     para['autoHeight'] = true;
                     para['maxHeight'] = '90px';
                 }
-                let title = d.query('[data-type="title"]', row);
-                console.log(container, title, row)
-                debugger
                 let com = inputTransFactory(null, para, inputType, container, sys.isMb);
                 com.set(value);
 
