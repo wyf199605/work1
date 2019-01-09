@@ -72,6 +72,8 @@
   display: flex;
   [data-type='title']{
     margin: auto;
+    line-height: 16px;
+    white-space: nowrap;
   }
   [data-type="input"]{
     margin: auto;
