@@ -4,14 +4,18 @@ import {FormCom, IFormComPara} from "../basic";
 import d = G.d;
 import {ShellAction} from "../../../action/ShellAction";
 import Shell = G.Shell;
+
 export interface ITextInputPara extends ITextInputBasicPara {
     icons?: string[];
+
     iconHandle?(index?: number, icon?: HTMLElement): void;
+
     isScan?: boolean;
-    on2dScan?(code: string):void
+
+    on2dScan?(code: string): void
 }
 
-export interface ITextInputBasicPara extends IFormComPara{
+export interface ITextInputBasicPara extends IFormComPara {
     placeholder?: string;
     readonly?: boolean;
     type?: string;
@@ -22,7 +26,7 @@ export class TextInput extends FormCom {
     protected input: HTMLInputElement;
     protected iconGroup: HTMLElement;
     protected isReadonly: boolean;
-    protected props : ITextInputPara;
+    protected props: ITextInputPara;
 
     constructor(protected para: ITextInputPara) {
         super(para);
@@ -32,16 +36,16 @@ export class TextInput extends FormCom {
             placeholder: '',
             readonly: false,
             disabled: false,
-            type : 'text'
+            type: 'text'
         };
 
         this.para = Object.assign(defaultPara, para);
-        this.isReadonly = !!this.para.readonly ;
+        this.isReadonly = !!this.para.readonly;
         this.inputType = this.para.type;
         // this.initInput();
 
         // this.initIcons();
-
+        tools.isNotEmpty(para.value) && (this._value = para.value,this.input.value = para.value);
         if (typeof para.iconHandle === 'function') {
             this.initIconEven();
         }
@@ -51,7 +55,7 @@ export class TextInput extends FormCom {
         });
 
         //ios软键盘下去后body滚动的距离还原
-        if(tools.isMb){
+        if (tools.isMb) {
             d.on(this.input, 'blur', () => {
                 document.body.scrollTop = 0;
             })
@@ -59,10 +63,13 @@ export class TextInput extends FormCom {
 
     }
 
-    protected keyHandle = (e : KeyboardEvent) => {};
-    tabIndexElGet() : HTMLElement{
+    protected keyHandle = (e: KeyboardEvent) => {
+    };
+
+    tabIndexElGet(): HTMLElement {
         return this.input
     }
+
     // /**
     //  * 初始化输入框
     //  * @return {HTMLInputElement}
@@ -127,15 +134,15 @@ export class TextInput extends FormCom {
         });
     }
 
-    private _scanEl : HTMLElement;
+    private _scanEl: HTMLElement;
     private _isScan: boolean;
-    set isScan(flag: boolean){
-        if(!flag && this._scanEl){
+    set isScan(flag: boolean) {
+        if (!flag && this._scanEl) {
             d.remove(this._scanEl);
             this._scanEl = null;
         }
-        if(!this._scanEl && flag){
-            if(!this.iconGroup){
+        if (!this._scanEl && flag) {
+            if (!this.iconGroup) {
                 this.iconGroup = <div className="btn-group"></div>;
                 this.wrapper.appendChild(this.iconGroup);
                 this.initIconEven();
@@ -144,7 +151,7 @@ export class TextInput extends FormCom {
             d.append(this.iconGroup, this._scanEl);
 
             let can2dScan = Shell.inventory.can2dScan;
-            if(can2dScan) {
+            if (can2dScan) {
                 Shell.inventory.openScan((res) => {
 
                     if (res.success && res.data !== 'openSuponScan') {
@@ -157,7 +164,8 @@ export class TextInput extends FormCom {
             }
         }
     }
-    get isScan(){
+
+    get isScan() {
         return this._isScan
     }
 
@@ -167,7 +175,7 @@ export class TextInput extends FormCom {
      * @param type - HTMLInputElement 原生事件
      * @param handle - 事件处理
      */
-    public on(type:string, handle: EventListener){
+    public on(type: string, handle: EventListener) {
         d.on(this.input, type, handle);
     }
 
@@ -181,49 +189,54 @@ export class TextInput extends FormCom {
     }
 
     private _inputType: string;
-    set inputType(str:string) {
-        let types = ['text','button', 'checkbox','password','radio','image','reset','file','submit','textarea','number'],
+    set inputType(str: string) {
+        let types = ['text', 'button', 'checkbox', 'password', 'radio', 'image', 'reset', 'file', 'submit', 'textarea', 'number'],
             type = types.indexOf(str) > -1 ? str : types[0];
 
         this.input.type = this._inputType = type;
     }
-    get inputType () {
+
+    get inputType() {
         return this._inputType;
     }
 
-    readonly (is? : boolean){
-        if(typeof is === 'undefined') {
+    readonly(is?: boolean) {
+        if (typeof is === 'undefined') {
             return this.isReadonly;
-        }else {
+        } else {
             this.input.readOnly = is;
             return is;
         }
     }
-    placeholder (str : string){
+
+    placeholder(str: string) {
         this.input.placeholder = str;
     }
-    destroy(){
+
+    destroy() {
         super.destroy();
         this.input = null;
         this.para = null;
     }
+
     // wrapperGet(){
     //     return this._wrapper;
     // }
 
-    focus(){
+    focus() {
         this.input.focus();
     }
 
-    get value(){
+    get value() {
         return this.input.value;
     }
-    set value(str){
+
+    set value(str) {
         this.input.value = tools.str.toEmpty(str);
         typeof this.onSet === 'function' && this.onSet(str);
     }
 
-    set disabled(e: boolean){
+    set disabled(e: boolean) {
         if (this._disabled !== e) {
             if (tools.isNotEmpty(e)) {
                 this._disabled = e;

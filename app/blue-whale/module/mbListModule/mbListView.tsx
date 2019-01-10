@@ -8,9 +8,11 @@ import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import {MbListModule} from "./mbListModule";
 import tools = G.tools;
 import d = G.d;
+import mod = require("module");
 
 interface IMbListView extends IComponentPara {
     ui: IBW_UI<R_SubTable_Field>;
+    url: string;
 }
 
 export class MbListView extends Component {
@@ -28,8 +30,8 @@ export class MbListView extends Component {
         let tabsTitle = ['详情'],
             listUIUrls = [];
         tools.isNotEmpty(listUi.subTableList) && listUi.subTableList.forEach(ele => {
-            listUIUrls.push(tools.url.addObj(BW.CONF.siteUrl + ele.uiAddr.dataAddr,{
-                output:"json"
+            listUIUrls.push(tools.url.addObj(BW.CONF.siteUrl + ele.uiAddr.dataAddr, {
+                output: "json"
             }));
             tabsTitle.push(ele.caption);
         });
@@ -51,17 +53,18 @@ export class MbListView extends Component {
                             dom: tabEl
                         });
                     } else {
-                        BwRule.Ajax.fetch(listUIUrls[i-1]).then(({response}) => {
+                        BwRule.Ajax.fetch(listUIUrls[i - 1]).then(({response}) => {
                             let tabEl = d.query(`.tab-pane.mbListView[data-index="${i}"]`, this.tab.getPanel());
                             let uiType = response.uiType;
-                            switch (uiType){
-                                case 'layout':{
+                            switch (uiType) {
+                                case 'layout': {
                                     this.subLists[i] = new MbListModule({
                                         ui: response,
-                                        container: tabEl
+                                        container: tabEl,
+                                        url: para.url
                                     })
                                 }
-                                break;
+                                    break;
                             }
                         });
                     }
@@ -79,8 +82,8 @@ export class MbListView extends Component {
         this.tab.active(0);
         if (tools.isMb) {
             let width = this.calcNavUlWidth();
-            if (width < document.documentElement.clientWidth){
-                d.query('ul.nav.nav-tabs.nav-tabs-line',this.wrapper).classList.add('space-around');
+            if (width < document.documentElement.clientWidth) {
+                d.query('ul.nav.nav-tabs.nav-tabs-line', this.wrapper).classList.add('space-around');
             }
         }
     }
@@ -97,5 +100,20 @@ export class MbListView extends Component {
         }
 
         return width;
+    }
+
+    refresh() {
+        let module = this.subLists[this.currentIndex];
+        if (tools.isNotEmpty(module)) {
+            this.subLists[this.currentIndex].refresh();
+        } else {
+            this.tab.active(this.currentIndex);
+        }
+    }
+
+    destroy(){
+        super.destroy();
+        this.tab = null;
+        this.subLists = null;
     }
 }

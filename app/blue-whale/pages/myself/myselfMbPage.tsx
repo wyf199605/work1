@@ -96,6 +96,16 @@ export = class myselfMbPage {
             </li>;
             d.append(list, li);
         }
+        if(sys.window.toClient){
+            let li = <li className="mui-table-view-cell">
+                <a href="#" className="mui-navigate-right">更改客户代码</a>
+            </li>;
+            d.append(list, li);
+            d.on(li, 'click', (e) => {
+                e.preventDefault();
+                sys.window.toClient();
+            })
+        }
 
         d.on(d.query('.selfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
             let dataset = d.closest(e.target as HTMLElement,'.mui-table-view-cell[data-page-name]').dataset.pageName;
@@ -242,7 +252,6 @@ export = class myselfMbPage {
 
 
     private initModal() {
-        let wrapper = <div className="test-module-wrapper"></div>;
         let body = <div className="mui-content">
             <div className="mui-rotate-box">
                 <div className="box-content">点击测速</div>
@@ -255,11 +264,10 @@ export = class myselfMbPage {
         </div>;
 
         return new Modal({
-            container: d.closest(wrapper, '.page-container'),
+            className: 'test-module-wrapper',
             header: '网络测速',
             body: body,
             position: sys.isMb ? 'full' : '',
-            width: '730px',
             isShow: false
         });
     }

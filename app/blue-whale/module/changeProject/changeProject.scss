@@ -27,53 +27,42 @@
         padding: 10px 20px;
         color: #333333;
         min-height: 193px;
-
-        .change-project {
-            position: relative;
-
-            .description {
-                margin-right: 3px;
+        .change-project-list-item{
+            height: 50px;
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e2e2;
+            .description{
+                flex: 0 0 auto;
             }
-
-            .current-project-wrapper {
-                height: auto;
-                margin-bottom: 20px;
-            }
-
-            .project-list-wrapper {
-                margin-bottom: 20px;
-                height: auto;
-
-                .select-project {
-                    .show-project-wrapper {
-                        position: relative;
-                        width: 70%;
-                        display: inline-block;
-                        .show-project {
-                            width: 100%;
-                            padding: 5px;
-                            background-color: #ffffff;
-                            border: solid 1px #e2e2e2;
-                        }
-
-                        .appcommon.app-xiala {
-                            position: absolute;
-                            right: 1px;
-                        }
-                    }
+            .text-input{
+                flex: 1 1 auto;
+                display: flex;
+                display: -webkit-flex;
+                align-items: center;
+                justify-content: flex-end;
+                height: 100%;
+                padding-right: 15px;
+                input{
+                    flex: 1 1 auto;
+                    height: 100%;
+                    text-align: right;
+                    margin-bottom: 0;
                 }
-
-                .dropdown-menu {
-                    height: auto;
-                    margin-top: -2px;
-                    clear: both;
-
-                    .drop-item.list-item {
-                        padding: 3px 5px;
+                .btn-group{
+                    position: static;
+                    a{
+                        display: flex;
+                        display: -webkit-flex;
+                        align-items: center;
+                        justify-content: center;
                     }
                 }
             }
         }
+
     }
 }
 
@@ -102,71 +91,41 @@
         font-size: $font-size__mobile-body;
         background-color: #ffffff;
         box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.18);
-        padding: 0 20px;
+        padding: 0 0 0 15px;
         color: #333333;
-
-        .change-project {
-            position: relative;
-
-            .description {
-                margin-right: 3px;
-                line-height: 40px;
-            }
-
-            .current-project-wrapper {
-                height: auto;
-                border-bottom: 1px solid #e2e2e2;
-                padding: 10px 0;
-                .current-project {
-                    position: absolute;
-                    right: 30px;
-                }
-            }
-
-            .project-list-wrapper {
-                padding: 10px 0;
-                border-bottom: 1px solid #e2e2e2;
-                height: auto;
-                position: relative;
+        .change-project{
+            .change-project-list-item{
+                height: 50px;
                 display: flex;
-
-                .select-project {
-                    position: relative;
-                    float: left;
-                    overflow: hidden;
-                    width: 100%;
-
-                    .show-project-wrapper {
-                        clear: both;
-                        overflow: hidden;
-                        float: right;
-                        width: 80%;
-                        input.show-project {
-                            padding: 0 30px 0 0;
-                            text-align: right;
-                            margin-bottom: 0;
-                            background-color: #ffffff;
-                            border: none;
-                            float: right;
-                            font-size: $font-size__mobile-body;
-                        }
-
-                        .appcommon.app-xiala {
-                            position: absolute;
-                            right: 1px;
-                        }
-                    }
+                display: -webkit-flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #e2e2e2;
+                .description{
+                    flex: 0 0 auto;
                 }
-
-                .dropdown-menu {
-                    height: auto;
-                    margin-top: -2px;
-                    clear: both;
-                    position: absolute;
-
-                    .drop-item.list-item {
-                        padding: 3px 5px;
-                        font-size: $font-size__mobile-body;
+                .text-input{
+                    flex: 1 1 auto;
+                    display: flex;
+                    display: -webkit-flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    height: 100%;
+                    padding-right: 15px;
+                    input{
+                        flex: 1 1 auto;
+                        height: 100%;
+                        text-align: right;
+                        margin-bottom: 0;
+                    }
+                    .btn-group{
+                        position: static;
+                        a{
+                            display: flex;
+                            display: -webkit-flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
                     }
                 }
             }

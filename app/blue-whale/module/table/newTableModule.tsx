@@ -81,7 +81,6 @@ export class NewTableModule {
             if (this.editType === 'linkage' && this.editable) {
                 this.editInit(main);
                 this.active.onChange = (isMain) => {
-                    console.log(isMain);
                     if(isMain){
                         this.main.modify.end();
                     }else{

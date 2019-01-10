@@ -39,7 +39,7 @@
   top: 80px!important;
   min-width: 200px;
   .modal-body-mobile{
-    max-height: 300px;
+    max-height: 300px!important;
   }
 }
 .avatar-progress{
@@ -63,11 +63,30 @@
       display: inline-block;
     }
   }
-  .atvarDom{
-    padding-left: 7px;
-    [data-type="input"]{
-      display: inline-block;
-      width: 125px;
+}
+.atvarDom.atvar-auto{
+  padding-left: 7px;
+  [data-type="input"]{
+    display: inline-block;
+  }
+  display: flex;
+  [data-type='title']{
+    margin: auto;
+    line-height: 16px;
+    white-space: nowrap;
+  }
+  [data-type="input"]{
+    margin: auto;
+  }
+
+  .height-auto{
+    padding: 9px 1px 0 0;
+  }
+}
+.fl-mobile{
+  .atvarDom.atvar-auto {
+    .height-auto{
+      padding: 9px 26px 0 0;
     }
   }
 }

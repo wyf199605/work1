@@ -230,10 +230,10 @@ export class Tab {
 
     protected static createTab(obj: obj,className?:string) {
         if (typeof obj.title === 'string') {
-            return <li className={className}  data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
+            return <li className={className || ''}  data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
         }
         else {
-            let tempLi = <li className={className} data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
+            let tempLi = <li className={className || ''} data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
             d.append(tempLi, obj.title);
             return tempLi;
         }

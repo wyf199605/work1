@@ -208,7 +208,7 @@ let event = (function () {
             },
             press: {
                 type: 'press',
-                time: 700,
+                time: 800,
                 longClick: 0,
                 on(el:Node, selector:string){
                     let press = events.press,
@@ -234,7 +234,7 @@ let event = (function () {
                     });
                     eventOn(document, EVENT_MB_MOVE, moveHandler = (ev) => {
                         let touch = ev.touches[0];
-                        if(Math.abs(touch.clientY - touchY) < 10) {
+                        if(Math.abs(touch.clientY - touchY) < 3) {
                             clearTimeout(timer);
                         }
                     });
@@ -1038,6 +1038,18 @@ export const d = {
             }
         }
         return null;
+    },
+    isParent(target: HTMLElement, parent: HTMLElement){
+        if(target instanceof HTMLElement && parent instanceof HTMLElement){
+            let tar = target;
+            while (tar){
+                if(tar.isSameNode(parent)){
+                    return true;
+                }
+                tar = tar.parentElement;
+            }
+        }
+        return false;
     },
     /**
      * 查询匹配的集合

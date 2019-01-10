@@ -12,10 +12,10 @@ interface objOf<T> {
 // }
 interface CustomFile {
     blob: Blob;
-    name: string;
-    lastModifiedDate: any;
-    type: string;
-    size: number;
+    name?: string;
+    lastModifiedDate?: any;
+    type?: string;
+    size?: number;
 }
 
 type Primitive = string | number | boolean
@@ -128,8 +128,8 @@ interface R_Field extends COL {
     lookUpKeyField?: string;
     comType?: string;
     displayFormat?: string;
-    dataType?: string
-    noSum?: number
+    dataType?: string;
+    noSum?: number;
     valueLists?: string;
     multiPick?: {
         dataAddr: R_ReqAddr;

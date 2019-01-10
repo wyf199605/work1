@@ -1,5 +1,4 @@
 /// <amd-module name="Tips"/>
-/// <amd-dependency path="raphael" name="Raphael"/>
 
 import d = G.d;
 import tools = G.tools;
@@ -27,26 +26,26 @@ export class Tips extends Component {
                 <div className="tip-line"/>
                 <div className="tip-item">
                     <div className="tip-item-inner click-item" data-name="select"><i
-                        className="appcommon app-Select"/>Select
+                        className="appcommon app-Select"/>选择
                     </div>
                 </div>
                 <div className="tip-item">
                     <div className="tip-item-inner click-item" data-name="transition"><i
-                        className="appcommon app-transition"/>Transition
+                        className="appcommon app-transition"/>连线
                     </div>
                 </div>
                 <div className="tip-line"/>
                 <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="start"><i className="appcommon app-start"/>Start
+                    <div className="tip-item-inner drag-item" data-name="start"><i className="appcommon app-start"/>开始
                     </div>
                 </div>
                 <div className="tip-item">
-                    <div className="tip-item-inner drag-item" data-name="end"><i className="appcommon app-end"/>End
+                    <div className="tip-item-inner drag-item" data-name="end"><i className="appcommon app-end"/>结束
                     </div>
                 </div>
                 <div className="tip-item">
                     <div className="tip-item-inner drag-item task-item" data-name="task"><i
-                        className="appcommon app-task"/>task
+                        className="appcommon app-task"/>任务
                     </div>
                 </div>
                 {/*<div className="tip-item">*/}
@@ -102,13 +101,15 @@ export class Tips extends Component {
                     // FlowDesigner.CURRENT_SELECT_TYPE = d.closest(e.target, '.drag-item').dataset.name;
                     FlowDesigner.CURRENT_SELECT_TYPE = '';
                     let top = Number(tools.offset.top(d.query('#design-canvas'))),
-                        left = Number(tools.offset.left(d.query('#design-canvas')));
+                        left = Number(tools.offset.left(d.query('#design-canvas'))),
+                        leftScroll = d.query('.modal-wrapper.flow-modal .modal-body').scrollLeft,
+                        topScroll = d.query('.modal-wrapper.flow-modal .modal-body').scrollTop;
                     let flowItem = new FlowItem({
                         type: d.closest(e.target, '.drag-item').dataset.name,
                         text: '',
                         position: {
-                            x: moveUpEvent.clientX - left + 15,
-                            y: moveUpEvent.clientY - top + 15
+                            x: leftScroll + moveUpEvent.clientX - left + 15,
+                            y: topScroll + moveUpEvent.clientY - top + 15
                         },
                         container: d.query('#design-canvas')
                     });

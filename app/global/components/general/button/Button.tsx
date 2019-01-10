@@ -176,7 +176,7 @@ export class Button extends Component implements IButton{
             this.wrapper.classList.add('dropdown-toggle');
             this.wrapper.appendChild(pos);
             this.onClick = ()=>{
-                dropDown.toggle();
+                this._dropDown.toggle();
             };
         }
         // else {
@@ -298,5 +298,10 @@ export class Button extends Component implements IButton{
         }
 
         this.init(button);
+    }
+
+    destroy(){
+        this._dropDown && this._dropDown.destroy();
+        super.destroy();
     }
 }

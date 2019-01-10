@@ -83,7 +83,11 @@ export class FileUpload {
                 }
             }).catch((...anyData) => {
                 console.log(anyData);
-                resolve(...anyData); // 表示已存在后台
+                if(tools.isEmpty(anyData)){
+                    reject();
+                }else{
+                    resolve(...anyData); // 表示已存在后台
+                }
             })
         })
     }

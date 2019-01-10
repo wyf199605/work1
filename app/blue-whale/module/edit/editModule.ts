@@ -24,6 +24,7 @@ import {RichTextModal} from "../../../global/components/form/richTextModal/richT
 import {BwUploader} from "../uploadModule/bwUploader";
 import {UploadImages} from "../uploadModule/uploadImages";
 import {Accessory} from "../uploadModule/accessory";
+import {TextAreaInput} from "../../../global/components/form/text/TextInput";
 
 interface ComInitFun {
     (para: ComInitP): FormCom
@@ -105,7 +106,7 @@ export class EditModule {
             }
         }
         if (this.comsExtraData[name] && cip.onExtra) {
-            cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames);
+            cip.onExtra(tools.obj.copy(this.comsExtraData[name]), fieldNames, false, true, true);
         }
 
         this.assign.checkAssign(this.comsExtraData[name], cip.onExtra);
@@ -371,12 +372,11 @@ export class EditModule {
             });
         },
 
-        // 流程引擎附件
-        accessory: (p) => {
-            // return new Accessory({
-            //     container: p.dom
-            // });
-            return null;
+        textarea: (p) => {
+            return new TextAreaInput({
+                container: p.dom,
+                custom: p.field
+            });
         }
 
     };
@@ -426,6 +426,7 @@ export class EditModule {
 
 
     protected assign = (() => {
+        let assignData: obj = {};
 
         let init = (com: FormCom, p?: ComInitP) => {
             if (!p) {
@@ -444,7 +445,8 @@ export class EditModule {
                 //     }
                 data = data || {};
                 if (data[field.name] != val) {
-                    assignSend(field, val, Object.assign({}, data, {[field.name]: val}), onExtra);
+                    assignData = Object.assign({}, data, assignData, {[field.name]: val});
+                    assignSend(field, val, assignData, onExtra);
                 }
 
                 // }, 30);
@@ -490,7 +492,7 @@ export class EditModule {
                     field.assignSelectFields.forEach((name) => {
                         assignData[name] = null;
                     });
-                    onExtra && onExtra(assignData, field.assignSelectFields, false, false);
+                    onExtra && onExtra(assignData, field.assignSelectFields, false, false, true);
                 }
                 return;
             }
@@ -506,7 +508,7 @@ export class EditModule {
 
                 assign2extra(field, assignData);
                 // debugger;
-                onExtra && onExtra(assignData, field.assignSelectFields, true);
+                onExtra && onExtra(assignData, field.assignSelectFields, true, false, true);
             })
         };
 
@@ -562,6 +564,9 @@ export class EditModule {
         for (let name in data) {
             if (!coms[name]) {
                 //页面没有这个输入控件，则启用虚拟输入控件
+                if (!this.nameFields[name]) {
+                    this.nameFields[name] = null;
+                }
                 coms[name] = this.initFactory('virtual', this.nameFields[name]);
             }
             //给控件赋值

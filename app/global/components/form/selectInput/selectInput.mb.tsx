@@ -16,7 +16,8 @@ export class SelectInputMb extends TextInput{
     constructor(protected para: ISelectInputPara){
         super(Object.assign({}, para, {
             icons : ['iconfont icon-arrow-down'],
-            iconHandle : para.clickType !== 0 ? () => {this.showList()} : null
+            iconHandle : para.clickType !== 0 ? () => {this.showList()} : null,
+            className: 'select-input-mb'
         }));
 
         this.pickList = <PickerList isBackground={false} isShow={false} isOnceDestroy={false}

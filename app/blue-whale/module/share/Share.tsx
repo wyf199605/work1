@@ -105,14 +105,6 @@ export class Share {
                             file_name : this.p.name + '.' + this._img.src.substr(11, 3),
                             content : this._img.src,
                         })
-
-                        // sys.window.open({
-                        //     url: G.tools.url.addObj(CONF.ajaxUrl.mailForward, {
-                        //         tag_id : this.p.tagId,
-                        //         file_name : this.p.name + '.' + this._img.src.substr(11, 3),
-                        //         content : this._img.src,
-                        //     })
-                        // })
                     });
                     break;
                 case 'downLoad':

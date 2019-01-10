@@ -16,19 +16,20 @@ interface IDetailModal extends EditPagePara {
     width?: string;
     height?: string;
     isPC?: boolean;
-    isNotDetail?: boolean;
 }
 
 export class DetailModal {
     private editModule: EditModule;
+    private fields: R_Field[] = [];
 
     constructor(private para: IDetailModal) {
         document.body.classList.add('edit-overflow-hidden');
         let emPara: EditModulePara = {fields: [], defaultData: this.para.defaultData},
-            formWrapper = <div className="form-wrapper"/>,
+            formWrapper = tools.os.ios ? <div className="form-wrapper ios-form"/> : <div className="form-wrapper"/>,
             fields = para.fm.fields || [],
             groupInfo = para.fm.groupInfo;
-        para.isNotDetail && BwRule.beforeHandle.fields(fields, para.uiType);
+        this.fields = fields;
+        BwRule.beforeHandle.fields(fields, para.uiType);
         if (tools.isMb || tools.isEmpty(groupInfo)) {
             tools.isPc && formWrapper.classList.add('no-group');
             for (let i = 0, len = fields.length; i < len; i++) {
@@ -129,9 +130,24 @@ export class DetailModal {
             });
         }
         this.editModule = new EditModule(emPara);
+        emPara.fields.forEach((f) => {
+            let field = f.field,
+                name = field.name,
+                isNotEdit = para.isAdd ? field.noModify : field.noEdit;
+            if (isNotEdit && !field.noShow) {
+                let com = this.editModule.getDom(name);
+                com && (com.disabled = true);
+                if (tools.isMb) {
+                    let wrapper = com.wrapper || com.container;
+                    wrapper && wrapper.addEventListener('click', () => {
+                        Modal.toast(field.caption + '不可以修改～');
+                    });
+                }
+            }
+        });
         if (para.isAdd) {
             if (tools.isNotEmpty(para.fm.defDataAddrList)) {
-                BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])).then(({response}) => {
+                Promise.all([BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])),this.lookup]).then(([{response}]) => {
                     // 字段默认值
                     this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
                     // 新增时的默认值
@@ -141,33 +157,71 @@ export class DetailModal {
                     for (let i = 0, len = meta.length; i < len; i++) {
                         res[meta[i]] = dataTab[i];
                     }
-                    this.editModule.set(res);
+                    this.editModule.set(DetailModal.removeEmptyContent(res));
+                    fields.forEach((field) => {
+                        if (field.elementType === 'lookup') {
+                            let lCom = this.editModule.getDom(field.name);
+                            if (field.elementType === 'lookup') {
+                                let lCom = this.editModule.getDom(field.name);
+                                if (!res[field.lookUpKeyField]) {
+                                    lCom.set('');
+                                } else {
+                                    let options = this.lookUpData[field.name] || [];
+                                    for (let opt of options) {
+                                        if (opt.value == res[field.lookUpKeyField]) {
+                                            lCom.set(opt.value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
                 })
             } else {
-                this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
+                let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
+                if (tools.isNotEmpty(para.defaultData)) {
+                    defaultValue = Object.assign({}, defaultValue, para.defaultData);
+                }
+                this.editModule.set(DetailModal.removeEmptyContent(defaultValue));
+                this.setLookUp(defaultValue);
             }
         } else {
-            // 字段默认值
-            this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
-            // 修改时字段的值
-            tools.isNotEmpty(para.defaultData) && this.editModule.set(para.defaultData);
+            let defaultValue = BwRule.getDefaultByFields(this.para.fm.fields);
+            if (tools.isNotEmpty(para.defaultData)) {
+                defaultValue = Object.assign({}, defaultValue, para.defaultData);
+            }
+            this.editModule.set(DetailModal.removeEmptyContent(defaultValue));
+            this.setLookUp(defaultValue);
+        }
+        // 适配键盘遮挡输入区域问题
+        if (tools.os.android) {
+            window.addEventListener('resize', function () {
+                if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
+                    window.setTimeout(function () {
+                        document.activeElement.scrollIntoView();
+                    }, 0);
+                }
+            })
         }
     }
 
     // 处理字段
     private handleField(f: R_Field, wrapper: HTMLElement, className?: string, isVirtual = false): ComInitP {
         let self = this;
-        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
-            f.comType = 'virtual';
-        }
         if (f.comType === 'file') {
             f.comType = 'newFile';
         }
-        if (isVirtual === true){
+        if (isVirtual === true) {
             f.comType = 'virtual';
         }
-        let field = {
-            dom: DetailModal.createFormWrapper(f, wrapper, className || ''),
+        if (((this.para.uiType == 'insert' || this.para.uiType == 'associate') && f.noAdd) || f.noShow) {
+            f.comType = 'virtual';
+        }
+        if (f.comType === 'textarea') {
+            className = tools.isNotEmpty(className) ? className + ' textarea' : 'textarea';
+        }
+        return {
+            dom: f.comType === 'virtual' ? null : DetailModal.createFormWrapper(f, wrapper, className || ''),
             field: f,
             data: this.para.defaultData,
             onExtra: (data, relateCols) => {
@@ -175,16 +229,89 @@ export class DetailModal {
                 for (let key of relateCols) {
                     let hCom = self.editModule.getDom(key);
                     if (hCom && hCom !== com) {
+                        let hField = hCom.custom as R_Field;
                         hCom.set(data[key] || '');
+                        if (hField.assignSelectFields && hField.assignAddr) {
+                            BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
+                                cache: true,
+                            }).then(({response}) => {
+                                let res = response.data;
+                                if (res && res[0]) {
+                                    hField.assignSelectFields.forEach((name) => {
+                                        let assignCom = self.editModule.getDom(name);
+                                        assignCom && assignCom.set(res[0][name]);
+                                    });
+                                    let data = this.dataGet();
+                                    this.fields.forEach((field) => {
+                                        if (field.elementType === 'lookup') {
+                                            let lCom = self.editModule.getDom(field.name);
+                                            if (!data[field.lookUpKeyField]) {
+                                                lCom.set('');
+                                            } else {
+                                                let options = this.lookUpData[field.name] || [];
+                                                for (let opt of options) {
+                                                    if (opt.value == data[field.lookUpKeyField]) {
+                                                        lCom.set(opt.value);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    })
+                                }
+
+                            })
+                        }
                     }
                 }
             }
         };
-        if (this.para.isAdd ? field.field.noModify : field.field.noEdit) {
-            field.dom && field.dom.classList.add('disabled');
-        }
+    }
 
-        return field;
+    private _lookUpData: objOf<ListItem[]> = {};
+    get lookUpData() {
+        return this._lookUpData || {};
+    }
+
+    private get lookup(): Promise<void> {
+        if (tools.isEmpty(this._lookUpData)) {
+            let allPromise = this.para.fm.fields.filter(col => col.elementType === 'lookup')
+                .map(col => BwRule.getLookUpOpts(col).then((items) => {
+                    // debugger;
+                    this._lookUpData = this._lookUpData || {};
+                    this._lookUpData[col.name] = items;
+                }));
+
+            return Promise.all(allPromise).then(() => {
+            })
+        } else {
+            return Promise.resolve();
+        }
+    }
+
+    private setLookUp(data:obj){
+        if (tools.isEmpty(data)){
+            return;
+        }
+        this.lookup.then(()=>{
+            this.para.fm.fields.forEach((field) => {
+                if (field.elementType === 'lookup') {
+                    let lCom = this.editModule.getDom(field.name);
+                    if (field.elementType === 'lookup') {
+                        let lCom = this.editModule.getDom(field.name);
+                        if (!data[field.lookUpKeyField]) {
+                            lCom.set('');
+                        } else {
+                            let options = this.lookUpData[field.name] || [];
+                            for (let opt of options) {
+                                if (opt.value == data[field.lookUpKeyField]) {
+                                    lCom.set(opt.value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
     }
 
     // 处理分组
@@ -194,8 +321,7 @@ export class DetailModal {
         }
         let groupsArr = groupInfo.cloNames.split(','),
             groupFields: R_Field[] = [],
-            fieldsArr = [...fields],
-            self = this;
+            fieldsArr = [...fields];
         groupsArr.forEach(field => {
             let gFields = fieldsArr.filter(f => f.name === field);
             if (tools.isNotEmptyArray(gFields)) {
@@ -256,11 +382,14 @@ export class DetailModal {
 
     // 验证
     private validate() {
-        let result = this.editModule.validate.start();
+        let result: obj = this.editModule.validate.start();
         if (tools.isNotEmpty(result)) {
             for (let key in result) {
-                Modal.alert(result[key].errMsg);
-                return false;
+                let errMsg = result[key].errMsg;
+                if (tools.isNotEmpty(errMsg)) {
+                    Modal.alert(result[key]);
+                    return false;
+                }
             }
         } else {
             return true;
@@ -283,6 +412,15 @@ export class DetailModal {
             type = 'text';
         }
         return type;
+    }
+
+    static removeEmptyContent(data:obj){
+        for (let key in data){
+            if(tools.isEmpty(data[key])){
+                delete data[key];
+            }
+        }
+        return data || {};
     }
 
     destroy() {

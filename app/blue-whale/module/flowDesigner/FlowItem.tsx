@@ -5,11 +5,10 @@ import d = G.d;
 import tools = G.tools;
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
-import {FlowDesigner} from "./FlowDesigner";
+import {FlowDesigner, Method} from "./FlowDesigner";
 import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {Tips} from "./Tips";
 import {LineItem} from "./LineItem";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IFlowItemPara extends IComponentPara {
     type?: string;      // 节点的类型
@@ -22,6 +21,8 @@ export interface IFlowItemPara extends IComponentPara {
     height?: number;    // 高
     isComplete?: boolean;   // 表示该节点是否已经完成
     fields?: IFieldPara;     // 用于初始化flowEditor
+    minTop?:number;
+    minLeft?:number;
 }
 
 export class FlowItem extends Component {
@@ -56,15 +57,16 @@ export class FlowItem extends Component {
 
     constructor(para: IFlowItemPara) {
         super(para);
-        this.para = para;
         if(tools.isMb){
-            para.position.x = para.position.x - 170;
+            para.position.x = para.position.x - (tools.isNotEmpty(para.minLeft) ? para.minLeft : 170);
+            para.position.y = para.position.y - (tools.isNotEmpty(para.minTop) ? para.minTop : 0);
             this.x = para.position.x;
             this.y = para.position.y;
         }else {
             this.x = para.position.x;
             this.y = para.position.y;
         }
+        this.para = para;
 
         this.isComplete = para.isComplete || false;
         if (para.type === 'start') {
@@ -91,7 +93,7 @@ export class FlowItem extends Component {
             let diamondArr = ['decision', 'fork', 'join'];
             this.wrapper.style.left = para.position.x + 'px';
             this.wrapper.style.top = para.position.y + 'px';
-            this.width = para.width || 50;
+            this.width = para.width || 100;
             this.height = para.height || 50;
             if (diamondArr.indexOf(para.type) >= 0) {
                 this.isDiamond = true;
@@ -223,11 +225,11 @@ export class FlowItem extends Component {
         return {
             on: () => {
                 this.rectNode.click(this.clickHandler());
-                this.rectNode.drag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
+                tools.isPc && this.rectNode.drag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
             },
             off: () => {
                 this.rectNode.unclick(this.clickHandler());
-                this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
+                tools.isPc && this.rectNode.undrag(this.draggerMoveHandler(), this.draggerStartHandler(), this.draggerEndHandler());
             }
         }
     })();
@@ -315,8 +317,8 @@ export class FlowItem extends Component {
                 _this.wrapper.style.top = this.oy + dy + 'px';
                 _this.wrapper.style.left = this.ox + dx + 'px';
             }
-            this.x = this.ox + dx;
-            this.y = this.oy + dy;
+            _this.x = this.ox + dx;
+            _this.y = this.oy + dy;
 
             // 移动flow-item
             FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
@@ -327,6 +329,12 @@ export class FlowItem extends Component {
     private draggerEndHandler(): () => void {
         let _this = this;
         return function () {
+            // 超出边界时刷新svg的宽高
+            let boundary = Method.getBoundary();
+            FlowDesigner.PAPER.setSize(boundary.width, boundary.height);
+            d.query('#design-canvas').style.width = boundary.width + 'px';
+            d.query('#design-canvas').style.height = boundary.height + 'px';
+
             let diamondArr = ['decision', 'fork', 'join'];
             if (diamondArr.indexOf(_this.para.type) >= 0) {
                 this.transform('r45');
@@ -387,7 +395,7 @@ export class FlowItem extends Component {
     set active(active: boolean) {
         this.wrapper.classList.toggle('active', active);
         this._active = active;
-        this.flowEditor.show = active;
+        tools.isPc && (this.flowEditor.show = active);
     }
 
     get active() {

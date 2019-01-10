@@ -229,7 +229,7 @@ export class InputBox extends Component {
                     content: '更多',
                     size: this._size,
                 }));
-                if (!this._moreBtn || !this._moreBtn.dropDown) {
+                if (!this._moreBtn.dropDown) {
                     this.wrapper.appendChild(this.moreBtn.wrapper);
                     let self = this;
                     this.moreBtn.dropDown = new DropDown({
@@ -366,9 +366,9 @@ export class InputBox extends Component {
         if (!this.isVertical && this.isResponsive) {
             //第一个组件元素
             if (this.wrapper.children.length < 2) {
-                this.wrapper.style.width = com.wrapper.clientWidth + 2 + 'px';
+                // this.wrapper.style.width = com.wrapper.clientWidth + 2 + 'px';
             } else {
-                this.wrapper.style.width =parseInt(this.wrapper.style.width) + com.wrapper.clientWidth + 2 + 'px';
+                // this.wrapper.style.width =parseInt(this.wrapper.style.width) + com.wrapper.clientWidth + 2 + 'px';
             }
             this.responsive();
         }

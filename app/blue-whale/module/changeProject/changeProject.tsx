@@ -3,127 +3,98 @@
 import d = G.d;
 import tools = G.tools;
 import {IModal, Modal} from "../../../global/components/feedback/modal/Modal";
-import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 import {BwRule} from "../../common/rule/BwRule";
+import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
+import {TextInput} from "../../../global/components/form/text/text";
+import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 
 export interface IChangeProjectPara extends IModal {   // 类构造函数的参数
     current: string;    // 当前项目
 }
+
 interface IResponseProjectItem {   // 后台响应的数据
     PLATFORM_SEQ: string;
     PLATFORM_NAME: string;
     CAPTION: string;
 }
-interface IProjectListItem extends ListItem {   // 列表项的数据类型
-    caption?: string;
-}
-interface IProjectListData extends Array<IProjectListItem>{ // 传递给Dropdown的项目数据
-
-}
 
 export class ChangeProject extends Modal {
 
-    private dropdown: DropDown = null;  // 下拉列表
-    private showProject: HTMLInputElement = null;   // 显示当前选择的项目
-    private projectList: IProjectListData = null;   // 项目列表
-
+    private dropdown: SelectInput;  // 下拉列表
+    private showProject: TextInput;   // 显示当前选择的项目
+    private selectItem: ListItem = {}; // 选中的项目
     constructor(para?: IChangeProjectPara) {
         super(Object.assign({
             header: {
                 title: '切换项目'
             },
-            footer: {
-
-            },
+            footer: {},
             className: 'modal-change-project',
             width: tools.isMb ? '100%' : '25%',
             height: tools.isMb && '100%',
             isAnimate: true,
-            position: 'center',
+            top: 100,
         }, para));
         this.current = para.current;
         this.initBody();
     }
 
     private initBody = () => {
+        let ajaxFun = (url: string, value: string, cb: Function) => {
+            BwRule.Ajax.fetch(url, {
+                type: 'GET',
+            }).then(({response}) => {
+                let options = response.data.map((obj: IResponseProjectItem) => {
+                    return {
+                        value: tools.isNotEmpty(obj.PLATFORM_SEQ) ? obj.PLATFORM_SEQ : '',
+                        text: tools.isNotEmpty(obj.PLATFORM_NAME) ? obj.PLATFORM_NAME : ''
+                    };
+                });
+                cb(options);
+            }).finally(() => {
+                cb();
+            });
+        };
+        let ajax = {
+            fun: ajaxFun,
+            url: BW.CONF.ajaxUrl.projectList
+        };
+        let SelectInputComponent:typeof SelectInput | typeof SelectInputMb = tools.isMb ? SelectInputMb : SelectInput;
         let content = <div className="change-project">
-            <div className="current-project-wrapper">
+            <div className="change-project-list-item">
                 <span className="description">当前：</span>
-                <span type="text" id="current-project" className="current-project">
-                    {this.current}
-                </span>
+                {this.showProject = <TextInput readonly={true} value={this.current}/>}
             </div>
-            <div className="project-list-wrapper">
-                <div className="select-project">
-                    <span className="description">切换：</span>
-                    <div className="show-project-wrapper">
-                        <input type="text" className="show-project" readOnly/>
-                        <i className="appcommon app-xiala"/>
-                    </div>
-                </div>
+            <div className="change-project-list-item">
+                <span className="description">切换：</span>
+                {this.dropdown = <SelectInputComponent readonly={true} clickType={0} ajax={ajax} onSet={(item) => {
+                    this.selectItem = item;
+                    this.showProject.set(item.text)
+                }}/>}
             </div>
         </div>;
-        this.showProject = d.query('input.show-project', content) as HTMLInputElement;
-        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.projectList, {
-            type: 'GET',
-        }).then(({response}) => {
-            // console.log('in getProjectList: ');
-            // console.log(response);
-            this.projectList = response.data.map((obj: IResponseProjectItem)  =>
-                ({value: parseInt(obj.PLATFORM_SEQ), text: obj.PLATFORM_NAME, caption: obj.CAPTION || ''}));
-            this.dropdown = new DropDown({
-                el: d.query('.project-list-wrapper', content),
-                data: this.projectList,
-                inline: true,
-                onSelect: (item: IProjectListItem)=> {
-                    // item.caption = 'cms3';
-                    this.showProject.value = (tools.isNotEmpty(item.caption) ? item.caption + '  ' : '') + item.text;
-                    this.dropdown.hideList();
-                }
-            });
-            this.dropdown.hideList();
-            d.append(this.bodyWrapper, content);
-            this.initStyle();
-            this.initEvent.on();
-        }).catch(err => {
-            console.log(err);
-        });
-    };
-
-    private initStyle = () => {
-        // 设置样式
-        d.query('.appcommon.app-xiala', this.wrapper) &&
-            (d.query('.appcommon.app-xiala', this.wrapper).style.lineHeight = window.getComputedStyle(this.showProject).height);
-
-        if(tools.isMb){
-            d.query('.current-project', this.wrapper).style.lineHeight = window.getComputedStyle(this.showProject).height;
-            this.dropdown.getUlDom().style.left = (d.query('.current-project', this.wrapper).offsetLeft - 18)+ 'px';
-        }else {
-            this.dropdown.getUlDom().style.width = window.getComputedStyle(this.showProject).width;
-            this.dropdown.getUlDom().style.left = d.query('.show-project-wrapper', this.wrapper).offsetLeft + 'px';
-        }
+        d.append(this.bodyWrapper, content);
+        this.initEvent.on();
     };
 
     private initEvent = (() => {
-        let toggleClickHandler = () => {
-            this.dropdown.toggle();
-        };
-
         return {
             on: () => {
-                d.on(d.query('.appcommon.app-xiala', this.bodyWrapper), 'click', toggleClickHandler);
                 this.onOk = () => {
-                    if(this.dropdown.selectedIndex >= 0){
-                        let selectItem = this.projectList[this.dropdown.selectedIndex];
+                    let selectItem = this.selectItem;
+                    if (tools.isNotEmpty(selectItem) && selectItem.text != this.current) {
                         BwRule.Ajax.fetch(BW.CONF.ajaxUrl.projectList, {
                             type: 'PUT',
                             data: {
-                                PLATFORM_SEQ: selectItem['value'],
-                                PLATFORM_NAME: selectItem['text'],
+                                platform_seq: selectItem['value'],
+                                platform_name: selectItem['text'],
                             }
                         }).then(({response}) => {
                             let prevUserInfo = JSON.parse(localStorage.getItem('userInfo'));
-                            localStorage.setItem('userInfo', JSON.stringify({...prevUserInfo, platformName: this.showProject.value}));
+                            localStorage.setItem('userInfo', JSON.stringify({
+                                ...prevUserInfo,
+                                platformName: selectItem.text
+                            }));
                             Modal.toast(response.msg);
                             location.reload();
                         }).catch(err => {
@@ -136,7 +107,6 @@ export class ChangeProject extends Modal {
                 this.onClose = () => this.destroy();
             },
             off: () => {
-                d.off(d.query('.appcommon.app-xiala', this.bodyWrapper), 'click', toggleClickHandler);
                 this.onOk = null;
                 this.onCancel = null;
                 this.onClose = null;
@@ -155,6 +125,8 @@ export class ChangeProject extends Modal {
 
     destroy() {
         this.dropdown.destroy();
+        this.showProject.destroy();
+        this.selectItem = null;
         this.initEvent.off();
         super.destroy();
     }

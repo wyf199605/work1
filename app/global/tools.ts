@@ -169,8 +169,8 @@ namespace G {
                 }
                 let paraObj = Object.assign({}, obj || {});
                 if(isReplace){
-                    let currentPara = tools.url.getObjPara(url);
-                    paraObj = Object.assign(currentPara, paraObj);
+                    let currentPara = tools.url.getObjPara(url, isLowCase);
+                    paraObj = Object.assign(currentPara, tools.obj.copy(paraObj, isLowCase));
                     url = url.split('?')[0];
                 }else{
                     for (let key in paraObj) {
@@ -415,11 +415,15 @@ namespace G {
              * @param {object} object
              * @return {object}
              */
-            copy: function (object): any {
+            copy: function (object, isLowCase = false): any {
                 let key, cp = {};
                 for (key in object) {
                     if (object.hasOwnProperty(key)) {
-                        cp[key] = object[key];
+                        let name = key;
+                        if(isLowCase){
+                            name = name.toLowerCase();
+                        }
+                        cp[name] = object[key];
                     }
                 }
                 return cp;

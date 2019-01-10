@@ -34,17 +34,15 @@ export class FlowList extends BasicPage {
                 break;
         }
         let muiContent = d.query('.mui-content.flowList'),
-            tabParent = <div className="tabParent"/>,
-            panelParent = <div className="panelParent"/>;
+            tabParent = <div className="tabParent"/>;
         muiContent.appendChild(tabParent);
-        muiContent.appendChild(panelParent);
         this.initEvents.on();
         let dom1 = <div/>,
             dom2 = <div/>,
             dom3 = <div/>;
         let tab = new SlideTab({
             tabParent: tabParent,
-            panelParent: panelParent,
+            panelParent: tabParent,
             tabs: [
                 {
                     title: titles[0],

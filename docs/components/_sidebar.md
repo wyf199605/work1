@@ -19,6 +19,10 @@
   - [Popover ](/components/view/popover/README.md) 
   - [SlideUp ](/components/view/slideup/README.md)
 
+- UI
+  - [ActionSheet ](/components/ui/actionSheet/README.md)
+  - [ContextMenu ](/components/ui/contextMenu/README.md)
+
 - Other
   - [Affix ](/components/other/Affix/README.md)
   - [SwipeOut ](/components/other/SwipeOut/README.md)

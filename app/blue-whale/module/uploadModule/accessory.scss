@@ -92,6 +92,10 @@
       line-height: 50px;
       min-width: 30px;
       margin-left: 10px;
+      &.disabled{
+        pointer-events: none;
+        opacity: 0.7;
+      }
     }
   }
   // 图片上传样式
@@ -164,6 +168,10 @@
           align-items: center;
           color: #ffffff;
           border-radius: 50%;
+          &.disabled{
+            pointer-events: none;
+            opacity: 0.7;
+          }
           i {
             font-size: 8px !important;
           }

@@ -33,6 +33,9 @@
   border-collapse: collapse;
   //border: 1px solid #ddd;
   font-size: 0;
+  * {
+    -webkit-overflow-scrolling: touch!important;
+  }
 
   &.table-right-lock{
     .new-table-wrapper{
@@ -83,6 +86,7 @@
   }
 
   .tables{
+    height: 100%;
     height: calc(100% - 85px); // 100% - 分页条和滚动条高度
     border: 1px solid $default_4;
   }
@@ -218,6 +222,7 @@
       position: relative;
       //padding-top: 0 !important;
       border-bottom: none;
+      max-height: 100%;
       max-height: calc(100% - 40px);
       min-height: 20px;
       .pseudo-table{

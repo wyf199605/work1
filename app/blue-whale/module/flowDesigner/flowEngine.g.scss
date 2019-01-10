@@ -247,9 +247,7 @@
         }
 
         .flow-editor {
-            position: absolute;
-            right: 20px;
-            bottom: 20px;
+            position: fixed;
             width: 260px;
             height: auto;
             background-color: #ffffff;
@@ -266,7 +264,7 @@
                     height: 36px;
 
                     .attr-editor-description {
-                        width: 67px;
+                        width: 75px;
                         text-align: right;
                         color: #254363;
                     }

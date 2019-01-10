@@ -4,6 +4,9 @@
   label{
     color: #333333;
   }
+  .disabled{
+    pointer-events: none!important;
+  }
   .none{
     display: none;
   }
@@ -85,7 +88,7 @@
         height: 332px;
         .option-limit{
           height: 35px;
-          margin-top: 0;
+          margin-top: 10px;
           >.checkbox-custom{
             padding-left: 0;
           }
