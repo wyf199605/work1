@@ -270,7 +270,7 @@ function menuElGet(menu: obj) {
         data-gps={menu.gps}
         className="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
         <a>
-            <span className={`mui-icon${menu.icon}`}></span>
+            <span className={`mui-icon ${menu.icon}`}></span>
             <div className="mui-media-body">{menu.caption}</div>
         </a>
     </li>

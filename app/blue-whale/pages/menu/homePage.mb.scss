@@ -138,23 +138,25 @@
     }
   }
   .mui-bar.mui-bar-nav{
-    background: rgba(241,244,250,1);
-    background: -moz-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(241,244,250,1)), color-stop(100%, rgba(180,212,245,1)));
-    background: -webkit-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -o-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -ms-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: radial-gradient(ellipse at center, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    background-color: #fff;
+    //background: rgba(241,244,250,1);
+    //background: -moz-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(241,244,250,1)), color-stop(100%, rgba(180,212,245,1)));
+    //background: -webkit-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: -o-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: -ms-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: radial-gradient(ellipse at center, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=1 );
   }
   .mui-content .mui-slider{
-    background: rgba(241,244,250,1);
-    background: -moz-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(241,244,250,1)), color-stop(100%, rgba(180,212,245,1)));
-    background: -webkit-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -o-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: -ms-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    background: linear-gradient(to bottom, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    background-color: #fff;
+    //background: rgba(241,244,250,1);
+    //background: -moz-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(241,244,250,1)), color-stop(100%, rgba(180,212,245,1)));
+    //background: -webkit-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: -o-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: -ms-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
+    //background: linear-gradient(to bottom, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=0 );
   }
   .mui-grid-view.mui-grid-9{
@@ -186,6 +188,57 @@
     .icon-sousuo{
       float: right;
       left: 9px;
+    }
+  }
+
+}
+
+// 新的首页菜单样式
+.homePage, .menuPage {
+
+  .mui-table-view{
+    border-top: none!important;
+    .mui-table-view-cell{
+      padding: 0;
+      border: none;
+      overflow: visible;
+      &>a{
+        padding: 8px 0 0!important;
+        &>span{
+          display: block;
+          margin: 0 auto;
+          height: 46px;
+          width: 46px;
+          border-radius: 50%;
+          color: #fff;
+          background-color: #4ea6f1;
+          text-align: center;
+          line-height: 46px;
+
+          &.green {
+            background-color: $green;
+          }
+          &.yellow {
+            background-color: $yellow;
+          }
+          &.red {
+            background-color: $red;
+          }
+          &.purple {
+            background-color: $purple;
+          }
+          &.black {
+            background-color: $black
+          }
+          &.grey {
+            background-color: $grey;
+          }
+        }
+        .mui-media-body{
+          height: auto;
+        }
+      }
+
     }
   }
 }

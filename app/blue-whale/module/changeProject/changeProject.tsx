@@ -63,7 +63,7 @@ export class ChangeProject extends Modal {
         let content = <div className="change-project">
             <div className="change-project-list-item">
                 <span className="description">当前：</span>
-                {this.showProject = <TextInput value={this.current}/>}
+                {this.showProject = <TextInput readonly={true} value={this.current}/>}
             </div>
             <div className="change-project-list-item">
                 <span className="description">切换：</span>

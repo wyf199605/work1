@@ -19,10 +19,15 @@ export class PDFPreview{
         let modal = new Modal({
             body: body,
             isShow: true,
-            position: 'full',
-            header: 'PDF预览',
+            header: {
+                title: 'PDF预览',
+                isFullScreen: true,
+            },
+            isBackground: false,
             className: 'pdf-preview-modal',
-            isOnceDestroy: true
+            isOnceDestroy: true,
+            width: '70%',
+            height: '70%'
         });
         // if(G.tools.isMb){
         requirejs(['pdfjs', 'pdfh5'], (pdfjsLib, Pdfh5) => {
