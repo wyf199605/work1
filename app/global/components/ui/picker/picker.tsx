@@ -364,11 +364,17 @@ export class Picker extends Component {
             deg = 20;
         this._options = [];
         options && options.forEach((itemData, index) => {
-            let styles = {
-                webkitTransformOrigin: 'center center -90px',
-                transformOrigin: 'center center -90px',
+            let styles: obj = {
+                // webkitTransformOrigin: 'center center -90px',
+                // transformOrigin: 'center center -90px',
                 webkitTransform: 'translateZ(90px) rotateX(' + -index * deg + 'deg)',
                 transform: 'translateZ(90px) rotateX(' + -index * deg + 'deg)',
+            };
+            styles = {
+                webkitTransformOrigin: 'center center',
+                transformOrigin: 'center center',
+                webkitTransform: 'translateY(' + index * 36 + 'px)',
+                transform: 'translateY(' + index * 36 + 'px)',
             };
             let li = <li className="picker-item" data-index={index}>
                 {(typeof itemData === 'string' || typeof itemData === 'number') ? itemData : itemData.text}
@@ -506,8 +512,10 @@ export class Picker extends Component {
                 angle = Math.max(-30, angle);
                 angle = Math.min(this._options.length * 20 + 10, angle);
 
-                this.listWrapper.style.webkitTransform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
-                this.listWrapper.style.transform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
+                // this.listWrapper.style.webkitTransform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
+                // this.listWrapper.style.transform = 'perspective(1000px) rotateY(0) rotateX(' + (angle) + 'deg) translateZ(0)';
+                this.listWrapper.style.webkitTransform = `perspective(1000px) translateY(${-angle / 20 * 36}px)`;
+                this.listWrapper.style.transform = `perspective(1000px) translateY(${-angle / 20 * 36}px)`;
             },
             ending: (change: number) => {
                 let time = 100,

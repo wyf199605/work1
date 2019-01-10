@@ -440,15 +440,16 @@ export = class FormPage extends BasicPage {
         this.fields.forEach((field) => {
             let name = field.name,
                 com = this.editModule.getDom(name);
-            if(com && name in data){
-                if(field.elementType === 'lookup'){
+
+            if(com){
+                if(field.elementType === 'lookup' && field.lookUpKeyField in data){
                     let options = this.lookUpData[name] || [];
                     for (let opt of options) {
                         if (opt.value == data[field.lookUpKeyField]) {
                             com.set(opt || '');
                         }
                     }
-                }else{
+                }else if(name in data){
                     com.set(data[name] || '');
                 }
             }
