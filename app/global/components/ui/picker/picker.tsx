@@ -298,7 +298,7 @@ export class Picker extends Component{
         }
     }
     get optionData(){
-        return [...this._optionData];
+        return tools.isNotEmpty(this._optionData) ? [...this._optionData] : [];
     }
 
     // 可选项的dom 数组
