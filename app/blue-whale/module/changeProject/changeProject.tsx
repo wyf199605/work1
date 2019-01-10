@@ -93,7 +93,7 @@ export class ChangeProject extends Modal {
                             let prevUserInfo = JSON.parse(localStorage.getItem('userInfo'));
                             localStorage.setItem('userInfo', JSON.stringify({
                                 ...prevUserInfo,
-                                platformName: this.showProject.value
+                                platformName: selectItem.text
                             }));
                             Modal.toast(response.msg);
                             location.reload();
@@ -125,6 +125,8 @@ export class ChangeProject extends Modal {
 
     destroy() {
         this.dropdown.destroy();
+        this.showProject.destroy();
+        this.selectItem = null;
         this.initEvent.off();
         super.destroy();
     }
