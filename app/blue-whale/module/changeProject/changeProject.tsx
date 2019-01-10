@@ -96,8 +96,14 @@ export class ChangeProject extends Modal {
                                 platformName: selectItem.text
                             }));
                             Modal.toast(response.msg);
-                            tools.isPc && sys.window.closeAll();
-                            location.reload();
+                            if (tools.isMb) {
+                                sys.window.reOpen({
+                                    url:BW.CONF.url.main
+                                });
+                            } else {
+                                sys.window.closeAll();
+                                location.reload();
+                            }
                         }).catch(err => {
                             console.log(err);
                         });
