@@ -70,7 +70,6 @@ export class ChangeProject extends Modal {
                 <span className="description">切换：</span>
                 {this.dropdown = <SelectInputComponent readonly={true} clickType={0} ajax={ajax} onSet={(item) => {
                     this.selectItem = item;
-                    this.showProject.set(item.text)
                 }}/>}
             </div>
         </div>;
@@ -97,9 +96,7 @@ export class ChangeProject extends Modal {
                                 platformName: selectItem.text
                             }));
                             Modal.toast(response.msg);
-                            if (tools.isPc) {
-                                sys.window.closeAll();
-                            }
+                            tools.isPc && sys.window.closeAll();
                             location.reload();
                         }).catch(err => {
                             console.log(err);
