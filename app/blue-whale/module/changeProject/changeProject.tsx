@@ -7,6 +7,7 @@ import {BwRule} from "../../common/rule/BwRule";
 import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
 import {TextInput} from "../../../global/components/form/text/text";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
+import sys = BW.sys;
 
 export interface IChangeProjectPara extends IModal {   // 类构造函数的参数
     current: string;    // 当前项目
@@ -59,7 +60,7 @@ export class ChangeProject extends Modal {
             fun: ajaxFun,
             url: BW.CONF.ajaxUrl.projectList
         };
-        let SelectInputComponent:typeof SelectInput | typeof SelectInputMb = tools.isMb ? SelectInputMb : SelectInput;
+        let SelectInputComponent: typeof SelectInput | typeof SelectInputMb = tools.isMb ? SelectInputMb : SelectInput;
         let content = <div className="change-project">
             <div className="change-project-list-item">
                 <span className="description">当前：</span>
@@ -96,6 +97,9 @@ export class ChangeProject extends Modal {
                                 platformName: selectItem.text
                             }));
                             Modal.toast(response.msg);
+                            if (tools.isPc) {
+                                sys.window.closeAll();
+                            }
                             location.reload();
                         }).catch(err => {
                             console.log(err);
