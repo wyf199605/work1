@@ -13,14 +13,16 @@ export class FlowReport extends BasicPage {
     private editModule: EditModule;
     private para: EditPagePara;
     private instance: number;
+    private agreeBtn: R_Button = null;
+    private rejectBtn: R_Button = null;
 
     constructor(para: EditPagePara) {
         super(para);
         this.instance = Number(tools.url.getPara('instance'));
         this.para = para;
-        let emPara: EditModulePara = {fields: []};
-        let nameFields: { [name: string]: R_Field } = {};
-        let form = this.createFormWrapper(para.fm.fields),
+        let emPara: EditModulePara = {fields: []},
+            nameFields: { [name: string]: R_Field } = {},
+            form = this.createFormWrapper(para.fm.fields),
             self = this,
             isInsert = tools.isNotEmpty(tools.url.getPara('task_id')) ? false : true,
             fields = para.fm.fields;
@@ -92,6 +94,7 @@ export class FlowReport extends BasicPage {
         // 编辑标识
         this.initData(isInsert);
         this.initEvent();
+        this.touchEvent.on();
     }
 
     private _lookUpData: objOf<ListItem[]> = {};
@@ -208,18 +211,75 @@ export class FlowReport extends BasicPage {
         }
     }
 
+    private touchEvent = (() => {
+        let touch = (e) => {
+            let detail = e.detail;
+            switch (detail) {
+                case 'cycle': {
+                    let btn = this.agreeBtn;
+                    btn.actionAddr.dataAddr += '&audit_memo=同意';
+                    btn.hintAfterAction = true;
+                    ButtonAction.get().clickHandle(btn, this.dataGet(), () => {
+                        // sys.window.close();
+                    }, this.url);
+                }
+                    break;
+                case 'cross': {
+                    let btn = this.rejectBtn;
+                    btn.hintAfterAction = true;
+                    let text: TextInput = null,
+                        body = <div className='remark-wrapper'>
+                            <div className="remark-title">操作备注:</div>
+                            {text = <TextInput className='remark-input-wrapper'/>}
+                        </div>;
+                    let modal = new Modal({
+                        body: body,
+                        className: 'flow-remark-modal',
+                        footer: {},
+                        width: '310px',
+                        isMb: false,
+                        top: 120,
+                        onOk: () => {
+                            let audit_memo = text.get();
+                            if (tools.isNotEmpty(audit_memo)) {
+                                btn.actionAddr.dataAddr = tools.url.addObj(btn.actionAddr.dataAddr, {
+                                    audit_memo: audit_memo
+                                });
+                                ButtonAction.get().clickHandle(btn, this.dataGet(), () => {
+                                    modal.destroy();
+                                }, this.url);
+                            } else {
+                                Modal.alert('备注不能为空!');
+                            }
+                        }
+                    });
+                }
+                    break;
+            }
+        };
+        return {
+            on: () => d.on(this.dom, BasicPage.FlowReortRouch, touch),
+            off: () => d.off(this.dom, BasicPage.FlowReortRouch, touch)
+        }
+    })();
+
     private initEvent() {
         let self = this,
             para = this.para,
-            saveBtn = (function () {
-                for (let btn of para.fm.subButtons) {
-                    if (btn.subType === 'save') {
-                        return btn;
-                    }
-                }
-                return null;
-            }());
-
+            saveBtn = null;
+        for (let btn of para.fm.subButtons) {
+            switch (btn.subType) {
+                case 'save':
+                    saveBtn = btn;
+                    break;
+                case 'agree':
+                    self.agreeBtn = btn;
+                    break;
+                case 'reject':
+                    self.rejectBtn = btn;
+                    break;
+            }
+        }
         // 事件绑定
         if (tools.isMb) {
             let muiContent = d.query('.mui-content'),
@@ -435,6 +495,15 @@ export class FlowReport extends BasicPage {
                 }
             });
         }
+    }
+
+    destroy() {
+        this.touchEvent.off();
+        this.editModule = null;
+        this.para = null;
+        this.agreeBtn = null;
+        this.rejectBtn = null;
+        super.destroy();
     }
 }
 
