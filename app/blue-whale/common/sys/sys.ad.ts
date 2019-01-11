@@ -178,7 +178,6 @@ namespace BW {
                 },
                 update: function () {
                     self.handle('checkUpdate');
-                    toast('已经是最新版本');
                 },
                 clear: function () {
                     self.handle('clear');

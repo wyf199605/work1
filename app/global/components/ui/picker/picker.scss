@@ -12,8 +12,8 @@
   left: 0;
   background-color: #fff;
   box-shadow: 0 -5px 7px 0 rgba(0,0,0,.1);
-  -webkit-transition: transform .3s;
-  transition: transform .3s;
+  -webkit-transition: all .3s;
+  transition: all .3s;
   width: 100%;
   user-select: none;
 
@@ -24,10 +24,6 @@
 
   .picker-list-header{
     padding: 6px 10px;
-    //display: -webkit-flex;
-    //display: flex;
-    //-webkit-justify-content: space-between;
-    //justify-content: space-between;
     &::after{
       display: block;
       content: "";
@@ -63,10 +59,10 @@
   }
 
   .picker-list-body{
-    -webkit-perspective: 75pc;
-    perspective: 75pc;
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
+    //-webkit-perspective: 75pc;
+    //perspective: 75pc;
+    //-webkit-transform-style: preserve-3d;
+    //transform-style: preserve-3d;
     overflow: hidden;
     border-top: 2px solid $default_4;
 
@@ -122,8 +118,8 @@
           z-index: 1;
           -webkit-transform-style: preserve-3d;
           transform-style: preserve-3d;
-          -webkit-transform: perspective(750px) rotateY(0) rotateX(0) translateZ(0);
-          transform: perspective(750px) rotateY(0) rotateX(0) translateZ(0);
+          -webkit-transform: perspective(1000px) rotateY(0) rotateX(0) translateZ(0);
+          transform: perspective(1000px) rotateY(0) rotateX(0) translateZ(0);
           -webkit-transform-origin: center center;
           transform-origin: center center;
 
@@ -135,7 +131,7 @@
             vertical-align: middle;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            font-size: 1pc;
+            font-size: 16px;
             font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
             color: #888;
             padding: 0 8px;
@@ -143,6 +139,8 @@
             text-overflow: ellipsis;
             cursor: default;
             visibility: hidden;
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
             -webkit-transform-origin: center center -90px;
             transform-origin: center center -90px;
 

@@ -7,6 +7,7 @@ import {BwRule} from "../../common/rule/BwRule";
 import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
 import {TextInput} from "../../../global/components/form/text/text";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
+import sys = BW.sys;
 
 export interface IChangeProjectPara extends IModal {   // 类构造函数的参数
     current: string;    // 当前项目
@@ -59,7 +60,7 @@ export class ChangeProject extends Modal {
             fun: ajaxFun,
             url: BW.CONF.ajaxUrl.projectList
         };
-        let SelectInputComponent:typeof SelectInput | typeof SelectInputMb = tools.isMb ? SelectInputMb : SelectInput;
+        let SelectInputComponent: typeof SelectInput | typeof SelectInputMb = tools.isMb ? SelectInputMb : SelectInput;
         let content = <div className="change-project">
             <div className="change-project-list-item">
                 <span className="description">当前：</span>
@@ -69,7 +70,6 @@ export class ChangeProject extends Modal {
                 <span className="description">切换：</span>
                 {this.dropdown = <SelectInputComponent readonly={true} clickType={0} ajax={ajax} onSet={(item) => {
                     this.selectItem = item;
-                    this.showProject.set(item.text)
                 }}/>}
             </div>
         </div>;
@@ -96,12 +96,25 @@ export class ChangeProject extends Modal {
                                 platformName: selectItem.text
                             }));
                             Modal.toast(response.msg);
-                            location.reload();
+                            if (tools.isMb) {
+                                sys.window.open({
+                                    url:BW.CONF.url.main
+                                });
+                            } else {
+                                sys.window.closeAll();
+                                location.reload();
+                            }
                         }).catch(err => {
                             console.log(err);
                         });
+                        this.destroy();
+                    }else{
+                        if (tools.isEmpty(selectItem)){
+                            Modal.alert('请选择需要切换的项目!');
+                        }else{
+                            Modal.alert('当前已经是该项目，请勿重复切换!');
+                        }
                     }
-                    this.destroy();
                 };
                 this.onCancel = () => this.destroy();
                 this.onClose = () => this.destroy();

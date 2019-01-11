@@ -101,7 +101,7 @@ export class FastTableColumn extends TableColumn {
         }
     }
 
-    sort(order: SortType) {
+    sort(order: SortType, ctrl? : boolean) {
         // 清除其他列的状态 并设置本列状态
         if(this.sortName){
             let column = this.ftable.columnGet(this.sortName);
@@ -118,7 +118,7 @@ export class FastTableColumn extends TableColumn {
 
                 if(wrapper){
                     if (col._sortState === 'NO') {
-                        d.classRemove(wrapper, 'sort-desc sort-asc');
+                        !ctrl && d.classRemove(wrapper, 'sort-desc sort-asc');
                     } else {
                         let isDesc = col._sortState === 'DESC';
                         d.classToggle(wrapper, 'sort-desc', isDesc);
@@ -132,7 +132,17 @@ export class FastTableColumn extends TableColumn {
             // debugger;
             // console.log(this.ftable.tableData.getServerMode())
             if (ftableData.serverMode) {
-                ftableData.sortState = [[this.name, this.sortState]];
+                let arr = [this.name, this.sortState] as [string, SortType];
+                if(ctrl){
+                    if(Array.isArray(ftableData.sortState)){
+                        ftableData.sortState.push(arr);
+                    }else {
+                        ftableData.sortState = [arr];
+                    }
+                }else {
+                    ftableData.sortState = [arr];
+                }
+
                 ftableData.refresh();
             } else {
                 let leftTable = this.ftable.leftTable,

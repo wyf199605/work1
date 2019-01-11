@@ -39,6 +39,7 @@
   .fast-table-container {
     &.has-top-search {
       .new-table-wrapper {
+        height: 90%;
         height: calc(100% - 41px);
       }
     }
