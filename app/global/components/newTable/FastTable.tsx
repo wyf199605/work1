@@ -329,12 +329,13 @@ export class FastTable extends Component {
                             return;
                         }
                         if (tools.isNotEmpty(col)) {
+                            let ctrl = e.ctrlKey;
                             if (col.sortState === 'NO') {
-                                col.sortState = 'ASC';
+                                ctrl ? col.sort('ASC', true) : col.sortState = 'ASC';
                             } else if (col.sortState === 'DESC') {
-                                col.sortState = 'ASC';
+                                ctrl ? col.sort('ASC', true) :  col.sortState = 'ASC';
                             } else if (col.sortState === 'ASC') {
-                                col.sortState = 'DESC';
+                                ctrl ? col.sort('DESC', true) : col.sortState = 'DESC';
                             }
                         }
                     }
