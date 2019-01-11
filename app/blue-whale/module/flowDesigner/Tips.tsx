@@ -60,7 +60,7 @@ export class Tips extends Component {
                 {/*</div>*/}
                 <div className="tip-item">
                     <div className="tip-item-inner drag-item" data-name="decision"><i
-                        className="appcommon app-decision1"/>decision
+                        className="appcommon app-decision1"/>决定
                     </div>
                 </div>
                 {/*<div className="tip-item">*/}
