@@ -97,7 +97,7 @@ export class ChangeProject extends Modal {
                             }));
                             Modal.toast(response.msg);
                             if (tools.isMb) {
-                                sys.window.reOpen({
+                                sys.window.open({
                                     url:BW.CONF.url.main
                                 });
                             } else {
@@ -107,8 +107,14 @@ export class ChangeProject extends Modal {
                         }).catch(err => {
                             console.log(err);
                         });
+                        this.destroy();
+                    }else{
+                        if (tools.isEmpty(selectItem)){
+                            Modal.alert('请选择需要切换的项目!');
+                        }else{
+                            Modal.alert('当前已经是该项目，请勿重复切换!');
+                        }
                     }
-                    this.destroy();
                 };
                 this.onCancel = () => this.destroy();
                 this.onClose = () => this.destroy();
