@@ -10,6 +10,7 @@ import {SelectInputMb} from "../../../../global/components/form/selectInput/sele
 import {Loading} from "../../../../global/components/ui/loading/loading";
 import {UploadImages} from "../../../module/uploadModule/uploadImages";
 import {BwLayoutImg} from "../../../module/uploadModule/bwLayoutImg";
+import sys = BW.sys;
 
 
 interface IRfidBarCode extends IComponentPara {
@@ -41,6 +42,13 @@ interface Ifiedls {
     title: string,
     name: string
 }
+interface IparaCode {
+    value:string //扫到的数据
+    uniqueFlag?:string //主键
+    where?:any //条件
+    option?:number //状态
+    num?:number //替换的数据
+}
 
 
 export class RfidBarCode extends Component {
@@ -65,6 +73,7 @@ export class RfidBarCode extends Component {
             zIndex: 1000,
             body: body,
             header: "条码扫码",
+            position: sys.isMb ? 'full' : '',
             onClose: () => {
                 console.log('关闭成功')
                 barcode.destroy();
@@ -125,133 +134,19 @@ export class RfidBarCode extends Component {
                                             d.query('.shelf-nums>input')['disabled'] = false;
                                         }
                                         // 切换注入监听事件
-                                        let optionStype, Where = {},
-                                            modeVal = d.query('.shelf-nums>input');
-                                        if (G.tools.isNotEmpty(this.fields)) {
 
-                                            for (let i = 0; i < this.fields.length; i++) {
-                                                if (i == 0) {
-                                                    //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
-                                                    Where[this.fields[i].name] = "";
-                                                } else if (i == 1) {
-                                                    // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
-                                                    Where[this.fields[i].name] = "";
-                                                } else if (i == 2) {
-                                                    //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
-                                                    Where[this.fields[i].name] = "";
-                                                }
-                                            }
-                                        }
-                                        let params = {
-                                            optionStype: optionStype,
-                                            num: modeVal['value'] || 0,
-                                            nameId: para.uniqueFlag,
-                                            Where: Where,
-                                            codeName: this.uid
-                                        }
+
                                         if (this.mode[key] == '逐一') {
-
-                                            params['optionStype'] = 2;
-                                            let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                // let data = res.data;
-                                                if (res.success) {
-                                                    let num = d.query('.total-nums>span');
-                                                    num.innerText = (parseInt(num.innerText) + 1) + '';
-                                                    this.domHash['scanamout'].innerText = res.data.option.scanNum;
-                                                    let array = res.data.search.array[0];
-                                                    this.domHash['barcode'].innerText = array.barcode;
-                                                    this.domHash['categoryVal'].innerText = array.classify1_value;
-                                                    //this.domHash['count'].innerText = arr[i].count;
-                                                    this.domHash['categoryVal1'].innerText = array.classify2_value;
-                                                    this.domHash['categoryVal2'].innerText = array.classify3_value;
-                                                    this.domHash['Commodity'].innerText = array.name;
-                                                    this.refreshCount(para)
-                                                }
-
-                                            })
+                                        //造数据
+                                            this.operateTbaleD.option = 1;
 
                                         } else if (this.mode[key] == '替换') {
-                                            params['optionStype'] = 0;
-                                            params['num'] = modeVal['value'] || 0;
-                                            let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                if (res.success) {
-                                                    this.domHash['scanamout'].innerText = res.data.option.scanNum;
-                                                    let array = res.data.search.array[0];
-                                                    this.domHash['barcode'].innerText = array.barcode;
-                                                    this.domHash['categoryVal'].innerText = array.classify1_value;
-                                                    //this.domHash['count'].innerText = arr[i].count;
-                                                    this.domHash['categoryVal1'].innerText = array.classify2_value;
-                                                    this.domHash['categoryVal2'].innerText = array.classify3_value;
-                                                    this.domHash['Commodity'].innerText = array.name;
-                                                    this.refreshCount(para)
-                                                }
-                                            })
+                                            //造数据
+                                            this.operateTbaleD.option = 2;
                                         } else if (this.mode[key] == '累加') {
-                                            params['optionStype'] = 1;
-                                            params['num'] = 0;
-                                            G.Shell.inventory.openRegistInventory(2, params, (res) => {
-
-                                                if (res.success) {
-                                                    this.domHash['scanamout'].innerText = res.data.option.scanNum;
-                                                    let array = res.data.search.array[0];
-                                                    this.domHash['barcode'].innerText = array.barcode;
-                                                    this.domHash['categoryVal'].innerText = array.classify1_value;
-                                                    //this.domHash['count'].innerText = arr[i].count;
-                                                    this.domHash['categoryVal1'].innerText = array.classify2_value;
-                                                    this.domHash['categoryVal2'].innerText = array.classify3_value;
-                                                    this.domHash['Commodity'].innerText = array.name;
-                                                    this.refreshCount(para)
-                                                }
-
-                                            })
+                                          //造数据
                                         } else {
-                                            G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
-
-                                                let data = res.data;
-                                                //alert(JSON.stringify(res));
-                                                this.fields.forEach((res) => {
-                                                    if (res.index == 1) {
-                                                        //分类一
-                                                        if (data.name == res.name) {
-                                                            let arr = data.array;
-                                                            for (let i = 0; i < arr.length; i++) {
-                                                                this.domHash['categoryVal'] = arr[i].value
-                                                            }
-                                                        }
-                                                    } else if (res.index == 2) {
-                                                        //分类二
-                                                        if (data.name == res.name) {
-                                                            let arr = data.array;
-                                                            for (let i = 0; i < arr.length; i++) {
-                                                                this.domHash['categoryVal1'] = arr[i].value
-                                                            }
-                                                        }
-                                                    } else {
-                                                        //分类三
-                                                        if (data.name == res.name) {
-                                                            let arr = data.array;
-                                                            for (let i = 0; i < arr.length; i++) {
-                                                                this.domHash['categoryVal2'] = arr[i].value
-                                                            }
-                                                        }
-                                                    }
-                                                })
-                                                if (data.name == this.uid) {
-                                                    let arr = data.array;
-                                                    for (let i = 0; i < arr.length; i++) {
-                                                        this.domHash['barcode'].innerText = arr[i].barcode;
-                                                        this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                                                        this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        //this.domHash['count'].innerText = arr[i].count;
-                                                        this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                                                        this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                                                        this.domHash['Commodity'].innerText = arr[i].name;
-                                                    }
-                                                    this.refreshCount(para)
-
-                                                }
-
-                                            })
+                                          //造数据
                                         }
 
 
@@ -267,131 +162,22 @@ export class RfidBarCode extends Component {
                                             d.query(".shelf-nums>.shelf-mode").innerHTML = this.mode[key];
                                         }
                                         // 切换注入监听事件
-                                        let optionStype, Where = {},
-                                            modeVal = d.query('.shelf-nums>input');
-                                        if (G.tools.isNotEmpty(this.fields)) {
-                                            for (let i = 0; i < this.fields.length; i++) {
-                                                if (i == 0) {
-                                                    //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
-                                                    Where[this.fields[i].name] = "";
-                                                } else if (i == 1) {
-                                                    // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
-                                                    Where[this.fields[i].name] = "";
-                                                } else if (i == 2) {
-                                                    //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
-                                                    Where[this.fields[i].name] = "";
-                                                }
-                                            }
-                                        }
-                                        let params = {
-                                            optionStype: optionStype,
-                                            num: modeVal['value'] || 0,
-                                            nameId: para.uniqueFlag,
-                                            Where: Where,
-                                            codeName: this.uid
-                                        }
+
+
+
                                         if (this.mode[key] == '累加') {
-                                            params['optionStype'] = 1
-                                            params['num'] = 0;
-                                            //先关闭之前的监听重新开启
-                                            //开启重新的
-                                            G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                if (res.success) {
-                                                    this.domHash['scanamout'].innerText = res.data.option.scanNum;
-                                                    let array = res.data.search.array[0];
-                                                    this.domHash['barcode'].innerText = array.barcode;
-                                                    this.domHash['categoryVal'].innerText = array.classify1_value;
-                                                    //this.domHash['count'].innerText = arr[i].count;
-                                                    this.domHash['categoryVal1'].innerText = array.classify2_value;
-                                                    this.domHash['categoryVal2'].innerText = array.classify3_value;
-                                                    this.domHash['Commodity'].innerText = array.name;
-                                                    this.refreshCount(para)
-                                                }
-                                            })
-                                            //
+
+                                           //造数据
                                         } else if (this.mode[key] == '替换') {
-                                            params['optionStype'] = 0;
-                                            params['num'] = modeVal['value'] || 0;
-                                            G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                let data = res.data;
-                                                if (res.success) {
-                                                    this.domHash['scanamout'].innerText = res.data.option.scanNum;
-                                                    let array = res.data.search.array[0];
-                                                    this.domHash['barcode'].innerText = array.barcode;
-                                                    this.domHash['categoryVal'].innerText = array.classify1_value;
-                                                    //this.domHash['count'].innerText = arr[i].count;
-                                                    this.domHash['categoryVal1'].innerText = array.classify2_value;
-                                                    this.domHash['categoryVal2'].innerText = array.classify3_value;
-                                                    this.domHash['Commodity'].innerText = array.name;
-                                                    this.refreshCount(para)
-                                                }
+                                            //造数据
+                                            this.operateTbaleD.option = 2;
 
-                                            })
                                         } else if (this.mode[key] == '逐一') {
-                                            params['optionStype'] = 2;
-                                            G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                                                if (res.success) {
-                                                    let num = d.query('.total-nums>span');
-                                                    num.innerText = (parseInt(num.innerText) + 1) + '';
-                                                    this.domHash['scanamout'].innerText = res.data.option.scanNum;
-                                                    let array = res.data.search.array[0];
-                                                    this.domHash['barcode'].innerText = array.barcode;
-                                                    this.domHash['categoryVal'].innerText = array.classify1_value;
-                                                    //this.domHash['count'].innerText = arr[i].count;
-                                                    this.domHash['categoryVal1'].innerText = array.classify2_value;
-                                                    this.domHash['categoryVal2'].innerText = array.classify3_value;
-                                                    this.domHash['Commodity'].innerText = array.name;
-                                                    this.refreshCount(para)
-                                                }
-                                            })
+                                            //造数据
+                                            this.operateTbaleD.option = 1;
                                         } else {
-                                            G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
-                                                let data = res.data;
-                                                //alert(JSON.stringify(res));
-                                                this.fields.forEach((res) => {
-                                                    if (res.index == 1) {
-                                                        //分类一
-                                                        if (data.name == res.name) {
-                                                            let arr = data.array;
-                                                            for (let i = 0; i < arr.length; i++) {
-                                                                this.domHash['categoryVal'] = arr[i].value
-                                                            }
-                                                        }
-                                                    } else if (res.index == 2) {
-                                                        //分类二
-                                                        if (data.name == res.name) {
-                                                            let arr = data.array;
-                                                            for (let i = 0; i < arr.length; i++) {
-                                                                this.domHash['categoryVal1'] = arr[i].value
-                                                            }
-                                                        }
-                                                    } else {
-                                                        //分类三
-                                                        if (data.name == res.name) {
-                                                            let arr = data.array;
-                                                            for (let i = 0; i < arr.length; i++) {
-                                                                this.domHash['categoryVal2'] = arr[i].value
-                                                            }
-                                                        }
-                                                    }
-                                                })
-                                                if (data.name == this.uid) {
-                                                    let arr = data.array;
-                                                    for (let i = 0; i < arr.length; i++) {
-                                                        this.domHash['barcode'].innerText = arr[i].barcode;
-                                                        this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                                                        this.domHash['scanamout'].innerText = arr[i].scanCount;
-                                                        //this.domHash['count'].innerText = arr[i].count;
-                                                        this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                                                        this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                                                        this.domHash['Commodity'].innerText = arr[i].name;
-                                                    }
+                                            //造数据
 
-                                                }
-
-                                                this.refreshCount(para)
-
-                                            })
                                         }
 
 
@@ -704,7 +490,9 @@ export class RfidBarCode extends Component {
     private stepStatus: boolean = false;
     private replaceVal: number;
     private photoImgData:obj = [];
-
+    private  operateTbaleD :IparaCode = {
+        value:'',
+    }
     private randNum(){
         let d2 = new Date().getTime()+ '',
             d1 = (Math.random()* 10),
@@ -757,85 +545,15 @@ export class RfidBarCode extends Component {
                 num.innerText = parseInt(num.innerText) + parseInt(modeVal['value']) + ""
                 //添加新的传值接口
                 let Where = {};
-                if (G.tools.isNotEmpty(this.fields)) {
 
-                    for (let i = 0; i < this.fields.length; i++) {
-                        if (i == 0) {
-                            Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
-                        } else if (i == 1) {
-                            Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
-                        } else if (i == 2) {
-                            Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
-                        }
-                    }
-                }
 
-                let params = {
-                    optionStype: 1,
-                    num: modeVal['value'] || 0,
-                    nameId: para.uniqueFlag,
-                    Where: Where,
-                    codeName: this.uid || '',
-                    barcode: this.domHash['barcode'].innerText || ''
-                }
-
-                let s = G.Shell.inventory.dealbarcode(2, params, (res) => {
-                    //alert(JSON.stringify(res.data))
-                    if (res.success) {
-                        this.domHash['scanamout'].innerText = res.data.scanNum;
-                        this.refreshCount(para);
-                    }
-                })
 
             } else if (this.mode[key] == "替换" && modeVal['value'] !== "") {
                 num.innerText = parseInt(modeVal['value']) + "";
                 //添加新的传值接口
 
-                let Where = {};
-                if (G.tools.isNotEmpty(this.fields)) {
-
-                    for (let i = 0; i < this.fields.length; i++) {
-                        if (i == 0) {
-                            Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
-                        } else if (i == 1) {
-                            Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
-                        } else if (i == 2) {
-                            Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
-                        }
-                    }
-                }
-                let params = {
-                    optionStype: 0,
-                    num: modeVal['value'] || 0,
-                    nameId: para.uniqueFlag,
-                    Where: Where,
-                    codeName: this.uid || '',
-                    barcode: this.domHash['barcode'].innerText || ''
-                }
                 // Modal.alert(G.Shell.inventory.dealbarcode)
-                let s = G.Shell.inventory.dealbarcode(2, params, (res) => {
-                    //alert(JSON.stringify(res))
-                    if (res.success) {
-                        this.domHash['scanamout'].innerText = res.data.scanNum;
-                        this.refreshCount(para)
-                        params['optionStype'] = 0;
-                        params['num'] = modeVal['value'] || 0;
-                        let s = G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                            if (res.success) {
-                                this.domHash['scanamout'].innerText = res.data.option.scanNum;
-                                let array = res.data.search.array[0];
-                                this.domHash['barcode'].innerText = array.barcode;
-                                this.domHash['categoryVal'].innerText = array.classify1_value;
-                                //this.domHash['count'].innerText = arr[i].count;
-                                this.domHash['categoryVal1'].innerText = array.classify2_value;
-                                this.domHash['categoryVal2'].innerText = array.classify3_value;
-                                this.domHash['Commodity'].innerText = array.name;
-                                this.refreshCount(para)
-                            }
-                        })
-                    }
 
-                })
             }
         }
         let category = d.query('.rfid-shelf-number>.shelf-category'),
@@ -874,6 +592,8 @@ export class RfidBarCode extends Component {
 
     private uid: string;
     private stepArry = [];
+    private dataWhere = {};
+    private DataclassInfo = [];
 
     private downData(para) {
         // let loading = new Loading({
@@ -893,130 +613,81 @@ export class RfidBarCode extends Component {
             if(res.success){
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
-                this.uid = pageName.uid;
-                this.domHash['inventory'].innerHTML = pageName.AffilTitle;
-                this.domHash['title'].innerText = pageName.funTitle;
-                this.domHash['barcodeTitl'].innerHTML = pageName.uidName;
-                //分类字段
-                //this.domHash['count'].innerHTML = pageName.count;
-                this.fields = pageName.fields;
-                //判断如果为空
-                if(tools.isEmpty(pageName.fields) && pageName.countName == "无数量标题"){
-                    this.stepStatus = true;
-                    d.query('.rfid-barCode-nums').style.display = 'none';
-                    d.query('.total-rfid>.bar-code-amount').style.display = 'none';
+                alert(JSON.stringify(pageName))
+                this.domHash['inventory'].innerHTML = pageName.subTitle;
+                this.domHash['title'].innerText = pageName.title;
+                this.domHash['barcodeTitl'].innerHTML = pageName.keyField;
+                this.DataclassInfo = pageName.classInfo;
+                if( pageName.classInfo[0]){
+                    this.domHash['category1'].innerHTML =  pageName.classInfoObj[pageName.classInfo[0]];
                 }
-                if(this.stepStatus){
-                    let optionStype, Where = {};
-                    if (G.tools.isNotEmpty(this.fields)) {
-
-                        for (let i = 0; i < this.fields.length; i++) {
-                            if (i == 0) {
-                                //Where[this.fields[i].name] = this.domHash['categoryVal'].innerText;
-                                Where[this.fields[i].name] = "";
-                            } else if (i == 1) {
-                                // Where[this.fields[i].name] = this.domHash['categoryVal1'].innerText;
-                                Where[this.fields[i].name] = "";
-                            } else if (i == 2) {
-                                //Where[this.fields[i].name] = this.domHash['categoryVal2'].innerText;
-                                Where[this.fields[i].name] = "";
-                            }
-                        }
-                    }
-                    let params = {
-                        optionStype: 2,
-                        num: 0,
-                        nameId: para.uniqueFlag,
-                        Where: Where,
-                        codeName: this.uid
-                    }
-
-                    G.Shell.inventory.openRegistInventory(2, params, (res) => {
-                        // alert(JSON.stringify(res.data));
-                        let array = res.data.search.array[0];
-                        if(res.success){
-                            if( this.stepStatus && this.stepArry.indexOf(array.barcode) == -1){
-                                this.stepArry.push(array.barcode);
-                                let num = parseInt(this.domHash['scanamout'].innerText);
-                                this.domHash['scanamout'].innerText = num + 1;
-
-                            }
-                            this.domHash['barcode'].innerText = array.barcode;
-                            this.domHash['categoryVal'].innerText = array.classify1_value;
-                            //this.domHash['count'].innerText = arr[i].count;
-                            this.domHash['categoryVal1'].innerText = array.classify2_value;
-                            this.domHash['categoryVal2'].innerText = array.classify3_value;
-                            this.domHash['Commodity'].innerText = array.name;
-                            this.refreshCount(para)
-                        }
-                    })
-                }else {
-                    G.Shell.inventory.openRegistInventory(1, this.params, (res) => {
-                        let data = res.data;
-                        //alert(JSON.stringify(res))
-                        this.fields.forEach((res) => {
-                            let arr = data.array;
-                            if (res.index == 1) {
-                                //分类一
-                                if (data.name == res.name) {
-                                    for (let i = 0; i < arr.length; i++) {
-                                        this.domHash['categoryVal'] = arr[i].value
-                                    }
-                                }
-                            } else if (res.index == 2) {
-                                //分类二
-                                if (data.name == res.name) {
-                                    for (let i = 0; i < arr.length; i++) {
-                                        this.domHash['categoryVal1'] = arr[i].value
-                                    }
-                                }
-                            } else {
-                                //分类三
-                                if (data.name == res.name) {
-                                    for (let i = 0; i < arr.length; i++) {
-                                        this.domHash['categoryVal2'] = arr[i].value
-                                    }
-                                }
-                            }
-                        })
-                        if (data.name == this.uid) {
-                            let arr = data.array,stepScanCount;
-                            for (let i = 0; i < arr.length; i++) {
-                                this.domHash['barcode'].innerText = arr[i].barcode;
-                                if( this.stepStatus && this.stepArry.indexOf(arr[i].barcode) == -1){
-                                    this.stepArry.push(arr[i].barcode);
-                                    let num = parseInt(this.domHash['scanamout'].innerText);
-                                    this.domHash['scanamout'].innerText = num + 1;
-
-                                }
-                                this.domHash['categoryVal'].innerText = arr[i].classify1_value;
-                                !this.stepStatus && (this.domHash['scanamout'].innerText = arr[i].scanCount);
-                                //this.domHash['count'].innerText = arr[i].count;
-                                this.domHash['categoryVal1'].innerText = arr[i].classify2_value;
-                                this.domHash['categoryVal2'].innerText = arr[i].classify3_value;
-                                this.domHash['Commodity'].innerText = arr[i].name;
-                            }
-                            this.refreshCount(para);
-
-                        }
-
-                    })
+                if ( pageName.classInfo[1]){
+                    this.domHash['category2'].innerHTML = pageName.classInfoObj[pageName.classInfo[1]];
                 }
-
-
-                tools.isNotEmpty(this.fields) && this.fields.forEach((val) => {
-                    if (val.index == 1) {
-                        this.domHash['category'].innerText = val.title;
-                    } else if (val.index == 2) {
-                        this.domHash['category1'].innerText = val.title;
-                    } else {
-                        this.domHash['category2'].innerText = val.title;
-                    }
-                })
+                alert('sssss')
+                this.dataWhere = pageName.classInfoObj;
+               //只需要注册一个监听事件
+                this.rigisterRifd();
+                //判断状态
+                //造数据条件
+                this.operateTbaleD.value = '';
+                this.operateTbaleD.uniqueFlag = para.uniqueFlag;
+                this.operateTbaleD.num = 0;
+                this.operateTbaleD.where = this.dataWhere;
+                this.operateTbaleD.option = 0;
+                alert('kvvvvvk')
+                alert(JSON.stringify(this.operateTbaleD) + 's')
             }
 
         })
 
+    }
+
+    //注册监听事件操作
+
+    private rigisterTable(data:IparaCode){
+        G.Shell.inventory.codedataOperate(data.value,data.uniqueFlag,data.where,data.option,data.num,(res)=>{
+            alert(JSON.stringify(res))
+            let data = res.data.data;
+            alert(JSON.stringify(data))
+            if(res.success){
+                for(let i = 0; i< data.length; i++){
+                    alert(data[i][this.DataclassInfo[0]])
+                    this.domHash['categoryVal1'].innerHTML = data[i][this.DataclassInfo[0]];
+                    this.dataWhere[this.DataclassInfo[0]] = data[i][this.DataclassInfo[0]];
+                    //更新数据条件e
+                    if(data.length == 1){
+                        this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
+                        this.dataWhere[this.DataclassInfo[1]] = data[i][this.DataclassInfo[1]];
+                        if(data[i]['BARCODE']){
+                            this.domHash['barcode'].innerText = data[i]['BARCODE'];
+                            this.domHash['Commodity'].innerHTML = data[i]['CAPTION'];
+                            this.operateTbaleD.num = parseInt(data[i]['AMOUNT']);
+                            this.domHash['count'].innerHTML = data[i]['AMOUNT'];
+                        }
+                    }
+                }
+                this.operateTbaleD.where = this.dataWhere;
+            }else {
+                alert('查询失败');
+            }
+
+
+        })
+    }
+
+    private rigisterRifd(){
+        G.Shell.inventory.openRegistInventory(0,{},(res)=>{
+            this.operateTbaleD.value = res.data;
+            //实时更新方法
+
+            alert(JSON.stringify(res) + 'ABA')
+            alert(JSON.stringify(this.operateTbaleD) +'ppp')
+            setTimeout(()=>{
+                this.rigisterTable(this.operateTbaleD);
+            },10)
+         
+        })
     }
     private refreshCount(para){
         let where={};

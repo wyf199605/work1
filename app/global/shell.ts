@@ -417,6 +417,9 @@ namespace G{
             inputcodedata(optionStype:number,uniqueFlag:string,value:string,category:string[],back:IShellEventHandler){
                 return ShellBase.handler('inputcodedata',{uniqueFlag:uniqueFlag,value:value,category:category,optionStype:optionStype},back)
             },
+            codedataOperate(value:string,uniqueFlag:string, where:any,option:number,num:number,back:IShellEventHandler){
+               return ShellBase.handler('operateTable',{value:value,uniqueFlag:uniqueFlag,where:where,option:option,num:num},back)
+            },
             scan2dOn(back: IShellEventHandler) {
                 return ShellBase.handler('startScan2DResult', '', back, null, false);
             },
