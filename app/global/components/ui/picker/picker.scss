@@ -24,14 +24,28 @@
 
   .picker-list-header{
     padding: 6px 10px;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-justify-content: space-between;
-    justify-content: space-between;
+    //display: -webkit-flex;
+    //display: flex;
+    //-webkit-justify-content: space-between;
+    //justify-content: space-between;
+    &::after{
+      display: block;
+      content: "";
+      clear: both;
+    }
+    .btn{
+      &:first-child{
+        float: left;
+      }
+      &:last-child{
+        float: right;
+      }
+    }
     .button-type-primary{
       color: $primary;
       border-color: $primary;
       background-color: #fff;
+
       span{
         margin-right: 0;
       }

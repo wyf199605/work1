@@ -1386,6 +1386,14 @@ export class FastTable extends Component {
         return cells;
     }
 
+    clearSelectedRows(){
+        this.selectedRows.forEach((row) => {
+            row.selected = false;
+        });
+        this.pseudoTable && this.pseudoTable.clearPresentSelected();
+        this._drawSelectedCells();
+    }
+
     // 获取所有选中的行
     get selectedRows() {
         return this.rows.filter(row => row && row.selected);
