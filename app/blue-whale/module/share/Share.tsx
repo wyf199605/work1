@@ -173,7 +173,6 @@ export class Share {
         let even =  G.tools.pattern.debounce(() => {
             this.hide();
             Shell.base.getEditImg(null, this._img.src, (result) => {
-                Modal.alert(result)
                 this.show();
                 this.setImg(result.data)
             });
