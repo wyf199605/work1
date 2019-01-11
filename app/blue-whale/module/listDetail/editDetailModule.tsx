@@ -250,16 +250,13 @@ export class EditDetailModule extends Component {
             this.para.fm.fields.forEach((field) => {
                 if (field.elementType === 'lookup') {
                     let lCom = this.editModule.getDom(field.name);
-                    if (field.elementType === 'lookup') {
-                        let lCom = this.editModule.getDom(field.name);
-                        if (!data[field.lookUpKeyField]) {
-                            lCom.set('');
-                        } else {
-                            let options = this.lookUpData[field.name] || [];
-                            for (let opt of options) {
-                                if (opt.value == data[field.lookUpKeyField]) {
-                                    lCom.set(opt.value);
-                                }
+                    if (!data[field.lookUpKeyField]) {
+                        lCom.set('');
+                    } else {
+                        let options = this.lookUpData[field.name] || [];
+                        for (let opt of options) {
+                            if (opt.value == data[field.lookUpKeyField]) {
+                                lCom.set(opt.value);
                             }
                         }
                     }

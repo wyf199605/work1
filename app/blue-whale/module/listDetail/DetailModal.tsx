@@ -191,7 +191,6 @@ export class DetailModal {
                 defaultValue = Object.assign({}, defaultValue, para.defaultData);
             }
             this.editModule.set(DetailModal.removeEmptyContent(defaultValue));
-            this.setLookUp(defaultValue);
         }
         // 适配键盘遮挡输入区域问题
         if (tools.os.android) {
