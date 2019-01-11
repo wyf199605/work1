@@ -280,7 +280,6 @@
                 &.content-tabs {
                     margin: 0;
                     padding-right: 28px;
-                    margin-top: -40px;
                 }
 
                 & > li {
@@ -433,7 +432,7 @@
 
         .top-navbar-menu {
             position: relative;
-            width: calc(100% - 140px);
+            width: calc(100% - 270px);
 
             @media (min-width: 768px) {
                 .page-tabs-content > li {

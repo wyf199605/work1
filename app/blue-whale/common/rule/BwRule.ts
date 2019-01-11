@@ -53,6 +53,21 @@ export class BwRule extends Rule {
         return dataType === BwRule.DT_DATETIME || dataType === BwRule.DT_TIME
     }
 
+    static isOldImg(dataType: string): boolean {
+        return [
+            BwRule.DT_MUL_IMAGE,
+            BwRule.DT_IMAGE
+        ].some((type) => dataType === type);
+    }
+
+    static isNewImg(dataType: string): boolean {
+        return [
+            BwRule.DT_SIGN,
+            BwRule.DT_UNI_IMAGE,
+            BwRule.DT_UNI_MUL_IMAGE
+        ].some((type) => dataType === type);
+    }
+
     static isImage(dataType: string): boolean {
         return [
             BwRule.DT_MUL_IMAGE,
@@ -653,8 +668,10 @@ export class BwRule extends Rule {
 
                 } else if (col.atrrs && BwRule.isImage(col.atrrs.dataType)) {
                     col.comType = 'image';
-                } else if (tools.isNotEmpty(col.atrrs.valueLists)) {
+                } else if (col.atrrs && tools.isNotEmpty(col.atrrs.valueLists)) {
                     col.comType = 'selectInput';
+                } else if (col.atrrs && col.atrrs.dataType == '18') {
+                    col.comType = 'textarea';
                 } else {
                     col.comType = 'input';// --------------
                 }
@@ -756,5 +773,28 @@ export class BwRule extends Rule {
             down: 'allow',
             imagetype: isThumb ? 'thumbnail' : 'picture'
         });
+    }
+
+    static reqAddrMenu(menu: IBW_Menu){
+        let addr = menu.menuPath;
+        if (addr) {
+            if(addr.type === 'front_custom'){
+                if(addr.dataAddr === 'ChangeProject'){
+                    let currentProject = JSON.parse(localStorage.getItem('userInfo')).platformName || '';
+                    if(tools.isNotEmpty(currentProject)){
+                        require(['ChangeProject'], (c) => {
+                            new c.ChangeProject({
+                                current: currentProject
+                            });
+                        });
+                    }else {
+                        Modal.toast('当前用户无所属项目！');
+                    }
+                }
+            }else {
+                let url = CONF.siteUrl + BwRule.reqAddr(addr);
+                sys.window.open({url, title: menu.menuName})
+            }
+        }
     }
 }

@@ -32,9 +32,11 @@ export interface IModal extends IComponentPara {
     onCancel?: EventListener;
     escKey?: boolean;
     isMb?: boolean;
-    isModal?:boolean; //移动端是否模态弹出
+    isModal?: boolean; //移动端是否模态弹出
+    isQuery?: boolean; // 是否查询器使用
 
     onClose  ?(): void;
+
     closeMsg?: string;
 
     onLarge ?(): void;
@@ -55,7 +57,7 @@ interface IConfirm {
     title?: string,
     btns?: string[],
     callback?: (flag: boolean) => void;
-    noHide? : boolean // 点击确认不主动关闭模态框
+    noHide?: boolean // 点击确认不主动关闭模态框
 }
 
 let allModalArr: Modal[] = [];
@@ -69,12 +71,14 @@ export class Modal extends Component {
     private drag: Drag; //控制拖拉开关
     private _modalHeader: ModalHeader; // 模态框头部
     private _closeMsg: string;
-    get closeMsg(){
+    get closeMsg() {
         return this._closeMsg;
     }
-    set closeMsg(closeMsg: string){
+
+    set closeMsg(closeMsg: string) {
         this._closeMsg = closeMsg;
     }
+
     get modalHeader() {
         return this._modalHeader
     }
@@ -126,7 +130,9 @@ export class Modal extends Component {
         // this.container = modal.container;
         this.container.classList.add('modal-box');
         // this._wrapper = d.create(`<div class="modal-wrapper"></div>`);
-        this.isModal = modal.isModal;
+        if (modal.isQuery !== true) {
+            this.isModal = modal.isModal;
+        }
         this.closeMsg = modal.closeMsg;
         this._isAdaptiveCenter = tools.isEmpty(modal.isAdaptiveCenter) ? false : modal.isAdaptiveCenter;
         this._isAnimate = this.isAdaptiveCenter ? false : (tools.isEmpty(modal.isAnimate) ? true : modal.isAnimate);
@@ -141,6 +147,9 @@ export class Modal extends Component {
         this.position = modal.position;
         this.fullPosition = modal.fullPosition;
         this.isShow = modal.isShow;
+        if (modal.isQuery === true) {
+            this.isModal = modal.isModal;
+        }
         this.height = modal.height;
         this.isDrag = modal.isDrag;
         this.size = modal.size;
@@ -160,11 +169,12 @@ export class Modal extends Component {
 
     }
 
-    protected _isModal:boolean = false;
-    set isModal(isModal:boolean){
+    protected _isModal: boolean = false;
+    set isModal(isModal: boolean) {
         this._isModal = isModal;
     }
-    get isModal(){
+
+    get isModal() {
         return this._isModal;
     }
 
@@ -219,15 +229,15 @@ export class Modal extends Component {
         this._header = header;
     }
 
-    protected modalHidden(){
-        if(this.closeMsg){
+    protected modalHidden() {
+        if (this.closeMsg) {
             Modal.confirm({
                 msg: this.closeMsg,
                 callback: (flag) => {
                     flag && (this.isShow = false);
                 }
             })
-        }else{
+        } else {
             this.isShow = false;
         }
     }
@@ -313,8 +323,7 @@ export class Modal extends Component {
         this.wrapper.style.height = height;
         let otherHeight = this.headWrapper ? this.headWrapper.offsetHeight : 0;
         otherHeight = otherHeight + (this._footWrapper ? this._footWrapper.offsetHeight : 0);
-
-        this.bodyWrapper.style.height = `calc(100% - ${otherHeight}px)`
+        this.bodyWrapper.style.height = `calc(100% - ${otherHeight}px)`;
     }
 
     get height() {
@@ -503,7 +512,7 @@ export class Modal extends Component {
                 if (this.modalScreen) {
                     this.modalScreen.style.pointerEvents = 'auto';
                 }
-                if (tools.isMb && this.isModal){
+                if (tools.isMb && this.isModal) {
                     this.wrapper.classList.remove('modal-animate-up-mb');
                 }
             }, 300);
@@ -577,12 +586,12 @@ export class Modal extends Component {
             }
             //若_isOnceDestroy为真，即创建后立即销毁，则直接调用destroy()后返回；
             if (this._isOnceDestroy) {
-                if (tools.isMb && this.isModal){
-                    setTimeout(()=>{
+                if (tools.isMb && this.isModal) {
+                    setTimeout(() => {
                         this.destroy();
                         return;
-                    },300)
-                }else{
+                    }, 300)
+                } else {
                     this.destroy();
                     return;
                 }
@@ -936,7 +945,7 @@ export class Modal extends Component {
                 if (confirm && confirm.callback && typeof  confirm.callback === 'function') {
                     confirm.callback(true);
                 }
-                if(!(confirm && confirm.noHide)){
+                if (!(confirm && confirm.noHide)) {
                     m.isShow = false
                 }
             }

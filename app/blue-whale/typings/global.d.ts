@@ -27,6 +27,7 @@ interface IBW_Menu{
     menuType: number;
     menuIcon : string;
     menuPath: R_ReqAddr;
+    isPc: number;
 }
 
 interface IBW_UI<U>{

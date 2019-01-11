@@ -1,19 +1,17 @@
 /// <amd-module name="BasicPage"/>
-
 import sys = BW.sys;
 import d = G.d;
 import tools = G.tools;
 import Gesture = require("../module/gesture/gesture");
 import {ButtonAction} from "../common/rule/ButtonAction/ButtonAction";
 import {Modal} from "../../global/components/feedback/modal/Modal";
-import {HelpMsg} from "../module/helpMsg/HelpMsg";
-import CONF = BW.CONF;
-
+import {Graffiti} from "../module/share/Share";
 
 export default class BasicPage{
     protected dom : HTMLElement;
     protected isMb : boolean;
     protected url : string;
+    protected param: obj = {};
     constructor(para? : BasicPagePara){
         // this.isMb = sys.os !== 'pc';
         this.isMb = tools.isMb;
@@ -32,10 +30,20 @@ export default class BasicPage{
                 this.url = d.closest(para.dom , '.page-container[data-src]').dataset.src;
             }
         }
+        this.param = tools.url.getObjPara(this.url);
 
         this.on('page.destroy', () => {
             this.destroy();
         });
+
+        let str = navigator.userAgent.toLowerCase();
+        let ver = str.match(/cpu iphone os (.*?) like mac os/);
+        if(ver && ver[1]){
+            let version = parseInt(ver[1]);
+            if(version <= 10){
+                document.documentElement.classList.add('no-overflow-scrolling');
+            }
+        }
 
         //判断是否是安卓5及以上版本才开启手势
         let version = 5;
@@ -68,7 +76,18 @@ export default class BasicPage{
         this.initHelpMsg(para);
 
         this._pageWrapper = this.wrapperInit();
-        this._pageWrapper && d.append(para.dom, this._pageWrapper)
+        this._pageWrapper && d.append(para.dom, this._pageWrapper);
+
+        let tag = para.ui && para.ui.tag;
+        if(tag && tools.isMb){
+            require(['Share'], (e) => {
+                new e.Graffiti({
+                    tag : tag,
+                    tagId : para.ui.tagId,
+                    name : para.ui.caption
+                });
+            })
+        }
     }
 
     protected wrapperInit() : HTMLElement{

@@ -47,3 +47,13 @@
     }
   }
 }
+.textarea-input{
+  &.height-auto{
+    resize: none;
+    border: none;
+    height: 30px;
+    line-height: 16px;
+    margin-bottom: 0;
+    font-size: inherit;
+  }
+}

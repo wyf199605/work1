@@ -10,6 +10,7 @@ import {Button} from "../../general/button/Button";
 
 export interface IImageManagerPara extends IComponentPara{
     isAdd?: boolean; // 默认false
+    isDelete?: boolean;
 }
 
 export class ImageManager extends Component{
@@ -18,6 +19,7 @@ export class ImageManager extends Component{
     static EVT_ADD_IMG = '__event_add_image__';
 
     protected addEl: HTMLElement;
+    protected isDel: boolean;
     protected wrapperInit(para: IImageManagerPara){
         this.addEl = <div className="img-add manager-img-item">+</div>;
         !para.isAdd && this.addEl.classList.add('hide');
@@ -28,8 +30,10 @@ export class ImageManager extends Component{
 
     constructor(para: IImageManagerPara){
         super(para);
+        this.isDel = tools.isEmpty(para.isDelete) ? true : para.isDelete;
         this.closeEvent.on();
         this.imgShowEvent.on();
+
 
         d.on(this.addEl, 'click', () => {
             this.trigger(ImageManager.EVT_ADD_IMG);
@@ -48,19 +52,19 @@ export class ImageManager extends Component{
             delEl = <i className="app-shanchu appcommon"/>;
 
         if(tools.isPc){
-            inputBox.addItem(<Button tip="上一页" icon="arrow-left" onClick={() => {
+            inputBox.addItem(<Button key="prev" tip="上一页" icon="arrow-left" onClick={() => {
                 showImg(current - 1);
             }}/>);
-            inputBox.addItem(<Button tip="下一页" icon="arrow-right" onClick={() => {
+            inputBox.addItem(<Button key="next" tip="下一页" icon="arrow-right" onClick={() => {
                 showImg(current + 1);
             }}/>);
-            inputBox.addItem(<Button tip="放大" icon="unie038" color="info" onClick={() => {
+            inputBox.addItem(<Button key="zoomIn" tip="放大" icon="unie038" color="info" onClick={() => {
                 imgScale(width + 10);
             }}/>);
-            inputBox.addItem(<Button tip="缩小" icon="suoxiao" color="info" onClick={() => {
+            inputBox.addItem(<Button key="zoomOut" tip="缩小" icon="suoxiao" color="info" onClick={() => {
                 imgScale(width - 10);
             }}/>);
-            inputBox.addItem(<Button tip="删除" icon="app-shanchu" iconPre="appcommon" color="error" onClick={() => {
+            inputBox.addItem(<Button key="delete" tip="删除" icon="app-shanchu" iconPre="appcommon" color="error" onClick={() => {
                 delImg(false, () => {
                     let index = current > 0 ? current - 1 : current + 1;
                     if(this.images.length === 0){
@@ -129,6 +133,10 @@ export class ImageManager extends Component{
 
         return {
             on: () => {
+                if(!this.isDel){
+                    delEl.classList.add('hide');
+                    inputBox.delItem('delete');
+                }
                 d.on(this.wrapper, 'click', '.img-wrapper', handler = (ev) => {
                     let el = ev.target as HTMLElement,
                         parent = d.closest(el, '.manager-img-item'),
@@ -171,7 +179,7 @@ export class ImageManager extends Component{
         let items: HTMLElement[] = d.queryAll('.manager-img-item:not(.img-add)', this.wrapper);
         d.diff(this.images, items, {
             create: (url: string, index: number) => {
-                d.before(this.addEl, ImageManager.createImg(url, index));
+                d.before(this.addEl, ImageManager.createImg(url, index, this.isDel));
             },
             replace: (url: string, el: HTMLElement, index: number) => {
                 let img = d.query('img', el) as HTMLImageElement;
@@ -216,14 +224,14 @@ export class ImageManager extends Component{
         super.destroy();
     }
 
-    static createImg(src: string, index: number){
+    static createImg(src: string, index: number, isDel: boolean = true){
         let div = <div className="manager-img-item" data-index={index + ''}>
             <div class="img-wrapper">
                 <img src={src} alt=""/>
             </div>
-            <div className="img-close">
+            {isDel ? <div className="img-close">
                 <i className="appcommon app-guanbi2"/>
-            </div>
+            </div> : null}
         </div>;
         d.data(div, src);
         return div;

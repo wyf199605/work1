@@ -1,0 +1,175 @@
+.modal-change-project:not(.modal-mobile) {
+    min-width: 250px;
+
+    .head-wrapper {
+        .modal-header {
+            background-color: #1d2b36;
+            height: 45px;
+
+            .close {
+                margin-top: 0;
+                line-height: 45px;
+            }
+
+            .modal-title {
+                font-size: 16px;
+                padding-left: 20px;
+                color: #ffffff;
+                line-height: 45px;
+            }
+        }
+    }
+
+    .modal-body {
+        font-size: 14px;
+        background-color: #ffffff;
+        box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.18);
+        padding: 10px 20px;
+        color: #333333;
+        min-height: 193px;
+        .change-project-list-item{
+            height: 50px;
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e2e2;
+            .description{
+                flex: 0 0 auto;
+            }
+            .text-input{
+                flex: 1 1 auto;
+                display: flex;
+                display: -webkit-flex;
+                align-items: center;
+                justify-content: flex-end;
+                height: 100%;
+                padding-right: 15px;
+                input{
+                    flex: 1 1 auto;
+                    height: 100%;
+                    text-align: right;
+                    margin-bottom: 0;
+                }
+                .btn-group{
+                    position: static;
+                    a{
+                        display: flex;
+                        display: -webkit-flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                }
+            }
+        }
+
+    }
+}
+
+.modal-change-project.modal-mobile {
+
+    .head-wrapper {
+        .modal-header {
+            height: 45px;
+
+            .close {
+                margin-top: 0;
+                line-height: 45px;
+            }
+
+            .modal-title {
+                font-size: 18px;
+                color: #333333;
+                line-height: 45px;
+            }
+        }
+    }
+
+    .modal-body {
+        $font-size__mobile-body: 15px;
+        height: calc(100% - 45px) !important;
+        font-size: $font-size__mobile-body;
+        background-color: #ffffff;
+        box-shadow: 0 5px 12px 0 rgba(0, 0, 0, 0.18);
+        padding: 0 0 0 15px;
+        color: #333333;
+        .change-project{
+            .change-project-list-item{
+                height: 50px;
+                display: flex;
+                display: -webkit-flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #e2e2e2;
+                .description{
+                    flex: 0 0 auto;
+                }
+                .text-input{
+                    flex: 1 1 auto;
+                    display: flex;
+                    display: -webkit-flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    height: 100%;
+                    padding-right: 15px;
+                    input{
+                        flex: 1 1 auto;
+                        height: 100%;
+                        text-align: right;
+                        margin-bottom: 0;
+                    }
+                    .btn-group{
+                        position: static;
+                        a{
+                            display: flex;
+                            display: -webkit-flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .foot-wrapper {
+        position: absolute;
+        min-width: 250px;
+        width: 66.7%;
+        left: 50%;
+        top: 270px;
+        transform: translate(-50%);
+        .modal-footer {
+            border-top: none;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            .right-plane {
+                float: none !important;
+                position: static;
+                display: block;
+                width: 100%;
+
+                .input-box {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    button {
+                        min-width: 96px;
+                        border-radius: 15px;
+                        &:first-child {
+                            border: solid 1px #005bac;
+                            background-color: #ffffff;
+                            color: #005bac;
+                        }
+                        &:last-child {
+                            background-color: #005bac;
+                            margin-left: 5.1%;
+                            color: #ffffff;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

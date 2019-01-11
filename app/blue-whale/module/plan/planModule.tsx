@@ -59,13 +59,21 @@ export class PlanModule extends Component{
         this.initDraw();
         tools.isPc && this.initSubBtn();
         this.initStatusBar();
-        //this.initScale();
+        this.initScale();
     }
 
     initScale(){
         if(tools.isMb){
             let div = <div class="initScale">
-                <div class="search iconfont icon-sousuo" onclick={()=>{
+                <div class="search iconfont icon-biyanjing" onclick={(e)=>{
+                   console.log(e.target.className)
+                    if(e.target.className.indexOf('icon-biyanjing') !== -1){
+                        e.target.className = 'search iconfont icon-plan-eyes-copy'
+                        this.draw.touchlook();
+                    }else {
+                       this.draw.touchNoLook();
+                        e.target.className = 'search iconfont icon-biyanjing'
+                    }
 
                 }
                 }></div>

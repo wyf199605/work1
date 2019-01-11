@@ -396,7 +396,7 @@ export = class MainPage {
                 let menus = response.body && response.body.elements;
                 // console.log('in pc');
                 // console.log(menus);
-                menus && menus.forEach((menu) => {
+                menus && menus.forEach((menu: IBW_Menu) => {
                     /*
                     *   0： pc和mb都显示
                     *   1： 仅pc显示
@@ -405,11 +405,7 @@ export = class MainPage {
                     (menu.isPc === 0 || menu.isPc === 1) && items.push({
                         title: `<a href="javascript:void(0)">${menu.menuName}</a>`,
                         onClick: () => {
-                            let addr = <R_ReqAddr>menu.menuPath;
-                            if (addr) {
-                                let url = CONF.siteUrl + BwRule.reqAddr(addr);
-                                openWindow(url, menu.menuName)
-                            }
+                            BwRule.reqAddrMenu(menu);
                         }
                     })
                 });

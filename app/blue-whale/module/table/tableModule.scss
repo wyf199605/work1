@@ -143,6 +143,13 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
+  .table-body-wrapper{
+    td{
+      .accessory-wrapper{
+        overflow: visible;
+      }
+    }
+  }
 }
 
 .table-img-wrapper {
@@ -242,6 +249,7 @@
     .fast-table-container {
       .new-table-wrapper {
         .table-body-wrapper {
+          height: 90%;
           height: calc(100% - 41px);
         }
       }
@@ -271,13 +279,16 @@
       font-size: 15px;
     }
     .mui-bar-footer {
-      height: 39px;
-      overflow-y: hidden;
+      height: 40px;
+      overflow: hidden;
       -webkit-box-shadow: none;
       box-shadow: none;
       border-top: 1px solid #e1e1e1;
+      z-index: 10000;
+      transition: none;
+
       & > div {
-        height: 100%;
+        height: 39px;
         button {
           &::after {
             content: ' ';

@@ -10,6 +10,7 @@ import {ListItemDetail} from "./ListItemDetail";
 import sys = BW.sys;
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {ContextMenu} from "../../../global/components/ui/actionSheet/contextMenu";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export type DetailCellType = 'text' | 'file' | 'date' | 'datetime' | 'textarea' | 'img'
 
@@ -28,16 +29,16 @@ interface IDetailCell extends IComponentPara {
     value?: string | string[];
     field?: R_Field;
     className?: string;
+    link?: R_ReqAddr;
 }
 
 export class ListItemDetailCell extends Component {
-    private para: IDetailCell;
-    private files: IFile[] = [];
     private imgs: string[] = [];
     private actionSheet: ActionSheet;
     private contextMenu: ContextMenu;
     private _currentFile: IFile;
     private fileType: string = '';
+    private files: IFile[] = [];
 
     set currentFile(fileInfo: IFile) {
         this._currentFile = fileInfo;
@@ -91,11 +92,11 @@ export class ListItemDetailCell extends Component {
         return wrapper;
     }
 
-    constructor(para: IDetailCell) {
+    constructor(private para: IDetailCell) {
         super(para);
-        this.para = para;
         this.fileType = para.field.dataType || para.field.atrrs.dataType;
         para.value && this.render(para.value);
+        tools.isNotEmpty(para.link) && this.linkEvent.on();
     }
 
     createImgs(value: string | string[], imgsWrapper: HTMLElement) {
@@ -116,6 +117,7 @@ export class ListItemDetailCell extends Component {
 
     createAllFiles(value: IFile[], fileWrapper: HTMLElement) {
         fileWrapper.innerHTML = '';
+        let self = this;
         if (tools.isNotEmpty(value)) {
             this.fileEvent.on();
             if (tools.isMb) {
@@ -135,16 +137,19 @@ export class ListItemDetailCell extends Component {
                                             type: this.para.field.link.type
                                         });
                                     } else {
-                                        // this.downloadFile(BW.CONF.siteUrl + this.currentFile.addr);
-                                        let fileName = this.currentFile.filename,
-                                            fileAddr = this.currentFile.addr,
-                                            nameArr = fileName.split('.'),
-                                            extensionName = nameArr[nameArr.length - 1],
-                                            imgs = ['jpg', 'png', 'jpeg', 'gif'];
-                                        if (~imgs.indexOf(extensionName)) {
-                                            sys.window.openImg(BW.CONF.siteUrl + fileAddr);
+                                        if (tools.isNotEmpty(self.currentFile) && tools.isNotEmpty(self.currentFile.addr)) {
+                                            let fileName = self.currentFile.filename,
+                                                fileAddr = self.currentFile.addr,
+                                                nameArr = fileName.split('.'),
+                                                extensionName = nameArr[nameArr.length - 1],
+                                                imgs = ['jpg', 'png', 'jpeg', 'gif'];
+                                            if (~imgs.indexOf(extensionName)) {
+                                                sys.window.openImg(BW.CONF.siteUrl + fileAddr);
+                                            } else {
+                                                sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                            }
                                         } else {
-                                            sys.window.download(BW.CONF.siteUrl + fileAddr);
+                                            Modal.toast('下载出错，请重试!');
                                         }
                                     }
                                 }
@@ -213,7 +218,7 @@ export class ListItemDetailCell extends Component {
 
     private fileEvent = (() => {
         let fileOption = (e) => {
-            e.stopImmediatePropagation();
+            e.stopPropagation();
             let index = parseInt(d.closest(e.target, '.detail-cell-file-item').dataset.index),
                 files = this.files || [];
             this.currentFile = files[index];
@@ -243,7 +248,8 @@ export class ListItemDetailCell extends Component {
     })();
 
     private imgEvent = (() => {
-        let imgOption = () => {
+        let imgOption = (e) => {
+            e.stopPropagation();
             let imgs = this.imgs || [];
             let imgData: ImgModalPara = {
                 img: ListItemDetailCell.getBigPicture(imgs)
@@ -265,21 +271,50 @@ export class ListItemDetailCell extends Component {
             }
         }
     })();
+    private linkEvent = (() => {
+        let linkHandler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            let link = this.para.link,
+                para = this.para,
+                data = para.detailPage.defaultData;
+            BwRule.link({
+                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, data)),
+                varList: link.varList,
+                dataType: para.field.atrrs.dataType,
+                data: data,
+                needGps: link.needGps === 1,
+                type: link.type
+            });
+        };
+        return {
+            on: () => {
+                d.on(this.wrapper, 'click', '.detail-cell-content .link', linkHandler);
+            },
+            off: () => {
+                d.off(this.wrapper, 'click', '.detail-cell-content .link', linkHandler);
+            }
+        }
+    })();
+
 
     render(data: string | string[]) {
         switch (this.para.type) {
-            case 'text': {
-                this.innerEl.content.innerText = data as string || '';
-                this.innerEl.content.title = data as string || '';
+            case 'text':
+            case 'date':
+            case 'datetime':
+            case 'textarea': {
+                if (tools.isNotEmpty(this.para.link)) {
+                    this.innerEl.content.innerHTML = `<a href="#"" class="link" title="${data}">${data}</a>`;
+                } else {
+                    this.innerEl.content.innerText = data as string || '';
+                    this.innerEl.content.title = data as string || '';
+                }
             }
                 break;
             case 'img': {
                 this.imgs = data as string[] || [];
                 this.createImgs(data, this.innerEl.imgs);
-            }
-                break;
-            case 'textarea': {
-                this.innerEl.content.innerText = data as string || '';
             }
                 break;
             case 'file': {
@@ -306,14 +341,6 @@ export class ListItemDetailCell extends Component {
                     this.files = [];
                     this.createAllFiles([], this.innerEl.files);
                 }
-            }
-                break;
-            case 'date': {
-                this.innerEl.content.innerText = data as string || '';
-            }
-                break;
-            case 'datetime': {
-                this.innerEl.content.innerText = data as string || '';
             }
                 break;
         }
@@ -353,8 +380,9 @@ export class ListItemDetailCell extends Component {
     };
 
     destroy() {
-        this.para = null;
+        tools.isNotEmpty(this.para.link) && this.linkEvent.off();
         this.files && this.fileEvent.off();
+        this.para = null;
         this.files = null;
         this.imgs && this.imgEvent.off();
         this.imgs = null;

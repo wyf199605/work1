@@ -329,12 +329,13 @@ export class FastTable extends Component {
                             return;
                         }
                         if (tools.isNotEmpty(col)) {
+                            let ctrl = e.ctrlKey;
                             if (col.sortState === 'NO') {
-                                col.sortState = 'ASC';
+                                ctrl ? col.sort('ASC', true) : col.sortState = 'ASC';
                             } else if (col.sortState === 'DESC') {
-                                col.sortState = 'ASC';
+                                ctrl ? col.sort('ASC', true) :  col.sortState = 'ASC';
                             } else if (col.sortState === 'ASC') {
-                                col.sortState = 'DESC';
+                                ctrl ? col.sort('DESC', true) : col.sortState = 'DESC';
                             }
                         }
                     }
@@ -537,11 +538,14 @@ export class FastTable extends Component {
             }
             // console.log(width);
             if (this.leftTable) {
+                console.log(this.mainTable.body.innerWrapper.offsetWidth);
+                let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
                 width += this.leftTable.width;
-                let widthStr = 'calc(100% - ' + width + 'px)';
+                let widthStr = offsetWidth - width + 'px';
                 this.mainTable.body.innerWrapper.style.width = widthStr;
                 this.mainTable.head.innerWrapper.style.width = widthStr;
                 this.colCount && (this.mainTable.foot.innerWrapper.style.width = widthStr);
+                console.log(this.mainTable.body.innerWrapper.offsetWidth);
             }else{
                 let widthStr = this.isLockRight ? 'calc(100% - 10px)' : '100%';
                 this.mainTable.body.innerWrapper.style.width = widthStr;
@@ -936,8 +940,6 @@ export class FastTable extends Component {
     private touchMoveEvent = (() => {
         let displacement = 0,
             self = this,
-            isScroll = false,
-            animationId = null,
             headTable,
             footTable;
 
@@ -1384,6 +1386,14 @@ export class FastTable extends Component {
             cells.push(arr);
         });
         return cells;
+    }
+
+    clearSelectedRows(){
+        this.selectedRows.forEach((row) => {
+            row.selected = false;
+        });
+        this.pseudoTable && this.pseudoTable.clearPresentSelected();
+        this._drawSelectedCells();
     }
 
     // 获取所有选中的行

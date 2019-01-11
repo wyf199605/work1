@@ -673,6 +673,8 @@ export class LoginPage{
             }).then(({response}) => {
                 result.success = true;
                 result.data = response;
+                // console.log(response);
+                // debugger
                 callback(result).then(() => {
                     loginPage.loginBtnState(10);
                     let user = User.get(),
@@ -690,6 +692,8 @@ export class LoginPage{
                             loginPage.device.auth_code = col.VALUE;
                         } else if (col.NAME === 'hideBaseMenu'){
                             noShow = col.VALUE.split(',');
+                        }else if(col.NAME === 'PLATFORM_NAME'){
+                            user.platformName = col.VALUE;
                         }
                     });
                     // debugger;
@@ -809,7 +813,8 @@ export class LoginPage{
             }, 1000);
         }
         let usertap = 0,maxtap = 5;
-        (tools.isMb ? d.query('.login-logo>img') :  d.query('[data-action="selectServer"]')).addEventListener('click',() => {
+        let type = tools.isMb ? 'touchstart' : 'click';
+        (tools.isMb ? d.query('.login-logo') :  d.query('[data-action="selectServer"]')).addEventListener(type,() => {
             usertap += 1 ;
             if(usertap === maxtap){
                 sys.window.load(CONF.url.selectServer);

@@ -81,7 +81,6 @@ export class NewTableModule {
             if (this.editType === 'linkage' && this.editable) {
                 this.editInit(main);
                 this.active.onChange = (isMain) => {
-                    console.log(isMain);
                     if(isMain){
                         this.main.modify.end();
                     }else{
@@ -543,8 +542,9 @@ export class NewTableModule {
         // 刷新主表
         return this.main.refresh(data).then(() => {
             // 刷新子表
-            !(this.subIndex in this.main.ftable.rows) && (this.subIndex = 0);
-            let row = this.main.ftable.rowGet(this.subIndex);
+            let mftable = this.main.ftable;
+            !(this.subIndex in mftable.rows) && (this.subIndex = 0);
+            let row = mftable.rowGet(this.subIndex);
             row && this.subRefresh(row.data).then(() => {
                 this.active.off();
                 this.active.on();

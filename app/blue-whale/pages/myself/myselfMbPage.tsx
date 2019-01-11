@@ -24,7 +24,7 @@ export = class myselfMbPage {
             let menus = response.body && response.body.elements;
             // console.log('in mb');
             // console.log(menus);
-            menus && menus.forEach((menu) => {
+            menus && menus.forEach((menu: IBW_Menu) => {
                 /*
                 *   0： pc和mb都显示
                 *   1： 仅pc显示
@@ -34,11 +34,7 @@ export = class myselfMbPage {
                     content: menu.menuName,
                     icon: menu.menuIcon,
                     onClick: () => {
-                        let addr = menu.menuPath as R_ReqAddr;
-                        if (addr) {
-                            let url = CONF.siteUrl + BwRule.reqAddr(addr);
-                            sys.window.open({url, title: menu.menuName})
-                        }
+                        BwRule.reqAddrMenu(menu);
                     }
                 })
             });
@@ -99,6 +95,16 @@ export = class myselfMbPage {
                 <a href="#" className="mui-navigate-right"> <i className="iconfont icon-renyuan" style="color:#FFB741;margin-right:10px"></i>密码修改</a>
             </li>;
             d.append(list, li);
+        }
+        if(sys.window.toClient){
+            let li = <li className="mui-table-view-cell">
+                <a href="#" className="mui-navigate-right">更改客户代码</a>
+            </li>;
+            d.append(list, li);
+            d.on(li, 'click', (e) => {
+                e.preventDefault();
+                sys.window.toClient();
+            })
         }
 
         d.on(d.query('.selfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
@@ -246,7 +252,6 @@ export = class myselfMbPage {
 
 
     private initModal() {
-        let wrapper = <div className="test-module-wrapper"></div>;
         let body = <div className="mui-content">
             <div className="mui-rotate-box">
                 <div className="box-content">点击测速</div>
@@ -259,11 +264,10 @@ export = class myselfMbPage {
         </div>;
 
         return new Modal({
-            container: d.closest(wrapper, '.page-container'),
+            className: 'test-module-wrapper',
             header: '网络测速',
             body: body,
             position: sys.isMb ? 'full' : '',
-            width: '730px',
             isShow: false
         });
     }

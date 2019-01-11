@@ -20,7 +20,7 @@ module.exports = function(request, rConfig){
     let configContent = fs.readFileSync('../required.config.js');
 
     if (!fs.existsSync(path)) {
-        mkdirsSync(path);
+        mkdirsSync(root);
         fs.writeFileSync(path, configContent);
     }
     let pathContent = fs.readFileSync(path);

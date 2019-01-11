@@ -9,7 +9,7 @@ import {QueryModule, QueryModulePara} from "../query/queryModule";
 interface INewQueryPara {
     queryItems?: IQueryItem[];
     search?: (data: obj) => void;
-    advanceSearch?: QueryModulePara;
+    advanceSearch?: IBw_Query;
     cols?: R_Field[];
     url?: string;
     refresher?: (ajaxData?: obj, noQuery?: boolean) => Promise<any>;
@@ -25,6 +25,23 @@ export class NewQueryModalMb {
         if (tools.isNotEmpty(para.queryItems)) {
             this.initModal();
             this.initItems(para.queryItems);
+            if (tools.os.android) {
+                window.addEventListener('resize', function () {
+                    if (document.activeElement.tagName == 'INPUT' || document.activeElement.tagName == 'TEXTAREA') {
+                        window.setTimeout(function () {
+                            document.activeElement.scrollIntoView();
+                        }, 0);
+                    }
+                })
+            }
+            if (tools.os.ios) {
+                let inputs = Array.prototype.slice.call(document.querySelectorAll('input'));
+                inputs.forEach(input => {
+                    input.onblur = function (e) {
+                        document.body.scrollTop = 0;
+                    }
+                })
+            }
         } else {
             this.initQuery();
         }
@@ -57,6 +74,10 @@ export class NewQueryModalMb {
     static QUERY_MODULE_NAME = 'QueryModuleMb';
 
     private initModal() {
+        let advanceSearch = this.para.advanceSearch, isShow: boolean = false;
+        if (tools.isNotEmpty(advanceSearch) && tools.isNotEmpty(advanceSearch.autTag) && advanceSearch.autTag !== 0) {
+            isShow = true;
+        }
         this.modal = new Modal({
             header: {
                 title: '搜索',
@@ -86,9 +107,8 @@ export class NewQueryModalMb {
             isMb: tools.isMb,
             className: 'new-query-modal',
             isModal: tools.isMb,
-            isOnceDestroy: false,
             body: this.queryWrapper,
-            isShow: false,
+            isShow: isShow,
             footer: {
                 rightPanel: [
                     {
@@ -115,7 +135,8 @@ export class NewQueryModalMb {
                         }
                     }
                 ]
-            }
+            },
+            isQuery: !isShow
         });
     }
 

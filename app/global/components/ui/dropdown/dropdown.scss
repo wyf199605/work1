@@ -69,3 +69,14 @@
     }
   }
 }
+
+.fl-mobile {
+  .dropdown-menu{
+    max-height: none;
+    .btn{
+      height: 34px;
+      line-height: 34px;
+      font-size: 18px;
+    }
+  }
+}

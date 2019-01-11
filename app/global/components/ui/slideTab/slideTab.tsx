@@ -4,9 +4,11 @@ import {ITab, Tab, TabPara} from "../tab/tab";
 import d = G.d;
 import tools = G.tools;
 import {DataManager, IDataManagerAjaxStatus, IDataManagerPara} from "../../DataManager/DataManager";
+import {Modal} from "../../feedback/modal/Modal";
 
 export interface ISlideTabPara extends TabPara {
     tabs?: ISlideTab[];
+    isPulldownRefresh?: number;
 }
 
 export interface ISlideTab extends ITab {
@@ -21,8 +23,10 @@ export interface ISlideTab extends ITab {
 
 
 export class SlideTab extends Tab {
-    constructor(para: ISlideTabPara) {
+    protected isPulldownRefresh: number = 0;
+    constructor(protected para: ISlideTabPara) {
         super(para);
+        this.isPulldownRefresh = tools.isNotEmpty(para.isPulldownRefresh) ? para.isPulldownRefresh : 0;
         this.panelContainer.classList.add('slide-tab-wrapper');
 
         this.width = this.panelContainer.offsetWidth;
@@ -51,17 +55,19 @@ export class SlideTab extends Tab {
 
     protected slideEvent = (() => {
         let translate = 0,
+            isPulldownRefresh = true,
             moveHandler = null,
+            direction = 'down',
             endHandler = null;
 
         let startHandler = (e: TouchEvent) => {
+            d.off(document, 'touchend', endHandler);
+            d.off(this.panelContainer, 'touchmove', moveHandler);
             translate = -this.current * this.width;
             this.panelContainer.style.removeProperty('transition');
             let panel = d.closest(e.target as HTMLElement, '.tab-pane'),
                 disX = e.changedTouches[0].clientX,
                 disY = e.changedTouches[0].clientY,
-                direction,
-                scale = 1,
                 isFirst = true;
             // console.log(panel);
 
@@ -75,20 +81,20 @@ export class SlideTab extends Tab {
 
                 }
 
-                if (panel.scrollTop === 0 && direction !== 'down') {
+                if (isPulldownRefresh && panel.scrollTop === 0 && direction !== 'down') {
                     e.preventDefault();
                 }
 
                 if (direction === 'left' || direction === 'right') {
                     let deltaX = currentX - disX;
                     disX = currentX;
-                    if ((this.current === 0 && e.direction === 'right')
-                        || (this.current === this.len - 1 && e.direction === 'left')) {
-                        scale *= .96;
-                        deltaX *= scale;
-                    } else {
-                        deltaX = deltaX * 1.15;
-                    }
+                    // if ((this.current === 0 && e.direction === 'right')
+                    //     || (this.current === this.len - 1 && e.direction === 'left')) {
+                    //     scale *= .96;
+                    //     deltaX *= scale;
+                    // } else {
+                    //     deltaX = deltaX * 1.1;
+                    // }
                     translate += deltaX;
                     // this.panelContainer.style.transform = 'translateX(' + translate + 'px)';
                     this.change(translate);
@@ -117,6 +123,7 @@ export class SlideTab extends Tab {
         };
         return {
             on: () => {
+                isPulldownRefresh = this.isPulldownRefresh === 0 ? true : !!~this.isPulldownRefresh;
                 d.on(this.panelContainer, 'touchstart', startHandler);
                 // d.on(this.panelContainer, 'panleft panright panstart panend', handler = (e: any) => {
                 //     // e.srcEvent.preventDefault && e.srcEvent.preventDefault();
@@ -141,6 +148,8 @@ export class SlideTab extends Tab {
                 // });
             },
             off: () => {
+                d.off(document, 'touchend', endHandler);
+                d.off(this.panelContainer, 'touchmove', moveHandler);
                 // d.off(this.panelContainer, 'panleft panright panstart panend', handler);
                 d.off(this.panelContainer, 'touchstart', startHandler);
             }
@@ -224,15 +233,17 @@ export class SlideTab extends Tab {
             this.temDataManagers = [];
         }
         if (tab.dataManager) {
+            let isPulldownRefresh = tools.isEmpty(this.para.isPulldownRefresh) ? 0 : this.para.isPulldownRefresh;
             let len = this.dataManagers.length,
                 page = tab.dataManager,
                 dataManager = new DataManager({
                     page: {
                         size: page.pageSize || 50,
                         container: d.query(`div.tab-pane[data-index="${len}"]`, this.panelContainer),
-                        isPulldownRefresh: page.isPulldownRefresh || false,
+                        isPulldownRefresh: isPulldownRefresh === 0 ? (page.isPulldownRefresh || false) : !!~isPulldownRefresh,
                     },
                     render: (start, length, isRefresh) => {
+                        this.current = this.current;
                         typeof page.render === 'function' && page.render(start, length, dataManager.data, isRefresh);
                     },
                     ajax: {

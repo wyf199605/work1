@@ -139,6 +139,16 @@ export = class FormPage extends BasicPage {
         // 编辑标识
         this.initData();
         this.initEvent();
+
+        setTimeout(() => {
+            let isPhone = sys.os === 'ad' || sys.os === 'ip',
+                signField = para.fm.signField;
+            if(isPhone && tools.isNotEmpty(signField)){
+                let com = editModule.getDom(signField);
+                com && com.click();
+                window['com'] = com;
+            }
+        }, 500);
         window['e'] = this;
         // this.initValidate();
     }
@@ -345,6 +355,14 @@ export = class FormPage extends BasicPage {
 
             return data;
         };
+        console.log(this.param);
+        if(tools.isNotEmpty(this.param)){
+            let param = {};
+            for(let key in this.param){
+                param[key.toUpperCase()] = this.param[key];
+            }
+            this.setData(param);
+        }
 
         // url请求默认值
         if(form.dataAddr){
@@ -422,15 +440,16 @@ export = class FormPage extends BasicPage {
         this.fields.forEach((field) => {
             let name = field.name,
                 com = this.editModule.getDom(name);
+
             if(com){
-                if(field.elementType === 'lookup'){
+                if(field.elementType === 'lookup' && field.lookUpKeyField in data){
                     let options = this.lookUpData[name] || [];
                     for (let opt of options) {
                         if (opt.value == data[field.lookUpKeyField]) {
                             com.set(opt || '');
                         }
                     }
-                }else{
+                }else if(name in data){
                     com.set(data[name] || '');
                 }
             }

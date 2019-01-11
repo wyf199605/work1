@@ -1,4 +1,4 @@
-.mb-list-module{
+.mb-list-module {
   background-color: #f2f2f2;
   height: 100%;
   display: flex;
@@ -45,8 +45,8 @@
     width: 100%;
     flex: 0 0 auto;
     overflow-y: auto;
-    .mb-list-wrapper.no-data{
-      &::after{
+    .mb-list-wrapper.no-data {
+      &::after {
         font-family: "appcommon" !important;
         font-style: normal;
         -webkit-font-smoothing: antialiased;
@@ -59,15 +59,16 @@
         color: #666;
       }
     }
-    &.global-buttons-height{
+    &.global-buttons-height {
       height: calc(100% - 50px) !important;
     }
   }
 }
-.mb-list-view{
+
+.mb-list-view {
   height: 100%;
-  ul.nav.nav-tabs.nav-tabs-line{
-    &.space-around{
+  ul.nav.nav-tabs.nav-tabs-line {
+    &.space-around {
       justify-content: space-around;
     }
     display: flex;

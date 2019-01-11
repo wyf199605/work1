@@ -45,7 +45,7 @@ export class UploadImagesItem extends Component {
     private toggleErrorWrapper(isError: boolean) {
         if (isError) {
             !this._errorWrapper && d.append(this.wrapper, this.errorWrapper);
-        }else{
+        } else {
             this._errorWrapper && d.remove(this.errorWrapper);
             this._errorWrapper = null;
         }
@@ -58,9 +58,9 @@ export class UploadImagesItem extends Component {
     }
 
     render(data: IImage) {
-        if(data.isOnLine){
+        if (data.isOnLine) {
             (this.innerEl.img as HTMLImageElement).setAttribute('src', BwRule.fileUrlGet(data.unique, this.para.nameField || 'FILE_ID', true));
-        }else{
+        } else {
             (this.innerEl.img as HTMLImageElement).setAttribute('src', data.localUrl);
         }
         this.toggleErrorWrapper(data.isError);
@@ -75,6 +75,11 @@ export class UploadImagesItem extends Component {
     set index(index: number) {
         this._index = index;
         this.wrapper && (this.wrapper.dataset['index'] = index + '');
+    }
+
+    set disabled(disabled: boolean) {
+        this._disabled = disabled;
+        d.query('.close-ball', this.wrapper).classList.toggle('hide', disabled === true);
     }
 
     destroy() {

@@ -64,6 +64,9 @@ namespace BW {
             loginCode: 'login/message', // 手机短信验证码登录
             unBinding: 'commonsvc/alldevice', // 手机短信验证解绑
 
+            mailForward: 'tag/mail', // 邮件转发
+            mailTemp : 'tag/temp', // 保存图片
+
             atdPwdReg: 'attendance/pwdregister/node_attend-3',
             atdFingerReg: 'attendance/fingerregister/node_attend-2',
             atdFingerAtd: 'attendance/fingerattend/node_attend-1',
@@ -96,9 +99,10 @@ namespace BW {
             flowListApply: 'flow/system/list', // 流程引擎-申请
             modifyFlow: 'process/modify/',      // 流程修改
             getProcessTypeId: 'process/type',   // 流程引擎-获取流程类型
-            useAddressList_user: 'ui/select/n3023_data-3023?output=json',
-            useAddressList_userGroup: 'ui/select/n3024_data-3024?output=json',
-            useAddressList_scriptSetting: 'ui/select/n3022_data-3022?output=json',
+            useAddressList_user: 'ui/select/n3023_data-3023?output=json',   // 流程引擎-属性编辑-使用通讯录-用户
+            useAddressList_userGroup: 'ui/select/n3024_data-3024?output=json',  // 流程引擎-属性编辑-使用通讯录-用户组
+            useAddressList_scriptSetting: 'ui/select/n3022_data-3022?output=json',  // 流程引擎-属性编辑-使用通讯录-脚本配置
+            projectList: 'common/changepf',  // 切换项目（工作平台）
             queryTest:'ui/select/node_nobugs?output=json'
         },
 

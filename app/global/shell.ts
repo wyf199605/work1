@@ -48,7 +48,10 @@ namespace G{
                 }, back, info)
             },
             getEditImg( type : number, image: string, back : IShellEventHandler){
-                return ShellBase.handler( 'getSignImg', {type, image}, back);
+                return ShellBase.handler('getSignImg', {type, image}, back);
+            },
+            wxShare(data : string){
+                return ShellBase.handler('wxShare', {data});
             }
         };
 
@@ -399,8 +402,12 @@ namespace G{
                 return ShellBase.handler('delInventoryData',{nameId:nameId,where:where},back);
             },
             //上传条码数据
-            uploadcodedata(nameId:string,back:IShellEventHandler){
-                return ShellBase.handler('uploadcodedata',{nameId:nameId},back,null,false);
+            uploadcodedata(nameId:string,uploadUrl:string,images:any,typeName:string,typeValue:string, back:IShellEventHandler){
+                return ShellBase.handler('uploadcodedata',{nameId:nameId,uploadUrl:uploadUrl,images:images,typeName:typeName,typeValue:typeValue},back,null,false);
+            },
+               //移动端打开摄像头扫码
+            openScanCode(type:number,back:IShellEventHandler){
+                return ShellBase.handler('scanCode',{type:type},back)
             },
             //获取盘点数据
             getTableInfo(uniqueFlag:string){
@@ -442,6 +449,28 @@ namespace G{
         };
 
         const image = {
+            // 拍照
+            photograph(callback: (file: CustomFile[]) => void, error?: (msg: string) => void){
+                this.getImg(0, callback, error);
+            },
+            // 图库
+            photoAlbum(callback: (file: CustomFile[]) => void, error?: (msg: string) => void){
+                this.getImg(1, callback, error);
+            },
+            getImg(type: number, callback: (file: CustomFile[]) => void, error?: (msg: string) => void){
+                ShellBase.handler('getImg', {
+                    type: type
+                }, (result: IShellResult) => {
+                    //alert(JSON.stringify(result.data));
+                    if(result.success){
+                        let data = result.data;
+                        let file = tools.base64ToFile(data.dataurl, data.filename);
+                        callback && callback([file]);
+                    }else{
+                        error && error(result.msg);
+                    }
+                });
+            },
             // 编辑指定图片
             editImg(img: string, back: IShellEventHandler){
                 ShellBase.handler('editImg', {
@@ -467,6 +496,7 @@ namespace G{
     declare const AppShell: {
         syncFunction(name: string, data: string): string;
         asyncFunction(name: string, data: string, back: string, infor?:string): boolean;
+        postMessage(name: string, data: string, back: string, infor?:string): boolean;
     };
     enum ShellTypes {
         IOS,

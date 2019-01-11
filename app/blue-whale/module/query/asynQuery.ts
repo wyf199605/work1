@@ -19,7 +19,7 @@ interface QueryDataPara{
     asynData : AsynQueryPara[]
 }
 export class AsynQuery {
-    private para;
+    private para : QueryDataPara;
     private loading : Loading;
     private query = [];
     constructor (para : QueryDataPara){
@@ -35,7 +35,7 @@ export class AsynQuery {
             this.liTpl(obj, body);
         });
         new SlideUp({
-            container : this.para.dom? this.para.dom : document.body,
+            container : this.para.container? this.para.container : document.body,
             contentEl : body,
             contentTitle : '查询记录',
             width : 305,
