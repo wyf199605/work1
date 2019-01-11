@@ -234,9 +234,7 @@ let event = (function () {
                     });
                     eventOn(document, EVENT_MB_MOVE, moveHandler = (ev) => {
                         let touch = ev.touches[0];
-                        if(Math.abs(touch.clientY - touchY) < 10) {
-                            clearTimeout(timer);
-                        }
+                        clearTimeout(timer);
                     });
 
                     eventOn(document, EVENT_MB_END, endHandler = (ev) => {

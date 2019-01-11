@@ -537,11 +537,14 @@ export class FastTable extends Component {
             }
             // console.log(width);
             if (this.leftTable) {
+                console.log(this.mainTable.body.innerWrapper.offsetWidth);
+                let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
                 width += this.leftTable.width;
-                let widthStr = 'calc(100% - ' + width + 'px)';
+                let widthStr = offsetWidth - width + 'px';
                 this.mainTable.body.innerWrapper.style.width = widthStr;
                 this.mainTable.head.innerWrapper.style.width = widthStr;
                 this.colCount && (this.mainTable.foot.innerWrapper.style.width = widthStr);
+                console.log(this.mainTable.body.innerWrapper.offsetWidth);
             }else{
                 let widthStr = this.isLockRight ? 'calc(100% - 10px)' : '100%';
                 this.mainTable.body.innerWrapper.style.width = widthStr;
@@ -936,8 +939,6 @@ export class FastTable extends Component {
     private touchMoveEvent = (() => {
         let displacement = 0,
             self = this,
-            isScroll = false,
-            animationId = null,
             headTable,
             footTable;
 

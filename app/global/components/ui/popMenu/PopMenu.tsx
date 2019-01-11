@@ -233,6 +233,7 @@ export class NewPopMenu extends NewPopMenuItem {
             this.wrapper.style.opacity = '1';
             this.wrapper.style.display = 'flex';
             this.wrapper.style.display = '-webkit-flex';
+            this.wrapper.style.display = '-webkit-box';
         } else {
             this.wrapper.style.opacity = '0';
             this.wrapper.style.display = 'none';

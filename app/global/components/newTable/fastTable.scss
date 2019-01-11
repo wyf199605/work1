@@ -83,7 +83,7 @@
   }
 
   .tables{
-    height: 100%;
+    height: 90%;
     height: calc(100% - 85px); // 100% - 分页条和滚动条高度
     border: 1px solid $default_4;
   }
@@ -219,7 +219,7 @@
       position: relative;
       //padding-top: 0 !important;
       border-bottom: none;
-      max-height: 100%;
+      max-height: 90%;
       max-height: calc(100% - 40px);
       min-height: 20px;
       .pseudo-table{
