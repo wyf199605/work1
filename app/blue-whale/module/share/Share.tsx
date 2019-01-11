@@ -5,6 +5,7 @@ import {Button, IButton} from "../../../global/components/general/button/Button"
 import CONF = BW.CONF;
 import sys = BW.sys;
 import {BwRule} from "../../common/rule/BwRule";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 interface ISharePara {
     onClose? : Function
     strArr : string[]
@@ -25,27 +26,31 @@ export class Graffiti {
             this.hideBtn();
             setTimeout(() => {
                 this.getEditImg(para);
-            });
+            },100);
         });
     }
 
     private getEditImg(para : IGraffitiPara){
         let tag = para.tag;
         let even = G.tools.pattern.debounce((e) => {
-            if(!this.share){
-                this.share = new Share({
-                    strArr : tag ? tag : ['weChat', 'mail', 'downLoad', 'print'],
-                    md5 : e.data,
-                    tagId : para.tagId,
-                    name : para.name,
-                    onClose : () => {
-                        this.showBtn();
-                    }
-                });
+            if(e.success){
+                if(!this.share){
+                    this.share = new Share({
+                        strArr : tag ? tag : ['weChat', 'mail', 'downLoad', 'print'],
+                        md5 : e.data,
+                        tagId : para.tagId,
+                        name : para.name,
+                        onClose : () => {
+                            this.showBtn();
+                        }
+                    });
+                }else {
+                    this.hideBtn();
+                    this.share.show();
+                    this.share.setImg(e.data);
+                }
             }else {
-                this.hideBtn();
-                this.share.show();
-                this.share.setImg(e.data);
+                this.showBtn();
             }
         },1000);
         Shell.base.getEditImg(null, null, even);
@@ -131,22 +136,6 @@ export class Share {
         });
     }
 
-    private post(url : string, params : obj) {
-        let temp = document.createElement("form");
-        temp.action = url;
-        temp.method = "post";
-        temp.style.display = "none";
-        temp.target="_blank";
-        for (let item in params) {
-            let opt = document.createElement("textarea");
-            opt.name = item;
-            opt.value = params[item];
-            temp.appendChild(opt);
-        }
-        document.body.appendChild(temp);
-        temp.submit();
-        return temp;
-    }
 
     private wrapperInit(){
         return this._wrapper = <div className="share-container">
@@ -184,6 +173,7 @@ export class Share {
         let even =  G.tools.pattern.debounce(() => {
             this.hide();
             Shell.base.getEditImg(null, this._img.src, (result) => {
+                Modal.alert(result)
                 this.show();
                 this.setImg(result.data)
             });
