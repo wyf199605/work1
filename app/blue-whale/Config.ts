@@ -65,6 +65,7 @@ namespace BW {
             unBinding: 'commonsvc/alldevice', // 手机短信验证解绑
 
             mailForward: 'tag/mail', // 邮件转发
+            mailTemp : 'tag/temp', // 保存图片
 
             atdPwdReg: 'attendance/pwdregister/node_attend-3',
             atdFingerReg: 'attendance/fingerregister/node_attend-2',

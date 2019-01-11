@@ -132,10 +132,15 @@ export class FastTableColumn extends TableColumn {
             // debugger;
             // console.log(this.ftable.tableData.getServerMode())
             if (ftableData.serverMode) {
+                let arr = [this.name, this.sortState] as [string, SortType];
                 if(ctrl){
-                    ftableData.sortState.push([this.name, this.sortState]);
+                    if(Array.isArray(ftableData.sortState)){
+                        ftableData.sortState.push(arr);
+                    }else {
+                        ftableData.sortState = [arr];
+                    }
                 }else {
-                    ftableData.sortState = [[this.name, this.sortState]];
+                    ftableData.sortState = [arr];
                 }
 
                 ftableData.refresh();

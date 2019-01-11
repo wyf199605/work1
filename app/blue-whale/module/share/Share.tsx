@@ -4,6 +4,7 @@ import Shell = G.Shell;
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import CONF = BW.CONF;
 import sys = BW.sys;
+import {BwRule} from "../../common/rule/BwRule";
 interface ISharePara {
     onClose? : Function
     strArr : string[]
@@ -100,10 +101,19 @@ export class Share {
                     break;
                 case 'mail':
                     btnPush('app-youjian', 'bg-blue', '邮件转发', () => {
-                        this.post(CONF.ajaxUrl.mailForward,{
-                            tag_id : this.p.tagId,
-                            file_name : this.p.name + '.' + this._img.src.substr(11, 3),
-                            content : this._img.src,
+                        BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json',{
+                            type : 'post',
+                            data : {
+                                tag_id : this.p.tagId,
+                                file_name : this.p.name + '.' + this._img.src.substr(11, 3),
+                                content : this._img.src,
+                            }
+                        }).then(({response}) => {
+                            let tempId = response && response.body && response.body.bodyList
+                                && response.body.bodyList[0] && response.body.bodyList[0].temp_id;
+                            sys.window.open({
+                                url : CONF.ajaxUrl.mailForward + '?temp_id=' + tempId,
+                            })
                         })
                     });
                     break;
