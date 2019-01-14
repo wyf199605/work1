@@ -263,6 +263,7 @@ export class RfidBarCode extends Component {
                                 }
 
                                 let s = G.Shell.inventory.inputcodedata(optionStype, para.uniqueFlag, val, category, (res) => {
+                                    alert(JSON.stringify(res.data))
                                     let data = res.data;
                                     let arr = data.array;
                                     for (let i = 0; i < arr.length; i++) {
@@ -361,9 +362,10 @@ export class RfidBarCode extends Component {
                                                 this.stepArry = [];
                                                 s.destroy();
                                                 if (!res.success) {
-                                                    Modal.alert('上传失败');
+                                                   alert('上传失败');
                                                 } else {
-                                                    Modal.alert(res.msg);
+                                                    this.domHash['count'].innerHTML = 0 + '';
+                                                    alert(res.msg);
                                                 }
                                             })
                                             mode.destroy();
@@ -464,10 +466,11 @@ export class RfidBarCode extends Component {
                                                 this.domHash['scanamout'].innerText = res.data.scanNum;
                                                 this.refreshCount(para);
                                                 d.query('.total-nums>span').innerText = res.data.scanNum;
-                                                Modal.alert('删除成功');
+                                                 alert('删除成功');
+                                                this.domHash['count'].innerHTML = 0 + '';
                                                 this.stepArry = [];
                                             } else {
-                                                Modal.alert('删除失败');
+                                                 alert('删除失败');
                                             }
 
                                         })
@@ -656,7 +659,7 @@ export class RfidBarCode extends Component {
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
             //alert(JSON.stringify(res) + '下载')
-            Modal.alert(res.msg);
+            alert(res.msg);
             if(res.success){
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
