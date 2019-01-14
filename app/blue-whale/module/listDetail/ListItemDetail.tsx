@@ -160,7 +160,7 @@ export class ListItemDetail {
                         }
                     } else {
                         Modal.alert('暂无数据!');
-                        resolve(BwRule.getDefaultByFields(fields));
+                        resolve({});
                     }
                 });
             } else {

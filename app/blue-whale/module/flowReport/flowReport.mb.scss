@@ -133,7 +133,6 @@ body.fl-mobile {
 
       label {
         width: 34.1%;
-        white-space: nowrap;
       }
 
       div[data-element-type="value"] input {
@@ -300,6 +299,9 @@ body.fl-mobile {
   .flowReport{
     label{
       width: 140px !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     div[data-input-type]{
       width: calc(100% - 150px) !important;

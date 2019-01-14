@@ -93,15 +93,17 @@ export class FlowItem extends Component {
             let diamondArr = ['decision', 'fork', 'join'];
             this.wrapper.style.left = para.position.x + 'px';
             this.wrapper.style.top = para.position.y + 'px';
-            this.width = para.width || 100;
-            this.height = para.height || 50;
             if (diamondArr.indexOf(para.type) >= 0) {
+                this.width = para.width || 50;
+                this.height = para.height || 50;
                 this.isDiamond = true;
                 this.wrapper.classList.add('diamond');
                 this.wrapper.appendChild(<div className="diamond-text">{para.text || para.type}</div>);
                 this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, this.width, this.height)
                                 .attr(this.getDefaultAttr(para.position.x, para.position.y)).transform('r45');
             } else {
+                this.width = para.width || 100;
+                this.height = para.height || 50;
                 this.text = para.text || para.type;
                 let areaObj = this.calcWidthAndHeight();
                 this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, para.width || areaObj.width, para.height || areaObj.height, 5)
@@ -440,6 +442,17 @@ export class FlowItem extends Component {
 
     get flowEditor() {
         return this._flowEditor;
+    }
+
+    public reDraw(){
+        if (this.para.type === 'rect'){
+            let areaObj = this.calcWidthAndHeight();
+            this.rectNode.attr.width = areaObj.width;
+            this.rectNode.attr.height = areaObj.height;
+            // 重绘所有的线
+            FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
+            FlowDesigner.connections && FlowDesigner.connections.forEach(connection => FlowDesigner.PAPER.connection(connection));
+        }
     }
 
     destroy() {
