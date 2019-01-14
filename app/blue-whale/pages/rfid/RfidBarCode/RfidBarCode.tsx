@@ -70,13 +70,16 @@ export class RfidBarCode extends Component {
         let body = <div></div>;
         let barcode = new Modal({
             className: 'rfid-bar-code',
-            zIndex: 1000,
+            zIndex: 1020,
             body: body,
             header: "条码扫码",
             position: sys.isMb ? 'full' : '',
             onClose: () => {
                 console.log('关闭成功')
                 barcode.destroy();
+                this.operateTbaleD = {
+                    value:''
+                }
             }
         });
 
@@ -142,11 +145,26 @@ export class RfidBarCode extends Component {
 
                                         } else if (this.mode[key] == '替换') {
                                             //造数据
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
                                             this.operateTbaleD.option = 2;
                                         } else if (this.mode[key] == '累加') {
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
+
                                           //造数据
+                                            this.operateTbaleD.option = 3;
                                         } else {
                                           //造数据
+                                            this.operateTbaleD.option = 0;
                                         }
 
 
@@ -166,17 +184,33 @@ export class RfidBarCode extends Component {
 
 
                                         if (this.mode[key] == '累加') {
-
+                                            this.operateTbaleD.option = 3;
+                                            //重新获取输入框数据
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
                                            //造数据
                                         } else if (this.mode[key] == '替换') {
                                             //造数据
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
                                             this.operateTbaleD.option = 2;
+                                            //重新获取输入框
+
 
                                         } else if (this.mode[key] == '逐一') {
                                             //造数据
                                             this.operateTbaleD.option = 1;
                                         } else {
                                             //造数据
+                                            this.operateTbaleD.option = 0;
 
                                         }
 
@@ -200,6 +234,7 @@ export class RfidBarCode extends Component {
                         let mode = new Modal({
                             isMb: false,
                             position: "center",
+                            zIndex:1022,
                             header: '请输入条码',
                             isOnceDestroy: true,
                             isBackground: true,
@@ -293,6 +328,7 @@ export class RfidBarCode extends Component {
                                 isMb: false,
                                 position: "center",
                                 header: '上传数据 ',
+                                zIndex:1022,
                                 isOnceDestroy: true,
                                 isBackground: true,
                                 body: <div data-code="updataModal">
@@ -381,6 +417,7 @@ export class RfidBarCode extends Component {
                         let deModel = new Modal({
                             isMb: false,
                             position: "center",
+                            zIndex:1022,
                             header: '请选择删除数据范围 ',
                             isOnceDestroy: true,
                             isBackground: true,
@@ -542,16 +579,26 @@ export class RfidBarCode extends Component {
             let key = this.stepByone + this.accumulation;
             console.log(modeVal['value']);
             if (this.mode[key] == "累加" && modeVal['value'] !== "") {
-                num.innerText = parseInt(num.innerText) + parseInt(modeVal['value']) + ""
+                //num.innerText = parseInt(num.innerText) + parseInt(modeVal['value']) + ""
                 //添加新的传值接口
-                let Where = {};
+                num.innerText = parseInt(modeVal['value']) + "";
+
+                if(isNaN(parseInt(num.innerText))){
+                    this.operateTbaleD.num = 0;
+                }else {
+                    this.operateTbaleD.num = parseInt(num.innerText);
+                }
 
 
 
             } else if (this.mode[key] == "替换" && modeVal['value'] !== "") {
                 num.innerText = parseInt(modeVal['value']) + "";
                 //添加新的传值接口
-
+                if(isNaN(parseInt(num.innerText))){
+                    this.operateTbaleD.num = 0;
+                }else {
+                    this.operateTbaleD.num = parseInt(num.innerText);
+                }
                 // Modal.alert(G.Shell.inventory.dealbarcode)
 
             }
@@ -617,15 +664,24 @@ export class RfidBarCode extends Component {
                 this.domHash['inventory'].innerHTML = pageName.subTitle;
                 this.domHash['title'].innerText = pageName.title;
                 this.domHash['barcodeTitl'].innerHTML = pageName.keyField;
-                this.DataclassInfo = pageName.classInfo;
-                if( pageName.classInfo[0]){
-                    this.domHash['category1'].innerHTML =  pageName.classInfoObj[pageName.classInfo[0]];
+                //有可能没有分类  有可能有分类
+                // if(pageName.classInfo){
+                //     this.DataclassInfo = pageName.classInfo;
+                //     this.dataWhere = pageName.classInfoObj;
+                // }
+                if(pageName.classInfo){
+                    alert('bbbbbbbb')
+                    if( pageName.classInfo[0]){
+                        this.DataclassInfo = pageName.classInfo;
+                        this.dataWhere = pageName.classInfoObj;
+                        this.domHash['category1'].innerHTML =  pageName.classInfoObj[pageName.classInfo[0]];
+                    }
+                    if ( pageName.classInfo[1]){
+                        this.domHash['category2'].innerHTML = pageName.classInfoObj[pageName.classInfo[1]];
+                    }
                 }
-                if ( pageName.classInfo[1]){
-                    this.domHash['category2'].innerHTML = pageName.classInfoObj[pageName.classInfo[1]];
-                }
+
                 alert('sssss')
-                this.dataWhere = pageName.classInfoObj;
                //只需要注册一个监听事件
                 this.rigisterRifd();
                 //判断状态
@@ -633,7 +689,12 @@ export class RfidBarCode extends Component {
                 this.operateTbaleD.value = '';
                 this.operateTbaleD.uniqueFlag = para.uniqueFlag;
                 this.operateTbaleD.num = 0;
-                this.operateTbaleD.where = this.dataWhere;
+                if(pageName.classInfo){
+                    this.operateTbaleD.where = this.dataWhere;
+                }else {
+                    this.operateTbaleD.where = '';
+                }
+
                 this.operateTbaleD.option = 0;
                 alert('kvvvvvk')
                 alert(JSON.stringify(this.operateTbaleD) + 's')
@@ -653,17 +714,27 @@ export class RfidBarCode extends Component {
             if(res.success){
                 for(let i = 0; i< data.length; i++){
                     alert(data[i][this.DataclassInfo[0]])
-                    this.domHash['categoryVal1'].innerHTML = data[i][this.DataclassInfo[0]];
-                    this.dataWhere[this.DataclassInfo[0]] = data[i][this.DataclassInfo[0]];
+                    if(tools.isNotEmpty(this.DataclassInfo[0])){
+                        this.domHash['categoryVal1'].innerHTML = data[i][this.DataclassInfo[0]];
+                        this.dataWhere[this.DataclassInfo[0]] = data[i][this.DataclassInfo[0]];
+                    }
                     //更新数据条件e
                     if(data.length == 1){
-                        this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
-                        this.dataWhere[this.DataclassInfo[1]] = data[i][this.DataclassInfo[1]];
+                        if(this.DataclassInfo[1]){
+                            this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
+                            this.dataWhere[this.DataclassInfo[1]] = data[i][this.DataclassInfo[1]];
+                        }
                         if(data[i]['BARCODE']){
                             this.domHash['barcode'].innerText = data[i]['BARCODE'];
                             this.domHash['Commodity'].innerHTML = data[i]['CAPTION'];
-                            this.operateTbaleD.num = parseInt(data[i]['AMOUNT']);
-                            this.domHash['count'].innerHTML = data[i]['AMOUNT'];
+                            if(data[i]['AMOUNT'] ){
+                                this.operateTbaleD.num = parseInt(data[i]['AMOUNT']);
+                                this.domHash['count'].innerHTML = data[i]['AMOUNT'];
+                            }else if(data[i]['SCANNUM']){
+                                this.operateTbaleD.num = parseInt(data[i]['SCANNUM']);
+                                this.domHash['count'].innerHTML = data[i]['SCANNUM'];
+                            }
+
                         }
                     }
                 }

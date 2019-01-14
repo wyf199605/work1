@@ -288,8 +288,8 @@ export class DrawPoint extends Component {
                         _this.g.transition()
                                .duration(150)
                                .ease('in')
-                              // .attr("transform", "translate(" + slate + ")"  + "scale(" + scale + ")" );
-                               .attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
+                               .attr("transform",   "translate(" + [-280 + pyx,0 + pyy] + ")"   + "scale(" + scale + ")" );
+                               //.attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
                                //.attr("transform",    "translate(" + [touchCenter['x'] - 65,touchCenter['y']] + ") " + "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
 
 
