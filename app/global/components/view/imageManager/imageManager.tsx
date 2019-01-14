@@ -120,6 +120,7 @@ export class ImageManager extends Component{
                 title: '图片预览',
                 rightPanel: tools.isPc ? null : delEl
             },
+            zIndex:1026,
             container: document.body,
             isShow: false,
             className: tools.isPc ? 'full-screen-fixed img-manager-show-modal' : 'img-manager-show-modal',
