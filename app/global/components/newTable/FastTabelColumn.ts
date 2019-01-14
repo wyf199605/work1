@@ -139,15 +139,8 @@ export class FastTableColumn extends TableColumn {
                 let arr = [this.name, this.sortState] as [string, SortType];
                 if(ctrl){
                     if(Array.isArray(ftableData.sortState)){
-                        let isExist = false;
-                        ftableData.sortState.forEach(obj => {
-                            if(obj[0] === this.name){
-                                isExist = true;
-                            }
-                        });
-                        if(!isExist){
-                            ftableData.sortState.push(arr);
-                        }
+                        ftableData.sortState = ftableData.sortState.filter( obj => obj[0] !== this.name) as [[string, SortType]];
+                        ftableData.sortState.push(arr);
                     }else {
                         ftableData.sortState = [arr];
                     }
