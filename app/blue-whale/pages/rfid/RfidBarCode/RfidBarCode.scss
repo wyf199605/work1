@@ -30,6 +30,8 @@
       font-size: 14px;
     }
     .rfid-barCode-content {
+      display: -webkit-box;
+      display: -webkit-flex;
       display: flex;
       flex-wrap: nowrap;
       .rfid-barCode-right {
@@ -77,6 +79,8 @@
         }
       }
       .rfid-barCode-set {
+        display: -webkit-box;
+        display: -webkit-flex;
         display: flex;
         .set-row{
           width: 50%;
@@ -90,6 +94,8 @@
       padding: 3px;
     }
     .total-rfid{
+      display: -webkit-box;
+      display: -webkit-flex;
       display: flex;
       justify-content: space-around;
     }
