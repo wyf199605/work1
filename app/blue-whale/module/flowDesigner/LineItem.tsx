@@ -48,7 +48,7 @@ export class LineItem extends Component {
                 height = Number(heightStr.slice(0, heightStr.length - 2));
             this.wrapper.style.left = x1 + (x2 - x1) / 2 - width / 2 + 'px';
             this.wrapper.style.top = y1 + (y2 - y1) / 2 - height / 2 + 'px';
-        }catch (e) {
+        } catch (e) {
 
         }
     }
@@ -77,12 +77,12 @@ export class LineItem extends Component {
         });
 
         para.fields && para.fields.name && para.fields.name.indexOf('path') > -1 &&
-                (LineItem.counter = parseInt(para.fields.name.slice(4)));
+        (LineItem.counter = parseInt(para.fields.name.slice(4)));
         this.flowEditor = new FlowEditor({
             type: 'transition',
             container: d.query('#design-canvas'),
             owner: this,
-            fields: Object.assign({name: `path${++ LineItem.counter}`}, para.fields),
+            fields: Object.assign({name: `path${++LineItem.counter}`}, para.fields),
         });
         this.initEvents.on();
     }
@@ -97,16 +97,25 @@ export class LineItem extends Component {
     }
 
     // 是否完成
-    private _isComplete: boolean;
-    get isComplete(){
+    private _isComplete: number;
+    get isComplete() {
         return this._isComplete;
     }
-    set isComplete(isComplete: boolean){
-        if(isComplete){
-            this.wrapper.classList.add('complete');
-            this.line.attr({
-                stroke: '#31ccff'
-            });
+
+    set isComplete(isComplete: number) {
+        switch (isComplete) {
+            case 1:
+                // this.wrapper.classList.add('complete-1');
+                this.line.attr({
+                    stroke: '#31ccff'
+                });
+                break;
+            case 2:
+                // this.wrapper.classList.add('complete');
+                this.line.attr({
+                    stroke: '#31ccff'
+                });
+                break;
         }
         this._isComplete = isComplete;
     }
@@ -126,6 +135,7 @@ export class LineItem extends Component {
     set from(from: FlowItem) {
         this._from = from;
     }
+
     get from() {
         return this._from;
     }
@@ -135,6 +145,7 @@ export class LineItem extends Component {
     set to(to: FlowItem) {
         this._to = to;
     }
+
     get to() {
         return this._to;
     }
