@@ -13,6 +13,7 @@ export interface IActionSheetButton extends IButton {
 
 interface IActionSheet {
     buttons: IActionSheetButton[]; // 按钮数组
+    zIndex: number
 }
 
 export class ActionSheet extends Modal {
@@ -24,7 +25,8 @@ export class ActionSheet extends Modal {
             width: '100%',
             position: 'down',
             isBackground: true,
-            isShow: false
+            isShow: false,
+            zIndex: para.zIndex
         });
         // 要给Modal.wrapper的的top属性设置important才能从下方弹出
         this.buttons = para.buttons;

@@ -101,32 +101,36 @@ export class FastTableColumn extends TableColumn {
         }
     }
 
-    sort(order: SortType, ctrl? : boolean) {
+    sort(order: SortType, ctrl: boolean = false, isStyle = true) {
+        if(!this.isCanSort){
+            Modal.toast('该列无排序功能');
+            return null;
+        }
+
+        this.ftable.columns.forEach((col) => {
+            if(!ctrl || col === this){
+                col._sortState = col === this ? order : 'NO'
+            }
+            let sortCol = col.cells[0][0],
+                wrapper = sortCol && sortCol.wrapper;
+
+            if(isStyle && wrapper){
+                if (col._sortState === 'NO') {
+                    !ctrl && d.classRemove(wrapper, 'sort-desc sort-asc');
+                } else {
+                    let isDesc = col._sortState === 'DESC';
+                    d.classToggle(wrapper, 'sort-desc', isDesc);
+                    d.classToggle(wrapper, 'sort-asc', !isDesc);
+                }
+            }
+
+        });
+
         // 清除其他列的状态 并设置本列状态
         if(this.sortName){
             let column = this.ftable.columnGet(this.sortName);
-            return column ? column.sort(order) : null;
+            return column ? column.sort(order, ctrl, false) : null;
         }else{
-            if(!this.isCanSort){
-                Modal.toast('该列无排序功能');
-                return null;
-            }
-            this.ftable.columns.forEach((col) => {
-                col._sortState = col === this ? order : 'NO';
-                let sortCol = col.cells[0][0],
-                    wrapper = sortCol && sortCol.wrapper;
-
-                if(wrapper){
-                    if (col._sortState === 'NO') {
-                        !ctrl && d.classRemove(wrapper, 'sort-desc sort-asc');
-                    } else {
-                        let isDesc = col._sortState === 'DESC';
-                        d.classToggle(wrapper, 'sort-desc', isDesc);
-                        d.classToggle(wrapper, 'sort-asc', !isDesc);
-                    }
-                }
-
-            });
             let indexes = null,
                 ftableData = this.ftable.tableData;
             // debugger;
@@ -135,7 +139,15 @@ export class FastTableColumn extends TableColumn {
                 let arr = [this.name, this.sortState] as [string, SortType];
                 if(ctrl){
                     if(Array.isArray(ftableData.sortState)){
-                        ftableData.sortState.push(arr);
+                        let isExist = false;
+                        ftableData.sortState.forEach(obj => {
+                            if(obj[0] === this.name){
+                                isExist = true;
+                            }
+                        });
+                        if(!isExist){
+                            ftableData.sortState.push(arr);
+                        }
                     }else {
                         ftableData.sortState = [arr];
                     }

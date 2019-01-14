@@ -93,7 +93,7 @@ export class Validate {
         for (let name in this.name2Rules) {
             let rules = this.name2Rules[name];
             for (let r of rules) {
-                if (data[name] !== undefined || r.rule === 'requieredFlag') {
+                if (name in data && (data[name] !== undefined || r.rule === 'requieredFlag')) {
                     if (!strategies[r.rule](data[name], r.value)) {
                         let err = r.errMsg ? r.errMsg : errMsgs[r.rule];
 
