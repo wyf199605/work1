@@ -13,7 +13,7 @@ export interface IActionSheetButton extends IButton {
 
 interface IActionSheet {
     buttons: IActionSheetButton[]; // 按钮数组
-    zIndex: number
+    zIndex?: number
 }
 
 export class ActionSheet extends Modal {
