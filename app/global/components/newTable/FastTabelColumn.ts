@@ -101,14 +101,14 @@ export class FastTableColumn extends TableColumn {
         }
     }
 
-    sort(order: SortType, ctrl? : boolean, isStyle = true) {
+    sort(order: SortType, ctrl: boolean = false, isStyle = true) {
         if(!this.isCanSort){
             Modal.toast('该列无排序功能');
             return null;
         }
 
         this.ftable.columns.forEach((col) => {
-            if(col === this  || !ctrl){
+            if(!ctrl || col === this){
                 col._sortState = col === this ? order : 'NO'
             }
             let sortCol = col.cells[0][0],
