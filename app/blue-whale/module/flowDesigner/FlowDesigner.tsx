@@ -146,7 +146,9 @@ export const Method = {
         });
         return {width, height};
     },
-
+    isComplete(complete:number){
+        return complete === 1 || complete === 2;
+    }
 };
 
 export class FlowDesigner {
@@ -270,17 +272,24 @@ export class FlowDesigner {
                 body.style.height = `${PcFullHeight}px`;
                 body.style.width = `${PcFullWidth}px`;
             }
-
             // 绘制xml中的所有节点
             rootElement.childNodes.forEach((child) => {
                 if (child.nodeType === 1) {
                     let layout = child.attributes.layout && child.attributes.layout.value.split(',')
                             .map(item => parseInt(item)),
-                        isComplete: boolean = false,
+                        isComplete:number = 0,
+                        auditTime:string = '',
+                        auditUser:string = '',
                         fields = Method.getFields(child);
                     // 存在xml中没有isComplete属性情况
                     'isComplete' in child.attributes && (
-                        isComplete = child.attributes.isComplete.value === 'true'
+                        isComplete = tools.isNotEmpty(child.attributes.isComplete.value) ? child.attributes.isComplete.value : 0
+                    );
+                    'auditTime' in child.attributes && (
+                        auditTime = tools.isNotEmpty(child.attributes.auditTime.value) ? child.attributes.auditTime.value : ''
+                    );
+                    'auditUser' in child.attributes && (
+                        auditUser = tools.isNotEmpty(child.attributes.auditUser.value) ? child.attributes.auditUser.value : ''
                     );
                     let shape: FlowItem = null;
                     layout && (shape = new FlowItem({
@@ -293,7 +302,9 @@ export class FlowDesigner {
                         container: d.query('#design-canvas'),
                         fields: fields,
                         minTop: minTop,
-                        minLeft: minLeft
+                        minLeft: minLeft,
+                        auditTime:auditTime,
+                        auditUser:auditUser
                     }));
 
                     if (tools.isNotEmpty(shape)) {
@@ -355,9 +366,13 @@ export class FlowDesigner {
             });
 
             // 如果节点已经完成，则对应的连接线的颜色也要改变
-            FlowDesigner.ALLITEMS.filter(item => item && item.isComplete).forEach((item, index, arr) => {
+            FlowDesigner.ALLITEMS.filter(item => item && (item.isComplete === 1 || item.isComplete === 2)).forEach((item, index, arr) => {
                 tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
-                    arr[index + 1] && arr[index + 1].isComplete && (lineItem.isComplete = true);
+                    let nextItem = arr[index +1];
+                    if (tools.isNotEmpty(nextItem)){
+                        let isComplete =  Method.isComplete(nextItem.isComplete);
+                        isComplete && (lineItem.isComplete = item.isComplete);
+                    }
                 });
             });
 

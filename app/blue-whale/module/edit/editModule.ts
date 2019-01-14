@@ -236,8 +236,13 @@ export class EditModule {
                     //fileId 值加入额外数据中
                     let upperKeyData = {};
                     for (let field in data) {
-                        let {key, value} = data[field];
-                        upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
+                        if(field === 'unique'){
+                            data[p.field.name] = data[field];
+                            upperKeyData[p.field.name] = tools.str.toEmpty(data[field]);
+                        }else{
+                            let {key, value} = data[field];
+                            upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
+                        }
                     }
                     p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
 

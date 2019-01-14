@@ -19,10 +19,12 @@ export interface IFlowItemPara extends IComponentPara {
     };
     width?: number;     // 宽
     height?: number;    // 高
-    isComplete?: boolean;   // 表示该节点是否已经完成
+    isComplete?: number;   // 表示该节点是否已经完成
     fields?: IFieldPara;     // 用于初始化flowEditor
     minTop?:number;
     minLeft?:number;
+    auditTime?:string; // 审批时间
+    auditUser?:string; // 审批用户
 }
 
 export class FlowItem extends Component {
@@ -33,12 +35,12 @@ export class FlowItem extends Component {
     static startCounter = 0;    // start节点的个数
     static endCounter = 0;      // end节点的个数
     static itemColor = {
-        task: '#65b3f0',
-        custom: '#71d189',
-        subprocess: '#f56767',
-        decision: '#f8b14b',
-        fork: '#db7bd8',
-        join: '#f5896c',
+        task: ['#65b3f0'],
+        custom: ['#71d189'],
+        subprocess: ['#f56767'],
+        decision: ['#f8b14b'],
+        fork: ['#db7bd8'],
+        join: ['#f5896c'],
     };
     private para: IFlowItemPara;
 
@@ -68,7 +70,6 @@ export class FlowItem extends Component {
         }
         this.para = para;
 
-        this.isComplete = para.isComplete || false;
         if (para.type === 'start') {
             // 开始节点
             this.isStart = true;
@@ -110,7 +111,7 @@ export class FlowItem extends Component {
                                 .attr(this.getDefaultAttr(para.position.x, para.position.y));
             }
         }
-        this.wrapper.style.backgroundColor = FlowItem.itemColor[para.type];
+        this.isComplete = tools.isNotEmpty(para.isComplete) ? para.isComplete : 0;
         this.initEvents.on();
 
         let fields: IFieldPara = {};
@@ -196,18 +197,20 @@ export class FlowItem extends Component {
     }
 
     // 该节点是否已完成
-    private _isComplete: boolean;
+    private _isComplete: number;
     get isComplete() {
         return this._isComplete;
     }
 
-    set isComplete(isComplete) {
-        if (isComplete) {
-            this.wrapper.classList.add('complete');
-        } else {
-            this.wrapper.style.borderColor = FlowItem.itemColor[this.para.type];
-        }
+    set isComplete(isComplete:number) {
         this._isComplete = isComplete;
+        let type = this.para.type;
+        if (['start','end'].indexOf(type) >= 0){
+            this.wrapper.classList.add('complete')
+        }else{
+            this.wrapper.style.borderColor = FlowItem.itemColor[this.para.type][isComplete];
+            this.wrapper.style.backgroundColor = FlowItem.itemColor[this.para.type][isComplete];
+        }
     }
 
     // 文本内容
@@ -445,7 +448,7 @@ export class FlowItem extends Component {
     }
 
     public reDraw(){
-        if (this.para.type === 'rect'){
+        if (this.para.type === 'task'){
             let areaObj = this.calcWidthAndHeight();
             this.rectNode.attr.width = areaObj.width;
             this.rectNode.attr.height = areaObj.height;

@@ -154,7 +154,7 @@ export class BwUploader extends FormCom {
                     }
                 }
             ].concat(buttons),
-            zIndex: 2000,
+            zIndex: 1001,
         })
     }
 
@@ -258,7 +258,8 @@ export class BwUploader extends FormCom {
                     file
                 });
                 this.value = file.name;
-            }).catch(() => {
+            }).catch((e) => {
+                console.log(e);
                 this.wrapper && this.wrapper.classList.add('error');
                 this.setInputValue('上传失败');
                 this.trigger(BwUploader.EVT_UPLOAD_ERROR, file);

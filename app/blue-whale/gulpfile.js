@@ -159,7 +159,8 @@ gulp.task('js', function () {
         'flowDesigner/Tips',
         'flowDesigner/FlowEngine',
         'flowDesigner/FlowListPC',
-        'flowDesigner/ContactsModule'
+        'flowDesigner/ContactsModule',
+        'flowDesigner/FlowInfo',
     ], 'flowEngine.js');
 
     gulpTsModule([
