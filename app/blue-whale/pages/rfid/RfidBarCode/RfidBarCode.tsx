@@ -70,7 +70,7 @@ export class RfidBarCode extends Component {
         let body = <div></div>;
         let barcode = new Modal({
             className: 'rfid-bar-code',
-            zIndex: 1020,
+            zIndex: 1000,
             body: body,
             header: "条码扫码",
             position: sys.isMb ? 'full' : '',
@@ -234,7 +234,7 @@ export class RfidBarCode extends Component {
                         let mode = new Modal({
                             isMb: false,
                             position: "center",
-                            zIndex:1022,
+                            zIndex:1001,
                             header: '请输入条码',
                             isOnceDestroy: true,
                             isBackground: true,
@@ -329,7 +329,7 @@ export class RfidBarCode extends Component {
                                 isMb: false,
                                 position: "center",
                                 header: '上传数据 ',
-                                zIndex:1022,
+                                zIndex:1001,
                                 isOnceDestroy: true,
                                 isBackground: true,
                                 body: <div data-code="updataModal">
@@ -419,7 +419,7 @@ export class RfidBarCode extends Component {
                         let deModel = new Modal({
                             isMb: false,
                             position: "center",
-                            zIndex:1022,
+                            zIndex:1001,
                             header: '请选择删除数据范围 ',
                             isOnceDestroy: true,
                             isBackground: true,
