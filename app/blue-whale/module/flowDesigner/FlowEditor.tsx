@@ -11,6 +11,7 @@ import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 import {BwRule} from "../../common/rule/BwRule";
 import CONF = BW.CONF;
 import {ContactsModule} from "./ContactsModule";
+import {FlowItem} from "./FlowItem";
 
 export interface IFieldPara {
     name?: string;  // 名称
@@ -351,7 +352,11 @@ export class FlowEditor extends FormCom {
                 this.owner.setTextWrapperPosition();
             } else {
                 // 是矩形就在wrapper上更新
-                this.owner['wrapper'].textContent = limitDisplayName || this.type;
+                let textContent = this.owner['wrapper'].textContent;
+                if (textContent !== limitDisplayName){
+                    this.owner['wrapper'].textContent = limitDisplayName || this.type;
+                    (this.owner as FlowItem).reDraw();
+                }
             }
         } else if (this.owner instanceof FlowDesigner) {
             fields.name && (d.query('#design-canvas').dataset.name = fields.name);

@@ -86,30 +86,32 @@ export const ImgModal = (() => {
                 }
 
                 Promise.all(pros).then(items => {
-                    gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
-                        // history & focus options are disabled on CodePen
-                        history: false
-                        , focus: false
-                        , page: false
-                        , pinchToClose: false
-                        , closeOnScroll: false
-                        , closeOnVerticalDrag: false
-                        , mouseUsed: false
-                        , escKey: true
-                        , arrowKeys: true
-                        , modal: false
-                        , clickToCloseNonZoomable: false
-                        , closeElClasses: []
-                        // , fullscreenEl: false
-                        , shareEl: false
-                        , showAnimationDuration: 0
-                        , hideAnimationDuration: 0
-                        , index: index
-                    });
-                    gallery.init();
-                    gallery.listen('close', function () {
-                        destroy();
-                    })
+                    if (tools.isNotEmpty(pros)){
+                        gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                            // history & focus options are disabled on CodePen
+                            history: false
+                            , focus: false
+                            , page: false
+                            , pinchToClose: false
+                            , closeOnScroll: false
+                            , closeOnVerticalDrag: false
+                            , mouseUsed: false
+                            , escKey: true
+                            , arrowKeys: true
+                            , modal: false
+                            , clickToCloseNonZoomable: false
+                            , closeElClasses: []
+                            // , fullscreenEl: false
+                            , shareEl: false
+                            , showAnimationDuration: 0
+                            , hideAnimationDuration: 0
+                            , index: index
+                        });
+                        gallery.init();
+                        gallery.listen('close', function () {
+                            destroy();
+                        })
+                    }
                 }).finally(() => {
                     loading && loading.hide();
                     loading = null;

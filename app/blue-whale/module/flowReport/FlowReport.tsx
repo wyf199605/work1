@@ -8,6 +8,8 @@ import tools = G.tools;
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import sys = BW.sys;
 import {TextInput} from "../../../global/components/form/text/text";
+import {ContactsModule} from "../flowDesigner/ContactsModule";
+import {FlowEditor} from "../flowDesigner/FlowEditor";
 
 export class FlowReport extends BasicPage {
     private editModule: EditModule;
@@ -266,7 +268,8 @@ export class FlowReport extends BasicPage {
     private initEvent() {
         let self = this,
             para = this.para,
-            saveBtn = null;
+            saveBtn = null,
+            isShowContacts = false;
         for (let btn of para.fm.subButtons) {
             switch (btn.subType) {
                 case 'save':
@@ -385,6 +388,32 @@ export class FlowReport extends BasicPage {
                             }
                         }
                     });
+                }
+                    break;
+                case 'flow-addSign': {
+                    if (isShowContacts === false){
+                        isShowContacts = true;
+                        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.useAddressList_user).then(({response}) => {
+                            let field = response.body.elements[0].cols[0];
+                            new ContactsModule({
+                                field: field,
+                                onGetData: (datas) => {
+                                    let userId = [];
+                                    datas.forEach(data => {
+                                        data['USERID'] && userId.push(data['USERID'].toLowerCase());
+                                    });
+                                    ButtonAction.get().clickHandle(btn, {userid:userId}, () => {
+                                        isShowContacts = false;
+                                    }, self.url);
+                                },
+                                onDestroy: () => {
+                                    isShowContacts = false;
+                                }
+                            });
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }
                 }
                     break;
             }
