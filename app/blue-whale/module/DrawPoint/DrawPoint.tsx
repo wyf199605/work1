@@ -256,18 +256,18 @@ export class DrawPoint extends Component {
                 console.log(obj2.length)
                 if (obj2.length > 1 && (_this.touchTime % 2 !== 0) && _this.touchstart) {
                     _this.distance['stop'] = _this.getDistance({
-                        x: obj2[0].pageX,
-                        y: obj2[0].pageY
+                        x: obj2[0].screenX,
+                        y: obj2[0].screenY
                     }, {
-                        x: obj2[1].pageX,
-                        y: obj2[1].pageY
+                        x: obj2[1].screenX,
+                        y: obj2[1].screenY
                     })
                     touchCenter = _this.getOrigin({
-                        x: obj2[0].pageX,
-                        y: obj2[0].pageY
+                        x: obj2[0].screenX,
+                        y: obj2[0].screenY
                     }, {
-                        x: obj2[1].pageX,
-                        y: obj2[1].pageY
+                        x: obj2[1].screenX,
+                        y: obj2[1].screenY
                     })
 
 
@@ -285,13 +285,13 @@ export class DrawPoint extends Component {
                         //获取中心点  得到缩放比例 然后再把原来的中心点减去 比例后的中心点 就是偏移量
                         let pyx = center[0] - center[0] * scale,
                             pyy = center[1] - center[1] * scale;
-                        _this.g.transition()
+                     _this.g.transition()
                                .duration(150)
                                .ease('in')
-                               .attr("transform",   "translate(" + [-280 + pyx,0 + pyy] + ")"   + "scale(" + scale + ")" );
+                               .attr("transform", "translate("+[ -center[0] * (scale - 1) - 280, -center[1] * (scale - 1)]+")"  + "scale(" + scale + ") " );
+                               //.attr("transform",   "translate(" + [-280 + slate[0] + pyx,0 + pyy + slate[1]] + ")"   + "scale(" + scale + ")" );
                                //.attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
                                //.attr("transform",    "translate(" + [touchCenter['x'] - 65,touchCenter['y']] + ") " + "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
-
 
                     }else {
                         _this.g.transition()

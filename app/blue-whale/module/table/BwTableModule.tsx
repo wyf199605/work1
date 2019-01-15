@@ -690,7 +690,6 @@ export class BwTableModule extends Component {
             if(self.ftable.editing){
                 self.imgManager.open(cell);
             }else{
-                console.log(self.imgManager.getImg(cell));
                 self.imgManager.showImg(cell);
             }
 
@@ -776,38 +775,43 @@ export class BwTableModule extends Component {
                     return;
                 }
 
-                let imgData: ImgModalPara = {
-                    img: getImg(cell)
-                };
-                let index = cell.row.index,
-                    field = cell.column.content as R_Field,
-                    name = field.name,
-                    len = cell.ftable.data.length;
+                let urls = getImg(cell);
+                if(tools.isNotEmpty(urls)){
+                    let imgData: ImgModalPara = {
+                        img: urls
+                    };
+                    let index = cell.row.index,
+                        field = cell.column.content as R_Field,
+                        name = field.name,
+                        len = cell.ftable.data.length;
 
-                if(len > 1){
-                    imgData.turnPage = (next) => {
-                        let getCell = (i) => {
-                            let rows = cell.ftable.rows,
-                                row = rows[i + 1];
-                            if(!next){
-                                row = rows[i - 1];
-                            }
-                            let curCell = row && row.cellGet(name);
-                            if(curCell){
-                                if(!getImg(curCell)[0]) {
-                                    getCell(next ? index ++ : index --);
-                                }else {
-                                    ImgModal.destroy();
-                                    this.showImg(curCell);
-                                    cell.selected = false;
-                                    curCell.selected = true;
+                    if(len > 1){
+                        imgData.turnPage = (next) => {
+                            let getCell = (i) => {
+                                let rows = cell.ftable.rows,
+                                    row = rows[i + 1];
+                                if(!next){
+                                    row = rows[i - 1];
                                 }
-                            }
-                        };
-                        getCell(index);
+                                let curCell = row && row.cellGet(name);
+                                if(curCell){
+                                    if(!getImg(curCell)[0]) {
+                                        getCell(next ? index ++ : index --);
+                                    }else {
+                                        ImgModal.destroy();
+                                        this.showImg(curCell);
+                                        cell.selected = false;
+                                        curCell.selected = true;
+                                    }
+                                }
+                            };
+                            getCell(index);
+                        }
                     }
+                    ImgModal.show(imgData);
+                }else{
+                    Modal.toast('无图片')
                 }
-                ImgModal.show(imgData);
             },
             open: (cell: FastTableCell) => {
                 layoutImg && layoutImg.destroy();
@@ -846,6 +850,7 @@ export class BwTableModule extends Component {
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
                                 BwRule.isNewImg(dataType) && (cell.data = images.join(','));
+                                console.log(cell.data);
                                 resolve();
                             });
                         }
@@ -1554,7 +1559,7 @@ export class BwTableModule extends Component {
                 text = <img src={url}/>;
                 classes.push('cell-img');
 
-            } else if (dataType === BwRule.DT_SIGN) {
+            } else if (BwRule.isNewImg(dataType)) {
                 if (cellData) {
                     let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                         "md5_field": field.name,
