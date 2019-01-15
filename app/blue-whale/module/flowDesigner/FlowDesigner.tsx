@@ -146,11 +146,11 @@ export const Method = {
         });
         return {width, height};
     },
-    isComplete(complete:number){
-        return complete === 1 || complete === 2;
+    isComplete(complete: number) {
+        return complete == 1 || complete == 2;
     },
-    isShowAuditUser(type:string){
-        return ['start','end','decision'].indexOf(type) === -1;
+    isShowAuditUser(type: string) {
+        return ['start', 'end', 'decision'].indexOf(type) === -1;
     }
 };
 
@@ -262,13 +262,13 @@ export class FlowDesigner {
                 FlowDesigner.PAPER.setSize(MbFullWidth, MbFullHeight);
                 body.style.height = `${MbFullHeight}px`;
                 body.style.width = `${MbFullWidth}px`;
-            }else{
+            } else {
                 let PcFullHeight = FlowDesigner.PAPER.height,
                     PcFullWidth = FlowDesigner.PAPER.width;
                 if (maxWidth > PcFullWidth) {
                     PcFullWidth = maxWidth + 20;
                 }
-                if (maxHeight > PcFullHeight){
+                if (maxHeight > PcFullHeight) {
                     PcFullHeight = maxHeight;
                 }
                 FlowDesigner.PAPER.setSize(PcFullWidth, PcFullHeight);
@@ -280,9 +280,9 @@ export class FlowDesigner {
                 if (child.nodeType === 1) {
                     let layout = child.attributes.layout && child.attributes.layout.value.split(',')
                             .map(item => parseInt(item)),
-                        isComplete:number = 0,
-                        auditTime:string = '',
-                        auditUser:string = '',
+                        isComplete: number = 0,
+                        auditTime: string = '',
+                        auditUser: string = '',
                         fields = Method.getFields(child);
                     // 存在xml中没有isComplete属性情况
                     'isComplete' in child.attributes && (
@@ -306,8 +306,8 @@ export class FlowDesigner {
                         fields: fields,
                         minTop: minTop,
                         minLeft: minLeft,
-                        auditTime:auditTime,
-                        auditUser:auditUser
+                        auditTime: auditTime,
+                        auditUser: auditUser
                     }));
 
                     if (tools.isNotEmpty(shape)) {
@@ -362,18 +362,17 @@ export class FlowDesigner {
                 }
             });
 
-            // 如果节点已经完成，则对应的连接线的颜色也要改变
-            FlowDesigner.ALLITEMS.filter(item => item && (item.isComplete === 1 || item.isComplete === 2)).forEach((item, index, arr) => {
-                tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
-                    let nextItem = arr[index +1];
-                    if (tools.isNotEmpty(nextItem)){
-                        let isComplete =  Method.isComplete(nextItem.isComplete);
-                        isComplete && (lineItem.isComplete = item.isComplete);
-                    }
-                });
-            });
-
             if (FlowDesigner.FlowType === 'look') {
+                // 对应的连接线的颜色改变
+                FlowDesigner.ALLITEMS.filter(item => item && (item.isComplete == 1 || item.isComplete == 2)).forEach((item, index, arr) => {
+                    tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
+                        let nextItem = arr[index + 1];
+                        if (tools.isNotEmpty(nextItem)) {
+                            let isComplete = Method.isComplete(nextItem.isComplete);
+                            isComplete && (lineItem.isComplete = item.isComplete);
+                        }
+                    });
+                });
                 // 所有input、下拉列表设为只读
                 d.queryAll('input').forEach(input => {
                     (input as HTMLInputElement).readOnly = true;
@@ -419,21 +418,16 @@ export class FlowDesigner {
             d.query('.icon-fullscreen').classList.toggle('icon-chuangkouhua');
             FlowEditor.refreshAllPosition();
         };
-        let mouseWheelHandler = () => {
-
-        };
 
         return {
             on: () => {
                 d.on(d.query('#design-canvas'), 'click', 'svg', clickSVG);
                 d.on(window, 'resize', resizeHandler);
-                d.on(d.query('#design-canvas'), 'mousewheel', mouseWheelHandler);
                 d.on(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
             },
             off: () => {
                 d.off(d.query('#design-canvas'), 'click', 'svg', clickSVG);
                 d.off(window, 'resize', resizeHandler);
-                d.off(d.query('#design-canvas'), 'mousewheel', mouseWheelHandler);
                 d.off(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
             },
         }

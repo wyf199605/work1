@@ -567,7 +567,7 @@ export class FlowReport extends BasicPage {
                         }
                     }
                 });
-                //    初始数据获取，不包含收件人id
+                //  初始数据获取
                 if (form.updatefileData) {
                     BwRule.Ajax.fetch(BwRule.reqAddr(form.updatefileData, data), {
                         silent: true

@@ -123,7 +123,7 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
     position: absolute;
     top: 60px;
     left: 20px;
-    z-index: 1001;
+    z-index: 1003;
 
     .tip-items {
       padding: 0 10px;
@@ -177,6 +177,8 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
     line-height: 20px;
     font-size: 13px;
   }
+  $flow_items_normal_border_color:(start:#b6d1e0,  end:#b6d1e0,  task:#b6d1e0,  decision:#7dd7d2);
+  $flow_items_active_border_color:(start:#005bac,  end:#005bac,  task:#005bac,  decision:#00bfb8);
   .flow-item {
     position: absolute;
     padding: 10px;
@@ -211,20 +213,9 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
     }
 
     &.start-circle.complete, .end-circle.complete {
-      border-color: #31ccff !important;
+      border-color: #ff7928 !important;
     }
 
-    &.active {
-      border-color: #005bac !important;
-
-      &.diamond {
-        border-color: #005bac;
-      }
-
-      .inner-circle {
-        background-color: #005bac;
-      }
-    }
 
     &.diamond {
       min-width: 50px;
@@ -232,14 +223,25 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
       max-width: 50px;
       width: 50px;
       height: 50px;
-      border: none;
       transform: rotate(45deg);
-      border: solid 1px #b6d1e0;
       background-color: #ffffff;
       border-radius: 0;
 
       .diamond-text {
         transform: rotate(-45deg);
+      }
+    }
+  }
+  @each $flow_item_type, $flow_item_color in $flow_items_normal_border_color {
+    .flow-item[data-type=#{$flow_item_type}]{
+      border-color: $flow_item_color;
+    }
+  }
+  @each $flow_item_type, $flow_item_color in $flow_items_active_border_color {
+    .flow-item[data-type=#{$flow_item_type}].active{
+      border-color: $flow_item_color;
+      .inner-circle {
+        background-color: #005bac;
       }
     }
   }
@@ -259,7 +261,7 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
     background-color: #ffffff;
     border-radius: 5px;
     border: solid 1px #b6d1e0;
-    z-index: 1001; // 需要设置，否则无法获取焦点
+    z-index: 1003; // 需要设置，否则无法获取焦点
     .tip-body {
       min-height: 36px;
 
