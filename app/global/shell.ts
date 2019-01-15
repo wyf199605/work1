@@ -48,7 +48,10 @@ namespace G{
                 }, back, info)
             },
             getEditImg( type : number, image: string, back : IShellEventHandler){
-                return ShellBase.handler( 'getSignImg', {type, image}, back);
+                return ShellBase.handler('getSignImg', {type, image}, back);
+            },
+            wxShare(data : string){
+                return ShellBase.handler('wxShare', {data});
             }
         };
 
@@ -402,7 +405,7 @@ namespace G{
             uploadcodedata(nameId:string,uploadUrl:string,images:any,typeName:string,typeValue:string, back:IShellEventHandler){
                 return ShellBase.handler('uploadcodedata',{nameId:nameId,uploadUrl:uploadUrl,images:images,typeName:typeName,typeValue:typeValue},back,null,false);
             },
-               //移动端打开摄像头扫码
+            //移动端打开摄像头扫码
             openScanCode(type:number,back:IShellEventHandler){
                 return ShellBase.handler('scanCode',{type:type},back)
             },
@@ -413,6 +416,9 @@ namespace G{
             //输入条码扫码查询
             inputcodedata(optionStype:number,uniqueFlag:string,value:string,category:string[],back:IShellEventHandler){
                 return ShellBase.handler('inputcodedata',{uniqueFlag:uniqueFlag,value:value,category:category,optionStype:optionStype},back)
+            },
+            codedataOperate(value:string,uniqueFlag:string, where:any,option:number,num:number,back:IShellEventHandler){
+                return ShellBase.handler('operateTable',{value:value,uniqueFlag:uniqueFlag,where:where,option:option,num:num},back)
             },
             scan2dOn(back: IShellEventHandler) {
                 return ShellBase.handler('startScan2DResult', '', back, null, false);
@@ -493,6 +499,7 @@ namespace G{
     declare const AppShell: {
         syncFunction(name: string, data: string): string;
         asyncFunction(name: string, data: string, back: string, infor?:string): boolean;
+        postMessage(name: string, data: string, back: string, infor?:string): boolean;
     };
     enum ShellTypes {
         IOS,
@@ -586,7 +593,7 @@ namespace G{
 
                     // 过程通知
                     if(!flag) {
-                       // alert('Shell失败');
+                        // alert('Shell失败');
                         d.off(window, eventInfor);
                         d.off(window, eventBack);
                     }
