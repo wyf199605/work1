@@ -15,9 +15,8 @@ interface IPopBtnBoxPara extends IComponentPara {
 }
 
 export class PopBtnBox extends Component {
-    private guid = tools.getGuid('pop-box');
     protected wrapperInit(para: IPopBtnBoxPara): HTMLElement {
-        return <div className="pop-btn-box" data-guid={this.guid}>
+        return <div className="pop-btn-box" data-guid={tools.getGuid('pop-box')}>
             <div className="pop-more-btn"><i className="appcommon app-gengduo"/>更多</div>
         </div>;
     }
@@ -72,19 +71,23 @@ export class PopBtnBox extends Component {
             tools.isFunction(fun) && fun();
             this.show = false;
         };
-        let hideClick = ()=>{
-            this.show = false;
+        let hideClick = (e)=>{
+            let guid = this.wrapper.dataset.guid;
+            let el = d.closest(e.target,`.pop-btn-box[data-guid="${guid}"]`);
+            if (tools.isEmpty(el)){
+                this.show = false;
+            }
         };
         return {
             on: () => {
                 d.on(this.wrapper, 'click', '.pop-more-btn', clickMore);
                 d.on(this.wrapper, 'click', '.pop-btn-item', clickBtn);
-                d.on(document.body,'click',`.pop-btn-box[data-guid="${this.guid}"]`,hideClick);
+                d.on(document.body,'click',hideClick);
             },
             off: () => {
                 d.off(this.wrapper, 'click', '.pop-more-btn', clickMore);
                 d.off(this.wrapper, 'click', '.pop-btn-item', clickBtn);
-                d.off(document.body,'click',`.pop-btn-box[data-guid="${this.guid}"]`,hideClick);
+                d.off(document.body,'click',hideClick);
             }
         }
     })();
