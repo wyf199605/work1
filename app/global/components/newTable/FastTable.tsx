@@ -1393,7 +1393,7 @@ export class FastTable extends Component {
         this.selectedRows.forEach((row) => {
             row.selected = false;
         });
-        this.pseudoTable && this.pseudoTable.clearPresentSelected();
+        // this.pseudoTable && this.pseudoTable.clearPresentSelected();
         this._drawSelectedCells();
     }
 

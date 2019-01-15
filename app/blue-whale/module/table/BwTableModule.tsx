@@ -894,7 +894,9 @@ export class BwTableModule extends Component {
         } else {
             return this.ftable.tableData.refresh(data).then(() => {
                 this.aggregate.get(data);
-                this.ftable.clearSelectedRows();
+                setTimeout(() => {
+                    this.ftable && this.ftable.clearSelectedRows();
+                }, 400)
             });
         }
 
