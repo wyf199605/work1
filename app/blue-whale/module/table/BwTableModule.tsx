@@ -628,9 +628,20 @@ export class BwTableModule extends Component {
         if (!field) {
             return;
         }
-        let link = field.link;
+        let link = field.link,
+            dataType = field.dataType || (field.atrrs && field.atrrs.dataType);
 
         if (tools.isEmpty(rowData[field.name])) {
+            return;
+        }
+
+        if(BwRule.isNewFile(dataType)){
+            let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                "md5_field": field.name,
+                [field.name]: rowData[field.name],
+                down: 'allow'
+            });
+            sys.window.download(url);
             return;
         }
 
@@ -1596,9 +1607,18 @@ export class BwTableModule extends Component {
 
                 } else if(BwRule.isNewFile(dataType)){
                     classes.push('cell-link');
+                    color = 'blue';
                     if(cellData){
-                        BwRule.getFileInfo(field.name, cellData).then((e) => {
-                            console.log(e);
+                        BwRule.getFileInfo(field.name, cellData).then(({response}) => {
+                            console.log(response);
+                            response = JSON.parse(response);
+                            if(response && response.dataArr && response.dataArr[0]){
+                                let data = response.dataArr[0],
+                                    filename = data.filename;
+                                text = filename;
+                            }
+                            resolve({text, classes, bgColor, color, data});
+                        }).catch(() => {
                             resolve({text, classes, bgColor, color, data});
                         });
                         return ;

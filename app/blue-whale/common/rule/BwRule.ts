@@ -542,9 +542,9 @@ export class BwRule extends Rule {
     }
 
     static getFileInfo(name: string, data: string){
-        return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.fileInfo, {
-            "file_name": name,
-            "file_id": data
+        return G.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.fileInfo, {
+            "field_name": name,
+            [name.toLowerCase()]: data
         }))
     }
 
