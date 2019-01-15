@@ -93,6 +93,13 @@ export class BwRule extends Rule {
         ].some((type) => dataType === type);
     }
 
+    static isNewFile(dataType: string): boolean {
+        return [
+            BwRule.DT_UNI_FILE,
+            BwRule.DT_UNI_MUL_FILE
+        ].some((type) => dataType === type);
+    }
+
     static Ajax = class extends Ajax {
 
         fetch(url: string, setting: IRAjaxSetting = {}) {
@@ -532,6 +539,13 @@ export class BwRule extends Rule {
         } else {
             typeof confirm === 'function' && confirm();
         }
+    }
+
+    static getFileInfo(name: string, data: string){
+        return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.fileInfo, {
+            "file_name": name,
+            "file_id": data
+        }))
     }
 
     static getLookUpOpts(field: R_Field, data?: obj): Promise<ListItem[]> {
