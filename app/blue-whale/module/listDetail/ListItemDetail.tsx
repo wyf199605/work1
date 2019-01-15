@@ -161,12 +161,12 @@ export class ListItemDetail {
                         resolve(data);
                     } else {
                         Modal.alert('暂无数据!');
-                        resolve(BwRule.getDefaultByFields(fields));
+                        resolve({});
                     }
                 });
             } else {
                 Modal.alert('无数据地址!');
-                resolve(BwRule.getDefaultByFields(fields));
+                resolve({});
             }
         })
     }

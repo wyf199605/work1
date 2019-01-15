@@ -66,36 +66,38 @@ export const ImgModal = (() => {
                 }
 
                 Promise.all(pros).then(items => {
-                    gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
-                        // history & focus options are disabled on CodePen
-                        history: false
-                        , focus: false
-                        , page: false
-                        , pinchToClose: false
-                        , closeOnScroll: false
-                        , closeOnVerticalDrag: false
-                        , mouseUsed: false
-                        , escKey: true
-                        , arrowKeys: true
-                        , modal: false
-                        , clickToCloseNonZoomable: false
-                        , closeElClasses: []
-                        // , fullscreenEl: false
-                        , shareEl: false
-                        , showAnimationDuration: 0
-                        , hideAnimationDuration: 0
-                        , index: index
-                    });
-                    gallery.init();
-                    gallery.listen('close', function () {
-                        gallery && gallery.close();
-                        gallery = null;
-                        d.remove(d.query('.pswp'));
-                        wrapper = null;
-                        if (tools.isMb) {
-                            document.body.style.overflow = '';
-                        }
-                    })
+                    if (tools.isNotEmpty(items)){
+                        gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                            // history & focus options are disabled on CodePen
+                            history: false
+                            , focus: false
+                            , page: false
+                            , pinchToClose: false
+                            , closeOnScroll: false
+                            , closeOnVerticalDrag: false
+                            , mouseUsed: false
+                            , escKey: true
+                            , arrowKeys: true
+                            , modal: false
+                            , clickToCloseNonZoomable: false
+                            , closeElClasses: []
+                            // , fullscreenEl: false
+                            , shareEl: false
+                            , showAnimationDuration: 0
+                            , hideAnimationDuration: 0
+                            , index: index
+                        });
+                        gallery.init();
+                        gallery.listen('close', function () {
+                            gallery && gallery.close();
+                            gallery = null;
+                            d.remove(d.query('.pswp'));
+                            wrapper = null;
+                            if (tools.isMb) {
+                                document.body.style.overflow = '';
+                            }
+                        })
+                    }
                 })
             });
         }
