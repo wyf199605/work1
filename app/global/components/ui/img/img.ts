@@ -86,7 +86,7 @@ export const ImgModal = (() => {
                 }
 
                 Promise.all(pros).then(items => {
-                    if (tools.isNotEmpty(pros)){
+                    if (tools.isNotEmpty(items)){
                         gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
                             // history & focus options are disabled on CodePen
                             history: false
@@ -112,9 +112,6 @@ export const ImgModal = (() => {
                             destroy();
                         })
                     }
-                }).finally(() => {
-                    loading && loading.hide();
-                    loading = null;
                 })
             });
         }

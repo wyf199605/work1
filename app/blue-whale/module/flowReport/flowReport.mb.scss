@@ -242,9 +242,10 @@ body.fl-mobile {
       align-items: center;
       justify-content: center;
       border-top: 1px solid #e2e2e2;
-
+      flex: 1 1 auto;
+      //padding-right: 16px;
       .sub-btn-item {
-        width: $sub-btn-item-width;
+        width: 120px;
         height: $sub-btn-item-height;
         text-align: center;
         border-radius: 5px;

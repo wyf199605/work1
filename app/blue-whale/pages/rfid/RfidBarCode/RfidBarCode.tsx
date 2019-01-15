@@ -611,6 +611,8 @@ export class RfidBarCode extends Component {
     private stepArry = [];
     private dataWhere = {};
     private DataclassInfo = [];
+    private DataclassInfoCp = [];
+    private DataCI = [];
 
     private downData(para) {
         // let loading = new Loading({
@@ -639,15 +641,21 @@ export class RfidBarCode extends Component {
                 //     this.DataclassInfo = pageName.classInfo;
                 //     this.dataWhere = pageName.classInfoObj;
                 // }
-                if(pageName.classInfo){
-                    alert('bbbbbbbb')
-                    if( pageName.classInfo[0]){
+                if(tools.isNotEmpty(pageName.classInfo)){
                         this.DataclassInfo = pageName.classInfo;
-                        this.dataWhere = pageName.classInfoObj;
-                        this.domHash['category1'].innerHTML =  pageName.classInfoObj[pageName.classInfo[0]];
-                    }
+                        this.DataclassInfoCp = pageName.classInfoObj;
+                        for(let i = 0;i< pageName.classInfoObj.length;i++){
+                            let obj = pageName.classInfoObj;
+                            for(let s in obj[i]){
+                                this.dataWhere[s] = obj[i][s];
+                            }
+                        }
+                        alert(JSON.stringify(this.dataWhere) + 'cccccc')
+
+                        this.domHash['category1'].innerHTML =  pageName.classInfoObj[0][pageName.classInfo[0]];
+
                     if ( pageName.classInfo[1]){
-                        this.domHash['category2'].innerHTML = pageName.classInfoObj[pageName.classInfo[1]];
+                        this.domHash['category2'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[1]];
                     }
                 }
                 if(pageName.amount == 'SCANNUM'){
@@ -664,6 +672,7 @@ export class RfidBarCode extends Component {
                 this.operateTbaleD.uniqueFlag = para.uniqueFlag;
                 this.operateTbaleD.num = 0;
                 if(pageName.classInfo){
+                    //还原键值对得形式
                     this.operateTbaleD.where = this.dataWhere;
                 }else {
                     this.operateTbaleD.where = '';
@@ -689,7 +698,7 @@ export class RfidBarCode extends Component {
                 for(let i = 0; i< data.length; i++){
                     alert(data[i][this.DataclassInfo[0]])
                     //stepArry 添加数组项
-                    if(this.stepArry.indexOf(data[i]['BARCODE'] == -1)){
+                    if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE'] == -1)){
                         this.stepArry.push(data[i]['BARCODE'])
                     }
                     if(tools.isNotEmpty(this.DataclassInfo[0])){
@@ -701,6 +710,29 @@ export class RfidBarCode extends Component {
                         if(this.DataclassInfo[1]){
                             this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
                             this.dataWhere[this.DataclassInfo[1]] = data[i][this.DataclassInfo[1]];
+                        }
+                        alert(JSON.stringify(this.DataclassInfoCp[0]) + 'uuuu')
+                        for(let val in this.DataclassInfoCp[0]) {
+
+                            alert(JSON.stringify(data[i]))
+                            let str = '';
+                            for(let obj in data[i]){
+                                alert(obj + 'ppp');
+                                if (obj == val) {
+                                    str += data[i][val];
+                                    alert(data[i][val] + 'oo')
+                                }
+                            }
+                            this.domHash['categoryVal1'].innerHTML = str;
+                        }
+                        for(let val in  this.DataclassInfoCp[1]){
+                            let str = '';
+                          for(let obj in data[i]){
+                              if(obj == val){
+                                  str+=data[i][val];
+                              }
+                          }
+                          this.domHash['categoryVal2'].innerHTML = str;
                         }
                         if(data[i]['BARCODE']){
                             this.domHash['barcode'].innerText = data[i]['BARCODE'];

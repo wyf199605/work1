@@ -147,7 +147,7 @@ export class DetailModal {
         });
         if (para.isAdd) {
             if (tools.isNotEmpty(para.fm.defDataAddrList)) {
-                Promise.all([BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])),this.lookup]).then(([{response}]) => {
+                Promise.all([BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(para.fm.defDataAddrList[0])), this.lookup]).then(([{response}]) => {
                     // 字段默认值
                     this.editModule.set(BwRule.getDefaultByFields(this.para.fm.fields));
                     // 新增时的默认值
@@ -161,16 +161,13 @@ export class DetailModal {
                     fields.forEach((field) => {
                         if (field.elementType === 'lookup') {
                             let lCom = this.editModule.getDom(field.name);
-                            if (field.elementType === 'lookup') {
-                                let lCom = this.editModule.getDom(field.name);
-                                if (!res[field.lookUpKeyField]) {
-                                    lCom.set('');
-                                } else {
-                                    let options = this.lookUpData[field.name] || [];
-                                    for (let opt of options) {
-                                        if (opt.value == res[field.lookUpKeyField]) {
-                                            lCom.set(opt.value);
-                                        }
+                            if (!res[field.lookUpKeyField]) {
+                                lCom.set('');
+                            } else {
+                                let options = this.lookUpData[field.name] || [];
+                                for (let opt of options) {
+                                    if (opt.value == res[field.lookUpKeyField]) {
+                                        lCom.set(opt.value);
                                     }
                                 }
                             }
@@ -287,11 +284,11 @@ export class DetailModal {
         }
     }
 
-    private setLookUp(data:obj){
-        if (tools.isEmpty(data)){
+    private setLookUp(data: obj) {
+        if (tools.isEmpty(data)) {
             return;
         }
-        this.lookup.then(()=>{
+        this.lookup.then(() => {
             this.para.fm.fields.forEach((field) => {
                 if (field.elementType === 'lookup') {
                     let lCom = this.editModule.getDom(field.name);
@@ -413,9 +410,9 @@ export class DetailModal {
         return type;
     }
 
-    static removeEmptyContent(data:obj){
-        for (let key in data){
-            if(tools.isEmpty(data[key])){
+    static removeEmptyContent(data: obj) {
+        for (let key in data) {
+            if (tools.isEmpty(data[key])) {
                 delete data[key];
             }
         }

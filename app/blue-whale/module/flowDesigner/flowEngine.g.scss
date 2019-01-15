@@ -172,6 +172,10 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
   }
   .flow-info {
     position: absolute;
+    text-align: center;
+    height: 20px;
+    line-height: 20px;
+    font-size: 13px;
   }
   .flow-item {
     position: absolute;

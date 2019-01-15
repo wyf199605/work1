@@ -252,6 +252,7 @@
           padding-right: 16px;
           &.textarea {
             height: 80px;
+            width: 100%;
             .textarea-input {
               width: calc(100% - 170px);
               height: 100%;
@@ -574,6 +575,20 @@
           padding: 0;
           &[data-type="virtual"] {
             display: none;
+          }
+          &.textarea {
+            height: 80px;
+            width: 100%;
+            .textarea-input {
+              width: calc(100% - 170px);
+              height: 100%;
+              resize: none;
+              outline: none;
+              border: none;
+              padding: 6px 7px;
+              background-color: #FFFFFF;
+              font-size: 14px;
+            }
           }
           & > .text-input {
             height: 100%;

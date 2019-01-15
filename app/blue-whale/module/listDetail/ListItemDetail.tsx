@@ -1,7 +1,5 @@
 /// <amd-module name="ListItemDetail"/>
-/// <amd-dependency path="hammer" name="Hammer"/>
 
-declare const Hammer;
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 import {BwRule} from "../../common/rule/BwRule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
@@ -33,23 +31,6 @@ export class ListItemDetail {
         this.initDetailData().then(data => {
             this.render(data);
             this.initDetailButtons();
-            // if (para.uiType === 'detail' && tools.isMb){
-            //     let hammertime = new Hammer(para.dom);
-            //     hammertime.on('swipeleft', function() {
-            //         // 下一页
-            //         if (self.currentPage !== self.totalNumber) {
-            //             let current = self.currentPage + 1;
-            //             self.changePage(current);
-            //         }
-            //     });
-            //     hammertime.on('swiperight', function() {
-            //         // 上一页
-            //         if (self.currentPage !== 1) {
-            //             let current = self.currentPage - 1;
-            //             self.changePage(current);
-            //         }
-            //     });
-            // }
         });
     }
 
@@ -165,7 +146,7 @@ export class ListItemDetail {
                 });
             } else {
                 Modal.alert('无数据地址!');
-                resolve(BwRule.getDefaultByFields(fields));
+                resolve({});
             }
         })
     }
@@ -184,6 +165,7 @@ export class ListItemDetail {
     }
 
     private handleLookUpData(res) {
+        let showData = Object.assign({},res);
         this.para.fm.fields.forEach((field) => {
             if (field.elementType === 'lookup') {
                 if (tools.isNotEmpty(res[field.lookUpKeyField])) {
@@ -191,13 +173,14 @@ export class ListItemDetail {
                     for (let opt of options) {
                         if (opt.value == res[field.lookUpKeyField]) {
                             res[field.name] = opt.value;
+                            showData[field.name] = tools.isNotEmpty(opt.text) ? opt.text : opt.value;
                         }
                     }
                 }
             }
         });
         this.defaultData = res;
-        return this.handleRes(res);
+        return this.handleRes(showData);
     }
 
     private _lookUpData: objOf<ListItem[]> = {};
@@ -367,6 +350,12 @@ export class ListItemDetail {
                 } else {
                     this.wrapper.style.paddingBottom = '0px';
                 }
+            } else {
+                let btnWrapper = <div className="list-item-detail-buttons"/>;
+                d.before(d.query('.list-detail-cells-wrapper', this.wrapper), btnWrapper);
+                let pageBtnWrapper = <div className="page-buttons"/>;
+                btnWrapper.appendChild(pageBtnWrapper);
+                this.createPageButton(pageBtnWrapper);
             }
         }
 
