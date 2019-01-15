@@ -663,7 +663,6 @@ export class RfidBarCode extends Component {
                 }
 
 
-                alert('sssss')
                 //只需要注册一个监听事件
                 this.rigisterRifd();
                 //判断状态
@@ -696,28 +695,28 @@ export class RfidBarCode extends Component {
             alert(JSON.stringify(data))
             if(res.success){
                 for(let i = 0; i< data.length; i++){
-                    alert(data[i][this.DataclassInfo[0]])
                     //stepArry 添加数组项
-                    if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE'] == -1)){
+                    if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE']) == -1){
+                        alert('2222')
                         this.stepArry.push(data[i]['BARCODE'])
+                        alert('33333')
                     }
                     if(tools.isNotEmpty(this.DataclassInfo[0])){
+                        alert('44444')
                         //this.domHash['categoryVal1'].innerHTML = data[i][this.DataclassInfo[0]];
                         this.dataWhere[this.DataclassInfo[0]] = data[i][this.DataclassInfo[0]];
+                        alert('55555')
                     }
                     //更新数据条件e
-                    if(data.length == 1){
+                    if(i == 0){
+                        alert(JSON.stringify(this.DataclassInfoCp) + 'OUI ')
                         if(this.DataclassInfo[1]){
                             //this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
                             this.dataWhere[this.DataclassInfo[1]] = data[i][this.DataclassInfo[1]];
                         }
-                        alert(JSON.stringify(this.DataclassInfoCp[0]) + 'uuuu')
-
                         if(!data[i]['BARCODE']){
+                            let str = '';
                             for(let val in this.DataclassInfoCp[0]) {
-
-                                alert(JSON.stringify(data[i]))
-                                let str = '';
                                 for(let obj in data[i]){
                                     alert(obj + 'ppp');
                                     if (obj == val) {
@@ -725,18 +724,17 @@ export class RfidBarCode extends Component {
                                         alert(data[i][val] + 'oo')
                                     }
                                 }
-                                alert(str+'第一')
+                                alert(str + '字符串')
                                 this.domHash['categoryVal1'].innerHTML = str;
                             }
+                            let strs = '';
                             for(let val in  this.DataclassInfoCp[1]){
-                                let str = '';
                                 for(let obj in data[i]){
                                     if(obj == val){
-                                        str+=data[i][val];
+                                        strs += data[i][val];
                                     }
                                 }
-                                alert(str+'第二')
-                                this.domHash['categoryVal2'].innerHTML = str;
+                                this.domHash['categoryVal2'].innerHTML = strs;
                             }
                         }
 
