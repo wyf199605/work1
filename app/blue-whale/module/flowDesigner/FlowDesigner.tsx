@@ -148,6 +148,9 @@ export const Method = {
     },
     isComplete(complete:number){
         return complete === 1 || complete === 2;
+    },
+    isShowAuditUser(type:string){
+        return ['start','end','decision'].indexOf(type) === -1;
     }
 };
 

@@ -9,6 +9,7 @@ import {FlowDesigner, Method} from "./FlowDesigner";
 import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {Tips} from "./Tips";
 import {LineItem} from "./LineItem";
+import {FlowInfo} from "./FlowInfo";
 
 export interface IFlowItemPara extends IComponentPara {
     type?: string;      // 节点的类型
@@ -21,10 +22,10 @@ export interface IFlowItemPara extends IComponentPara {
     height?: number;    // 高
     isComplete?: number;   // 表示该节点是否已经完成
     fields?: IFieldPara;     // 用于初始化flowEditor
-    minTop?:number;
-    minLeft?:number;
-    auditTime?:string; // 审批时间
-    auditUser?:string; // 审批用户
+    minTop?: number;
+    minLeft?: number;
+    auditTime?: string; // 审批时间
+    auditUser?: string; // 审批用户
 }
 
 export class FlowItem extends Component {
@@ -45,10 +46,10 @@ export class FlowItem extends Component {
     private para: IFlowItemPara;
 
     // 工具集里的start和end节点是否可用
-    static toggleDisabledStartAndEnd(){
+    static toggleDisabledStartAndEnd() {
         let start = d.query('.tip-item-inner[data-name=start]'),
             end = d.query('.tip-item-inner[data-name=end]');
-        if(!(start || end)){
+        if (!(start || end)) {
             return;
         }
         FlowItem.startCounter >= 1 ? start.style.pointerEvents = 'none' : start.style.pointerEvents = 'auto';
@@ -59,12 +60,12 @@ export class FlowItem extends Component {
 
     constructor(para: IFlowItemPara) {
         super(para);
-        if(tools.isMb){
+        if (tools.isMb) {
             para.position.x = para.position.x - (tools.isNotEmpty(para.minLeft) ? para.minLeft : 170);
             para.position.y = para.position.y - (tools.isNotEmpty(para.minTop) ? para.minTop : 0);
             this.x = para.position.x;
             this.y = para.position.y;
-        }else {
+        } else {
             this.x = para.position.x;
             this.y = para.position.y;
         }
@@ -101,22 +102,24 @@ export class FlowItem extends Component {
                 this.wrapper.classList.add('diamond');
                 this.wrapper.appendChild(<div className="diamond-text">{para.text || para.type}</div>);
                 this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, this.width, this.height)
-                                .attr(this.getDefaultAttr(para.position.x, para.position.y)).transform('r45');
+                    .attr(this.getDefaultAttr(para.position.x, para.position.y)).transform('r45');
             } else {
                 this.width = para.width || 100;
                 this.height = para.height || 50;
                 this.text = para.text || para.type;
                 let areaObj = this.calcWidthAndHeight();
+                this.width = areaObj.width;
+                this.height = areaObj.height;
                 this.rectNode = FlowDesigner.PAPER.rect(para.position.x, para.position.y, para.width || areaObj.width, para.height || areaObj.height, 5)
-                                .attr(this.getDefaultAttr(para.position.x, para.position.y));
+                    .attr(this.getDefaultAttr(para.position.x, para.position.y));
             }
         }
         this.isComplete = tools.isNotEmpty(para.isComplete) ? para.isComplete : 0;
         this.initEvents.on();
 
         let fields: IFieldPara = {};
-        this.isStart && FlowItem.startCounter ++;
-        this.isEnd && FlowItem.endCounter ++;
+        this.isStart && FlowItem.startCounter++;
+        this.isEnd && FlowItem.endCounter++;
         (this.isStart || this.isEnd) && FlowItem.toggleDisabledStartAndEnd();
         this.flowEditor = new FlowEditor({
             type: para.type,
@@ -124,6 +127,41 @@ export class FlowItem extends Component {
             owner: this,
             fields: para.fields || fields,
         });
+        let arr = [];
+        if (tools.isNotEmpty(para.auditUser) && Method.isShowAuditUser(this.para.type)) {
+            arr.push(new FlowInfo({
+                text: para.auditUser,
+                position: {
+                    x: this.x,
+                    y: this.y - 20
+                },
+                width: this.width,
+                isTop: true,
+                container:d.query('#design-canvas')
+            }))
+        }
+        if (tools.isNotEmpty(para.auditTime)  && Method.isShowAuditUser(this.para.type)) {
+            arr.push(new FlowInfo({
+                text: para.auditTime,
+                position: {
+                    x: this.x,
+                    y: this.y + this.height
+                },
+                width: this.width,
+                isTop: false,
+                container:d.query('#design-canvas')
+            }))
+        }
+        this.infoItems = arr;
+    }
+
+    private _infoItems: FlowInfo[];
+    set infoItems(infoItems: FlowInfo[]) {
+        this._infoItems = infoItems;
+    }
+
+    get infoItems() {
+        return this._infoItems;
     }
 
     // 当前绘制出的 raphael 节点
@@ -202,12 +240,12 @@ export class FlowItem extends Component {
         return this._isComplete;
     }
 
-    set isComplete(isComplete:number) {
+    set isComplete(isComplete: number) {
         this._isComplete = isComplete;
         let type = this.para.type;
-        if (['start','end'].indexOf(type) >= 0){
+        if (['start', 'end'].indexOf(type) >= 0) {
             this.wrapper.classList.add('complete')
-        }else{
+        } else {
             this.wrapper.style.borderColor = FlowItem.itemColor[this.para.type][isComplete];
             this.wrapper.style.backgroundColor = FlowItem.itemColor[this.para.type][isComplete];
         }
@@ -239,7 +277,7 @@ export class FlowItem extends Component {
         }
     })();
 
-    private clickHandler(): () => void{
+    private clickHandler(): () => void {
         let self = this;
 
         return function () {
@@ -252,15 +290,15 @@ export class FlowItem extends Component {
                 let transitionFlag = null;
                 if (self === Tips.TransitionItems[0]) {
                     // Modal.toast('不能连接自己！');
-                }else if(Tips.TransitionItems[0] && self.flowEditor.get().name &&
-                            self.flowEditor.get().name === Tips.TransitionItems[0].flowEditor.get().name){
+                } else if (Tips.TransitionItems[0] && self.flowEditor.get().name &&
+                    self.flowEditor.get().name === Tips.TransitionItems[0].flowEditor.get().name) {
                     // Modal.toast('名称相同，无法连接！');
-                }else if(Tips.TransitionItems[0] && FlowDesigner.AllLineItems.filter(line =>
+                } else if (Tips.TransitionItems[0] && FlowDesigner.AllLineItems.filter(line =>
                         (line.from === Tips.TransitionItems[0].rectNode && line.to === self.rectNode && (transitionFlag = 'repeat')) ||
-                        (line.from === self.rectNode && line.to === Tips.TransitionItems[0].rectNode && (transitionFlag = 'reverse')))[0]){
+                        (line.from === self.rectNode && line.to === Tips.TransitionItems[0].rectNode && (transitionFlag = 'reverse')))[0]) {
                     // transitionFlag === 'repeat' && Modal.toast('不能重复连线！');
                     // transitionFlag === 'reverse' && Modal.toast('不能反向连线！');
-                }else {
+                } else {
                     Tips.TransitionItems = arr.concat([self]);
                 }
 
@@ -325,9 +363,25 @@ export class FlowItem extends Component {
             _this.x = this.ox + dx;
             _this.y = this.oy + dy;
 
-            // 移动flow-item
+            // 重绘连线
             FlowDesigner.AllLineItems && FlowDesigner.AllLineItems.forEach(line => line.setTextWrapperPosition());
             FlowDesigner.connections && FlowDesigner.connections.forEach(connection => FlowDesigner.PAPER.connection(connection));
+
+            // 移动info 这里不需要移动，只有查看时才有审批人等，查看时节点不能拖动
+            // let infoItems = _this.infoItems || [];
+            // if (tools.isNotEmpty(infoItems)) {
+            //     infoItems.forEach(item => {
+            //         let y = _this.y - 20;
+            //         if (!item.isTop) {
+            //             y = y + _this.height + 20;
+            //         }
+            //         item.setPosition({
+            //             x: _this.x,
+            //             y: y,
+            //             width: _this.width
+            //         })
+            //     })
+            // }
         };
     }
 
@@ -390,7 +444,7 @@ export class FlowItem extends Component {
         arr.forEach(item => {
             item && (
                 item._active = false,
-                item.flowEditor.show = false
+                    item.flowEditor.show = false
             )
         })
     }
@@ -447,8 +501,8 @@ export class FlowItem extends Component {
         return this._flowEditor;
     }
 
-    public reDraw(){
-        if (this.para.type === 'task'){
+    public reDraw() {
+        if (this.para.type === 'task') {
             let areaObj = this.calcWidthAndHeight();
             this.rectNode.attr.width = areaObj.width;
             this.rectNode.attr.height = areaObj.height;
@@ -459,8 +513,10 @@ export class FlowItem extends Component {
     }
 
     destroy() {
-        this.isStart && FlowItem.startCounter --;
-        this.isEnd && FlowItem.endCounter --;
+        this.infoItems = null;
+        this.lineItems = null;
+        this.isStart && FlowItem.startCounter--;
+        this.isEnd && FlowItem.endCounter--;
         FlowItem.toggleDisabledStartAndEnd();
         this.rectNode.remove();
         FlowDesigner.ALLITEMS.forEach((item, index, arr) => item === this && arr.splice(index, 1));

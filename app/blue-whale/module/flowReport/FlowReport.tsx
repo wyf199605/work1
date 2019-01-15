@@ -10,6 +10,11 @@ import sys = BW.sys;
 import {TextInput} from "../../../global/components/form/text/text";
 import {ContactsModule} from "../flowDesigner/ContactsModule";
 import {FlowEditor} from "../flowDesigner/FlowEditor";
+import {ButtonBox} from "../../../global/components/mbList/ButtonBox";
+import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {Button} from "../../../global/components/general/button/Button";
+import {PopBtnBox} from "../../../global/components/ui/actionSheet/popBtnBox";
+import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 
 export class FlowReport extends BasicPage {
     private editModule: EditModule;
@@ -291,10 +296,37 @@ export class FlowReport extends BasicPage {
                 muiContent.style.paddingBottom = '70px';
                 target = <div className="sub-btns"/>;
                 muiContent.appendChild(target);
-                para.fm.subButtons.map((item, index) => {
-                    let btnWrapper: HTMLElement = <div className="sub-btn-item" data-index={index}>{item.caption}</div>;
-                    target.appendChild(btnWrapper);
-                });
+                let buttons = para.fm.subButtons || [];
+                if (buttons.length <= 2) {
+                    buttons.map((item, index) => {
+                        let btnWrapper: HTMLElement = <div className="sub-btn-item" data-index={index}
+                                                           data-type={item.subType}>{item.caption}</div>;
+                        target.appendChild(btnWrapper);
+                    });
+                } else {
+                    let showButtons = buttons.slice(0, 2),
+                        hideButtons = buttons.slice(2);
+                    if (tools.isNotEmpty(hideButtons)) {
+                        let boxButtons = [];
+                        hideButtons.forEach((btn, index) => {
+                            boxButtons.push({
+                                content: btn.caption,
+                                onClick: () => {
+                                    subBtnEvent(index + 2);
+                                }
+                            })
+                        });
+                        new PopBtnBox({
+                            container: target,
+                            buttons: boxButtons
+                        });
+                    }
+                    showButtons.map((item, index) => {
+                        let btnWrapper: HTMLElement = <div className="sub-btn-item" data-index={index}
+                                                           data-type={item.subType}>{item.caption}</div>;
+                        target.appendChild(btnWrapper);
+                    });
+                }
             }
             d.on(target, 'click', '.sub-btn-item', function (e: Event) {
                 e.stopPropagation();
@@ -390,10 +422,15 @@ export class FlowReport extends BasicPage {
                     });
                 }
                     break;
-                case 'flow-addSign': {
-                    if (isShowContacts === false){
+                case 'add_sign': {
+                    if (isShowContacts === false) {
                         isShowContacts = true;
-                        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.useAddressList_user).then(({response}) => {
+                        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.useAddressList_user,{
+                            loading:{
+                                msg:'加载中...',
+                                disableEl:document.body
+                            }
+                        }).then(({response}) => {
                             let field = response.body.elements[0].cols[0];
                             new ContactsModule({
                                 field: field,
@@ -402,7 +439,7 @@ export class FlowReport extends BasicPage {
                                     datas.forEach(data => {
                                         data['USERID'] && userId.push(data['USERID'].toLowerCase());
                                     });
-                                    ButtonAction.get().clickHandle(btn, {userid:userId}, () => {
+                                    ButtonAction.get().clickHandle(btn, {USERID: userId}, () => {
                                         isShowContacts = false;
                                     }, self.url);
                                 },
@@ -416,6 +453,20 @@ export class FlowReport extends BasicPage {
                     }
                 }
                     break;
+                case 'check': {
+                    let dataAddr = BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr,pageData);
+                    BwRule.Ajax.fetch(dataAddr).then(({response}) => {
+                        new FlowDesigner(response, 'look');
+                    }).catch(err => {
+                        console.log(err);
+                    });
+                }
+                    break;
+                default: {
+                    ButtonAction.get().clickHandle(btn, pageData, () => {
+                    }, self.url);
+                }
+                    break
             }
         }
     };

@@ -9,7 +9,8 @@ interface FlowInfoPara extends IComponentPara {
         x: number;
         y: number;
     };
-    width: number
+    width: number,
+    isTop:boolean;
 }
 
 export class FlowInfo extends Component {
@@ -20,11 +21,20 @@ export class FlowInfo extends Component {
     constructor(para: FlowInfoPara) {
         super(para);
         this.wrapper.innerText = para.text || '';
+        this.isTop = para.isTop;
         this.setPosition({
             x: para.position.x,
             y: para.position.y,
             width: para.width
         });
+    }
+
+    private _isTop:boolean;
+    set isTop(isTop:boolean){
+        this._isTop = isTop;
+    }
+    get isTop(){
+        return this._isTop
     }
 
     setPosition({x, y, width}) {
