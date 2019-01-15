@@ -165,7 +165,7 @@ export class ListItemDetail {
                 });
             } else {
                 Modal.alert('无数据地址!');
-                resolve(BwRule.getDefaultByFields(fields));
+                resolve({});
             }
         })
     }
@@ -367,6 +367,12 @@ export class ListItemDetail {
                 } else {
                     this.wrapper.style.paddingBottom = '0px';
                 }
+            }else{
+                let btnWrapper = <div className="list-item-detail-buttons"/>;
+                d.before(d.query('.list-detail-cells-wrapper', this.wrapper), btnWrapper);
+                let pageBtnWrapper = <div className="page-buttons"/>;
+                btnWrapper.appendChild(pageBtnWrapper);
+                this.createPageButton(pageBtnWrapper);
             }
         }
 
