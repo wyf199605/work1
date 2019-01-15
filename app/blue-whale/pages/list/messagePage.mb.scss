@@ -5,6 +5,9 @@
   ul.mui-table-view{
     overflow: auto;
     height: calc(100vh - 43px);
+    &:after{
+      content: unset;
+    }
   }
   .mui-table-view-cell{
     padding-left: 20px;
