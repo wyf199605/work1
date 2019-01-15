@@ -35,14 +35,15 @@ export class FlowItem extends Component {
 
     static startCounter = 0;    // start节点的个数
     static endCounter = 0;      // end节点的个数
-    static itemColor = {
-        task: ['#65b3f0'],
-        custom: ['#71d189'],
-        subprocess: ['#f56767'],
-        decision: ['#f8b14b'],
-        fork: ['#db7bd8'],
-        join: ['#f5896c'],
-    };
+    // static itemColor = {
+    //     task: '#65b3f0',
+    //     custom: '#71d189',
+    //     subprocess: '#f56767',
+    //     decision: '#f8b14b',
+    //     fork: '#db7bd8',
+    //     join: '#f5896c',
+    // };
+    static lookItemColor = ['#005bac', '#12a094', '#ff7928']; // 完成未完成颜色
     private para: IFlowItemPara;
 
     // 工具集里的start和end节点是否可用
@@ -114,7 +115,9 @@ export class FlowItem extends Component {
                     .attr(this.getDefaultAttr(para.position.x, para.position.y));
             }
         }
-        this.isComplete = tools.isNotEmpty(para.isComplete) ? para.isComplete : 0;
+        if (FlowDesigner.FlowType === 'look') {
+            this.isComplete = tools.isNotEmpty(para.isComplete) ? para.isComplete : 0;
+        }
         this.initEvents.on();
 
         let fields: IFieldPara = {};
@@ -137,10 +140,10 @@ export class FlowItem extends Component {
                 },
                 width: this.width,
                 isTop: true,
-                container:d.query('#design-canvas')
+                container: d.query('#design-canvas')
             }))
         }
-        if (tools.isNotEmpty(para.auditTime)  && Method.isShowAuditUser(this.para.type)) {
+        if (tools.isNotEmpty(para.auditTime) && Method.isShowAuditUser(this.para.type)) {
             arr.push(new FlowInfo({
                 text: para.auditTime,
                 position: {
@@ -149,7 +152,7 @@ export class FlowItem extends Component {
                 },
                 width: this.width,
                 isTop: false,
-                container:d.query('#design-canvas')
+                container: d.query('#design-canvas')
             }))
         }
         this.infoItems = arr;
@@ -246,8 +249,8 @@ export class FlowItem extends Component {
         if (['start', 'end'].indexOf(type) >= 0) {
             this.wrapper.classList.add('complete')
         } else {
-            this.wrapper.style.borderColor = FlowItem.itemColor[this.para.type][isComplete];
-            this.wrapper.style.backgroundColor = FlowItem.itemColor[this.para.type][isComplete];
+            this.wrapper.style.borderColor = FlowItem.lookItemColor[isComplete];
+            this.wrapper.style.backgroundColor = FlowItem.lookItemColor[isComplete];
         }
     }
 

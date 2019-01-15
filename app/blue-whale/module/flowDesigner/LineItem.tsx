@@ -63,16 +63,14 @@ export class LineItem extends Component {
         line && (this.line = line.line);
         this.wrapper.innerText = (para.fields && para.fields.displayName) || '';
         this.setTextWrapperPosition();
-        this.isComplete && this.line.attr({stroke: '#31ccff'});
         let _this = this;
         line.line.click(function () {
-            if (_this.active === false) {
+            if (_this.active === false && FlowDesigner.FlowType !== 'look') {
                 FlowDesigner.removeAllActive();
                 _this.line.attr({
                     stroke: '#005bac'
                 });
                 _this.active = true;
-                _this.isComplete && _this.line.attr({stroke: '#31ccff'});
             }
         });
 
@@ -103,20 +101,9 @@ export class LineItem extends Component {
     }
 
     set isComplete(isComplete: number) {
-        switch (isComplete) {
-            case 1:
-                // this.wrapper.classList.add('complete-1');
-                this.line.attr({
-                    stroke: '#31ccff'
-                });
-                break;
-            case 2:
-                // this.wrapper.classList.add('complete');
-                this.line.attr({
-                    stroke: '#31ccff'
-                });
-                break;
-        }
+        this.line.attr({
+            stroke: FlowItem.lookItemColor[isComplete]
+        });
         this._isComplete = isComplete;
     }
 

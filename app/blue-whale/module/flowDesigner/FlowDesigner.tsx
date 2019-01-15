@@ -318,14 +318,8 @@ export class FlowDesigner {
                         shape.wrapper.dataset.name = child.attributes.name.value;
 
                         if (FlowDesigner.FlowType === 'look') {
-                            if (shape.isComplete) {
-                                shape.wrapper.style.color = 'white';
-                                shape.wrapper.style.backgroundColor = FlowItem.itemColor[child.tagName];
-                            }
-                            else {
-                                shape.wrapper.style.backgroundColor = '#ffffff';
-                                shape.wrapper.style.borderColor = FlowItem.itemColor[child.tagName];
-                            }
+                            shape.wrapper.style.color = 'white';
+                            shape.wrapper.style.backgroundColor = FlowItem.lookItemColor[shape.isComplete];
                             if (shape.isStart && shape.isComplete) {
                                 d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#ffffff';
                             }
