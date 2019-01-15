@@ -262,10 +262,8 @@ export class ListItemDetail {
                     // PC 按钮
                     let pcBtnWrapper = <div className="item-buttons"/>,
                         pageBtnWrapper = <div className="page-buttons"/>;
-                    if (tools.isNotEmpty(buttons)) {
-                        btnWrapper.appendChild(pcBtnWrapper);
-                        createPcButtons(buttons, pcBtnWrapper);
-                    }
+                    btnWrapper.appendChild(pcBtnWrapper);
+                    createPcButtons(buttons, pcBtnWrapper);
                     btnWrapper.appendChild(pageBtnWrapper);
                     this.createPageButton(pageBtnWrapper);
                 }
@@ -299,11 +297,9 @@ export class ListItemDetail {
                     }
                 } else {
                     // PC 按钮
-                    if (tools.isNotEmpty(buttons)) {
-                        let pcBtnWrapper = <div className="item-buttons"/>;
-                        btnWrapper.appendChild(pcBtnWrapper);
-                        createPcButtons(buttons, pcBtnWrapper);
-                    }
+                    let pcBtnWrapper = <div className="item-buttons"/>;
+                    btnWrapper.appendChild(pcBtnWrapper);
+                    createPcButtons(buttons, pcBtnWrapper);
                 }
             }
         } else {
@@ -316,6 +312,12 @@ export class ListItemDetail {
                 } else {
                     this.wrapper.style.paddingBottom = '0px';
                 }
+            }else{
+                let btnWrapper = <div className="list-item-detail-buttons"/>;
+                d.before(d.query('.list-detail-cells-wrapper', this.wrapper), btnWrapper);
+                let pageBtnWrapper = <div className="page-buttons"/>;
+                btnWrapper.appendChild(pageBtnWrapper);
+                this.createPageButton(pageBtnWrapper);
             }
         }
 
