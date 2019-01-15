@@ -1,7 +1,5 @@
 /// <amd-module name="ListItemDetail"/>
-/// <amd-dependency path="hammer" name="Hammer"/>
 
-declare const Hammer;
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 import {BwRule} from "../../common/rule/BwRule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
@@ -33,23 +31,6 @@ export class ListItemDetail {
         this.initDetailData().then(data => {
             this.render(data);
             this.initDetailButtons();
-            // if (para.uiType === 'detail' && tools.isMb){
-            //     let hammertime = new Hammer(para.dom);
-            //     hammertime.on('swipeleft', function() {
-            //         // 下一页
-            //         if (self.currentPage !== self.totalNumber) {
-            //             let current = self.currentPage + 1;
-            //             self.changePage(current);
-            //         }
-            //     });
-            //     hammertime.on('swiperight', function() {
-            //         // 上一页
-            //         if (self.currentPage !== 1) {
-            //             let current = self.currentPage - 1;
-            //             self.changePage(current);
-            //         }
-            //     });
-            // }
         });
     }
 
@@ -129,7 +110,6 @@ export class ListItemDetail {
     initDetailData(): Promise<obj> {
         let fields: R_Field[] = this.para.fm.fields;
         return new Promise<obj>((resolve) => {
-            let data: obj = {};
             if (tools.isNotEmpty(this.ajaxUrl)) {
                 let url = tools.url.addObj(this.ajaxUrl, {
                     pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
@@ -150,15 +130,15 @@ export class ListItemDetail {
                         if (this.para.uiType === 'detail') {
                             this.totalNumber = response.head.totalNum;
                         }
-                        this.defaultData = res;
-                        if (tools.isNotEmpty(res)) {
-                            let cells = this.cells;
-                            for (let key in cells) {
-                                let field = fields.filter((f) => f.name === key)[0];
-                                data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
-                            }
+                        if (tools.isNotEmpty(this.lookUpData)) {
+                            let data = this.handleLookUpData(res);
+                            resolve(data);
+                        } else {
+                            this.lookup.then(() => {
+                                let data = this.handleLookUpData(res);
+                                resolve(data);
+                            })
                         }
-                        resolve(data);
                     } else {
                         Modal.alert('暂无数据!');
                         resolve({});
@@ -170,6 +150,58 @@ export class ListItemDetail {
             }
         })
     }
+
+    private handleRes(res: obj): obj {
+        let data: obj = {},
+            fields = this.para.fm.fields;
+        if (tools.isNotEmpty(res)) {
+            let cells = this.cells;
+            for (let key in cells) {
+                let field = fields.filter((f) => f.name === key)[0];
+                data[key] = tools.isNotEmpty(res[key]) ? this.handlerValue(res[key], field) : '';
+            }
+        }
+        return data;
+    }
+
+    private handleLookUpData(res) {
+        this.para.fm.fields.forEach((field) => {
+            if (field.elementType === 'lookup') {
+                if (tools.isNotEmpty(res[field.lookUpKeyField])) {
+                    let options = this.lookUpData[field.name] || [];
+                    for (let opt of options) {
+                        if (opt.value == res[field.lookUpKeyField]) {
+                            res[field.name] = opt.value;
+                        }
+                    }
+                }
+            }
+        });
+        this.defaultData = res;
+        return this.handleRes(res);
+    }
+
+    private _lookUpData: objOf<ListItem[]> = {};
+    get lookUpData() {
+        return this._lookUpData || {};
+    }
+
+    private get lookup(): Promise<void> {
+        if (tools.isEmpty(this._lookUpData)) {
+            let allPromise = this.para.fm.fields.filter(col => col.elementType === 'lookup')
+                .map(col => BwRule.getLookUpOpts(col).then((items) => {
+                    // debugger;
+                    this._lookUpData = this._lookUpData || {};
+                    this._lookUpData[col.name] = items;
+                }));
+
+            return Promise.all(allPromise).then(() => {
+            })
+        } else {
+            return Promise.resolve();
+        }
+    }
+
 
     // 上一页下一页加载数据
     changePage(page?: number) {
@@ -262,8 +294,10 @@ export class ListItemDetail {
                     // PC 按钮
                     let pcBtnWrapper = <div className="item-buttons"/>,
                         pageBtnWrapper = <div className="page-buttons"/>;
-                    btnWrapper.appendChild(pcBtnWrapper);
-                    createPcButtons(buttons, pcBtnWrapper);
+                    if (tools.isNotEmpty(buttons)) {
+                        btnWrapper.appendChild(pcBtnWrapper);
+                        createPcButtons(buttons, pcBtnWrapper);
+                    }
                     btnWrapper.appendChild(pageBtnWrapper);
                     this.createPageButton(pageBtnWrapper);
                 }
@@ -297,9 +331,11 @@ export class ListItemDetail {
                     }
                 } else {
                     // PC 按钮
-                    let pcBtnWrapper = <div className="item-buttons"/>;
-                    btnWrapper.appendChild(pcBtnWrapper);
-                    createPcButtons(buttons, pcBtnWrapper);
+                    if (tools.isNotEmpty(buttons)) {
+                        let pcBtnWrapper = <div className="item-buttons"/>;
+                        btnWrapper.appendChild(pcBtnWrapper);
+                        createPcButtons(buttons, pcBtnWrapper);
+                    }
                 }
             }
         } else {
