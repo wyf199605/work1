@@ -683,6 +683,7 @@ export class RfidBarCode extends Component {
             }
 
         })
+        alert('下载结果' + s )
 
     }
 

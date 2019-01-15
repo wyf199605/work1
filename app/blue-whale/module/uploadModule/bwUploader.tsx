@@ -153,7 +153,8 @@ export class BwUploader extends FormCom {
                         }), BwUploader.hintMsg);
                     }
                 }
-            ].concat(buttons)
+            ].concat(buttons),
+            zIndex:1022
         })
     }
 
