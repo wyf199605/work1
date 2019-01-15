@@ -79,9 +79,9 @@ export class EditDetailModule extends Component {
                         this.defaultData = res;
                         resolve(res);
                     } else {
-                        let data = BwRule.getDefaultByFields(this.fields);
-                        this.defaultData = data;
-                        resolve(data);
+                        // let data = BwRule.getDefaultByFields(this.fields);
+                        // this.defaultData = data;
+                        resolve({});
                     }
                 });
             } else {
