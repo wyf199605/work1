@@ -165,6 +165,7 @@ export class ListItemDetail {
     }
 
     private handleLookUpData(res) {
+        let showData = Object.assign({},res);
         this.para.fm.fields.forEach((field) => {
             if (field.elementType === 'lookup') {
                 if (tools.isNotEmpty(res[field.lookUpKeyField])) {
@@ -172,13 +173,14 @@ export class ListItemDetail {
                     for (let opt of options) {
                         if (opt.value == res[field.lookUpKeyField]) {
                             res[field.name] = opt.value;
+                            showData[field.name] = tools.isNotEmpty(opt.text) ? opt.text : opt.value;
                         }
                     }
                 }
             }
         });
         this.defaultData = res;
-        return this.handleRes(res);
+        return this.handleRes(showData);
     }
 
     private _lookUpData: objOf<ListItem[]> = {};
@@ -348,7 +350,7 @@ export class ListItemDetail {
                 } else {
                     this.wrapper.style.paddingBottom = '0px';
                 }
-            }else{
+            } else {
                 let btnWrapper = <div className="list-item-detail-buttons"/>;
                 d.before(d.query('.list-detail-cells-wrapper', this.wrapper), btnWrapper);
                 let pageBtnWrapper = <div className="page-buttons"/>;
