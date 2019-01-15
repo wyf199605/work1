@@ -109,17 +109,21 @@ export const ImgModal = (() => {
                         });
                         gallery.init();
                         gallery.listen('close', function () {
-                            gallery && gallery.close();
-                            gallery = null;
-                            d.remove(d.query('.pswp'));
-                            wrapper = null;
-                            if (tools.isMb) {
-                                document.body.style.overflow = '';
-                            }
+                            destroy();
                         })
                     }
                 })
             });
+        }
+    }
+
+    function destroy() {
+        gallery && gallery.close();
+        gallery = null;
+        d.remove(d.query('.pswp'));
+        wrapper = null;
+        if (tools.isMb) {
+            document.body.style.overflow = '';
         }
     }
 
