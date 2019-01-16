@@ -364,8 +364,8 @@ export class RfidBarCode extends Component {
                             value: '所有',
                             text: "所有"
                         }, {
-                            value: this.domHash['category'].innerText + this.domHash['categoryVal'].innerText,
-                            text: this.domHash['category'].innerText + this.domHash['categoryVal'].innerText
+                            value: this.domHash['category1'].innerText + this.domHash['categoryVal1'].innerText,
+                            text: this.domHash['category1'].innerText + this.domHash['categoryVal1'].innerText
                         }, {
                             value: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText,
                             text: '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText
@@ -377,10 +377,12 @@ export class RfidBarCode extends Component {
                                 value: '条码' + this.domHash['barcode'].innerText,
                                 text: '条码' + this.domHash['barcode'].innerText
                             }]
-                        let tempCateGory = this.domHash['categoryVal'].innerText;
+                        let tempCateGory = this.domHash['categoryVal1'].innerHTML;
                         let stepStatus = this.stepStatus;
                         if (tools.isEmpty(tempCateGory)) {
                             stepStatus = true;
+                        }else {
+                            stepStatus = false;
                         }
                         let deModel = new Modal({
                             isMb: false,
@@ -412,7 +414,7 @@ export class RfidBarCode extends Component {
                                                 where[uid] = '';
                                                 where[category] = '';
                                                 break;
-                                            case this.domHash['category'].innerText + this.domHash['categoryVal'].innerText:
+                                            case this.domHash['category1'].innerText + this.domHash['categoryVal1'].innerText:
                                                 where[uid] = '';
                                                 where[category] = this.domHash['categoryVal'].innerHTML;
                                                 break;
@@ -669,6 +671,7 @@ export class RfidBarCode extends Component {
                     }
                 }
                 if(pageName.amount == 'SCANNUM'){
+                    this.stepStatus = false;
                     d.query('.rfidBarCode-page>.rfid-barCode-body>.rfid-barCode-nums').style.display = 'none';
                 }
 
