@@ -140,14 +140,12 @@ export class RangeInputItem extends FormCom {
 
     private initEvents = (() => {
         let audio = () => {
+            document.body.scrollTop = 0;
             Shell.base.speak(0, '', () => {
             });
             this.createSpeakModal(() => {
                 Shell.base.speak(1, '', (e) => {
                     this.set(e.data || '');
-                });
-            }, () => {
-                Shell.base.speak(1, '', () => {
                 });
             });
         };
