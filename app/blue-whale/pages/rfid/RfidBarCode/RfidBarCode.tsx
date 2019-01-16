@@ -110,6 +110,8 @@ export class RfidBarCode extends Component {
                         <p class="value2" style="color:rgb(0, 122, 255)"></p>
                         <span className="title3"></span>
                         <p class="value3" style="color:rgb(0, 122, 255)"></p>
+                        <span className="title4"></span>
+                        <p className="value4" style="color:rgb(0, 122, 255)"></p>
                     </div>
                     <div class="rfid-barCode-right">
                         <p class="title">条码</p>
@@ -579,8 +581,10 @@ export class RfidBarCode extends Component {
             categoryVal = d.query('.rfid-shelf-number>.shelf-number'),
             category1 = d.query('.rfid-barCode-content>.rfid-barCode-left>.title2'),
             category2 = d.query('.rfid-barCode-content>.rfid-barCode-left>.title3'),
+            category3 = d.query('.rfid-barCode-content>.rfid-barCode-left>.title4'),
             categoryVal1 = d.query('.rfid-barCode-content>.rfid-barCode-left>.value2'),
             categoryVal2 = d.query('.rfid-barCode-content>.rfid-barCode-left>.value3'),
+            categoryVal3 = d.query('.rfid-barCode-content>.rfid-barCode-left>.value4'),
             Commodity = d.query('.rifd-bar-code-describe'),
             num = d.query('.shelf-nums'),
             scanamout = d.query('.total-rfid >.bar-code-scan>span'),
@@ -593,8 +597,10 @@ export class RfidBarCode extends Component {
         this.domHash['categoryVal'] = categoryVal;
         this.domHash['category1'] = category1;
         this.domHash['category2'] = category2;
+        this.domHash['category3'] = category3;
         this.domHash['categoryVal1'] = categoryVal1;
         this.domHash['categoryVal2'] = categoryVal2;
+        this.domHash['categoryVal3'] = categoryVal3;
         this.domHash['barcodeTitl'] = barcodeTitl;
         this.domHash['Commodity'] = Commodity;
         this.domHash['num'] = num;
@@ -659,6 +665,10 @@ export class RfidBarCode extends Component {
                     if ( pageName.classInfo[1] ){
                         this.domHash['category2'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[1]];
                     }
+
+                    if (pageName.classInfo[2] ){
+                        this.domHash['category3'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[2]];
+                    }
                 }
                 if(pageName.amount == 'SCANNUM'){
                     d.query('.rfidBarCode-page>.rfid-barCode-body>.rfid-barCode-nums').style.display = 'none';
@@ -715,6 +725,10 @@ export class RfidBarCode extends Component {
                             //this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
                             this.dataWhere[this.DataclassInfo[1]] = data[i][this.DataclassInfo[1]];
                         }
+                        if(this.DataclassInfo[2]){
+                            //this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
+                            this.dataWhere[this.DataclassInfo[2]] = data[i][this.DataclassInfo[2]];
+                        }
                         if(!data[i]['BARCODE']){
                             let str = '';
                             for(let val in this.DataclassInfoCp[0]) {
@@ -738,6 +752,16 @@ export class RfidBarCode extends Component {
                                     }
                                     this.domHash['categoryVal2'].innerHTML = strs;
                                 }
+                            let strss = '';
+
+                            for(let val in  this.DataclassInfoCp[1]){
+                                for(let obj in data[i]){
+                                    if(obj == val){
+                                        strs += data[i][val];
+                                    }
+                                }
+                                this.domHash['categoryVal3'].innerHTML = strss;
+                            }
 
                         }
 
