@@ -12,6 +12,7 @@ import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loadi
 import {G_FILE_MD5, G_MD5} from "../../../global/utils/md5";
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 import Shell = G.Shell;
+import {BwRule} from "../../common/rule/BwRule";
 
 type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
@@ -258,7 +259,9 @@ export class BwUploader extends FormCom {
                     file
                 });
                 this.value = file.name;
-            }).catch(() => {
+            }).catch((msg) => {
+                msg = msg && typeof msg === 'string' ? msg : '上传失败';
+                Modal.alert(msg);
                 this.wrapper && this.wrapper.classList.add('error');
                 this.setInputValue('上传失败');
                 this.trigger(BwUploader.EVT_UPLOAD_ERROR, file);
@@ -402,7 +405,7 @@ export class BwUploader extends FormCom {
                         if(response.code === '200'){
                             resolve(response);
                         }else{
-                            reject();
+                            reject(response.mag || response.errorMsg);
                         }
                     }).catch(() => {
                         reject();
