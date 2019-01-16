@@ -112,6 +112,9 @@ export const ImgModal = (() => {
                             destroy();
                         })
                     }
+                }).finally(() => {
+                    loading && loading.hide();
+                    loading = null;
                 })
             });
         }
