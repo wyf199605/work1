@@ -29,7 +29,7 @@ export class ButtonAction {
     }, url?: string, itemId?: string, atvData?: obj) {
         let self = this;
         if (btn.subType === 'excel') {
-
+            callback(null);
             let com;
             let uploderModal = new Modal({
                 header: '选择导入的文件',
@@ -92,7 +92,6 @@ export class ButtonAction {
                             com && com.destroy();
                             com = null;
                             uploderModal.destroy();
-                            callback(result);
                             self.btnRefresh(btn.refresh, url);
                         }, 100);
                         // G.tools.event.fire(NewTableModule.EVT_EXPORT_DATA, data);
