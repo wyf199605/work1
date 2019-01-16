@@ -613,6 +613,7 @@ export class RfidBarCode extends Component {
     private DataclassInfo = [];
     private DataclassInfoCp = [];
     private DataCI = [];
+    private nameField = '';
 
     private downData(para) {
         // let loading = new Loading({
@@ -636,6 +637,7 @@ export class RfidBarCode extends Component {
                 this.domHash['inventory'].innerHTML = pageName.subTitle;
                 this.domHash['title'].innerText = pageName.title;
                 this.domHash['barcodeTitl'].innerHTML = pageName.keyField;
+                this.nameField = pageName.nameField;
                 //有可能没有分类  有可能有分类
                 // if(pageName.classInfo){
                 //     this.DataclassInfo = pageName.classInfo;
@@ -698,9 +700,7 @@ export class RfidBarCode extends Component {
                 for(let i = 0; i< data.length; i++){
                     //stepArry 添加数组项
                     if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE']) == -1){
-                        alert('2222')
                         this.stepArry.push(data[i]['BARCODE'])
-                        alert('33333')
                     }
                     if(tools.isNotEmpty(this.DataclassInfo[0])){
                         alert('44444')
@@ -743,7 +743,8 @@ export class RfidBarCode extends Component {
 
                         if(data[i]['BARCODE']){
                             this.domHash['barcode'].innerText = data[i]['BARCODE'];
-                            this.domHash['Commodity'].innerHTML = data[i]['CAPTION'];
+
+                            this.domHash['Commodity'].innerHTML = data[i][this.nameField];
                             if(data[i]['AMOUNT'] ){
                                 this.operateTbaleD.num = parseInt(data[i]['AMOUNT']);
                                 this.domHash['count'].innerHTML = data[i]['AMOUNT'];
