@@ -303,8 +303,7 @@ export class FlowReport extends BasicPage {
                 let buttons = para.fm.subButtons || [];
                 if (buttons.length <= 2) {
                     buttons.map((item, index) => {
-                        let btnWrapper: HTMLElement = <div className="sub-btn-item" data-index={index}
-                                                           data-type={item.subType}>{item.caption}</div>;
+                        let btnWrapper: HTMLElement = <div className="sub-btn-item" data-index={index} data-type={item.subType}>{item.caption}</div>;
                         target.appendChild(btnWrapper);
                     });
                 } else {
