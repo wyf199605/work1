@@ -647,14 +647,14 @@ export class RfidBarCode extends Component {
                     for(let i = 0;i< pageName.classInfoObj.length;i++){
                         let obj = pageName.classInfoObj;
                         for(let s in obj[i]){
-                            this.dataWhere[s] = obj[i][s];
+                            this.dataWhere[s] = '';
                         }
                     }
                     alert(JSON.stringify(this.dataWhere) + 'cccccc')
 
                     this.domHash['category1'].innerHTML =  pageName.classInfoObj[0][pageName.classInfo[0]];
 
-                    if ( pageName.classInfo[1]){
+                    if ( pageName.classInfo[1] ){
                         this.domHash['category2'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[1]];
                     }
                 }
@@ -729,14 +729,16 @@ export class RfidBarCode extends Component {
                                 this.domHash['categoryVal1'].innerHTML = str;
                             }
                             let strs = '';
-                            for(let val in  this.DataclassInfoCp[1]){
-                                for(let obj in data[i]){
-                                    if(obj == val){
-                                        strs += data[i][val];
+
+                                for(let val in  this.DataclassInfoCp[1]){
+                                    for(let obj in data[i]){
+                                        if(obj == val){
+                                            strs += data[i][val];
+                                        }
                                     }
+                                    this.domHash['categoryVal2'].innerHTML = strs;
                                 }
-                                this.domHash['categoryVal2'].innerHTML = strs;
-                            }
+
                         }
 
                         if(data[i]['BARCODE']){
