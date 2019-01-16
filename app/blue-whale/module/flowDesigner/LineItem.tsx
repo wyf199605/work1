@@ -2,12 +2,12 @@
 /// <amd-dependency path="raphael" name="Raphael"/>
 
 import d = G.d;
-import tools = G.tools;
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {FlowDesigner} from "./FlowDesigner";
 import {FlowEditor, IFieldPara} from "./FlowEditor";
 import {FlowItem} from "./FlowItem";
+import tools = G.tools;
 
 export interface ILineItemPara extends IComponentPara {
     startNode: any;     // 连接线的来源
@@ -76,7 +76,8 @@ export class LineItem extends Component {
                 _this.line.attr({
                     stroke: '#005bac'
                 });
-                _this.active = true;
+                _this.line.toFront();
+               tools.isPc && (_this.active = true);
             }
         });
 
@@ -175,7 +176,8 @@ export class LineItem extends Component {
                 this.line.attr({
                     stroke: '#005bac'
                 });
-                this.active = true;
+                this.line.toFront();
+                tools.isPc && (this.active = true);
             }
         };
 

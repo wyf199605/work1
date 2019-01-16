@@ -9,10 +9,6 @@ import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import sys = BW.sys;
 import {TextInput} from "../../../global/components/form/text/text";
 import {ContactsModule} from "../flowDesigner/ContactsModule";
-import {FlowEditor} from "../flowDesigner/FlowEditor";
-import {ButtonBox} from "../../../global/components/mbList/ButtonBox";
-import {InputBox} from "../../../global/components/general/inputBox/InputBox";
-import {Button} from "../../../global/components/general/button/Button";
 import {PopBtnBox} from "../../../global/components/ui/actionSheet/popBtnBox";
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 
@@ -43,7 +39,7 @@ export class FlowReport extends BasicPage {
             let field = {
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
                 field: nameFields[f.name],
-                onExtra: (data, relateCols, isEmptyClear = false) => {
+                onExtra: (data, relateCols) => {
                     let com = self.editModule.getDom(f.name);
                     for (let key of relateCols) {
                         let hCom = self.editModule.getDom(key);
@@ -542,7 +538,6 @@ export class FlowReport extends BasicPage {
         // url请求默认值
         if (form.dataAddr) {
             Promise.all([BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(form.dataAddr)), this.lookup]).then(([{response}]) => {
-                //	    alert(JSON.stringify(response));
                 let data = response.data[0];
                 if (!data) {
                     Modal.alert('数据为空');
