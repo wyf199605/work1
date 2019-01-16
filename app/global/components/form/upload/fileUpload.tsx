@@ -60,8 +60,8 @@ export class FileUpload {
                             this.afterSendFile(file, ...any).then((...anyData) => {
                                 // anyData 为成功后返回的数据
                                 resolve(...anyData); // 上传成功
-                            }).catch(() => {
-                                reject();
+                            }).catch((msg) => {
+                                reject(msg);
                             });
                         });
                     }).catch(() => {
@@ -77,8 +77,8 @@ export class FileUpload {
                     this.uploadFile(file.blob, file.name, data).then((response) => {
                         // 成功返回
                         resolve(response);
-                    }).catch(() => {
-                        reject(); // 表示分片上传失败
+                    }).catch((msg) => {
+                        reject(msg); // 表示分片上传失败
                     })
                 }
             }).catch((...anyData) => {

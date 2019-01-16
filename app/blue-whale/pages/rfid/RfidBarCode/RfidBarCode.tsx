@@ -70,7 +70,7 @@ export class RfidBarCode extends Component {
         let body = <div></div>;
         let barcode = new Modal({
             className: 'rfid-bar-code',
-            zIndex: 1000,
+            zIndex: 1020,
             body: body,
             header: "条码扫码",
             position: sys.isMb ? 'full' : '',
@@ -140,7 +140,7 @@ export class RfidBarCode extends Component {
 
 
                                         if (this.mode[key] == '逐一') {
-                                        //造数据
+                                            //造数据
                                             this.operateTbaleD.option = 1;
 
                                         } else if (this.mode[key] == '替换') {
@@ -160,10 +160,10 @@ export class RfidBarCode extends Component {
                                                 this.operateTbaleD.num = parseInt(num);
                                             }
 
-                                          //造数据
+                                            //造数据
                                             this.operateTbaleD.option = 3;
                                         } else {
-                                          //造数据
+                                            //造数据
                                             this.operateTbaleD.option = 0;
                                         }
 
@@ -192,7 +192,7 @@ export class RfidBarCode extends Component {
                                             }else {
                                                 this.operateTbaleD.num = parseInt(num);
                                             }
-                                           //造数据
+                                            //造数据
                                         } else if (this.mode[key] == '替换') {
                                             //造数据
                                             let num = d.query('.total-nums>span').innerText;
@@ -234,7 +234,7 @@ export class RfidBarCode extends Component {
                         let mode = new Modal({
                             isMb: false,
                             position: "center",
-                            zIndex:1001,
+                            zIndex:1022,
                             header: '请输入条码',
                             isOnceDestroy: true,
                             isBackground: true,
@@ -295,7 +295,7 @@ export class RfidBarCode extends Component {
                                 isMb: false,
                                 position: "center",
                                 header: '上传数据 ',
-                                zIndex:1001,
+                                zIndex:1022,
                                 isOnceDestroy: true,
                                 isBackground: true,
                                 body: <div data-code="updataModal">
@@ -328,7 +328,7 @@ export class RfidBarCode extends Component {
                                                 this.stepArry = [];
                                                 s.destroy();
                                                 if (!res.success) {
-                                                   alert('上传失败');
+                                                    alert('上传失败');
                                                 } else {
                                                     this.domHash['scanamout'].innerHTML = 0 + '';
                                                     this.domHash['count'].innerHTML = 0 + '';
@@ -386,7 +386,7 @@ export class RfidBarCode extends Component {
                         let deModel = new Modal({
                             isMb: false,
                             position: "center",
-                            zIndex:1001,
+                            zIndex:1022,
                             header: '请选择删除数据范围 ',
                             isOnceDestroy: true,
                             isBackground: true,
@@ -433,11 +433,11 @@ export class RfidBarCode extends Component {
                                                 this.domHash['scanamout'].innerText = res.data.scanNum;
                                                 this.refreshCount(para);
                                                 d.query('.total-nums>span').innerText = res.data.scanNum;
-                                                 alert('删除成功');
+                                                alert('删除成功');
                                                 this.domHash['count'].innerHTML = 0 + '';
                                                 this.stepArry = [];
                                             } else {
-                                                 alert('删除失败');
+                                                alert('删除失败');
                                             }
 
                                         })
@@ -642,19 +642,19 @@ export class RfidBarCode extends Component {
                 //     this.dataWhere = pageName.classInfoObj;
                 // }
                 if(tools.isNotEmpty(pageName.classInfo)){
-                        this.DataclassInfo = pageName.classInfo;
-                        this.DataclassInfoCp = pageName.classInfoObj;
-                        for(let i = 0;i< pageName.classInfoObj.length;i++){
-                            let obj = pageName.classInfoObj;
-                            for(let s in obj[i]){
-                                this.dataWhere[s] = obj[i][s];
-                            }
+                    this.DataclassInfo = pageName.classInfo;
+                    this.DataclassInfoCp = pageName.classInfoObj;
+                    for(let i = 0;i< pageName.classInfoObj.length;i++){
+                        let obj = pageName.classInfoObj;
+                        for(let s in obj[i]){
+                            this.dataWhere[s] = '';
                         }
-                        alert(JSON.stringify(this.dataWhere) + 'cccccc')
+                    }
+                    alert(JSON.stringify(this.dataWhere) + 'cccccc')
 
-                        this.domHash['category1'].innerHTML =  pageName.classInfoObj[0][pageName.classInfo[0]];
+                    this.domHash['category1'].innerHTML =  pageName.classInfoObj[0][pageName.classInfo[0]];
 
-                    if ( pageName.classInfo[1]){
+                    if ( pageName.classInfo[1] ){
                         this.domHash['category2'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[1]];
                     }
                 }
@@ -663,8 +663,7 @@ export class RfidBarCode extends Component {
                 }
 
 
-                alert('sssss')
-               //只需要注册一个监听事件
+                //只需要注册一个监听事件
                 this.rigisterRifd();
                 //判断状态
                 //造数据条件
@@ -684,6 +683,7 @@ export class RfidBarCode extends Component {
             }
 
         })
+        alert('下载结果' + s )
 
     }
 
@@ -696,44 +696,51 @@ export class RfidBarCode extends Component {
             alert(JSON.stringify(data))
             if(res.success){
                 for(let i = 0; i< data.length; i++){
-                    alert(data[i][this.DataclassInfo[0]])
                     //stepArry 添加数组项
-                    if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE'] == -1)){
+                    if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE']) == -1){
+                        alert('2222')
                         this.stepArry.push(data[i]['BARCODE'])
+                        alert('33333')
                     }
                     if(tools.isNotEmpty(this.DataclassInfo[0])){
-                        this.domHash['categoryVal1'].innerHTML = data[i][this.DataclassInfo[0]];
+                        alert('44444')
+                        //this.domHash['categoryVal1'].innerHTML = data[i][this.DataclassInfo[0]];
                         this.dataWhere[this.DataclassInfo[0]] = data[i][this.DataclassInfo[0]];
+                        alert('55555')
                     }
                     //更新数据条件e
-                    if(data.length == 1){
+                    if(i == 0){
+                        alert(JSON.stringify(this.DataclassInfoCp) + 'OUI ')
                         if(this.DataclassInfo[1]){
-                            this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
+                            //this.domHash['categoryVal2'].innerHTML = data[i][this.DataclassInfo[1]];
                             this.dataWhere[this.DataclassInfo[1]] = data[i][this.DataclassInfo[1]];
                         }
-                        alert(JSON.stringify(this.DataclassInfoCp[0]) + 'uuuu')
-                        for(let val in this.DataclassInfoCp[0]) {
-
-                            alert(JSON.stringify(data[i]))
+                        if(!data[i]['BARCODE']){
                             let str = '';
-                            for(let obj in data[i]){
-                                alert(obj + 'ppp');
-                                if (obj == val) {
-                                    str += data[i][val];
-                                    alert(data[i][val] + 'oo')
+                            for(let val in this.DataclassInfoCp[0]) {
+                                for(let obj in data[i]){
+                                    alert(obj + 'ppp');
+                                    if (obj == val) {
+                                        str += data[i][val];
+                                        alert(data[i][val] + 'oo')
+                                    }
                                 }
+                                alert(str + '字符串')
+                                this.domHash['categoryVal1'].innerHTML = str;
                             }
-                            this.domHash['categoryVal1'].innerHTML = str;
+                            let strs = '';
+
+                                for(let val in  this.DataclassInfoCp[1]){
+                                    for(let obj in data[i]){
+                                        if(obj == val){
+                                            strs += data[i][val];
+                                        }
+                                    }
+                                    this.domHash['categoryVal2'].innerHTML = strs;
+                                }
+
                         }
-                        for(let val in  this.DataclassInfoCp[1]){
-                            let str = '';
-                          for(let obj in data[i]){
-                              if(obj == val){
-                                  str+=data[i][val];
-                              }
-                          }
-                          this.domHash['categoryVal2'].innerHTML = str;
-                        }
+
                         if(data[i]['BARCODE']){
                             this.domHash['barcode'].innerText = data[i]['BARCODE'];
                             this.domHash['Commodity'].innerHTML = data[i]['CAPTION'];
@@ -768,7 +775,7 @@ export class RfidBarCode extends Component {
             setTimeout(()=>{
                 this.rigisterTable(this.operateTbaleD);
             },10)
-         
+
         })
     }
     //统计扫描项方法

@@ -896,7 +896,7 @@ export class BwTableModule extends Component {
                 this.aggregate.get(data);
                 setTimeout(() => {
                     this.ftable && this.ftable.clearSelectedRows();
-                }, 400)
+                }, 500)
             });
         }
 
@@ -1697,8 +1697,6 @@ export class BwTableModule extends Component {
 
             resolve({text, classes, bgColor, color, data});
         })
-
-
     }
 
     // 多图查看与编辑
