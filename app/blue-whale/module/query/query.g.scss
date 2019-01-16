@@ -142,6 +142,7 @@
         max-height: 247px;
         height: 247px;
         width: 100%;
+        overflow: auto;
         margin-top: 4px;
         & > li {
           text-align: center;
@@ -177,6 +178,7 @@
       .sort-field, .group-field {
         height: 110px;
         width: 100%;
+        overflow: auto;
       }
       .group-field {
         margin-top: 27px;

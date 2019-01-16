@@ -428,7 +428,6 @@ export class NewTableModule {
         return Promise.all(promise).then((arr) => {
             Object.values(this.sub).forEach((subTable) => {
                 if(subTable.isPivot){
-                    debugger;
                     this.editInit(subTable);
                 }
             });
