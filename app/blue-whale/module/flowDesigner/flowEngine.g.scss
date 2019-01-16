@@ -172,10 +172,10 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
   }
   .flow-info {
     position: absolute;
-    text-align: center;
-    height: 20px;
-    line-height: 20px;
+    text-align: left;
     font-size: 13px;
+    z-index: 1001;
+    word-break: break-all;
   }
   $flow_items_normal_border_color:(start:#b6d1e0,  end:#b6d1e0,  task:#b6d1e0,  decision:#7dd7d2);
   $flow_items_active_border_color:(start:#005bac,  end:#005bac,  task:#005bac,  decision:#00bfb8);

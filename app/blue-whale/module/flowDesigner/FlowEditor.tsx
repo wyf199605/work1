@@ -3,7 +3,7 @@
 import d = G.d;
 import tools = G.tools;
 import Component = G.Component;
-import {FlowDesigner} from "./FlowDesigner";
+import {FlowDesigner, Method} from "./FlowDesigner";
 import {FormCom, IFormComPara} from "../../../global/components/form/basic";
 import {LineItem} from "./LineItem";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
@@ -23,9 +23,9 @@ export interface IFieldPara {
     taskType?: string;      // 任务类型
     performType?: string;   // 参与类型
     processTypeId?: number; // 流程类型
-    numberAddr?:string; // 取数地址
-    adoptAddr?:string; // 通过回写地址
-    rejectAddr?:string; // 拒绝回写地址
+    numberAddr?: string; // 取数地址
+    adoptAddr?: string; // 通过回写地址
+    rejectAddr?: string; // 拒绝回写地址
 }
 
 export interface IFlowEditorPara extends IFormComPara {
@@ -47,7 +47,7 @@ export class FlowEditor extends FormCom {
         start: ['name', 'displayName'],
         end: ['name', 'displayName'],
         subprocess: ['name', 'displayName', 'processName'],
-        task: ['name', 'displayName', 'form', 'assignee', 'taskType', 'performType','numberAddr','adoptAddr','rejectAddr'],
+        task: ['name', 'displayName', 'form', 'assignee', 'taskType', 'performType', 'numberAddr', 'adoptAddr', 'rejectAddr'],
         transition: ['name', 'displayName'],
     };
 
@@ -61,9 +61,9 @@ export class FlowEditor extends FormCom {
         assignee: '参与者',
         taskType: '任务类型',
         performType: '参与类型',
-        numberAddr:'取数地址',
-        adoptAddr:'通过回写地址',
-        rejectAddr:'拒绝回写地址'
+        numberAddr: '取数地址',
+        adoptAddr: '通过回写地址',
+        rejectAddr: '拒绝回写地址'
     };
 
     /*
@@ -108,9 +108,9 @@ export class FlowEditor extends FormCom {
             // 查看流程时获取的数据也要进行转换
             Object.keys(fields).forEach(key => {
                 if (key in FlowEditor.DROPDOWN_KEYVALUE) {
-                    if(key === 'assignee'){
+                    if (key === 'assignee') {
                         fields[key] = para.fields[key];
-                    }else{
+                    } else {
                         let valueText = FlowEditor.DROPDOWN_KEYVALUE[key].filter(item => item.value === fields[key])[0];
                         valueText && (fields[key] = valueText.text);
                     }
@@ -124,13 +124,14 @@ export class FlowEditor extends FormCom {
     static hideAllDropdown() {
         FlowEditor.DropDowns.forEach(dropdown => dropdown.hideList());
     }
+
     // 刷新所有flowEditor
-    static refreshAllPosition(){
+    static refreshAllPosition() {
         FlowDesigner.ALLITEMS.forEach(item => item.flowEditor.refreshPosition());
     }
 
     // 刷新当前flowEditor的位置
-    public refreshPosition(){
+    public refreshPosition() {
         let flowModalStyle = window.getComputedStyle(d.query('.modal-wrapper.flow-modal'));
         this.wrapper.style.right = parseInt(flowModalStyle.right) + 25 + 'px';
         this.wrapper.style.bottom = parseInt(flowModalStyle.bottom) + 25 + 'px';
@@ -163,10 +164,10 @@ export class FlowEditor extends FormCom {
                     onSelect: (item, index) => {
                         // 在选中时，判断该项是否含有地址(address)，有的话从地址中获取数据，没有就直接回显
                         FlowEditor.hideAllDropdown();
-                        if(FlowEditor.DROPDOWN_KEYVALUE[attr].some(valueText => 'address' in valueText)){
-                            if (!isOpenAddressList){
+                        if (FlowEditor.DROPDOWN_KEYVALUE[attr].some(valueText => 'address' in valueText)) {
+                            if (!isOpenAddressList) {
                                 isOpenAddressList = true;
-                                for(let hasAddressItem of FlowEditor.DROPDOWN_KEYVALUE[attr].filter(item => 'address' in item)){
+                                for (let hasAddressItem of FlowEditor.DROPDOWN_KEYVALUE[attr].filter(item => 'address' in item)) {
                                     hasAddressItem === item && BwRule.Ajax.fetch(hasAddressItem.address).then(({response}) => {
                                         let field = response.body.elements[0].cols[0];
                                         new ContactsModule({
@@ -195,10 +196,10 @@ export class FlowEditor extends FormCom {
                                         console.log(err);
                                     });
                                 }
-                            }else {
+                            } else {
                                 Modal.alert('正在加载，请稍候...');
                             }
-                        }else{
+                        } else {
                             this.set({[attr]: item.text});
                         }
                     }
@@ -262,10 +263,10 @@ export class FlowEditor extends FormCom {
                 let dropdownHeight = d.queryAll('.drop-item', dropdown.ulDom).length *
                     parseInt(window.getComputedStyle(d.query('.drop-item', dropdown.ulDom)).height) + 8;
                 let bottom = (wrapperLength - targetIndex) * wrapperHeight - dropdownHeight - 26;
-                if(bottom < 0){
+                if (bottom < 0) {
                     d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom =
                         (wrapperLength - targetIndex) * wrapperHeight + 'px';
-                }else{
+                } else {
                     d.closest(dropdown.ulDom, '.dropdown-wrapper', this.wrapper).style.bottom = bottom + 'px';
                 }
             };
@@ -310,10 +311,11 @@ export class FlowEditor extends FormCom {
     }
 
     private _selectKeyValue = {value: '', text: ''};
-    get selectKeyValue(){
+    get selectKeyValue() {
         return this._selectKeyValue;
     }
-    set selectKeyValue(keyValue: {value: string, text: string}){
+
+    set selectKeyValue(keyValue: { value: string, text: string }) {
         this._selectKeyValue = keyValue;
     }
 
@@ -353,7 +355,7 @@ export class FlowEditor extends FormCom {
             } else {
                 // 是矩形就在wrapper上更新
                 let textContent = this.owner['wrapper'].textContent;
-                if (textContent !== limitDisplayName){
+                if (textContent !== limitDisplayName) {
                     this.owner['wrapper'].textContent = limitDisplayName || this.type;
                     (this.owner as FlowItem).reDraw();
                 }
@@ -382,14 +384,9 @@ export class FlowEditor extends FormCom {
         for (let attr in fields) {
             let attrEditorWrapper = d.queryAll('.attr-editor-wrapper', this.wrapper)
                     .filter(item => item.dataset.attr === attr)[0],
-                text:string = fields[attr];
-            if(attr === 'expr'){
-                text = text.replace(/(&gt;)/g,'>')
-                    .replace(/(&lt;)/g,'<')
-                    .replace(/(&eq;)/g,'=')
-                    .replace(/(&gte;)/g,'>=')
-                    .replace(/(&lte;)/g,'<=')
-                    .replace(/(&ne;)/g,'!=');
+                text: string = fields[attr];
+            if (attr === 'expr' || attr === 'displayName') {
+                text = Method.transferredText(text);
             }
             d.query('input', attrEditorWrapper)['value'] = text;
         }

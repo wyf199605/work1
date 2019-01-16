@@ -26,6 +26,7 @@ export interface IFlowItemPara extends IComponentPara {
     minLeft?: number;
     auditTime?: string; // 审批时间
     auditUser?: string; // 审批用户
+    name?: string;
 }
 
 export class FlowItem extends Component {
@@ -113,6 +114,7 @@ export class FlowItem extends Component {
         }
         if (FlowDesigner.FlowType === 'look') {
             this.isComplete = tools.isNotEmpty(para.isComplete) ? para.isComplete : 0;
+            this.flowItemName = tools.isNotEmpty(para.name) ? this.para.name : '';
         }
         this.initEvents.on();
 
@@ -126,34 +128,59 @@ export class FlowItem extends Component {
             owner: this,
             fields: para.fields || fields,
         });
-        if (tools.isNotEmpty(para.isComplete) && Method.isComplete(para.isComplete)) {
+        if (FlowDesigner.FlowType === 'look') {
             let arr = [];
-            if (tools.isNotEmpty(para.auditUser) && Method.isShowAuditUser(this.para.type)) {
-                arr.push(new FlowInfo({
-                    text: para.auditUser,
-                    position: {
-                        x: this.x,
-                        y: this.y - 20
-                    },
-                    width: this.width,
-                    isTop: true,
-                    container: d.query('#design-canvas')
-                }))
+            if (tools.isNotEmpty(para.isComplete) && Method.isComplete(para.isComplete)) {
+                if (tools.isNotEmpty(para.auditUser) && Method.isShowAuditUser(this.para.type)) {
+                    arr.push(new FlowInfo({
+                        text: '操作人:' + para.auditUser,
+                        position: {
+                            x: this.x,
+                            y: this.y - 4
+                        },
+                        width: this.width,
+                        isTop: true,
+                        container: d.query('#design-canvas')
+                    }))
+                }
+                if (tools.isNotEmpty(para.auditTime) && Method.isShowAuditUser(this.para.type)) {
+                    arr.push(new FlowInfo({
+                        text: '操作时间:' + para.auditTime,
+                        position: {
+                            x: this.x,
+                            y: this.y + this.height
+                        },
+                        width: this.width,
+                        isTop: false,
+                        container: d.query('#design-canvas')
+                    }))
+                }
             }
-            if (tools.isNotEmpty(para.auditTime) && Method.isShowAuditUser(this.para.type)) {
-                arr.push(new FlowInfo({
-                    text: para.auditTime,
+            if (this.isDiamond) {
+                let text = Method.transferredText(para.fields.displayName);
+                tools.isEmpty(text) && (text = Method.transferredText(para.fields.expr));
+                tools.isNotEmpty(text) && arr.push(new FlowInfo({
+                    text: '条件:' + text,
                     position: {
                         x: this.x,
-                        y: this.y + this.height
+                        y: this.y - 4
                     },
-                    width: this.width,
-                    isTop: false,
+                    width: this.width + 50,
+                    isTop: true,
                     container: d.query('#design-canvas')
                 }))
             }
             this.infoItems = arr;
         }
+    }
+
+    private _flowItemName: string;
+    set flowItemName(name: string) {
+        this._flowItemName = name;
+    }
+
+    get flowItemName() {
+        return this._flowItemName;
     }
 
     private _infoItems: FlowInfo[];

@@ -31,9 +31,14 @@ export class FlowReport extends BasicPage {
             nameFields: { [name: string]: R_Field } = {},
             form = this.createFormWrapper(para.fm.fields),
             self = this,
-            isInsert = tools.isNotEmpty(tools.url.getPara('task_id')) ? false : true,
             fields = para.fm.fields;
-        para.fm.fields.forEach(function (f) {
+        let isInsert = false;
+        if (tools.isMb){
+            isInsert = tools.isEmpty(tools.url.getPara('task_id',window.location.href))
+        }else{
+            isInsert = para.fm.caption === '新增';
+        }
+        fields.forEach(function (f) {
             nameFields[f.name] = f;
             let field = {
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
@@ -83,9 +88,8 @@ export class FlowReport extends BasicPage {
             emPara.fields.push(field);
         });
         this.editModule = new EditModule(emPara);
-        emPara.fields.forEach((f) => {
-            let field = f.field,
-                name = field.name,
+        fields.forEach((field) => {
+            let name = field.name,
                 isNotEdit = isInsert ? field.noModify : field.noEdit;
             if (isNotEdit && !field.noShow) {
                 let com = this.editModule.getDom(name);

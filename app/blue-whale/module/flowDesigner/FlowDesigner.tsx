@@ -102,7 +102,8 @@ export const Method = {
     },
     searchFlowItem: function (name: string) {
         // 根据data-name寻找对应的节点
-        return FlowDesigner.ALLITEMS.filter(item => item.wrapper.dataset.name === name)[0];
+        let allItems = FlowDesigner.ALLITEMS || [];
+        return allItems.filter(item => item.wrapper.dataset.name === name)[0];
     },
     getFields: function (node: Node, type: string = node['tagName']) {
         // 根据类型属性限定表(ATTR_LIMIT)中的属性查找节点的所有属性值，返回该节点所有属性和值的集合
@@ -151,6 +152,14 @@ export const Method = {
     },
     isShowAuditUser(type: string) {
         return ['start', 'end', 'decision'].indexOf(type) === -1;
+    },
+    transferredText(text: string): string {
+        return tools.isNotEmpty(text) ? text.replace(/(&gt;)/g, '>')
+            .replace(/(&lt;)/g, '<')
+            .replace(/(&eq;)/g, '=')
+            .replace(/(&gte;)/g, '>=')
+            .replace(/(&lte;)/g, '<=')
+            .replace(/(&ne;)/g, '!=') : '';
     }
 };
 
@@ -283,6 +292,7 @@ export class FlowDesigner {
                         isComplete: number = 0,
                         auditTime: string = '',
                         auditUser: string = '',
+                        fname: string = '',
                         fields = Method.getFields(child);
                     // 存在xml中没有isComplete属性情况
                     'isComplete' in child.attributes && (
@@ -293,6 +303,9 @@ export class FlowDesigner {
                     );
                     'auditUser' in child.attributes && (
                         auditUser = tools.isNotEmpty(child.attributes.auditUser.value) ? child.attributes.auditUser.value : ''
+                    );
+                    'name' in child.attributes && (
+                        fname = tools.isNotEmpty(child.attributes.name.value) ? child.attributes.name.value : ''
                     );
                     let shape: FlowItem = null;
                     layout && (shape = new FlowItem({
@@ -307,7 +320,8 @@ export class FlowDesigner {
                         minTop: minTop,
                         minLeft: minLeft,
                         auditTime: auditTime,
-                        auditUser: auditUser
+                        auditUser: auditUser,
+                        name: fname
                     }));
 
                     if (tools.isNotEmpty(shape)) {
@@ -347,6 +361,8 @@ export class FlowDesigner {
                                 endNode: end.rectNode,
                                 container: d.query('#design-canvas'),
                                 fields: Method.getFields(transition),
+                                toItem: end,
+                                fromItem: start
                             });
                             lineItem.active = false;
 
@@ -364,12 +380,13 @@ export class FlowDesigner {
 
             if (FlowDesigner.FlowType === 'look') {
                 // 对应的连接线的颜色改变
-                FlowDesigner.ALLITEMS.filter(item => item && (item.isComplete == 1 || item.isComplete == 2)).forEach((item, index, arr) => {
-                    tools.isNotEmptyArray(item.lineItems) && item.lineItems.forEach(lineItem => {
-                        let nextItem = arr[index + 1];
+                FlowDesigner.ALLITEMS.filter(item => item && (item.isComplete == 1 || item.isComplete == 2)).forEach((item) => {
+                    let lineItems = item.lineItems || [];
+                    tools.isNotEmptyArray(lineItems) && lineItems.forEach(lineItem => {
+                        let nextItem = Method.searchFlowItem(lineItem.toItem.flowItemName);
                         if (tools.isNotEmpty(nextItem)) {
-                            let isComplete = Method.isComplete(nextItem.isComplete);
-                            isComplete && (lineItem.isComplete = item.isComplete);
+                            let comp = nextItem.isDiamond ? item.isComplete : nextItem.isComplete;
+                            this.setComplete(nextItem, lineItem, comp);
                         }
                     });
                 });
@@ -381,6 +398,21 @@ export class FlowDesigner {
                 [].concat(FlowDesigner).concat(FlowDesigner.AllLineItems).concat(FlowDesigner.ALLITEMS)
                     .forEach(item => item.flowEditor && item.flowEditor.initEvents.off());
             }
+        }
+    }
+
+    private setComplete(item: FlowItem, lineItem: LineItem, complete: number) {
+        let isComplete = Method.isComplete(complete);
+        isComplete && (lineItem.isComplete = complete);
+        if (item.isDiamond) {
+            let lineItems = item.lineItems;
+            tools.isNotEmptyArray(lineItems) && lineItems.forEach(lineItem => {
+                let nextItem = Method.searchFlowItem(lineItem.toItem.flowItemName);
+                if (tools.isNotEmpty(nextItem)) {
+                    let comp = nextItem.isDiamond ? complete : lineItem.toItem.isComplete;
+                    this.setComplete(nextItem, lineItem, comp);
+                }
+            });
         }
     }
 

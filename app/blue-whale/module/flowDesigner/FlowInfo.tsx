@@ -2,6 +2,7 @@
 
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
+import {FlowDesigner} from "./FlowDesigner";
 
 interface FlowInfoPara extends IComponentPara {
     text: string;
@@ -11,6 +12,7 @@ interface FlowInfoPara extends IComponentPara {
     };
     width: number,
     isTop:boolean;
+    isDecision?:boolean;
 }
 
 export class FlowInfo extends Component {
@@ -21,7 +23,7 @@ export class FlowInfo extends Component {
     constructor(para: FlowInfoPara) {
         super(para);
         this.wrapper.innerText = para.text || '';
-        this.isTop = para.isTop;
+        this.isTop = para.isTop || false;
         this.setPosition({
             x: para.position.x,
             y: para.position.y,
@@ -38,7 +40,11 @@ export class FlowInfo extends Component {
     }
 
     setPosition({x, y, width}) {
-        this.wrapper.style.top = y + 'px';
+        if (this.isTop){
+            this.wrapper.style.bottom = FlowDesigner.PAPER.height - y + 'px';
+        }else{
+            this.wrapper.style.top = y + 'px';
+        }
         this.wrapper.style.left = x + 'px';
         this.wrapper.style.width = width + 'px';
     }

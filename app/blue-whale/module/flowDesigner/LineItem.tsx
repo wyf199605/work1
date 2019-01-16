@@ -13,6 +13,8 @@ export interface ILineItemPara extends IComponentPara {
     startNode: any;     // 连接线的来源
     endNode: any;       // 连接线的去向
     fields?: IFieldPara;     // 用于初始化flowEditor
+    fromItem?:FlowItem; // 连接线起点元素
+    toItem?:FlowItem; // 连接线终点元素
 }
 
 export class LineItem extends Component {
@@ -55,6 +57,10 @@ export class LineItem extends Component {
 
     constructor(para: ILineItemPara) {
         super(para);
+        if (FlowDesigner.FlowType === 'look'){
+            this.toItem = para.toItem || null;
+            this.fromItem = para.fromItem || null;
+        }
         let arr = FlowDesigner.connections || [];
         this.from = para.startNode;
         this.to = para.endNode;
@@ -92,6 +98,21 @@ export class LineItem extends Component {
 
     get line() {
         return this._line;
+    }
+
+    private _toItem:FlowItem;
+    set toItem(item:FlowItem){
+        this._toItem = item;
+    }
+    get toItem(){
+        return this._toItem;
+    }
+    private _fromItem:FlowItem;
+    set fromItem(item:FlowItem){
+        this._fromItem = item;
+    }
+    get fromItem(){
+        return this._fromItem;
     }
 
     // 是否完成
