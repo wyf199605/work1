@@ -409,7 +409,8 @@ export class FlowDesigner {
             tools.isNotEmptyArray(lineItems) && lineItems.forEach(lineItem => {
                 let nextItem = Method.searchFlowItem(lineItem.toItem.flowItemName);
                 if (tools.isNotEmpty(nextItem)) {
-                    let comp = nextItem.isDiamond ? complete : lineItem.toItem.isComplete;
+                    let comp = nextItem.isDiamond ? complete : nextItem.isComplete;
+                    item.isComplete = comp;
                     this.setComplete(nextItem, lineItem, comp);
                 }
             });
