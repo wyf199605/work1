@@ -540,7 +540,9 @@ export class FastTable extends Component {
             if (this.leftTable) {
                 width += this.leftTable.width;
                 let widthStr = 'calc(100% - ' + width + 'px)';
-                if(!('CSS' in window && CSS.supports && CSS.supports('width: ' + widthStr))){
+                if(!('CSS' in window && CSS.supports
+                    && (CSS.supports('width: ' + widthStr)
+                    || CSS.supports('width', widthStr)))){
                     let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
                     if(offsetWidth == 0){
                         setTimeout(() => {
@@ -556,7 +558,9 @@ export class FastTable extends Component {
                 this.colCount && (this.mainTable.foot.innerWrapper.style.width = widthStr);
             }else{
                 let widthStr = this.isLockRight ? 'calc(100% - 10px)' : '100%';
-                if(!('CSS' in window && CSS.supports && CSS.supports('width: ' + widthStr))){
+                if(!('CSS' in window && CSS.supports
+                    && (CSS.supports('width: ' + widthStr)
+                        || CSS.supports('width', widthStr)))){
                     let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
                     if(offsetWidth == 0){
                         setTimeout(() => {

@@ -115,7 +115,6 @@ export class BwLayoutImg{
                 rightPanel: tools.isPc ? null : inputBox,
                 isFullScreen: tools.isPc
             },
-            zIndex: 1000,
             isShow: false,
             onClose: () => {
                 this.autoClear && this.clear();
