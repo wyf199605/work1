@@ -275,7 +275,7 @@ export class BwTableModule extends Component {
         this.ftable = new FastBtnTable(
             Object.assign(this.baseFtablePara, {
                 exportTitle: this.ui.caption,
-                cols: this.colParaGet(this._cols), // 把fields转为表格的参数
+                cols: BwTableModule.colParaGet(this._cols), // 把fields转为表格的参数
                 ajax: {
                     ajaxData,
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
@@ -381,7 +381,7 @@ export class BwTableModule extends Component {
         this.trigger(BwTableModule.EVT_READY);
     }
 
-    private colParaGet(fields: R_Field[]): IFastTableCol[][] {
+    static colParaGet(fields: R_Field[]): IFastTableCol[][] {
         let isAbsField = fields.some(col => tools.isNotEmpty(col.subcols)), // 是否有子列
             colsPara: IFastTableCol[][] = [[]],
             showCount = 0; // 显示字段个数统计

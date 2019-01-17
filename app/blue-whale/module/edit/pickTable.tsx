@@ -3,6 +3,7 @@
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {FastTable} from "../../../global/components/newTable/FastTable";
 import tools = G.tools;
+import {BwTableModule} from "../table/BwTableModule";
 
 export interface IPickTablePara {
     title?: string;
@@ -60,11 +61,12 @@ export class PickTable {
         let meta = para.meta,
             field: R_Field[] = meta.map((name) => {
                 return para.fields.filter((col) => {
-                    return col.name = name;
+                    return col.name === name;
                 })[0]
             });
+
         this.table = new FastTable({
-            cols: [field],
+            cols: BwTableModule.colParaGet(field),
             data: para.data,
             container: this.wrapper,
             pseudo: {
