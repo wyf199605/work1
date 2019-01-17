@@ -61,7 +61,7 @@ export class FlowItem extends Component {
             this.y = para.position.y;
         } else {
             if (FlowDesigner.FlowType === 'look') {
-                para.position.x = para.position.x - 170;
+                para.position.x = para.position.x - 30;
             }
             this.x = para.position.x;
             this.y = para.position.y;
@@ -155,20 +155,6 @@ export class FlowItem extends Component {
                         container: d.query('#design-canvas')
                     }))
                 }
-            }
-            if (this.isDiamond) {
-                let text = Method.transferredText(para.fields.displayName);
-                tools.isEmpty(text) && (text = Method.transferredText(para.fields.expr));
-                tools.isNotEmpty(text) && arr.push(new FlowInfo({
-                    text: '条件:' + text,
-                    position: {
-                        x: this.x,
-                        y: this.y - 4
-                    },
-                    width: this.width + 50,
-                    isTop: true,
-                    container: d.query('#design-canvas')
-                }))
             }
             this.infoItems = arr;
         }
