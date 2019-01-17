@@ -824,6 +824,7 @@ export class QueryBuilder {
 export class AtVarBuilder{
     protected queryConfigs: QueryConf[];
     protected coms : objOf<TextInput> = {};
+    private isFirst : boolean = true;
 
     constructor(protected para : QueryBuilderPara){
         this.queryConfigs = this.para.queryConfigs;
@@ -878,9 +879,7 @@ export class AtVarBuilder{
 
         row.dataset.index = index.toString();
 
-        if(conf.atrrs && conf.atrrs.readOnlyFlag === 1){
-            row.classList.add('disabled-none');
-        }
+
         d.queryAll('[data-type]', row).forEach((container) => {
             let type = container.dataset.type;
             if(type === 'title'){
@@ -935,6 +934,17 @@ export class AtVarBuilder{
         });
 
         d.append(this.para.resultDom, row);
+        if(conf.atrrs && conf.atrrs.readOnlyFlag === 1){
+            row.classList.add('disabled-none');
+        }else {
+            if(this.isFirst){
+                let input = d.query('input', row) || d.query('textarea', row);
+                if(input){
+                    input.focus();
+                    this.isFirst = false;
+                }
+            }
+        }
     }
 
     dataGet(beforeIndex:number = -1, full = false){
