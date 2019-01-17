@@ -38,6 +38,14 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
       }
     }
   }
+  &.flow-look {
+    .flow-item {
+      color: white !important;
+      &.diamond {
+        color: #b0b0b0 !important;
+      }
+    }
+  }
   .modal-header {
     background-color: #005bac;
 
@@ -235,6 +243,7 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
       background-color: #ffffff;
       border-radius: 0;
       padding: 0;
+      word-break: break-all;
       .diamond-text {
         transform: rotate(-45deg);
       }

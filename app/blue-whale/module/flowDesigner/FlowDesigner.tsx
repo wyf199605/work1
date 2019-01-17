@@ -191,7 +191,7 @@ export class FlowDesigner {
                 title: '流程设计',
                 rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}/>
             },
-            className: 'flow-modal',
+            className: FlowDesigner.FlowType === 'look' ? 'flow-modal flow-look' : 'flow-modal',
             width: tools.isMb ? '100%' : '90%',
             height: tools.isMb ? '100%' : '90%',
             isMb: tools.isMb,
@@ -308,10 +308,15 @@ export class FlowDesigner {
                     'name' in child.attributes && (
                         fname = tools.isNotEmpty(child.attributes.name.value) ? child.attributes.name.value : ''
                     );
-                    let shape: FlowItem = null;
+                    let shape: FlowItem = null,
+                        text = fields['displayName'],
+                        type = child.tagName;
+                    if (type === 'decision' && tools.isEmpty(text)){
+                        text = Method.transferredText(fields['expr'] || '');
+                    }
                     layout && (shape = new FlowItem({
-                        type: child.tagName,
-                        text: fields['displayName'],
+                        type: type,
+                        text: text,
                         position: {x: layout[0], y: layout[1]},
                         width: layout[2],
                         height: layout[3],
@@ -333,7 +338,6 @@ export class FlowDesigner {
                         shape.wrapper.dataset.name = child.attributes.name.value;
 
                         if (FlowDesigner.FlowType === 'look') {
-                            shape.wrapper.style.color = 'white';
                             shape.wrapper.style.backgroundColor = FlowItem.lookItemColor[shape.isComplete];
                             if (shape.isStart && shape.isComplete) {
                                 d.query('.inner-circle', shape.wrapper).style.backgroundColor = '#ffffff';
