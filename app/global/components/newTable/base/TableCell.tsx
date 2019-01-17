@@ -284,7 +284,7 @@ export class TableDataCell extends TableCell {
                     html = this.text;
                 }
             }
-            this.wrapper && (this.wrapper.innerHTML = html);
+            this.wrapper && (this.wrapper.innerHTML = tools.isEmpty(html) ? '' : html);
             this.initMoreBtn();
         }
     }
@@ -375,6 +375,7 @@ export class TableDataCell extends TableCell {
                         if(text instanceof Node){
                             this.wrapper && d.append(this.wrapper, text);
                         }else {
+                            text = tools.isEmpty(text) ? '' : text;
                             this._text = text + '';
                             this.wrapper && d.append(this.wrapper, document.createTextNode(this._text));
                         }

@@ -80,6 +80,7 @@ export class NewStatisticBase {
             container: tempTable,
             // maxHeight: 400,
             isFullWidth: true,
+            sort: true,
             pseudo: {
                 type: "number",
             },

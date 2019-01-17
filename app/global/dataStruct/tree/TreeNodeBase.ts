@@ -1,24 +1,24 @@
 /// <amd-module name="TreeNodeBase"/>
 import tools = G.tools;
 
-export interface IBasicTreePara {
+export interface IBasicTreePara<T = any> {
     // parent?: BasicTreeNode;
-    content?:any;
-    children?: IBasicTreePara[]
+    content?:T;
+    children?: IBasicTreePara<T>[]
     // tnode?: BasicTreeNode;
 }
 const isInit = '__IS_INIT__',
     parent = '__PARENT__';
 
 
-export class TreeNodeBase {
+export class TreeNodeBase<T = any> {
     /**
      * para[parent] - 不用parent作为参数接口的属性 是防止外部调用是误传此参数.
      * @param {IBasicTreePara} para
      */
-    constructor(para?: IBasicTreePara) {
+    constructor(para: IBasicTreePara<T> = {}) {
         if(!para[isInit]) { // 根节点, 广度遍历初始化树，以免初始化时无法找到父节点
-            let paraQueue: IBasicTreePara[] = [para],
+            let paraQueue: IBasicTreePara<T>[] = [para],
                 root: this = null;
 
             while (paraQueue[0]) {
@@ -80,7 +80,7 @@ export class TreeNodeBase {
         // }
     }
 
-    protected init(para?: IBasicTreePara){
+    protected init(para?: IBasicTreePara<T>){
         if(para[parent] instanceof TreeNodeBase){
             this.parent = para[parent];
             delete para[parent];
@@ -88,7 +88,7 @@ export class TreeNodeBase {
         this.content = para.content;
     }
 
-    protected nodeCreate(para: IBasicTreePara = {}): this {
+    protected nodeCreate(para: IBasicTreePara<T> = {}): this {
         return new (<any>this.constructor)(para);
     }
 
@@ -172,7 +172,7 @@ export class TreeNodeBase {
      * 重置子节点
      * @param {this | this[]} tnode
      */
-    childrenSet(tnode: this | IBasicTreePara | (this | IBasicTreePara)[]) {
+    childrenSet(tnode: this | IBasicTreePara<T> | (this | IBasicTreePara<T>)[]) {
         // 将之前的children父元素清理
         Array.isArray(this._children) && this._children.forEach(t => {
             t._parent = null;
@@ -182,7 +182,7 @@ export class TreeNodeBase {
         this.childrenAdd(tnode);
     }
 
-    childrenAdd(nodePara: this | IBasicTreePara | (this | IBasicTreePara)[]):this[] {
+    childrenAdd(nodePara: this | IBasicTreePara<T> | (this | IBasicTreePara<T>)[]):this[] {
         let add = (tnodes: this[]) => {
             if (tools.isEmpty(tnodes)) {
                 return;
