@@ -39,17 +39,17 @@ namespace BW {
                                 }
                             })
                         } else {
-                            resolve({})
+                            resolve()
                         }
                     })).then(gps => {
                         o.header = gps ? Object.assign(o.header || {}, {position: gps}) : o.header;
                         self.handle('open', JSON.stringify(o));
                     }).catch(reason => {
-                        if (!reason.flag) {
+                        if ('flag' in  reason && !reason.flag) {
                             alert('gps未打开, 点击确定去开启.');
                             self.window.openGps();
                         } else {
-                            alert(reason.msg);
+                            alert(reason.msg || '定位失败');
                         }
                     });
                 },
@@ -156,7 +156,7 @@ namespace BW {
                 getGps: function (callback: Function) {
                     let handler = function (e: CustomEvent) {
                         d.off(window, 'putGps', handler);
-                        clearInterval(timer);
+                        clearTimeout(timer);
 
                         // alert(e.detail);
                         let json = JSON.parse(e.detail);
