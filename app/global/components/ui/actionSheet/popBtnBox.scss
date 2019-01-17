@@ -14,7 +14,7 @@
   }
   .pop-btns-wrapper {
     position: absolute;
-    width: 70px;
+    min-width: 70px;
     bottom: 66px;
     background-color: #f6f6f6;
     border: solid 1px #e2e2e2;
@@ -24,20 +24,36 @@
     align-items: center;
     justify-content: center;
     z-index: 2;
-    &::before {
-      content: '';
+    //&::before {
+    //  content: '';
+    //  position: absolute;
+    //  top: 100%;
+    //  left: calc(50% - 10px);
+    //  border-left: 5px solid transparent;
+    //  border-right: 5px solid transparent;
+    //  border-top: 5px solid #e2e2e2;
+    //}
+    //&::after {
+    //  content: '';
+    //  position: absolute;
+    //  top: calc(100% - 2px);
+    //  left: calc(50% - 10px);
+    //  border-left: 5px solid transparent;
+    //  border-right: 5px solid transparent;
+    //  border-top: 5px solid #f6f6f6;
+    //}
+    .pop-arrow-1 {
       position: absolute;
       top: 100%;
-      left: 30px;
+      left: calc(50% - 10px);
       border-left: 5px solid transparent;
       border-right: 5px solid transparent;
       border-top: 5px solid #e2e2e2;
     }
-    &::after {
-      content: '';
+    .pop-arrow-2 {
       position: absolute;
       top: calc(100% - 2px);
-      left: 30px;
+      left: calc(50% - 10px);
       border-left: 5px solid transparent;
       border-right: 5px solid transparent;
       border-top: 5px solid #f6f6f6;
@@ -50,6 +66,7 @@
       height: 32px;
       text-align: center;
       border-bottom: 1px solid #e2e2e2;
+      //padding: 0 8px;
       &:last-child {
         border-bottom: none;
       }

@@ -28,14 +28,22 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
 .flow-modal {
   width: 100%;
   height: 100%;
-
+  &.modal-mobile {
+    .modal-header {
+      h1 {
+        color: #000;
+      }
+      .header-btn-right {
+        display: none !important;
+      }
+    }
+  }
   .modal-header {
     background-color: #005bac;
 
     .close {
       opacity: 1;
     }
-
     .close, .close:hover {
       color: #FFFFFF;
     }
@@ -172,13 +180,13 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
   }
   .flow-info {
     position: absolute;
-    text-align: center;
-    height: 20px;
-    line-height: 20px;
+    text-align: left;
     font-size: 13px;
+    z-index: 1001;
+    word-break: break-all;
   }
-  $flow_items_normal_border_color:(start:#b6d1e0,  end:#b6d1e0,  task:#b6d1e0,  decision:#7dd7d2);
-  $flow_items_active_border_color:(start:#005bac,  end:#005bac,  task:#005bac,  decision:#00bfb8);
+  $flow_items_normal_border_color: (start:#b6d1e0, end:#b6d1e0, task:#b6d1e0, decision:#7dd7d2);
+  $flow_items_active_border_color: (start:#005bac, end:#005bac, task:#005bac, decision:#00bfb8);
   .flow-item {
     position: absolute;
     padding: 10px;
@@ -216,29 +224,29 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
       border-color: #ff7928 !important;
     }
 
-
     &.diamond {
-      min-width: 50px;
-      min-height: 50px;
-      max-width: 50px;
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
+      max-width: 60px;
+      min-width: 60px;
+      min-height: 60px;
+      max-height: 60px;
       transform: rotate(45deg);
       background-color: #ffffff;
       border-radius: 0;
-
+      padding: 0;
       .diamond-text {
         transform: rotate(-45deg);
       }
     }
   }
   @each $flow_item_type, $flow_item_color in $flow_items_normal_border_color {
-    .flow-item[data-type=#{$flow_item_type}]{
+    .flow-item[data-type=#{$flow_item_type}] {
       border-color: $flow_item_color;
     }
   }
   @each $flow_item_type, $flow_item_color in $flow_items_active_border_color {
-    .flow-item[data-type=#{$flow_item_type}].active{
+    .flow-item[data-type=#{$flow_item_type}].active {
       border-color: $flow_item_color;
       .inner-circle {
         background-color: #005bac;

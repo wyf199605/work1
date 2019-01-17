@@ -9,10 +9,6 @@ import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import sys = BW.sys;
 import {TextInput} from "../../../global/components/form/text/text";
 import {ContactsModule} from "../flowDesigner/ContactsModule";
-import {FlowEditor} from "../flowDesigner/FlowEditor";
-import {ButtonBox} from "../../../global/components/mbList/ButtonBox";
-import {InputBox} from "../../../global/components/general/inputBox/InputBox";
-import {Button} from "../../../global/components/general/button/Button";
 import {PopBtnBox} from "../../../global/components/ui/actionSheet/popBtnBox";
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 
@@ -31,14 +27,19 @@ export class FlowReport extends BasicPage {
             nameFields: { [name: string]: R_Field } = {},
             form = this.createFormWrapper(para.fm.fields),
             self = this,
-            isInsert = tools.isNotEmpty(tools.url.getPara('task_id')) ? false : true,
             fields = para.fm.fields;
-        para.fm.fields.forEach(function (f) {
+        let isInsert = false;
+        if (tools.isMb){
+            isInsert = tools.isEmpty(tools.url.getPara('task_id',window.location.href))
+        }else{
+            isInsert = para.fm.caption === '新增';
+        }
+        fields.forEach(function (f) {
             nameFields[f.name] = f;
             let field = {
                 dom: d.query(`[data-name="${f.name}"] [data-input-type]`, form),
                 field: nameFields[f.name],
-                onExtra: (data, relateCols, isEmptyClear = false) => {
+                onExtra: (data, relateCols) => {
                     let com = self.editModule.getDom(f.name);
                     for (let key of relateCols) {
                         let hCom = self.editModule.getDom(key);
@@ -83,9 +84,8 @@ export class FlowReport extends BasicPage {
             emPara.fields.push(field);
         });
         this.editModule = new EditModule(emPara);
-        emPara.fields.forEach((f) => {
-            let field = f.field,
-                name = field.name,
+        fields.forEach((field) => {
+            let name = field.name,
                 isNotEdit = isInsert ? field.noModify : field.noEdit;
             if (isNotEdit && !field.noShow) {
                 let com = this.editModule.getDom(name);
@@ -299,8 +299,7 @@ export class FlowReport extends BasicPage {
                 let buttons = para.fm.subButtons || [];
                 if (buttons.length <= 2) {
                     buttons.map((item, index) => {
-                        let btnWrapper: HTMLElement = <div className="sub-btn-item" data-index={index}
-                                                           data-type={item.subType}>{item.caption}</div>;
+                        let btnWrapper: HTMLElement = <div className="sub-btn-item" data-index={index} data-type={item.subType}>{item.caption}</div>;
                         target.appendChild(btnWrapper);
                     });
                 } else {
@@ -539,7 +538,6 @@ export class FlowReport extends BasicPage {
         // url请求默认值
         if (form.dataAddr) {
             Promise.all([BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(form.dataAddr)), this.lookup]).then(([{response}]) => {
-                //	    alert(JSON.stringify(response));
                 let data = response.data[0];
                 if (!data) {
                     Modal.alert('数据为空');
