@@ -116,17 +116,17 @@ export = class NewCrossTabBasic extends NewStatisticBase{
                     data : [{value : 0,text : '生成合计值'}]
                 });
                 break;
-            case 'statistic_fixed':
-                this.coms['statistic_fixed'] = new SelectBox({
-                    container : el,
-                    select : {
-                        multi : true,
-                        callback : function(index){}
-                    },
-                    data : [{value : 0,text : '是否锁列'}]
-                });
-                this.coms['statistic_fixed'].setAll();
-                break;
+            // case 'statistic_fixed':
+            //     this.coms['statistic_fixed'] = new SelectBox({
+            //         container : el,
+            //         select : {
+            //             multi : true,
+            //             callback : function(index){}
+            //         },
+            //         data : [{value : 0,text : '是否锁列'}]
+            //     });
+            //     this.coms['statistic_fixed'].setAll();
+            //     break;
         }
     }
     /*
@@ -147,7 +147,7 @@ export = class NewCrossTabBasic extends NewStatisticBase{
             let row = <SelectBox>self.coms['row'],
                 col = <SelectBox>self.coms['col'],
                 val = <SelectBox>self.coms['val'],
-                // colsSum = self.coms['statistic_sum'],
+                colsSum = self.coms['statistic_sum'],
                 rowTmp = [],colTmp = [],valTmp = [],i,statistic,result;
             if(row.get().length === 0 || col.get().length === 0 || val.get().length === 0){
                 Modal.alert('行,列,值不允许为空');
@@ -176,13 +176,10 @@ export = class NewCrossTabBasic extends NewStatisticBase{
                 val: valTmp,
                 cols: self.conf.cols,
                 data: self.coms['statistic_select'].get()[0] === 0 ? self.conf.allData() : self.conf.selectedData(),
-                // colsSum: colsSum.get().length === 1,
-                isFixed: this.coms['statistic_fixed'].get().length === 1,
-            }).then((ev: resType) => {
-                self.tableRender(ev, self.conf.container,true);
-            }).catch((msg) => {
-                Modal.alert(msg)
+                colsSum: colsSum.get().length === 1,
+                // isFixed: this.coms['statistic_fixed'].get().length === 1,
             });
+            self.tableRender(result, self.conf.container,true);
             // self.modal.isShow = false;
             return false;
         };
@@ -334,12 +331,12 @@ export = class NewCrossTabBasic extends NewStatisticBase{
                 '<div class="col-xs-8">' +
                    '<div data-name="statistic_select" class="statistic_select"></div>'+
                 '</div>'+
-                // '<div class="col-xs-3">' +
-                //     '<div data-name="statistic_sum" class="statistic_sum"></div>'+
-                // '</div>'+
                 '<div class="col-xs-4">' +
-                '<div data-name="statistic_fixed" class="statistic_sum"></div>'+
+                    '<div data-name="statistic_sum" class="statistic_sum"></div>'+
                 '</div>'+
+                // '<div class="col-xs-3">' +
+                // '<div data-name="statistic_fixed" class="statistic_sum"></div>'+
+                // '</div>'+
             '</div>';
     }
 }

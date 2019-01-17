@@ -103,7 +103,9 @@ namespace BW {
             useAddressList_userGroup: 'ui/select/n3024_data-3024?output=json',  // 流程引擎-属性编辑-使用通讯录-用户组
             useAddressList_scriptSetting: 'ui/select/n3022_data-3022?output=json',  // 流程引擎-属性编辑-使用通讯录-脚本配置
             projectList: 'common/changepf',  // 切换项目（工作平台）
-            queryTest:'ui/select/node_nobugs?output=json'
+            queryTest:'ui/select/node_nobugs?output=json',
+
+            fileInfo: 'rest/attachment/info/file', // 文件信息
         },
 
         init(siteUrl: string, appid: string, version: string, webscoket) {

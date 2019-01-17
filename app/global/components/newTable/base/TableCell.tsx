@@ -78,16 +78,28 @@ export abstract class TableCell {
     }
 
     // 渲染到页面的格式
-    protected format(data: any) {
+    protected format(data: any): Promise<{
+        text: string | Node,
+        color?: string;
+        bgColor?: string;
+        classes?: string[],
+        data?: any
+    }> {
         let format = this.table.cellFormat,
             formated = format && format(data, this);
         // formated = format && format(this.column, (this.row as TableDataRow).data || {[this.name]: data});
         // if(this instanceof TableFooterCell){
         //     console.log(this.column)
         // }
-        formated = formated || {text: data};
-        formated.text = tools.str.removeHtmlTags(tools.str.toEmpty(formated.text));
-        return formated;
+        // formated = formated || {text: data};
+        // formated.text = tools.str.removeHtmlTags(tools.str.toEmpty(formated.text));
+        return new Promise((resolve, reject) => {
+            formated ? formated.then((result) => {
+                result = result || {text: data};
+                result.text = tools.str.removeHtmlTags(tools.str.toEmpty(result.text));
+                resolve(result);
+            }) : resolve({text: data});
+        });
     }
 
     // 是否显示在页面上
@@ -272,7 +284,7 @@ export class TableDataCell extends TableCell {
                     html = this.text;
                 }
             }
-            this.wrapper && (this.wrapper.innerHTML = html);
+            this.wrapper && (this.wrapper.innerHTML = tools.isEmpty(html) ? '' : html);
             this.initMoreBtn();
         }
     }
@@ -333,6 +345,7 @@ export class TableDataCell extends TableCell {
         });
     }
 
+    protected textNode: Text;
     render(cellData?){
         // debugger
         let data = tools.isEmpty(cellData) ? this.data : cellData;
@@ -352,44 +365,53 @@ export class TableDataCell extends TableCell {
             }
         }
         // this.wrapper && (this.wrapper.innerHTML = '');
-        if(data instanceof Node) {
-            this.wrapper && d.append(this.wrapper, data);
-        }else{
-            let formated = this.format(data);
-            if(formated) {
-                let {classes, text, color, bgColor, data} = formated;
-                if(text instanceof Node){
-                    this.wrapper && d.append(this.wrapper, text);
-                }else {
-                    this._text = text + '';
-                    this.wrapper && d.append(this.wrapper, document.createTextNode(this._text));
-                }
-                this.width = getTextWidth(this.text);
-                this.initMoreBtn();
-                this.classes = classes;
-                this.color = color;
-                this.background = bgColor;
-                if(data){
-                    this.table.tableData.update({[this.name]: data}, this.row.index);
-                }
+        new Promise((resolve) => {
+            if(data instanceof Node) {
+                this.wrapper && d.append(this.wrapper, data);
+                resolve();
+            }else{
+                this.format(data).then((formated) => {
+                    if(formated) {
+                        let {classes, text, color, bgColor, data} = formated;
+                        if(text instanceof Node){
+                            this.wrapper && d.append(this.wrapper, text);
+                        }else {
+                            text = tools.isEmpty(text) ? '' : text;
+                            this._text = text + '';
+                            if(this.wrapper){
+                                d.append(this.wrapper, this.textNode = document.createTextNode(this._text));
+                            }
+                        }
+                        this.width = getTextWidth(this.text);
+                        this.initMoreBtn();
+                        this.classes = classes;
+                        this.color = color;
+                        this.background = bgColor;
+                        if(data){
+                            this.table.tableData.update({[this.name]: data}, this.row.index);
+                        }
+                    }
+                    resolve();
+                });
             }
-        }
-        !this.table.isWrapLine && this.initMoreBtn();
+        }).then(() => {
+            !this.table.isWrapLine && this.initMoreBtn();
 
-        if(this.table.editing){
-            let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
-                rowData = null;
-            for(let data of this.table.tableData.edit.getOriginalData()){
-                if(data[TableBase.GUID_INDEX] === guidIndex){
-                    rowData = data;
-                    break;
+            if(this.table.editing){
+                let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
+                    rowData = null;
+                for(let data of this.table.tableData.edit.getOriginalData()){
+                    if(data[TableBase.GUID_INDEX] === guidIndex){
+                        rowData = data;
+                        break;
+                    }
                 }
+                // console.log(rowsData);
+                let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
+                // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
+                this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
             }
-            // console.log(rowsData);
-            let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
-            // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
-            this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
-        }
+        })
     }
 
     tagName() {
@@ -581,29 +603,40 @@ export class TableFooterCell extends TableCell{
         if(this.colCount) {
             this.optionGroup = {};
             let optionGroup = this.optionGroup;
+            let promises = [];
             this.options.forEach((data) => {
-                let text = this.format(data).text;
-                if (Array.isArray(optionGroup[text])) {
-                    optionGroup[text].push(data);
-                } else {
-                    optionGroup[text] = [data];
-                }
+                promises.push(this.format(data));
+                // let text = this.format(data).text;
+                // if (Array.isArray(optionGroup[text])) {
+                //     optionGroup[text].push(data);
+                // } else {
+                //     optionGroup[text] = [data];
+                // }
             });
-            let arr = Array.from({length: this.selectEl.length - 1}, (v, k) => k + 1);
+            Promise.all(promises).then((data) => {
+                data.forEach(({text}) => {
+                    if (Array.isArray(optionGroup[text])) {
+                        optionGroup[text].push(data);
+                    } else {
+                        optionGroup[text] = [data];
+                    }
+                });
+                let arr = Array.from({length: this.selectEl.length - 1}, (v, k) => k + 1);
 
-            d.diff(Object.keys(optionGroup), arr, {
-                create: (n) => {
-                    let option = <option>{n}</option>;
-                    d.data(option, optionGroup[n]);
-                    this.selectEl.add(option);
-                },
-                replace: (n, o) => {
-                    let option = this.selectEl.options[o];
-                    d.data(option, optionGroup[n]);
-                },
-                destroy: (o) => {
-                    this.selectEl.remove(o);
-                }
+                d.diff(Object.keys(optionGroup), arr, {
+                    create: (n) => {
+                        let option = <option>{n}</option>;
+                        d.data(option, optionGroup[n]);
+                        this.selectEl.add(option);
+                    },
+                    replace: (n, o) => {
+                        let option = this.selectEl.options[o];
+                        d.data(option, optionGroup[n]);
+                    },
+                    destroy: (o) => {
+                        this.selectEl.remove(o);
+                    }
+                });
             });
         }
 
@@ -638,22 +671,25 @@ export class TableFooterCell extends TableCell{
         if(tools.isNotEmpty(data)){
             if(this._options.indexOf(data) === -1){
                 this._options.push(data);
-                let text = this.format(data).text;
-                if(Array.isArray(this.optionGroup[text])){
-                    this.optionGroup[text].push(data);
-                    for(let i = 0; i < this.selectEl.length; i ++){
-                        let option = this.selectEl.options[i];
-                        let tem = option.text;
-                        if(tem == text){
-                            d.data(option, this.optionGroup[text]);
-                            break;
+                this.format(data).then((result) => {
+                    let text = result.text as string;
+                    if(Array.isArray(this.optionGroup[text])){
+                        this.optionGroup[text].push(data);
+                        for(let i = 0; i < this.selectEl.length; i ++){
+                            let option = this.selectEl.options[i];
+                            let tem = option.text;
+                            if(tem == text){
+                                d.data(option, this.optionGroup[text]);
+                                break;
+                            }
                         }
+                    }else{
+                        let option = <option>{text}</option>;
+                        this.optionGroup[text] = [data];
+                        this.selectEl.add(option, null);
                     }
-                }else{
-                    let option = <option>{text}</option>;
-                    this.optionGroup[text] = [data];
-                    this.selectEl.add(option, null);
-                }
+                });
+
             }
         }
     }
@@ -672,7 +708,9 @@ export class TableFooterCell extends TableCell{
             optionEl = this.selectEl.options[oldIndex + 1];
         if(oldIndex > -1){
             optionEl.value = newData;
-            optionEl.innerText = this.format(newData).text;
+            this.format(newData).then(({text}) => {
+                optionEl.innerText = text as string;
+            });
         }
     }
 

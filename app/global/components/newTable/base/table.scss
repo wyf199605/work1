@@ -217,7 +217,7 @@
 
     .section-inner-wrapper {
       position: relative;
-      overflow-x: auto;
+      overflow: auto;
       //min-height: 1px;
       &::-webkit-scrollbar {
         display: none;

@@ -4,6 +4,8 @@ import tools = G.tools;
 import sys = BW.sys;
 import {Modal} from "global/components/feedback/modal/Modal";
 import {FastBtnTable, IFastBtnTablePara} from "../../../global/components/FastBtnTable/FastBtnTable";
+import {FastTableCell} from "../../../global/components/newTable/FastTableCell";
+import {BwRule} from "../../common/rule/BwRule";
 
 export interface resType{
     cols : Array<any>;
@@ -41,7 +43,8 @@ export class NewStatisticBase {
         }
 
         let width,
-            resColsLen = isMulit ? result.cols[0].length : result.cols.length;
+            last = result.cols.length - 1,
+            resColsLen = isMulit ? result.cols[last].length : result.cols.length;
         if(resColsLen <= 2){
             width = '400px';
         }
@@ -63,6 +66,7 @@ export class NewStatisticBase {
             isBackground: false,
             container: container,
             width: width,
+            className: 'statistic-modal',
             height: '90%',
             header: {
                 title :  '统计结果',
@@ -80,12 +84,32 @@ export class NewStatisticBase {
             container: tempTable,
             // maxHeight: 400,
             isFullWidth: true,
+            sort: true,
             pseudo: {
                 type: "number",
             },
             isResizeCol: true,
             clickSelect: true,
-            dragSelect: !tools.isMb
+            dragSelect: !tools.isMb,
+            cellFormat: (cellData, cell: FastTableCell) => {
+                let col = cell.column,
+                    content = col.content;
+                return new Promise((resolve) => {
+                    let text = cellData,
+                        classes = [];
+                    if(content && content.content){
+                        let field = content.content as R_Field;
+                        text = BwRule.formatTableText(cellData, field);
+                        let dataType = field.dataAddr || (field.atrrs && field.atrrs.dataType);
+                        if (BwRule.isNumber(dataType)) {
+                            classes.push('text-right');
+                        }
+                        resolve({text, classes});
+                    }else{
+                        resolve({text, classes});
+                    }
+                })
+            }
         };
         !tools.isMb && (para['btn'] = {
             name:['search', 'statistic', 'export'],

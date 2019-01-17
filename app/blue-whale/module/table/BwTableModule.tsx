@@ -161,8 +161,16 @@ export class BwTableModule extends Component {
             },
             cellFormat: (cellData, cell: FastTableCell) => {
                 let col = cell.column,
+                    promise: Promise<any>,
                     rowData = this.ftable.tableData.rowDataGet(cell.row.index); // 行数据
-                return col ? this.cellFormat(col.content, cellData, rowData) : {text: cellData};
+                if(col){
+                    promise = this.cellFormat(col.content, cellData, rowData);
+                }else{
+                    promise = new Promise((resolve) => {
+                        resolve({text: cellData});
+                    })
+                }
+                return promise;
             },
             rowFormat: (rowData: obj) => {
                 let color = '',
@@ -620,9 +628,20 @@ export class BwTableModule extends Component {
         if (!field) {
             return;
         }
-        let link = field.link;
+        let link = field.link,
+            dataType = field.dataType || (field.atrrs && field.atrrs.dataType);
 
         if (tools.isEmpty(rowData[field.name])) {
+            return;
+        }
+
+        if(BwRule.isNewFile(dataType)){
+            let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                "md5_field": field.name,
+                [field.name]: rowData[field.name],
+                down: 'allow'
+            });
+            sys.window.download(url);
             return;
         }
 
@@ -875,7 +894,9 @@ export class BwTableModule extends Component {
         } else {
             return this.ftable.tableData.refresh(data).then(() => {
                 this.aggregate.get(data);
-                this.ftable.clearSelectedRows();
+                setTimeout(() => {
+                    this.ftable && this.ftable.clearSelectedRows();
+                }, 500)
             });
         }
 
@@ -1542,121 +1563,140 @@ export class BwTableModule extends Component {
      * @param rowData - 行数据
      */
     private cellFormat(field: R_Field, cellData: any, rowData: obj) {
-        let text: string | Node = cellData, // 文字 或 Node
-            data = null,
-            color: string,                  // 文字颜色
-            bgColor: string,                // 背景颜色
-            classes: string[] = [];         // 类名
-        if (field && !field.noShow && field.atrrs) {
-            let dataType = field.atrrs.dataType,
-                isImg = dataType === BwRule.DT_IMAGE;
+        return new Promise((resolve, reject) => {
+            let text: string | Node = cellData, // 文字 或 Node
+                data = null,
+                color: string,                  // 文字颜色
+                bgColor: string,                // 背景颜色
+                classes: string[] = [];         // 类名
+            if (field && !field.noShow && field.atrrs) {
+                let dataType = field.atrrs.dataType,
+                    isImg = dataType === BwRule.DT_IMAGE;
 
-            if (isImg && field.link) {
-                // 缩略图
-                let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData, true, true);
-                url = tools.url.addObj(url, {version: new Date().getTime()});
+                if (isImg && field.link) {
+                    // 缩略图
+                    let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData, true, true);
+                    url = tools.url.addObj(url, {version: new Date().getTime()});
 
-                text = <img src={url}/>;
-                classes.push('cell-img');
-
-            } else if (BwRule.isNewImg(dataType)) {
-                if (cellData) {
-                    let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                        "md5_field": field.name,
-                        [field.name]: cellData,
-                        down: 'allow'
-                    });
                     text = <img src={url}/>;
-                }
-                classes.push('cell-img');
-            } else if (dataType === BwRule.DT_MUL_IMAGE) {
-                // 多图缩略图
-                if (typeof cellData === 'string' && cellData[0]) {
-                    // url生成
-                    let urls = cellData.split(',')
-                        .map(md5 => BwRule.fileUrlGet(md5, field.name, true))
-                        .filter(url => url);
+                    classes.push('cell-img');
 
-                    // 多图缩略图控件
-                    if (tools.isNotEmptyArray(urls)) {
-                        text = new LayoutImage({urls}).wrapper;
+                } else if (BwRule.isNewImg(dataType)) {
+                    if (cellData) {
+                        let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                            "md5_field": field.name,
+                            [field.name]: cellData,
+                            down: 'allow'
+                        });
+                        text = <img src={url}/>;
+                    }
+                    classes.push('cell-img');
+                } else if (dataType === BwRule.DT_MUL_IMAGE) {
+                    // 多图缩略图
+                    if (typeof cellData === 'string' && cellData[0]) {
+                        // url生成
+                        let urls = cellData.split(',')
+                            .map(md5 => BwRule.fileUrlGet(md5, field.name, true))
+                            .filter(url => url);
+
+                        // 多图缩略图控件
+                        if (tools.isNotEmptyArray(urls)) {
+                            text = new LayoutImage({urls}).wrapper;
+                        }
+                    }
+
+                    classes.push('cell-img');
+
+                } else if(BwRule.isNewFile(dataType)){
+                    classes.push('cell-link');
+                    color = 'blue';
+                    if(cellData){
+                        BwRule.getFileInfo(field.name, cellData).then(({response}) => {
+                            console.log(response);
+                            response = JSON.parse(response);
+                            if(response && response.dataArr && response.dataArr[0]){
+                                let data = response.dataArr[0],
+                                    filename = data.filename;
+                                text = filename;
+                            }
+                            resolve({text, classes, bgColor, color, data});
+                        }).catch(() => {
+                            resolve({text, classes, bgColor, color, data});
+                        });
+                        return ;
+                    }
+                } else if (dataType === '50') {
+                    // 打钩打叉
+                    text = <div
+                        className={`appcommon ${cellData === 1 ? 'app-xuanzhong' : 'app-guanbi1'}`}
+                        style={`color: ${cellData === 1 ? 'green' : 'red'}`}>
+                    </div>;
+
+                } else if (field.name === 'STDCOLORVALUE') {
+                    // 显示颜色
+                    let {r, g, b} = tools.val2RGB(cellData);
+                    text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
+
+                } else if (field.elementType === 'lookup') {
+                    // lookUp替换
+                    let options = this.lookUpData[field.name] || [];
+                    for (let opt of options) {
+                        if (opt.value == rowData[field.lookUpKeyField]) {
+                            text = opt.text;
+                            data = opt.text;
+                        }
+                    }
+                } else {
+                    // 其他文字(金额,百分比,数字 等)
+                    text = BwRule.formatTableText(cellData, field);
+                }
+
+                // 时间
+                if (cellData && BwRule.isTime(dataType)) {
+                    text = BwRule.strDateFormat(cellData, field.atrrs.displayFormat);
+                }
+
+                // 数字默认右对齐
+                if (BwRule.isNumber(dataType)) {
+                    classes.push('text-right');
+                }
+
+                // 可点击单元格样式
+                ['drillAddr', 'webDrillAddr', 'webDrillAddrWithNull'].forEach((addr, i) => {
+                    // debugger;
+                    let reqAddr: R_ReqAddr = field[addr],
+                        keyFieldData = rowData[this.ui.keyField];
+                    if (reqAddr && reqAddr.dataAddr) {
+                        if (i === 2 ? tools.isEmpty(keyFieldData) : tools.isNotEmpty(keyFieldData)) {
+                            color = 'blue';
+                            classes.push("cell-link");
+                        }
+                    }
+                });
+
+                // 可点击单元格样式
+                if (field.link && !isImg && (field.endField ? rowData[field.endField] === 1 : true)) {
+                    color = 'blue';
+                    classes.push("cell-link");
+                }
+
+                if (this.btnsLinkName.includes(field.name)) {
+                    classes.push("cell-link");
+                    color = 'blue';
+                }
+
+                // 后台计算规则
+                let when = field.backWhen;
+                if (when) {
+                    if (eval(tools.str.parseTpl(when, rowData))) {
+                        let {r, g, b} = tools.val2RGB(field.backColor);
+                        bgColor = `rgb(${r},${g},${b})`
                     }
                 }
-
-                classes.push('cell-img');
-
-            } else if (dataType === '50') {
-                // 打钩打叉
-                text = <div
-                    className={`appcommon ${cellData === 1 ? 'app-xuanzhong' : 'app-guanbi1'}`}
-                    style={`color: ${cellData === 1 ? 'green' : 'red'}`}>
-                </div>;
-
-            } else if (field.name === 'STDCOLORVALUE') {
-                // 显示颜色
-                let {r, g, b} = tools.val2RGB(cellData);
-                text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
-
-            } else if (field.elementType === 'lookup') {
-                // lookUp替换
-                let options = this.lookUpData[field.name] || [];
-                for (let opt of options) {
-                    if (opt.value == rowData[field.lookUpKeyField]) {
-                        text = opt.text;
-                        data = opt.text;
-                    }
-                }
-            } else {
-                // 其他文字(金额,百分比,数字 等)
-                text = BwRule.formatTableText(cellData, field);
             }
 
-            // 时间
-            if (cellData && BwRule.isTime(dataType)) {
-                text = BwRule.strDateFormat(cellData, field.atrrs.displayFormat);
-            }
-
-            // 数字默认右对齐
-            if (BwRule.isNumber(dataType)) {
-                classes.push('text-right');
-            }
-
-            // 可点击单元格样式
-            ['drillAddr', 'webDrillAddr', 'webDrillAddrWithNull'].forEach((addr, i) => {
-                // debugger;
-                let reqAddr: R_ReqAddr = field[addr],
-                    keyFieldData = rowData[this.ui.keyField];
-                if (reqAddr && reqAddr.dataAddr) {
-                    if (i === 2 ? tools.isEmpty(keyFieldData) : tools.isNotEmpty(keyFieldData)) {
-                        color = 'blue';
-                        classes.push("cell-link");
-                    }
-                }
-            });
-
-            // 可点击单元格样式
-            if (field.link && !isImg && (field.endField ? rowData[field.endField] === 1 : true)) {
-                color = 'blue';
-                classes.push("cell-link");
-            }
-
-            if (this.btnsLinkName.includes(field.name)) {
-                classes.push("cell-link");
-                color = 'blue';
-            }
-
-            // 后台计算规则
-            let when = field.backWhen;
-            if (when) {
-                if (eval(tools.str.parseTpl(when, rowData))) {
-                    let {r, g, b} = tools.val2RGB(field.backColor);
-                    bgColor = `rgb(${r},${g},${b})`
-                }
-            }
-        }
-
-        return {text, classes, bgColor, color, data};
-
+            resolve({text, classes, bgColor, color, data});
+        })
     }
 
     // 多图查看与编辑
@@ -2123,14 +2163,19 @@ export class BwTableModule extends Component {
                             //     Modal.alert('请选最多一条数据');
                             //     return;
                             // }
-                            btn && (btn.isDisabled = true);
+
+                            box.children.forEach((button) => {
+                                button && (button.isDisabled = true);
+                            });
                             let spinner = new Spinner({
                                 el: btn.wrapper,
                                 type: Spinner.SHOW_TYPE.replace,
-                                time: 10000,
+                                time: 5000,
                                 onTimeout: () => {
-                                    btn && (btn.isDisabled = false);
-                                    Modal.toast('当前网络不佳～');
+                                    box.children.forEach((button) => {
+                                        button && (button.isDisabled = false);
+                                    });
+                                    // Modal.toast('当前网络不佳～');
                                 }
                             });
                             spinner.show();
@@ -2175,7 +2220,9 @@ export class BwTableModule extends Component {
                                     if (tools.isNotEmpty(locData)) {
                                         clearInterval(interval);
                                         ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                            btn && (btn.isDisabled = false);
+                                            box.children.forEach((button) => {
+                                                button && (button.isDisabled = false);
+                                            });
                                             spinner && spinner.hide();
                                         }, this.pageUrl, this.ui.itemId);
                                     }
@@ -2185,7 +2232,9 @@ export class BwTableModule extends Component {
                                 window.localStorage.removeItem('nextKeyField');
                                 window.localStorage.removeItem('currentKeyField');
                                 ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                    btn && (btn.isDisabled = false);
+                                    box.children.forEach((button) => {
+                                        button && (button.isDisabled = false);
+                                    });
                                     spinner && spinner.hide();
                                 }, this.pageUrl, this.ui.itemId);
                             }

@@ -3,6 +3,8 @@
 import {TableBase} from "../components/newTable/base/TableBase";
 import tools = G.tools;
 import {Loading} from "../components/ui/loading/loading";
+import {IFastTableCol} from "../components/newTable/FastTable";
+import {TreeNodeBase} from "../dataStruct/tree/TreeNodeBase";
 
 interface BT_cross {
     colsSum?: boolean,
@@ -11,7 +13,6 @@ interface BT_cross {
     val: any[]        // 值
     cols: any[],		// 表头数据
     data: any[], 	    // 表格数据
-    isFixed?: boolean,
 }
 
 interface BT_abc {
@@ -39,15 +40,315 @@ export class Statistic {
 
     }
 
-    static crossTable = (() => {
+    static getCrossTableData = (data: Array<Array<string | number>>, colLength: number = 1, isTotal = true, valTitle: Array<string> = []) => {
+        let rows: Array<Array<string | number>> = [],
+            cols: Array<Array<string | number>> = [],
+            pos: Array<{row: number, col: number, value: number, isTotal: boolean}> = [],
+            rowLength = data[0].length - colLength - 1;
 
-        /*let getData = (col: ITableCol[], conf: BT_cross) => {
-            let result = [];
-            for(let item of col){
+        data.forEach((datum, index) => {
+            let colItem: Array<string | number> = [],
+                rowItem: Array<string | number> = [],
+                posItem = {
+                    row: -1,
+                    col: -1,
+                    value: null,
+                    isTotal: false
+                };
 
+            for(let i = 0; i < cols.length; i++){
+                let col = cols[i];
+                if(col.every((val, index) => {
+                        return val == datum[index]
+                    })){
+                    posItem.col = i;
+                    break;
+                }
             }
-            return [];
-        };*/
+
+            for(let i = 0; i < rows.length; i++){
+                let row = rows[i];
+                if(row.every((val, index) => {
+                        return val == datum[colLength + index]
+                    })){
+                    posItem.row = i;
+                    break;
+                }
+            }
+
+            for(let i = 0; i < datum.length; i++){
+                let value = datum[i];
+                if(i < colLength) {
+                    colItem.push(value);
+                }else if(i < datum.length - 1){
+                    rowItem.push(value);
+                }else{
+                    posItem.value = Number(value);
+                }
+            }
+            if(posItem.col === -1){
+                colItem['index'] = cols.length;
+                posItem.col = cols.push(colItem) - 1;
+            }
+            if(posItem.row === -1){
+                rowItem['index'] = rows.length;
+                posItem.row = rows.push(rowItem) - 1;
+            }
+            pos.push(posItem);
+        });
+
+        let tableData: Array<{row: number, col: number, value: number, isTotal: boolean}> = [];
+        pos.forEach((datum) => {
+            let isAdd = false;
+            for(let i = 0; i < tableData.length; i ++){
+                let data = tableData[i];
+                if(data.row === datum.row && data.col === datum.col){
+                    tableData[i].value = tableData[i].value + datum.value;
+                    isAdd = true;
+                    break;
+                }
+            }
+            !isAdd && tableData.push(datum);
+        });
+
+        rows = rows.sort();
+        if(isTotal){
+            let colItem = new Array(colLength),
+                colCount = cols.length,
+                rowCount = rows.length,
+                valLength = valTitle.length || 1;
+            colItem[0] = '合计';
+            colItem['index'] = colCount;
+            colItem['isTotal'] = true;
+            cols.push(colItem);
+
+            if(Array.isArray(valTitle) && valLength > 1){
+                valTitle.forEach((title, index) => {
+                    let rowItem = new Array(rowLength);
+                    rowItem[0] = '合计';
+                    rowItem[1] = title;
+                    rowItem['index'] = rowCount + index;
+                    rowItem['isTotal'] = true;
+                    rows.push(rowItem);
+                })
+            }else{
+                let rowItem = new Array(rowLength);
+                rowItem[0] = '合计';
+                rowItem['index'] = rowCount;
+                rowItem['isTotal'] = true;
+                rows.push(rowItem);
+            }
+
+            for(let i = 0; i < colCount; i ++){
+                for(let k = 0; k < valLength; k++) {
+                    let value = tableData.reduce((previousValue, currentValue) => {
+                        let val = !currentValue.isTotal && (currentValue.col === i && currentValue.row % valLength === k)
+                            ? currentValue.value : 0;
+                        return previousValue + val;
+                    }, 0);
+                    tableData.push({
+                        row: rowCount + k,
+                        col: i,
+                        value: value,
+                        isTotal: true
+                    });
+                }
+            }
+
+            for(let i = 0; i < rowCount; i ++){
+                let value = tableData.reduce((previousValue, currentValue) => {
+                    let val = !currentValue.isTotal && currentValue.row === i
+                        ? currentValue.value : 0;
+                    return previousValue + val;
+                }, 0);
+                tableData.push({
+                    row: i,
+                    col: colCount,
+                    value: value,
+                    isTotal: true
+                });
+            }
+
+            for(let k = 0; k < valLength; k++) {
+                let value = tableData.reduce((previousValue, currentValue) => {
+                    let val = currentValue.isTotal && (currentValue.col !== colCount && currentValue.row % valLength === k)
+                        ? currentValue.value : 0;
+                    return previousValue + val;
+                }, 0);
+                tableData.push({
+                    row: rowCount + k,
+                    col: colCount,
+                    value: value,
+                    isTotal: true
+                });
+            }
+
+        }
+        return {
+            tableData,
+            rows: rows,
+            cols: cols
+        }
+    };
+
+    static crossTable = (() => {
+        let getData = (para: BT_cross) => {
+            let tableData = [],
+                {
+                    data,
+                    col,
+                    row,
+                    val,
+                    cols,
+                    colsSum
+                } = para,
+                valTitle = [];
+            data.forEach((item) => {
+                let datum = [];
+                col.forEach((name) => {
+                    datum.push(item[name]);
+                });
+                row.forEach((name) => {
+                    datum.push(item[name]);
+                });
+                if(val.length > 1){
+                    val.forEach((name) => {
+                        let data = datum.slice();
+                        for(let col of cols){
+                            if(name === col.name){
+                                data.push(col.title);
+                                valTitle.push(col.title);
+                            }
+                        }
+                        data.push(item[name]);
+                        tableData.push(data);
+                    });
+                    valTitle = valTitle.slice(0, val.length);
+                }else{
+                    val.forEach((name) => {
+                        datum.push(item[name]);
+                    });
+                    tableData.push(datum);
+                }
+            });
+            return Statistic.getCrossTableData(tableData, col.length, colsSum, valTitle);
+        };
+
+        let getProp = (result, config: BT_cross) => {
+            let rowLength = result.rows[0].length,
+                fields: IFastTableCol[][] = Array.from({length: rowLength}, () => []),
+                colName = config.col,
+                values = config.val,
+                valFields = [],
+                isTotal = config.colsSum;
+
+            config.cols.forEach((col) => {
+                if(~colName.indexOf(col.name)){
+                    fields[0].push({
+                        title: col.title,
+                        name: col.name,
+                        rowspan: rowLength,
+                        isFixed: true
+                    })
+                }
+                if(~values.indexOf(col.name)){
+                    valFields.push(col)
+                }
+            });
+
+            let trees: TreeNodeBase = new TreeNodeBase({});
+
+            result.rows.forEach((row) => {
+                let parent: TreeNodeBase = trees,
+                    rowIndex = row['index'];
+                row.forEach((col) => {
+                    let children = parent.find((child) => {
+                        return child.content ? child.content.title == col : false;
+                    });
+                    if(children && tools.isNotEmpty(children[0])){
+                        children[0].content.colspan ++;
+                        children[0].content.indexes.push(rowIndex);
+                        parent = children[0];
+                    }else{
+                        let rowspan = row['isTotal'] && !parent.content ? rowLength : 1,
+                            colspan = 1;
+                        if(row['isTotal'] && !parent.content && config.val.length > 1){
+                            rowspan = rowspan - 1;
+                        }
+                        parent.childrenAdd(parent = new TreeNodeBase({
+                            content: {
+                                title: col,
+                                name: tools.getGuid(),
+                                rowspan: rowspan,
+                                colspan: colspan,
+                                indexes: [rowIndex]
+                            }
+                        }))
+                    }
+                })
+            });
+            let colLength = result.cols.length,
+                colData = Array.from({length: colLength}, () => ({})),
+                rowIndexes: Array<{indexes: number[], name: string}> = [];
+
+            trees.each((child, deep) => {
+                if(Array.isArray(fields[deep - 1])){
+                    let rowspan = child.content ? child.content.rowspan || 1 : 1,
+                        parentRowSpan = child.parent && child.parent.content ? child.parent.content.rowspan || 1 : 1;
+                    if(deep - 1 + parentRowSpan === fields.length){
+                        fields[fields.length - 1].push(child.content);
+                        rowIndexes.push({
+                            indexes: child.content.indexes,
+                            name: child.content.name
+                        });
+                    }else{
+                        fields[deep - 1].push(child.content);
+                    }
+                }
+            });
+            result.cols.forEach((values, index) => {
+                for(let i = 0; i < values.length; i ++){
+                    let val = values[i] || '';
+                    let name = fields[0][i].name;
+                    colData[index][name] = values['isTotal'] ? '合计' : val;
+                }
+                // values.forEach((val) => {
+                // })
+            });
+            result.tableData.forEach(({row, col, value}, index) => {
+                for(let item of rowIndexes){
+                    if(~item.indexes.indexOf(row)){
+                        colData[col][item.name] = value || '';
+                        break;
+                    }
+                }
+            });
+
+            let valFieldLength = valFields.length;
+            if(valFieldLength > 1){
+                fields[fields.length - 1].forEach((item, index) => {
+                    if(item && item.title){
+                        for(let val of valFields){
+                            if(val.title === item.title){
+                                item.content = val;
+                                break;
+                            }
+                        }
+                    }
+                });
+            }else{
+                let last = fields.length - 1,
+                    start = last > 0 ? 0 : colName.length;
+                for(let i = start, len = fields[last].length; i < len; i++){
+                    fields[last][i].content = valFields[0];
+                }
+            }
+            console.log(fields);
+            return {
+                cols: fields,
+                data: colData
+            }
+        };
         return {
             init(para: BT_cross) {
                 let result = {
@@ -60,45 +361,45 @@ export class Statistic {
                     val: [],
                     cols: [],	// 表头数据
                     data: [],	// 表格数据
-                    isFixed: false,
                 };
 
                 let config = <BT_cross>Object.assign({}, defaultConf, para);
                 // result.data = getData(TableBase.getDataCol(result.cols), conf);
-
-                return new Promise((resolve, reject) => {
-                    if ('Worker' in window) {
-                        let worker = new Worker(G.requireBaseUrl + 'statisticWorker.js');
-                        let loading = new Loading({});
-                        loading.show();
-                        worker.postMessage({
-                            type: "cols",
-                            data: {
-                                config: config,
-                            }
-                        });
-                        worker.onmessage = (ev) => {
-                            if(ev.data.type === 'cols'){
-                                result.cols = ev.data.result;
-                                worker.postMessage({
-                                    type: "data",
-                                    data: {
-                                        cols: TableBase.getDataCol(result.cols),
-                                        config: config,
-                                    }
-                                });
-                            }else if(ev.data.type === 'data') {
-                                result.data = ev.data.result;
-                                resolve(result);
-                                worker.terminate();
-                                worker = null;
-                                loading.hide();
-                            }
-                        };
-                    }else {
-                        reject('您的设备暂时不支持交叉制表');
-                    }
-                });
+                let data = getData(config);
+                return getProp(data, config);
+                // return new Promise((resolve, reject) => {
+                //     if ('Worker' in window) {
+                //         let worker = new Worker(G.requireBaseUrl + 'statisticWorker.js');
+                //         let loading = new Loading({});
+                //         loading.show();
+                //         worker.postMessage({
+                //             type: "cols",
+                //             data: {
+                //                 config: config,
+                //             }
+                //         });
+                //         worker.onmessage = (ev) => {
+                //             if(ev.data.type === 'cols'){
+                //                 result.cols = ev.data.result;
+                //                 worker.postMessage({
+                //                     type: "data",
+                //                     data: {
+                //                         cols: TableBase.getDataCol(result.cols),
+                //                         config: config,
+                //                     }
+                //                 });
+                //             }else if(ev.data.type === 'data') {
+                //                 result.data = ev.data.result;
+                //                 resolve(result);
+                //                 worker.terminate();
+                //                 worker = null;
+                //                 loading.hide();
+                //             }
+                //         };
+                //     }else {
+                //         reject('您的设备暂时不支持交叉制表');
+                //     }
+                // });
             }
         }
     })();

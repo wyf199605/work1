@@ -1,3 +1,9 @@
+.statistic-modal{
+  .modal-body{
+    max-height: none!important;
+  }
+}
+
 .fl-pc .table-module-has-sub {
   .sub-table-tab-wrapper {
     overflow: hidden;
@@ -284,6 +290,7 @@
       -webkit-box-shadow: none;
       box-shadow: none;
       border-top: 1px solid #e1e1e1;
+      //z-index: 10000;
       transition: none;
 
       & > div {

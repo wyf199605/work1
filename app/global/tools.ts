@@ -50,6 +50,12 @@ namespace G {
         escapeRegExp(str) {
             return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
         },
+        cssSupports(property: string, value: string): boolean {
+            if('CSS' in window && CSS && CSS.supports){
+                return CSS.supports(property, value) || CSS.supports(property + ':' + value);
+            }
+            return false;
+        },
         /**
          * 为特定字符串设置为高亮
          * @param {string} str - 整个字符串
