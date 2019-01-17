@@ -84,10 +84,10 @@ export class PickTable {
         if(this.table) {
             let data = this.table.selectedRowsData;
             if(data.length === 0){
+                Modal.alert('没有选中任何数据', '温馨提示');
+            }else{
                 this.onDataGet && this.onDataGet(data);
                 this.isOnceDestroy && this.destroy();
-            }else{
-                Modal.alert('没有获取到数据') ;
             }
         }else{
            Modal.alert('没有获取到数据') ;
