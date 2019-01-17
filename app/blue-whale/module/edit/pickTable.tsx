@@ -25,7 +25,7 @@ export class PickTable {
     protected onClose: () => void;
     protected isOnceDestroy: boolean = true;
     constructor(para: IPickTablePara){
-        this.wrapper = <div/>;
+        this.wrapper = <div class="pick-table-wrapper"/>;
 
         this.isOnceDestroy = tools.isEmpty(para.isOnceDestroy) ? true : para.isOnceDestroy;
         this.onDataGet = para.onDataGet;
@@ -60,10 +60,11 @@ export class PickTable {
     protected initTable(para: IPickTablePara){
         let meta = para.meta,
             field: R_Field[] = meta.map((name) => {
-                return para.fields.filter((col) => {
+                let fields = para.fields.filter((col) => {
                     return col.name === name;
-                })[0]
-            });
+                });
+                return fields[0] || null;
+            }).filter((field) => tools.isNotEmpty(field));
 
         this.table = new FastTable({
             cols: BwTableModule.colParaGet(field),
