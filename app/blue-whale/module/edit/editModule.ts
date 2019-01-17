@@ -25,12 +25,15 @@ import {BwUploader} from "../uploadModule/bwUploader";
 import {UploadImages} from "../uploadModule/uploadImages";
 import {Accessory} from "../uploadModule/accessory";
 import {TextAreaInput} from "../../../global/components/form/text/TextInput";
+import {PickTable} from "./pickTable";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 interface ComInitFun {
     (para: ComInitP): FormCom
 }
 
 export class EditModule {
+    private cols: R_Field[];
     private coms: objOf<FormCom> = {};
     private comsExtraData: objOf<obj> = {};
 
@@ -44,6 +47,7 @@ export class EditModule {
     }
 
     constructor(private para: EditModulePara) {
+        this.cols = para.cols;
         this.defaultData = para.defaultData || {};
         if (Array.isArray(para.fields)) {
             para.fields.forEach((f) => {
@@ -505,16 +509,37 @@ export class EditModule {
             this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.assignAddr, data), {
                 cache: true,
             }).then(({response}) => {
-                let resData = tools.keysVal(response, 'data', 0),
-                    assignData = assignDataGet(val, resData);
+                let resData = tools.keysVal(response, 'data');
 
-                for (let key in assignData) {
-                    assignData[key] = Array.isArray(assignData[key]) ? assignData[key].join(';') : ''
-                }
+                new Promise<obj>((resolve) => {
+                    if(this.cols && resData.length > 1){
+                        let meta = tools.keysVal(response, 'body', 'bodyList', 0, 'meta') || [];
+                        new PickTable({
+                            fields: this.cols,
+                            data: resData,
+                            meta: meta,
+                            title: field.caption,
+                            container: this.para.container,
+                            onDataGet: (data) => {
+                                console.log(data);
+                                resolve(data[0] || {});
+                            }
+                        });
+                    }else{
+                        resolve(resData[0]);
+                    }
+                }).then((data) => {
+                    let assignData = assignDataGet(val, data);
 
-                assign2extra(field, assignData);
-                // debugger;
-                onExtra && onExtra(assignData, field.assignSelectFields, true, false, true);
+                    for (let key in assignData) {
+                        assignData[key] = Array.isArray(assignData[key]) ? assignData[key].join(';') : ''
+                    }
+
+                    assign2extra(field, assignData);
+                    // debugger;
+                    onExtra && onExtra(assignData, field.assignSelectFields, true, false, true);
+                })
+
             })
         };
 

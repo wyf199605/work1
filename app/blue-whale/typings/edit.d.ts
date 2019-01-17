@@ -12,6 +12,7 @@ interface EditModulePara {
     type?: string;
     container?: HTMLElement;
     defaultData?: obj;
+    cols?: R_Field[]
 }
 
 //

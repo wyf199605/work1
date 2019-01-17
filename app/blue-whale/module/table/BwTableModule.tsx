@@ -2440,7 +2440,9 @@ export class BwTableModule extends Component {
                         dom: null,
                         field: f
                     }
-                })
+                }),
+                container: this.container,
+                cols: this.ui.cols
             });
 
             bwTable.ftable.editorInit({

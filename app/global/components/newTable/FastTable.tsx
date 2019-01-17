@@ -36,6 +36,7 @@ export interface IFastTablePara extends IComponentPara {
     pseudo?: { // 是否开启伪列, 默认不开,
         type: PseudoTableType;
         isShow?: boolean;
+        isAll?: boolean; // 是否开启全选
         multi?: boolean; // 点击时单选还是多选, 默认单选
     },
     ajax?: IDataManagerAjax;
@@ -164,7 +165,7 @@ export class FastTable extends Component {
         this.setMainTableWidth();
     }
 
-    private mutiSelect: boolean;
+    protected mutiSelect: boolean;
 
     // 初始化
     protected init(para: IFastTablePara) {
@@ -203,8 +204,8 @@ export class FastTable extends Component {
         // 索引列
 
         if (para.pseudo) {
-            let {type, isShow} = para.pseudo;
-            this.initPseudoTable(type, isShow);
+            let {type, isShow, isAll} = para.pseudo;
+            this.initPseudoTable(type, isShow, isAll);
         }
         // else {
         //     this.pseudoTable = null;
@@ -581,12 +582,13 @@ export class FastTable extends Component {
         return this._pseudoTable;
     }
 
-    private initPseudoTable(type: PseudoTableType, isShow: boolean) {
+    private initPseudoTable(type: PseudoTableType, isShow: boolean, isAll = true) {
         // let count = this.mainTable.body.rows ? this.mainTable.body.rows.length : 0;
         this._pseudoTable = this.mainTable._createAnnexedTable({
             fastTable: this,
             type,
             isShow,
+            isAll,
             multiHeadRow: this.mainTable.head.rows.length,
             colCount: this.colCount && {text: ' '}
         }, FastPseudoTable, 0) as FastPseudoTable;
