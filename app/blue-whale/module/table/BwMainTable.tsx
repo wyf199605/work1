@@ -78,8 +78,7 @@ export class BwMainTableModule extends BwTableModule{
             clientHeight -= 45;
 
             // iphone x 兼容
-            if('CSS' in window && CSS.supports && (CSS.supports('height: env(safe-area-inset-bottom)')
-                || CSS.supports('height', 'env(safe-area-inset-bottom)'))){
+            if(tools.cssSupports('height', 'env(safe-area-inset-bottom)')){
                 this.ftable.wrapper.style.height  = `calc(${clientHeight}px - env(safe-area-inset-bottom) - env(safe-area-inset-bottom))`;
             }else{
                 this.ftable.wrapper.style.height = clientHeight + 'px';
