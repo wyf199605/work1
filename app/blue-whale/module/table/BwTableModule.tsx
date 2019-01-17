@@ -2578,7 +2578,7 @@ export class BwTableModule extends Component {
             });
         };
 
-        let validate = (editModule, cell: FastTableCell): Promise<any> => {
+        let validate = (editModule: EditModule, cell: FastTableCell): Promise<any> => {
             let promise: Promise<any> = new Promise((resolve, reject) => {
                 let name = cell.name,
                     field: R_Field = cell.column.content,
@@ -2609,7 +2609,7 @@ export class BwTableModule extends Component {
                     // lookUpCell && (lookUpCell.errorMsg = errorMsg.errMsg);
                     resolve();
                     // callback(td, false);
-                } else if (field.chkAddr && tools.isNotEmpty(rowData[name])) {
+                } else if (field.chkAddr/* && tools.isNotEmpty(rowData[name])*/) {
                     EditConstruct.checkValue(field, rowData, () => {
                         if (this.ftable && this.ftable.editing) {
                             lookUpCell && (lookUpCell.data = null);

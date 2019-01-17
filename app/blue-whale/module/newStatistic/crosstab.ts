@@ -302,18 +302,18 @@ export = class NewCrossTabBasic extends NewStatisticBase{
                     '<div class="col-xs-4">' +
                         '<fieldset class="col-xs-12">' +
                             '<legend>行</legend>' +
-                                '<div class="statistic_row">' +
-                                  '<div data-name="row"></div>'+
+                                '<div class="statistic_col">' +
+                                  '<div data-name="col"></div>'+
                                 '</div>'+
-                             '</legend>'+
+                            '</legend>'+
                         '</fieldset>'+
                     '</div>'+
                     '<div class="col-xs-4">' +
                         '<fieldset class="col-xs-12">' +
                             '<legend>列</legend>' +
-                                '<div class="statistic_col">' +
-                                  '<div data-name="col"></div>'+
-                                '</div>'+
+                                '<div class="statistic_row">' +
+                                '<div data-name="row"></div>'+
+                            '</div>'+
                             '</legend>'+
                         '</fieldset>'+
                     '</div>'+
