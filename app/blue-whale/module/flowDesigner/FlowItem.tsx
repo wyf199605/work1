@@ -94,8 +94,8 @@ export class FlowItem extends Component {
             this.wrapper.style.left = x + 'px';
             this.wrapper.style.top = y + 'px';
             if (diamondArr.indexOf(para.type) >= 0) {
-                this.width = para.width || 50;
-                this.height = para.height || 50;
+                this.width = 60;
+                this.height = 60;
                 this.isDiamond = true;
                 this.wrapper.classList.add('diamond');
                 this.wrapper.appendChild(<div className="diamond-text">{para.text || para.type}</div>);
