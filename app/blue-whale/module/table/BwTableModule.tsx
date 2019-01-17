@@ -2163,14 +2163,19 @@ export class BwTableModule extends Component {
                             //     Modal.alert('请选最多一条数据');
                             //     return;
                             // }
-                            btn && (btn.isDisabled = true);
+
+                            box.children.forEach((button) => {
+                                button && (button.isDisabled = true);
+                            });
                             let spinner = new Spinner({
                                 el: btn.wrapper,
                                 type: Spinner.SHOW_TYPE.replace,
-                                time: 10000,
+                                time: 5000,
                                 onTimeout: () => {
-                                    btn && (btn.isDisabled = false);
-                                    Modal.toast('当前网络不佳～');
+                                    box.children.forEach((button) => {
+                                        button && (button.isDisabled = false);
+                                    });
+                                    // Modal.toast('当前网络不佳～');
                                 }
                             });
                             spinner.show();
@@ -2215,7 +2220,9 @@ export class BwTableModule extends Component {
                                     if (tools.isNotEmpty(locData)) {
                                         clearInterval(interval);
                                         ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                            btn && (btn.isDisabled = false);
+                                            box.children.forEach((button) => {
+                                                button && (button.isDisabled = false);
+                                            });
                                             spinner && spinner.hide();
                                         }, this.pageUrl, this.ui.itemId);
                                     }
@@ -2225,7 +2232,9 @@ export class BwTableModule extends Component {
                                 window.localStorage.removeItem('nextKeyField');
                                 window.localStorage.removeItem('currentKeyField');
                                 ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                    btn && (btn.isDisabled = false);
+                                    box.children.forEach((button) => {
+                                        button && (button.isDisabled = false);
+                                    });
                                     spinner && spinner.hide();
                                 }, this.pageUrl, this.ui.itemId);
                             }

@@ -154,7 +154,7 @@ export class Statistic {
                     });
                 }
             }
-            console.log(colCount, valLength);
+
             for(let i = 0; i < rowCount; i ++){
                 let value = tableData.reduce((previousValue, currentValue) => {
                     let val = !currentValue.isTotal && currentValue.row === i
@@ -170,12 +170,17 @@ export class Statistic {
             }
 
             for(let k = 0; k < valLength; k++) {
+                let value = tableData.reduce((previousValue, currentValue) => {
+                    let val = currentValue.isTotal && (currentValue.col !== colCount && currentValue.row % valLength === k)
+                        ? currentValue.value : 0;
+                    return previousValue + val;
+                }, 0);
                 tableData.push({
                     row: rowCount + k,
                     col: colCount,
-                    value: null,
+                    value: value,
                     isTotal: true
-                })
+                });
             }
 
         }
@@ -233,6 +238,8 @@ export class Statistic {
             let rowLength = result.rows[0].length,
                 fields: IFastTableCol[][] = Array.from({length: rowLength}, () => []),
                 colName = config.col,
+                values = config.val,
+                valFields = [],
                 isTotal = config.colsSum;
 
             config.cols.forEach((col) => {
@@ -244,13 +251,17 @@ export class Statistic {
                         isFixed: true
                     })
                 }
+                if(~values.indexOf(col.name)){
+                    valFields.push(col)
+                }
             });
+
             let trees: TreeNodeBase = new TreeNodeBase({});
 
             result.rows.forEach((row) => {
                 let parent: TreeNodeBase = trees,
                     rowIndex = row['index'];
-                row.forEach((col, index) => {
+                row.forEach((col) => {
                     let children = parent.find((child) => {
                         return child.content ? child.content.title == col : false;
                     });
@@ -295,15 +306,10 @@ export class Statistic {
                     }
                 }
             });
-
-            console.log(result);
-            console.log(rowIndexes);
-            console.log(trees);
             result.cols.forEach((values, index) => {
                 for(let i = 0; i < values.length; i ++){
                     let val = values[i] || '';
                     let name = fields[0][i].name;
-                    console.log(name);
                     colData[index][name] = values['isTotal'] ? '合计' : val;
                 }
                 // values.forEach((val) => {
@@ -318,7 +324,25 @@ export class Statistic {
                 }
             });
 
-            console.log(colData);
+            let valFieldLength = valFields.length;
+            if(valFieldLength > 1){
+                fields[fields.length - 1].forEach((item, index) => {
+                    if(item && item.title){
+                        for(let val of valFields){
+                            if(val.title === item.title){
+                                item.content = val;
+                                break;
+                            }
+                        }
+                    }
+                });
+            }else{
+                let last = fields.length - 1,
+                    start = last > 0 ? 0 : colName.length;
+                for(let i = start, len = fields[last].length; i < len; i++){
+                    fields[last][i].content = valFields[0];
+                }
+            }
             console.log(fields);
             return {
                 cols: fields,

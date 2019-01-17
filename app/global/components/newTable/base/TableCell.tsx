@@ -345,6 +345,7 @@ export class TableDataCell extends TableCell {
         });
     }
 
+    protected textNode: Text;
     render(cellData?){
         // debugger
         let data = tools.isEmpty(cellData) ? this.data : cellData;
@@ -377,7 +378,9 @@ export class TableDataCell extends TableCell {
                         }else {
                             text = tools.isEmpty(text) ? '' : text;
                             this._text = text + '';
-                            this.wrapper && d.append(this.wrapper, document.createTextNode(this._text));
+                            if(this.wrapper){
+                                d.append(this.wrapper, this.textNode = document.createTextNode(this._text));
+                            }
                         }
                         this.width = getTextWidth(this.text);
                         this.initMoreBtn();

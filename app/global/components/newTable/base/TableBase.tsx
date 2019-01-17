@@ -790,7 +790,7 @@ export class TableBase extends Component {
 
     public sortByIndex(sortRule: ISortRule) {
         this.tableData.sortByIndex(sortRule);
-        this.render(0, this.tableData.get().length);
+        // this.render(0, this.tableData.get().length);
     }
 
     public colCountByIndex(indexes: Array<number>) {
