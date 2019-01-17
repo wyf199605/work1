@@ -430,9 +430,7 @@ export class RfidBarCode extends Component {
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
                                             if (res.success) {
                                                 this.domHash['scanamout'].innerHTML = 0 + '';
-                                                this.domHash['scanamout'].innerText = res.data.scanNum;
                                                 this.refreshCount(para);
-                                                d.query('.total-nums>span').innerText = res.data.scanNum;
                                                 alert('删除成功');
                                                 this.domHash['count'].innerHTML = 0 + '';
                                                 this.stepArry = [];
