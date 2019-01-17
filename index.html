@@ -33,7 +33,7 @@
         margin-bottom: 40px;
     }
 
-    #downloadPC {
+    #downloadPC, #downloadAD, #downloadIOS {
         display: block;
         margin-left: auto;
         margin-right: auto;
@@ -41,9 +41,10 @@
         color: #4d4d4d;
         border: 1px solid #c2c2c2 !important;
         background: #fff;
+        margin-bottom: 40px;
     }
 
-    #downloadPC:hover {
+    #downloadPC:hover, #downloadAD:hover, #downloadIOS:hover {
         background: buttonface;
     }
 
@@ -68,8 +69,8 @@
                     <h4>iOS版</h4>
                 </div>
                 <img class="downloadImg" src="img/ipLogo.png" style="width: 67px">
+                <button id="downloadIOS" class="btn">立即下载</button>
                 <img class="QRCode" src="img/ipCode.png">
-
             </div>
         </div>
         <div class="col-sm-4 col-xs-6">
@@ -78,7 +79,8 @@
                     <h4>Android版</h4>
                 </div>
                 <img class="downloadImg" src="img/adLogo.png" style="width: 71px">
-                <img class="QRCode" id="downloadAD" src="img/adDownloadQRCode.png">
+                <button id="downloadAD" class="btn">立即下载</button>
+                <img class="QRCode" src="img/adDownloadQRCode.png">
             </div>
         </div>
         <div class="col-sm-4 col-xs-6">
@@ -105,6 +107,9 @@
         });
         $('#downloadAD').click(function () {
             window.location.href = 'https://bw.sanfu.com/bw.apk';
+        });
+        $('#downloadIOS').click(function () {
+            window.location.href = 'https://itunes.apple.com/cn/app/%E8%93%9D%E9%B2%B8%E5%90%8E%E5%8F%B0/id1185146111?l=en&mt=8';
         })
     })
 </script>
