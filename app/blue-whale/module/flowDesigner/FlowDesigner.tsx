@@ -198,7 +198,8 @@ export class FlowDesigner {
             onClose: () => {
                 this.destroy();
                 this.modal.destroy();
-            }
+            },
+            isDrag: FlowDesigner.FlowType !== 'look'
         });
         (FlowDesigner.FlowType === 'design' && tools.isPc) && (
             new Tips({
@@ -417,7 +418,7 @@ export class FlowDesigner {
         }
     }
 
-    private _modal:Modal = null;
+    private _modal: Modal = null;
     get modal() {
         return this._modal;
     }
