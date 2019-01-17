@@ -42,12 +42,13 @@ interface ITableBaseAnnexedPara {    // 创建附表的参数
 
 // cell格式
 export interface ITableCellFormatter {
-    (data: any, cell: TableCell): {
+    (data: any, cell: TableCell): Promise<{
         text: string | Node,
         color?: string;
         bgColor?: string;
-        classes?: string[]
-    }
+        classes?: string[],
+        data?: any
+    }>
 }
 
 
@@ -789,7 +790,7 @@ export class TableBase extends Component {
 
     public sortByIndex(sortRule: ISortRule) {
         this.tableData.sortByIndex(sortRule);
-        this.render(0, this.tableData.get().length);
+        // this.render(0, this.tableData.get().length);
     }
 
     public colCountByIndex(indexes: Array<number>) {

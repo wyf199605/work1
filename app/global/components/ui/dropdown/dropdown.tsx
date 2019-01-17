@@ -118,12 +118,6 @@ export class DropDown {
         } else {
             window.addEventListener('mui' in window ? 'tap' : 'click', this.clickHideHandler, true);
         }
-
-        if(tools.isMb){
-            d.on(this.ulDom, 'touchmove', (e) => {
-                e.preventDefault();
-            });
-        }
     }
 
     get selectedIndex() {

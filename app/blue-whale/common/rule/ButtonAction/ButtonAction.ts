@@ -89,13 +89,13 @@ export class ButtonAction {
                         //     });
                         //     return obj;
                         // });
-                        uploderModal.destroy();
                         setTimeout(() => {
                             com && com.destroy();
                             com = null;
+                            uploderModal.destroy();
+                            callback(result);
                             self.btnRefresh(btn.refresh, url);
                         }, 100);
-                        callback(result);
                         // G.tools.event.fire(NewTableModule.EVT_EXPORT_DATA, data);
                     }
                 })

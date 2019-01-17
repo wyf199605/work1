@@ -239,12 +239,13 @@ export class EditModule {
                         if(field === 'unique'){
                             data[p.field.name] = data[field];
                             upperKeyData[p.field.name] = tools.str.toEmpty(data[field]);
+                            com.set(data[field]);
                         }else{
                             let {key, value} = data[field];
                             upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
                         }
                     }
-                    p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
+                    p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData), false, true, 'unique' in data);
 
                     this.comsExtraData[p.field.name] = {};
                     for (let name in upperKeyData) {
