@@ -418,8 +418,8 @@ export class RfidBarCode extends Component {
                                                 break;  
                                             case '当前所有分类下:' + "条码:" + this.domHash['barcode'].innerText:
                                                 where[uid] = this.domHash['barcode'].innerText;
-                                                this.DataclassInfo[0] (where[this.DataclassInfo[0]] = this.domHash['categoryVal1'].innerText);
-                                                this.DataclassInfo[1] ( where[this.DataclassInfo[1]] = this.domHash['categoryVal2'].innerText);
+                                                this.DataclassInfo[0] && (where[this.DataclassInfo[0]] = this.domHash['categoryVal1'].innerText);
+                                                this.DataclassInfo[1] && ( where[this.DataclassInfo[1]] = this.domHash['categoryVal2'].innerText);
                                                 break;
                                             case '条码' + this.domHash['barcode'].innerText:
                                                 where[uid] = this.domHash['barcode'].innerText;
@@ -427,7 +427,6 @@ export class RfidBarCode extends Component {
                                                 break;
                                         }
                                         let success = false;
-                                        alert(JSON.stringify(where));
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
                                             if (res.success) {
                                                 this.domHash['scanamout'].innerHTML = 0 + '';
