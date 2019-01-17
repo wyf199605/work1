@@ -521,8 +521,10 @@ export class EditModule {
                             title: field.caption,
                             container: this.para.container,
                             onDataGet: (data) => {
-                                console.log(data);
                                 resolve(data[0] || {});
+                            },
+                            onClose: () => {
+                                resolve({});
                             }
                         });
                     }else{

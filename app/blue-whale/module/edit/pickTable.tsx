@@ -10,8 +10,10 @@ export interface IPickTablePara {
     fields: R_Field[];
     data: obj[];
     onDataGet?: (obj: obj[]) => void;
+    onClose?: () => void;
     multi?: boolean;
     container?: HTMLElement;
+    isOnceDestroy?: boolean;
 }
 
 export class PickTable {
@@ -19,10 +21,14 @@ export class PickTable {
     protected modal: Modal;
     protected table: FastTable;
     protected onDataGet: (obj: obj[]) => void;
+    protected onClose: () => void;
+    protected isOnceDestroy: boolean = true;
     constructor(para: IPickTablePara){
         this.wrapper = <div/>;
 
+        this.isOnceDestroy = tools.isEmpty(para.isOnceDestroy) ? true : para.isOnceDestroy;
         this.onDataGet = para.onDataGet;
+        this.onClose = para.onClose;
 
         this.initModal(para);
         this.initTable(para);
@@ -41,9 +47,7 @@ export class PickTable {
             top: 40,
             isMb: false,
             onClose: () => {
-                setTimeout(() => {
-                    this.destroy();
-                }, 300);
+                this.onClose && this.onClose();
             },
             container: para.container || document.body
         });
@@ -79,10 +83,9 @@ export class PickTable {
     protected getData(){
         if(this.table) {
             let data = this.table.selectedRowsData;
-            console.log(data);
             if(data.length === 0){
                 this.onDataGet && this.onDataGet(data);
-                this.modal.isShow = false;
+                this.isOnceDestroy && this.destroy();
             }else{
                 Modal.alert('没有获取到数据') ;
             }
