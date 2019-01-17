@@ -66,6 +66,7 @@ export class NewStatisticBase {
             isBackground: false,
             container: container,
             width: width,
+            className: 'statistic-modal',
             height: '90%',
             header: {
                 title :  '统计结果',
