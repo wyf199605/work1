@@ -409,7 +409,7 @@ export class FlowDesigner {
 
     private setComplete(item: FlowItem, lineItem: LineItem, complete: number) {
         let isComplete = Method.isComplete(complete);
-        isComplete && (lineItem.isComplete = complete);
+        isComplete && (lineItem.isComplete = complete,lineItem.line.toFront());
         if (item.isDiamond) {
             let lineItems = item.lineItems;
             tools.isNotEmptyArray(lineItems) && lineItems.forEach(lineItem => {
