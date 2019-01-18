@@ -35,7 +35,7 @@ export class PayModule{
 
     protected overTimer: number;
     init(para: IPayModulePara){
-        let overtime = para.timeout || 2,
+        let overtime = para.timeout || 120,
             time: HTMLElement,
             qrCodeWrapper: HTMLElement;
         this.wrapper = <div className="pay-code-wrapper">

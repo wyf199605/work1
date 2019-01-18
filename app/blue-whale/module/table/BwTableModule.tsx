@@ -548,6 +548,7 @@ export class BwTableModule extends Component {
             tools.isPc && (this._btnWrapper = this.ftable.btnWrapper);
             this.ftable.btnShow = this.btnShow;
             this.ftableReady();
+            this.subBtns.initState();
         });
     }
 
@@ -897,6 +898,7 @@ export class BwTableModule extends Component {
             return this.ftable.tableData.refresh(data).then(() => {
                 this.aggregate.get(data);
                 setTimeout(() => {
+                    this.subBtns.initState();
                     this.ftable && this.ftable.clearSelectedRows();
                 }, 500)
             });
@@ -2041,6 +2043,33 @@ export class BwTableModule extends Component {
             ftable: FastBtnTable = null,
             handler = null;
 
+        let btnRefresh = () => {
+            let selectedLen = ftable.selectedRows.length,
+                rowData = ftable.selectedRowsData[0],
+                allLen = ftable.rows.length;
+
+            box && box.children.forEach(btn => {
+                let btnField = btn.data as R_Button,
+                    selectionFlag = btnField.selectionFlag,
+                    len = btnField.selectionFlag ? allLen - selectedLen : selectedLen;
+
+                if (len === 0) {
+                    btn.isDisabled = selectionFlag ? false : btnField.multiselect > 0;
+                } else if (selectedLen === 1) {
+                    btn.isDisabled = false;
+                    // 根据表格行数据判断按钮是否可点击
+                    if (tools.isNotEmpty(btnField.judgefield) && rowData) {
+                        let judges = btnField.judgefield.split(','),
+                            flag = judges.every((judge) => tools.isNotEmpty(rowData[judge]) ? rowData[judge] === 1 : true);
+                        btn.isDisabled = !flag;
+                    }
+                } else {
+                    btn.isDisabled = btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
+                }
+
+            });
+        };
+
         let init = (wrapper: HTMLElement) => {
             let btnsUi = this.ui.subButtons;
             ftable = this.ftable;
@@ -2249,39 +2278,16 @@ export class BwTableModule extends Component {
             // 根据选中行数判断按钮是否可操作
             this.ftable.off(FastTable.EVT_SELECTED, handler);
             this.ftable.on(FastTable.EVT_SELECTED, handler = () => {
-                let selectedLen = ftable.selectedRows.length,
-                    rowData = ftable.selectedRowsData[0],
-                    allLen = ftable.rows.length;
-
-                box.children.forEach(btn => {
-                    let btnField = btn.data as R_Button,
-                        selectionFlag = btnField.selectionFlag,
-                        len = btnField.selectionFlag ? allLen - selectedLen : selectedLen;
-
-                    if (len === 0) {
-                        btn.isDisabled = selectionFlag ? false : btnField.multiselect > 0;
-                    } else if (selectedLen === 1) {
-                        btn.isDisabled = false;
-                        // 根据表格行数据判断按钮是否可点击
-                        if (tools.isNotEmpty(btnField.judgefield) && rowData) {
-                            let judges = btnField.judgefield.split(','),
-                                flag = judges.every((judge) => tools.isNotEmpty(rowData[judge]) ? rowData[judge] === 1 : true);
-                            btn.isDisabled = !flag;
-                        }
-                    } else {
-                        btn.isDisabled = btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
-                    }
-
-                });
+                btnRefresh();
             });
         };
-
 
         return {
             init,
             get box() {
                 return box
-            }
+            },
+            initState: btnRefresh
         }
     })();
 
