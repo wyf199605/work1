@@ -218,6 +218,7 @@ export class FastPseudoTable extends TableBase {
         this.tableData.set(this.tableData.get().filter((item) => {
             return typeof item !== 'undefined';
         }));
+        return Promise.resolve();
     }
 
     private _isShow: boolean;

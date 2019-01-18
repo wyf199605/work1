@@ -405,7 +405,7 @@ export class BwUploader extends FormCom {
                         if(response.code === '200'){
                             resolve(response);
                         }else{
-                            reject(response.mag || response.errorMsg);
+                            reject(response.msg || response.errorMsg);
                         }
                     }).catch(() => {
                         reject();

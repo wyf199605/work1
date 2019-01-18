@@ -161,6 +161,7 @@ export class FastTable extends Component {
         this.tablesEach(table => {
             table.adjustColWidth();
         });
+        this.isWrapLine && this.setRowsHeight();
         this.calcWidth();
         this.setMainTableWidth();
     }
@@ -1735,18 +1736,20 @@ export class FastTable extends Component {
         // }
     }
 
+    protected rendering = false;
     // 渲染
     render(indexes: number[], position?: number): void
     render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
     render(x, y?, w?, z = true) {
+        if(this.rendering){
+            return;
+        }
+        this.rendering = true;
+
+        let promiseList: Promise<any>[] = [];
         this.wrapper.style.display = 'none';
         this.tablesEach(table => {
-            table.render(x, y, w, z);
-            if (this.tableData.serverMode) {
-                table.adjustColWidth(/*tools.isMb ? Math.max(0, len - this.tableData.pageSize) :*/ 0);
-            } else {
-                table.adjustColWidth(0);
-            }
+            promiseList.push(table.render(x, y, w, z));
         });
         // debugger;
         let indexes = this.mainTable.body.rows.map(row => row ? row.index : null);
@@ -1808,11 +1811,19 @@ export class FastTable extends Component {
         this.noData.toggle(Object.keys(this.tableData.data).length === 0);
 
         this.wrapper.style.display = 'block';
-        this.isWrapLine && this.setRowsHeight();
-        //   监听滚动事件
-
-        this.calcWidth();
-        this.setMainTableWidth();
+        // this.tablesEach((table) => {
+        //     table.adjustColWidth(0);
+        //     // if (this.tableData.serverMode) {
+        //     //     table.adjustColWidth(/*tools.isMb ? Math.max(0, len - this.tableData.pageSize) :*/ 0);
+        //     // } else {
+        //     //     table.adjustColWidth(0);
+        //     // }
+        // });
+        // this.isWrapLine && this.setRowsHeight();
+        // //   监听滚动事件
+        //
+        // this.calcWidth();
+        // this.setMainTableWidth();
 
         this.rows && this.rows.forEach((row) => {
             row.format();
@@ -1834,8 +1845,13 @@ export class FastTable extends Component {
         Array.isArray(handlers) && handlers.forEach(handler => {
             handler();
         });
+        Promise.all(promiseList).then(() => {}).catch((e) => {
+            console.log(e);
+        }).finally(() => {
+            this.recountWidth();
+            this.rendering = false;
+        });
     }
-
 
     loadedError = () => {
         let clickHandler = null;
@@ -2014,11 +2030,12 @@ export class FastTable extends Component {
         for (let index in uniIndex) {
             let status = 0,
                 row = this.rowGet(parseInt(index)),
-                len = uniIndex[index];
+                len = uniIndex[index],
+                length = row.cells.filter((cell) => cell.show && !cell.isVirtual).length;
             row && row._rowSelectedWidthDraw(false, false);
-            if (len > 0 && len < row.cells.length) {
+            if (len > 0 && len < length) {
                 status = 2;
-            } else if (row && row.cells.length === len) {
+            } else if (row && length <= len) {
                 status = 1;
             }
             if (status > 0) {

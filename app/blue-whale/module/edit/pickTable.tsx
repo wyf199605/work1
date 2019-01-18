@@ -7,7 +7,6 @@ import {BwTableModule} from "../table/BwTableModule";
 
 export interface IPickTablePara {
     title?: string;
-    meta: string[];
     fields: R_Field[];
     data: obj[];
     onDataGet?: (obj: obj[]) => void;
@@ -37,12 +36,15 @@ export class PickTable {
     }
 
     protected initModal(para: IPickTablePara){
+        let length = para.fields.filter((field) => !field.noShow).length,
+            width = 200 + length * 100;
+        width = Math.min(width, 1000);
         this.modal = new Modal({
             body: this.wrapper,
             header: para.title || '选择框',
             className: 'pick-table-modal',
-            width: '500px',
-            height: '80%',
+            width: width + 'px',
+            height: '75%',
             isBackground: false,
             footer: {},
             top: 40,
@@ -58,20 +60,13 @@ export class PickTable {
     }
 
     protected initTable(para: IPickTablePara){
-        let meta = para.meta,
-            field: R_Field[] = meta.map((name) => {
-                let fields = para.fields.filter((col) => {
-                    return col.name === name;
-                });
-                return fields[0] || null;
-            }).filter((field) => tools.isNotEmpty(field));
 
         this.table = new FastTable({
-            cols: BwTableModule.colParaGet(field),
+            cols: BwTableModule.colParaGet(para.fields),
             data: para.data,
             container: this.wrapper,
             pseudo: {
-                type: 'number',
+                type: 'checkbox',
                 isAll: false,
                 multi: para.multi || false // 默认单选
             },
