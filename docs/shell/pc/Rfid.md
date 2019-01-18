@@ -93,3 +93,27 @@
     }
 ```
 
+#### downloadbarcode(同步)
+调用壳下载数据，此函数需指定回调事件名
+* 参数:
+    ```js
+    {
+        "url": string, // 下载地址
+        "token":string, 
+        "uniqueFlag":string,
+    }
+    ```
+* 返回值
+```js
+    {
+        "success": true,
+        "msg": "成功",
+        "data":[{
+           "SHO_ID":"店号",
+         },{
+           "GOD_ID":"货号"
+         },{
+           "CAPTION":"标题"
+         }]
+    }
+```

@@ -167,7 +167,7 @@ namespace G{
                 return ShellBase.handler('rfidReset',  data, back, null, false);
             }
 
-            function config(str: string, num: number, config:{led?: boolean, buzzer?: boolean, power?: number}, back: IShellEventHandler) {
+            function config(str: string, num: number, config:{led?: boolean, buzzer?: boolean, power?: number, mode? : string}, back: IShellEventHandler) {
                 // 判断是否是ip
                 let data = str.split('.').length === 4 ? {ipAddress: str, ipPort: num} : {comPort: str, comBaud: num};
                 // document.body.innerHTML = JSON.stringify( Object.assign(data, {config}));
@@ -180,7 +180,15 @@ namespace G{
                 return ShellBase.handler('rfidStop', null, back);
             }
 
-            return{start, stop, config, reset}
+            function downLoad(url : string, token : string, uniqueFlag : string, back: IShellEventHandler) {
+                return ShellBase.handler('downloadbarcode', {url, token, uniqueFlag}, back);
+            }
+
+            function scanCode(code : string, back: IShellEventHandler) {
+                return ShellBase.handler('scanCode', {code}, back);
+            }
+
+            return{start, stop, config, reset, downLoad, scanCode}
         })();
 
         const startUp = {

@@ -27,6 +27,9 @@ export class Loading {
             className: 'modal-loading' + (this.container !== body ? ' container-loading' : ''),
             isBackground: false
         });
+        if (this.para.disableEl) {
+            this.para.disableEl.classList.add('disabled');
+        }
         this.delayHied();
     }
 

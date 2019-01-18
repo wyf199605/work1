@@ -1,0 +1,164 @@
+.rfid-conf{
+  .text-input{
+    >input{
+      height: 25px;
+    }
+  }
+  .text-input{
+    input:focus{
+      outline: 1px dotted;
+    }
+  }
+  .rfid-row{
+    margin-left: 10px;
+    .text{
+      color: #000000;
+      font-weight: 600;
+    }
+    >div{
+      display: inline-block;
+    }
+    .btn-left,.btn-center,.btn-right{
+      margin: 5px;
+      .btn{
+        border: .5px solid #cccccc;
+        color: #000000;
+        outline: none;
+        cursor: pointer;
+        &:focus{
+          outline: 1px dotted #cccccc;
+        }
+      }
+    }
+    .row-left{
+      .rfid-select{
+        .select-box{
+          display: block;
+          &:first-child{
+            margin-bottom: 15px;
+          }
+          .label-radio:before{
+            top: 3px;
+          }
+          .label-radio:after{
+            top: 6px;
+          }
+        }
+        &:focus{
+          outline: 1px dotted;
+        }
+        .label-radio{
+          font-weight: 600;
+          color: black;
+          font-size: 12px;
+          &:before{
+            border: 1px solid #007AFF;
+            width: 15px;
+            height: 15px;
+            bottom: 4px;
+          }
+          &:after{
+            width: 9px;
+            height: 9px;
+            top: 6px;
+            left: 3px;
+
+          }
+        }
+      }
+
+    }
+    .row-right{
+      width: 233px;
+      margin-left: 10px;
+      .line,.unline{
+        height: 37px;
+      }
+      >div{
+        display: inline-block;
+      }
+      .rfid-ip{
+        width: 103px;
+      }
+      .rfid-port{
+        width: 70px;
+      }
+      .text-baud{
+        margin-left: 10px;
+      }
+      .rfid-com,.rfid-baud{
+        .text-input{
+          border: .5px solid #ccc;
+          border-radius: 3px;
+          width: 70px;
+          input{
+            width: 100%!important;
+          }
+        }
+      }
+    }
+    .text{
+
+    }
+    .rfid-aerial{
+      border: none;
+      width: 72px;
+      .text-input{
+        input{
+          margin-left: 24px;
+          border: 1px solid #ccc;
+        }
+        .icon-jiahao{
+          padding: 3px;
+          border: 1px solid #ccc;
+          margin-left: -53px;
+          position: absolute;
+          border-right: none;
+          width: 25px;
+          &:before{
+            font-size: 12px;
+            display: block;
+            color: black;
+            font-weight: 600;
+          }
+        }
+        .icon-jianhao{
+          border: 1px solid #ccc;
+          display: block;
+          border-left: none;
+          margin-right: -7px;
+          width: 25px;
+          &:before{
+            font-size: 12px;
+            display: block;
+            margin-top: 3px;
+            color: black;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+    .rfid-buzz{
+      margin-left: 15px;
+    }
+    .rfid-led{
+      margin-left: 20px;
+    }
+    .rfid-buzz,.rfid-led{
+
+    }
+  }
+  .rfid-content{
+    border: .5px solid #bbb;
+    border-radius: 4px;
+    padding: 5px;
+    overflow-y: auto;
+    margin-bottom: 13px;
+    margin-top: 12px;
+    height: 124px;
+  }
+  .btn-group{
+    margin-left: 0;
+    margin-bottom: 8px;
+  }
+}
