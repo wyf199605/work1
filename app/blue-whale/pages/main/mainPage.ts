@@ -17,6 +17,7 @@ import {BugReportModal} from "../../module/BugReport/BugReport";
 import sysPcHistory = BW.sysPcHistory;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {Notify} from "../../../global/components/feedback/notify/Notify";
+import {RfidConfig} from "../../module/rfidConfig/RfidConfig";
 
 interface IProps {
     pageContainer: HTMLDivElement;
@@ -311,7 +312,17 @@ export = class MainPage {
 
     private static myselfMenu = (function () {
         //顶部个人信息下拉窗口点击事件
-        let self = this;
+        let rfid : RfidConfig;
+        window.localStorage.setItem('rfidConf', JSON.stringify({
+            line : 0,
+            ip : '192.168.1.200',
+            port : 100,
+            com : 'COM1',
+            baud : 115200,
+            mode : '命令',
+            buzz : false,
+            led : false,
+        }));
         let items: IPopoverItemPara[] = [
             {
                 title: '<a href="javascript:void(0)" data-page-name="myself" data-action="myself">个人资料</a>',
@@ -328,7 +339,10 @@ export = class MainPage {
                 onClick: () => {
                     sys.window.update();
                 }
-            },
+            },{
+                title : '<a href="javascript:void(0)" data-action="check">RFID设置</a>',
+                onClick: () => rfid ? rfid.show() : rfid = new RfidConfig()
+            }
             // {
             //     title: '<a href="javascript:void(0)" data-action="clear">清理缓存</a>',
             //     onClick: () => {

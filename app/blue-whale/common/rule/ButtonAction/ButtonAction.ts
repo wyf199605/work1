@@ -13,9 +13,11 @@ import {BwRule} from "../BwRule";
 import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
 import {User} from "../../../../global/entity/User";
 import {RingProgress} from "../../../../global/components/ui/progress/ringProgress";
+import Shell = G.Shell;
+import {Spinner} from "../../../../global/components/ui/spinner/spinner";
+import {TextInput} from "../../../../global/components/form/text/text";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
-
 
 /**
  * Created by zhengchao on 2017/12/21.
@@ -144,11 +146,11 @@ export class ButtonAction {
                 break;
             case 3 :
                 setTimeout(function () {
-                    if (tools.isMb && tools.isEmpty(tools.url.getPara('instance')) && tools.url.getPara('page') === 'flowReport'){
+                    if (tools.isMb && tools.isEmpty(tools.url.getPara('instance')) && tools.url.getPara('page') === 'flowReport') {
                         BW.sys.window.reOpen({
-                            url:url
+                            url: url
                         })
-                    } else{
+                    } else {
                         BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
                     }
                 }, 1000);
@@ -228,11 +230,37 @@ export class ButtonAction {
                 addr = tools.url.addObj(addr, {output: 'json'});
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     //创建条码扫码页面
-                        self.btnPopup(response, () => {
-                            self.btnRefresh(btn.refresh, url);
-                        }, url);
+                    self.btnPopup(response, () => {
+                        self.btnRefresh(btn.refresh, url);
+                    }, url);
                     callback(response);
                 }, () => callback(null));
+                break;
+            case 'integrated':
+                if (!ajaxType) {
+                    Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
+                    return;
+                }
+                if (tools.isPc) {
+                    addr = tools.url.addObj(addr, {output: 'json'});
+                    self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                        //创建条码扫码页面
+                        if (response.uiType === 'import') {
+                            require(['RfidInventory'], (e) => {
+                                new e.RfidInventory({
+                                    data : response,
+                                    onClose : () => self.btnRefresh(btn.refresh, url)
+                                })
+                            });
+
+                        }
+                        callback(response);
+                    }, () => callback(null))
+                } else {
+                    callback(null);
+                    Modal.alert('该操作不支持移动端功能');
+                }
+
                 break;
             case  'barcode_inventory':
                 if (!ajaxType) {
@@ -271,6 +299,7 @@ export class ButtonAction {
         }
     }
 
+
     private initBarCode(res, data, dataObj) {
         // console.log(res.body.elements)
         let dataAddr = res.body.elements,
@@ -280,12 +309,12 @@ export class ButtonAction {
             ajaxUrl: string,
             uploadUrl: string,
             downUrl: string,
-            picAddr:string,
-            picFields:string;
+            picAddr: string,
+            picFields: string;
 
         for (let i = 0; i < dataAddr.length; i++) {
             url = dataAddr[i].downloadAddr.dataAddr;
-            if(dataAddr[i].atvarparams){
+            if (dataAddr[i].atvarparams) {
                 codeStype = dataAddr[i].atvarparams[0] ? dataAddr[i].atvarparams[0].data : [];//可能需要做判断
             }
             uniqueFlag = dataAddr[i].uniqueFlag;
@@ -305,8 +334,8 @@ export class ButtonAction {
                 uploadUrl: uploadUrl,
                 downUrl: url,
                 uniqueFlag: uniqueFlag,
-                picFields:picFields,
-                picAddr:CONF.siteUrl+picAddr
+                picFields: picFields,
+                picAddr: CONF.siteUrl + picAddr
             })
         })
 
@@ -318,14 +347,14 @@ export class ButtonAction {
     private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string): Promise<any> {
         let self = this;
         return new Promise((resolve, reject) => {
-            if(btn.actionAddr && (btn.actionAddr.type === 'pdf')){
+            if (btn.actionAddr && (btn.actionAddr.type === 'pdf')) {
                 require(['PDFPreview'], (o) => {
                     new o.PDFPreview({
                         url: tools.url.addObj(BW.CONF.siteUrl + addr, ajaxData || {})
                     });
                     resolve();
                 })
-            }else{
+            } else {
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
                     data2url: btn.actionAddr.varType !== 3,
                     type: ajaxType,
@@ -338,7 +367,7 @@ export class ButtonAction {
                     if (data && (data.type || data.type === 0)) {
                         if (data.type === 0) {
                             Modal.alert(data.showText);
-                        } else if(data.type === 2) {
+                        } else if (data.type === 2) {
                             this.progressPopup(data.url, data.showText, resolve);
                         } else {
                             Modal.confirm({
@@ -348,7 +377,7 @@ export class ButtonAction {
                                         self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then((response) => {
                                             resolve(response);
                                         });
-                                    }else{
+                                    } else {
                                         reject();
                                     }
                                 }
@@ -374,8 +403,8 @@ export class ButtonAction {
 
     }
 
-    progressPopup(url: string, msg: string, callback?: Function){
-        if(url){
+    progressPopup(url: string, msg: string, callback?: Function) {
+        if (url) {
             let body = d.create(`<div style="padding: 4px 15px;"></div>`),
                 text = d.create(`<p>${msg}</p>`),
                 time = 5000;
@@ -411,26 +440,26 @@ export class ButtonAction {
                         msg: message,
                         errorCode
                     } = response;
-                    if(errorCode === 0){
-                        if(all){
+                    if (errorCode === 0) {
+                        if (all) {
                             percent = current / all * 100;
-                        }else{
+                        } else {
                             percent = 0
                         }
-                        if(percent >= 100){
+                        if (percent >= 100) {
                             progress.format(percent, false, 250);
                             setTimeout(() => {
                                 modal.destroy();
                                 Modal.alert(message);
                                 callback && callback();
                             }, 500)
-                        }else{
+                        } else {
                             progress.format(percent, false, time - 300);
                             setTimeout(() => {
                                 getProgress();
                             }, time);
                         }
-                    }else{
+                    } else {
                         modalDestroy(percent, message);
                     }
                 }).catch(() => {

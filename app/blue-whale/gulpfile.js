@@ -248,6 +248,10 @@ gulp.task('js', function () {
     //gesture
     gulpTsModule(['gesture/gesture'], 'gesture.js');
 
+    //rfidConfig
+    gulpTsModule(['rfidConfig/RfidConfig'], 'rfidConfig.js');
+    gulpTsModule(['rfidConfig/RfidInventory'], 'rfidInventory.js');
+
     gulpTsModule('webscoket/webscoket', 'webscoket.js');
 
     //BugReport

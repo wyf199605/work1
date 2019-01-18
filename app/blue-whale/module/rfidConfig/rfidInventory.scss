@@ -1,0 +1,57 @@
+
+.rfid-modal{
+  width: 350px;
+  .rfid-inventory{
+    .rfid-title{
+      text-align: center;
+    }
+    .rfid-sort{
+      .rfid-li{
+        display: inline-block;
+        margin: 5px;
+        padding: 3px 5px;
+        float: left;
+        &>div{
+          display: inline-block;
+
+        }
+        [data-prop]{
+
+        }
+        [data-name]{
+
+        }
+      }
+    }
+    .rfid-content{
+      width: 100%;
+      border: .5px solid #bbb;
+      border-radius: 4px;
+      padding: 5px;
+      overflow-y: auto;
+      margin-bottom: 13px;
+      margin-top: 12px;
+      height: 124px;
+    }
+    .rfid-atvar{
+      width: 200px;
+    }
+    .rfid-footer{
+      &>div{
+        display: inline-block;
+        float: right;
+        margin-right: 25px;
+        &>div{
+          display: inline-block;
+        }
+        .rfid-this{
+
+        }
+        .rfid-all{
+
+        }
+      }
+
+    }
+  }
+}
