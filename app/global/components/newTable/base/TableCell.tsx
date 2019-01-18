@@ -345,9 +345,16 @@ export class TableDataCell extends TableCell {
         });
     }
 
-    protected textNode: Text;
+    protected rendering = false;
     render(cellData?){
         // debugger
+        if(this.rendering){
+            return;
+        }
+        this.rendering = true;
+        setTimeout(() => {
+            this.rendering = false;
+        }, 100);
         let data = tools.isEmpty(cellData) ? this.data : cellData;
 
         // 移除 除了moreBtn以外的所有dom
@@ -379,7 +386,7 @@ export class TableDataCell extends TableCell {
                             text = tools.isEmpty(text) ? '' : text;
                             this._text = text + '';
                             if(this.wrapper){
-                                d.append(this.wrapper, this.textNode = document.createTextNode(this._text));
+                                d.append(this.wrapper, document.createTextNode(this._text));
                             }
                         }
                         this.width = getTextWidth(this.text);

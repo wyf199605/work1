@@ -512,12 +512,18 @@ export class EditModule {
                 let resData = tools.keysVal(response, 'data');
 
                 new Promise<obj>((resolve) => {
-                    if(this.cols && resData.length > 1){
+                    if(resData && resData.length > 1 && this.cols){
                         let meta = tools.keysVal(response, 'body', 'bodyList', 0, 'meta') || [];
+
+                        let fields: R_Field[] = meta.map((name) => {
+                                let cols = this.cols.filter((col) => {
+                                    return col.name === name;
+                                });
+                                return cols[0] || null;
+                            }).filter((field) => tools.isNotEmpty(field));
                         new PickTable({
-                            fields: this.cols,
+                            fields: fields,
                             data: resData,
-                            meta: meta,
                             title: field.caption,
                             container: this.para.container,
                             onDataGet: (data) => {
@@ -528,7 +534,7 @@ export class EditModule {
                             }
                         });
                     }else{
-                        resolve(resData[0]);
+                        resolve(resData ? resData[0] : {});
                     }
                 }).then((data) => {
                     let assignData = assignDataGet(val, data);

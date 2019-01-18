@@ -184,7 +184,7 @@ export class TextInput extends FormCom {
     }
 
     set(str: string | number): void {
-        this.input.value = tools.str.toEmpty(str);
+        this.input && (this.input.value = tools.str.toEmpty(str));
         typeof this.onSet === 'function' && this.onSet(str);
     }
 

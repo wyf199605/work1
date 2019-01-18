@@ -1735,18 +1735,18 @@ export class FastTable extends Component {
         // }
     }
 
+    protected rendering = false;
     // 渲染
     render(indexes: number[], position?: number): void
     render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
     render(x, y?, w?, z = true) {
+        if(this.rendering){
+            return;
+        }
+        this.rendering = true;
         this.wrapper.style.display = 'none';
         this.tablesEach(table => {
             table.render(x, y, w, z);
-            if (this.tableData.serverMode) {
-                table.adjustColWidth(/*tools.isMb ? Math.max(0, len - this.tableData.pageSize) :*/ 0);
-            } else {
-                table.adjustColWidth(0);
-            }
         });
         // debugger;
         let indexes = this.mainTable.body.rows.map(row => row ? row.index : null);
@@ -1808,6 +1808,14 @@ export class FastTable extends Component {
         this.noData.toggle(Object.keys(this.tableData.data).length === 0);
 
         this.wrapper.style.display = 'block';
+        this.tablesEach((table) => {
+            table.adjustColWidth(0);
+            // if (this.tableData.serverMode) {
+            //     table.adjustColWidth(/*tools.isMb ? Math.max(0, len - this.tableData.pageSize) :*/ 0);
+            // } else {
+            //     table.adjustColWidth(0);
+            // }
+        });
         this.isWrapLine && this.setRowsHeight();
         //   监听滚动事件
 
@@ -1834,6 +1842,7 @@ export class FastTable extends Component {
         Array.isArray(handlers) && handlers.forEach(handler => {
             handler();
         });
+        this.rendering = false;
     }
 
 
@@ -2014,11 +2023,12 @@ export class FastTable extends Component {
         for (let index in uniIndex) {
             let status = 0,
                 row = this.rowGet(parseInt(index)),
-                len = uniIndex[index];
+                len = uniIndex[index],
+                length = row.cells.filter((cell) => cell.show && !cell.isVirtual).length;
             row && row._rowSelectedWidthDraw(false, false);
-            if (len > 0 && len < row.cells.length) {
+            if (len > 0 && len < length) {
                 status = 2;
-            } else if (row && row.cells.length === len) {
+            } else if (row && length <= len) {
                 status = 1;
             }
             if (status > 0) {
