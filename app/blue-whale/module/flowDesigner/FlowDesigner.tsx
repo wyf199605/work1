@@ -454,10 +454,12 @@ export class FlowDesigner {
             this.modal.wrapper.classList.toggle('full-screen');
             d.query('.icon-fullscreen').classList.toggle('icon-zuidahua');
             d.query('.icon-fullscreen').classList.toggle('icon-chuangkouhua');
-            let paper = window.getComputedStyle(this.modal.bodyWrapper),
-                paperWidth = paper.width,
-                paperHeight = paper.height;
-            FlowDesigner.PAPER.setSize(parseInt(paperWidth.slice(0, paperWidth.length - 2)), parseInt(paperHeight.slice(0, paperHeight.length - 2)));
+            // let paper = window.getComputedStyle(this.modal.bodyWrapper),
+            //     paperWidth = paper.width,
+            //     paperHeight = paper.height,
+            //     width = Math.max(parseInt(paperWidth.slice(0, paperWidth.length - 2)),d.query('#design-canvas').clientWidth),
+            //     height = Math.max(parseInt(paperHeight.slice(0, paperHeight.length - 2)),d.query('#design-canvas').clientHeight);
+            FlowDesigner.PAPER.setSize(d.query('#design-canvas').clientWidth, d.query('#design-canvas').clientHeight);
             FlowEditor.refreshAllPosition();
         };
 
