@@ -3,6 +3,19 @@
     max-height: none!important;
   }
 }
+.pick-table-modal{
+  .modal-body{
+    max-height: none!important;
+    .pick-table-wrapper{
+      height: 100%;
+      .tables{
+        height: 98%;
+        height: calc(100% - 10px);
+      }
+    }
+  }
+
+}
 
 .fl-pc .table-module-has-sub {
   .sub-table-tab-wrapper {
