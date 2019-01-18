@@ -231,7 +231,7 @@ export abstract class TableCell {
     // protected _editing:
 
     // 指向tableBase对象
-    get table(){
+    get table(): TableBase{
         let table = null;
         if(this.row){
             table = this.row.section.table;
@@ -354,7 +354,7 @@ export class TableDataCell extends TableCell {
         this.rendering = true;
         setTimeout(() => {
             this.rendering = false;
-        }, 100);
+        }, 200);
         let data = tools.isEmpty(cellData) ? this.data : cellData;
 
         // 移除 除了moreBtn以外的所有dom
@@ -372,7 +372,7 @@ export class TableDataCell extends TableCell {
             }
         }
         // this.wrapper && (this.wrapper.innerHTML = '');
-        new Promise((resolve) => {
+        this.table.addStack(new Promise((resolve) => {
             if(data instanceof Node) {
                 this.wrapper && d.append(this.wrapper, data);
                 resolve();
@@ -418,7 +418,7 @@ export class TableDataCell extends TableCell {
                 // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
                 this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
             }
-        })
+        }))
     }
 
     tagName() {

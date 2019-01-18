@@ -782,10 +782,17 @@ export class TableBase extends Component {
 
     // private _allData: obj[];
     // private current: [number, number];
-    render(indexes: number[], position?: number): void
-    render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
-    render(x, y, w?, z = true) {
+    _promiseList: Promise<any>[] = [];
+    addStack(promise: Promise<any>){
+        this._promiseList.push(promise);
+    }
+
+    render(indexes: number[], position?: number): Promise<any>
+    render(start: number, length: number, position?: number, isUpdateFoot?: boolean): Promise<any>
+    render(x, y, w?, z = true): Promise<any> {
+        this._promiseList = [];
         this.body.render(x, y, w, z);
+        return Promise.all(this._promiseList);
     }
 
     public sortByIndex(sortRule: ISortRule) {
