@@ -311,7 +311,7 @@ export class FlowDesigner {
                     let shape: FlowItem = null,
                         text = fields['displayName'],
                         type = child.tagName;
-                    if (type === 'decision' && tools.isEmpty(text)){
+                    if (type === 'decision' && tools.isEmpty(text) && FlowDesigner.FlowType === 'look'){
                         text = Method.transferredText(fields['expr'] || '');
                     }
                     layout && (shape = new FlowItem({
