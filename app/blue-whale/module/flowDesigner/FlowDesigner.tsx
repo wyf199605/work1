@@ -218,7 +218,6 @@ export class FlowDesigner {
         }
 
         this.initEvents.on();
-
         // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程；如果没有则需要自己绘制流程
         if (tools.isNotEmpty(responseData)) {
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
@@ -275,8 +274,10 @@ export class FlowDesigner {
             } else {
                 let PcFullHeight = FlowDesigner.PAPER.height,
                     PcFullWidth = FlowDesigner.PAPER.width;
-                if (maxWidth > PcFullWidth) {
+                if (maxWidth + 20 > PcFullWidth) {
                     PcFullWidth = maxWidth + 20;
+                } else {
+                    PcFullWidth = PcFullWidth - 20;
                 }
                 if (maxHeight > PcFullHeight) {
                     PcFullHeight = maxHeight;
@@ -311,7 +312,7 @@ export class FlowDesigner {
                     let shape: FlowItem = null,
                         text = fields['displayName'],
                         type = child.tagName;
-                    if (type === 'decision' && tools.isEmpty(text) && FlowDesigner.FlowType === 'look'){
+                    if (type === 'decision' && tools.isEmpty(text) && FlowDesigner.FlowType === 'look') {
                         text = Method.transferredText(fields['expr'] || '');
                     }
                     layout && (shape = new FlowItem({
