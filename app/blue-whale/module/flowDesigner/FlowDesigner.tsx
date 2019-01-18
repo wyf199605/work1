@@ -218,7 +218,6 @@ export class FlowDesigner {
         }
 
         this.initEvents.on();
-
         // 如果有responseData传入，根据responseData获取xml==>根据xml绘制流程；如果没有则需要自己绘制流程
         if (tools.isNotEmpty(responseData)) {
             // 从xml中读取时，改变标题、隐藏流程的属性、移除保存功能
@@ -275,8 +274,10 @@ export class FlowDesigner {
             } else {
                 let PcFullHeight = FlowDesigner.PAPER.height,
                     PcFullWidth = FlowDesigner.PAPER.width;
-                if (maxWidth > PcFullWidth) {
+                if (maxWidth + 20 > PcFullWidth) {
                     PcFullWidth = maxWidth + 20;
+                } else {
+                    PcFullWidth = PcFullWidth - 20;
                 }
                 if (maxHeight > PcFullHeight) {
                     PcFullHeight = maxHeight;
@@ -311,7 +312,7 @@ export class FlowDesigner {
                     let shape: FlowItem = null,
                         text = fields['displayName'],
                         type = child.tagName;
-                    if (type === 'decision' && tools.isEmpty(text)){
+                    if (type === 'decision' && tools.isEmpty(text) && FlowDesigner.FlowType === 'look') {
                         text = Method.transferredText(fields['expr'] || '');
                     }
                     layout && (shape = new FlowItem({
@@ -454,10 +455,12 @@ export class FlowDesigner {
             this.modal.wrapper.classList.toggle('full-screen');
             d.query('.icon-fullscreen').classList.toggle('icon-zuidahua');
             d.query('.icon-fullscreen').classList.toggle('icon-chuangkouhua');
-            let paper = window.getComputedStyle(this.modal.bodyWrapper),
-                paperWidth = paper.width,
-                paperHeight = paper.height;
-            FlowDesigner.PAPER.setSize(parseInt(paperWidth.slice(0, paperWidth.length - 2)), parseInt(paperHeight.slice(0, paperHeight.length - 2)));
+            // let paper = window.getComputedStyle(this.modal.bodyWrapper),
+            //     paperWidth = paper.width,
+            //     paperHeight = paper.height,
+            //     width = Math.max(parseInt(paperWidth.slice(0, paperWidth.length - 2)),d.query('#design-canvas').clientWidth),
+            //     height = Math.max(parseInt(paperHeight.slice(0, paperHeight.length - 2)),d.query('#design-canvas').clientHeight);
+            FlowDesigner.PAPER.setSize(d.query('#design-canvas').clientWidth, d.query('#design-canvas').clientHeight);
             FlowEditor.refreshAllPosition();
         };
 
