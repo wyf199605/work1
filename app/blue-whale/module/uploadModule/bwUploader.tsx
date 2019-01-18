@@ -402,7 +402,7 @@ export class BwUploader extends FormCom {
                         // , cache: false
                         , dataType: "json"
                     }).then(({response}) => {
-                        if(response.code === '200'){
+                        if(response.code == '200'){
                             resolve(response);
                         }else{
                             reject(response.msg || response.errorMsg);

@@ -186,6 +186,9 @@ gulp.task('js', function () {
     //search模块
     gulpTsModule(['search/search'], 'search.js');
 
+    // qrcodeModule模块
+    gulpTsModule(['payModule/payModule'], 'pay.js');
+
     //share模块
     gulpTsModule(['share/Share'], 'share.js');
 
