@@ -108,8 +108,8 @@ export class RfidBarCode extends Component {
                         <span class="title2"> </span>
                         <span class="value2" style="color:rgb(0, 122, 255)"></span><br/>
                         <span className="title3"></span>
-                        <span class="value3" style="color:rgb(0, 122, 255)"></span>
-                        <span className="title4"></span><br/>
+                        <span class="value3" style="color:rgb(0, 122, 255)"></span><br/>
+                        <span className="title4"></span>
                         <span className="value4" style="color:rgb(0, 122, 255)"></span>
                     </div>
                     <div class="rfid-barCode-right">
@@ -265,6 +265,21 @@ export class RfidBarCode extends Component {
 
                     <button onclick={() => {
                         let optionStype = 0;
+                        let step = true;
+                        let step1 = true;
+                        console.log(this.stepByone);
+                        if(this.stepByone == '0'){
+                            step = false;
+                        }else {
+                            step = true;
+                        }
+                        if(this.accumulation == '0'){
+                            step1 = false;
+                        }else {
+                            step1 = true;
+                        }
+
+                        console.log(this.accumulation);
                         let mode = new Modal({
                             isMb: false,
                             position: "center",
@@ -275,7 +290,7 @@ export class RfidBarCode extends Component {
                             body:  <div className="rfid-barCode-set">
                         <div className="set-row">
                             <div>逐一扫描</div>
-                            <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
+                            <Toggle size={20} checked={step} custom={{check: "ON", noCheck: "OFF"}}
                                     onClick={(isChecked) => {
                                         isChecked ? this.stepByone = "1" : this.stepByone = "0";
                                         let key = this.stepByone + this.accumulation;
@@ -323,7 +338,7 @@ export class RfidBarCode extends Component {
                         </div>
                         <div className="set-row">
                             <div>累加</div>
-                            <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
+                            <Toggle size={20} checked={step1} custom={{check: "ON", noCheck: "OFF"}}
                                     onClick={(isChecked) => {
                                         isChecked ? this.accumulation = "1" : this.accumulation = "0";
                                         let key = this.stepByone + this.accumulation;
