@@ -244,7 +244,6 @@ export class ButtonAction {
                 if (tools.isPc) {
                     addr = tools.url.addObj(addr, {output: 'json'});
                     self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
-                        //创建条码扫码页面
                         if (response.uiType === 'import') {
                             require(['RfidInventory'], (e) => {
                                 new e.RfidInventory({

@@ -14,7 +14,7 @@ interface IRfidConfPara{
     port : number,
     com : string,
     baud : number,
-    aerial : number,
+    mode : string,
     buzz : boolean,
     led : boolean,
 }
@@ -198,13 +198,13 @@ export class RfidConfig {
             readonly : true,
             data : [{
                 text : '命令',
-                value : '命令'
+                value : '0'
             },{
                 text : '自动',
-                value : '自动'
+                value : '1'
             },{
                 text : '触发',
-                value : '触发'
+                value : '2'
             }]
         });
         this.buzz = new CheckBox({
@@ -298,7 +298,7 @@ export class RfidConfig {
         this.port.set(rfidConf.port);
         this.com.set(rfidConf.com);
         this.baud.set(rfidConf.baud);
-        this.mode.set(rfidConf.aerial);
+        this.mode.set(rfidConf.mode);
         this.buzz.set(rfidConf.buzz);
         this.led.set(rfidConf.led);
 
@@ -317,7 +317,7 @@ export class RfidConfig {
         let line = this.select.get()[0],
             str = this.ip.get(),
             num = this.port.get(),
-            power = this.mode.get(),
+            mode = this.mode.get(),
             buzzer = this.buzz.get() === 1,
             led = this.led.get() === 1;
 
@@ -326,7 +326,7 @@ export class RfidConfig {
             num = this.baud.get();
         }
         num = parseInt(num);
-        return {str, num, power, buzzer, led}
+        return {str, num, mode, buzzer, led}
     }
 
     show(){

@@ -319,7 +319,7 @@ export = class MainPage {
             port : 100,
             com : 'COM1',
             baud : 115200,
-            mode : '命令',
+            mode : '0',
             buzz : false,
             led : false,
         }));
