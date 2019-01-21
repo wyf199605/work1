@@ -60,6 +60,7 @@
              "power" : string,  // 功率
              "buzzer": true, // 蜂鸣器
              "led": true, // led
+             "mode" : number, // 模式
          }
     }
     ```
@@ -72,6 +73,7 @@
             "power" : string,  // 功率
             "buzzer": true, // 蜂鸣器
             "led": true, // led
+            "mode" : number, // 模式
         }
      }
      ```

@@ -54,8 +54,8 @@ export class EditDetailModule extends Component {
         this.getDefaultData().then((data) => {
             this.initAllButtons();
             this.initEditModule(para, data);
+            this.inputs(para.fm.inputs, this.wrapper);
         });
-        this.inputs(para.fm.inputs, this.wrapper);
     }
 
     private inputs(inputs, dom) {

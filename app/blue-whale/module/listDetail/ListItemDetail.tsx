@@ -29,7 +29,6 @@ export class ListItemDetail {
         this.wrapper = wrapper;
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.initDetailTpl(para.fm.fields);
-        let self = this;
         this.initDetailData().then(data => {
             this.render(data);
             this.initDetailButtons();
@@ -132,7 +131,6 @@ export class ListItemDetail {
 
     // 初始化详情数据
     initDetailData(): Promise<obj> {
-        let fields: R_Field[] = this.para.fm.fields;
         return new Promise<obj>((resolve) => {
             if (this.isKeyStep === true) {
                 let keyStepData = this.keyStepData || [],

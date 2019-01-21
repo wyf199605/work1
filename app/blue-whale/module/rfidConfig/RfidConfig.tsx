@@ -14,7 +14,7 @@ interface IRfidConfPara{
     port : number,
     com : string,
     baud : number,
-    mode : string,
+    mode : number,
     buzz : boolean,
     led : boolean,
 }
@@ -198,13 +198,13 @@ export class RfidConfig {
             readonly : true,
             data : [{
                 text : '命令',
-                value : '0'
+                value : 1
             },{
                 text : '自动',
-                value : '1'
+                value : 2
             },{
                 text : '触发',
-                value : '2'
+                value : 3
             }]
         });
         this.buzz = new CheckBox({
