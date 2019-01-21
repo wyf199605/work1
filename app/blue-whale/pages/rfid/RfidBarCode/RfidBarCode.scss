@@ -30,18 +30,18 @@
       font-size: 14px;
     }
     .rfid-barCode-content {
-      display: -webkit-box;
-      display: -webkit-flex;
-      display: flex;
-      flex-wrap: nowrap;
+      font-size: 18px;
+      margin-bottom: 5px;
       .rfid-barCode-right {
-        width: 50%;
-        text-align: center;
-        border-left: 1px solid #cccccc;
+        .value{
+          margin-left: 15px;
+        }
       }
       .rfid-barCode-left {
-        width: 50%;
-        text-align: center;
+        padding-top: 16px;
+        .value2 ,.value3 ,.value4 {
+          margin-left: 15px;
+        }
       }
 
       //.shelf-number {
@@ -64,7 +64,7 @@
       //}
     }
     .rifd-bar-code-describe{
-      text-align: center;
+      font-size: 18px;
       border-bottom: 1px solid #cccc;
       height: 30px;
       line-height: 2.5;
@@ -94,6 +94,7 @@
       padding: 3px;
     }
     .total-rfid{
+      margin-top: 20px;
       display: -webkit-box;
       display: -webkit-flex;
       display: flex;

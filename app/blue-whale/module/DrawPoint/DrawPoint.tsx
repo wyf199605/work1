@@ -248,7 +248,7 @@ export class DrawPoint extends Component {
 
 
             }, true).on('touchmove', function (ev) {
-                 D3.event.preventDefault();
+                D3.event.preventDefault();
                 let ob1 = D3.event.changedTouches,
                     obj2 = D3.event.targetTouches,
                     obj3 = D3.event.touches;
@@ -288,8 +288,9 @@ export class DrawPoint extends Component {
                      _this.g.transition()
                                .duration(150)
                                .ease('in')
-                               .attr("transform", "translate("+[ -center[0] * (scale - 1) - 280, -center[1] * (scale - 1)]+")"  + "scale(" + scale + ") " );
-                               //.attr("transform",   "translate(" + [-280 + slate[0] + pyx,0 + pyy + slate[1]] + ")"   + "scale(" + scale + ")" );
+                              .attr("transform",   "scale(" + scale + ")" + "translate(" + [-280, 0 ] + ")" );
+                               //.attr("style", "transform:translate("+[ (-center[0] * (scale - 1)) + 'px', (-center[1] * (scale - 1)) + 'px']+")"  + "scale(" + scale + ") " );
+
                                //.attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
                                //.attr("transform",    "translate(" + [touchCenter['x'] - 65,touchCenter['y']] + ") " + "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
 
@@ -304,7 +305,6 @@ export class DrawPoint extends Component {
 
             }, true).on('touchend', function () {
                 _this.touchstart = false
-                D3.event.preventDefault()
             }, true)
         }
 

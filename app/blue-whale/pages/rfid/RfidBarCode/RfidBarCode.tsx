@@ -106,15 +106,15 @@ export class RfidBarCode extends Component {
                 <div class="rfid-barCode-content">
                     <div class="rfid-barCode-left">
                         <span class="title2"> </span>
-                        <p class="value2" style="color:rgb(0, 122, 255)"></p>
+                        <span class="value2" style="color:rgb(0, 122, 255)"></span><br/>
                         <span className="title3"></span>
-                        <p class="value3" style="color:rgb(0, 122, 255)"></p>
-                        <span className="title4"></span>
-                        <p className="value4" style="color:rgb(0, 122, 255)"></p>
+                        <span class="value3" style="color:rgb(0, 122, 255)"></span>
+                        <span className="title4"></span><br/>
+                        <span className="value4" style="color:rgb(0, 122, 255)"></span>
                     </div>
                     <div class="rfid-barCode-right">
-                        <p class="title">条码</p>
-                        <p class="value" style="color:red"></p>
+                        <span class="title"></span>
+                        <span class="value" style="color:red"></span>
                     </div>
                 </div>
                 <div class="rifd-bar-code-describe"></div>
@@ -122,7 +122,7 @@ export class RfidBarCode extends Component {
                     <div class="shelf-nums">
                         <span class="shelf-name"></span>(<span class="shelf-mode"></span>)<input type="number"/>
                     </div>
-                    <div className="rfid-barCode-set">
+                    <div className="rfid-barCode-set" style=" display: none;">
                         <div className="set-row">
                             <div>逐一扫描</div>
                             <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
@@ -261,6 +261,126 @@ export class RfidBarCode extends Component {
                         })
 
                     }}>输入条码
+                    </button>
+
+                    <button onclick={() => {
+                        let optionStype = 0;
+                        let mode = new Modal({
+                            isMb: false,
+                            position: "center",
+                            header: '请输入设置',
+                            zIndex: 1022,
+                            isOnceDestroy: true,
+                            isBackground: true,
+                            body:  <div className="rfid-barCode-set">
+                        <div className="set-row">
+                            <div>逐一扫描</div>
+                            <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
+                                    onClick={(isChecked) => {
+                                        isChecked ? this.stepByone = "1" : this.stepByone = "0";
+                                        let key = this.stepByone + this.accumulation;
+                                        if (key && this.mode[key]) {
+                                            d.query(".shelf-nums>.shelf-mode").innerText = this.mode[key];
+                                        }
+                                        if (isChecked) {
+                                            d.query('.shelf-nums>input')['disabled'] = true;
+                                        } else {
+                                            d.query('.shelf-nums>input')['disabled'] = false;
+                                        }
+                                        // 切换注入监听事件
+
+
+                                        if (this.mode[key] == '逐一') {
+                                            //造数据
+                                            this.operateTbaleD.option = 1;
+
+                                        } else if (this.mode[key] == '替换') {
+                                            //造数据
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
+                                            this.operateTbaleD.option = 2;
+                                        } else if (this.mode[key] == '累加') {
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
+
+                                            //造数据
+                                            this.operateTbaleD.option = 3;
+                                        } else {
+                                            //造数据
+                                            this.operateTbaleD.option = 0;
+                                        }
+
+
+                                    }}></Toggle>
+                        </div>
+                        <div className="set-row">
+                            <div>累加</div>
+                            <Toggle size={20} checked={true} custom={{check: "ON", noCheck: "OFF"}}
+                                    onClick={(isChecked) => {
+                                        isChecked ? this.accumulation = "1" : this.accumulation = "0";
+                                        let key = this.stepByone + this.accumulation;
+                                        if (key && this.mode[key]) {
+                                            d.query(".shelf-nums>.shelf-mode").innerHTML = this.mode[key];
+                                        }
+                                        // 切换注入监听事件
+
+
+
+                                        if (this.mode[key] == '累加') {
+                                            this.operateTbaleD.option = 3;
+                                            //重新获取输入框数据
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
+                                            //造数据
+                                        } else if (this.mode[key] == '替换') {
+                                            //造数据
+                                            let num = d.query('.total-nums>span').innerText;
+                                            if(isNaN(parseInt(num))){
+                                                this.operateTbaleD.num = 0;
+                                            }else {
+                                                this.operateTbaleD.num = parseInt(num);
+                                            }
+                                            this.operateTbaleD.option = 2;
+                                            //重新获取输入框
+
+
+                                        } else if (this.mode[key] == '逐一') {
+                                            //造数据
+                                            this.operateTbaleD.option = 1;
+                                        } else {
+                                            //造数据
+                                            this.operateTbaleD.option = 0;
+
+                                        }
+
+
+                                    }}></Toggle>
+                        </div>
+                    </div>,
+                            footer: {},
+                            onOk: () => {
+
+                                mode.destroy();
+                            },
+                            onClose: () => {
+                                //Modal.toast('输入成功');
+                            }
+
+                        })
+
+                    }}>设置
                     </button>
                     <button onclick={
                         () => {
@@ -663,14 +783,14 @@ export class RfidBarCode extends Component {
                     }
                     // alert(JSON.stringify(this.dataWhere) + 'cccccc')
 
-                    this.domHash['category1'].innerHTML =  pageName.classInfoObj[0][pageName.classInfo[0]];
+                    this.domHash['category1'].innerHTML =  pageName.classInfoObj[0][pageName.classInfo[0]] + ':';
 
                     if ( pageName.classInfo[1] && pageName.classInfoObj[1]){
-                        this.domHash['category2'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[1]];
+                        this.domHash['category2'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[1]] + ':';
                     }
 
                     if (pageName.classInfo[2] &&  pageName.classInfoObj[2]){
-                        this.domHash['category3'].innerHTML = pageName.classInfoObj[2][pageName.classInfo[2]];
+                        this.domHash['category3'].innerHTML = pageName.classInfoObj[2][pageName.classInfo[2]] + ':';
                     }
                 }
                 if(pageName.amount == 'SCANNUM'){
@@ -711,6 +831,8 @@ export class RfidBarCode extends Component {
             let data = res.data.data;
             // alert(JSON.stringify(data))
             if(res.success){
+                let modeVal = d.query('.shelf-nums>input');
+                modeVal['value'] = '';
                 for(let i = 0; i< data.length; i++){
                     //stepArry 添加数组项
                     if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE']) == -1){
