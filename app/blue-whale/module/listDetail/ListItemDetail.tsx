@@ -19,6 +19,8 @@ export class ListItemDetail {
     public totalNumber: number = 0;
     private ajaxUrl: string = '';
     private actionSheet: ActionSheet;
+    private keyStepData: obj[] = [];
+    private isKeyStep: boolean = false;
 
     constructor(private para: EditPagePara) {
         let wrapper = <div className="list-item-detail-wrapper"/>,
@@ -31,27 +33,25 @@ export class ListItemDetail {
         this.initDetailData().then(data => {
             this.render(data);
             this.initDetailButtons();
+            this.inputs(para.fm.inputs, this.wrapper);
         });
-
-        console.log(para);
-        this.inputs(para.fm.inputs, this.wrapper);
     }
 
-    private inputs(inputs, dom){
-        if(!inputs){
+    private inputs(inputs, dom) {
+        if (!inputs) {
             return;
         }
         require(['Inputs'], (i) => {
             new i.Inputs({
                 inputs: inputs,
                 container: dom,
-                setListItemData : (data) => {
-                    this.defaultData = data[0];
-                    let cells = this.cells || {};
-                    for (let cellsKey in cells) {
-                        let cell = cells[cellsKey],
-                            cellData = this.defaultData[cellsKey] || '';
-                        cell.render(cellData);
+                setListItemData: (data) => {
+                    if (tools.isNotEmptyArray(data)) {
+                        this.isKeyStep = true;
+                        this.currentPage = 1;
+                        this.totalNumber = data.length || 0;
+                        this.keyStepData = data;
+                        this.changePage();
                     }
                 }
             })
@@ -134,43 +134,50 @@ export class ListItemDetail {
     initDetailData(): Promise<obj> {
         let fields: R_Field[] = this.para.fm.fields;
         return new Promise<obj>((resolve) => {
-            if (tools.isNotEmpty(this.ajaxUrl)) {
-                let url = tools.url.addObj(this.ajaxUrl, {
-                    pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
-                });
-                BwRule.Ajax.fetch(url, {
-                    loading: {
-                        msg: '数据加载中...',
-                        disableEl: this.wrapper
-                    }
-                }).then(({response}) => {
-                    if (tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)) {
-                        let res: obj = {};
-                        let meta = response.body.bodyList[0].meta,
-                            dataTab = response.body.bodyList[0].dataList[0];
-                        for (let i = 0, len = meta.length; i < len; i++) {
-                            res[meta[i]] = dataTab[i];
+            if (this.isKeyStep === true) {
+                let keyStepData = this.keyStepData || [],
+                    data = keyStepData[this.currentPage - 1];
+                this.defaultData = data;
+                resolve(data);
+            } else {
+                if (tools.isNotEmpty(this.ajaxUrl)) {
+                    let url = tools.url.addObj(this.ajaxUrl, {
+                        pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
+                    });
+                    BwRule.Ajax.fetch(url, {
+                        loading: {
+                            msg: '数据加载中...',
+                            disableEl: this.wrapper
                         }
-                        if (this.para.uiType === 'detail') {
-                            this.totalNumber = response.head.totalNum;
-                        }
-                        if (tools.isNotEmpty(this.lookUpData)) {
-                            let data = this.handleLookUpData(res);
-                            resolve(data);
-                        } else {
-                            this.lookup.then(() => {
+                    }).then(({response}) => {
+                        if (tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)) {
+                            let res: obj = {};
+                            let meta = response.body.bodyList[0].meta,
+                                dataTab = response.body.bodyList[0].dataList[0];
+                            for (let i = 0, len = meta.length; i < len; i++) {
+                                res[meta[i]] = dataTab[i];
+                            }
+                            if (this.para.uiType === 'detail') {
+                                this.totalNumber = response.head.totalNum;
+                            }
+                            if (tools.isNotEmpty(this.lookUpData)) {
                                 let data = this.handleLookUpData(res);
                                 resolve(data);
-                            })
+                            } else {
+                                this.lookup.then(() => {
+                                    let data = this.handleLookUpData(res);
+                                    resolve(data);
+                                })
+                            }
+                        } else {
+                            Modal.alert('暂无数据!');
+                            resolve({});
                         }
-                    } else {
-                        Modal.alert('暂无数据!');
-                        resolve({});
-                    }
-                });
-            } else {
-                Modal.alert('无数据地址!');
-                resolve({});
+                    });
+                } else {
+                    Modal.alert('无数据地址!');
+                    resolve({});
+                }
             }
         })
     }
@@ -189,7 +196,7 @@ export class ListItemDetail {
     }
 
     private handleLookUpData(res) {
-        let showData = Object.assign({},res);
+        let showData = Object.assign({}, res);
         this.para.fm.fields.forEach((field) => {
             if (field.elementType === 'lookup') {
                 if (tools.isNotEmpty(res[field.lookUpKeyField])) {
@@ -387,7 +394,7 @@ export class ListItemDetail {
         function subBtnEvent(index) {
             let btn = self.para.fm.subButtons[index];
             switch (btn.subType) {
-                case 'update_save' :
+                case 'update_save':
                 case 'insert_save':
                     let isAdd = btn.subType !== 'update_save';
                     if (!isAdd && self.totalNumber === 0 && self.para.uiType === 'detail') {
@@ -401,15 +408,29 @@ export class ListItemDetail {
                         isPC: !tools.isMb,
                         confirm(data) {
                             return new Promise((resolve) => {
-                                ButtonAction.get().clickHandle(btn, data, () => {
+                                let old_data = ListItemDetail.getOldFieldData(btn, data);
+                                ButtonAction.get().clickHandle(btn, old_data, () => {
+                                    let keyStepData = self.keyStepData || [];
                                     switch (btn.subType) {
                                         case 'insert_save': {
-                                            self.totalNumber += 1;
-                                            self.changePage(1);
+                                            if (self.isKeyStep === true) {
+                                                keyStepData.push(data);
+                                                self.keyStepData = keyStepData;
+                                                self.totalNumber = self.totalNumber + 1;
+                                                self.currentPage = self.totalNumber;
+                                                self.changePage();
+                                            } else {
+                                                self.totalNumber += 1;
+                                                self.changePage(1);
+                                            }
                                             resolve();
                                         }
                                             break;
                                         case 'update_save': {
+                                            if (self.isKeyStep === true) {
+                                                keyStepData[self.currentPage - 1] = data;
+                                                self.keyStepData = keyStepData;
+                                            }
                                             self.changePage();
                                             resolve();
                                         }
@@ -423,9 +444,15 @@ export class ListItemDetail {
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
                         btn.refresh = 0;
-                        ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                        let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                        ButtonAction.get().clickHandle(btn, data, () => {
                             if (self.para.uiType === 'detail') {
                                 // 删除后显示下一页，如果已是最后一页，则显示上一页
+                                if (self.isKeyStep === true) {
+                                    let keyStepData = self.keyStepData || [];
+                                    keyStepData.splice(self.currentPage - 1, 1);
+                                    self.keyStepData = keyStepData;
+                                }
                                 let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
                                 self.totalNumber = self.totalNumber - 1;
                                 self.changePage(currentPage);
@@ -438,7 +465,8 @@ export class ListItemDetail {
                     break;
                 default:
                     // 其他按钮
-                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                    let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                    ButtonAction.get().clickHandle(btn, data, () => {
                     });
                     break;
             }
@@ -500,6 +528,11 @@ export class ListItemDetail {
                 window.scrollTo(0, currentScroll - (currentScroll / 5));
             }
         })();
+    }
+
+    static getOldFieldData(btn: R_Button, data: obj): obj {
+        let varList = BwRule.getOldField(btn.actionAddr.varList);
+        return BwRule.addOldField(varList, data);
     }
 
     handlerValue(text, format: R_Field): string | string[] {
