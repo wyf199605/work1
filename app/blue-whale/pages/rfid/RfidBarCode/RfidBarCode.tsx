@@ -120,7 +120,7 @@ export class RfidBarCode extends Component {
                 <div class="rifd-bar-code-describe"></div>
                 <div class="rfid-barCode-nums">
                     <div class="shelf-nums">
-                        数量(<span class="shelf-mode"></span>)<input type="number"/>
+                        <span class="shelf-name"></span>(<span class="shelf-mode"></span>)<input type="number"/>
                     </div>
                     <div className="rfid-barCode-set">
                         <div className="set-row">
@@ -220,7 +220,7 @@ export class RfidBarCode extends Component {
                         </div>
                     </div>
                     <div class="total-nums">
-                        <i class="iconfont icon-zonghesum1"></i>数量:<span style="color:#007aff">0</span>
+                        <i class="iconfont icon-zonghesum1"></i><span class="total-name"></span>:<span class="total-color" style="color:#007aff">0</span>
                     </div>
                 </div>
                 <div class="total-rfid">
@@ -281,7 +281,6 @@ export class RfidBarCode extends Component {
                             let updataEl;
                             let div = <div>
 
-                                <p>上传数据处理方式</p>
                                 {
                                     updataEl = <SelectInputMb data={str}/>
                                 }
@@ -301,6 +300,7 @@ export class RfidBarCode extends Component {
                                     <p>{this.domHash['inventory'].innerHTML}</p>
                                     <p>操作者信息:{para.USERID + "店" + para.SHO_ID}</p>
                                     <p>{'共扫描' + this.domHash['scanamout'].innerText + '项'}，{'总数量为' + this.domHash['count'].innerText}</p>
+                                    <p>上传数据处理方式:</p>
                                     {
                                         tools.isNotEmpty(para.codeStype) ? div : ''
                                     }
@@ -430,9 +430,8 @@ export class RfidBarCode extends Component {
                                         let del = G.Shell.inventory.delInventoryData(para.uniqueFlag, where, (res) => {
                                             if (res.success) {
                                                 this.domHash['scanamout'].innerHTML = 0 + '';
-                                                this.refreshCount(para);
-                                                alert('删除成功');
                                                 this.domHash['count'].innerHTML = 0 + '';
+
                                                 this.stepArry = [];
                                             } else {
                                                 alert('删除失败');
@@ -544,7 +543,7 @@ export class RfidBarCode extends Component {
         console.log(modeVal);
         modeVal.onblur = () => {
             console.log('开始改变')
-            let num = d.query('.total-nums>span')
+            let num = d.query('.total-nums>.total-color')
             let key = this.stepByone + this.accumulation;
             console.log(modeVal['value']);
             if (this.mode[key] == "累加" && modeVal['value'] !== "") {
@@ -583,12 +582,15 @@ export class RfidBarCode extends Component {
             categoryVal2 = d.query('.rfid-barCode-content>.rfid-barCode-left>.value3'),
             categoryVal3 = d.query('.rfid-barCode-content>.rfid-barCode-left>.value4'),
             Commodity = d.query('.rifd-bar-code-describe'),
-            num = d.query('.shelf-nums'),
+            num = d.query('.shelf-nums>.total-color'),
+            totalName = d.query('.total-nums>.total-name'),
             scanamout = d.query('.total-rfid >.bar-code-scan>span'),
             count = d.query('.total-rfid>.bar-code-amount>span'),
             title = d.query('.rfid-barCode-title>.barCode-title'),
             title1 = d.query('.rfid-barCode-title>.barCode-title1'),
-            inventory = d.query('.rfid-barCode-body>.rfid-barCode-inventory')
+            inventory = d.query('.rfid-barCode-body>.rfid-barCode-inventory'),
+            shelfName = d.query('.rfid-barCode-nums>.shelf-nums>.shelf-name')
+
         this.domHash['category'] = category;
         this.domHash['barcode'] = barcode;
         this.domHash['categoryVal'] = categoryVal;
@@ -606,6 +608,8 @@ export class RfidBarCode extends Component {
         this.domHash['title'] = title;
         this.domHash['title1'] = title1;
         this.domHash['inventory'] = inventory;
+        this.domHash['shelfName'] = shelfName;
+        this.domHash['totalName'] = totalName;
 
 
     }
@@ -632,15 +636,17 @@ export class RfidBarCode extends Component {
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
             //alert(JSON.stringify(res) + '下载')
-            // alert(res.msg);
+            alert(res.msg);
             if(res.success){
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
-                // alert(JSON.stringify(pageName))
+                alert(JSON.stringify(pageName))
                 this.domHash['inventory'].innerHTML = pageName.subTitle;
                 this.domHash['title'].innerText = pageName.title;
-                this.domHash['barcodeTitl'].innerHTML = pageName.keyField;
+                this.domHash['barcodeTitl'].innerHTML = pageName.keyName ? pageName.keyName  : '';
                 this.nameField = pageName.nameField;
+                this.domHash['shelfName'].innerHTML = pageName.amountName ? pageName.amountName  : '';
+                this.domHash['totalName'].innerHTML = pageName.amountName ? pageName.amountName  : '';
                 //有可能没有分类  有可能有分类
                 // if(pageName.classInfo){
                 //     this.DataclassInfo = pageName.classInfo;
