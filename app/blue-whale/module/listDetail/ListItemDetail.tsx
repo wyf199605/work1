@@ -32,8 +32,6 @@ export class ListItemDetail {
             this.render(data);
             this.initDetailButtons();
         });
-
-        console.log(para);
         this.inputs(para.fm.inputs, this.wrapper);
     }
 

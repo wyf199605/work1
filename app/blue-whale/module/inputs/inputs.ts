@@ -21,7 +21,7 @@ interface InputsPara {
     afterScan? : Function
     tableModule? : Function // 获取表格模块
     queryModule? : Function // 查询器
-    setListItemData? : (data : obj) => void // 设置单页数据
+    setListItemData? : (data : obj[]) => void // 设置单页数据
 }
 interface IKeyStepPara{
     callback(text : string, input? : R_Input, open? : Function) : Promise<any>
