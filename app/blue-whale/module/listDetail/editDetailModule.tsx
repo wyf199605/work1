@@ -25,6 +25,7 @@ interface IEditDetailPara extends IComponentPara {
         updatefileData?: R_ReqAddr;
         groupInfo?: IGroupInfo[];
         signField?: string;
+        inputs? : R_Input[]
     },
     url: string;
 }
@@ -52,8 +53,30 @@ export class EditDetailModule extends Component {
             this.initAllButtons();
             this.initEditModule(para, data);
         });
+        this.inputs(para.fm.inputs, this.wrapper);
     }
 
+    private inputs(inputs, dom){
+        if(!inputs){
+            return;
+        }
+        require(['Inputs'], (i) => {
+            new i.Inputs({
+                inputs: inputs,
+                container: dom,
+                setListItemData : (data) => {
+                    this.defaultData = data[0];
+                    for (let i=0;i<this.fields.length;i++) {
+                        let field = this.fields[i],
+                            key = field.name,
+                            cell = this.editModule.getDom(key) || null,
+                            cellData = this.defaultData[key] || '';
+                        cell && cell.set(cellData);
+                    }
+                }
+            })
+        });
+    }
     // 获取数据
     private getDefaultData(): Promise<obj> {
         return new Promise((resolve) => {

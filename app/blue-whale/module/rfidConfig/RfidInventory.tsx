@@ -46,7 +46,6 @@ export class RfidInventory {
     private value: string = '';
     private recentData ; obj;
     private epc : string[] = [];
-    private loading : Loading;
     private token : string;
 
     constructor(data: IRfidInventoryPara) {
@@ -110,36 +109,32 @@ export class RfidInventory {
     }
 
     private scan(){
-        this.recentData = {'SHO_ID':'101','SHO_ID_CAPTION':'宝龙','SHOLEF':'货架','BARCODE':'76425401'};
-        let setValue = () => {
-            let els = d.queryAll('[data-name]', this.sortEl);
-            els.forEach( el => {
-                let name = el.dataset.name.split(','),
-                    value = '';
-                name.forEach((n, i) => {
-                    if(n in this.recentData){
-                        if(i !== 0){
-                            value += '-'
-                        }
-                        value += this.recentData[n];
-                    }
-                });
-                el.innerHTML = value;
-            });
+        // this.recentData = {'SHO_ID':'101','SHO_ID_CAPTION':'宝龙','SHOLEF':'货架','BARCODE':'76425401'};
+        // 'BARCODE' in this.recentData ? this.commit().then(() => this.setValue()) : this.setValue();
 
-            // Shell.rfid.scanCode(this.value,result => {
-            //     this.recentData = result.data;
-            //     if('barcode' in this.recentData){
-            //         this.commit();
-            //     }
-            //     for(let item in this.recentData){
-            //         let el = d.query('[data-name=' + item + ']');
-            //         el && (el.innerHTML = this.recentData[item]);
-            //     }
-            // });
-            this.value = '';
-        };
-        'BARCODE' in this.recentData ? this.commit().then(() => setValue()) : setValue();
+        Shell.rfid.scanCode(this.value,result => {
+            this.recentData = result.data;
+            'BARCODE' in this.recentData ? this.commit().then(() => this.setValue()) : this.setValue();
+        });
+    }
+
+    private setValue(){
+        let els = d.queryAll('[data-name]', this.sortEl);
+        els.forEach( el => {
+            let name = el.dataset.name.split(','),
+                value = '';
+            name.forEach((n, i) => {
+                if(n in this.recentData){
+                    if(i !== 0){
+                        value += '-'
+                    }
+                    value += this.recentData[n];
+                }
+            });
+            el.innerHTML = value;
+        });
+
+        this.value = '';
     }
 
     private modalBody() : HTMLElement{
@@ -193,16 +188,13 @@ export class RfidInventory {
 
         let conf = JSON.parse(window.localStorage.getItem('rfidConf')),
             port = this.getRfidPort(conf);
-        this.epc = this.epc.concat(['aEPC454895152648945']);
-        this.allCount++;
-        this.thisCount++;
-        this.allEl.innerHTML = this.allCount + '';
-        this.thisEl.innerHTML = this.thisCount + '';
-        this.contentEl.appendChild(<div class="r">识别epc：aEPC454895152648945</div>);
-        this.contentEl.appendChild(<div class="r">识别epc：aEPC454895152648945</div>);
-        this.contentEl.appendChild(<div class="r">识别epc：aEPC454895152648945</div>);
-        this.contentEl.appendChild(<div class="r">识别epc：aEPC454895152648945</div>);
-        this.contentEl.scrollTop = 100000000;
+        // this.epc = this.epc.concat(['aEPC454895152648945']);
+        // this.allCount++;
+        // this.thisCount++;
+        // this.allEl.innerHTML = this.allCount + '';
+        // this.thisEl.innerHTML = this.thisCount + '';
+        // this.contentEl.appendChild(<div class="r">识别epc：aEPC454895152648945</div>);
+        // this.contentEl.scrollTop = 100000000;
 
         Shell.rfid.start(port.str, port.num, (result) => {
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败';
@@ -221,21 +213,11 @@ export class RfidInventory {
 
     private commit() {
         return new Promise(resolve => {
-            if(!this.loading){
-                this.loading = new Loading({
-                    msg : '数据上传中...',
-                    disableEl : this.modal.wrapper
-                });
-            }else {
-                this.loading.show();
-            }
+            let loading = new Loading({
+                msg : '数据上传中...',
+                disableEl : this.modal.wrapper
+            });
 
-            // Modal.toast('上传成功');
-            // this.epc = [];
-            // this.clearData();
-            // this.loading.hide();
-            // this.modal.wrapper.focus();
-            // resolve();
             if(this.barCodeEl && !('BARCODE' in this.recentData)){
                 this.epc = [];
                 this.clearData();
@@ -260,7 +242,7 @@ export class RfidInventory {
                 this.modal.wrapper.focus();
                 resolve();
             }).finally(() => {
-                this.loading.hide();
+                loading.hide();
                 this.focus();
             })
         });
@@ -314,7 +296,7 @@ export class RfidInventory {
         let element = this.p.data.body.elements[0],
             uniqueFlag = element.uniqueFlag,
             url = element.uploadAddr.dataAddr;
-        Shell.rfid.downLoad( url, this.token, uniqueFlag,(result) => {
+        Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, uniqueFlag,(result) => {
             let data : ISortUiPara = result.data;
             data.classifyInfo.forEach(obj => {
                 let keys = Object.keys(obj),

@@ -312,14 +312,15 @@ export = class MainPage {
 
     private static myselfMenu = (function () {
         //顶部个人信息下拉窗口点击事件
-        let rfid : RfidConfig;
-        window.localStorage.setItem('rfidConf', JSON.stringify({
+        let rfid : RfidConfig,
+            conf = window.localStorage.getItem('rfidConf');
+        !conf && window.localStorage.setItem('rfidConf', JSON.stringify({
             line : 0,
             ip : '192.168.1.200',
             port : 100,
             com : 'COM1',
             baud : 115200,
-            mode : '命令',
+            mode : 1,
             buzz : false,
             led : false,
         }));

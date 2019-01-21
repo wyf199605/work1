@@ -10,16 +10,18 @@ import {FastBtnTable} from "../../../global/components/FastBtnTable/FastBtnTable
 import {Button} from "../../../global/components/general/button/Button";
 import {ShellAction} from "../../../global/action/ShellAction";
 import Shell = G.Shell;
+import {ListItemDetail} from "../listDetail/ListItemDetail";
 
 interface InputsPara {
     inputs: R_Input[]
     locationLine? : string
     container: HTMLElement
     keyField? : string
-    table? : Function
+    table? : Function    // 获取表格ftable
     afterScan? : Function
-    tableModule? : Function
-    queryModule? : Function
+    tableModule? : Function // 获取表格模块
+    queryModule? : Function // 查询器
+    setListItemData? : (data : obj[]) => void // 设置单页数据
 }
 interface IKeyStepPara{
     callback(text : string, input? : R_Input, open? : Function) : Promise<any>
@@ -160,6 +162,7 @@ export class Inputs {
         if(tools.isEmpty(data)){
             return;
         }
+
         queryModule && queryModule.hide();
         if(queryModule && !ftable){
             queryModule.para.refresher({}, true).then(() => {
@@ -167,6 +170,8 @@ export class Inputs {
             })
         }else if(ftable){
             ftable.data = data;
+        }else if(tools.isFunction(this.para.setListItemData)){
+            this.para.setListItemData(data);
         }
     }
 
@@ -188,7 +193,7 @@ export class Inputs {
         this.isProcess = true;
         let atv, modal =  new Modal({
             header : {
-              title : '提示'
+                title : '提示'
             },
             isOnceDestroy : true,
             isMb : false,
@@ -248,7 +253,7 @@ export class Inputs {
      */
     private eventInit(para: InputsPara) {
         if(G.tools.isMb){
-           this.keyStep = new KeyStep({
+            this.keyStep = new KeyStep({
                 inputs : para.inputs,
                 callback : (ajaxData, input, open) => {
                     if(input && !this.isProcess){
@@ -268,17 +273,17 @@ export class Inputs {
                 line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 let handle = () => {
-                    let reg = regExpMatch(input, text);
-                    //匹配成功
-                    if(reg){
-                        this.matchPass(reg, text);
-                    }else if(line){
-                        this.rowSelect(line, text);
-                    }
+                        let reg = regExpMatch(input, text);
+                        //匹配成功
+                        if(reg){
+                            this.matchPass(reg, text);
+                        }else if(line){
+                            this.rowSelect(line, text);
+                        }
 
-                    timer = null;
-                    text = '';
-                },
+                        timer = null;
+                        text = '';
+                    },
                     code = e.keyCode || e.which || e.charCode;
 
                 if(code === 13){
