@@ -32,6 +32,30 @@ export class ListItemDetail {
             this.render(data);
             this.initDetailButtons();
         });
+
+        console.log(para);
+        this.inputs(para.fm.inputs, this.wrapper);
+    }
+
+    private inputs(inputs, dom){
+        if(!inputs){
+            return;
+        }
+        require(['Inputs'], (i) => {
+            new i.Inputs({
+                inputs: inputs,
+                container: dom,
+                setListItemData : (data) => {
+                    this.defaultData = data[0];
+                    let cells = this.cells || {};
+                    for (let cellsKey in cells) {
+                        let cell = cells[cellsKey],
+                            cellData = this.defaultData[cellsKey] || '';
+                        cell.render(cellData);
+                    }
+                }
+            })
+        });
     }
 
     // 初始化详情DOM

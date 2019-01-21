@@ -97,6 +97,7 @@ export class ListItemDetailCell extends Component {
         this.fileType = para.field.dataType || para.field.atrrs.dataType;
         para.value && this.render(para.value);
         tools.isNotEmpty(para.link) && this.linkEvent.on();
+
     }
 
     createImgs(value: string | string[], imgsWrapper: HTMLElement) {

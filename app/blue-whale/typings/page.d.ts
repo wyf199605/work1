@@ -35,5 +35,6 @@ interface EditPagePara extends BasicPagePara{
         updatefileData? : R_ReqAddr;
         groupInfo?:IGroupInfo[];
         signField?: string;
+        inputs? : R_Input[]
     }
 }
