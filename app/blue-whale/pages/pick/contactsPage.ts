@@ -379,60 +379,60 @@ export = class contactsPage {
 
 
                 // console.log(para);
-                simData.forEach(function (data) {
+                simData.forEach(function (m) {
                     let parseData: obj;
 
                     //数据一次性加载
                     if(para.levelField === ''){
                         if(para.recursion === 1){
                             parseData = {
-                                name: data[highlightName],
+                                name: m[fromField],
                                 level: level,
-                                id : data[subId],
-                                valueJson: JSON.stringify(data)
+                                id : m[subId],
+                                valueJson: JSON.stringify(m)
                             };
                         }else if(para.recursion === 0){
                             let field = treeField[level],
                                 parentField = treeField[level - 1],
-                                id = data[field];
+                                id = m[field];
                             if(parentField){
-                                id = data[parentField] + data[field];
+                                id = m[parentField] + m[field];
                             }
                             parseData = {
-                                name: data[highlightName],
+                                name: m[fromField],
                                 level: level,
                                 id : id,
-                                valueJson: JSON.stringify(data)
+                                valueJson: JSON.stringify(m)
                             };
                         }
 
                     }else {
                         //数据每次点击后加载
                         parseData = {
-                            name: data[highlightName],
-                            from: data[fromField],
+                            name: m[fromField],
+                            from: m[fromField],
                             level: level,
-                            valueJson: JSON.stringify(data)
+                            valueJson: JSON.stringify(m)
                         };
                     }
 
                     if(para.recursion === 1){
                         let hasSub = false;
                         data.forEach(obj => {
-                            if(data[subId] === obj[parentId]){
+                            if(m[subId] === obj[parentId]){
                                 hasSub = true;
                             }
                         });
                         createHTML = (<HTMLScriptElement>G.d.query(hasSub ? '#notLeaf': '#leaf' )).text;
                     }
                     if (!isLeaf) {
-                        parseData.query = idField && idField.toLowerCase() + '=' + data[idField];
+                        parseData.query = idField && idField.toLowerCase() + '=' + m[idField];
                     }
 
                     //颜色处理
-                    if(~Object.keys(data).indexOf(BwRule.ColorField)){
-                        let {r, g, b} = tools.val2RGB(data[BwRule.ColorField]);
-                        parseData.name = data[highlightName]
+                    if(~Object.keys(m).indexOf(BwRule.ColorField)){
+                        let {r, g, b} = tools.val2RGB(m[BwRule.ColorField]);
+                        parseData.name = m[highlightName]
                             + `<span style="height: 14px;display: inline-block;margin-left: 10px;height: 14px; width:50px; background: rgb(${r},${g},${b})"></span>`;
                     }
                     // parseData.valueJson && (parseData.valueJson = tools.str.htmlEncode(parseData.valueJson));

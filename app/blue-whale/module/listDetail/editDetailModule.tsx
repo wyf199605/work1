@@ -25,7 +25,7 @@ interface IEditDetailPara extends IComponentPara {
         updatefileData?: R_ReqAddr;
         groupInfo?: IGroupInfo[];
         signField?: string;
-        inputs? : R_Input[]
+        inputs?: R_Input[]
     },
     url: string;
 }
@@ -38,6 +38,8 @@ export class EditDetailModule extends Component {
     public currentPage: number = 1;
     public totalNumber: number = 0;
     private ajaxUrl: string = '';
+    private keyStepData: obj[] = [];
+    private isKeyStep: boolean = false;
 
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
         return <div className="edit-detail-module">
@@ -52,63 +54,70 @@ export class EditDetailModule extends Component {
         this.getDefaultData().then((data) => {
             this.initAllButtons();
             this.initEditModule(para, data);
+            this.inputs(para.fm.inputs, this.wrapper);
         });
-        this.inputs(para.fm.inputs, this.wrapper);
     }
 
-    private inputs(inputs, dom){
-        if(!inputs){
+    private inputs(inputs, dom) {
+        if (!inputs) {
             return;
         }
         require(['Inputs'], (i) => {
             new i.Inputs({
                 inputs: inputs,
                 container: dom,
-                setListItemData : (data) => {
-                    this.defaultData = data[0];
-                    for (let i=0;i<this.fields.length;i++) {
-                        let field = this.fields[i],
-                            key = field.name,
-                            cell = this.editModule.getDom(key) || null,
-                            cellData = this.defaultData[key] || '';
-                        cell && cell.set(cellData);
+                setListItemData: (data) => {
+                    if (tools.isNotEmptyArray(data)) {
+                        this.isKeyStep = true;
+                        this.currentPage = 1;
+                        this.totalNumber = data.length || 0;
+                        this.keyStepData = data;
+                        this.changePage();
                     }
                 }
             })
         });
     }
+
     // 获取数据
     private getDefaultData(): Promise<obj> {
         return new Promise((resolve) => {
-            if (tools.isNotEmpty(this.ajaxUrl)) {
-                let url = tools.url.addObj(this.ajaxUrl, {
-                    pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
-                });
-                BwRule.Ajax.fetch(url, {
-                    loading: {
-                        msg: '数据加载中...',
-                        disableEl: this.wrapper
-                    }
-                }).then(({response}) => {
-                    if (tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)) {
-                        let res: obj = {},
-                            body = response.body.bodyList[0],
-                            meta = body.meta,
-                            dataTab = body.dataList[0];
-                        for (let i = 0, len = meta.length; i < len; i++) {
-                            res[meta[i]] = dataTab[i];
-                        }
-                        this.totalNumber = response.head.totalNum;
-                        this.defaultData = res;
-                        resolve(res);
-                    } else {
-                        // let data = BwRule.getDefaultByFields(this.fields);
-                        // this.defaultData = data;
-                        resolve({});
-                    }
-                });
+            if (this.isKeyStep === true) {
+                let keyStepData = this.keyStepData || [],
+                    data = keyStepData[this.currentPage - 1];
+                this.defaultData = data;
+                resolve(data);
             } else {
-                resolve({});
+                if (tools.isNotEmpty(this.ajaxUrl)) {
+                    let url = tools.url.addObj(this.ajaxUrl, {
+                        pageparams: '{"index"=' + this.currentPage + ', "size"=' + 1 + ',"total"=1}'
+                    });
+                    BwRule.Ajax.fetch(url, {
+                        loading: {
+                            msg: '数据加载中...',
+                            disableEl: this.wrapper
+                        }
+                    }).then(({response}) => {
+                        if (tools.isNotEmpty(response.body.bodyList[0]) && tools.isNotEmpty(response.body.bodyList[0].dataList)) {
+                            let res: obj = {},
+                                body = response.body.bodyList[0],
+                                meta = body.meta,
+                                dataTab = body.dataList[0];
+                            for (let i = 0, len = meta.length; i < len; i++) {
+                                res[meta[i]] = dataTab[i];
+                            }
+                            this.totalNumber = response.head.totalNum;
+                            this.defaultData = res;
+                            resolve(res);
+                        } else {
+                            // let data = BwRule.getDefaultByFields(this.fields);
+                            // this.defaultData = data;
+                            resolve({});
+                        }
+                    });
+                } else {
+                    resolve({});
+                }
             }
         })
     }
@@ -265,11 +274,11 @@ export class EditDetailModule extends Component {
         }
     }
 
-    private setLookUp(data:obj){
-        if (tools.isEmpty(data)){
+    private setLookUp(data: obj) {
+        if (tools.isEmpty(data)) {
             return;
         }
-        this.lookup.then(()=>{
+        this.lookup.then(() => {
             this.para.fm.fields.forEach((field) => {
                 if (field.elementType === 'lookup') {
                     let lCom = this.editModule.getDom(field.name);
@@ -287,6 +296,7 @@ export class EditDetailModule extends Component {
             });
         })
     }
+
     // 处理分组
     private getGroupFormPara(groupInfo: IGroupInfo, fields: R_Field[], wrapper: HTMLElement): obj {
         if (tools.isEmpty(groupInfo.cloNames)) {
@@ -338,7 +348,7 @@ export class EditDetailModule extends Component {
     }
 
     // 上一页下一页加载数据
-    changePage(page?: number):Promise<void> {
+    changePage(page?: number): Promise<void> {
         if (tools.isNotEmpty(page)) {
             if (page > 0) {
                 if (page > this.totalNumber) {
@@ -543,7 +553,13 @@ export class EditDetailModule extends Component {
                     if (self.validate()) {
                         // 验证成功
                         self.updateBtnPara.refresh = 0;
-                        ButtonAction.get().clickHandle(self.updateBtnPara, self.editModule.get(), () => {
+                        let data = ListItemDetail.getOldFieldData(self.updateBtnPara, self.editModule.get());
+                        ButtonAction.get().clickHandle(self.updateBtnPara, data, () => {
+                            if (self.isKeyStep === true) {
+                                let keyStepData = self.keyStepData || [];
+                                keyStepData[self.currentPage - 1] = data;
+                                self.keyStepData = keyStepData;
+                            }
                             self.isEdit = false;
                         }, self.para.url || '');
                     }
@@ -604,8 +620,17 @@ export class EditDetailModule extends Component {
                         isPC: !tools.isMb,
                         confirm(data) {
                             return new Promise((resolve) => {
-                                ButtonAction.get().clickHandle(btn, data, () => {
-                                    self.totalNumber += 1;
+                                let old_data = ListItemDetail.getOldFieldData(btn, data);
+                                ButtonAction.get().clickHandle(btn, old_data, () => {
+                                    if (self.isKeyStep === true) {
+                                        let keyStepData = self.keyStepData;
+                                        keyStepData.push(data);
+                                        self.keyStepData = keyStepData;
+                                        self.totalNumber = self.totalNumber + 1;
+                                        self.currentPage = self.totalNumber;
+                                    } else {
+                                        self.totalNumber += 1;
+                                    }
                                     self.changePage();
                                     resolve();
                                 });
@@ -616,8 +641,14 @@ export class EditDetailModule extends Component {
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
                         btn.refresh = 0;
-                        ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                        let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                        ButtonAction.get().clickHandle(btn, data, () => {
                             // 删除后显示下一页，如果已是最后一页，则显示上一页
+                            if (self.isKeyStep === true) {
+                                let keyStepData = self.keyStepData || [];
+                                keyStepData.splice(self.currentPage - 1, 1);
+                                self.keyStepData = keyStepData;
+                            }
                             let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
                             self.totalNumber = self.totalNumber - 1;
                             self.changePage(currentPage);
@@ -629,7 +660,8 @@ export class EditDetailModule extends Component {
                     break;
                 default:
                     // 其他按钮
-                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                    let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                    ButtonAction.get().clickHandle(btn, data, () => {
                     }, self.para.url || '');
                     break;
             }
