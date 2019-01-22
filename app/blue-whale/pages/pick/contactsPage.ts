@@ -377,7 +377,6 @@ export = class contactsPage {
                     simData = data;
                 }
 
-
                 // console.log(para);
                 simData.forEach(function (m) {
                     let parseData: obj;
@@ -399,7 +398,7 @@ export = class contactsPage {
                                 id = m[parentField] + m[field];
                             }
                             parseData = {
-                                name: m[fromField],
+                                name: m[highlightName],
                                 level: level,
                                 id : id,
                                 valueJson: JSON.stringify(m)
