@@ -673,6 +673,7 @@ export class RfidBarCode extends Component {
         // })
         this.photoImg = new ManagerImages({
             imagesContainer: d.query('.rfidBarCode-page>.rfid-barCode-body', this.container),
+            autoUpload:false,
             onFinish: () => {
                 this.photoImgData = [];
                 let ss = this.photoImg.getBase64().then((data) => {
