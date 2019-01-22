@@ -673,6 +673,8 @@ export class LoginPage{
             }).then(({response}) => {
                 result.success = true;
                 result.data = response;
+                let token = response.head.accessToken || '';
+                window.localStorage.setItem('token', token);
                 // console.log(response);
                 // debugger
                 callback(result).then(() => {
