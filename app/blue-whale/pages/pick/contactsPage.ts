@@ -76,7 +76,7 @@ export = class contactsPage {
                 }
             }
 
-            d.on(list, clickEvent, '.mui-table-view-cell.mui-collapse a', function (e) {
+            d.on(list, clickEvent, '.mui-table-view-cell.mui-collapse a', function () {
                 setTimeout(() => {
                     if(typeof hasOpen === 'undefined') {
                         hasOpen = this.parentElement.classList.contains('mui-active');
@@ -88,11 +88,9 @@ export = class contactsPage {
                 }, 0);
             });
 
-            d.on(list, clickEvent, '.mui-table-view-cell a.notLoad[data-query]', function (e) {
+            d.on(list, clickEvent, '.mui-table-view-cell a.notLoad[data-query]', function () {
                 let tapThis = this;
-                // console.log(tapThis.text)
                 function getLevelQuery(dom: HTMLElement, query = '') {
-
                      let parent = d.closest(dom.parentElement, 'li.mui-table-view-cell', list),
                          queryDom = d.query('[data-query]', dom),
                          queryStr = query ? query + '&' + queryDom.dataset.query : queryDom.dataset.query;
@@ -103,7 +101,6 @@ export = class contactsPage {
                          return queryStr;
                      }
                 }
-
                 let url = '';
                 let parseQuery = function (query) {
                     let reg = /([^=&\s]+)[=\s]*([^&\s]*)/g;
@@ -146,7 +143,6 @@ export = class contactsPage {
                 let inputValue:string = search.value, vLen = inputValue.length;
                 if (vLen === 0 || (/\S/).test(inputValue[vLen - 1])) {
                     page = 1;
-
                     list.querySelector('ul.mui-table-view').innerHTML = '<li class="mui-table-view-cell" style="text-align: center"> <span class="mui-spinner" style="vertical-align: bottom;"></span> </li>';
                     dataManager && dataManager.destroy();
                     if (vLen === 0) {
@@ -166,7 +162,6 @@ export = class contactsPage {
 
                             let isEnd = response.data.length < page;
                             // pullScroll.pullRefresh().endPullupToRefresh(isEnd);
-                            // console.log(110)
                             showList(list, level, response.data);
                         });
                     } else {
@@ -283,9 +278,12 @@ export = class contactsPage {
                     }
 
                     isEnd = response.data.length < page;
+                    console.time('arr');
 
                     showList(list, level, response.data, true);
                     callback(isEnd, response.data);
+                    console.timeEnd('arr');
+
                 });
 
 
@@ -325,7 +323,6 @@ export = class contactsPage {
                         subId = treeField[0];
                         subName = treeField[2];
                         parentId = treeField[1];
-                        // console.log(subId,subName,parentId);
                         data.forEach(obj => {
                             if(level === 0){
                                 if(!obj[parentId]){
@@ -336,22 +333,19 @@ export = class contactsPage {
                                     simData.push(obj);
                                 }
                             }
-                        })
+                        });
+                        console.timeEnd('data')
                     }else if(para.recursion === 0){
                         //去重
-                        let filterData = [];
+                        let filterData = [], arr = {};
                         data.forEach(d => {
-                            isExist = false;
-                            filterData.forEach(s => {
-                                if (d[nameField] === s[nameField]) {
-                                    isExist = true;
-                                }
-                            });
-                            if (!isExist) {
+                            let name = d[nameField];
+                            if(!arr[name]){
+                                arr[name] = true;
                                 filterData.push(d);
-                                isExist = false;
                             }
                         });
+
                         filterData.forEach((obj, i) => {
                             for(let key in obj){
                                 if(level === 0){
@@ -371,13 +365,11 @@ export = class contactsPage {
                                 }
                             }
                         });
-
                     }
                 }else {
                     simData = data;
                 }
 
-                // console.log(para);
                 simData.forEach(function (m) {
                     let parseData: obj;
 
