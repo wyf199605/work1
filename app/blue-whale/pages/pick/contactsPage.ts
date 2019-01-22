@@ -313,15 +313,12 @@ export = class contactsPage {
                     }
                 }
 
-                let simData = [],
-                    parentField = treeField[level - 1],
-                    isExist;
-
+                let simData = [];
                 if(para.levelField === ''){
                     let parent = d.query('a[data-id]', dom);
                     if(para.recursion === 1){
                         subId = treeField[0];
-                        subName = treeField[2];
+                        // subName = treeField[2];
                         parentId = treeField[1];
                         data.forEach(obj => {
                             if(level === 0){
@@ -346,7 +343,7 @@ export = class contactsPage {
                             }
                         });
 
-                        filterData.forEach((obj, i) => {
+                        filterData.forEach((obj) => {
                             for(let key in obj){
                                 if(level === 0){
                                     if(key === treeField[level]){
