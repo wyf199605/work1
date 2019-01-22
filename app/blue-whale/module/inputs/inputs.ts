@@ -410,7 +410,7 @@ export class KeyStep{
                 let open = () => {
                     this.scanOpen().then((res : obj) => {
                         if(res.success && res.data !== 'openSuponScan') {
-                            this.p.callback(res.data)
+                            this.p.callback(res.data).then()
                         }
                         open();
                     });
@@ -418,7 +418,7 @@ export class KeyStep{
                 open();
             }else {
                 this.open(para).then((text : string) => {
-                    this.p.callback(text)
+                    this.p.callback(text).then()
                 });
 
             }
@@ -428,7 +428,7 @@ export class KeyStep{
 
 
     scanOpen(){
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             Shell.inventory.scan2dOn((res) => {
                 resolve(res)
             });
@@ -441,8 +441,8 @@ export class KeyStep{
      * @param {IKeyStepPara} para
      */
     open(para : IKeyStepPara){
-        return new Promise((resolve, reject) => {
-            ShellAction.get().device().scan({
+        return new Promise((resolve) => {
+            (ShellAction.get().device().scan as any)({
                 callback: (even) => {
                     resolve(JSON.parse(even.detail).data)
                 }
