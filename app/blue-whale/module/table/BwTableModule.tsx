@@ -832,7 +832,7 @@ export class BwTableModule extends Component {
                     }
                     ImgModal.show(imgData);
                 }else{
-                    Modal.toast('无图片')
+                    // Modal.toast('无图片')
                 }
             },
             open: (cell: FastTableCell) => {

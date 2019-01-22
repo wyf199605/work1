@@ -409,7 +409,7 @@ export = class contactsPage {
                     }else {
                         //数据每次点击后加载
                         parseData = {
-                            name: m[fromField],
+                            name: m[highlightName],
                             from: m[fromField],
                             level: level,
                             valueJson: JSON.stringify(m)
