@@ -113,7 +113,7 @@ export class DrawSvg{
             let maxCount = Math.floor(allWidth / font),
                 index = 0,
                 // 将字符串中的字符与转义字符分开
-                textArr: string[] = text.match(/&[a-zA-Z]+;|&#\d+;|[\w\W]/g),
+                textArr: string[] = text.match(/&[a-zA-Z]+;|&#\d+;|[\w\W]/g) || [],
                 result: string[] = [];
 
             while(index * maxCount < textArr.length){
