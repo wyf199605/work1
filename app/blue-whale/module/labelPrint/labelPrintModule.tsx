@@ -328,12 +328,12 @@ export = class LabelPrintModule {
             }
             if (type === 'preview') {
                 self.dealPreview();
-                sp.hide();
+                sp && sp.hide();
             }
             else if (type === 'print') {
                 if (self.jsonData.length === self.allTableData.length) {//当数据加载完之后执行打印任务
                     self.dealPrint();
-                    sp.hide();
+                    sp && sp.hide();
                 }
             }
             else if (type === 'next') {
@@ -354,7 +354,7 @@ export = class LabelPrintModule {
                     }
                 }
                 self.para.container.getElementsByClassName('previewBody')[0].appendChild(self.pageSvgArray[self.currentPage - 1]);
-                sp.hide();
+                sp && sp.hide();
             }
         }
 
@@ -380,11 +380,11 @@ export = class LabelPrintModule {
                 }
                 else {
                     Modal.toast("暂无数据");
-                    sp.hide();//隐藏预览按钮loading
+                    sp && sp.hide();//隐藏预览按钮loading
                 }
             }).catch((e) => {
                 console.log(e);
-                sp.hide();//隐藏预览按钮loading
+                sp && sp.hide();//隐藏预览按钮loading
             });
         }
         else {
