@@ -1833,7 +1833,6 @@ export class FastTable extends Component {
         if (tools.isPc) {
             // PC端
             this.scrollEvent.off();
-            this.changeScrollWidth(0);
             this.scrollEvent.on();
         } else {
             //  移动端
