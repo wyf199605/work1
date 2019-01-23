@@ -50,7 +50,7 @@ export class ListItemDetail {
                         this.currentPage = 1;
                         this.totalNumber = data.length || 0;
                         this.keyStepData = data;
-                        this.changePage();
+                        this.refresh();
                     }
                 }
             })
@@ -233,9 +233,8 @@ export class ListItemDetail {
         }
     }
 
-
     // 上一页下一页加载数据
-    changePage(page?: number) {
+    refresh(page?: number) {
         if (this.para.uiType === 'detail') {
             if (tools.isNotEmpty(page)) {
                 if (page > 0) {
@@ -416,10 +415,10 @@ export class ListItemDetail {
                                                 self.keyStepData = keyStepData;
                                                 self.totalNumber = self.totalNumber + 1;
                                                 self.currentPage = self.totalNumber;
-                                                self.changePage();
+                                                self.refresh();
                                             } else {
                                                 self.totalNumber += 1;
-                                                self.changePage(1);
+                                                self.refresh(1);
                                             }
                                             resolve();
                                         }
@@ -429,7 +428,7 @@ export class ListItemDetail {
                                                 keyStepData[self.currentPage - 1] = data;
                                                 self.keyStepData = keyStepData;
                                             }
-                                            self.changePage();
+                                            self.refresh();
                                             resolve();
                                         }
                                             break;
@@ -453,7 +452,7 @@ export class ListItemDetail {
                                 }
                                 let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
                                 self.totalNumber = self.totalNumber - 1;
-                                self.changePage(currentPage);
+                                self.refresh(currentPage);
                             }
                         });
                     } else {
@@ -482,7 +481,7 @@ export class ListItemDetail {
             onClick: () => {
                 if (this.currentPage !== 1) {
                     let current = this.currentPage - 1;
-                    this.changePage(current);
+                    this.refresh(current);
                 }
             }
         });
@@ -492,7 +491,7 @@ export class ListItemDetail {
             onClick: () => {
                 if (this.currentPage !== this.totalNumber) {
                     let current = this.currentPage + 1;
-                    this.changePage(current);
+                    this.refresh(current);
                 }
             },
             className: 'list-detail-btn'
