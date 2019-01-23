@@ -1160,17 +1160,17 @@ export = class LabelPrintModule {
                         if ((typeof codeData[k].condition) === 'undefined' || codeData[k].condition) {
                             let x = codeData[k].leftPos * 3.78 * self.scale,
                                 w = codeData[k].width * 3.78 * self.scale;
-                            w = w + 20 > svgWidth ? w - 20 : w;
-                            switch (codeData[k].alignment) {
-                                case 0:
-                                    break;
-                                case 1:
-                                    x = svgWidth - w;
-                                    break;
-                                case 2:
-                                    x = (svgWidth - w) / 2;
-                                    break;
-                            }
+                            // w = w + 20 > svgWidth ? w - 20 : w;
+                            // switch (codeData[k].alignment) {
+                            //     case 0:
+                            //         break;
+                            //     case 1:
+                            //         x = svgWidth - w;
+                            //         break;
+                            //     case 2:
+                            //         x = (svgWidth - w) / 2;
+                            //         break;
+                            // }
                             if (codeData[k].codeType === 99) {
 
                                 new QrCode(drawSvg.group, {

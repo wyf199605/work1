@@ -46,6 +46,23 @@ export class BarCode{
             this.svg.setAttribute("viewBox", `0 0 ${loc.w} ${loc.h}`);
 
             svgDom.appendChild(this.svg);
+            setTimeout(() => {
+                let boxObj = this.svg.getBBox();
+                let x;
+                switch (sty.alignment) {
+                    case 0:
+                        break;
+                    case 1:
+                        x = Math.max((loc.w - boxObj.width), 0);
+                        this.svg.setAttribute('x', `${x}`);
+                        break;
+                    case 2:
+                        x = (loc.w - boxObj.width) / 2;
+                        this.svg.setAttribute('x', `${x}`);
+                        break;
+                }
+
+            }, 300)
         }
         static CodeType = {
             0:'ITF',
