@@ -1,0 +1,2 @@
+/// <amd-module name="ListItemDetailMain"/>
+

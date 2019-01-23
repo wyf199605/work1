@@ -72,7 +72,7 @@ export class EditDetailModule extends Component {
                         this.currentPage = 1;
                         this.totalNumber = data.length || 0;
                         this.keyStepData = data;
-                        this.changePage();
+                        this.refresh();
                     }
                 }
             })
@@ -348,7 +348,7 @@ export class EditDetailModule extends Component {
     }
 
     // 上一页下一页加载数据
-    changePage(page?: number): Promise<void> {
+    refresh(page?: number): Promise<void> {
         if (tools.isNotEmpty(page)) {
             if (page > 0) {
                 if (page > this.totalNumber) {
@@ -408,13 +408,13 @@ export class EditDetailModule extends Component {
                             callback: (flag) => {
                                 if (flag) {
                                     let current = this.currentPage - 1;
-                                    this.changePage(current);
+                                    this.refresh(current);
                                 }
                             }
                         })
                     } else {
                         let current = this.currentPage - 1;
-                        this.changePage(current);
+                        this.refresh(current);
                     }
                 }
             }
@@ -430,13 +430,13 @@ export class EditDetailModule extends Component {
                             callback: (flag) => {
                                 if (flag) {
                                     let current = this.currentPage + 1;
-                                    this.changePage(current);
+                                    this.refresh(current);
                                 }
                             }
                         })
                     } else {
                         let current = this.currentPage + 1;
-                        this.changePage(current);
+                        this.refresh(current);
                     }
                 }
             },
@@ -631,7 +631,7 @@ export class EditDetailModule extends Component {
                                     } else {
                                         self.totalNumber += 1;
                                     }
-                                    self.changePage();
+                                    self.refresh();
                                     resolve();
                                 });
                             })
@@ -651,7 +651,7 @@ export class EditDetailModule extends Component {
                             }
                             let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
                             self.totalNumber = self.totalNumber - 1;
-                            self.changePage(currentPage);
+                            self.refresh(currentPage);
                         });
                     } else {
                         Modal.alert('无数据可以删除!');

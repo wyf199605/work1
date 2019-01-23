@@ -17,14 +17,14 @@ export class ListDetailPage extends BasicPage {
                 url: this.url
             });
             this.on(BwRule.EVT_REFRESH, () => {
-                editDetail.changePage();
+                editDetail.refresh();
             })
         } else {
             let detailItem = new ListItemDetail(para);
             // 刷新非detail页面，detail页面的刷新在页面内完成
             if (para.uiType !== 'detail') {
                 this.on(BwRule.EVT_REFRESH, () => {
-                    detailItem.changePage();
+                    detailItem.refresh();
                 })
             }
         }
