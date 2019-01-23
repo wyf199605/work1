@@ -387,8 +387,11 @@ namespace G{
                 return ShellBase.handler('getColumnCount',{when:when,time:time,turn:false,inventory:inventoryKey,once:true,out:true},back);
             },
             //条码扫码下载的
-            downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,back:IShellEventHandler){
-                return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl},back,null,false);
+            downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,defaultUpload:boolean,back:IShellEventHandler){
+                return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl,defaultUpload:defaultUpload},back,null,false);
+            },
+            getScanData(){
+                return  ShellBase.handler('getScanData',{})
             },
             //条码扫码总量统计
             getCountData(uniqueFlag:string,where:obj,back:IShellEventHandler){
