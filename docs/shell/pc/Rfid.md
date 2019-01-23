@@ -119,3 +119,21 @@
          }]
     }
 ```
+
+#### operateTable(同步)
+调用壳查询条码数据，此函数需指定回调事件名
+* 参数:
+    ```js
+    {
+        "code": string, // 查询字段
+        "uniqueFlag":string, // 后台提供的唯一字段
+    }
+    ```
+* 返回值
+```js
+    {
+        "success": true,
+        "msg": "成功",
+        "data":obj
+    }
+```
