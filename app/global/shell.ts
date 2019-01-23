@@ -497,6 +497,10 @@ namespace G{
                 ShellBase.handler('editImg', {
                     type: 1,
                 }, back)
+            },
+            // TODO 保存图片至本地
+            saveImg(img : string){
+                ShellBase.handler('saveImg', {img})
             }
         };
 
