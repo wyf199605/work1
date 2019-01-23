@@ -185,7 +185,7 @@ namespace G{
             }
 
             function scanCode(code : string, back: IShellEventHandler) {
-                return ShellBase.handler('scanCode', {code}, back);
+                return ShellBase.handler('operateTable', {code}, back);
             }
 
             return{start, stop, config, reset, downLoad, scanCode}
@@ -387,8 +387,11 @@ namespace G{
                 return ShellBase.handler('getColumnCount',{when:when,time:time,turn:false,inventory:inventoryKey,once:true,out:true},back);
             },
             //条码扫码下载的
-            downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,back:IShellEventHandler){
-                return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl},back,null,false);
+            downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,defaultUpload:boolean,back:IShellEventHandler){
+                return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl,defaultUpload:defaultUpload},back,null,false);
+            },
+            getScanData(uniqueFlag:string){
+                return  ShellBase.handler('getScanData',{uniqueFlag:uniqueFlag})
             },
             //条码扫码总量统计
             getCountData(uniqueFlag:string,where:obj,back:IShellEventHandler){

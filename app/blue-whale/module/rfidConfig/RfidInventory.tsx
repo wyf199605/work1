@@ -72,7 +72,7 @@ export class RfidInventory {
                 }, {
                     content: "提交",
                     onClick: () => {
-                        this.commit();
+                        this.commit().then();
                     }
                 }],
                 rightPanel: [{
@@ -133,10 +133,10 @@ export class RfidInventory {
 
     private modalBody() : HTMLElement{
         return <div className="rfid-inventory">
-            {this.titleEl = <div className="rfid-title"></div>}
-            {this.sortEl = <div className="rfid-sort"></div>}
-            {this.contentEl = <div className="rfid-content"></div>}
-            {this.atvarEl = <div className="rfid-atvar"></div>}
+            {this.titleEl = <div className="rfid-title"> </div>}
+            {this.sortEl = <div className="rfid-sort"> </div>}
+            {this.contentEl = <div className="rfid-content"> </div>}
+            {this.atvarEl = <div className="rfid-atvar"> </div>}
             <div className="rfid-footer">
                 <div>
                     <div>累计：</div>
@@ -258,26 +258,26 @@ export class RfidInventory {
         let element = this.p.data.body.elements[0],
             uniqueFlag = element.uniqueFlag,
             url = element.uploadAddr.dataAddr;
-        Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, uniqueFlag,(result) => {
+        console.log(Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, uniqueFlag,(result) => {
             let data : ISortUiPara = result.data;
             data.classifyInfo.forEach(obj => {
                 let keys = Object.keys(obj),
                     li = <div class="rfid-li">
                         <div>{obj[keys[0]]}：</div>
-                        <div data-name={keys.join(',')}></div>
+                        <div data-name={keys.join(',')}> </div>
                     </div>;
                 d.append(this.sortEl, li);
             });
             if(data.keyField){
                 d.append(this.sortEl, <div className="rfid-li">
                     <div>{data.nameField}：</div>
-                    <div data-name={data.keyField}></div>
+                    <div data-name={data.keyField}> </div>
                 </div>)
             }
             this.titleEl.innerHTML = data.title;
             loading.destroy();
             this.focus();
-        });
+        }));
     };
 
     private getRfidPort = (conf: IRfidConfPara) => {

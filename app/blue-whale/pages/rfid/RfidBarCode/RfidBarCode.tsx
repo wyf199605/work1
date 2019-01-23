@@ -11,6 +11,7 @@ import {Loading} from "../../../../global/components/ui/loading/loading";
 import {UploadImages} from "../../../module/uploadModule/uploadImages";
 import {BwLayoutImg} from "../../../module/uploadModule/bwLayoutImg";
 import sys = BW.sys;
+import {ManagerImages} from "../../../module/uploadModule/ManagerImages";
 
 
 interface IRfidBarCode extends IComponentPara {
@@ -59,7 +60,8 @@ export class RfidBarCode extends Component {
     private params: registParams;
     //private regist;
     private fields: Ifiedls[];
-    private photoImg: BwLayoutImg;
+    private photoImg: ManagerImages;
+    private amountType : boolean = false;
 
     constructor(para: IRfidBarCode) {
         super(para);
@@ -229,7 +231,7 @@ export class RfidBarCode extends Component {
                 </div>
             </div>
             <div class="rfid-barCode-footer">
-                <div>
+                <div class="rfid-button">
                     <button onclick={() => {
                         let optionStype = 0;
                         let mode = new Modal({
@@ -263,7 +265,7 @@ export class RfidBarCode extends Component {
                     }}>输入条码
                     </button>
 
-                    <button onclick={() => {
+                    { (!this.amountType) ? (<button class="button-set" onclick={() => {
                         let optionStype = 0;
                         let step = true;
                         let step1 = true;
@@ -396,7 +398,7 @@ export class RfidBarCode extends Component {
                         })
 
                     }}>设置
-                    </button>
+                    </button>): ''}
                     <button onclick={
                         () => {
                             console.log(para.codeStype)
@@ -489,7 +491,7 @@ export class RfidBarCode extends Component {
                     <button onclick={() => {
 
                         let deleteEL, uid, category;
-                        uid = 'BARCODE';
+                        uid = this.keyField;
                         this.fields && this.fields.forEach((res) => {
                             if (res.index == 1) {
                                 category = res.name;
@@ -568,6 +570,7 @@ export class RfidBarCode extends Component {
                                                 this.domHash['count'].innerHTML = 0 + '';
 
                                                 this.stepArry = [];
+                                                alert('删除成功');
                                             } else {
                                                 alert('删除失败');
                                             }
@@ -642,32 +645,47 @@ export class RfidBarCode extends Component {
 
     private InitRfidBarCode(para) {
         //拍照上传的数据
-        this.photoImg = new BwLayoutImg({
-            isShow: false,
-            autoClear:false,
+        // this.photoImg = new BwLayoutImg({
+        //     isShow: false,
+        //     autoClear:false,
+        //     autoUpload:false,
+        //     isCloseMsg:true,
+        //     onFinish: () => {
+        //         return new Promise((resolve)=>{
+        //             this.photoImgData = [];
+        //             let ss = this.photoImg.getBase64().then((data)=>{
+        //                 for(let i = 0 ,len = data.length;i<len; i++){
+        //                     let obj = {};
+        //                     obj['file_name'] = this.randNum();
+        //                     obj['file_data'] = data[i].replace(/data:.+?,/, '')
+        //                     this.photoImgData.push(obj);
+        //                 }
+        //             })
+        //             resolve();
+        //         })
+        //     },
+        //     buttons:[{
+        //         content:'图片管理',
+        //         onClick:() =>{
+        //             this.photoImg.modalShow = true;
+        //         }
+        //     }]
+        // })
+        this.photoImg = new ManagerImages({
+            imagesContainer: d.query('.rfidBarCode-page>.rfid-barCode-body', this.container),
             autoUpload:false,
-            isCloseMsg:true,
             onFinish: () => {
-                return new Promise((resolve)=>{
-                    this.photoImgData = [];
-                    let ss = this.photoImg.getBase64().then((data)=>{
-                        for(let i = 0 ,len = data.length;i<len; i++){
-                            let obj = {};
-                            obj['file_name'] = this.randNum();
-                            obj['file_data'] = data[i].replace(/data:.+?,/, '')
-                            this.photoImgData.push(obj);
-                        }
-                    })
-                    resolve();
+                this.photoImgData = [];
+                let ss = this.photoImg.getBase64().then((data) => {
+                    for (let i = 0, len = data.length; i < len; i++) {
+                        let obj = {};
+                        obj['file_name'] = this.randNum();
+                        obj['file_data'] = data[i].replace(/data:.+?,/, '');
+                        this.photoImgData.push(obj);
+                    }
                 })
-            },
-            buttons:[{
-                content:'图片管理',
-                onClick:() =>{
-                    this.photoImg.modalShow = true;
-                }
-            }]
-        })
+            }
+        });
         let key = this.stepByone + this.accumulation;
         if (this.mode[key] == '(查询状态)') {
             d.query('.shelf-nums>input')['disabled'] = true;
@@ -756,6 +774,7 @@ export class RfidBarCode extends Component {
     private DataclassInfoCp = [];
     private DataCI = [];
     private nameField = '';
+    private  keyField = '';
 
     private downData(para) {
         // let loading = new Loading({
@@ -769,17 +788,16 @@ export class RfidBarCode extends Component {
         }
         console.log(para.uniqueFlag);
         //需要加个加载中
-        let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl, (res) => {
-            //alert(JSON.stringify(res) + '下载')
+        let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,false, (res) => {
             alert(res.msg);
             if(res.success){
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
-                alert(JSON.stringify(pageName))
                 this.domHash['inventory'].innerHTML = pageName.subTitle;
                 this.domHash['title'].innerText = pageName.title;
                 this.domHash['barcodeTitl'].innerHTML = pageName.keyName ? pageName.keyName  : '';
                 this.nameField = pageName.nameField;
+                this.keyField = pageName.keyField;
                 this.domHash['shelfName'].innerHTML = pageName.amountName ? pageName.amountName  : '';
                 this.domHash['totalName'].innerHTML = pageName.amountName ? pageName.amountName  : '';
                 //有可能没有分类  有可能有分类
@@ -809,8 +827,10 @@ export class RfidBarCode extends Component {
                     }
                 }
                 if(pageName.amount == 'SCANNUM'){
+                    this.amountType = true;
                     this.stepStatus = false;
                     d.query('.rfidBarCode-page>.rfid-barCode-body>.rfid-barCode-nums').style.display = 'none';
+                    d.query('.rfid-barCode-footer>.rfid-button>.button-set').style.display = 'none';
                 }
 
 
@@ -832,6 +852,85 @@ export class RfidBarCode extends Component {
                 // alert('kvvvvvk')
                 // alert(JSON.stringify(this.operateTbaleD) + 's')
             }
+            else {
+                //发现有未上传数据
+                let mode1 = new Modal({
+                    isMb: false,
+                    position: "center",
+                    header: '提示',
+                    zIndex:1022,
+                    isOnceDestroy: true,
+                    isBackground: true,
+                    body:<div><h5>有未上传数据，是否继续</h5></div>,
+                    footer: {},
+                    onOk: () => {
+                       this.getHeadTable(para);
+                       let ScanData =  G.Shell.inventory.getScanData(para.uniqueFlag);
+                        if(ScanData.success){
+                           let res = ScanData.data.data;
+                           //重新定义数据
+                            //存储obj数据结构 跟 res数据比对 拼接 以及重新刷新条件传值参数
+
+
+                            if(res){
+
+                                let str = '';
+                                for(let val in this.DataclassInfoCp[0]) {
+                                    for(let obj in res[0]){
+                                        // alert(obj + 'ppp');
+                                        if (obj == val) {
+                                            str += res[0][val];
+                                            // alert(data[i][val] + 'oo')
+                                        }
+                                    }
+                                    // alert(str + '字符串')
+                                    this.domHash['categoryVal1'].innerHTML = str;
+                                }
+                                let strs = '';
+
+                                for(let val in  this.DataclassInfoCp[1]){
+                                    for(let obj in res[0]){
+                                        if(obj == val){
+                                            strs += res[0][val];
+                                        }
+                                    }
+                                    this.domHash['categoryVal2'].innerHTML = strs;
+                                }
+                                let strss = '';
+
+                                for(let val in  this.DataclassInfoCp[2]){
+                                    for(let obj in res[0]){
+                                        if(obj == val){
+                                            strss += res[0][val];
+                                        }
+                                    }
+                                    this.domHash['categoryVal3'].innerHTML = strss;
+                                }
+
+                            }
+                            //更新数据条件
+                            this.domHash['barcode'].innerHTML =  res[0][this.keyField];
+                            this.domHash['Commodity'].innerHTML = res[0][this.nameField];
+                            this.domHash['count'].innerHTML = res[0]['AMOUNT'] ? res[0]['AMOUNT']: 0 + '';
+
+                        }
+
+                        //
+                        mode1.destroy();
+                    },
+                    onClose: () => {
+                        G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,true, (res=>{
+                            alert(res.msg)
+                            if(res.success){
+                                this.getHeadTable(para);
+                            }
+                        }))
+                        //Modal.toast('输入成功');
+
+                    }
+
+                })
+            }
 
         })
         // alert('下载结果' + s )
@@ -848,6 +947,12 @@ export class RfidBarCode extends Component {
             if(res.success){
                 let modeVal = d.query('.shelf-nums>input');
                 modeVal['value'] = '';
+                //判断是否是替换 如果是替换value值不变 如果是其他的状态需要清空为0
+                let key = this.stepByone + this.accumulation;
+
+                if ( this.mode[key] !== "替换") {
+                    this.operateTbaleD.num = 0;
+                }
                 for(let i = 0; i< data.length; i++){
                     //stepArry 添加数组项
                     if(data[i]['BARCODE'] && this.stepArry.indexOf(data[i]['BARCODE']) == -1){
@@ -884,7 +989,6 @@ export class RfidBarCode extends Component {
                                 this.domHash['categoryVal1'].innerHTML = str;
                             }
                             let strs = '';
-
                             for(let val in  this.DataclassInfoCp[1]){
                                 for(let obj in data[i]){
                                     if(obj == val){
@@ -906,15 +1010,15 @@ export class RfidBarCode extends Component {
 
                         }
 
-                        if(data[i]['BARCODE']){
-                            this.domHash['barcode'].innerText = data[i]['BARCODE'];
+                        if(data[i][this.nameField]){
+                            this.domHash['barcode'].innerText = data[i][this.keyField];
 
                             this.domHash['Commodity'].innerHTML = data[i][this.nameField];
                             if(data[i]['AMOUNT'] ){
-                                this.operateTbaleD.num = parseInt(data[i]['AMOUNT']);
+                               // this.operateTbaleD.num = parseInt(data[i]['AMOUNT']);
                                 this.domHash['count'].innerHTML = data[i]['AMOUNT'];
                             }else if(data[i]['SCANNUM']){
-                                this.operateTbaleD.num = parseInt(data[i]['SCANNUM']);
+                                //this.operateTbaleD.num = parseInt(data[i]['SCANNUM']);
                                 this.domHash['count'].innerHTML = data[i]['SCANNUM'];
                             }
 
@@ -931,13 +1035,74 @@ export class RfidBarCode extends Component {
         })
     }
 
+   private getHeadTable(para){
+       let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
+       let pageName = data.data;
+       alert(JSON.stringify(pageName))
+       this.domHash['inventory'].innerHTML = pageName.subTitle;
+       this.domHash['title'].innerText = pageName.title;
+       this.domHash['barcodeTitl'].innerHTML = pageName.keyName ? pageName.keyName  : '';
+       this.nameField = pageName.nameField;
+       this.keyField = pageName.keyField;
+       this.domHash['shelfName'].innerHTML = pageName.amountName ? pageName.amountName  : '';
+       this.domHash['totalName'].innerHTML = pageName.amountName ? pageName.amountName  : '';
+       //有可能没有分类  有可能有分类
+       // if(pageName.classInfo){
+       //     this.DataclassInfo = pageName.classInfo;
+       //     this.dataWhere = pageName.classInfoObj;
+       // }
+       if(tools.isNotEmpty(pageName.classInfo)){
+           this.DataclassInfo = pageName.classInfo;
+           this.DataclassInfoCp = pageName.classInfoObj;
+           for(let i = 0;i< pageName.classInfoObj.length;i++){
+               let obj = pageName.classInfoObj;
+               for(let s in obj[i]){
+                   this.dataWhere[s] = '';
+               }
+           }
+           // alert(JSON.stringify(this.dataWhere) + 'cccccc')
+
+           this.domHash['category1'].innerHTML =  pageName.classInfoObj[0][pageName.classInfo[0]] + ':';
+
+           if ( pageName.classInfo[1] && pageName.classInfoObj[1]){
+               this.domHash['category2'].innerHTML = pageName.classInfoObj[1][pageName.classInfo[1]] + ':';
+           }
+
+           if (pageName.classInfo[2] &&  pageName.classInfoObj[2]){
+               this.domHash['category3'].innerHTML = pageName.classInfoObj[2][pageName.classInfo[2]] + ':';
+           }
+       }
+       if(pageName.amount == 'SCANNUM'){
+           this.amountType = true;
+           this.stepStatus = false;
+           d.query('.rfidBarCode-page>.rfid-barCode-body>.rfid-barCode-nums').style.display = 'none';
+       }
+
+
+       //只需要注册一个监听事件
+       this.rigisterRifd();
+       //判断状态
+       //造数据条件
+       this.operateTbaleD.value = '';
+       this.operateTbaleD.uniqueFlag = para.uniqueFlag;
+       this.operateTbaleD.num = 0;
+       if(pageName.classInfo){
+           //还原键值对得形式
+           this.operateTbaleD.where = this.dataWhere;
+       }else {
+           this.operateTbaleD.where = '';
+       }
+
+       this.operateTbaleD.option = 0;
+   }
+
     private rigisterRifd(){
         G.Shell.inventory.openRegistInventory(0,{},(res)=>{
             this.operateTbaleD.value = res.data;
             //实时更新方法
 
             // alert(JSON.stringify(res) + 'ABA')
-            // alert(JSON.stringify(this.operateTbaleD) +'ppp')
+             alert(JSON.stringify(this.operateTbaleD) +'ppp')
             this.rigisterTable(this.operateTbaleD);
 
         })
