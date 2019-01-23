@@ -11,6 +11,7 @@ import {Loading} from "../../../../global/components/ui/loading/loading";
 import {UploadImages} from "../../../module/uploadModule/uploadImages";
 import {BwLayoutImg} from "../../../module/uploadModule/bwLayoutImg";
 import sys = BW.sys;
+import {ManagerImages} from "../../../module/uploadModule/ManagerImages";
 
 
 interface IRfidBarCode extends IComponentPara {
@@ -59,7 +60,8 @@ export class RfidBarCode extends Component {
     private params: registParams;
     //private regist;
     private fields: Ifiedls[];
-    private photoImg: BwLayoutImg;
+    private photoImg: ManagerImages;
+    private amountType : boolean = false;
 
     constructor(para: IRfidBarCode) {
         super(para);
@@ -229,7 +231,7 @@ export class RfidBarCode extends Component {
                 </div>
             </div>
             <div class="rfid-barCode-footer">
-                <div>
+                <div class="rfid-button">
                     <button onclick={() => {
                         let optionStype = 0;
                         let mode = new Modal({
@@ -263,7 +265,7 @@ export class RfidBarCode extends Component {
                     }}>输入条码
                     </button>
 
-                    { (!this.amountType) ? (<button onclick={() => {
+                    { (!this.amountType) ? (<button class="button-set" onclick={() => {
                         let optionStype = 0;
                         let step = true;
                         let step1 = true;
@@ -396,7 +398,7 @@ export class RfidBarCode extends Component {
                         })
 
                     }}>设置
-                    </button>):''}
+                    </button>): ''}
                     <button onclick={
                         () => {
                             console.log(para.codeStype)
@@ -643,32 +645,47 @@ export class RfidBarCode extends Component {
 
     private InitRfidBarCode(para) {
         //拍照上传的数据
-        this.photoImg = new BwLayoutImg({
-            isShow: false,
-            autoClear:false,
+        // this.photoImg = new BwLayoutImg({
+        //     isShow: false,
+        //     autoClear:false,
+        //     autoUpload:false,
+        //     isCloseMsg:true,
+        //     onFinish: () => {
+        //         return new Promise((resolve)=>{
+        //             this.photoImgData = [];
+        //             let ss = this.photoImg.getBase64().then((data)=>{
+        //                 for(let i = 0 ,len = data.length;i<len; i++){
+        //                     let obj = {};
+        //                     obj['file_name'] = this.randNum();
+        //                     obj['file_data'] = data[i].replace(/data:.+?,/, '')
+        //                     this.photoImgData.push(obj);
+        //                 }
+        //             })
+        //             resolve();
+        //         })
+        //     },
+        //     buttons:[{
+        //         content:'图片管理',
+        //         onClick:() =>{
+        //             this.photoImg.modalShow = true;
+        //         }
+        //     }]
+        // })
+        this.photoImg = new ManagerImages({
+            imagesContainer: d.query('.rfidBarCode-page>.rfid-barCode-body', this.container),
             autoUpload:false,
-            isCloseMsg:true,
             onFinish: () => {
-                return new Promise((resolve)=>{
-                    this.photoImgData = [];
-                    let ss = this.photoImg.getBase64().then((data)=>{
-                        for(let i = 0 ,len = data.length;i<len; i++){
-                            let obj = {};
-                            obj['file_name'] = this.randNum();
-                            obj['file_data'] = data[i].replace(/data:.+?,/, '')
-                            this.photoImgData.push(obj);
-                        }
-                    })
-                    resolve();
+                this.photoImgData = [];
+                let ss = this.photoImg.getBase64().then((data) => {
+                    for (let i = 0, len = data.length; i < len; i++) {
+                        let obj = {};
+                        obj['file_name'] = this.randNum();
+                        obj['file_data'] = data[i].replace(/data:.+?,/, '');
+                        this.photoImgData.push(obj);
+                    }
                 })
-            },
-            buttons:[{
-                content:'图片管理',
-                onClick:() =>{
-                    this.photoImg.modalShow = true;
-                }
-            }]
-        })
+            }
+        });
         let key = this.stepByone + this.accumulation;
         if (this.mode[key] == '(查询状态)') {
             d.query('.shelf-nums>input')['disabled'] = true;
@@ -758,7 +775,6 @@ export class RfidBarCode extends Component {
     private DataCI = [];
     private nameField = '';
     private  keyField = '';
-    private amountType : boolean = false;
 
     private downData(para) {
         // let loading = new Loading({
@@ -773,12 +789,10 @@ export class RfidBarCode extends Component {
         console.log(para.uniqueFlag);
         //需要加个加载中
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,false, (res) => {
-            alert(JSON.stringify(res) + '下载')
             alert(res.msg);
             if(res.success){
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
-                alert(JSON.stringify(pageName))
                 this.domHash['inventory'].innerHTML = pageName.subTitle;
                 this.domHash['title'].innerText = pageName.title;
                 this.domHash['barcodeTitl'].innerHTML = pageName.keyName ? pageName.keyName  : '';
@@ -816,6 +830,7 @@ export class RfidBarCode extends Component {
                     this.amountType = true;
                     this.stepStatus = false;
                     d.query('.rfidBarCode-page>.rfid-barCode-body>.rfid-barCode-nums').style.display = 'none';
+                    d.query('.rfid-barCode-footer>.rfid-button>.button-set').style.display = 'none';
                 }
 
 
@@ -850,16 +865,15 @@ export class RfidBarCode extends Component {
                     footer: {},
                     onOk: () => {
                        this.getHeadTable(para);
-                       let ScanData =  G.Shell.inventory.getScanData();
-                       alert(JSON.stringify(ScanData))
+                       let ScanData =  G.Shell.inventory.getScanData(para.uniqueFlag);
                         if(ScanData.success){
                            let res = ScanData.data.data;
                            //重新定义数据
                             //存储obj数据结构 跟 res数据比对 拼接 以及重新刷新条件传值参数
 
-                            alert(JSON.stringify(res[0]))
+
                             if(res){
-                                alert(JSON.stringify(this.DataclassInfoCp))
+
                                 let str = '';
                                 for(let val in this.DataclassInfoCp[0]) {
                                     for(let obj in res[0]){
@@ -935,10 +949,9 @@ export class RfidBarCode extends Component {
                 modeVal['value'] = '';
                 //判断是否是替换 如果是替换value值不变 如果是其他的状态需要清空为0
                 let key = this.stepByone + this.accumulation;
-                alert(this.mode[key])
+
                 if ( this.mode[key] !== "替换") {
                     this.operateTbaleD.num = 0;
-                    alert(JSON.stringify(this.operateTbaleD.num))
                 }
                 for(let i = 0; i< data.length; i++){
                     //stepArry 添加数组项
@@ -976,7 +989,6 @@ export class RfidBarCode extends Component {
                                 this.domHash['categoryVal1'].innerHTML = str;
                             }
                             let strs = '';
-
                             for(let val in  this.DataclassInfoCp[1]){
                                 for(let obj in data[i]){
                                     if(obj == val){

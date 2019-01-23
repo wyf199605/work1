@@ -390,8 +390,8 @@ namespace G{
             downloadbarcode(uniqueFlag:string,downUrl:string,uploadUrl:string,defaultUpload:boolean,back:IShellEventHandler){
                 return ShellBase.handler('downloadbarcode',{uniqueFlag:uniqueFlag,downUrl:downUrl,uploadUrl:uploadUrl,defaultUpload:defaultUpload},back,null,false);
             },
-            getScanData(){
-                return  ShellBase.handler('getScanData',{})
+            getScanData(uniqueFlag:string){
+                return  ShellBase.handler('getScanData',{uniqueFlag:uniqueFlag})
             },
             //条码扫码总量统计
             getCountData(uniqueFlag:string,where:obj,back:IShellEventHandler){
