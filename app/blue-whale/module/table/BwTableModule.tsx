@@ -2046,30 +2046,33 @@ export class BwTableModule extends Component {
             handler = null;
 
         let btnRefresh = () => {
-            let selectedLen = ftable.selectedRows.length,
-                rowData = ftable.selectedRowsData[0],
-                allLen = ftable.rows.length;
+            if(ftable && ftable.selectedRows){
+                let selectedLen = ftable.selectedRows.length,
+                    rowData = ftable.selectedRowsData[0],
+                    allLen = ftable.rows.length;
 
-            box && box.children.forEach(btn => {
-                let btnField = btn.data as R_Button,
-                    selectionFlag = btnField.selectionFlag,
-                    len = btnField.selectionFlag ? allLen - selectedLen : selectedLen;
+                box && box.children.forEach(btn => {
+                    let btnField = btn.data as R_Button,
+                        selectionFlag = btnField.selectionFlag,
+                        len = btnField.selectionFlag ? allLen - selectedLen : selectedLen;
 
-                if (len === 0) {
-                    btn.isDisabled = selectionFlag ? false : btnField.multiselect > 0;
-                } else if (selectedLen === 1) {
-                    btn.isDisabled = false;
-                    // 根据表格行数据判断按钮是否可点击
-                    if (tools.isNotEmpty(btnField.judgefield) && rowData) {
-                        let judges = btnField.judgefield.split(','),
-                            flag = judges.every((judge) => tools.isNotEmpty(rowData[judge]) ? rowData[judge] === 1 : true);
-                        btn.isDisabled = !flag;
+                    if (len === 0) {
+                        btn.isDisabled = selectionFlag ? false : btnField.multiselect > 0;
+                    } else if (selectedLen === 1) {
+                        btn.isDisabled = false;
+                        // 根据表格行数据判断按钮是否可点击
+                        if (tools.isNotEmpty(btnField.judgefield) && rowData) {
+                            let judges = btnField.judgefield.split(','),
+                                flag = judges.every((judge) => tools.isNotEmpty(rowData[judge]) ? rowData[judge] === 1 : true);
+                            btn.isDisabled = !flag;
+                        }
+                    } else {
+                        btn.isDisabled = btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
                     }
-                } else {
-                    btn.isDisabled = btnField.multiselect !== 2 || tools.isNotEmpty(btnField.judgefield);
-                }
 
-            });
+                });
+            }
+
         };
 
         let init = (wrapper: HTMLElement) => {

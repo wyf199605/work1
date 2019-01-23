@@ -263,6 +263,15 @@ export class BwRule extends Rule {
      * 重新生成交叉制表的cols数据
      * @param {Array} metaData 数据数组
      * @param {Array} colData 原始cols数据
+     * @return {Array}
+     */
+    static createCrossTableCols(metaData: string[], colData: R_Field[]){
+
+    }
+    /**
+     * 重新生成交叉制表的cols数据
+     * @param {Array} metaData 数据数组
+     * @param {Array} colData 原始cols数据
      * @return {{cols , lockNum}} 返回新的cols与需要的锁列数
      */
     static getCrossTableCols(metaData, colData) {

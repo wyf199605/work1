@@ -164,6 +164,7 @@ export class FastTable extends Component {
         this.isWrapLine && this.setRowsHeight();
         this.calcWidth();
         this.setMainTableWidth();
+        this.changeScrollWidth(0);
     }
 
     protected mutiSelect: boolean;

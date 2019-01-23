@@ -338,14 +338,16 @@ export class TableDataCell extends TableCell {
         }
         this.editing && (this.editing = false);
         this.render();
-
-        let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
-        tools.isNotEmpty(events) && events.forEach((fun) => {
-            typeof fun === 'function' && fun(this.table.editing);
+        this.renderPromise.finally(() => {
+            let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
+            tools.isNotEmpty(events) && events.forEach((fun) => {
+                typeof fun === 'function' && fun(this.table.editing);
+            });
         });
     }
 
     protected rendering = false;
+    protected renderPromise: Promise<any> = Promise.resolve();
     render(cellData?){
         // debugger
         if(this.rendering){
@@ -372,7 +374,7 @@ export class TableDataCell extends TableCell {
             }
         }
         // this.wrapper && (this.wrapper.innerHTML = '');
-        this.table.addStack(new Promise((resolve) => {
+        this.table.addStack(this.renderPromise = new Promise((resolve) => {
             if(data instanceof Node) {
                 this.wrapper && d.append(this.wrapper, data);
                 resolve();
@@ -531,9 +533,12 @@ export class TableDataCell extends TableCell {
                         this.input = null;
                     }
                     // let isChange = this.row.cells.some((cell: TableDataCell) => cell.isEdited);
-                    let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
-                    tools.isNotEmpty(events) && events.forEach((fun) => {
-                        typeof fun === 'function' && fun(this);
+
+                    this.renderPromise.finally(() => {
+                        let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
+                        tools.isNotEmpty(events) && events.forEach((fun) => {
+                            typeof fun === 'function' && fun(this);
+                        });
                     });
                 }
             }
