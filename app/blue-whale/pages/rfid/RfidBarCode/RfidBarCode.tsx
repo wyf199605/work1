@@ -933,7 +933,6 @@ export class RfidBarCode extends Component {
             }
 
         })
-        // alert('下载结果' + s )
 
     }
 
@@ -959,10 +958,8 @@ export class RfidBarCode extends Component {
                         this.stepArry.push(data[i]['BARCODE'])
                     }
                     if(tools.isNotEmpty(this.DataclassInfo[0])){
-                        // alert('44444')
                         //this.domHash['categoryVal1'].innerHTML = data[i][this.DataclassInfo[0]];
                         this.dataWhere[this.DataclassInfo[0]] = data[i][this.DataclassInfo[0]];
-                        // alert('55555')
                     }
                     //更新数据条件e
                     if(i == 0){
@@ -979,13 +976,10 @@ export class RfidBarCode extends Component {
                             let str = '';
                             for(let val in this.DataclassInfoCp[0]) {
                                 for(let obj in data[i]){
-                                    // alert(obj + 'ppp');
                                     if (obj == val) {
                                         str += data[i][val];
-                                        // alert(data[i][val] + 'oo')
                                     }
                                 }
-                                // alert(str + '字符串')
                                 this.domHash['categoryVal1'].innerHTML = str;
                             }
                             let strs = '';
@@ -1038,7 +1032,6 @@ export class RfidBarCode extends Component {
    private getHeadTable(para){
        let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
        let pageName = data.data;
-       alert(JSON.stringify(pageName))
        this.domHash['inventory'].innerHTML = pageName.subTitle;
        this.domHash['title'].innerText = pageName.title;
        this.domHash['barcodeTitl'].innerHTML = pageName.keyName ? pageName.keyName  : '';
@@ -1101,8 +1094,6 @@ export class RfidBarCode extends Component {
             this.operateTbaleD.value = res.data;
             //实时更新方法
 
-            // alert(JSON.stringify(res) + 'ABA')
-             alert(JSON.stringify(this.operateTbaleD) +'ppp')
             this.rigisterTable(this.operateTbaleD);
 
         })
