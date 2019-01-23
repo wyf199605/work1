@@ -693,7 +693,7 @@ export class BwTableModule extends Component {
         // 点击显示图片， 判断是否存在缩略图
         let hasThumbnail = this.cols.some(col => {
             let dataType = col.atrrs && col.atrrs.dataType;
-            return !col.noShow && [BwRule.DT_IMAGE, BwRule.DT_SIGN, BwRule.DT_MUL_IMAGE].includes(dataType);
+            return !col.noShow && BwRule.isImage(dataType);
         });
 
         let imgHandler = function (e: MouseEvent, isTd = true) {
@@ -733,8 +733,11 @@ export class BwTableModule extends Component {
                 imgHandler(e, true);
             }, 1000))
         } else {
+
             ftable.click.add(trSelector, tools.pattern.throttling((e) => {
-                imgHandler(e, false);
+                let td = d.closest(e.target as HTMLElement, 'td'),
+                    index = parseInt(td.parentElement.dataset.index);
+                self.imgEdit.showImg(index);
             }, 1000));
         }
 
