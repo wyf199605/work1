@@ -79,7 +79,7 @@ export = class detailPage extends BasicPage {
             }
 
 
-            let field = para.tableUi.scannableField;
+            let field = para.tableUi && para.tableUi.scannableField;
             if(tools.isNotEmpty(field)){
                 require(['MobileScan'],  (M) => {
                     let ui = para.tableUi;
