@@ -4,7 +4,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {IQueryItem, IResult, NewQueryItem} from "./NewQueryItem";
 import tools = G.tools;
 import {Button} from "../../../global/components/general/button/Button";
-import {QueryModule, QueryModulePara} from "../query/queryModule";
+import {QueryModule} from "../query/queryModule";
 
 interface INewQueryPara {
     queryItems?: IQueryItem[];
