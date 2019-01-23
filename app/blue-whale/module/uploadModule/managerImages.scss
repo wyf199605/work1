@@ -1,3 +1,7 @@
+.bw-upload-wrapper.manager-images-uploader {
+  display: none;
+}
+
 .manager-images-wrapper {
   width: 100%;
   display: -webkit-box;
@@ -34,7 +38,7 @@
       align-items: center;
       color: #ffffff;
       border-radius: 50%;
-      &.disabled{
+      &.disabled {
         pointer-events: none;
         opacity: 0.7;
       }

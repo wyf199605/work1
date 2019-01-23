@@ -46,6 +46,7 @@ export class ManagerImages {
             extensions: 'jpg,png,gif,jpeg',
             mimeTypes: 'image/*'
         };
+        para.className = 'manager-images-uploader';
         this.bwUpload = new BwUploader(para);
         this.bwUpload.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: CustomFile[]) => {
             let file = files[0];
