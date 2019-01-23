@@ -56,35 +56,35 @@ export class RfidConfig {
         this._rfidTpl = <div class="rfid-conf">
             <div class="rfid-row">
                 <div class="row-left">
-                    {select = <div className="rfid-select"></div>}
+                    {select = <div className="rfid-select"> </div>}
                 </div>
                 <div class="row-right">
                     {line = <div className="rfid-row line">
                         <div className="text">ip</div>
-                        {ip = <div className="rfid-ip"></div>}
+                        {ip = <div className="rfid-ip"> </div>}
                         <div className="text text-port">端口</div>
-                        {port = <div className="rfid-port"></div>}
+                        {port = <div className="rfid-port"> </div>}
                     </div>}
                     {unLine = <div className="rfid-row unline">
                         <div className="text">串口</div>
-                        {com = <div className="rfid-com"></div>}
+                        {com = <div className="rfid-com"> </div>}
                         <div className="text text-baud">波特率</div>
-                        {baud =  <div className="rfid-baud"></div>}
+                        {baud =  <div className="rfid-baud"> </div>}
                     </div>}
                 </div>
             </div>
             <div class="rfid-row">
                 <div class="text">工作模式</div>
-                {mode = <div className="rfid-mode"></div>}
-                {buzz = <div className="rfid-buzz"></div>}
-                {led = <div className="rfid-led"></div>}
+                {mode = <div className="rfid-mode"> </div>}
+                {buzz = <div className="rfid-buzz"> </div>}
+                {led = <div className="rfid-led"> </div>}
             </div>
-            {content = <div className="rfid-content"></div>}
+            {content = <div className="rfid-content"> </div>}
             <div class="rfid-row btn-group">
-                {reset = <div className="btn-left reset"></div>}
-                {test = <div className="btn-center begin-test"></div>}
-                {end = <div className="btn-right end-test"></div>}
-                {save = <div className="btn-right save"></div>}
+                {reset = <div className="btn-left reset"> </div>}
+                {test = <div className="btn-center begin-test"> </div>}
+                {end = <div className="btn-right end-test"> </div>}
+                {save = <div className="btn-right save"> </div>}
             </div>
         </div>;
 
