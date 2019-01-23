@@ -33,12 +33,7 @@ export class BarCode{
                 displayValue: false,
                 format: BarCode.CodeType[sty.codeType]
             });
-            let width = this.svg.width.animVal.value,
-                scale = (loc.w - 20) / width;
-            console.log(scale);
-            Array.prototype.forEach.call(this.svg.children, (el) => {
-                el.setAttribute('transform', `scale(${scale}, 1)`);
-            });
+            let width = this.svg.width.animVal.value;
             this.svg.setAttribute('width', `${loc.w}`);
             // this.svg.setAttribute('height', `${loc.h}`);
             this.svg.setAttribute('x', `${loc.x}`);
@@ -62,7 +57,7 @@ export class BarCode{
                         break;
                 }
 
-            }, 300)
+            }, 200);
         }
         static CodeType = {
             0:'ITF',
