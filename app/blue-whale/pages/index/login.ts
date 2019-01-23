@@ -698,7 +698,6 @@ export class LoginPage{
                             user.platformName = col.VALUE;
                         }
                     });
-                    // debugger;
                     if (sys.os === 'ad' || sys.os === 'ip') {
                         let accessToken = response.head.accessToken || '';
                         sys.window.opentab(user.userid, accessToken.toString(), noShow);
