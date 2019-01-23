@@ -459,11 +459,14 @@ export = class LabelPrintModule {
             self = this,
             tPaData = this.pageData;
         for (let num = 0; num < this.totalPage; num++) {//循环生成每页的图像
-            let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
-            pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
-            pageSvg.setAttribute('style', 'background-color:white;');
-            pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            // let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            // pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
+            // pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
+            // pageSvg.setAttribute('style', 'background-color:white;');
+            // pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            let pageSvg = document.createElement('div');
+            pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth};
+            height: ${this.userInputValObj.paperHeight};`);
 
             this.pageSvgArray.push(pageSvg);
             let curSize = num * tRow * tCol;
@@ -511,13 +514,13 @@ export = class LabelPrintModule {
 
                     let dataURL = canvas.toDataURL("image/jpeg", 1);  //返回的是一串Base64编码的URL并指定格式
 
-                    new Modal({
-                        body: canvas,
-                        header: '展示',
-                    });
+                    // new Modal({
+                    //     body: canvas,
+                    //     header: '展示',
+                    // });
 
                     canvas = null; //释放
-                    console.log(dataURL);
+                    // console.log(dataURL);
                     dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));
                 };
                 console.log('data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML))));
@@ -637,11 +640,15 @@ export = class LabelPrintModule {
                             sp.show();
                             tempEl.innerHTML = '';
 
-                            let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                            pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
-                            pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
-                            pageSvg.setAttribute('style', 'background-color:white;');
-                            pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                            // let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                            // pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
+                            // pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
+                            // pageSvg.setAttribute('style', 'background-color:white;');
+                            // pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                            let pageSvg = document.createElement('div');
+                            pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth};
+                            height: ${this.userInputValObj.paperHeight};`);
+
 
                             this.pageSvgArray.push(pageSvg);
 

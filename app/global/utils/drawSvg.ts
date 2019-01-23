@@ -89,8 +89,8 @@ export class DrawSvg{
     private init(can : svgStyle){
         this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this.g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        // this.svg.setAttribute('width',`${can.width}`);
-        // this.svg.setAttribute('height',`${can.height}`);
+        this.svg.setAttribute('width',`${can.width}`);
+        this.svg.setAttribute('height',`${can.height}`);
         this.svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         /*document.body.innerHTML = '';
         document.body.appendChild(this.svg);*/
