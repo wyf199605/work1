@@ -89,8 +89,8 @@ export class DrawSvg{
     private init(can : svgStyle){
         this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this.g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        this.svg.setAttribute('width',`${can.width}`);
-        this.svg.setAttribute('height',`${can.height}`);
+        // this.svg.setAttribute('width',`${can.width}`);
+        // this.svg.setAttribute('height',`${can.height}`);
         this.svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         /*document.body.innerHTML = '';
         document.body.appendChild(this.svg);*/
@@ -108,13 +108,16 @@ export class DrawSvg{
         this.g.appendChild(svgimg);
     };
     private drawText = (function(self){
-        let wrapBreak = (text: string, allWidth: number, font: number) => {
+        let wrapBreak = (text: string, allWidth: number, font: number): string[] => {
+            text = text || '';
             let maxCount = Math.floor(allWidth / font),
                 index = 0,
-                result = [];
+                // 将字符串中的字符与转义字符分开
+                textArr: string[] = text.match(/&[a-zA-Z]+;|&#\d+;|[\w\W]/g),
+                result: string[] = [];
 
-            while(index * maxCount < text.length){
-                result.push(text.slice(index * maxCount, (index + 1) * maxCount));
+            while(index * maxCount < textArr.length){
+                result.push(textArr.slice(index * maxCount, (index + 1) * maxCount).join(''));
                 index ++;
             }
             return result;
