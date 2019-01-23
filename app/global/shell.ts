@@ -499,8 +499,8 @@ namespace G{
                 }, back)
             },
             // TODO 保存图片至本地
-            saveImg(img : string, back : IShellEventHandler){
-                ShellBase.handler('saveImg', {img}, back)
+            saveImg(img : string){
+                ShellBase.handler('saveImg', {img})
             }
         };
 
