@@ -37,7 +37,7 @@ export class NewQueryModalMb {
             if (tools.os.ios) {
                 let inputs = Array.prototype.slice.call(document.querySelectorAll('input'));
                 inputs.forEach(input => {
-                    input.onblur = function (e) {
+                    input.onblur = function () {
                         document.body.scrollTop = 0;
                     }
                 })
