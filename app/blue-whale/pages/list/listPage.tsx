@@ -9,7 +9,10 @@ import {DataManager} from "../../../global/components/DataManager/DataManager";
 
 export = class listPage extends BasicPage {
     constructor(private para) {
-        super({'subButtons': para.subButtons});
+        super({
+            subButtons: para.subButtons,
+            ui : para.ui
+        });
         // mui.init();
         let pullScroll = d.query('.mui-scroll-wrapper .mui-scroll');
         let isListEnd;
