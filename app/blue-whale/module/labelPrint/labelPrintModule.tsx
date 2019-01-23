@@ -251,7 +251,8 @@ export = class LabelPrintModule {
                 }
             })
 
-            .catch(() => {
+            .catch((e) => {
+                console.log(e);
                 sp.hide();//隐藏预览按钮loading
             })
 
@@ -381,7 +382,8 @@ export = class LabelPrintModule {
                     Modal.toast("暂无数据");
                     sp.hide();//隐藏预览按钮loading
                 }
-            }).catch(() => {
+            }).catch((e) => {
+                console.log(e);
                 sp.hide();//隐藏预览按钮loading
             });
         }
