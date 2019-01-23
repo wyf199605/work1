@@ -465,8 +465,9 @@ export = class LabelPrintModule {
             // pageSvg.setAttribute('style', 'background-color:white;');
             // pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
             let pageSvg = document.createElement('div');
-            pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth};
-            height: ${this.userInputValObj.paperHeight};`);
+            pageSvg.className = 'label-print-wrapper';
+            pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth}px;
+            height: ${this.userInputValObj.paperHeight}px;`);
 
             this.pageSvgArray.push(pageSvg);
             let curSize = num * tRow * tCol;
@@ -646,8 +647,9 @@ export = class LabelPrintModule {
                             // pageSvg.setAttribute('style', 'background-color:white;');
                             // pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
                             let pageSvg = document.createElement('div');
-                            pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth};
-                            height: ${this.userInputValObj.paperHeight};`);
+                            pageSvg.className = 'label-print-wrapper';
+                            pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth}px;
+                            height: ${this.userInputValObj.paperHeight}px;`);
 
 
                             this.pageSvgArray.push(pageSvg);
@@ -721,11 +723,16 @@ export = class LabelPrintModule {
              height:${userInp.paperHeight}px`
         );
         //初始化一张纸大小的cancas的宽高
-        let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        pageSvg.setAttribute('width', `${userInp.paperWidth}`);
-        pageSvg.setAttribute('height', `${userInp.paperHeight}`);
-        pageSvg.setAttribute('style', 'background-color:white;');
-        pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        // let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        // pageSvg.setAttribute('width', `${userInp.paperWidth}`);
+        // pageSvg.setAttribute('height', `${userInp.paperHeight}`);
+        // pageSvg.setAttribute('style', 'background-color:white;');
+        // pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        let pageSvg = document.createElement('div');
+        pageSvg.className = 'label-print-wrapper';
+        pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth}px;
+            height: ${this.userInputValObj.paperHeight}px;`);
+
         this.pageSvgArray.push(pageSvg);
         //执行ajax调用后台操作
         this.doAjax(CONF.siteUrl + this.para.printList[this.labelType].templateLink.dataAddr, 'preview', sp);
@@ -1081,8 +1088,8 @@ export = class LabelPrintModule {
                 });
                 //渲染到大纸张上
                 let svgData = drawSvg.getSvg();
-                svgData.setAttribute('x', `${x}`);
-                svgData.setAttribute('y', `${y}`);
+                // svgData.setAttribute('x', `${x}`);
+                // svgData.setAttribute('y', `${y}`);
                 self.pageSvgArray[currentPageCanvas].appendChild(svgData);
                 let codeData = data.body.bodyList[0].lableCodes;//一维码以及二维码数据
                 let textData = data.body.bodyList[0].lableDatas;//文字的数据

@@ -7,6 +7,10 @@
     overflow-x: scroll;
     background-color: white;
     max-height:640px;
+
+    .label-print-wrapper{
+      text-align: left;
+    }
     &:hover{
       cursor:pointer;
     }
