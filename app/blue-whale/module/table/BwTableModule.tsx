@@ -847,6 +847,7 @@ export class BwTableModule extends Component {
                     layoutImg = new BwLayoutImg({
                         isCloseMsg: true,
                         isDelete: dataType !== '20',
+                        multi: dataType === '28',
                         nameField: field.name,
                         thumbField: dataType === '20' ? field.name : void 0,
                         loading: {
@@ -870,7 +871,6 @@ export class BwTableModule extends Component {
                                 images = [res.data.unique];
                             }
                         },
-                        multi: false,
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
                                 BwRule.isNewImg(dataType) && (cell.data = images.join(','));
