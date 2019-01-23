@@ -184,8 +184,8 @@ namespace G{
                 return ShellBase.handler('downloadbarcode', {url, token, uniqueFlag}, back);
             }
 
-            function scanCode(code : string, back: IShellEventHandler) {
-                return ShellBase.handler('operateTable', {code}, back);
+            function scanCode(code : string, uniqueFlag : string, back: IShellEventHandler) {
+                return ShellBase.handler('operateTable', {code, uniqueFlag}, back);
             }
 
             return{start, stop, config, reset, downLoad, scanCode}

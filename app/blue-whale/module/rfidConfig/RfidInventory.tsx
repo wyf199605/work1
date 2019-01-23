@@ -106,10 +106,11 @@ export class RfidInventory {
     }
 
     private scan(){
-        Shell.rfid.scanCode(this.value,result => {
+        Shell.rfid.scanCode(this.value,this.uniqueFlag,result => {
             this.recentData = result.data;
             'BARCODE' in this.recentData ? this.commit().then(() => this.setValue()) : this.setValue();
         });
+        this.value = '';
     }
 
     private setValue(){
@@ -127,8 +128,6 @@ export class RfidInventory {
             });
             el.innerHTML = value;
         });
-
-        this.value = '';
     }
 
     private modalBody() : HTMLElement{
@@ -249,6 +248,7 @@ export class RfidInventory {
         this.thisEl.innerHTML = this.thisCount + '';
     }
 
+    private uniqueFlag : string;
     private sortUi() {
         let loading = new Loading({
             msg : '下载数据中',
@@ -256,10 +256,11 @@ export class RfidInventory {
         });
 
         let element = this.p.data.body.elements[0],
-            uniqueFlag = element.uniqueFlag,
             url = element.uploadAddr.dataAddr;
-        console.log(Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, uniqueFlag,(result) => {
+        this.uniqueFlag = element.uniqueFlag;
+        Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
             let data : ISortUiPara = result.data;
+            console.log(data);
             data.classifyInfo.forEach(obj => {
                 let keys = Object.keys(obj),
                     li = <div class="rfid-li">
@@ -277,7 +278,7 @@ export class RfidInventory {
             this.titleEl.innerHTML = data.title;
             loading.destroy();
             this.focus();
-        }));
+        });
     };
 
     private getRfidPort = (conf: IRfidConfPara) => {
