@@ -225,20 +225,21 @@ export class DrawPoint extends Component {
                     obj2 = D3.event.targetTouches,
                     obj3 = D3.event.touches;
                 _this.touchstart = true;
+                console.log(obj2)
                 if (obj2.length > 1) {
                     _this.distance['start'] = _this.getDistance({
-                        x: D3.event.targetTouches[0].pageX,
-                        y: D3.event.targetTouches[0].pageY
+                        x: D3.event.targetTouches[0].screenX,
+                        y: D3.event.targetTouches[0].screenY
                     }, {
-                        x: D3.event.targetTouches[1].pageX,
-                        y: D3.event.targetTouches[1].pageY
+                        x: D3.event.targetTouches[1].screenX,
+                        y: D3.event.targetTouches[1].screenY
                     })
                      touchCenter = _this.getOrigin({
-                         x: D3.event.targetTouches[0].pageX,
-                         y: D3.event.targetTouches[0].pageY
+                         x: D3.event.targetTouches[0].screenX,
+                         y: D3.event.targetTouches[0].screenY
                      }, {
-                         x: D3.event.targetTouches[1].pageX,
-                         y: D3.event.targetTouches[1].pageY
+                         x: D3.event.targetTouches[1].screenX,
+                         y: D3.event.targetTouches[1].screenY
                      })
                     _this.touchscale = scale
                     center = [];
@@ -288,11 +289,10 @@ export class DrawPoint extends Component {
                      _this.g.transition()
                                .duration(150)
                                .ease('in')
-                              .attr("transform",   "scale(" + scale + ")" + "translate(" + [-280, 0 ] + ")" );
-                               //.attr("style", "transform:translate("+[ (-center[0] * (scale - 1)) + 'px', (-center[1] * (scale - 1)) + 'px']+")"  + "scale(" + scale + ") " );
-
+                               //.attr("transform",   "scale(" + scale + ")" + "translate(" + [-280, 0 ] + ")" );
+                                //.attr("transform", "translate("+[ (-center[0] * (scale - 1)), (-center[1] * (scale - 1))]+")"  + "scale(" + scale + ") " );
                                //.attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
-                               //.attr("transform",    "translate(" + [touchCenter['x'] - 65,touchCenter['y']] + ") " + "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
+                               .attr("transform",     "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
 
                     }else {
                         _this.g.transition()
