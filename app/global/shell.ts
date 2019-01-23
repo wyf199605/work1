@@ -185,7 +185,7 @@ namespace G{
             }
 
             function scanCode(code : string, back: IShellEventHandler) {
-                return ShellBase.handler('scanCode', {code}, back);
+                return ShellBase.handler('operateTable', {code}, back);
             }
 
             return{start, stop, config, reset, downLoad, scanCode}
