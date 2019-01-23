@@ -48,20 +48,39 @@ export class BwLayoutImg{
         };
         this.bwUpload = new BwUploader(para);
         this.bwUpload.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: CustomFile[]) => {
-            let file = files[0];
-            BwLayoutImg.fileToImg(file).then((url) => {
-                this.modal.isShow = true;
-                if(!this.multi){
-                    this.files = [];
-                    this.imgManager.delImg();
-                }
-                this.files.push(files[0]);
-                this.imgManager.addImg(url);
-                this.isCloseMsg && this.modal && (this.modal.closeMsg = '是否放弃选中的图片？');
-            }).catch((e) => {
-                console.log(e);
-                Modal.alert('获取图片失败');
-            })
+            if(files && files[0]){
+                Promise.all(files.map((file) => {
+                    return BwLayoutImg.fileToImg(file);
+                })).then((urls) => {
+                    this.modal.isShow = true;
+                    if(!this.multi){
+                        this.files = [];
+                        this.imgManager.delImg();
+                    }
+                    urls.forEach((url) => {
+                        this.files.push(files[0]);
+                        this.imgManager.addImg(url);
+                    });
+                    this.isCloseMsg && this.modal && (this.modal.closeMsg = '是否放弃选中的图片？');
+                }).catch((e) => {
+                    console.log(e);
+                    Modal.alert('获取图片失败');
+                })
+            }
+            // let file = files[0];
+            // BwLayoutImg.fileToImg(file).then((url) => {
+            //     this.modal.isShow = true;
+            //     if(!this.multi){
+            //         this.files = [];
+            //         this.imgManager.delImg();
+            //     }
+            //     this.files.push(files[0]);
+            //     this.imgManager.addImg(url);
+            //     this.isCloseMsg && this.modal && (this.modal.closeMsg = '是否放弃选中的图片？');
+            // }).catch((e) => {
+            //     console.log(e);
+            //     Modal.alert('获取图片失败');
+            // })
         });
         !isShow && this.bwUpload.wrapper.classList.add('hide');
     }

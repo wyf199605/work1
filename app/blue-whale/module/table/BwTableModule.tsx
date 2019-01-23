@@ -843,11 +843,12 @@ export class BwTableModule extends Component {
                 if(cell && cell.column){
                     let field = cell.column.content as R_Field,
                         row = this.ftable.rowGet(cell.row.index),
-                        dataType = field.dataType || field.atrrs.dataType;
+                        dataType = field.dataType || field.atrrs.dataType,
+                        multi = dataType === '28';
                     layoutImg = new BwLayoutImg({
                         isCloseMsg: true,
                         isDelete: dataType !== '20',
-                        multi: dataType === '28',
+                        multi: multi,
                         nameField: field.name,
                         thumbField: dataType === '20' ? field.name : void 0,
                         loading: {
@@ -868,7 +869,11 @@ export class BwTableModule extends Component {
                                 images = [md5Data[field.name]];
                                 row.data = Object.assign({}, row.data, md5Data);
                             }else if(BwRule.isNewImg(dataType)){
-                                images = [res.data.unique];
+                                if(multi){
+                                    images.push(res.data.unique);
+                                }else{
+                                    images = [res.data.unique];
+                                }
                             }
                         },
                         onFinish: () => {

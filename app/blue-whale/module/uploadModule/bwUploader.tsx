@@ -113,9 +113,7 @@ export class BwUploader extends FormCom {
     }
 
     protected addFile(files: CustomFile[]){
-        if(!this.multi){
-            this.temFiles = [];
-        }
+        this.temFiles = [];
         if(tools.isNotEmpty(files)){
             files.forEach((file) => {
                 if(this.maxSize !== -1 && file.size > this.maxSize){
@@ -243,9 +241,9 @@ export class BwUploader extends FormCom {
         this._isFinish = false;
         this.wrapper.classList.remove('error');
         this.setInputValue('上传中...');
-        if(!this.multi){
-            this.files = [];
-        }
+
+        this.files = [];
+
         let promises: Promise<any>[] = [];
         files = this.multi ? files : tools.toArray(files[0]);
         files && files.forEach((file) => {
