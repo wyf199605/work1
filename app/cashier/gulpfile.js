@@ -117,7 +117,7 @@ gulp.task('CC_G_Watch',['CC_G_Compressor'], function () {
 
 //启动页
 gulp.task('CC_G_StartPage',function () {
-    compiler.ts(['global/ajax','global/tools','global/shell', 'global/dom'], 'global.js', para.starPage)
+    compiler.ts(['global/ajax','global/tools','global/shell', 'global/dom'], 'global.js', path.starPage)
 });
 
 gulp.task('CC_G_Start', ['CC_G_Watch'], function () {

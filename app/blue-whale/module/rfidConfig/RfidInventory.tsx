@@ -22,7 +22,6 @@ interface ISortUiPara {
     nameField : string
     amount? : number
     classifyInfo : obj[]
-    rfidepc? : string
 }
 interface IRfidInventoryPara {
     data ; obj
@@ -93,7 +92,7 @@ export class RfidInventory {
         this.beginEl = d.query('.rfid-begin', this.modal.wrapper);
         this.stopEl.classList.add('disabled-none');
         this.sortUi();
-        this.atvar(data.data.body.elements[0])
+        this.atvar(data.data.body.elements[0]);
     }
 
     private keyHandle = (e) => {
@@ -113,6 +112,7 @@ export class RfidInventory {
     private scan(value : string){
         let scanCode = Shell.rfid.scanCode(value,this.uniqueFlag),
             data = null;
+        console.log(scanCode, '查询数据');
         if(scanCode.success){
             data = scanCode.data[0]
         }else {
@@ -123,29 +123,22 @@ export class RfidInventory {
         }
         if('BARCODE' in data){
             if(this.isEmpty()){
-                Modal.alert('分类数据不能为空', null, () => {
-                    this.focus();
-                });
+                Modal.alert('分类数据不能为空', null, () => this.focus());
                 return;
-            }else {
-                if(!this.recentData['BARCODE']){
-                    this.recentData = Object.assign(this.recentData, data);
-                    this.setValue();
-                }else {
-                    this.commit().then(() => {
-                        this.recentData = Object.assign(this.recentData, {BARCODE : data.BARCODE});
-                        this.setValue();
-                    });
-                }
             }
+            this.recentData['BARCODE'] ? this.commit().then(() => this.assign({BARCODE : data.BARCODE})) : this.assign(data);
         }else {
-            this.recentData = Object.assign(this.recentData, data);
-            this.setValue();
+            this.assign(data);
             if(this.isEmpty()){
                 this.barCodeEl && (this.barCodeEl.innerHTML = '');
                 this.recentData['BARCODE'] = '';
             }
         }
+    }
+
+    private assign(data : obj){
+        this.recentData = Object.assign(this.recentData, data);
+        this.setValue();
     }
 
     private setValue(){
@@ -228,20 +221,23 @@ export class RfidInventory {
             port = this.getRfidPort(conf);
 
         Shell.rfid.start(port.str, port.num, (result) => {
-            let msg = result.success ? 'rfid开启成功' : 'rfid开启失败';
-            if (result.data) {
+            console.log(result, '开启数据');
+            let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
+                data = result.data;
+            if (data) {
                 msg = result.msg + '：' + result.data[0];
             }
-            this.contentEl.appendChild(<div class="r">{msg}</div>);
-            this.contentEl.scrollTop = 100000000;
-            this.allCount++;
-            this.thisCount++;
-            this.allEl.innerHTML = this.allCount + '';
-            this.thisEl.innerHTML = this.thisCount + '';
-            let epc = result.data;
-            if(this.epc.indexOf(epc) === -1){
-                this.epc.push(epc);
-            }
+            data.forEach(d => {
+                if(this.epc.indexOf(d) === -1){
+                    this.epc.push(d);
+                    this.contentEl.appendChild(<div class="r">{msg}</div>);
+                    this.contentEl.scrollTop = 100000000;
+                    this.allCount++;
+                    this.thisCount++;
+                    this.allEl.innerHTML = this.allCount + '';
+                    this.thisEl.innerHTML = this.thisCount + '';
+                }
+            });
         });
     }
 
@@ -279,7 +275,7 @@ export class RfidInventory {
                 type: 'post',
             }).then(({response}) => {
                 console.log(response);
-                Modal.toast('上传成功');
+                Modal.toast(response.msg);
                 this.epc = [];
                 this.clearData();
                 this.modal.wrapper.focus();
@@ -296,6 +292,7 @@ export class RfidInventory {
     private clearData(){
         let els = d.queryAll('[data-name]', this.sortEl);
         els.forEach( el => el.innerHTML = '');
+        this.recentData = {};
         this.contentEl.innerHTML = '';
         this.thisCount = 0;
         this.thisEl.innerHTML = this.thisCount + '';

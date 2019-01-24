@@ -41,7 +41,7 @@ export class RfidConfig {
             className : 'rfid-conf',
             body : this.rfidTpl(),
             onClose : () => {
-                Shell.rfid.stop(function (result) {})
+                Shell.rfid.stop( result => {})
             }
         })
     }
@@ -219,6 +219,7 @@ export class RfidConfig {
             text : 'LED灯'
         });
         let back = (result, msg) => {
+            console.log(result.data);
             if(result.data){
                 msg = result.msg + '：' + result.data[0];
             }
