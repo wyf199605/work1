@@ -40,6 +40,9 @@ export class RfidConfig {
             },
             className : 'rfid-conf',
             body : this.rfidTpl(),
+            onClose : () => {
+                Shell.rfid.stop(function (result) {})
+            }
         })
     }
 
@@ -231,8 +234,8 @@ export class RfidConfig {
                     isFirst = true;
                 Shell.rfid.config(conf.str, conf.num, {
                     mode : this.mode.get(),
-                    buzzer : this.buzz.get() === 1,
-                    led : this.led.get() === 1
+                    buzzer : this.buzz.get(),
+                    led : this.led.get()
                 },function (result) {
                     back(result, result.success ? '天线功率、蜂鸣器和led配置成功' : '天线功率、蜂鸣器和led配置失败');
                     if(isFirst){
@@ -286,8 +289,8 @@ export class RfidConfig {
                     com : this.com.get(),
                     baud : this.baud.get(),
                     mode : this.mode.get(),
-                    buzz : this.buzz.get() === 1,
-                    led : this.led.get() === 1,
+                    buzz : this.buzz.get(),
+                    led : this.led.get(),
                 }));
                 Modal.alert('保存成功');
             }
@@ -318,8 +321,8 @@ export class RfidConfig {
             str = this.ip.get(),
             num = this.port.get(),
             mode = this.mode.get(),
-            buzzer = this.buzz.get() === 1,
-            led = this.led.get() === 1;
+            buzzer = this.buzz.get(),
+            led = this.led.get();
 
         if(line === 1){
             str = this.com.get();
