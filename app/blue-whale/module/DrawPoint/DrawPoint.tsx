@@ -160,7 +160,7 @@ export class DrawPoint extends Component {
         }
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-        let ss;
+
         // if (tools.isMb) {
         //     let scale = 1;
         //     D3.select(_this.wrapper).on('touchstart', function (ev) {
@@ -215,98 +215,98 @@ export class DrawPoint extends Component {
         //
         //     }, true)
         // }
-        if (tools.isMb) {
-            let scale = 1,
-            touchCenter = {},
-            center = [];
-            D3.select(_this.wrapper).on('touchstart', function (ev) {
-                D3.event.preventDefault();
-                let ob1 = D3.event.changedTouches,
-                    obj2 = D3.event.targetTouches,
-                    obj3 = D3.event.touches;
-                _this.touchstart = true;
-                console.log(obj2)
-                if (obj2.length > 1) {
-                    _this.distance['start'] = _this.getDistance({
-                        x: D3.event.targetTouches[0].screenX,
-                        y: D3.event.targetTouches[0].screenY
-                    }, {
-                        x: D3.event.targetTouches[1].screenX,
-                        y: D3.event.targetTouches[1].screenY
-                    })
-                     touchCenter = _this.getOrigin({
-                         x: D3.event.targetTouches[0].screenX,
-                         y: D3.event.targetTouches[0].screenY
-                     }, {
-                         x: D3.event.targetTouches[1].screenX,
-                         y: D3.event.targetTouches[1].screenY
-                     })
-                    _this.touchscale = scale
-                    center = [];
-                    center.push(touchCenter['x'])
-                    center.push(touchCenter['y'])
-                }
-
-
-            }, true).on('touchmove', function (ev) {
-                D3.event.preventDefault();
-                let ob1 = D3.event.changedTouches,
-                    obj2 = D3.event.targetTouches,
-                    obj3 = D3.event.touches;
-                _this.touchTime++;
-                console.log(obj2.length)
-                if (obj2.length > 1 && (_this.touchTime % 2 !== 0) && _this.touchstart) {
-                    _this.distance['stop'] = _this.getDistance({
-                        x: obj2[0].screenX,
-                        y: obj2[0].screenY
-                    }, {
-                        x: obj2[1].screenX,
-                        y: obj2[1].screenY
-                    })
-                    touchCenter = _this.getOrigin({
-                        x: obj2[0].screenX,
-                        y: obj2[0].screenY
-                    }, {
-                        x: obj2[1].screenX,
-                        y: obj2[1].screenY
-                    })
-
-
-                    //alert(JSON.stringify(_this.distance) + _this.touchTime);
-                    scale = _this.distance['stop'] * _this.touchscale / (_this.distance['start']);
-                    //alert(scale);
-                    if(scale > 6){
-                        scale = 6
-                    }
-
-                    let slate = [-280, 0],center1 = [],slate1 = [280,0];
-                    if(touchCenter['x'] && touchCenter['y']){
-                        // center.push(touchCenter['x'])
-                        // center.push(touchCenter['y'] )
-                        //获取中心点  得到缩放比例 然后再把原来的中心点减去 比例后的中心点 就是偏移量
-                        let pyx = center[0] - center[0] * scale,
-                            pyy = center[1] - center[1] * scale;
-                     _this.g.transition()
-                               .duration(150)
-                               .ease('in')
-                               .attr("transform",   "scale(" + scale + ")" + "translate(" + [-280, 0 ] + ")" );
-                                //.attr("transform", "translate("+[ (-center[0] * (scale - 1)), (-center[1] * (scale - 1))]+")"  + "scale(" + scale + ") " );
-                               //.attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
-                               //.attr("transform",     "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
-
-                    }else {
-                        _this.g.transition()
-                            .duration(150)
-                            .ease('in')
-                            .attr("transform", "translate(" + slate + ")"  + "scale(" + scale + ")" );
-                    }
-
-                }
-
-            }, true).on('touchend', function () {
-                _this.touchstart = false
-            }, true)
-        }
+        // if (tools.isMb) {
+        //     let scale = 1,
+        //     touchCenter = {},
+        //     center = [];
+        //     D3.select(_this.wrapper).on('touchstart', function (ev) {
+        //         D3.event.preventDefault();
+        //         let ob1 = D3.event.changedTouches,
+        //             obj2 = D3.event.targetTouches,
+        //             obj3 = D3.event.touches;
+        //         _this.touchstart = true;
+        //         console.log(obj2)
+        //         if (obj2.length > 1) {
+        //             _this.distance['start'] = _this.getDistance({
+        //                 x: D3.event.targetTouches[0].screenX,
+        //                 y: D3.event.targetTouches[0].screenY
+        //             }, {
+        //                 x: D3.event.targetTouches[1].screenX,
+        //                 y: D3.event.targetTouches[1].screenY
+        //             })
+        //              touchCenter = _this.getOrigin({
+        //                  x: D3.event.targetTouches[0].screenX,
+        //                  y: D3.event.targetTouches[0].screenY
+        //              }, {
+        //                  x: D3.event.targetTouches[1].screenX,
+        //                  y: D3.event.targetTouches[1].screenY
+        //              })
+        //             _this.touchscale = scale
+        //             center = [];
+        //             center.push(touchCenter['x'])
+        //             center.push(touchCenter['y'])
+        //         }
+        //
+        //
+        //     }, true).on('touchmove', function (ev) {
+        //         D3.event.preventDefault();
+        //         let ob1 = D3.event.changedTouches,
+        //             obj2 = D3.event.targetTouches,
+        //             obj3 = D3.event.touches;
+        //         _this.touchTime++;
+        //         console.log(obj2.length)
+        //         if (obj2.length > 1 && (_this.touchTime % 2 !== 0) && _this.touchstart) {
+        //             _this.distance['stop'] = _this.getDistance({
+        //                 x: obj2[0].screenX,
+        //                 y: obj2[0].screenY
+        //             }, {
+        //                 x: obj2[1].screenX,
+        //                 y: obj2[1].screenY
+        //             })
+        //             touchCenter = _this.getOrigin({
+        //                 x: obj2[0].screenX,
+        //                 y: obj2[0].screenY
+        //             }, {
+        //                 x: obj2[1].screenX,
+        //                 y: obj2[1].screenY
+        //             })
+        //
+        //
+        //             //alert(JSON.stringify(_this.distance) + _this.touchTime);
+        //             scale = _this.distance['stop'] * _this.touchscale / (_this.distance['start']);
+        //             //alert(scale);
+        //             if(scale > 6){
+        //                 scale = 6
+        //             }
+        //
+        //             let slate = [-280, 0],center1 = [],slate1 = [280,0];
+        //             if(touchCenter['x'] && touchCenter['y']){
+        //                 // center.push(touchCenter['x'])
+        //                 // center.push(touchCenter['y'] )
+        //                 //获取中心点  得到缩放比例 然后再把原来的中心点减去 比例后的中心点 就是偏移量
+        //                 let pyx = center[0] - center[0] * scale,
+        //                     pyy = center[1] - center[1] * scale;
+        //              _this.g.transition()
+        //                        .duration(120)
+        //                        .ease('in')
+        //                        .attr("transform",   "scale(" + scale + ")" + "translate(" + [-280, 0 ] + ")"  + "translate(" + [-pyx,pyy ] + ")" );
+        //                         //.attr("transform", "translate("+[ (-center[0] * (scale - 1)), (-center[1] * (scale - 1))]+")"  + "scale(" + scale + ") " );
+        //                        //.attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
+        //                        //.attr("transform",     "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
+        //
+        //             }else {
+        //                 _this.g.transition()
+        //                     .duration(150)
+        //                     .ease('in')
+        //                     .attr("transform", "translate(" + slate + ")"  + "scale(" + scale + ")" );
+        //             }
+        //
+        //         }
+        //
+        //     }, true).on('touchend', function () {
+        //         _this.touchstart = false
+        //     }, true)
+        // }
 
         let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
@@ -321,12 +321,14 @@ export class DrawPoint extends Component {
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
         if (tools.isMb) {
-
+            this.svg.call(this.zoom);
+            this.zoom.translate([-280,0]);
+            this.zoom.scale(0.7);
             let slate = [-280, 0],
                 slate1 = [-150, -50]
-            this.g.attr("transform",   "scale(0.7)" + "translate(" + slate + ")");
-            // this.svg.attr('width',1600).attr('height',1900)
-            // this.svg.attr("transform","translate(" + slate1+ ")")
+             this.g.attr("transform",   "scale(0.7)" + "translate(" + slate + ")");
+             this.svg.attr('width',1600).attr('height',1900)
+             //this.svg.attr("transform","translate(" + slate1+ ")")
         }
     }
 
@@ -425,7 +427,7 @@ export class DrawPoint extends Component {
             let group = this.g.append('g').datum(d);
             detail = d;
             if (tools.isMb) {
-                this.svg.attr('style','pointer-events:none');
+                //this.svg.attr('style','pointer-events:none');
                 G.d.on(group.node(), 'press', (res) => {
                     group.select('path').attr('fill-opacity', '0.9');
                     setTimeout(() => {
@@ -1199,19 +1201,7 @@ export class DrawPoint extends Component {
                 .domain([0, para.height])
                 .range([0, para.height]);
 
-        if (tools.isMb) {
-            let scale = 1;
-            //  d.on(this.wrapper, 'touchzoom', (ev) => {
-            //      //
-            //      scale = ev.scale;
-            //      scale = Math.min(ev.scale, 5);
-            //      scale = Math.max(0.5, ev.scale);
-            //      // _this.g.attr('transform', "translate(" + str + ")" + "scale(" + scale + ")");
-            //      _this.g.attr('transform', "scale(" + scale + ")");
-            //      _this.svg.attr('width', scale * 1200);
-            //      _this.svg.attr('height', scale * 800);
-            // })
-        } else {
+
             this.zoom = D3.behavior.zoom()
                 .x(X)
                 .y(Y)
@@ -1222,10 +1212,10 @@ export class DrawPoint extends Component {
                 .on('zoom', function (d) {
                     if (D3.event.scale > 5 && D3.event.scale < 8) {
 
-                        D3.selectAll('circle').attr('r', 1.2);
+                        //D3.selectAll('circle').attr('r', 1.2);
                         //D3.selectAll('path').attr('stroke-width',_this.LV(6))
                     } else if (D3.event.scale > 8) {
-                        D3.selectAll('circle').attr('r', 0.5);
+                        //D3.selectAll('circle').attr('r', 0.5);
 
                         //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
                     } else {
@@ -1236,7 +1226,7 @@ export class DrawPoint extends Component {
 
                 }).on("zoomend", function (d) {
                 })
-        }
+
 
 
     }
