@@ -859,7 +859,8 @@ export class BwTableModule extends Component {
                         },
                         autoUpload: true,
                         onDelete: (index) => {
-                            images.splice(index, 1);
+                            console.log(index);
+                            delete images[index];
                         },
                         onSuccess: (res) => {
                             if(BwRule.isOldImg(dataType)){
@@ -881,7 +882,7 @@ export class BwTableModule extends Component {
                         },
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
-                                BwRule.isNewImg(dataType) && (cell.data = images.join(','));
+                                BwRule.isNewImg(dataType) && (cell.data = images.filter((a) => !!a).join(','));
                                 console.log(cell.data);
                                 resolve();
                             });
@@ -889,7 +890,9 @@ export class BwTableModule extends Component {
                     });
 
                     layoutImg.set(getImg(cell));
-                    images = [cell.data as string];
+                    if(cell.data && typeof cell.data === 'string'){
+                        images = cell.data.split(',');
+                    }
                     layoutImg.modalShow = true;
                 }
             }
@@ -1560,7 +1563,7 @@ export class BwTableModule extends Component {
                                 }
                             }
                         });
-                    }, 980)
+                    }, 980);
                     Shell.inventory.columnCountOff(when, 1, inventory, (res) => {
                     })
                 })
@@ -1607,7 +1610,11 @@ export class BwTableModule extends Component {
                         });
                         text = <div>
                             {urls.map((url) => {
-                                return <img style={"max-width: " + (100 / urls.length) + '%;'} src={url} alt=""/>
+                                let width = 100 / urls.length;
+                                return <img style={{
+                                    maxWidth: width - 2 + '%',
+                                    marginRight: '2%'
+                                }} src={url} alt=""/>
                             })}
                         </div>;
                     }

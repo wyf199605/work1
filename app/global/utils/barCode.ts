@@ -1,5 +1,6 @@
 /// <amd-module name="BarCode" />
 /// <amd-dependency path="JsBarcode" name="JsBarcode"/>
+/// <amd-dependency path="D3" name="D3"/>
 declare const JsBarcode;
 interface locPara{
     x:number,//横坐标
@@ -10,7 +11,8 @@ interface locPara{
 interface codePara{
     alignment?:number,
     codeData?:string,
-    codeType?:number
+    codeType?:number;
+    codeRate?: number;
 }
 export class BarCode{
     private svg:SVGSVGElement;
@@ -27,7 +29,7 @@ export class BarCode{
             JsBarcode("#tempSvg", sty.codeData,{
                 lineColor: "#000000",
                 // width: (loc.w-88)/68+1,
-                width: sty.codeType === 3 ? 2 : 1,
+                width: 1,
                 height: loc.h,
                 margin: 0,
                 displayValue: false,
@@ -43,20 +45,30 @@ export class BarCode{
             svgDom.appendChild(this.svg);
             setTimeout(() => {
                 let boxObj = this.svg.getBBox();
-                let x;
-                switch (sty.alignment) {
-                    case 0:
-                        break;
-                    case 1:
-                        x = Math.max((loc.w - boxObj.width), 0);
-                        this.svg.setAttribute('x', `${x}`);
-                        break;
-                    case 2:
-                        x = (loc.w - boxObj.width) / 2;
-                        this.svg.setAttribute('x', `${x}`);
-                        break;
+                if(boxObj.width > loc.w){
+                    d3.select(this.svg).remove();
+                    d3.select(svgDom).append('text')
+                        .html('条码宽度超出')
+                        .attr('x', loc.x)
+                        .attr('y', loc.y + 10)
+                        // .attr('width', loc.w)
+                        .attr('font-size', 10)
+                        // .style('text-anchor','middle')
+                }else{
+                    let x;
+                    switch (sty.alignment) {
+                        case 0:
+                            break;
+                        case 1:
+                            x = Math.max((loc.w - boxObj.width), 0);
+                            this.svg.setAttribute('x', `${x}`);
+                            break;
+                        case 2:
+                            x = (loc.w - boxObj.width) / 2;
+                            this.svg.setAttribute('x', `${x}`);
+                            break;
+                    }
                 }
-
             }, 200);
         }
         static CodeType = {
