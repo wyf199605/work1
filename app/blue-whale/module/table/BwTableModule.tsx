@@ -757,7 +757,7 @@ export class BwTableModule extends Component {
                     row = cell.row,
                     field = column.content as R_Field;
                 if(BwRule.isNewImg(field.atrrs.dataType)){
-                    if (typeof data === 'string') {
+                    if (data && typeof data === 'string') {
                         data.split(',').forEach((data) => {
                             urls.push(tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                                 "md5_field": field.name,
@@ -1596,7 +1596,7 @@ export class BwTableModule extends Component {
                     classes.push('cell-img');
 
                 } else if (BwRule.isNewImg(dataType)) {
-                    if (cellData) {
+                    if (cellData && typeof cellData === 'string') {
                         let urls = [];
                         cellData.split(',').forEach((data) => {
                             urls.push(tools.url.addObj(CONF.ajaxUrl.fileDownload, {
