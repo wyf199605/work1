@@ -274,10 +274,10 @@ export class BwRule extends Rule {
                     name: '__nothing'
                 }
             }),
-            deep = 0,
+            count = 0,
             metaArr: Array<string[]> = metaData.map((name) => {
                 let arr = name.split('.');
-                deep = Math.max(arr.length, deep);
+                count = Math.max(arr.length, count);
                 return arr;
             });
         metaArr.forEach((arr) => {
@@ -298,7 +298,7 @@ export class BwRule extends Rule {
                         title: fieldName
                     };
                     if(index === arr.length - 1){
-                        content.rowspan = deep - index;
+                        content.rowspan = count - index;
                         for(let field of fields){
                             if(field.name === fieldName){
                                 content.field = field;
@@ -313,7 +313,7 @@ export class BwRule extends Rule {
             })
 
         });
-        let fieldArr: IFastTableCol[][] = Array.from({length: deep}, () => []);
+        let fieldArr: IFastTableCol[][] = Array.from({length: count}, () => []);
         tree.each((tnode, deep) => {
             let content = tnode.content;
             if(Array.isArray(fieldArr[deep - 1]) && content !== '__nothing'){
@@ -328,6 +328,7 @@ export class BwRule extends Rule {
                     field = Object.assign({}, field, {
                         title: col.caption,
                         content: col,
+                        isFixed: content.rowspan === count,
                         isNumber: BwRule.isNumber(col.atrrs && col.atrrs.dataType),
                         isVirtual: col.noShow,
                         isCanSort: col.isCanSort,
