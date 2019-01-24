@@ -456,7 +456,7 @@ export class BwTableModule extends Component {
          * 把返回的数据与UI合并成交叉制表的列参数(具体规则要问下小路, 太久记不清了)
          * @param meta
          */
-        let colsParaGet = (meta: string[]): obj[] => {
+        /*let colsParaGet = (meta: string[]): obj[] => {
 
             let originCols = this._cols,
                 fields: R_Field[] = BwRule.getCrossTableCols(meta, originCols).cols;
@@ -531,7 +531,7 @@ export class BwTableModule extends Component {
             });
 
             return colsPara;
-        };
+        };*/
 
         // let isFirst = tableDom.classList.contains('mobileTable');
         return this.pivotRefresh(ajaxData).then((response) => {
