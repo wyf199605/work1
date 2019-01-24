@@ -280,7 +280,6 @@ export class BwRule extends Rule {
                 deep = Math.max(arr.length, deep);
                 return arr;
             });
-        console.log(deep);
         metaArr.forEach((arr) => {
             let parent = tree;
             arr.forEach((fieldName, index) => {
@@ -338,7 +337,6 @@ export class BwRule extends Rule {
                 fieldArr[deep - 1].push(field);
             }
         });
-        console.log(fieldArr);
         return fieldArr;
     }
     /**
