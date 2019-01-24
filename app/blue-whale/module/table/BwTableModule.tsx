@@ -461,6 +461,7 @@ export class BwTableModule extends Component {
             let originCols = this._cols,
                 fields: R_Field[] = BwRule.getCrossTableCols(meta, originCols).cols;
 
+            BwRule.createCrossTableCols(meta, originCols);
             let countFields = [], // 统计字段
                 otherFields = []; // 其他字段
 
@@ -541,7 +542,7 @@ export class BwTableModule extends Component {
             this.ftable = new FastBtnTable(
                 Object.assign(this.baseFtablePara, {
                     exportTitle: this.ui.caption,
-                    cols: colsParaGet(response.meta),
+                    cols: BwRule.createCrossTableCols(response.meta, this._cols),
                     data: response.data
                 })
             );

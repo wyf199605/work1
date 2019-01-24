@@ -9,6 +9,8 @@ import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {ImgModalMobile} from "../ImgModalMobile";
 import {BugReportModal} from "../../module/BugReport/BugReport";
 import {Loading} from "../../../global/components/ui/loading/loading";
+import {TreeNodeBase} from "../../../global/dataStruct/tree/TreeNodeBase";
+import {IFastTableCol} from "../../../global/components/newTable/FastTable";
 
 export class BwRule extends Rule {
     /**
@@ -262,11 +264,82 @@ export class BwRule extends Rule {
     /**
      * 重新生成交叉制表的cols数据
      * @param {Array} metaData 数据数组
-     * @param {Array} colData 原始cols数据
+     * @param {Array} fields 原始cols数据
      * @return {Array}
      */
-    static createCrossTableCols(metaData: string[], colData: R_Field[]){
+    static createCrossTableCols(metaData: string[], fields: R_Field[]): IFastTableCol[][]{
 
+        let tree: TreeNodeBase = new TreeNodeBase({
+                content: {
+                    name: '__nothing'
+                }
+            }),
+            deep = 0,
+            metaArr: Array<string[]> = metaData.map((name) => {
+                let arr = name.split('.');
+                deep = Math.max(arr.length, deep);
+                return arr;
+            });
+        console.log(deep);
+        metaArr.forEach((arr) => {
+            let parent = tree;
+            arr.forEach((fieldName, index) => {
+                let name = arr.slice(0, index + 1).join('.');
+                let children = parent.find((child) => {
+                    return child.content.name === name;
+                });
+                if(children && tools.isNotEmpty(children[0])){
+                    parent = children[0];
+                    parent.content.colspan ++;
+                }else{
+                    let content: obj = {
+                        name: name,
+                        colspan: 1,
+                        rowspan: 1,
+                        title: fieldName
+                    };
+                    if(index === arr.length - 1){
+                        content.rowspan = deep - index;
+                        for(let field of fields){
+                            if(field.name === fieldName){
+                                content.field = field;
+                                break;
+                            }
+                        }
+                    }
+                    parent.childrenAdd(parent = new TreeNodeBase({
+                        content
+                    }));
+                }
+            })
+
+        });
+        let fieldArr: IFastTableCol[][] = Array.from({length: deep}, () => []);
+        tree.each((tnode, deep) => {
+            let content = tnode.content;
+            if(Array.isArray(fieldArr[deep - 1]) && content !== '__nothing'){
+                let field: IFastTableCol = {
+                    name: content.name,
+                    colspan: content.colspan,
+                    rowspan: content.rowspan,
+                    title: content.title,
+                };
+                if('field' in content){
+                    let col: R_Field = content.field;
+                    field = Object.assign({}, field, {
+                        title: col.caption,
+                        content: col,
+                        isNumber: BwRule.isNumber(col.atrrs && col.atrrs.dataType),
+                        isVirtual: col.noShow,
+                        isCanSort: col.isCanSort,
+                        sortName: col.sortName,
+                    })
+                }
+                fieldArr[deep - 1].push(field);
+            }
+        });
+        console.log(fieldArr);
+        return fieldArr;
     }
     /**
      * 重新生成交叉制表的cols数据
