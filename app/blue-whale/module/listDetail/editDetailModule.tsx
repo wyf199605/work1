@@ -553,7 +553,10 @@ export class EditDetailModule extends Component {
                     if (self.validate()) {
                         // 验证成功
                         self.updateBtnPara.refresh = 0;
-                        let data = ListItemDetail.getOldFieldData(self.updateBtnPara, self.editModule.get());
+                        let data = self.editModule.get();
+                        if (tools.isNotEmpty(self.updateBtnPara.actionAddr.varList)) {
+                            data = ListItemDetail.getOldFieldData(self.updateBtnPara, data);
+                        }
                         ButtonAction.get().clickHandle(self.updateBtnPara, data, () => {
                             if (self.isKeyStep === true) {
                                 let keyStepData = self.keyStepData || [];
@@ -611,6 +614,7 @@ export class EditDetailModule extends Component {
 
         // 处理按钮触发
         function subBtnEvent(btn: R_Button) {
+            let varList = btn.actionAddr.varList;
             switch (btn.subType) {
                 case 'insert_save':
                     btn.refresh = 0;
@@ -620,7 +624,10 @@ export class EditDetailModule extends Component {
                         isPC: !tools.isMb,
                         confirm(data) {
                             return new Promise((resolve) => {
-                                let old_data = ListItemDetail.getOldFieldData(btn, data);
+                                let old_data = data;
+                                if (tools.isNotEmpty(varList)) {
+                                    old_data = ListItemDetail.getOldFieldData(btn, old_data);
+                                }
                                 ButtonAction.get().clickHandle(btn, old_data, () => {
                                     if (self.isKeyStep === true) {
                                         let keyStepData = self.keyStepData;
@@ -641,7 +648,10 @@ export class EditDetailModule extends Component {
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
                         btn.refresh = 0;
-                        let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                        let data = self.defaultData;
+                        if (tools.isNotEmpty(varList)) {
+                            data = ListItemDetail.getOldFieldData(btn, data || {});
+                        }
                         ButtonAction.get().clickHandle(btn, data, () => {
                             // 删除后显示下一页，如果已是最后一页，则显示上一页
                             if (self.isKeyStep === true) {
@@ -660,7 +670,10 @@ export class EditDetailModule extends Component {
                     break;
                 default:
                     // 其他按钮
-                    let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                    let data = self.defaultData;
+                    if (tools.isNotEmpty(varList)) {
+                        data = ListItemDetail.getOldFieldData(btn, data || {});
+                    }
                     ButtonAction.get().clickHandle(btn, data, () => {
                     }, self.para.url || '');
                     break;
