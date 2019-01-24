@@ -136,6 +136,11 @@ export abstract class TableCell {
         this.wrapper.rowSpan = rowspan;
         if(this.rowspan !== 1){
             this.wrapper.style.height = rowspan * 40 + 'px';
+            let div = d.query('.cell-content', this.wrapper);
+            if(div){
+                div.style.height = rowspan * 40 + 'px';
+                div.style.lineHeight = rowspan * 40 + 'px';
+            }
         }
     }
 
@@ -557,6 +562,7 @@ export class TableHeaderCell extends TableCell{
     constructor(para: ITableHeaderCellPara) {
         super(para);
         this.text = para.text;
+        this.rowspan = para.rowspan;
     }
 
     protected _text:string;

@@ -48,7 +48,13 @@ export class FastPseudoTable extends TableBase {
 
         let multiHead = tools.isEmpty(para.multiHeadRow) ? 1 : para.multiHeadRow;
 
-        this.head.rows[0].cells[0].wrapper.style.height = multiHead * 40 + 1 + 'px';
+        let allCheckBoxWrapper = this.head.rows[0].cells[0].wrapper;
+        allCheckBoxWrapper.style.height = multiHead * 40 + 1 + 'px';
+        let div = d.query('.cell-content', allCheckBoxWrapper);
+        if(div){
+            div.style.height = multiHead * 40 + 'px';
+            div.style.lineHeight = multiHead * 40 + 'px';
+        }
 
         let isAll = tools.isEmpty(para.isAll) ? true : para.isAll;
         if(isAll){
