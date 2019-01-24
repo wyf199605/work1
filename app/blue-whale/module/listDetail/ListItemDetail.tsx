@@ -389,7 +389,12 @@ export class ListItemDetail {
 
         // 处理按钮触发
         function subBtnEvent(index) {
-            let btn = self.para.fm.subButtons[index];
+            let btn = self.para.fm.subButtons[index],
+                varList = tools.isNotEmpty(btn.actionAddr) ? btn.actionAddr.varList : null;
+            if (tools.isEmpty(btn.actionAddr)) {
+                Modal.alert('当前按钮无任何操作!');
+                return;
+            }
             switch (btn.subType) {
                 case 'update_save':
                 case 'insert_save':
@@ -405,7 +410,10 @@ export class ListItemDetail {
                         isPC: !tools.isMb,
                         confirm(data) {
                             return new Promise((resolve) => {
-                                let old_data = ListItemDetail.getOldFieldData(btn, data);
+                                let old_data = data;
+                                if (tools.isNotEmpty(varList)) {
+                                    old_data = ListItemDetail.getOldFieldData(btn, old_data)
+                                }
                                 ButtonAction.get().clickHandle(btn, old_data, () => {
                                     let keyStepData = self.keyStepData || [];
                                     switch (btn.subType) {
@@ -441,7 +449,10 @@ export class ListItemDetail {
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
                         btn.refresh = 0;
-                        let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                        let data = self.defaultData;
+                        if (tools.isNotEmpty(varList)) {
+                            data = ListItemDetail.getOldFieldData(btn, data || {})
+                        }
                         ButtonAction.get().clickHandle(btn, data, () => {
                             if (self.para.uiType === 'detail') {
                                 // 删除后显示下一页，如果已是最后一页，则显示上一页
@@ -462,7 +473,10 @@ export class ListItemDetail {
                     break;
                 default:
                     // 其他按钮
-                    let data = ListItemDetail.getOldFieldData(btn, self.defaultData || {});
+                    let data = self.defaultData;
+                    if (tools.isNotEmpty(varList)) {
+                        data = ListItemDetail.getOldFieldData(btn, data || {})
+                    }
                     ButtonAction.get().clickHandle(btn, data, () => {
                     });
                     break;

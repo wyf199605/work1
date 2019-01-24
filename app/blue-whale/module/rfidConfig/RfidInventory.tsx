@@ -22,6 +22,7 @@ interface ISortUiPara {
     nameField : string
     amount? : number
     classifyInfo : obj[]
+    rfidepc? : string
 }
 interface IRfidInventoryPara {
     data ; obj
@@ -42,7 +43,7 @@ export class RfidInventory {
     private p: obj;
     private modal: Modal;
     private value: string = '';
-    private recentData ; obj;
+    private recentData = {};
     private epc : string[] = [];
     private token : string;
 
@@ -82,6 +83,9 @@ export class RfidInventory {
                         this.stop();
                     }
                 }]
+            },
+            onClose : () => {
+                Shell.rfid.stop(() => {});
             }
         });
         this.token = window.localStorage.getItem('token');
@@ -95,22 +99,53 @@ export class RfidInventory {
     private keyHandle = (e) => {
         let code = e.keyCode || e.which || e.charCode;
         if (code === 13) {
-            this.scan();
+            this.scan(this.value);
+            this.value = '';
         } else {
             this.value += e.key;
         }
     };
 
-    private dataGet() : ISortUiPara[]{
-        return Object.assign(this.recentData, {RFIDEPC : this.epc.join(',')})
+    private dataGet(){
+        return Object.assign(this.recentData, {rfidepc : this.epc.join(',')})
     }
 
-    private scan(){
-        Shell.rfid.scanCode(this.value,this.uniqueFlag,result => {
-            this.recentData = result.data;
-            'BARCODE' in this.recentData ? this.commit().then(() => this.setValue()) : this.setValue();
-        });
-        this.value = '';
+    private scan(value : string){
+        let scanCode = Shell.rfid.scanCode(value,this.uniqueFlag),
+            data = null;
+        if(scanCode.success){
+            data = scanCode.data[0]
+        }else {
+            Modal.alert(scanCode.msg, null, () => {
+                this.focus();
+            });
+            return;
+        }
+        if('BARCODE' in data){
+            if(this.isEmpty()){
+                Modal.alert('分类数据不能为空', null, () => {
+                    this.focus();
+                });
+                return;
+            }else {
+                if(!this.recentData['BARCODE']){
+                    this.recentData = Object.assign(this.recentData, data);
+                    this.setValue();
+                }else {
+                    this.commit().then(() => {
+                        this.recentData = Object.assign(this.recentData, {BARCODE : data.BARCODE});
+                        this.setValue();
+                    });
+                }
+            }
+        }else {
+            this.recentData = Object.assign(this.recentData, data);
+            this.setValue();
+            if(this.isEmpty()){
+                this.barCodeEl && (this.barCodeEl.innerHTML = '');
+                this.recentData['BARCODE'] = '';
+            }
+        }
     }
 
     private setValue(){
@@ -128,14 +163,16 @@ export class RfidInventory {
             });
             el.innerHTML = value;
         });
+        this.contentEl.innerHTML = '';
+        this.epc = [];
     }
 
     private modalBody() : HTMLElement{
         return <div className="rfid-inventory">
-            {this.titleEl = <div className="rfid-title"> </div>}
-            {this.sortEl = <div className="rfid-sort"> </div>}
-            {this.contentEl = <div className="rfid-content"> </div>}
-            {this.atvarEl = <div className="rfid-atvar"> </div>}
+            {this.titleEl = <div className="rfid-title"/>}
+            {this.sortEl = <div className="rfid-sort"/>}
+            {this.contentEl = <div className="rfid-content"/>}
+            {this.atvarEl = <div className="rfid-atvar"/>}
             <div className="rfid-footer">
                 <div>
                     <div>累计：</div>
@@ -163,8 +200,12 @@ export class RfidInventory {
             this.atVarBuilder = new q.AtVarBuilder({
                 queryConfigs: atvarparams,
                 resultDom: this.atvarEl,
-                tpl: () => d.create(`<div class="atvarDom atvar-auto"><div style="display: inline-block;" data-type="title"></div>
-                    <div data-type="input"></div></div>`),
+                tpl: () =><div class="atvarDom atvar-auto">
+                    <div style="display: inline-block;" data-type="title">
+                    </div>
+                    <div data-type="input">
+                    </div>
+                </div>,
                 setting: res.setting
             });
         });
@@ -197,24 +238,36 @@ export class RfidInventory {
             this.thisCount++;
             this.allEl.innerHTML = this.allCount + '';
             this.thisEl.innerHTML = this.thisCount + '';
-            this.epc = this.epc.concat(result.data);
+            let epc = result.data;
+            if(this.epc.indexOf(epc) === -1){
+                this.epc.push(epc);
+            }
         });
     }
 
+    private isEmpty(){
+        let els = d.queryAll('[data-name]', this.sortEl),
+            isEmpty = false;
+        els.forEach( el => {
+            if(el.innerHTML === '' && el.dataset.name !== 'BARCODE'){
+                isEmpty = true;
+            }
+        });
+        return isEmpty;
+    }
     private commit() {
         return new Promise(resolve => {
+            if(!this.epc[0]){
+                Modal.alert('无盘点数据', null, () => {
+                    this.focus();
+                });
+                resolve();
+                return;
+            }
             let loading = new Loading({
                 msg : '数据上传中...',
                 disableEl : this.modal.wrapper
             });
-
-            if(this.barCodeEl && !('BARCODE' in this.recentData)){
-                this.epc = [];
-                this.clearData();
-                this.modal.wrapper.focus();
-                resolve();
-                return;
-            }
 
             let url = CONF.siteUrl + this.p.data.body.elements[0].uploadAddr.dataAddr;
             url = G.tools.url.addObj(url, {
@@ -260,19 +313,19 @@ export class RfidInventory {
         this.uniqueFlag = element.uniqueFlag;
         Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
             let data : ISortUiPara = result.data;
-            console.log(data);
+            console.log(data,'这是下载数据');
             data.classifyInfo.forEach(obj => {
                 let keys = Object.keys(obj),
                     li = <div class="rfid-li">
                         <div>{obj[keys[0]]}：</div>
-                        <div data-name={keys.join(',')}> </div>
+                        <div data-name={keys.join(',')}/>
                     </div>;
                 d.append(this.sortEl, li);
             });
             if(data.keyField){
                 d.append(this.sortEl, <div className="rfid-li">
                     <div>{data.nameField}：</div>
-                    <div data-name={data.keyField}> </div>
+                    <div data-name={data.keyField}/>
                 </div>)
             }
             this.titleEl.innerHTML = data.title;

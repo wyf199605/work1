@@ -777,9 +777,9 @@ export class RfidBarCode extends Component {
     private  keyField = '';
 
     private downData(para) {
-        // let loading = new Loading({
-        //     msg: "加载中"
-        // })
+        let loading = new Loading({
+            msg: "加载中"
+        })
         let where = {};
         this.params = {
             optionStype: 0,
@@ -791,6 +791,7 @@ export class RfidBarCode extends Component {
         let s = G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,false, (res) => {
             alert(res.msg);
             if(res.success){
+                loading.destroy();
                 let data = G.Shell.inventory.getTableInfo(para.uniqueFlag)
                 let pageName = data.data;
                 this.domHash['inventory'].innerHTML = pageName.subTitle;

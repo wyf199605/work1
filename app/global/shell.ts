@@ -184,8 +184,8 @@ namespace G{
                 return ShellBase.handler('downloadbarcode', {url, token, uniqueFlag}, back);
             }
 
-            function scanCode(code : string, uniqueFlag : string, back: IShellEventHandler) {
-                return ShellBase.handler('operateTable', {code, uniqueFlag}, back);
+            function scanCode(code : string, uniqueFlag : string) {
+                return ShellBase.handler('operateTable', {code, uniqueFlag});
             }
 
             return{start, stop, config, reset, downLoad, scanCode}
@@ -498,9 +498,9 @@ namespace G{
                     type: 1,
                 }, back)
             },
-            // TODO 保存图片至本地
+            // 保存图片至本地
             saveImg(img : string){
-                ShellBase.handler('saveImg', {img})
+                return ShellBase.handler('saveImg', {img})
             }
         };
 
@@ -577,7 +577,7 @@ namespace G{
                                 infor(typeof detail === 'string' ? JSON.parse(detail) : detail);
                             }catch (e){
                                 console.log(detail);
-                                console.log(e);
+                                console.log(e, 'JSON解析错误');
                                 alert('JSON解析错误')
                             }
                         })
@@ -595,6 +595,8 @@ namespace G{
                             try {
                                 detail = typeof detail === 'string' ? JSON.parse(detail) : detail;
                             } catch (e) {
+                                console.log(e, 'JSON解析错误');
+                                console.log(detail);
                                 alert('JSON解析错误');
                                 return;
                             }
