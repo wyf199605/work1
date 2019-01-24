@@ -1607,7 +1607,7 @@ export class BwTableModule extends Component {
                         });
                         text = <div>
                             {urls.map((url) => {
-                                return <img src={url} alt=""/>
+                                return <img style={"max-width: " + (100 / urls.length) + '%;'} src={url} alt=""/>
                             })}
                         </div>;
                     }
