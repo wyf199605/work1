@@ -757,12 +757,14 @@ export class BwTableModule extends Component {
                     row = cell.row,
                     field = column.content as R_Field;
                 if(BwRule.isNewImg(field.atrrs.dataType)){
-                    if (data) {
-                        urls = [tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                            "md5_field": field.name,
-                            [field.name]: data,
-                            down: 'allow'
-                        })];
+                    if (typeof data === 'string') {
+                        data.split(',').forEach((data) => {
+                            urls.push(tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                                "md5_field": field.name,
+                                [field.name]: data,
+                                down: 'allow'
+                            }))
+                        });
                     }
                 }else if(BwRule.isOldImg(field.atrrs.dataType)){
                     let picAddrList = this.ui.pictureAddrList;
@@ -1595,12 +1597,19 @@ export class BwTableModule extends Component {
 
                 } else if (BwRule.isNewImg(dataType)) {
                     if (cellData) {
-                        let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                            "md5_field": field.name,
-                            [field.name]: cellData,
-                            down: 'allow'
+                        let urls = [];
+                        cellData.split(',').forEach((data) => {
+                            urls.push(tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                                "md5_field": field.name,
+                                [field.name]: data,
+                                down: 'allow'
+                            }))
                         });
-                        text = <img src={url}/>;
+                        text = <div>
+                            {urls.map((url) => {
+                                return <img src={url} alt=""/>
+                            })}
+                        </div>;
                     }
                     classes.push('cell-img');
                 } else if (dataType === BwRule.DT_MUL_IMAGE) {
