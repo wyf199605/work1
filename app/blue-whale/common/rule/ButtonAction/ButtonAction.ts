@@ -396,6 +396,7 @@ export class ButtonAction {
                         if (data && (data.type || data.type === 0)) {
                             if (data.type === 0) {
                                 Modal.alert(data.showText);
+                                reject();
                             } else if(data.type === 2) {
                                 this.progressPopup(data.url, data.showText, resolve);
                             } else {
