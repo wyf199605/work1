@@ -227,7 +227,7 @@ export class RfidInventory {
             if (data) {
                 msg = result.msg + '：' + result.data[0];
             }
-            data.forEach(d => {
+            Array.isArray(data) && data.forEach(d => {
                 if(this.epc.indexOf(d) === -1){
                     this.epc.push(d);
                     this.contentEl.appendChild(<div class="r">{msg}</div>);
@@ -290,9 +290,9 @@ export class RfidInventory {
     }
 
     private clearData(){
-        let els = d.queryAll('[data-name]', this.sortEl);
-        els.forEach( el => el.innerHTML = '');
-        this.recentData = {};
+        // let els = d.queryAll('[data-name]', this.sortEl);
+        // els.forEach( el => el.innerHTML = '');
+        // this.recentData = {};
         this.contentEl.innerHTML = '';
         this.thisCount = 0;
         this.thisEl.innerHTML = this.thisCount + '';
@@ -306,12 +306,12 @@ export class RfidInventory {
         });
 
         let element = this.p.data.body.elements[0],
-            url = element.uploadAddr.dataAddr;
+            url = element.downloadAddr.dataAddr;
         this.uniqueFlag = element.uniqueFlag;
         Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
             let data : ISortUiPara = result.data;
             console.log(data,'这是下载数据');
-            data.classifyInfo.forEach(obj => {
+            Array.isArray(data) && data.classifyInfo.forEach(obj => {
                 let keys = Object.keys(obj),
                     li = <div class="rfid-li">
                         <div>{obj[keys[0]]}：</div>
@@ -319,13 +319,13 @@ export class RfidInventory {
                     </div>;
                 d.append(this.sortEl, li);
             });
-            if(data.keyField){
+            if(data && data.keyField){
                 d.append(this.sortEl, <div className="rfid-li">
                     <div>{data.nameField}：</div>
                     <div data-name={data.keyField}/>
                 </div>)
             }
-            this.titleEl.innerHTML = data.title;
+            this.titleEl.innerHTML = data && data.title || '';
             loading.destroy();
             this.focus();
         });
