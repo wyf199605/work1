@@ -47,7 +47,6 @@ export class RfidInventory {
     private token : string;
 
     constructor(data: IRfidInventoryPara) {
-        console.log(data);
         this.p = data;
         this.init(data);
     }
@@ -112,7 +111,7 @@ export class RfidInventory {
     private scan(value : string){
         let scanCode = Shell.rfid.scanCode(value,this.uniqueFlag),
             data = null;
-        console.log(scanCode, '查询数据');
+
         if(scanCode.success){
             data = scanCode.data[0]
         }else {
@@ -221,7 +220,6 @@ export class RfidInventory {
             port = this.getRfidPort(conf);
 
         Shell.rfid.start(port.str, port.num, (result) => {
-            console.log(result, '开启数据');
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
             if (data) {
@@ -285,14 +283,9 @@ export class RfidInventory {
                 this.focus();
             })
         });
-
-
     }
 
     private clearData(){
-        // let els = d.queryAll('[data-name]', this.sortEl);
-        // els.forEach( el => el.innerHTML = '');
-        // this.recentData = {};
         this.contentEl.innerHTML = '';
         this.thisCount = 0;
         this.thisEl.innerHTML = this.thisCount + '';
