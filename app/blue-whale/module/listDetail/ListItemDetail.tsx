@@ -9,6 +9,14 @@ import {Button} from "../../../global/components/general/button/Button";
 import {DetailModal} from "./DetailModal";
 import tools = G.tools;
 import d = G.d;
+import {FlowDesigner} from "../flowDesigner/FlowDesigner";
+import {TextInput} from "../../../global/components/form/text/text";
+import {ContactsModule} from "../flowDesigner/ContactsModule";
+import sys = BW.sys;
+
+interface IListItemDetailPara extends EditPagePara {
+    url: string;
+}
 
 export class ListItemDetail {
     // DOM容器
@@ -22,7 +30,7 @@ export class ListItemDetail {
     private keyStepData: obj[] = [];
     private isKeyStep: boolean = false;
 
-    constructor(private para: EditPagePara) {
+    constructor(private para: IListItemDetailPara) {
         let wrapper = <div className="list-item-detail-wrapper"/>,
             dom = para.dom || document.body;
         dom.appendChild(wrapper);
@@ -390,10 +398,15 @@ export class ListItemDetail {
         // 处理按钮触发
         function subBtnEvent(index) {
             let btn = self.para.fm.subButtons[index],
-                varList = tools.isNotEmpty(btn.actionAddr) ? btn.actionAddr.varList : null;
+                varList = tools.isNotEmpty(btn.actionAddr) ? btn.actionAddr.varList : null,
+                isShowContacts = false;
             if (tools.isEmpty(btn.actionAddr)) {
                 Modal.alert('当前按钮无任何操作!');
                 return;
+            }
+            let def_data = self.defaultData;
+            if (tools.isNotEmpty(varList)) {
+                def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
             }
             switch (btn.subType) {
                 case 'update_save':
@@ -449,11 +462,7 @@ export class ListItemDetail {
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
                         btn.refresh = 0;
-                        let data = self.defaultData;
-                        if (tools.isNotEmpty(varList)) {
-                            data = ListItemDetail.getOldFieldData(btn, data || {})
-                        }
-                        ButtonAction.get().clickHandle(btn, data, () => {
+                        ButtonAction.get().clickHandle(btn, def_data, () => {
                             if (self.para.uiType === 'detail') {
                                 // 删除后显示下一页，如果已是最后一页，则显示上一页
                                 if (self.isKeyStep === true) {
@@ -471,14 +480,92 @@ export class ListItemDetail {
                     }
                 }
                     break;
+                // case 'flow_with_draw':
+                //     btn.hintBeforeAction = true;
+                //     ButtonAction.get().clickHandle(btn, def_data, (response) => {
+                //     }, self.para.url);
+                //     break;
+                // case 'flow_agree': {
+                //     btn.actionAddr.dataAddr += '&audit_memo=同意';
+                //     btn.hintAfterAction = true;
+                //     ButtonAction.get().clickHandle(btn, def_data, () => {
+                //     }, self.para.url);
+                // }
+                //     break;
+                case 'flow_reject': {
+                    btn.hintAfterAction = true;
+                    let text: TextInput = null,
+                        body = <div className='remark-wrapper'>
+                            <div className="remark-title">操作备注:</div>
+                            {text = <TextInput className='remark-input-wrapper'/>}
+                        </div>;
+                    let modal = new Modal({
+                        body: body,
+                        className: 'flow-remark-modal',
+                        footer: {},
+                        width: '310px',
+                        isMb: false,
+                        top: 120,
+                        onOk: () => {
+                            let audit_memo = text.get();
+                            if (tools.isNotEmpty(audit_memo)) {
+                                btn.actionAddr.dataAddr = tools.url.addObj(btn.actionAddr.dataAddr, {
+                                    audit_memo: audit_memo
+                                });
+                                ButtonAction.get().clickHandle(btn, def_data, () => {
+                                    modal.destroy();
+                                }, self.para.url);
+                            } else {
+                                Modal.alert('备注不能为空!');
+                            }
+                        }
+                    });
+                }
+                    break;
+                case 'flow_add_sign': {
+                    if (isShowContacts === false) {
+                        isShowContacts = true;
+                        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.useAddressList_user, {
+                            loading: {
+                                msg: '加载中...',
+                                disableEl: document.body
+                            }
+                        }).then(({response}) => {
+                            let field = response.body.elements[0].cols[0];
+                            new ContactsModule({
+                                field: field,
+                                onGetData: (datas) => {
+                                    let userId = [];
+                                    datas.forEach(data => {
+                                        data['USERID'] && userId.push(data['USERID'].toLowerCase());
+                                    });
+                                    ButtonAction.get().clickHandle(btn, {USERID: userId}, () => {
+                                        isShowContacts = false;
+                                    }, self.para.url);
+                                },
+                                onDestroy: () => {
+                                    isShowContacts = false;
+                                }
+                            });
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }
+                }
+                    break;
+                case 'flow_check': {
+                    let dataAddr = BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr, def_data);
+                    BwRule.Ajax.fetch(dataAddr).then(({response}) => {
+                        new FlowDesigner(response, 'look');
+                    }).catch(err => {
+                        console.log(err);
+                    });
+                }
+                    break;
                 default:
                     // 其他按钮
-                    let data = self.defaultData;
-                    if (tools.isNotEmpty(varList)) {
-                        data = ListItemDetail.getOldFieldData(btn, data || {})
-                    }
-                    ButtonAction.get().clickHandle(btn, data, () => {
-                    });
+                    ButtonAction.get().clickHandle(btn, def_data, () => {
+                    }, self.para.url);
                     break;
             }
         }

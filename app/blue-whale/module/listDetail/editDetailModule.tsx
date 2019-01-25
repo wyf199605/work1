@@ -12,6 +12,7 @@ import {Button} from "../../../global/components/general/button/Button";
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import d= G.d;
+import sys = BW.sys;
 
 interface IEditDetailPara extends IComponentPara {
     isEdit: boolean;
@@ -492,7 +493,14 @@ export class EditDetailModule extends Component {
     private initAllButtons() {
         let subButtons: R_Button[] = this.para.fm.subButtons,
             buttons: R_Button[] = [],
-            self = this;
+            self = this,
+            saveBtn = null;
+        for (let btn of subButtons) {
+            if (btn.subType === 'flow_save') {
+                saveBtn = btn;
+                break;
+            }
+        }
 
         // 更多按钮
         function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement) {
@@ -614,7 +622,11 @@ export class EditDetailModule extends Component {
 
         // 处理按钮触发
         function subBtnEvent(btn: R_Button) {
-            let varList = btn.actionAddr.varList;
+            let varList = btn.actionAddr.varList,
+                def_data = self.defaultData;
+            if (tools.isNotEmpty(varList)) {
+                def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
+            }
             switch (btn.subType) {
                 case 'insert_save':
                     btn.refresh = 0;
@@ -648,11 +660,7 @@ export class EditDetailModule extends Component {
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
                         btn.refresh = 0;
-                        let data = self.defaultData;
-                        if (tools.isNotEmpty(varList)) {
-                            data = ListItemDetail.getOldFieldData(btn, data || {});
-                        }
-                        ButtonAction.get().clickHandle(btn, data, () => {
+                        ButtonAction.get().clickHandle(btn, def_data, () => {
                             // 删除后显示下一页，如果已是最后一页，则显示上一页
                             if (self.isKeyStep === true) {
                                 let keyStepData = self.keyStepData || [];
@@ -668,6 +676,29 @@ export class EditDetailModule extends Component {
                     }
                 }
                     break;
+                case 'flow_save':
+                    if (!self.validate()) {
+                        return false;
+                    }
+                    btn.hintAfterAction = true;
+                    self.save(btn, self.editModule.get(), () => {
+                    });
+                    break;
+                case 'flow_submit':
+                    if (!self.validate()) {
+                        return false;
+                    }
+                    saveBtn.hintAfterAction = false;
+                    // 先保存再发送
+                    saveBtn.refresh = 1;
+                    let edit_data = self.editModule.get();
+                    self.save(saveBtn, edit_data, function () {
+                        btn.hintAfterAction = true;
+                        ButtonAction.get().clickHandle(btn, edit_data, () => {
+
+                        }, self.para.url);
+                    });
+                    break;
                 default:
                     // 其他按钮
                     let data = self.defaultData;
@@ -679,6 +710,17 @@ export class EditDetailModule extends Component {
                     break;
             }
         }
+    }
+
+    private save(btn: R_Button, pageData: obj, callback?) {
+        ButtonAction.get().clickHandle(btn, pageData, response => {
+            btn.buttonType = 2;
+            let data = response.data && response.data[0] ? response.data[0] : null;
+            if (data) {
+                this.editModule.set(data);
+            }
+            typeof callback === 'function' && callback(response);
+        }, this.para.url);
     }
 
     private _isEdit: boolean;

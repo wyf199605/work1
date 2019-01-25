@@ -20,7 +20,7 @@ export class ListDetailPage extends BasicPage {
                 editDetail.refresh();
             })
         } else {
-            let detailItem = new ListItemDetail(para);
+            let detailItem = new ListItemDetail(Object.assign({}, para, {url: this.url}));
             // 刷新非detail页面，detail页面的刷新在页面内完成
             if (para.uiType !== 'detail') {
                 this.on(BwRule.EVT_REFRESH, () => {
