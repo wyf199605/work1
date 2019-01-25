@@ -343,7 +343,7 @@ export class FlowReport extends BasicPage {
             let btn = para.fm.subButtons[index],
                 pageData = self.dataGet();
             switch (btn.subType) {
-                case 'flow_save':
+                case 'save':
                     if (!self.validate()) {
                         return false;
                     }
@@ -356,7 +356,7 @@ export class FlowReport extends BasicPage {
                         }
                     });
                     break;
-                case 'flow_submit':
+                case 'submit':
                     if (!self.validate()) {
                         return false;
                     }
@@ -375,7 +375,7 @@ export class FlowReport extends BasicPage {
                         }, tools.isMb ? BW.CONF.url.myApplication : self.url);
                     });
                     break;
-                case 'flow_with_draw':
+                case 'with_draw':
                     btn.hintBeforeAction = true;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), (response) => {
                         sys.window.open({
@@ -383,7 +383,7 @@ export class FlowReport extends BasicPage {
                         });
                     }, self.url);
                     break;
-                case 'flow_agree': {
+                case 'agree': {
                     btn.actionAddr.dataAddr += '&audit_memo=同意';
                     btn.hintAfterAction = true;
                     ButtonAction.get().clickHandle(btn, self.dataGet(), () => {
@@ -391,7 +391,7 @@ export class FlowReport extends BasicPage {
                     }, self.url);
                 }
                     break;
-                case 'flow_reject': {
+                case 'reject': {
                     btn.hintAfterAction = true;
                     let text: TextInput = null,
                         body = <div className='remark-wrapper'>
@@ -421,7 +421,7 @@ export class FlowReport extends BasicPage {
                     });
                 }
                     break;
-                case 'flow_add_sign': {
+                case 'add_sign': {
                     if (isShowContacts === false) {
                         isShowContacts = true;
                         BwRule.Ajax.fetch(BW.CONF.ajaxUrl.useAddressList_user,{
@@ -452,7 +452,7 @@ export class FlowReport extends BasicPage {
                     }
                 }
                     break;
-                case 'flow_check': {
+                case 'check': {
                     let dataAddr = BW.CONF.siteUrl + BwRule.reqAddr(btn.actionAddr,pageData);
                     BwRule.Ajax.fetch(dataAddr).then(({response}) => {
                         new FlowDesigner(response, 'look');
