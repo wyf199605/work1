@@ -486,6 +486,10 @@ namespace G{
                 ShellBase.handler('editImg', {
                     type: 1,
                 }, back)
+            },
+            // 保存图片至本地
+            saveImg(img : string){
+                return ShellBase.handler('saveImg', {img})
             }
         };
 
