@@ -148,6 +148,7 @@ export class DrawPoint extends Component {
         this.svg = D3.select(this.wrapper).append('svg')
             .attr('width', para.width)
             .attr('height', para.height)
+            .attr('style','touch-action: none');
         if (!tools.isMb) {
             this.svg.on('mousedown', (e) => {
                 this.contextMenu.show = false;
@@ -326,8 +327,9 @@ export class DrawPoint extends Component {
             this.zoom.scale(0.7);
             let slate = [-280, 0],
                 slate1 = [-150, -50]
+            //this.svg.attr('width',1600).attr('height',1900)
             this.g.attr("transform",   "scale(0.7)" + "translate(" + slate + ")");
-            this.svg.attr('width',1600).attr('height',1900)
+
             //this.svg.attr("transform","translate(" + slate1+ ")")
         }
     }
@@ -1201,11 +1203,10 @@ export class DrawPoint extends Component {
                 .domain([0, para.height])
                 .range([0, para.height]);
 
-
         this.zoom = D3.behavior.zoom()
             .x(X)
             .y(Y)
-            .scaleExtent([1, 10])
+            .scaleExtent([0.7, 10])
             .on('zoomstart', function () {
                 _this.svg.on("dblclick.zoom", null);
             })
