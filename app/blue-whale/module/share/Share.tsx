@@ -5,7 +5,6 @@ import {Button, IButton} from "../../../global/components/general/button/Button"
 import CONF = BW.CONF;
 import sys = BW.sys;
 import {BwRule} from "../../common/rule/BwRule";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
 interface ISharePara {
     onClose? : Function
     strArr : string[]
@@ -60,8 +59,7 @@ export class Graffiti {
     private graffitiBtn(){
         if(!this._graffitiBtnEl){
             this._graffitiBtnEl = <div className="graffiti-btn">
-                <span className="appcommon app-tuya">
-                </span>
+                <span className="appcommon app-tuya"> </span>
             </div>
         }
         return this._graffitiBtnEl;
@@ -124,7 +122,7 @@ export class Share {
                     break;
                 case 'downLoad':
                     btnPush('app-xiazaidaobendi', 'bg-grey', '下载至本地', () => {
-
+                        Shell.image.saveImg(this._img.src);
                     });
                     break;
                 case 'print':
@@ -156,7 +154,7 @@ export class Share {
 
     setBtn(){
         this.btnArr.forEach(obj => {
-            let btnEl = <div class="share-btnEl"></div>;
+            let btnEl = <div class="share-btnEl"> </div>;
             new Button({
                 container : btnEl,
                 className : obj.className,
@@ -173,8 +171,13 @@ export class Share {
         let even =  G.tools.pattern.debounce(() => {
             this.hide();
             Shell.base.getEditImg(null, this._img.src, (result) => {
-                this.show();
-                this.setImg(result.data)
+                if(result.success){
+                    this.show();
+                    this.setImg(result.data)
+                }else {
+                    this.hide();
+                    this.callBack()
+                }
             });
         },1000);
 
