@@ -12,10 +12,9 @@ import {Button} from "../../../global/components/general/button/Button";
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import d= G.d;
-import sys = BW.sys;
 
-interface IEditDetailPara extends IComponentPara {
-    isEdit: boolean;
+export interface IEditDetailPara extends IComponentPara {
+    isEdit?: boolean;
     uiType?: string;
     fm: {
         caption?: string;//panel 标题，有可能为空

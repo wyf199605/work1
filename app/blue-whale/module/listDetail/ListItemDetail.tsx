@@ -12,15 +12,11 @@ import d = G.d;
 import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 import {TextInput} from "../../../global/components/form/text/text";
 import {ContactsModule} from "../flowDesigner/ContactsModule";
-import sys = BW.sys;
+import Component = G.Component;
+import {IEditDetailPara} from "./editDetailModule";
 
-interface IListItemDetailPara extends EditPagePara {
-    url: string;
-}
-
-export class ListItemDetail {
+export class ListItemDetail extends Component{
     // DOM容器
-    private wrapper: HTMLElement;
     private cells: objOf<ListItemDetailCell> = {};
     public defaultData: obj = {};
     public currentPage: number = 1;
@@ -30,11 +26,12 @@ export class ListItemDetail {
     private keyStepData: obj[] = [];
     private isKeyStep: boolean = false;
 
-    constructor(private para: IListItemDetailPara) {
-        let wrapper = <div className="list-item-detail-wrapper"/>,
-            dom = para.dom || document.body;
-        dom.appendChild(wrapper);
-        this.wrapper = wrapper;
+    protected wrapperInit(para: IEditDetailPara): HTMLElement {
+        return <div className="list-item-detail-wrapper"/>;
+    }
+
+    constructor(private para: IEditDetailPara) {
+        super(para);
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.initDetailTpl(para.fm.fields);
         this.initDetailData().then(data => {
@@ -692,7 +689,6 @@ export class ListItemDetail {
             this.cells[key].destroy();
         }
         this.cells = null;
-        this.wrapper = null;
         this.defaultData = null;
     }
 }
