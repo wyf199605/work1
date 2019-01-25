@@ -923,6 +923,7 @@ export class RfidBarCode extends Component {
                         G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,true, (res=>{
                             alert(res.msg)
                             if(res.success){
+                                loading.destroy();
                                 this.getHeadTable(para);
                             }
                         }))
