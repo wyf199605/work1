@@ -180,8 +180,8 @@ namespace G{
                 return ShellBase.handler('rfidStop', null, back);
             }
 
-            function downLoad(url : string, uniqueFlag : string, back: IShellEventHandler) {
-                return ShellBase.handler('downloadbarcode', {url, uniqueFlag}, back);
+            function downLoad(url : string, token : string, uniqueFlag : string, back: IShellEventHandler) {
+                return ShellBase.handler('downloadbarcode', {url, token, uniqueFlag}, back);
             }
 
             function scanCode(code : string, uniqueFlag : string) {

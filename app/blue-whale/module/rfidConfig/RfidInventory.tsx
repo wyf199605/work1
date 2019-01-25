@@ -301,7 +301,7 @@ export class RfidInventory {
         let element = this.p.data.body.elements[0],
             url = element.downloadAddr.dataAddr;
         this.uniqueFlag = element.uniqueFlag;
-        Shell.rfid.downLoad(G.tools.url.addObj(CONF.siteUrl +  url, {token : this.token}), this.uniqueFlag,(result) => {
+        Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
             let data : ISortUiPara = result.data;
             console.log(data,'这是下载数据');
             Array.isArray(data) && data.classifyInfo.forEach(obj => {
