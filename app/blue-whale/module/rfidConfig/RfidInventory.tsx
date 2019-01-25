@@ -225,7 +225,7 @@ export class RfidInventory {
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
             if (data) {
-                msg = result.msg + '：' + result.data[0];
+                msg = result.msg + '：' + data[0];
             }
             Array.isArray(data) && data.forEach(d => {
                 if(this.epc.indexOf(d) === -1){
@@ -308,12 +308,12 @@ export class RfidInventory {
         let element = this.p.data.body.elements[0],
             url = element.downloadAddr.dataAddr;
         this.uniqueFlag = element.uniqueFlag;
-        Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
+        Shell.rfid.downLoad(G.tools.url.addObj(CONF.siteUrl +  url, {token : this.token}), this.uniqueFlag,(result) => {
             let data : ISortUiPara = result.data;
             console.log(data,'这是下载数据');
             Array.isArray(data) && data.classifyInfo.forEach(obj => {
                 let keys = Object.keys(obj),
-                    li = <div class="rfid-li">
+                    li = <div class="rfid-li"> 
                         <div>{obj[keys[0]]}：</div>
                         <div data-name={keys.join(',')}/>
                     </div>;
