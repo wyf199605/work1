@@ -7,7 +7,7 @@ import {EditDetailModule} from "../../module/listDetail/editDetailModule";
 export class ListDetailPage extends BasicPage {
     constructor(para: EditPagePara) {
         super(para);
-        let details = ['edit_detail', 'noedit_detail'];
+        let details = ['edit_detail', 'noedit_detail','edit_view'];
         if (~details.indexOf(para.uiType)) {
             let editDetail = new EditDetailModule({
                 container: para.dom,

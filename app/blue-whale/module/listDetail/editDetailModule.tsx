@@ -40,6 +40,7 @@ export class EditDetailModule extends Component {
     private ajaxUrl: string = '';
     private keyStepData: obj[] = [];
     private isKeyStep: boolean = false;
+    static detailTypes = ['edit_detail', 'noedit_detail'];
 
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
         return <div className="edit-detail-module">
@@ -49,6 +50,9 @@ export class EditDetailModule extends Component {
 
     constructor(private para: IEditDetailPara) {
         super(para);
+        if (this.para.uiType === 'edit_view'){
+            this.wrapper.classList.add('edit_view');
+        }
         this.fields = para.fm.fields;
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.getDefaultData().then((data) => {
@@ -106,7 +110,9 @@ export class EditDetailModule extends Component {
                             for (let i = 0, len = meta.length; i < len; i++) {
                                 res[meta[i]] = dataTab[i];
                             }
-                            this.totalNumber = response.head.totalNum;
+                            if (~EditDetailModule.detailTypes.indexOf(this.para.uiType)) {
+                                this.totalNumber = response.head.totalNum;
+                            }
                             this.defaultData = res;
                             resolve(res);
                         } else {
@@ -492,15 +498,7 @@ export class EditDetailModule extends Component {
     private initAllButtons() {
         let subButtons: R_Button[] = this.para.fm.subButtons,
             buttons: R_Button[] = [],
-            self = this,
-            saveBtn = null;
-        for (let btn of subButtons) {
-            if (btn.subType === 'flow_save') {
-                saveBtn = btn;
-                break;
-            }
-        }
-
+            self = this;
         // 更多按钮
         function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement) {
             self.moreBtn = new Button({
@@ -603,7 +601,9 @@ export class EditDetailModule extends Component {
                 if (tools.isMb) {
                     createMoreBtn(buttons, btnWrapper);
                     createEditBtn(btnWrapper);
-                    this.initPageButtons();
+                    if (~EditDetailModule.detailTypes.indexOf(this.para.uiType)) {
+                        this.initPageButtons();
+                    }
                 } else {
                     // PC 按钮
                     let pcBtnWrapper = <div className="item-buttons"/>,
@@ -613,7 +613,9 @@ export class EditDetailModule extends Component {
                         createEditBtn(pcBtnWrapper);
                         createPcButtons(buttons, pcBtnWrapper);
                     }
-                    this.initPageButtons(pageBtnWrapper);
+                    if (~EditDetailModule.detailTypes.indexOf(this.para.uiType)) {
+                        this.initPageButtons(pageBtnWrapper);
+                    }
                     btnWrapper.appendChild(pageBtnWrapper);
                 }
             }
@@ -687,11 +689,11 @@ export class EditDetailModule extends Component {
                     if (!self.validate()) {
                         return false;
                     }
-                    saveBtn.hintAfterAction = false;
+                    self.updateBtnPara.hintAfterAction = false;
                     // 先保存再发送
-                    saveBtn.refresh = 1;
+                    self.updateBtnPara.refresh = 1;
                     let edit_data = self.editModule.get();
-                    self.save(saveBtn, edit_data, function () {
+                    self.save(self.updateBtnPara, edit_data, function () {
                         btn.hintAfterAction = true;
                         ButtonAction.get().clickHandle(btn, edit_data, () => {
 
@@ -725,7 +727,7 @@ export class EditDetailModule extends Component {
     private _isEdit: boolean;
     set isEdit(isEdit: boolean) {
         this._isEdit = isEdit;
-        if (this.totalNumber === 0) {
+        if (this.totalNumber === 0 && this.para.uiType !== 'edit_view') {
             this.cancelBtn.disabled = true;
             this.updateBtn.disabled = true;
             this.saveBtn.disabled = true;
