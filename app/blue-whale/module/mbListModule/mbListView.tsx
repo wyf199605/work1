@@ -8,7 +8,6 @@ import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import {MbListModule} from "./mbListModule";
 import tools = G.tools;
 import d = G.d;
-import mod = require("module");
 
 interface IMbListView extends IComponentPara {
     ui: IBW_UI<R_SubTable_Field>;
@@ -24,7 +23,7 @@ export class MbListView extends Component {
     private subLists: MbListModule | ListItemDetail[] = [];
     private tab: Tab;
 
-    constructor(para: IMbListView) {
+    constructor(private para: IMbListView) {
         super(para);
         let listUi: R_SubTable_Field = para.ui.body.elements[0];
         let tabsTitle = ['详情'],
@@ -50,7 +49,8 @@ export class MbListView extends Component {
                         this.subLists[0] = new ListItemDetail({
                             uiType: 'view',
                             fm: listUi,
-                            dom: tabEl
+                            container: tabEl,
+                            url: this.para.url
                         });
                     } else {
                         BwRule.Ajax.fetch(listUIUrls[i - 1]).then(({response}) => {
@@ -111,9 +111,10 @@ export class MbListView extends Component {
         }
     }
 
-    destroy(){
+    destroy() {
         super.destroy();
         this.tab = null;
         this.subLists = null;
+        this.para = null;
     }
 }
