@@ -2,9 +2,11 @@
 let gulp = require('gulp'),
     GulpCommon = require('../gulp-common'),
     config = require('./gulp.conf'),
+    browserSync = require("browser-sync"),
+    reload = browserSync.reload,
     compiler = new GulpCommon('../tsconfig.json', '../global/', config, [
         'typings/*.d', 'index'
-    ]);
+    ], reload);
 
 let path = config.path;
 path.page = path.root + 'pages/';
@@ -13,9 +15,19 @@ path.css = path.root + 'css/';
 path.module = path.root + 'module/';
 
 /**
+ * ------------ 动态代理 -------------
+ */
+gulp.task("server", function() {
+    browserSync.init({
+        proxy: "http://127.0.0.1:8080/sf"
+    });
+})
+
+
+/**
  * ------------ css -------------
  */
-gulp.task('css', function () {
+gulp.task('css', function() {
 
     const globalArr = [
         'module/**/*',
@@ -37,7 +49,7 @@ gulp.task('css', function () {
     ];
 
     function not(arr) {
-        return arr.map(function (a) {
+        return arr.map(function(a) {
             return '!' + a;
         })
     }
@@ -72,7 +84,7 @@ function gulpTsPage(src, rname) {
     compiler.ts(GulpCommon.srcPrefix('pages/', src), rname, path.page);
 }
 
-gulp.task('js', function () {
+gulp.task('js', function() {
 
     compiler.ts(['*', 'common/**/*'], 'bw.js', path.global);
 
@@ -369,18 +381,18 @@ gulp.task('js', function () {
  * ------------ Js ---------------
  */
 //定义默认任务
-gulp.task('BW_Watch', ['js', 'css'], function () {
+gulp.task('BW_Watch', ['js', 'css', 'server'], function() {
     // for(var i=0,len = pathSrc.length; i <= len - 1; i++){
     //     gulp.watch(pathSrc[i], [str[i]]);
     // }
 });
 //编译所有任务
-gulp.task('BW_Start', ['js', 'css'], function () {
+gulp.task('BW_Start', ['js', 'css'], function() {
     gulp.start(compiler.allTask);
 });
 
 //压缩
-gulp.task('BW_Compressor', function () {
+gulp.task('BW_Compressor', function() {
     GulpCommon.compressor('css', `${path.root}css/*.css`, `${path.min}css/`);
 
     GulpCommon.compressor('js', `${path.root}*.js`, path.min);
@@ -390,9 +402,9 @@ gulp.task('BW_Compressor', function () {
 });
 
 //清空page,
-gulp.task('BW_Clean', function () {
-    return gulp.src([path.page + '**/*'], {read: false}) // 清理page文件
-        .pipe(clean({force: true}));
+gulp.task('BW_Clean', function() {
+    return gulp.src([path.page + '**/*'], { read: false }) // 清理page文件
+        .pipe(clean({ force: true }));
 });
 
 

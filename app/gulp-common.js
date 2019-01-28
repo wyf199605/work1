@@ -1,16 +1,17 @@
 //导入工具包 require('node_modules里对应模块')
 'use strict';
-const gulp              = require('gulp'),                   //gulp
-    typescript          = require('gulp-typescript'),        //打包ts文件
-    rename              = require('gulp-rename'),            //文件重命名
-    concat              = require('gulp-concat'),            //合并文件
-    minifyjs            = require('gulp-uglify'),            //压缩js文件
-    minifycss           = require('gulp-clean-css'),     //压缩css文件
-    css                 = require('gulp-scss'),         //打包css文件
-    through             = require('through2'),
-    fs                  = require('fs'),
-    Path                = require('path'),
-    createRequire       = require('./gulp-require.config'); //创建require.congif.js文件
+const gulp = require('gulp'), //gulp
+    typescript = require('gulp-typescript'), //打包ts文件
+    rename = require('gulp-rename'), //文件重命名
+    concat = require('gulp-concat'), //合并文件
+    minifyjs = require('gulp-uglify'), //压缩js文件
+    minifycss = require('gulp-clean-css'), //压缩css文件
+    css = require('gulp-scss'), //打包css文件
+    sass = require('gulp-sass'),
+    through = require('through2'),
+    fs = require('fs'),
+    Path = require('path'),
+    createRequire = require('./gulp-require.config'); //创建require.congif.js文件
 
 global.cookie = {};
 module.exports = class Compiler {
@@ -19,8 +20,9 @@ module.exports = class Compiler {
      * @param tsConfig - ts配置
      * @param globalPath - 全局目录
      * @param commonTsSrc - 需要一起编译的公共ts文件src
+     * @param reload  -刷新浏览器
      */
-    constructor(tsConfig, globalPath, requireConfig, commonTsSrc) {
+    constructor(tsConfig, globalPath, requireConfig, commonTsSrc, reload) {
         this.tsConfig = tsConfig;
         this.allTask = []; // 当前所有任务
 
@@ -31,8 +33,8 @@ module.exports = class Compiler {
         this.rConfig = requireConfig;
 
 
-        this.once = true;//只执行一次生成require.config.js
-
+        this.once = true; //只执行一次生成require.config.js
+        this.reload = reload;
     }
 
     /**
@@ -49,11 +51,11 @@ module.exports = class Compiler {
         global.cookie[rname] = (target + rname).replace(/.+dist\//, '');
         let self = this;
         this.allTask.push(name);
-        let task = gulp.task(name, function () {
+        let task = gulp.task(name, function() {
             gulp.src(src)
-                .pipe(self.createConfig( rname, target));
+                .pipe(self.createConfig(rname, target));
             let funs = gulp.src(src);
-            if(fun) {
+            if (fun) {
                 funs = funs.pipe(fun());
             }
 
@@ -64,21 +66,25 @@ module.exports = class Compiler {
             funs.pipe(gulp.dest(target))
         });
         gulp.watch(watchSrc, [name]);
+        //兼容global打包
+        if (this.reload) {
+            gulp.watch(watchSrc).on("change", this.reload);
+        }
         // gulpWatch(src,name);
         return task;
     }
 
 
     /*
-    * 生成url的信息
-    * ranme => JSON 属性名称 即 编译的文件
-    * target => rname 对应的文件夹名称
-    * */
+     * 生成url的信息
+     * ranme => JSON 属性名称 即 编译的文件
+     * target => rname 对应的文件夹名称
+     * */
     createConfig(rname, target, urlList = ['require.config.js']) {
         let self = this,
-            modules = [],//require.config.js 中 bundles 属性的模块
+            modules = [], //require.config.js 中 bundles 属性的模块
             config = {},
-            filesrc = {};//btl 的文件内容
+            filesrc = {}; //btl 的文件内容
         //遍历一条流
         let transform = (file, enc, cb) => {
             if (file.isBuffer()) {
@@ -110,38 +116,38 @@ module.exports = class Compiler {
             config.url = target + rname;
             if (/js/gi.test(extname)) {
                 if (modules.length === 0) {
-                    modules.push( basename);
+                    modules.push(basename);
                 }
                 modules.sort();
                 config.modules = modules;
             }
             //创建 require.config.js
-            if (typeof this.rConfig.requireConfig !== 'undefined' && typeof this.rConfig.path !== 'undefined'){
+            if (typeof this.rConfig.requireConfig !== 'undefined' && typeof this.rConfig.path !== 'undefined') {
                 createRequire(request, this.rConfig);
             }
-            if(typeof this.rConfig.btl !== 'undefined' && typeof this.rConfig.btl.filename !== 'undefined'){
-                for(let i = 0, len = this.rConfig.btl.dirs.length; i< len; i++){
+            if (typeof this.rConfig.btl !== 'undefined' && typeof this.rConfig.btl.filename !== 'undefined') {
+                for (let i = 0, len = this.rConfig.btl.dirs.length; i < len; i++) {
                     let filesurl = this.rConfig.btl.dirs[i] + this.rConfig.btl.filename;
                     //创建btl 文件
                     let data = {};
-                    for(let i = 0, len = urlList.length; i < len; i++){
+                    for (let i = 0, len = urlList.length; i < len; i++) {
                         let url = urlList[i];
-                        if(typeof this.rConfig.btl[url] === 'string'){
+                        if (typeof this.rConfig.btl[url] === 'string') {
                             data[url] = this.rConfig.btl[url];
                         }
                     }
-                    if(this.once){
+                    if (this.once) {
                         this.once = false;
-                        if(Object.keys(data).length === 0){
+                        if (Object.keys(data).length === 0) {
                             self.promise = getPromise(filesurl, self.rConfig.btl.src, rname, target);
-                        }else{
+                        } else {
                             self.promise = getPromise(filesurl, self.rConfig.btl.src, rname, target, data);
                         }
-                    }else{
+                    } else {
                         self.promise.then(() => {
-                            if(Object.keys(data).length === 0) {
+                            if (Object.keys(data).length === 0) {
                                 return getPromise(filesurl, self.rConfig.btl.src, rname, target);
-                            }else{
+                            } else {
                                 return getPromise(filesurl, self.rConfig.btl.src, rname, target, data);
                             }
                         }).catch((e, fd) => {
@@ -150,12 +156,12 @@ module.exports = class Compiler {
                     }
                     cb();
                 }
-            }else{
+            } else {
                 console.log(rname.toString() + ' 编译成功');
             }
         };
 
-        return through({objectMode: true, allowHalfOpen: false}, transform, flush);
+        return through({ objectMode: true, allowHalfOpen: false }, transform, flush);
     }
 
     /**
@@ -182,7 +188,7 @@ module.exports = class Compiler {
         this.allTask.push(rname);
         gulp.task(rname, () => {
             gulp.src(allSrc)
-                .pipe(this.createConfig( rname, target));
+                .pipe(this.createConfig(rname, target));
             gulp.src(allSrc)
                 .pipe(typescript.createProject(this.tsConfig)())
                 .js.pipe(concat(rname))
@@ -190,9 +196,13 @@ module.exports = class Compiler {
         });
 
         gulp.watch(watchSrc, [rname]);
+        //兼容global打包
+        if (this.reload) {
+            gulp.watch(watchSrc).on("change", this.reload);
+        }
 
         function addext(srcs) {
-            return [...srcs].map(src => `${src}.{ts,tsx}`)//.concat([...srcs].map(src => `${src}.tsx`));
+            return [...srcs].map(src => `${src}.{ts,tsx}`) //.concat([...srcs].map(src => `${src}.tsx`));
         }
     }
 
@@ -210,7 +220,7 @@ module.exports = class Compiler {
         src = src.map(s => `${s}.scss`);
         watchSrc = watchSrc.map(s => `${s}.scss`);
 
-        this.gulpTask(rname, src, css, rname, target, watchSrc);
+        this.gulpTask(rname, src, sass, rname, target, watchSrc);
     }
 
     static compressor(type, src, target) {
@@ -229,7 +239,7 @@ module.exports = class Compiler {
      */
     static srcPrefix(prefix, src) {
         if (Array.isArray(src)) {
-            src = src.map(function (s) {
+            src = src.map(function(s) {
                 return prefix + s
             })
         } else {
@@ -248,44 +258,44 @@ function parsePath(path) {
     };
 }
 
-function getPromise(url, urlList, rname, target, extra){
+function getPromise(url, urlList, rname, target, extra) {
     return new Promise((resolve, reject) => {
         fs.open(url, 'r+', (err, fd) => {
-            if(err){
-                fs.open(url, 'w+', (err,fd) => {
-                    if(err)
+            if (err) {
+                fs.open(url, 'w+', (err, fd) => {
+                    if (err)
                         return reject(err, fd);
                     fs.write(fd, strByBtl({}.toString()), () => {
                         readWrite(fd, resolve, reject);
                     })
                 });
-                return ;
+                return;
             }
             readWrite(fd, resolve, reject);
         })
     });
 
-    function readWrite(fd, resolve, reject){
+    function readWrite(fd, resolve, reject) {
         let buf = Buffer.alloc(1024 * 1024);
         fs.read(fd, buf, 0, buf.length, 0, (err, len) => {
-            if(err)
-                return  reject(err, fd);
+            if (err)
+                return reject(err, fd);
             // console.log(buf)
             // console.log(len)
             let data = strByBtl(buf.slice(0, len).toString(), true);
-            if(typeof data !== 'object'){
+            if (typeof data !== 'object') {
                 data = {};
             }
             let version = new Date().getTime() + '';
             let isChange = false;
             for (let attr in urlList) {
-                if(typeof data[attr] === 'undefined'){
+                if (typeof data[attr] === 'undefined') {
                     isChange = true;
                     data[attr] = {};
                 }
-                if(typeof extra !== 'undefined'){
+                if (typeof extra !== 'undefined') {
                     isChange = true;
-                    for(let key in extra){
+                    for (let key in extra) {
                         data[attr][key] = extra[key] + '?v=' + version;
                     }
                 }
@@ -298,13 +308,13 @@ function getPromise(url, urlList, rname, target, extra){
                 });
             }
             fs.close(fd, () => {
-                if(isChange){
+                if (isChange) {
                     fs.open(url, 'w+', (err, fd) => {
-                        if(err)
-                            return  reject(err, fd);
+                        if (err)
+                            return reject(err, fd);
                         for (let attr in urlList) {
                             urlList[attr].forEach((item) => {
-                                if(typeof data[attr][item] === 'undefined'){
+                                if (typeof data[attr][item] === 'undefined') {
                                     data[attr][item] = global.cookie[item] + '?v=' + version;
                                 }
                             })
@@ -316,7 +326,7 @@ function getPromise(url, urlList, rname, target, extra){
                             })
                         });
                     })
-                }else{
+                } else {
                     console.log(rname.toString() + ' 编译成功');
                     resolve();
                 }
@@ -324,13 +334,13 @@ function getPromise(url, urlList, rname, target, extra){
         })
     }
 
-    function strByBtl (str, replace = false) {
-        if(replace){
+    function strByBtl(str, replace = false) {
+        if (replace) {
             let filesrc = {};
             str.replace(/var\s+filesrc\s?=\s?({[\s\S]+})/, ($1, $2) => {
-                try{
+                try {
                     filesrc = JSON.parse($2);
-                }catch(e){
+                } catch (e) {
                     filesrc = {};
                 }
             });
