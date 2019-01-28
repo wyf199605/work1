@@ -153,12 +153,9 @@ export class FlowList extends BasicPage {
 
     private initEvents = (() => {
         let clickHandler = (e) => {
-            let url = d.closest(e.target, '.item-wrapper').dataset.url,
-                instance = d.closest(e.target, '.item-wrapper').dataset.instance;
+            let url = d.closest(e.target, '.item-wrapper').dataset.url;
             sys.window.open({
-                url: tools.url.addObj(url, {
-                    instance: instance
-                })
+                url: url
             })
         };
         let back = () => {
@@ -234,7 +231,7 @@ export class FlowList extends BasicPage {
         }
 
         return <div className="item-wrapper"
-                    data-url={tools.url.addObj(BW.CONF.siteUrl + data.auditUrl, {page: 'flowReport'})}
+                    data-url={BW.CONF.siteUrl + data.auditUrl}
                     data-instance={data.instanceState}>
             <div className="item-title"><span>{data.processName}-{data.createUserName}</span><i
                 className="iconfont icon-arrow-right"/></div>

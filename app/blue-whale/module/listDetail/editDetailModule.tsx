@@ -355,19 +355,21 @@ export class EditDetailModule extends Component {
 
     // 上一页下一页加载数据
     refresh(page?: number): Promise<void> {
-        if (tools.isNotEmpty(page)) {
-            if (page > 0) {
-                if (page > this.totalNumber) {
-                    this.currentPage = this.totalNumber;
+        if (this.para.uiType !== 'edit_view'){
+            if (tools.isNotEmpty(page)) {
+                if (page > 0) {
+                    if (page > this.totalNumber) {
+                        this.currentPage = this.totalNumber;
+                    } else {
+                        this.currentPage = page;
+                    }
                 } else {
-                    this.currentPage = page;
+                    this.totalNumber = 0;
+                    this.currentPage = 1;
                 }
-            } else {
-                this.totalNumber = 0;
-                this.currentPage = 1;
             }
+            this.checkPageButtonDisabled();
         }
-        this.checkPageButtonDisabled();
         this.scrollToTop();
         return this.getDefaultData().then(data => {
             if (tools.isEmpty(data)) {
