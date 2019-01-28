@@ -263,11 +263,13 @@ export class RfidInventory {
                 disableEl : this.modal.wrapper
             });
 
-            let url = CONF.siteUrl + this.p.data.body.elements[0].uploadAddr.dataAddr;
-            url = G.tools.url.addObj(url, {
-                token : this.token,
-                atvarparams: JSON.stringify(this.atVarBuilder.dataGet())
-            });
+            let url = CONF.siteUrl + this.p.data.body.elements[0].uploadAddr.dataAddr,
+                addData = {token : this.token};
+            if(this.atVarBuilder){
+                addData['atvarparams'] = JSON.stringify( this.atVarBuilder.dataGet())
+            }
+            url = G.tools.url.addObj(url, addData);
+
             BwRule.Ajax.fetch(url, {
                 data: this.dataGet(),
                 type: 'post',
