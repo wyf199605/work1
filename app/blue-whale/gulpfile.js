@@ -18,10 +18,10 @@ path.module = path.root + 'module/';
  * ------------ 动态代理 -------------
  */
 gulp.task("server", function() {
-    browserSync.init({
-        proxy: "http://127.0.0.1:8080/sf"
-    });
-})
+    // browserSync.init({
+    //     proxy: "http://192.168.1.243/sf"
+    // });
+});
 
 
 /**
