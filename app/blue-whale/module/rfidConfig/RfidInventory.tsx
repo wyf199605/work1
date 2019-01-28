@@ -20,6 +20,7 @@ interface ISortUiPara {
     title : string
     subTitle? : string
     keyField : string
+    keyName : string
     nameField : string
     amount? : number
     classifyInfo : obj[]
@@ -126,7 +127,8 @@ export class RfidInventory {
                 Modal.alert('分类数据不能为空', null, () => this.focus());
                 return;
             }
-            this.recentData['BARCODE'] ? this.commit().then(() => this.assign({BARCODE : data.BARCODE})) : this.assign(data);
+            this.recentData['BARCODE'] ?
+                this.commit().then(() => this.assign({BARCODE : data.BARCODE})) : this.assign(data);
         }else {
             this.assign(data);
             if(this.isEmpty()){
@@ -156,8 +158,7 @@ export class RfidInventory {
             });
             el.innerHTML = value;
         });
-        this.contentEl.innerHTML = '';
-        this.epc = [];
+        this.clearData();
     }
 
     private modalBody() : HTMLElement{
@@ -280,7 +281,6 @@ export class RfidInventory {
             }).then(({response}) => {
                 console.log(response);
                 Modal.toast(response.msg);
-                this.epc = [];
                 this.clearData();
                 this.modal.wrapper.focus();
                 resolve();
@@ -292,6 +292,7 @@ export class RfidInventory {
     }
 
     private clearData(){
+        this.epc = [];
         this.contentEl.innerHTML = '';
         this.thisCount = 0;
         this.thisEl.innerHTML = this.thisCount + '';
@@ -320,7 +321,7 @@ export class RfidInventory {
             });
             if(data && data.keyField){
                 d.append(this.sortEl, <div className="rfid-li">
-                    <div>{data.nameField}：</div>
+                    <div>{data.keyName}：</div>
                     <div data-name={data.keyField}/>
                 </div>)
             }
