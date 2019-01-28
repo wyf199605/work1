@@ -5,6 +5,7 @@ import d = G.d;
 import Shell = G.Shell;
 import {Loading} from "../../../global/components/ui/loading/loading";
 import CONF = BW.CONF;
+import {Device} from "../../../global/entity/Device";
 interface IRfidConfPara {
     line: number,
     ip: string,
@@ -264,7 +265,10 @@ export class RfidInventory {
             });
 
             let url = CONF.siteUrl + this.p.data.body.elements[0].uploadAddr.dataAddr,
-                addData = {token : this.token};
+                addData = {
+                    token : this.token,
+                    uuid : Device.get().uuid
+                };
             if(this.atVarBuilder){
                 addData['atvarparams'] = JSON.stringify( this.atVarBuilder.dataGet())
             }
