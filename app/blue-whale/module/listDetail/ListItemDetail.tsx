@@ -405,6 +405,7 @@ export class ListItemDetail extends Component{
             if (tools.isNotEmpty(varList)) {
                 def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
             }
+            debugger
             switch (btn.subType) {
                 case 'update_save':
                 case 'insert_save':

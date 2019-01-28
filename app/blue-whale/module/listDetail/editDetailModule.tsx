@@ -691,16 +691,11 @@ export class EditDetailModule extends Component {
                     if (!self.validate()) {
                         return false;
                     }
-                    self.updateBtnPara.hintAfterAction = false;
+                    btn.hintAfterAction = true;
                     // 先保存再发送
-                    self.updateBtnPara.refresh = 1;
                     let edit_data = self.editModule.get();
-                    self.save(self.updateBtnPara, edit_data, function () {
-                        btn.hintAfterAction = true;
-                        ButtonAction.get().clickHandle(btn, edit_data, () => {
-
-                        }, self.para.url);
-                    });
+                    ButtonAction.get().clickHandle(btn, edit_data, () => {
+                    }, self.para.url);
                     break;
                 default:
                     // 其他按钮
