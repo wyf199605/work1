@@ -35,31 +35,28 @@ export class DrawPoint extends Component {
     protected contextMenu: SubBtnMenu;
     public svg;
     public g;
-    public index = 0;
+    public index = 0; // 指定当前操作的区域的下标
     public points = [];//存入当前的信息
-    public map
-    public selected
-    public line;
+    public map // 创建 D3类型的键值对数据
+    public selected //已经选中的
+    public line;//
     public r;
-    public isDrawLine: boolean = false;
+    public isDrawLine: boolean = false; // 当前是编辑可以绘线状态
     public indexStr;//保存当前选中的path 下标
-    public drag;
+    public drag; //拖拽对象
     private onAreaClick: (areaType: IAreaType) => Promise<any>;
     private format;
-    private renderData;
+    private renderData;//渲染的图形数据
     private LV;
     private LR;
-    public zoom;
-    private isShowStatus: boolean;
-    private tooltip;
-    protected selectedData: obj;
-    private _keyField;
+    public zoom; //D3缩放ZOOM对象
+    private isShowStatus: boolean; //旁段 图形显示OR 不显示的状态
+    private tooltip; //提示框
+    protected selectedData: obj; //选中的数据对象（绑定在图形里的 数据）
+    private _keyField; // 后台给的唯一标识 用来配置显示文字信息
     protected ui: IBW_Plan_Table
     static POINT_FIELD = '__POINT_FIELD___';
     static EVT_AREA_CLICK = '__event_draw_area_click__';
-    // static EVT_INSERT_DATA = '__event_insert_area_click__';
-    // static EVT_DELETE_DATA = '__event_delete_area_click__';
-    // static EVT_IMG_INIT = '__event_image_area_click__';
 
     protected wrapperInit() {
         return <div className="draw-point-wrapper"/>
@@ -68,6 +65,7 @@ export class DrawPoint extends Component {
     constructor(protected para: IDrapPoint) {
         super(para);
         if (!tools.isMb) {
+            //PC的有键盘菜单初始化
             d.on(this.wrapper, 'contextmenu', (e) => {
                 e.preventDefault()
             })
@@ -90,9 +88,11 @@ export class DrawPoint extends Component {
         this._keyField = para.ui.keyField;
         this.onAreaClick = para.onAreaClick;
         this.format = para.format;
+        //map  建立一张哈希表 用来存储 path里面的坐标点
         this.map = D3.map(this.points, function (d, i) {
             return i;
         })
+        //点 的半径的比例尺
         this.r = D3.scale.linear()
             .domain([1, 6])
             .range([5.5, 1])
@@ -137,11 +137,7 @@ export class DrawPoint extends Component {
         return this.getDistance(start[0], start[1]) / this.getDistance(stop[0], stop[1]);
     }
 
-    private touchscale = 1;
-    private touchTime = 0;
-    private touchstart: boolean;
-    private tCP = [0,0];
-
+// 初始化SVG界面
     public InitSvg(para) {
         let _this = this;
         let scale = 0;
@@ -158,7 +154,7 @@ export class DrawPoint extends Component {
                 this.redraw();
             })
         }
-
+       //防止PC端 hover文字时闪动问题
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
         
         // if (tools.isMb) {
@@ -259,7 +255,7 @@ export class DrawPoint extends Component {
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
-
+   //设置背景图的方法
     set imgUrl(url) {
         this.g.select('image').attr('xlink:href',
             () => {
@@ -278,6 +274,7 @@ export class DrawPoint extends Component {
         }
     }
 
+
     public touchlook(){
          this.svg.attr('style', ' pointer-events: auto;');
     }
@@ -285,7 +282,9 @@ export class DrawPoint extends Component {
         this.svg.attr('style', ' pointer-events: none;');
     }
 
+
     private mousedown() {
+        //在数组里添加坐标点 便于在绘制方法 渲染新的线段
         this.points.push(this.selected = D3.mouse(this.g.node()))
         this.map.set(this.index, this.points)
     }
@@ -334,6 +333,8 @@ export class DrawPoint extends Component {
 
     private _data;
 
+
+    //绘制方法
     public render(data?: obj[]) {
         let that = this;
         this._data = data && data.map((obj) => Object.assign({}, obj || {}));
@@ -367,7 +368,6 @@ export class DrawPoint extends Component {
         if (tools.isEmpty(data)) {
             return
         }
-        //this.g.selectAll('g').data(data).enter().append('g').html().exit().remove();
         let detail = {};
         data.forEach((d, index) => {
             let group = this.g.append('g').datum(d);
@@ -527,6 +527,7 @@ export class DrawPoint extends Component {
         }
     }
 
+    //重新排序  解决文字显示的顺序问题
     private changeArr(arr) {
         let index = 0;
         for (let i = 0; i < arr.length; i++) {
@@ -589,6 +590,7 @@ export class DrawPoint extends Component {
         });
     }
 
+//找到图形的中心点
     private setIconPos(str) {
         let max = 0, maxStr = [];
         if (str.length >= 0) {
@@ -605,7 +607,7 @@ export class DrawPoint extends Component {
         }
 
     }
-
+// 加载图标方法
     private InitIcon(group, points) {
         let x = this.setIconPos(points)[0],
             y = this.setIconPos(points)[1],
@@ -638,7 +640,7 @@ export class DrawPoint extends Component {
         }, 1000))
     }
 
-
+//随便点的拖动 文字也跟着拖动方法
     private OnDragText() {
         this.selectedG.selectAll('text').remove();
         let w = this.selectedG.node().getBBox().width, g = this.selectedG.node().getBBox().height;
@@ -723,8 +725,9 @@ export class DrawPoint extends Component {
         return [x, y]
     }
 
-    //绘图
+    //绘图  每点击一下生成一个圈 都需要重新绘制
     private redraw() {
+        //需要在path增加坐标点 以及根据鼠标点击点 添加圆
         //let svg = D3.select('svg').select('.g-wrapper');
         let svg = this.g;
         svg.selectAll('g').select('#path' + this.index)
@@ -759,7 +762,7 @@ export class DrawPoint extends Component {
         svg.selectAll("circle").call(this.drag);
     }
 
-
+//创建线段的方法
     public createPath() {
         let that = this
         if (!this.isDrawLine) {
@@ -929,7 +932,7 @@ export class DrawPoint extends Component {
     }
 
     protected selectedG;
-
+//初始化拖拽方法
     private InitDrag() {
         let _this = this;
         this.drag = D3.behavior.drag()
@@ -1130,15 +1133,16 @@ export class DrawPoint extends Component {
     reback() {
         this.keyDownEvent.on()
     }
-
+   //绑定上缩放功能
     public OnZoom() {
         this.svg.call(this.zoom);
     }
-
+   //初始化线的比列
     private rLate = 1;
     private lineLate = 3;
 
     public ZoomStart(para) {
+        //初始化缩放的方法
         let _this = this;
         let X = D3.scale.linear()
                 .domain([0, para.width])
