@@ -160,61 +160,7 @@ export class DrawPoint extends Component {
         }
 
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-
-        // if (tools.isMb) {
-        //     let scale = 1;
-        //     D3.select(_this.wrapper).on('touchstart', function (ev) {
-        //         // _this.svg.attr('style', ' pointer-events: none;');
-        //         D3.event.preventDefault();
-        //         let ob1 = D3.event.changedTouches,
-        //             obj2 = D3.event.targetTouches,
-        //             obj3 = D3.event.touches;
-        //         _this.touchstart = true;
-        //         if (obj2.length > 1) {
-        //                 _this.distance['start'] = _this.getDistance({
-        //                     x: D3.event.targetTouches[0].pageX,
-        //                     y: D3.event.targetTouches[0].pageY
-        //                 }, {
-        //                     x: D3.event.targetTouches[1].pageX,
-        //                     y: D3.event.targetTouches[1].pageY
-        //                 })
-        //                 _this.touchscale = scale
-        //         }
-        //
-        //
-        //     }, true).on('touchmove', function (ev) {
-        //         D3.event.preventDefault();
-        //         let ob1 = D3.event.changedTouches,
-        //             obj2 = D3.event.targetTouches,
-        //             obj3 = D3.event.touches;
-        //         _this.touchTime++;
-        //         console.log(obj2.length)
-        //         if (obj2.length > 1 && (_this.touchTime % 2 !== 0) && _this.touchstart) {
-        //             _this.distance['stop'] = _this.getDistance({
-        //                 x: obj2[0].pageX,
-        //                 y: obj2[0].pageY
-        //             }, {
-        //                 x: obj2[1].pageX,
-        //                 y: obj2[1].pageY
-        //             })
-        //
-        //             //alert(JSON.stringify(_this.distance) + _this.touchTime);
-        //             scale = _this.distance['stop'] * _this.touchscale / (_this.distance['start']);
-        //             //alert(scale);
-        //
-        //             let slate = [-280, 0];
-        //             _this.g.transition()
-        //                 .duration(150)
-        //                 .ease('in')
-        //                 .attr("transform", "scale(" + scale + ")" + "translate(" + slate + ")");
-        //         }
-        //
-        //     }, true)
-        //     D3.select(_this.wrapper).on('touchend', function () {
-        //         _this.touchstart = false
-        //
-        //     }, true)
-        // }
+        
         // if (tools.isMb) {
         //     let scale = 1,
         //     touchCenter = {},
@@ -1225,6 +1171,7 @@ export class DrawPoint extends Component {
                     _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
                 }).on("zoomend", function (d) {
+
                 })
 
 
