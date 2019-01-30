@@ -146,13 +146,14 @@ export class ButtonAction {
                 break;
             case 3 :
                 setTimeout(function () {
-                    if (tools.isMb && tools.isEmpty(tools.url.getPara('instance')) && tools.url.getPara('page') === 'flowReport') {
-                        BW.sys.window.reOpen({
-                            url: url
-                        })
-                    } else {
-                        BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
-                    }
+                    // if (tools.isMb && tools.isEmpty(tools.url.getPara('instance')) && tools.url.getPara('page') === 'flowReport') {
+                    //     BW.sys.window.reOpen({
+                    //         url: url
+                    //     })
+                    // } else {
+                    //     BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
+                    // }
+                    BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
                 }, 1000);
                 break;
             case 4 :
@@ -395,6 +396,7 @@ export class ButtonAction {
                         if (data && (data.type || data.type === 0)) {
                             if (data.type === 0) {
                                 Modal.alert(data.showText);
+                                reject();
                             } else if(data.type === 2) {
                                 this.progressPopup(data.url, data.showText, resolve);
                             } else {

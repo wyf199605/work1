@@ -2,6 +2,12 @@
   width: 100%;
   height: 100%;
   position: relative;
+  &.edit_view{
+    .edit-detail-content{
+      top: 0;
+      height: calc(100% - 70px);
+    }
+  }
   .page-buttons {
     width: 100%;
     height: 50px;
@@ -160,7 +166,6 @@
       .accessory-wrapper {
         border-bottom: 1px solid #e2e2e2;
       }
-      padding-bottom: 10px;
     }
   }
 }

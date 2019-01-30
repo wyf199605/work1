@@ -5,6 +5,7 @@ import d = G.d;
 import Shell = G.Shell;
 import {Loading} from "../../../global/components/ui/loading/loading";
 import CONF = BW.CONF;
+import {Device} from "../../../global/entity/Device";
 interface IRfidConfPara {
     line: number,
     ip: string,
@@ -19,6 +20,7 @@ interface ISortUiPara {
     title : string
     subTitle? : string
     keyField : string
+    keyName : string
     nameField : string
     amount? : number
     classifyInfo : obj[]
@@ -47,7 +49,6 @@ export class RfidInventory {
     private token : string;
 
     constructor(data: IRfidInventoryPara) {
-        console.log(data);
         this.p = data;
         this.init(data);
     }
@@ -60,6 +61,7 @@ export class RfidInventory {
             tabIndex: true,
             className: 'rfid-modal',
             isOnceDestroy: true,
+            isBackground: false,
             body: this.modalBody(),
             keyDownHandle: this.keyHandle,
             footer: {
@@ -83,10 +85,20 @@ export class RfidInventory {
                     }
                 }]
             },
-            onClose : () => {
+        });
+        this.modal.onClose = () => {
+            if(G.tools.isNotEmptyArray(this.epc)){
+                Modal.confirm({
+                    msg : '退出前是否要提交尚未处理的RFID标签？',
+                    callback : (flag) => {
+                        flag ? this.commit().then(() => this.modal.isShow = false) : this.modal.isShow = false;
+                        Shell.rfid.stop(() => {});
+                    }
+                })
+            }else {
                 Shell.rfid.stop(() => {});
             }
-        });
+        };
         this.token = window.localStorage.getItem('token');
         this.stopEl = d.query('.rfid-stop', this.modal.wrapper);
         this.beginEl = d.query('.rfid-begin', this.modal.wrapper);
@@ -112,7 +124,10 @@ export class RfidInventory {
     private scan(value : string){
         let scanCode = Shell.rfid.scanCode(value,this.uniqueFlag),
             data = null;
-        console.log(scanCode, '查询数据');
+        if(!this.beginEl.classList.contains('disabled-none')){
+            this.value = '';
+            return;
+        }
         if(scanCode.success){
             data = scanCode.data[0]
         }else {
@@ -122,11 +137,8 @@ export class RfidInventory {
             return;
         }
         if('BARCODE' in data){
-            if(this.isEmpty()){
-                Modal.alert('分类数据不能为空', null, () => this.focus());
-                return;
-            }
-            this.recentData['BARCODE'] ? this.commit().then(() => this.assign({BARCODE : data.BARCODE})) : this.assign(data);
+            this.recentData['BARCODE'] ?
+                this.commit().then(() => this.assign(data)) : this.assign(data);
         }else {
             this.assign(data);
             if(this.isEmpty()){
@@ -154,10 +166,13 @@ export class RfidInventory {
                     value += this.recentData[n];
                 }
             });
+            if(name[0] === 'BARCODE'){
+                let caption = this.recentData[this.ui.nameField];
+                value = value + ' ' + (caption ? caption : '')
+            }
             el.innerHTML = value;
         });
-        this.contentEl.innerHTML = '';
-        this.epc = [];
+        this.clearData();
     }
 
     private modalBody() : HTMLElement{
@@ -194,10 +209,8 @@ export class RfidInventory {
                 queryConfigs: atvarparams,
                 resultDom: this.atvarEl,
                 tpl: () =><div class="atvarDom atvar-auto">
-                    <div style="display: inline-block;" data-type="title">
-                    </div>
-                    <div data-type="input">
-                    </div>
+                    <div style="display: inline-block;" data-type="title"/>
+                    <div data-type="input"/>
                 </div>,
                 setting: res.setting
             });
@@ -210,7 +223,7 @@ export class RfidInventory {
         Shell.rfid.stop((result) => {
             this.contentEl.appendChild(<div class="r">{result.msg}</div>);
         });
-        this.modal.wrapper.focus();
+        this.focus();
     }
 
     private start() {
@@ -221,13 +234,12 @@ export class RfidInventory {
             port = this.getRfidPort(conf);
 
         Shell.rfid.start(port.str, port.num, (result) => {
-            console.log(result, '开启数据');
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
             if (data) {
-                msg = result.msg + '：' + result.data[0];
+                msg = result.msg + '：' + data[0];
             }
-            data.forEach(d => {
+            Array.isArray(data) && data.forEach(d => {
                 if(this.epc.indexOf(d) === -1){
                     this.epc.push(d);
                     this.contentEl.appendChild(<div class="r">{msg}</div>);
@@ -260,23 +272,33 @@ export class RfidInventory {
                 resolve();
                 return;
             }
+
+            if(this.isEmpty()){
+                Modal.alert('分类数据不能为空', null, () => this.focus());
+                return;
+            }
+
             let loading = new Loading({
                 msg : '数据上传中...',
                 disableEl : this.modal.wrapper
             });
 
-            let url = CONF.siteUrl + this.p.data.body.elements[0].uploadAddr.dataAddr;
-            url = G.tools.url.addObj(url, {
-                token : this.token,
-                atvarparams: JSON.stringify(this.atVarBuilder.dataGet())
-            });
+            let url = CONF.siteUrl + this.p.data.body.elements[0].uploadAddr.dataAddr,
+                addData = {
+                    token : this.token,
+                    uuid : Device.get().uuid
+                };
+            if(this.atVarBuilder){
+                addData['atvarparams'] = JSON.stringify( this.atVarBuilder.dataGet())
+            }
+            url = G.tools.url.addObj(url, addData);
+
             BwRule.Ajax.fetch(url, {
                 data: this.dataGet(),
                 type: 'post',
             }).then(({response}) => {
                 console.log(response);
                 Modal.toast(response.msg);
-                this.epc = [];
                 this.clearData();
                 this.modal.wrapper.focus();
                 resolve();
@@ -285,20 +307,17 @@ export class RfidInventory {
                 this.focus();
             })
         });
-
-
     }
 
     private clearData(){
-        let els = d.queryAll('[data-name]', this.sortEl);
-        els.forEach( el => el.innerHTML = '');
-        this.recentData = {};
+        this.epc = [];
         this.contentEl.innerHTML = '';
         this.thisCount = 0;
         this.thisEl.innerHTML = this.thisCount + '';
     }
 
     private uniqueFlag : string;
+    private ui : ISortUiPara;
     private sortUi() {
         let loading = new Loading({
             msg : '下载数据中',
@@ -306,26 +325,27 @@ export class RfidInventory {
         });
 
         let element = this.p.data.body.elements[0],
-            url = element.uploadAddr.dataAddr;
+            url = element.downloadAddr.dataAddr;
         this.uniqueFlag = element.uniqueFlag;
         Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
-            let data : ISortUiPara = result.data;
-            console.log(data,'这是下载数据');
-            data.classifyInfo.forEach(obj => {
+            this.ui = result.data;
+             let info = this.ui.classifyInfo;
+            console.log(this.ui,'这是下载数据');
+            Array.isArray(info) && info.forEach(obj => {
                 let keys = Object.keys(obj),
-                    li = <div class="rfid-li">
+                    li = <div class="rfid-li"> 
                         <div>{obj[keys[0]]}：</div>
                         <div data-name={keys.join(',')}/>
                     </div>;
                 d.append(this.sortEl, li);
             });
-            if(data.keyField){
+            if(this.ui && this.ui.keyField){
                 d.append(this.sortEl, <div className="rfid-li">
-                    <div>{data.nameField}：</div>
-                    <div data-name={data.keyField}/>
+                    <div>{this.ui.keyName}：</div>
+                    <div data-name={this.ui.keyField}/>
                 </div>)
             }
-            this.titleEl.innerHTML = data.title;
+            this.titleEl.innerHTML = this.ui && this.ui.title || '';
             loading.destroy();
             this.focus();
         });
@@ -345,6 +365,6 @@ export class RfidInventory {
     };
 
     private focus(){
-        this.modal.wrapper.focus();
+        this.modal && this.modal.wrapper && this.modal.wrapper.focus();
     }
 }

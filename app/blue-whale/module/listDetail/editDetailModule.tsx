@@ -13,8 +13,8 @@ import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/act
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import d= G.d;
 
-interface IEditDetailPara extends IComponentPara {
-    isEdit: boolean;
+export interface IEditDetailPara extends IComponentPara {
+    isEdit?: boolean;
     uiType?: string;
     fm: {
         caption?: string;//panel 标题，有可能为空
@@ -40,6 +40,7 @@ export class EditDetailModule extends Component {
     private ajaxUrl: string = '';
     private keyStepData: obj[] = [];
     private isKeyStep: boolean = false;
+    static detailTypes = ['edit_detail', 'noedit_detail'];
 
     protected wrapperInit(para: G.IComponentPara): HTMLElement {
         return <div className="edit-detail-module">
@@ -49,6 +50,9 @@ export class EditDetailModule extends Component {
 
     constructor(private para: IEditDetailPara) {
         super(para);
+        if (this.para.uiType === 'edit_view'){
+            this.wrapper.classList.add('edit_view');
+        }
         this.fields = para.fm.fields;
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.getDefaultData().then((data) => {
@@ -106,7 +110,9 @@ export class EditDetailModule extends Component {
                             for (let i = 0, len = meta.length; i < len; i++) {
                                 res[meta[i]] = dataTab[i];
                             }
-                            this.totalNumber = response.head.totalNum;
+                            if (~EditDetailModule.detailTypes.indexOf(this.para.uiType)) {
+                                this.totalNumber = response.head.totalNum;
+                            }
                             this.defaultData = res;
                             resolve(res);
                         } else {
@@ -349,19 +355,21 @@ export class EditDetailModule extends Component {
 
     // 上一页下一页加载数据
     refresh(page?: number): Promise<void> {
-        if (tools.isNotEmpty(page)) {
-            if (page > 0) {
-                if (page > this.totalNumber) {
-                    this.currentPage = this.totalNumber;
+        if (this.para.uiType !== 'edit_view'){
+            if (tools.isNotEmpty(page)) {
+                if (page > 0) {
+                    if (page > this.totalNumber) {
+                        this.currentPage = this.totalNumber;
+                    } else {
+                        this.currentPage = page;
+                    }
                 } else {
-                    this.currentPage = page;
+                    this.totalNumber = 0;
+                    this.currentPage = 1;
                 }
-            } else {
-                this.totalNumber = 0;
-                this.currentPage = 1;
             }
+            this.checkPageButtonDisabled();
         }
-        this.checkPageButtonDisabled();
         this.scrollToTop();
         return this.getDefaultData().then(data => {
             if (tools.isEmpty(data)) {
@@ -493,7 +501,6 @@ export class EditDetailModule extends Component {
         let subButtons: R_Button[] = this.para.fm.subButtons,
             buttons: R_Button[] = [],
             self = this;
-
         // 更多按钮
         function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement) {
             self.moreBtn = new Button({
@@ -596,7 +603,9 @@ export class EditDetailModule extends Component {
                 if (tools.isMb) {
                     createMoreBtn(buttons, btnWrapper);
                     createEditBtn(btnWrapper);
-                    this.initPageButtons();
+                    if (~EditDetailModule.detailTypes.indexOf(this.para.uiType)) {
+                        this.initPageButtons();
+                    }
                 } else {
                     // PC 按钮
                     let pcBtnWrapper = <div className="item-buttons"/>,
@@ -606,7 +615,9 @@ export class EditDetailModule extends Component {
                         createEditBtn(pcBtnWrapper);
                         createPcButtons(buttons, pcBtnWrapper);
                     }
-                    this.initPageButtons(pageBtnWrapper);
+                    if (~EditDetailModule.detailTypes.indexOf(this.para.uiType)) {
+                        this.initPageButtons(pageBtnWrapper);
+                    }
                     btnWrapper.appendChild(pageBtnWrapper);
                 }
             }
@@ -614,7 +625,11 @@ export class EditDetailModule extends Component {
 
         // 处理按钮触发
         function subBtnEvent(btn: R_Button) {
-            let varList = btn.actionAddr.varList;
+            let varList = btn.actionAddr.varList,
+                def_data = self.defaultData;
+            if (tools.isNotEmpty(varList)) {
+                def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
+            }
             switch (btn.subType) {
                 case 'insert_save':
                     btn.refresh = 0;
@@ -648,11 +663,7 @@ export class EditDetailModule extends Component {
                 case 'delete_save': {
                     if (self.totalNumber !== 0) {
                         btn.refresh = 0;
-                        let data = self.defaultData;
-                        if (tools.isNotEmpty(varList)) {
-                            data = ListItemDetail.getOldFieldData(btn, data || {});
-                        }
-                        ButtonAction.get().clickHandle(btn, data, () => {
+                        ButtonAction.get().clickHandle(btn, def_data, () => {
                             // 删除后显示下一页，如果已是最后一页，则显示上一页
                             if (self.isKeyStep === true) {
                                 let keyStepData = self.keyStepData || [];
@@ -668,6 +679,24 @@ export class EditDetailModule extends Component {
                     }
                 }
                     break;
+                case 'flow_save':
+                    if (!self.validate()) {
+                        return false;
+                    }
+                    btn.hintAfterAction = true;
+                    self.save(btn, self.editModule.get(), () => {
+                    });
+                    break;
+                case 'flow_submit':
+                    if (!self.validate()) {
+                        return false;
+                    }
+                    btn.hintAfterAction = true;
+                    // 先保存再发送
+                    let edit_data = self.editModule.get();
+                    ButtonAction.get().clickHandle(btn, edit_data, () => {
+                    }, self.para.url);
+                    break;
                 default:
                     // 其他按钮
                     let data = self.defaultData;
@@ -681,10 +710,21 @@ export class EditDetailModule extends Component {
         }
     }
 
+    private save(btn: R_Button, pageData: obj, callback?) {
+        ButtonAction.get().clickHandle(btn, pageData, response => {
+            btn.buttonType = 2;
+            let data = response.data && response.data[0] ? response.data[0] : null;
+            if (data) {
+                this.editModule.set(data);
+            }
+            typeof callback === 'function' && callback(response);
+        }, this.para.url);
+    }
+
     private _isEdit: boolean;
     set isEdit(isEdit: boolean) {
         this._isEdit = isEdit;
-        if (this.totalNumber === 0) {
+        if (this.totalNumber === 0 && this.para.uiType !== 'edit_view') {
             this.cancelBtn.disabled = true;
             this.updateBtn.disabled = true;
             this.saveBtn.disabled = true;

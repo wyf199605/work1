@@ -868,6 +868,7 @@ export class RfidBarCode extends Component {
                        this.getHeadTable(para);
                        let ScanData =  G.Shell.inventory.getScanData(para.uniqueFlag);
                         if(ScanData.success){
+                            loading.destroy();
                            let res = ScanData.data.data;
                            //重新定义数据
                             //存储obj数据结构 跟 res数据比对 拼接 以及重新刷新条件传值参数
@@ -923,6 +924,7 @@ export class RfidBarCode extends Component {
                         G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,true, (res=>{
                             alert(res.msg)
                             if(res.success){
+                                loading.destroy();
                                 this.getHeadTable(para);
                             }
                         }))

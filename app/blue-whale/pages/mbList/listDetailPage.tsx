@@ -7,7 +7,7 @@ import {EditDetailModule} from "../../module/listDetail/editDetailModule";
 export class ListDetailPage extends BasicPage {
     constructor(para: EditPagePara) {
         super(para);
-        let details = ['edit_detail', 'noedit_detail'];
+        let details = ['edit_detail', 'noedit_detail','edit_view'];
         if (~details.indexOf(para.uiType)) {
             let editDetail = new EditDetailModule({
                 container: para.dom,
@@ -20,7 +20,7 @@ export class ListDetailPage extends BasicPage {
                 editDetail.refresh();
             })
         } else {
-            let detailItem = new ListItemDetail(para);
+            let detailItem = new ListItemDetail(Object.assign({}, para, {url: this.url, container: para.dom}));
             // 刷新非detail页面，detail页面的刷新在页面内完成
             if (para.uiType !== 'detail') {
                 this.on(BwRule.EVT_REFRESH, () => {
