@@ -61,7 +61,6 @@ export class RfidInventory {
             tabIndex: true,
             className: 'rfid-modal',
             isOnceDestroy: true,
-            isBackground: false,
             body: this.modalBody(),
             keyDownHandle: this.keyHandle,
             footer: {
@@ -85,20 +84,20 @@ export class RfidInventory {
                     }
                 }]
             },
-        });
-        this.modal.onClose = () => {
-            if(G.tools.isNotEmptyArray(this.epc)){
-                Modal.confirm({
-                    msg : '退出前是否要提交尚未处理的RFID标签？',
-                    callback : (flag) => {
-                        flag ? this.commit().then(() => this.modal.isShow = false) : this.modal.isShow = false;
-                        Shell.rfid.stop(() => {});
-                    }
-                })
-            }else {
-                Shell.rfid.stop(() => {});
+            onClose : () => {
+                if(G.tools.isNotEmptyArray(this.epc)){
+                    Modal.confirm({
+                        msg : '退出前是否要提交尚未处理的RFID标签？',
+                        callback : (flag) => {
+                            flag && this.commit();
+                            Shell.rfid.stop(() => {});
+                        }
+                    })
+                }else {
+                    Shell.rfid.stop(() => {});
+                }
             }
-        };
+        });
         this.token = window.localStorage.getItem('token');
         this.stopEl = d.query('.rfid-stop', this.modal.wrapper);
         this.beginEl = d.query('.rfid-begin', this.modal.wrapper);
@@ -136,26 +135,31 @@ export class RfidInventory {
             });
             return;
         }
+        // 若扫入条码
         if('BARCODE' in data){
-            this.recentData['BARCODE'] ?
-                this.commit().then(() => this.assign(data)) : this.assign(data);
+            // 若已有条码，先提交数据
+            if(G.tools.isNotEmpty(this.recentData['BARCODE'])){
+                this.commit().then(() => this.setValue(data));
+            }else {
+                // 若分类为空，不可设置条码值
+                if(this.isSortEmpty()){
+                    Modal.alert('分类为空，需先扫入分类值', null, () => this.focus());
+                    return
+                }
+                this.setValue(data)
+            }
         }else {
-            this.assign(data);
-            if(this.isEmpty()){
+            this.setValue(data);
+            if(this.isSortEmpty()){
                 this.barCodeEl && (this.barCodeEl.innerHTML = '');
                 this.recentData['BARCODE'] = '';
             }
         }
     }
 
-    private assign(data : obj){
+    private setValue(data : obj){
         this.recentData = Object.assign(this.recentData, data);
-        this.setValue();
-    }
-
-    private setValue(){
-        let els = d.queryAll('[data-name]', this.sortEl);
-        els.forEach( el => {
+        this.sortEls.forEach( el => {
             let name = el.dataset.name.split(','),
                 value = '';
             name.forEach((n, i) => {
@@ -253,16 +257,24 @@ export class RfidInventory {
         });
     }
 
-    private isEmpty(){
-        let els = d.queryAll('[data-name]', this.sortEl),
-            isEmpty = false;
-        els.forEach( el => {
+    private _sortEls : HTMLElement[];
+    get sortEls(){
+        if(!this._sortEls){
+            this._sortEls = d.queryAll('[data-name]', this.sortEl);
+        }
+        return this._sortEls
+    }
+
+    private isSortEmpty(){
+        let isEmpty = false;
+        this.sortEls.forEach( el => {
             if(el.innerHTML === '' && el.dataset.name !== 'BARCODE'){
                 isEmpty = true;
             }
         });
         return isEmpty;
     }
+
     private commit() {
         return new Promise(resolve => {
             if(!this.epc[0]){
@@ -273,7 +285,7 @@ export class RfidInventory {
                 return;
             }
 
-            if(this.isEmpty()){
+            if(this.isSortEmpty()){
                 Modal.alert('分类数据不能为空', null, () => this.focus());
                 return;
             }
