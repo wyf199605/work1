@@ -58,6 +58,7 @@ export class AssignModuleBasic extends FormCom{
 
         this.contactModal = new Modal({
             body : iframe,
+            isOnceDestroy : true,
             className: 'contact-modal',
         });
 
