@@ -2669,7 +2669,11 @@ export class BwTableModule extends Component {
                             }
                             let linkCell: FastTableCell = row ? row.cellGet(fieldName) as FastTableCell : null;
 
-                            linkCell && !linkCell.isEdited && validList.push(validate(editModule, linkCell, false));
+                            // 此时未触发编辑事件，需给予延时
+                            setTimeout(() => {
+                                // 判断linkCell是否处于编辑状态，否则不予验证
+                                linkCell && !linkCell.editing && validList.push(validate(editModule, linkCell, false));
+                            }, 100);
 
                         }
                     }
