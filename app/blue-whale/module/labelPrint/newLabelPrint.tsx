@@ -293,10 +293,10 @@ export class NewLabelPrint {
                                     cxt.fillRect(0, 0, printCanvas.width, printCanvas.height);
                                     cxt.drawImage(canvas, 0, 0);
                                     d.remove(canvas);
-                                    new Modal({
-                                        body: printCanvas,
-                                        header: '展示',
-                                    });
+                                    // new Modal({
+                                    //     body: printCanvas,
+                                    //     header: '展示',
+                                    // });
                                     let dataURL = printCanvas.toDataURL("image/png"),
                                         url = dataURL.replace('data:image/jpeg;base64,', '');
                                     console.log(dataURL);
