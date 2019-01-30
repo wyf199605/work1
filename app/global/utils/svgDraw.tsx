@@ -156,7 +156,7 @@ export class SvgDraw{
             text.selectAll('tspan').data(textArr).enter().append('tspan')
                 .attr('x', x)
                 .attr('dy', (d, index) => {
-                    return size * 1.2;
+                    return size * 1.2 * Math.min(1, index);
                 })
                 .html((d) => {
                     return d;
