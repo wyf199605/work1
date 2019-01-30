@@ -1,17 +1,14 @@
 .btn-group-container {
-    width: 100%;
-    display: flex;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    background-color: red;
-    &::-webkit-scrollbar {
-        width: 0px;
-    }
-    .btn {
-        border: none;
-        border-radius: 0px;
-    }
-    .btn:not(:last-child) {
-        border-right: 1px solid #d9d9d9;
-    }
+  display: flex;
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    width: 0px;
+  }
+  .btn {
+    border: none;
+    border-radius: 0px;
+  }
+  .btn:not(:last-child) {
+    border-right: 1px solid #d9d9d9;
+  }
 }
