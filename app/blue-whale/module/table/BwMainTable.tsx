@@ -127,16 +127,14 @@ export class BwMainTableModule extends BwTableModule{
     /*
     * 初始化标签打印
     * */
-    protected initLabelPrint(callback?: Function) {
-        let label,
-            isFirst = true;
+    protected initLabelPrint() {
+        let label;
 
         this.ftable.btnAdd('labelPrint', {
             content: '标签打印',
             icon: 'label',
             onClick: () => {
-                if(isFirst) {
-                    isFirst = false;
+                if(!label) {
                     let sp = new Spinner({
                         el : this.ftable.btnGet('labelPrint').wrapper,
                         size : 14,
@@ -144,7 +142,16 @@ export class BwMainTableModule extends BwTableModule{
                     });
                     sp.show();
 
-                    require(['LabelPrintModule'], (Print) => {
+                    require(['NewLabelPrint'], (Print) => {
+                        label = new Print.NewLabelPrint({
+                            container: this.wrapper,
+                            getData: () => this.ftable.data,
+                            getSelectedData: () => this.ftable.selectedRowsData,
+                            ui: this.ui
+                        });
+                        sp.hide();
+                    })
+                    /*require(['LabelPrintModule'], (Print) => {
                         let moneys = {};
                         this.ftable.columnsVisible.forEach((col) => {
                             if(col.content && col.content.dataType === '11'){
@@ -166,9 +173,6 @@ export class BwMainTableModule extends BwTableModule{
                             cols: this.ftable.columns,
                             getData: () => this.ftable.data,
                             selectedData: () => this.ftable.selectedRowsData,
-                            callBack : () => {
-                                callback && callback();
-                            },
                             onSetDefault: (data: string) => {
                                 console.log(data);
                                 BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.ajaxUrl.labelDefault, {'item_id': this.ui.itemId}), {
@@ -187,9 +191,9 @@ export class BwMainTableModule extends BwTableModule{
                             console.log(e);
                         }
                         sp.hide();
-                    });
+                    });*/
                 }else{
-                    label.modal.isShow = true;
+                    label.modalShow = true;
                 }
             }
         }, 0);

@@ -952,7 +952,9 @@ export class BwTableModule extends Component {
                     Promise.all(defAddrs.map(url => {
                         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(url))
                             .then(({response}) => {
-                                data = Object.assign(data, response.data[0] || {})
+                                // TODO data可能不存在
+                                let resultData = tools.keysVal(response, 'data', 0) || {};
+                                data = Object.assign(data, resultData);
                                 // cb();
                             });
                     })).then(() => {

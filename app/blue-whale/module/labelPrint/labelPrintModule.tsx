@@ -530,7 +530,14 @@ export = class LabelPrintModule {
                 }
             }
         }, 500);
-
+        /* for(let i = 0,l = this.pageSvgArray.length;i < l;i++){
+             let s = new XMLSerializer().serializeToString(this.pageSvgArray[i]);
+             let encodedData = Base64.encode(s);
+             dealPrintData(encodedData);
+             if(i = l-1){
+                 this.para.callBack();
+             }
+         }*/
     }
 
     /**

@@ -213,6 +213,12 @@ gulp.task('js', function () {
         'uploadModule/ManagerImages',
     ], 'uploadModule.js');
 
+    //newLabelPrint模块
+    gulpTsModule([
+        'labelPrint/newLabelPrint',
+        'labelPrint/labelPrintModal',
+    ], 'newLabelPrint.js');
+
     //changePassword模块
     gulpTsModule(['changePassword/*'], 'passwdModal.js');
 

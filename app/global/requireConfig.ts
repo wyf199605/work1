@@ -34,6 +34,9 @@ namespace G{
                 pdfObject: ['../plugin/pdfObject/pdf-object'],
                 pdfh5: ['../plugin/pdfjs/pdfh5'],
                 pdfjs: ['../plugin/pdfjs/pdf'],
+                canvg: ['../plugin/svg2Canvas/canvg.min'],
+                rgbcolor: ['../plugin/svg2Canvas/rgbcolor.min'],
+                'stackblur-canvas': ['../plugin/svg2Canvas/stackblur.min'],
                 hammer:['../plugin/hammer']
                 // picker: ['../web/plugin/mui/js/mui.picker.min']
             }, config.paths),

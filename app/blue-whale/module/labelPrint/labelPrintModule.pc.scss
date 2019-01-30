@@ -211,3 +211,23 @@
     }
   }
 }
+
+.new-label-print-modal{
+  .modal-body{
+    overflow: hidden;
+    max-height: none!important;
+  }
+  .label-print-content{
+    border: 1px solid #000;
+    box-sizing: content-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    transform-origin: 0 0;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-align-content: start;
+    align-content: start;
+  }
+}
