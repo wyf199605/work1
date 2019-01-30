@@ -117,6 +117,23 @@ export class NewLabelPrint {
                 }
             })
         }
+        let printerData = [{text: '默认', value: 0}];
+        try {
+            let printList = Shell.printer.get();
+            if(printList.data && Array.isArray(printList.data.driveList)){
+                let result = printList.data.driveList,
+                    printer = [];
+                for(let item of result){
+                    printer.push({
+                        text: item.driveName,
+                        value: item.driveCode,
+                    });
+                }
+                printerData = printer;
+            }
+        }catch (e){
+            console.log(e);
+        }
         this.printModal = new LabelPrintModal({
             container: para.container,
             onClick: (type) => {
@@ -148,7 +165,8 @@ export class NewLabelPrint {
                     loading = null;
                 });
             },
-            printList
+            printList,
+            printerData
         });
         this.printModal.data = this.getDefaultProp();
     }
@@ -283,12 +301,15 @@ export class NewLabelPrint {
                             svg.g.attr('transform', 'scale(' + scale + ')');
                             let canvas = <canvas/>,
                                 svgEl = svg.svgEl;
+                            svgEl.innerHTML = new Array(8).join(svgEl.innerHTML);
                             d.append(document.body, canvas);
 
                             canvg(canvas, svgEl.outerHTML, {
-                                renderCallback: (e) => {
-                                    let printCanvas = <canvas width={canvas.width} height={canvas.height}/>,
+                                renderCallback: () => {
+                                    let scale = 2,
+                                        printCanvas = <canvas width={canvas.width * scale} height={canvas.height * scale}/>,
                                         cxt = printCanvas.getContext('2d');
+                                    cxt.scale(scale, scale);
                                     cxt.fillStyle = "#fff";
                                     cxt.fillRect(0, 0, printCanvas.width, printCanvas.height);
                                     cxt.drawImage(canvas, 0, 0);
@@ -297,9 +318,9 @@ export class NewLabelPrint {
                                     //     body: printCanvas,
                                     //     header: '展示',
                                     // });
-                                    let dataURL = printCanvas.toDataURL("image/png"),
-                                        url = dataURL.replace('data:image/jpeg;base64,', '');
-                                    console.log(dataURL);
+                                    let dataURL = printCanvas.toDataURL("image/png", 1),
+                                        url = dataURL.replace('data:image/png;base64,', '');
+                                    // console.log(dataURL);
                                     resolve(url);
                                 }
                             });

@@ -20,7 +20,8 @@ type printType = 'preview' | 'print' | 'setDefault';
 
 export interface ILabelPrintModalPara extends IComponentPara{
     onClick?: (type: printType) => Promise<any>;
-    printList: {text: string, value: any}[]
+    printList: {text: string, value: any}[];
+    printerData: {text: string, value: any}[];
 }
 
 export class LabelPrintModal extends Component{
@@ -37,6 +38,7 @@ export class LabelPrintModal extends Component{
         super(para);
         this.onClick = para.onClick || Promise.resolve;
         this.selectInputJson.printList = para.printList || [];
+        this.selectInputJson.printer = para.printerData || [{text: '默认', value: 0}];
 
         this.initModal(para);
         this.initContent();
@@ -208,7 +210,7 @@ export class LabelPrintModal extends Component{
                     onSet: function (item, index) {
                     },
                     className: 'selectInput',
-                    clickType: 1
+                    clickType: 0
                 });
                 break;
             case 'port':
@@ -219,7 +221,7 @@ export class LabelPrintModal extends Component{
                     onSet: function (item, index) {
                     },
                     className: 'selectInput',
-                    clickType: 1
+                    clickType: 0
                 });
                 break;
             case 'paper':
@@ -235,7 +237,7 @@ export class LabelPrintModal extends Component{
                         }
                     },
                     className: 'selectInput',
-                    clickType: 1
+                    clickType: 0
                 });
                 break;
             case 'scale':
