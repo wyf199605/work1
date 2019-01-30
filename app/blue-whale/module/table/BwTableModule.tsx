@@ -2615,9 +2615,10 @@ export class BwTableModule extends Component {
             });
         };
 
-        let validate = (editModule: EditModule, cell: FastTableCell): Promise<any> => {
+        let validate = (editModule: EditModule, cell: FastTableCell, checkLinkCell = true): Promise<any> => {
             let promise: Promise<any> = new Promise((resolve, reject) => {
                 let name = cell.name,
+                    row = cell.row,
                     field: R_Field = cell.column.content,
                     fastRow = cell.frow,
                     rowData = fastRow.data,
@@ -2647,6 +2648,29 @@ export class BwTableModule extends Component {
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr/* && tools.isNotEmpty(rowData[name])*/) {
+                    if(checkLinkCell && Array.isArray(this.ui.cols)){
+                        let chkName = field.name;
+                        for(let col of this.ui.cols){
+                            // 不存在chkAddr不继续验证
+                            if(!col.chkAddr || !Array.isArray(col.chkAddr.varList)){
+                                continue;
+                            }
+                            let varList = col.chkAddr.varList,
+                                fieldName = col.name;
+
+                            // 字段名一样不继续验证
+                            if(fieldName === name || fieldName === chkName) {
+                                continue;
+                            }
+
+                            // chkAdd.varList包含修改的cell的字段则不继续验证
+                            if(!varList.some(({varName}) => varName === chkName)){
+                                continue;
+                            }
+                            let linkCell: FastTableCell = row ? row.cellGet(fieldName) as FastTableCell : null;
+                            linkCell && validList.push(validate(editModule, linkCell, false));
+                        }
+                    }
                     EditConstruct.checkValue(field, rowData, () => {
                         if (this.ftable && this.ftable.editing) {
                             lookUpCell && (lookUpCell.data = null);

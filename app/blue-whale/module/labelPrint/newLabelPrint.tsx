@@ -357,12 +357,15 @@ export class NewLabelPrint {
     preview(){
         return this.getLabels().then(({svgList, tmp, data}) => {
             let settingData: obj = this.printModal.data,
-                width = settingData.width * NewLabelPrint.scale,
-                height = settingData.height * NewLabelPrint.scale,
-                paddingLeft = settingData.left,
-                paddingRight = settingData.right,
-                paddingTop = settingData.up,
-                paddingBottom = settingData.down,
+                dpi = settingData.ratio,
+                width = settingData.width * dpi,
+                height = settingData.height * dpi,
+                paddingLeft = settingData.left * dpi,
+                paddingRight = settingData.right * dpi,
+                paddingTop = settingData.up * dpi,
+                paddingBottom = settingData.down * dpi,
+                rowSpace = this.printModal.getData('rowSpace') * dpi,
+                colSpace = this.printModal.getData('colSpace') * dpi,
                 isLengthWays = settingData.horizontalRank,
                 isHorizontal = !settingData.direction,
                 scale = settingData.scale;
@@ -377,7 +380,7 @@ export class NewLabelPrint {
                     .size([width, height])
                     .x(xLinear)
                     .y(yLinear)
-                    .scaleExtent([0.8, 5])
+                    .scaleExtent([0.5, 5])
                     .scale(scale)
                     .on('zoomstart', function () {
                         // d3.select(this).on("dblclick.zoom", null);
@@ -399,13 +402,11 @@ export class NewLabelPrint {
                 padding: `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`
             }}/>;
 
-            let rowSpace = this.printModal.getData('rowSpace'),
-                colSpace = this.printModal.getData('colSpace'),
-                svgHeight = tmp.height * NewLabelPrint.scale,
+            let svgHeight = tmp.height * NewLabelPrint.scale,
                 svgWidth = tmp.width * NewLabelPrint.scale,
-                pageSize = Math.floor((width - paddingLeft - paddingRight) / (svgWidth + colSpace))
-                    * Math.floor((height - paddingTop - paddingBottom) / (svgHeight + rowSpace)),
-                total = Math.ceil(data.length / (pageSize || 1));
+                pageSize = (Math.floor((width - paddingLeft - paddingRight) / (svgWidth + colSpace))
+                    * Math.floor((height - paddingTop - paddingBottom) / (svgHeight + rowSpace))) || 1,
+                total = Math.ceil(data.length / (pageSize));
 
             svgList.slice(0, pageSize).forEach((svg) => {
                 svg.svgEl.style.marginRight = colSpace + 'px';
@@ -562,7 +563,7 @@ export class NewLabelPrint {
         return svg;
     }
 
-    static scale = 3.78; // 固定放大倍数
+    static scale = 1; // 固定放大倍数
     static iconSuffix = {
         1: '.bmp',
         2: '.bmp',
