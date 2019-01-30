@@ -2668,7 +2668,9 @@ export class BwTableModule extends Component {
                                 continue;
                             }
                             let linkCell: FastTableCell = row ? row.cellGet(fieldName) as FastTableCell : null;
-                            linkCell && validList.push(validate(editModule, linkCell, false));
+
+                            linkCell && !linkCell.isEdited && validList.push(validate(editModule, linkCell, false));
+
                         }
                     }
                     EditConstruct.checkValue(field, rowData, () => {
