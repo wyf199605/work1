@@ -103,7 +103,6 @@ export class EpcList extends Component {
             boundEl= this.boundEl;
 
 
-        let i = 0;
         let s = new Button({
             container: wrapper,
             content: '开始扫描',
@@ -141,7 +140,7 @@ export class EpcList extends Component {
                 } else {
                     console.log(this.ftable.data);
                     clearInterval(this.bindBarTime)
-                    G.Shell.inventory.stopEpc({}, function (res) {});
+                    G.Shell.inventory.stopEpc({}, function () {});
                     s.content = "开始扫描";
                 }
             }
@@ -216,7 +215,7 @@ export class EpcList extends Component {
                 let fragDoc = document.createDocumentFragment();
                 d.append(fragDoc, data);
                 d.append(fragDoc, <div className="delete">x</div>);
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     resolve({
                         text: fragDoc
                     });

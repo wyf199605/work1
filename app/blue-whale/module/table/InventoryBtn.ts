@@ -107,7 +107,7 @@ function start(content: string, btn: Button, bwTable: BwTableModule) {
     let invenData;
     if (content === 'rfid_begin') {
         let rfidCol = bwTable.ui.rfidCols;
-        let when = rfidCol.calc.when;
+        //let when = rfidCol.calc.when;
         //判断rfidCol 如果为空 就直接退出；
         if (G.tools.isEmpty(rfidCol)) {
             return;
@@ -116,7 +116,9 @@ function start(content: string, btn: Button, bwTable: BwTableModule) {
         btn.data.openType = 'rfid_stop';
 
         sessionInve = setInterval(() => {
-            Ajax.fetch(CONF.ajaxUrl.rfidLoginTime)
+            Ajax.fetch(CONF.ajaxUrl.rfidLoginTime).catch((e) => {
+                console.log(e);
+            });
         }, 9 * 60 * 1000);
 
         if (rfidCol.classify) {
@@ -137,14 +139,14 @@ function start(content: string, btn: Button, bwTable: BwTableModule) {
 
     } else {
         let rfidCol = bwTable.ui.rfidCols;
-        G.Shell.inventory.stopCheck({}, function (res) {
+        G.Shell.inventory.stopCheck({}, function () {
             Modal.alert("结束扫描");
         });
         btn.content = '开始';
         btn.data.openType = 'rfid_begin';
         //close
 
-        Shell.inventory.columnCountOff({}, 1, rfidCol.inventoryKey, (res) => {
+        Shell.inventory.columnCountOff({}, 1, rfidCol.inventoryKey, () => {
         });
         clearInterval(sessionInve);
     }
@@ -154,13 +156,13 @@ function start(content: string, btn: Button, bwTable: BwTableModule) {
 
 function up(url: string, bwTable: BwTableModule) {
     let inventoryKey = "";
-    bwTable.ui.subButtons.forEach((value, index, array) => {
+    bwTable.ui.subButtons.forEach((value) => {
         if (value.openType == "rfid_up") {
             inventoryKey = value.inventoryKey;
         }
     });
     if (inventoryKey) {
-        G.Shell.inventory.uploadData(tools.url.addObj(CONF.siteUrl + url, bwTable.ajaxData), inventoryKey, function (res) {
+        G.Shell.inventory.uploadData(tools.url.addObj(CONF.siteUrl + url, bwTable.ajaxData), inventoryKey, function () {
             // alert(JSON.stringify(res));
         })
     }
@@ -175,13 +177,13 @@ function down(url: string, uploadUrl: string, btn: Button, bwTable: BwTableModul
         btn.isDisabled = true;
         let inVen,
             inventoryKey = "";
-        bwTable.ui.subButtons.forEach((value, index) => {
+        bwTable.ui.subButtons.forEach((value) => {
             if (value.openType == "rfid_down") {
                 inventoryKey = value.inventoryKey;
             }
         });
         if (inventoryKey) {
-            inVen = G.Shell.inventory.loadData(url1, uploadUrl1, inventoryKey, function (res) {
+            inVen = G.Shell.inventory.loadData(url1, uploadUrl1, inventoryKey, function () {
                 // alert('盘点信息:' + JSON.stringify(res));
                 resolve();
 
@@ -227,7 +229,7 @@ function search(openType: string, btn: Button, bwTable: BwTableModule) {
             btn.data.openType = 'rfid_nofind';
         } else {
 
-            Shell.inventory.stopFind({}, function (res) {
+            Shell.inventory.stopFind({}, function () {
                 Modal.alert('停止找货');
             });
             btn.content = '开始找货';
