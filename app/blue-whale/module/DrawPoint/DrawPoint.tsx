@@ -156,7 +156,7 @@ export class DrawPoint extends Component {
         }
        //防止PC端 hover文字时闪动问题
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-        
+        //使用这个方法可以再次提高安卓手机端的缩放速度，中心缩放方法需要深究
         // if (tools.isMb) {
         //     let scale = 1,
         //     touchCenter = {},
