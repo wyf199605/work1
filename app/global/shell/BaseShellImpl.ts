@@ -7,6 +7,9 @@ import tools = G.tools;
  * 硬件接口基类
  */
 declare const AppShell;
+declare const webkit : any;
+declare const BlueWhaleShell : any;
+
 export class BaseShellImpl{
     public adHandle(action:string, dict?:string) {
         if(typeof window['AppShell'] === 'undefined'){

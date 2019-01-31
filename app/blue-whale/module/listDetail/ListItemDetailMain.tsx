@@ -1,8 +1,9 @@
 /// <amd-module name="ListItemDetailMain"/>
-import {IEditDetailPara} from "./editDetailModule";
+
+import {IDetailBasePara} from "./DetailBase";
 
 export class ListItemDetailMain {
-    constructor(para: IEditDetailPara) {
+    constructor(para: IDetailBasePara) {
 
     }
 }
