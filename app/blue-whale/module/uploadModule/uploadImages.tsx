@@ -64,7 +64,7 @@ export class UploadImages extends FormCom {
             switch (this.imgType) {
                 case '20': {
                     this.imgs = [{
-                        localUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.para.pageData),
+                        localUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.pageData),
                         isError: false,
                         unique: val || '',
                     }];
@@ -92,6 +92,15 @@ export class UploadImages extends FormCom {
         } else {
             this.imgs = [];
         }
+    }
+
+    private _pageData: obj;
+    set pageData(pageData: obj) {
+        this._pageData = pageData;
+    }
+
+    get pageData() {
+        return this._pageData;
     }
 
     private _imgs: IImage[];
@@ -123,6 +132,7 @@ export class UploadImages extends FormCom {
 
     constructor(private para: IUploadImages) {
         super(para);
+        this.pageData = para.pageData || {};
         this.imgType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.unique;
         this.createUploader();

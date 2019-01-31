@@ -61,7 +61,7 @@ export class Accessory extends FormCom {
                     if (tools.isNotEmpty(fileInfo)) {
                         let obj: obj = {};
                         obj[this.para.nameField] = value;
-                        let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(fileInfo, Object.assign({}, this.para.pageData, obj));
+                        let fileInfoAddr = BW.CONF.siteUrl + BwRule.reqAddr(fileInfo, Object.assign({}, this.pageData, obj));
                         BwRule.Ajax.fetch(fileInfoAddr).then(({response}) => {
                             this.files = response.dataArr || [];
                         })
@@ -72,7 +72,7 @@ export class Accessory extends FormCom {
                 case '43': {
                     this.files = [{
                         unique: value,
-                        filename: this.para.pageData ? (this.para.pageData[this.para.nameField] || '') : '',
+                        filename: this.pageData ? (this.pageData[this.para.nameField] || '') : '',
                         filesize: 0,
                         addr: ''
                     }];
@@ -125,8 +125,18 @@ export class Accessory extends FormCom {
         return wrapper;
     }
 
+    private _pageData: obj;
+    set pageData(pageData: obj) {
+        this._pageData = pageData;
+    }
+
+    get pageData() {
+        return this._pageData;
+    }
+
     constructor(private para: IAccessory) {
         super(para);
+        this.pageData = para.pageData || {};
         this.typeUnique = new Date().getTime() + para.field.name;
         this.fileType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.uniques || '';
@@ -246,7 +256,7 @@ export class Accessory extends FormCom {
         this._listItems = this._listItems.filter((item) => item);
         this.refreshIndex();
         this.listItems.forEach(item => {
-            item.disabled =  this.disabled;
+            item.disabled = this.disabled;
         });
     }
 
@@ -296,15 +306,17 @@ export class Accessory extends FormCom {
             this.refreshIndex();
         }
     }
-    set disabled(disabled:boolean){
+
+    set disabled(disabled: boolean) {
         disabled = tools.isNotEmpty(disabled) ? disabled : false;
         this._disabled = disabled;
         this.listItems.forEach(item => {
-            item.disabled =  disabled;
+            item.disabled = disabled;
         });
-        this.uploader && (this.uploader.disabled =  disabled);
+        this.uploader && (this.uploader.disabled = disabled);
     }
-    get disabled(){
+
+    get disabled() {
         return this._disabled;
     }
 

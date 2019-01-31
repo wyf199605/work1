@@ -45,7 +45,7 @@ namespace BW {
                         o.header = gps ? Object.assign(o.header || {}, {position: gps}) : o.header;
                         self.handle('open', JSON.stringify(o));
                     }).catch(reason => {
-                        if ('flag' in  reason && !reason.flag) {
+                        if ('flag' in reason && !reason.flag) {
                             alert('gps未打开, 点击确定去开启.');
                             self.window.openGps();
                         } else {
@@ -240,10 +240,10 @@ namespace BW {
                                 let data = detail.msg;
                                 let file = tools.base64ToFile(data.dataurl, data.filename);
                                 callback && callback([file]);
-                            }else{
+                            } else {
                                 error && error(detail.msg || '');
                             }
-                        }catch (e){
+                        } catch (e) {
                             error && error('获取图片失败');
                         }
                     });
@@ -280,18 +280,18 @@ namespace BW {
                     });
                     self.handle('getSignImg', JSON.stringify({event, type: 0}));
                 },
-                reOpen:function (o: winOpen) {
+                reOpen: function (o: winOpen) {
                     self.handle('reOpen', JSON.stringify(o));
                 },
-                toClient: function (){
+                toClient: function () {
                     self.handle('toClient');
                 },
-                clientCode: function(callback){
+                clientCode: function (callback) {
                     let event = '__EVT_TO_CLIENT__';
                     d.once(window, event, (response: CustomEvent) => {
                         try {
                             let detail = JSON.parse(response.detail);
-                            if(detail.success) {
+                            if (detail.success) {
                                 let data = detail.data,
                                     content = data.content;
                                 if (content && content.appUrls) {
@@ -308,6 +308,9 @@ namespace BW {
                         }
                     });
                     self.handle('clientCode', JSON.stringify({event}));
+                },
+                refreshHome() {
+                    self.handle('refreshHome');
                 }
             }
         })(this);

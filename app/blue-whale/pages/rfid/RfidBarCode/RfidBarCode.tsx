@@ -171,7 +171,7 @@ export class RfidBarCode extends Component {
                                         }
 
 
-                                    }}></Toggle>
+                                    }}/>
                         </div>
                         <div className="set-row">
                             <div>累加</div>
@@ -218,7 +218,7 @@ export class RfidBarCode extends Component {
                                         }
 
 
-                                    }}></Toggle>
+                                    }}/>
                         </div>
                     </div>
                     <div class="total-nums">
@@ -641,6 +641,7 @@ export class RfidBarCode extends Component {
             rand = d2 + d1 + '.jpg';
         return rand;
     }
+
 
 
     private InitRfidBarCode(para) {

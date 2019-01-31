@@ -12,23 +12,7 @@ import {Button} from "../../../global/components/general/button/Button";
 import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import d= G.d;
-
-export interface IEditDetailPara extends IComponentPara {
-    isEdit?: boolean;
-    uiType?: string;
-    fm: {
-        caption?: string;//panel 标题，有可能为空
-        fields?: R_Field [];//面板中元素列表  input date 下拉等
-        subButtons?: R_Button[];//操作按钮列表
-        defDataAddrList?: R_ReqAddr[];//默认值获取地址列表
-        dataAddr?: R_ReqAddr;//获取数据后台地址
-        updatefileData?: R_ReqAddr;
-        groupInfo?: IGroupInfo[];
-        signField?: string;
-        inputs?: R_Input[]
-    },
-    url: string;
-}
+import {IDetailBasePara} from "./DetailBase";
 
 export class EditDetailModule extends Component {
 
@@ -48,7 +32,7 @@ export class EditDetailModule extends Component {
         </div>;
     }
 
-    constructor(private para: IEditDetailPara) {
+    constructor(private para: IDetailBasePara) {
         super(para);
         if (this.para.uiType === 'edit_view'){
             this.wrapper.classList.add('edit_view');
@@ -128,7 +112,7 @@ export class EditDetailModule extends Component {
         })
     }
 
-    private initEditModule(para: IEditDetailPara, defaultData: obj) {
+    private initEditModule(para: IDetailBasePara, defaultData: obj) {
         let emPara: EditModulePara = {fields: [], defaultData: defaultData},
             formWrapper = tools.os.ios ? <div className="form-wrapper ios-form"/> : <div className="form-wrapper"/>,
             fields = para.fm.fields || [],

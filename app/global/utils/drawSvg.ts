@@ -138,8 +138,8 @@ export class DrawSvg{
                     let fontSize = sty.font.fontSize;
                     wrapBreak(innerText, loc.w, fontSize).forEach((txt, index) => {
                         let tspan  = <SVGSVGElement>document.createElementNS(DrawSvg.svgUrl,'tspan');
-                        tspan.setAttribute('x',loc.x + '');
-                        tspan.setAttribute('y',fontSize * 1.2 * index + loc.y + '');
+                        // tspan.setAttribute('x',loc.x + '');
+                        tspan.setAttribute('dy',fontSize * 1.2 * index + '');
                         tspan.innerHTML = txt;
                         textDom.appendChild(tspan);
                     })

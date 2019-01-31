@@ -242,3 +242,14 @@
     }
   }
 }
+
+#favSheet{
+  .mui-table-view-cell{
+    position: relative;
+    overflow: hidden;
+    padding: 11px 15px;
+    a{
+      padding: inherit!important;
+    }
+  }
+}

@@ -13,7 +13,7 @@ import {FlowDesigner} from "../flowDesigner/FlowDesigner";
 import {TextInput} from "../../../global/components/form/text/text";
 import {ContactsModule} from "../flowDesigner/ContactsModule";
 import Component = G.Component;
-import {IEditDetailPara} from "./editDetailModule";
+import {IDetailBasePara} from "./DetailBase";
 
 export class ListItemDetail extends Component{
     // DOM容器
@@ -26,11 +26,11 @@ export class ListItemDetail extends Component{
     private keyStepData: obj[] = [];
     private isKeyStep: boolean = false;
 
-    protected wrapperInit(para: IEditDetailPara): HTMLElement {
+    protected wrapperInit(para: IDetailBasePara): HTMLElement {
         return <div className="list-item-detail-wrapper"/>;
     }
 
-    constructor(private para: IEditDetailPara) {
+    constructor(private para: IDetailBasePara) {
         super(para);
         this.ajaxUrl = tools.isNotEmpty(para.fm.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(para.fm.dataAddr) : '';
         this.initDetailTpl(para.fm.fields);
@@ -405,7 +405,6 @@ export class ListItemDetail extends Component{
             if (tools.isNotEmpty(varList)) {
                 def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
             }
-            debugger
             switch (btn.subType) {
                 case 'update_save':
                 case 'insert_save':

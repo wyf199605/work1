@@ -240,11 +240,11 @@ export class EditModule {
                     //fileId 值加入额外数据中
                     let upperKeyData = {};
                     for (let field in data) {
-                        if(field === 'unique'){
+                        if (field === 'unique') {
                             data[p.field.name] = data[field];
                             upperKeyData[p.field.name] = tools.str.toEmpty(data[field]);
                             com.set(data[field]);
-                        }else{
+                        } else {
                             let {key, value} = data[field];
                             upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
                         }
@@ -512,15 +512,15 @@ export class EditModule {
                 let resData = tools.keysVal(response, 'data');
 
                 new Promise<obj>((resolve) => {
-                    if(resData && resData.length > 1 && this.cols){
+                    if (resData && resData.length > 1 && this.cols) {
                         let meta = tools.keysVal(response, 'body', 'bodyList', 0, 'meta') || [];
 
                         let fields: R_Field[] = meta.map((name) => {
-                                let cols = this.cols.filter((col) => {
-                                    return col.name === name;
-                                });
-                                return cols[0] || null;
-                            }).filter((field) => tools.isNotEmpty(field));
+                            let cols = this.cols.filter((col) => {
+                                return col.name === name;
+                            });
+                            return cols[0] || null;
+                        }).filter((field) => tools.isNotEmpty(field));
                         new PickTable({
                             fields: fields,
                             data: resData,
@@ -533,7 +533,7 @@ export class EditModule {
                                 resolve({});
                             }
                         });
-                    }else{
+                    } else {
                         resolve(resData ? resData[0] : {});
                     }
                 }).then((data) => {
@@ -607,6 +607,10 @@ export class EditModule {
                     this.nameFields[name] = null;
                 }
                 coms[name] = this.initFactory('virtual', this.nameFields[name]);
+            }
+            // 特殊控件需要页面数据
+            if (coms[name] instanceof Accessory || coms[name] instanceof UploadImages) {
+                (coms[name] as Accessory | UploadImages).pageData = data;
             }
             //给控件赋值
             coms[name].set(tools.str.toEmpty(data[name]));

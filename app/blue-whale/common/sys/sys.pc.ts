@@ -350,6 +350,10 @@ namespace BW {
                 },
                 reOpen: function (o: winOpen){
                     sys.window.open(o);
+                },
+                refreshHome() {
+                    sys.window.closeAll();
+                    location.reload();
                 }
             };
         }(this));

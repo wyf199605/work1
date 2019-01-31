@@ -737,6 +737,7 @@ export class BwTableModule extends Component {
                 imgHandler(e, true);
             }, 1000))
         } else {
+
             ftable.click.add(trSelector, tools.pattern.throttling((e) => {
                 let td = d.closest(e.target as HTMLElement, 'td'),
                     index = parseInt(td.parentElement.dataset.index);
@@ -859,7 +860,8 @@ export class BwTableModule extends Component {
                         },
                         autoUpload: true,
                         onDelete: (index) => {
-                            images.splice(index, 1);
+                            console.log(index);
+                            delete images[index];
                         },
                         onSuccess: (res) => {
                             if(BwRule.isOldImg(dataType)){
@@ -881,7 +883,7 @@ export class BwTableModule extends Component {
                         },
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
-                                BwRule.isNewImg(dataType) && (cell.data = images.join(','));
+                                BwRule.isNewImg(dataType) && (cell.data = images.filter((a) => !!a).join(','));
                                 console.log(cell.data);
                                 resolve();
                             });
@@ -889,7 +891,9 @@ export class BwTableModule extends Component {
                     });
 
                     layoutImg.set(getImg(cell));
-                    images = [cell.data as string];
+                    if(cell.data && typeof cell.data === 'string'){
+                        images = cell.data.split(',');
+                    }
                     layoutImg.modalShow = true;
                 }
             }
@@ -949,7 +953,9 @@ export class BwTableModule extends Component {
                     Promise.all(defAddrs.map(url => {
                         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(url))
                             .then(({response}) => {
-                                data = Object.assign(data, response.data[0] || {})
+                                // TODO data可能不存在
+                                let resultData = tools.keysVal(response, 'data', 0) || {};
+                                data = Object.assign(data, resultData);
                                 // cb();
                             });
                     })).then(() => {
@@ -1566,7 +1572,7 @@ export class BwTableModule extends Component {
                                 }
                             }
                         });
-                    }, 980)
+                    }, 980);
                     Shell.inventory.columnCountOff(when, 1, inventory, (res) => {
                     })
                 })
@@ -1613,7 +1619,11 @@ export class BwTableModule extends Component {
                         });
                         text = <div>
                             {urls.map((url) => {
-                                return <img style={"max-width: " + (100 / urls.length) + '%;'} src={url} alt=""/>
+                                let width = 100 / urls.length;
+                                return <img style={{
+                                    maxWidth: width - 2 + '%',
+                                    marginRight: '2%'
+                                }} src={url} alt=""/>
                             })}
                         </div>;
                     }
@@ -2612,9 +2622,10 @@ export class BwTableModule extends Component {
             });
         };
 
-        let validate = (editModule: EditModule, cell: FastTableCell): Promise<any> => {
+        let validate = (editModule: EditModule, cell: FastTableCell, checkLinkCell = true): Promise<any> => {
             let promise: Promise<any> = new Promise((resolve, reject) => {
                 let name = cell.name,
+                    row = cell.row,
                     field: R_Field = cell.column.content,
                     fastRow = cell.frow,
                     rowData = fastRow.data,
@@ -2644,6 +2655,35 @@ export class BwTableModule extends Component {
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr/* && tools.isNotEmpty(rowData[name])*/) {
+                    if(checkLinkCell && Array.isArray(this.ui.cols)){
+                        let chkName = field.name;
+                        for(let col of this.ui.cols){
+                            // 不存在chkAddr不继续验证
+                            if(!col.chkAddr || !Array.isArray(col.chkAddr.varList)){
+                                continue;
+                            }
+                            let varList = col.chkAddr.varList,
+                                fieldName = col.name;
+
+                            // 字段名一样不继续验证
+                            if(fieldName === name || fieldName === chkName) {
+                                continue;
+                            }
+
+                            // chkAdd.varList包含修改的cell的字段则不继续验证
+                            if(!varList.some(({varName}) => varName === chkName)){
+                                continue;
+                            }
+                            let linkCell: FastTableCell = row ? row.cellGet(fieldName) as FastTableCell : null;
+
+                            // 此时未触发编辑事件，需给予延时
+                            setTimeout(() => {
+                                // 判断linkCell是否处于编辑状态，否则不予验证
+                                linkCell && !linkCell.editing && validList.push(validate(editModule, linkCell, false));
+                            }, 100);
+
+                        }
+                    }
                     EditConstruct.checkValue(field, rowData, () => {
                         if (this.ftable && this.ftable.editing) {
                             lookUpCell && (lookUpCell.data = null);

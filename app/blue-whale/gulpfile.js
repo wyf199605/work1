@@ -187,7 +187,11 @@ gulp.task('js', function() {
         'listDetail/ListItemDetail',
         'listDetail/ListItemDetailCell',
         'listDetail/DetailModal',
-        'listDetail/editDetailModule'
+        'listDetail/editDetailModule',
+        'listDetail/DetailBase',
+        'listDetail/DetailFormModule',
+        'listDetail/ListItemDetailMain',
+        'listDetail/EditDetail',
     ], 'listDetail.js');
 
     //process模块
@@ -224,6 +228,12 @@ gulp.task('js', function() {
         'uploadModule/bwLayoutImg',
         'uploadModule/ManagerImages',
     ], 'uploadModule.js');
+
+    //newLabelPrint模块
+    gulpTsModule([
+        'labelPrint/newLabelPrint',
+        'labelPrint/labelPrintModal',
+    ], 'newLabelPrint.js');
 
     //changePassword模块
     gulpTsModule(['changePassword/*'], 'passwdModal.js');

@@ -454,82 +454,82 @@ export = class LabelPrintModule {
         //     Modal.alert('无法连接到打印机');
         //     return ;
         // }
-        let tRow = this.onePageRowAndCol.rowNum,
-            tCol = this.onePageRowAndCol.colNum,
-            self = this,
-            tPaData = this.pageData;
-        for (let num = 0; num < this.totalPage; num++) {//循环生成每页的图像
-            // let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            // pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
-            // pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
-            // pageSvg.setAttribute('style', 'background-color:white;');
-            // pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            let pageSvg = document.createElement('div');
-            pageSvg.className = 'label-print-wrapper';
-            pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth}px;
+        setTimeout(() => {
+            let tRow = this.onePageRowAndCol.rowNum,
+                tCol = this.onePageRowAndCol.colNum,
+                self = this,
+                tPaData = this.pageData;
+            for (let num = 0; num < this.totalPage; num++) {//循环生成每页的图像
+                // let pageSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                // pageSvg.setAttribute('width', `${this.userInputValObj.paperWidth}`);
+                // pageSvg.setAttribute('height', `${this.userInputValObj.paperHeight}`);
+                // pageSvg.setAttribute('style', 'background-color:white;');
+                // pageSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+                let pageSvg = document.createElement('div');
+                pageSvg.className = 'label-print-wrapper';
+                pageSvg.setAttribute('style', `width: ${this.userInputValObj.paperWidth}px;
             height: ${this.userInputValObj.paperHeight}px;`);
 
-            this.pageSvgArray.push(pageSvg);
-            let curSize = num * tRow * tCol;
-            for (let row = 0; row < tRow; row++) {
-                for (let col = 0; col < tCol; col++) {
-                    let size = curSize + row * tCol + col;
-                    if (this.jsonData[size]) {
-                        this.printUtil.printLabel(
-                            this.jsonData[size],
-                            tPaData.left + col * (tPaData.labelWidth + tPaData.colSpace),
-                            tPaData.up + row * (tPaData.labelHeight + tPaData.rowSpace),
-                            num);
+                this.pageSvgArray.push(pageSvg);
+                let curSize = num * tRow * tCol;
+                for (let row = 0; row < tRow; row++) {
+                    for (let col = 0; col < tCol; col++) {
+                        let size = curSize + row * tCol + col;
+                        if (this.jsonData[size]) {
+                            this.printUtil.printLabel(
+                                this.jsonData[size],
+                                tPaData.left + col * (tPaData.labelWidth + tPaData.colSpace),
+                                tPaData.up + row * (tPaData.labelHeight + tPaData.rowSpace),
+                                num);
+                        }
                     }
                 }
             }
-        }
-        let dealPrintData = function (uri) {
-            if ('BlueWhaleShell' in window) {
-                let result = BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + uri + '"}');
-            } else if ('AppShell' in window) {
-                let code = self.coms['printer'].get();
-                Shell.printer.labelPrint(1, code, uri, () => {
-                    Modal.toast('打印成功');
-                })
-            } else {
-                Modal.alert('无法连接到打印机');
+            let dealPrintData = function (uri) {
+                if ('BlueWhaleShell' in window) {
+                    let result = BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + uri + '"}');
+                } else if ('AppShell' in window) {
+                    let code = self.coms['printer'].get();
+                    Shell.printer.labelPrint(1, code, uri, () => {
+                        Modal.toast('打印成功');
+                    })
+                } else {
+                    Modal.alert('无法连接到打印机');
+                }
+            };
+            // Array.prototype.forEach.call(this.pageSvgArray[0] && this.pageSvgArray[0].children, () =)
+            if(this.pageSvgArray[0]){
+                for(let svg of this.pageSvgArray[0].children){
+                    // svg.querySelector('g').setAttribute('transfrom', 'scale(10, 10)');
+                    svg.style.backgroundColor = '#fff';
+                    svg.innerHTML = new Array(4).join(svg.innerHTML);
+                    let innerHTML = svg.outerHTML;
+                    let image = new Image();
+                    image.onload = () => {
+                        let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
+                        canvas.style.backgroundColor = '#fff';
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        let ctx = canvas.getContext("2d");
+
+                        ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
+
+                        let dataURL = canvas.toDataURL("image/jpeg", 1);  //返回的是一串Base64编码的URL并指定格式
+
+                        // new Modal({
+                        //     body: canvas,
+                        //     header: '展示',
+                        // });
+
+                        canvas = null; //释放
+                        // console.log(dataURL);
+                        dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));
+                    };
+                    console.log('data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML))));
+                    image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML)));
+                }
             }
-        };
-        // Array.prototype.forEach.call(this.pageSvgArray[0] && this.pageSvgArray[0].children, () =)
-        if(this.pageSvgArray[0]){
-            for(let svg of this.pageSvgArray[0].children){
-                // svg.querySelector('g').setAttribute('transfrom', 'scale(10, 10)');
-                svg.style.backgroundColor = '#fff';
-                svg.innerHTML = new Array(4).join(svg.innerHTML);
-                let innerHTML = svg.outerHTML;
-                let image = new Image();
-                image.onload = () => {
-                    let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
-                    canvas.style.backgroundColor = '#fff';
-                    canvas.width = image.width;
-                    canvas.height = image.height;
-                    let ctx = canvas.getContext("2d");
-
-                    ctx.drawImage(image, 0, 0, image.width, image.height); //使用画布画图
-
-                    let dataURL = canvas.toDataURL("image/jpeg", 1);  //返回的是一串Base64编码的URL并指定格式
-
-                    // new Modal({
-                    //     body: canvas,
-                    //     header: '展示',
-                    // });
-
-                    canvas = null; //释放
-                    // console.log(dataURL);
-                    dealPrintData(dataURL.replace('data:image/jpeg;base64,', ''));
-                };
-                console.log('data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML))));
-                image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(innerHTML)));
-            }
-        }
-
-
+        }, 500);
         /* for(let i = 0,l = this.pageSvgArray.length;i < l;i++){
              let s = new XMLSerializer().serializeToString(this.pageSvgArray[i]);
              let encodedData = Base64.encode(s);
@@ -1196,6 +1196,7 @@ export = class LabelPrintModule {
                                         codeData: codeData[k].codeData ? codeData[k].codeData : 'noData',
                                         codeType: codeData[k].codeType,
                                         alignment: codeData[k].alignment,
+                                        codeRate: codeData[k].codeRate || 2,
                                     });
                             }
                         }

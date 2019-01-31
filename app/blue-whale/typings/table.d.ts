@@ -54,9 +54,9 @@ interface TableModuleConf {
 
 interface printListArr{
     caption:string,
-    dataAddr:R_ReqAddr[],
+    dataAddr:R_ReqAddr,
     labelId:number,
-    templateLink:R_ReqAddr[]
+    templateLink:R_ReqAddr
 }
 
 

@@ -262,18 +262,18 @@ namespace BW {
                 reOpen: function (o: winOpen) {
                     self.handle('reOpen', o);
                 },
-                toClient: function (){
+                toClient: function () {
                     self.handle('toClient');
                 },
-                clientCode: function(callback){
+                clientCode: function (callback) {
                     let event = '__EVT_TO_CLIENT__';
                     d.once(window, event, (response: CustomEvent) => {
                         try {
                             let detail = JSON.parse(response.detail);
-                            if(detail.success){
+                            if (detail.success) {
                                 let data = detail.data,
                                     content = data.content;
-                                if(content && content.appUrls){
+                                if (content && content.appUrls) {
                                     let urls = content.appUrls,
                                         html = '<option value="">-select-</option>';
                                     urls.forEach((item) => {
@@ -287,6 +287,9 @@ namespace BW {
                         }
                     });
                     self.handle('clientCode', {back: event});
+                },
+                refreshHome() {
+                    self.handle('refreshHome');
                 }
             }
         })(this);

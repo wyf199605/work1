@@ -247,8 +247,17 @@ export class BwUploader extends FormCom {
         let promises: Promise<any>[] = [];
         files = this.multi ? files : tools.toArray(files[0]);
         files && files.forEach((file) => {
-            promises.push(this.fileUpload.upload(file).then((data) => {
-                console.log(data);
+            promises.push(this.fileUpload.upload(file).catch((msg) => {
+                msg = msg && typeof msg === 'string' ? msg : '上传失败';
+                Modal.alert(msg);
+                this.wrapper && this.wrapper.classList.add('error');
+                this.setInputValue('上传失败');
+                this.trigger(BwUploader.EVT_UPLOAD_ERROR, file);
+            }))
+        });
+        Promise.all(promises).then((dataArr) => {
+            dataArr.forEach((data, index) => {
+                let file = files[index];
                 this.files.push(file);
                 this.temFiles = [];
                 this.onSuccess && this.onSuccess(data, file);
@@ -257,15 +266,8 @@ export class BwUploader extends FormCom {
                     file
                 });
                 this.value = file.name;
-            }).catch((msg) => {
-                msg = msg && typeof msg === 'string' ? msg : '上传失败';
-                Modal.alert(msg);
-                this.wrapper && this.wrapper.classList.add('error');
-                this.setInputValue('上传失败');
-                this.trigger(BwUploader.EVT_UPLOAD_ERROR, file);
-            }))
-        });
-        Promise.all(promises).then(() => {}).finally(() => {
+            })
+        }).finally(() => {
             this.loading && this.loading.hide();
             this._isFinish = true;
         })
