@@ -10,7 +10,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import d = G.d;
 
 export interface IDetailBasePara extends IComponentPara {
-    isEdit?: boolean;
+    isEdit?: boolean;  // 是否可编辑
     uiType?: string;
     fm: {
         caption?: string;//panel 标题，有可能为空
@@ -28,7 +28,7 @@ export interface IDetailBasePara extends IComponentPara {
 
 export abstract class DetailBase extends Component {
 
-    static detailTypes = ['edit_detail', 'noedit_detail'];
+    static detailTypes = ['edit_detail', 'noedit_detail']; // edit_view
     protected para: IDetailBasePara;
     protected fields: R_Field[];
 
@@ -43,12 +43,12 @@ export abstract class DetailBase extends Component {
         </div>;
     }
 
-    protected ajaxUrl: string = '';
-    public defaultData: obj = {};
-    public currentPage: number = 1;
-    public totalNumber: number = 0;
-    protected keyStepData: obj[] = [];
-    protected isKeyStep: boolean = false;
+    protected ajaxUrl: string = ''; // 获取数据URL
+    public defaultData: obj = {};  // 页面数据
+    public currentPage: number = 1; // 当前页
+    public totalNumber: number = 0; // 总页数
+    protected keyStepData: obj[] = []; // KeyStep数据
+    protected isKeyStep: boolean = false; // 是否是keystep
 
     constructor(para: IDetailBasePara) {
         super(para);
@@ -119,8 +119,8 @@ export abstract class DetailBase extends Component {
      * @date 2019/1/30
      * @Description: 是否可以编辑
      */
-    protected _isEdit: any;
-    abstract get isEdit(): any;
+    protected _isEdit: boolean;
+    abstract get isEdit(): boolean;
     abstract set isEdit(val);
 
     /**
@@ -217,7 +217,7 @@ export abstract class DetailBase extends Component {
      * @date 2019/1/30
      * @Description: 获取数据
      */
-    protected getDetailData() {
+    protected getDetailData(): Promise<obj> {
         return new Promise((resolve) => {
             if (this.isKeyStep === true) {
                 let keyStepData = this.keyStepData || [],

@@ -1107,6 +1107,7 @@ export class RfidBarCode extends Component {
         let num = this.stepArry.length;
         this.domHash['scanamout'].innerHTML = num + '';
     }
+
     private refreshCount(para){
         let where={};
         if (G.tools.isNotEmpty(this.fields)) {

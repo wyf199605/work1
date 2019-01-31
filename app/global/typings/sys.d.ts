@@ -47,6 +47,7 @@ interface SYS_Window{
     toClient?();
     clientCode?(callback: Function);
     // speak?(type:number,text?:string,callback?:Function,error?:Function);
+    refreshHome?();
 }
 
 interface SYS_UI{

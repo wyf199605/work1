@@ -47,14 +47,19 @@ interface IEpcListPara extends IComponentPara{
     bindBtn: {
         itemid: string;
         elementid: string;
-        caption: string;
-        type:string;
-        nohead:string;
-        param:obj;
+        caption: string; //绑定 or 解绑 or 报废 后台配置
+        type:string; //配置类型 可以判断是解绑页还是绑定页
+        nohead:string;//配置字段，是否有 barcode 输入框显示
+        param:obj;//上传参数
     };
 
     epc?: string;
 }
+/**
+ *
+ * @returns 根据调用壳接口 扫到EPC码 添加到表格的一行数据中
+ * 可做删除操作。
+ */
 export class EpcList extends Component {
     private ftable: FastTable;
     private boundEl: HTMLElement; // 已绑定
@@ -98,7 +103,6 @@ export class EpcList extends Component {
             boundEl= this.boundEl;
 
 
-        let i = 0;
         let s = new Button({
             container: wrapper,
             content: '开始扫描',
@@ -122,10 +126,11 @@ export class EpcList extends Component {
                                }
                                 if(flag){
                                    ftables.dataAdd(epcArr);
+                                   //需要统计 表格里面的数据
                                    scanNumEl.innerHTML = parseInt(scanNumEl.innerHTML) + epcArr.length + '';
                                 }
                             })
-
+                           // 需要实时的在扫描过程中，持续上传数据
                             tools.pattern.debounce(this.senData,500)
                         }
                     });
@@ -135,7 +140,7 @@ export class EpcList extends Component {
                 } else {
                     console.log(this.ftable.data);
                     clearInterval(this.bindBarTime)
-                    G.Shell.inventory.stopEpc({}, function (res) {});
+                    G.Shell.inventory.stopEpc({}, function () {});
                     s.content = "开始扫描";
                 }
             }
@@ -198,6 +203,7 @@ export class EpcList extends Component {
 
         d.append(this.wrapper, wrapper);
     }
+    //创建表格
     private tableInit() {
         let ftable = new FastTable({
             container: this.wrapper,
@@ -209,7 +215,7 @@ export class EpcList extends Component {
                 let fragDoc = document.createDocumentFragment();
                 d.append(fragDoc, data);
                 d.append(fragDoc, <div className="delete">x</div>);
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     resolve({
                         text: fragDoc
                     });
@@ -252,6 +258,7 @@ export class EpcList extends Component {
 
     }
     private bingCell:object = {};
+    //根据后台配置的类型 type 决定是否显示需要输入的barcode值
     public judge(para: IEpcListPara) {
 
          if (para.bindBtn.type === '0') {
@@ -265,6 +272,7 @@ export class EpcList extends Component {
 
         private  colConfig(bindBtn: { itemid: string; elementid: string; caption: string; type:string,param:obj}){
             let param = tools.isNotEmpty(bindBtn.param) ? bindBtn.param : {};
+            //epc上传需要传入的参数
             let address = tools.url.addObj(`/inventoryrfid/getdata/${bindBtn.itemid}/${bindBtn.elementid}`, param),
                 line = d.query('.bind-data',this.wrapper),
                 temp = document.createDocumentFragment();

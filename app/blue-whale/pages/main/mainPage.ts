@@ -60,6 +60,8 @@ export = class MainPage {
         MainPage.myselfMenu.init();
         MainPage.rightSidebar.init();
         MainPage.search.init(props);
+        let platformName = User.get().platformName;
+        d.query('.navbar-brand .nav-bluewhale', window.document.body).innerText = platformName || '速狮';
         /*let url = `${conf.urlAppid}/v1/commonui/pageroute?page=defaultTab`;
           sys.window.open({url});*/
     }
@@ -391,7 +393,7 @@ export = class MainPage {
 
         }
 
-        function openWindow(url: string, title: string){
+        function openWindow(url: string, title: string) {
             if (sysPcHistory.indexOf(url) >= 0) {
                 sys.window.refresh(url);
             }
@@ -465,12 +467,12 @@ export = class MainPage {
                 let msgDom = d.query('.messagesContent'),
                     unreadMsgNum = d.query('#unreadMsgNum'),
                     num = localMsg.getUnreadCount();
-                if(num > 0){
+                if (num > 0) {
                     unreadMsgNum.classList.remove('hide');
                     unreadMsgNum.innerText = num + '';
                 }
                 d.on(msgDom, 'click', function () {
-                    sys.window.open({url: CONF.url.msgList, title : '消息'});
+                    sys.window.open({url: CONF.url.msgList, title: '消息'});
                 });
             });
         }
