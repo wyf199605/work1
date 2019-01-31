@@ -208,10 +208,11 @@ export class NewLabelPrint {
         })
     }
 
-    getPrintData(): Promise<{ tmp: ILabelPrintResponse, data: obj[] }> {
-        // 获取模板数据与需打印的表格数据
+    // 获取模板数据与需打印的表格数据
+    getPrintData(): Promise<{ tmp: ILabelPrintResponse, data: obj[], title: string }> {
         let index = this.printModal.getData('labelType'),
             dataAddr = this.ui.printList[index].dataAddr,
+            caption = this.ui.printList[index].caption,
             templateLink = this.ui.printList[index].templateLink,
             isAll = !!this.printModal.getData('printData')[0],
             tableData = isAll ? this.getSelectedData() : this.getData(), //获取选中数据或全部数据
@@ -243,7 +244,8 @@ export class NewLabelPrint {
                     data = tools.keysVal(response2, 'data') as obj[];
                 resolve({
                     tmp: tmp,
-                    data: data
+                    data: data,
+                    title: caption
                 })
             }).catch((e) => {
                 reject(e);
@@ -252,10 +254,10 @@ export class NewLabelPrint {
     }
 
     // 根据模板数据与表格数据，获取全部生成的svg标签
-    getLabels(): Promise<{svgList: SvgDraw[], wrapper: HTMLElement, tmp: ILabelPrintResponse, data: obj[]}>{
+    getLabels(): Promise<{svgList: SvgDraw[], wrapper: HTMLElement, tmp: ILabelPrintResponse, data: obj[], title: string}>{
         return new Promise((resolve, reject) => {
 
-            this.getPrintData().then(({tmp, data}) => {
+            this.getPrintData().then(({tmp, data, title}) => {
                 let svgList: SvgDraw[] = [],
                     wrapper = <div/>;
 
@@ -279,11 +281,13 @@ export class NewLabelPrint {
                     d.append(wrapper, svg.svgEl);
                 });
 
+
                 resolve({
                     svgList,
                     wrapper,
                     tmp,
-                    data
+                    data,
+                    title
                 })
             }).catch((e) => {
                 reject(e);
@@ -370,7 +374,7 @@ export class NewLabelPrint {
 
     // 预览方法
     preview(){
-        return this.getLabels().then(({svgList, tmp, data}) => {
+        return this.getLabels().then(({svgList, tmp, data, title}) => {
             let settingData: obj = this.printModal.data,
                 dpi = getDpi() / 10, // 分辨率，宽高边距均为毫米，乘分辨率便为像素
                 width = settingData.width * dpi,
@@ -489,9 +493,11 @@ export class NewLabelPrint {
 
             inputBox.addItem(prevBtn);
             inputBox.addItem(nextBtn);
+
+            title = title ? '预览 - ' + title : '预览';
             let modal = new Modal({
                 header: {
-                    title: '预览',
+                    title: title,
                     isFullScreen: true
                 },
                 container: this.container,
@@ -564,7 +570,7 @@ export class NewLabelPrint {
                         x: item.leftPos * scale,
                         y: item.topPos * scale,
                         data: NewLabelPrint.getTmpData(item.codeData, data)
-                    })
+                    });
                 } else {
                     // 其余为条形码
                     svg.drawBarCode({
@@ -576,7 +582,7 @@ export class NewLabelPrint {
                         barCodeWidth: 1,
                         align: NewLabelPrint.alignTag[item.alignment], // 对齐方式
                         format: NewLabelPrint.codeType[type] // 条形码类型
-                    })
+                    });
                 }
 
             }
