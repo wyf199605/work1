@@ -1,10 +1,12 @@
 .btn-group-container {
-  display: flex;
-  overflow: scroll;
+  white-space: nowrap;
+  overflow-x: auto;
   &::-webkit-scrollbar {
     width: 0px;
+    height: 0px;
   }
   .btn {
+    display: inline-block;
     border: none;
     border-radius: 0px;
   }
