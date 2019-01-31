@@ -108,6 +108,7 @@ export class NewLabelPrint {
         this.getSelectedData = para.getSelectedData;
         this.container = para.container;
 
+        // 根据printList生成打印标签类型
         let printList: { text: string, value: any }[] = [];
         if (Array.isArray(this.ui.printList)) {
             printList = this.ui.printList.map((item, index) => {
@@ -117,6 +118,8 @@ export class NewLabelPrint {
                 }
             })
         }
+
+        // 获取壳接口的打印机信息，生成打印机选项
         let printerData = [{text: '默认', value: 0}];
         try {
             let printList = Shell.printer.get();
@@ -134,6 +137,8 @@ export class NewLabelPrint {
         }catch (e){
             console.log(e);
         }
+
+        // 初始化模态框组件
         this.printModal = new LabelPrintModal({
             container: para.container,
             onClick: (type) => {
@@ -168,6 +173,7 @@ export class NewLabelPrint {
             printList,
             printerData
         });
+        // 设置默认数据
         this.printModal.data = this.getDefaultProp();
     }
 
@@ -176,6 +182,7 @@ export class NewLabelPrint {
     }
 
     getDefaultProp(): obj {
+        // 获取默认数据
         let defaultVal = {};
         try {
             defaultVal = JSON.parse(this.ui.printSetting);
@@ -187,6 +194,7 @@ export class NewLabelPrint {
     }
 
     setDefaultProp(): Promise<any> {
+        // 设置默认数据
         let data = this.printModal.data;
         return BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.ajaxUrl.labelDefault, {'item_id': this.ui.itemId}), {
             type: 'POST',
@@ -201,13 +209,15 @@ export class NewLabelPrint {
     }
 
     getPrintData(): Promise<{ tmp: ILabelPrintResponse, data: obj[] }> {
+        // 获取模板数据与需打印的表格数据
         let index = this.printModal.getData('labelType'),
             dataAddr = this.ui.printList[index].dataAddr,
             templateLink = this.ui.printList[index].templateLink,
             isAll = !!this.printModal.getData('printData')[0],
-            tableData = isAll ? this.getSelectedData() : this.getData(),
+            tableData = isAll ? this.getSelectedData() : this.getData(), //获取选中数据或全部数据
             ajaxData: any;
 
+        // 没有获取到数据则不继续
         if (tableData.length === 0) {
             Modal.alert('没有数据选中');
             return Promise.reject();
@@ -241,6 +251,7 @@ export class NewLabelPrint {
         });
     }
 
+    // 根据模板数据与表格数据，获取全部生成的svg标签
     getLabels(): Promise<{svgList: SvgDraw[], wrapper: HTMLElement, tmp: ILabelPrintResponse, data: obj[]}>{
         return new Promise((resolve, reject) => {
 
@@ -248,18 +259,21 @@ export class NewLabelPrint {
                 let svgList: SvgDraw[] = [],
                     wrapper = <div/>;
 
+                // 获取需要金额格式化的字段名称
                 let moneys = tmp.selectFields.filter((field) => {
                     return field.atrrs ? field.atrrs.dataType == '11' : false;
                 });
 
                 data.forEach((item, index) => {
                     let data = Object.assign({}, item || {});
+                    // 格式化金额数据
                     for (let money of moneys) {
                         let key = money.fieldName;
                         if (data[key]) {
                             data[key] = '¥' + Rule.parseNumber(data[key], money.atrrs.displayFormat);
                         }
                     }
+                    // 默认将svg放置到body上
                     let svg = this.initPrintSvg(tmp, data);
                     svgList.push(svg);
                     d.append(wrapper, svg.svgEl);
@@ -354,10 +368,11 @@ export class NewLabelPrint {
         })
     }
 
+    // 预览方法
     preview(){
         return this.getLabels().then(({svgList, tmp, data}) => {
             let settingData: obj = this.printModal.data,
-                dpi = settingData.ratio,
+                dpi = getDpi() / 10, // 分辨率，宽高边距均为毫米，乘分辨率便为像素
                 width = settingData.width * dpi,
                 height = settingData.height * dpi,
                 paddingLeft = settingData.left * dpi,
@@ -367,10 +382,10 @@ export class NewLabelPrint {
                 rowSpace = this.printModal.getData('rowSpace') * dpi,
                 colSpace = this.printModal.getData('colSpace') * dpi,
                 isLengthWays = settingData.horizontalRank,
-                isHorizontal = !settingData.direction,
+                isHorizontal = !settingData.direction[0], // 横向时，将宽高互换
                 scale = settingData.scale;
 
-            if(!isHorizontal){
+            if(isHorizontal){
                 [width, height] = [height, width];
             }
 
@@ -404,13 +419,24 @@ export class NewLabelPrint {
 
             let svgHeight = tmp.height * NewLabelPrint.scale,
                 svgWidth = tmp.width * NewLabelPrint.scale,
-                pageSize = (Math.floor((width - paddingLeft - paddingRight) / (svgWidth + colSpace))
-                    * Math.floor((height - paddingTop - paddingBottom) / (svgHeight + rowSpace))) || 1,
-                total = Math.ceil(data.length / (pageSize));
+                row = Math.floor((height - paddingTop - paddingBottom + rowSpace) / (svgHeight + rowSpace)),
+                col = Math.floor((width - paddingLeft - paddingRight + colSpace) / (svgWidth + colSpace)),
+                pageSize = (row * col) || 1,
+                total = Math.ceil(data.length / (pageSize)),
+                marginRight = 'marginRight',
+                marginBottom = 'marginBottom';
+            if(isLengthWays){
+                [marginRight, marginBottom] = [marginBottom, marginRight]
+            }
 
-            svgList.slice(0, pageSize).forEach((svg) => {
-                svg.svgEl.style.marginRight = colSpace + 'px';
-                svg.svgEl.style.marginBottom = rowSpace + 'px';
+            svgList.slice(0, pageSize).forEach((svg, index, {length}) => {
+                if((index + 1) % col !== 0){
+                    svg.svgEl.style[marginRight] = colSpace + 'px';
+                }
+                if(index < length - col){
+                    svg.svgEl.style[marginBottom] = rowSpace + 'px';
+                }
+
                 d.append(wrapper, svg.svgEl);
             });
 
@@ -418,9 +444,13 @@ export class NewLabelPrint {
             function toPageSvg(num: number){
                 let arr = svgList.slice(num * pageSize, (num + 1) * pageSize);
                 wrapper.innerHTML = '';
-                arr.forEach((svg) => {
-                    svg.svgEl.style.marginRight = colSpace + 'px';
-                    svg.svgEl.style.marginBottom = rowSpace + 'px';
+                arr.forEach((svg, index, {length}) => {
+                    if((index + 1) % col !== 0){
+                        svg.svgEl.style[marginRight] = colSpace + 'px';
+                    }
+                    if(index < length - col){
+                        svg.svgEl.style[marginBottom] = rowSpace + 'px';
+                    }
                     d.append(wrapper, svg.svgEl);
                 });
                 zoom.scale(1).translate([0, 0]);
@@ -496,30 +526,33 @@ export class NewLabelPrint {
             container: document.body
         });
 
+        // 生成文字信息
         lableDatas && lableDatas.forEach((item) => {
+            // forFill为false时，则不打印，可以预览，以下类型一样
             if (!isPrint || (tools.isEmpty(item.forFill) || item.forFill)) {
                 let fontObj = Object.assign({}, defaultFont, item.font) as ILabelTextFont,
                     {r, g, b} = tools.val2RGB(fontObj.fontColor),
                     text = NewLabelPrint.getTmpData(item.dataName, data);
 
                 svg.drawText({
-                    data: text,
+                    data: text, // 文字信息
                     width: (item.width || 0) * scale,
                     x: item.leftPos * scale,
                     y: item.topPos * scale,
                     height: item.height * scale,
-                    font: {
+                    font: { // 字体相关
                         size: fontObj.fontSize * scale,
                         family: fontObj.fontName,
                         color: `rgb(${r}, ${g}, ${b})`,
                         weight: fontObj.fontStyle == 1 && 'bold'
                     },
-                    align: NewLabelPrint.alignTag[item.alignment],
-                    isWrap: item.wrapping || false
+                    align: NewLabelPrint.alignTag[item.alignment], // 对齐方式
+                    isWrap: item.wrapping || false // 是否换行
                 })
             }
         });
 
+        // 生成二维码或条形码
         lableCodes && lableCodes.forEach((item) => {
             if (!isPrint || (tools.isEmpty(item.forFill) || item.forFill)) {
                 let type = item.codeType;
@@ -533,6 +566,7 @@ export class NewLabelPrint {
                         data: NewLabelPrint.getTmpData(item.codeData, data)
                     })
                 } else {
+                    // 其余为条形码
                     svg.drawBarCode({
                         data: NewLabelPrint.getTmpData(item.codeData, data),
                         width: item.width * scale,
@@ -540,14 +574,15 @@ export class NewLabelPrint {
                         x: item.leftPos * scale,
                         y: item.topPos * scale,
                         barCodeWidth: 1,
-                        align: NewLabelPrint.alignTag[item.alignment],
-                        format: NewLabelPrint.codeType[type]
+                        align: NewLabelPrint.alignTag[item.alignment], // 对齐方式
+                        format: NewLabelPrint.codeType[type] // 条形码类型
                     })
                 }
 
             }
         });
 
+        // 打印图片
         lableGraphs && lableGraphs.forEach((item) => {
             if (!isPrint || (tools.isEmpty(item.forFill) || item.forFill)) {
                 svg.drawImage({
@@ -612,4 +647,24 @@ export class NewLabelPrint {
     }
 
 
+}
+
+function getDpi(): number{
+    let arrDPI = [];
+    if (window.screen.deviceXDPI) {
+        arrDPI[0] = window.screen.deviceXDPI;
+        arrDPI[1] = window.screen.deviceYDPI;
+    }
+    else {
+        let tmpNode = document.createElement("div");
+        tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+        document.body.appendChild(tmpNode);
+        arrDPI[0] = tmpNode.offsetWidth;
+        arrDPI[1] = tmpNode.offsetHeight;
+        tmpNode.parentNode.removeChild(tmpNode);
+    }
+    let dpi = arrDPI[0],
+        scale = 72 / 28.346;
+
+    return dpi / scale;
 }

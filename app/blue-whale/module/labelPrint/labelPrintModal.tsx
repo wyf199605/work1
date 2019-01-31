@@ -45,6 +45,7 @@ export class LabelPrintModal extends Component{
 
     }
 
+    // 设置com的数据
     set data(data: obj){
         for(let key in data){
             let com = this.coms[key];
@@ -52,6 +53,7 @@ export class LabelPrintModal extends Component{
         }
     }
 
+    // 获取全部数据
     get data(){
         let data: obj = {};
         for(let key in this.coms){
@@ -60,16 +62,18 @@ export class LabelPrintModal extends Component{
         return data;
     }
 
+    // 获取对应com的数据
     getData(name: string){
         let com = this.coms[name];
         return com ? com.get() : null;
     }
 
+    // 生成旋转小图标
     static createSpinner(btn: Button): {close: Function}{
         btn && (btn.isDisabled = true);
         let spinner =  new Spinner({
             el: btn.wrapper,
-            type: Spinner.SHOW_TYPE.replace,
+            type: Spinner.SHOW_TYPE.cover,
             time: 12000,
             onTimeout: () => {
                 btn && (btn.isDisabled = false);
@@ -86,6 +90,7 @@ export class LabelPrintModal extends Component{
         }
     }
 
+    // 初始化模态框以及对应按钮及事件
     protected initModal(para: ILabelPrintModalPara){
         let leftInputBox = new InputBox(),
             rightInputBox = new InputBox(),
@@ -150,6 +155,7 @@ export class LabelPrintModal extends Component{
         return this.modal.isShow;
     }
 
+    // 初始化模态框里面的数据
     protected initContent(){
         this.tab = new Tab({
             tabParent: this.wrapper,
@@ -195,7 +201,7 @@ export class LabelPrintModal extends Component{
     }
 
     /**
-     * 初始化模板标签
+     * 初始化模板标签控件
      * @param {string} name
      * @param {HTMLElement} el
      */
@@ -415,6 +421,7 @@ export class LabelPrintModal extends Component{
         }
     }
 
+    // 生成设置对应的dom
     protected static createSettingPage(): HTMLElement{
         return <div className="setDom">
             <div className='leftSet'>
@@ -466,12 +473,14 @@ export class LabelPrintModal extends Component{
         </div>
     }
 
+    // 生成选项对应的dom
     protected static createOptionPage(): HTMLElement{
         return <div className="labelTypeDom">
             <div data-name="labelType"> <span>标签类型</span> </div>
         </div>
     }
 
+    // 下拉框数据社会
     selectInputJson = {
         printer: [{text: '默认', value: 0}],
         port: [{text: '25', value: 25}, {text: '8080', value: 8080}],
