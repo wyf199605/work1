@@ -3,7 +3,6 @@ import BasicPage from "../basicPage";
 import {ListItemDetail} from "../../module/listDetail/ListItemDetail";
 import {BwRule} from "../../common/rule/BwRule";
 import {EditDetailModule} from "../../module/listDetail/editDetailModule";
-import {EditDetail} from "../../module/listDetail/EditDetail";
 
 export class ListDetailPage extends BasicPage {
     constructor(para: EditPagePara) {

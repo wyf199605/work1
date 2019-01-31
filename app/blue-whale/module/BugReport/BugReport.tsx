@@ -67,13 +67,13 @@ export class BugReport extends Component {
             <div className="form-group">
                 <div className="form-text" data-name="title">
                 </div>
-                <div className="form-textarea" data-name="detail"></div>
+                <div className="form-textarea" data-name="detail"/>
                 <div className="form-img" data-name="uploader">
-                    <div className="uploader-wrapper"></div>
+                    <div className="uploader-wrapper"/>
                 </div>
                 <div className="msg">温馨提示: 最多可上传5张图片和1个短视频</div>
             </div>
-            <div className="submit" data-name="submit"></div>
+            <div className="submit" data-name="submit"/>
         </form>;
 
         this.formEle = {
@@ -119,7 +119,7 @@ export class BugReport extends Component {
                     break;
                 case 'uploader':
                     let addImg = <div className="addImage">
-                            <div className="upload"></div>
+                            <div className="upload"/>
                         </div>,
                         elWrap = d.query('.uploader-wrapper', el);
                     let type = '',
@@ -381,7 +381,7 @@ export class BugReport extends Component {
         } else {
             imgWrapper = <div className="upload-img" data-index="0" data-type="video">
                 <video src={url}></video>
-                <i className="appcommon app-shipin"></i>
+                <i className="appcommon app-shipin"/>
                 <div className="close-ball">×</div>
             </div>;
         }
@@ -394,7 +394,7 @@ export class BugReport extends Component {
         } else {
             imgWrapper.dataset.type = 'video-error';
         }
-        imgWrapper.appendChild(<div className="bug-error"><i className="appcommon app-shibai"></i><br/>传输失败</div>);
+        imgWrapper.appendChild(<div className="bug-error"><i className="appcommon app-shibai"/><br/>传输失败</div>);
         isImg && this.setDataIndex();
     }
 
