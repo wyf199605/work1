@@ -737,6 +737,7 @@ export class BwTableModule extends Component {
                 imgHandler(e, true);
             }, 1000))
         } else {
+
             ftable.click.add(trSelector, tools.pattern.throttling((e) => {
                 let td = d.closest(e.target as HTMLElement, 'td'),
                     index = parseInt(td.parentElement.dataset.index);

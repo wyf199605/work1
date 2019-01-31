@@ -83,7 +83,8 @@ export class ChangeProject extends Modal {
                 this.onOk = () => {
                     let selectItem = this.selectItem;
                     if (tools.isNotEmpty(selectItem) && selectItem.text != this.current) {
-                        BwRule.Ajax.fetch(BW.CONF.ajaxUrl.projectList, {
+                        let token = localStorage.getItem('token');
+                        BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.ajaxUrl.projectList, {token: token}), {
                             type: 'PUT',
                             data: {
                                 platform_seq: selectItem['value'],
@@ -96,22 +97,15 @@ export class ChangeProject extends Modal {
                                 platformName: selectItem.text
                             }));
                             Modal.toast(response.msg);
-                            if (tools.isMb) {
-                                sys.window.open({
-                                    url:BW.CONF.url.main
-                                });
-                            } else {
-                                sys.window.closeAll();
-                                location.reload();
-                            }
+                            sys.window.refreshHome();
                         }).catch(err => {
                             console.log(err);
                         });
                         this.destroy();
-                    }else{
-                        if (tools.isEmpty(selectItem)){
+                    } else {
+                        if (tools.isEmpty(selectItem)) {
                             Modal.alert('请选择需要切换的项目!');
-                        }else{
+                        } else {
                             Modal.alert('当前已经是该项目，请勿重复切换!');
                         }
                     }

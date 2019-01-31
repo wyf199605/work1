@@ -36,7 +36,7 @@ $desktop: 800px; $tablet: 600px; $mobile: 480px;
 $nav-height: 40px;
 $nav-receive-height: $nav-height - 1px;
 $nav-line-height: 3*$nav-height/5;
-$nav-font-size: 18*$nav-height/30;
+$nav-font-size: 18*$nav-height/40;
 $nav-padding1: round($nav-height/10*3-5);
 $nav-padding2: round($nav-height/5*2-11);
 $nav-calc: calc(100vh - #{$nav-height});

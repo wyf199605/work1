@@ -1,19 +1,19 @@
 // import GLOBAL_CONF = require('conf.ts');
-namespace BW{
+namespace BW {
     import tools = G.tools;
     import d = G.d;
 
-    export class SYSH5 implements SYS_Type{
+    export class SYSH5 implements SYS_Type {
         public os: string;
-        public isMb : boolean;
-        public window = (function(self){
+        public isMb: boolean;
+        public window = (function (self) {
             let closeConfirmConfig: ICloseConfirmPara = null;
 
             return {
                 uploadVersion: function () {
 
                 },
-                backHome: function (){
+                backHome: function () {
                     sys.window.open({
                         url: CONF.url.main
                     });
@@ -25,28 +25,28 @@ namespace BW{
                 },
                 close: function (event: string, data: object) {
                     closeConfirmConfig = closeConfirmConfig || {};
-                    let {msg, noHandler, btn, condition} = closeConfirmConfig ;
-                    if(msg && typeof condition !== 'function') {
+                    let {msg, noHandler, btn, condition} = closeConfirmConfig;
+                    if (msg && typeof condition !== 'function') {
                         condition = () => true;
                     }
-                    if(msg) {
-                        let flagPromise =  condition() ;
-                        if(!(flagPromise instanceof Promise)){
+                    if (msg) {
+                        let flagPromise = condition();
+                        if (!(flagPromise instanceof Promise)) {
                             flagPromise = Promise.resolve(!!flagPromise);
                         }
                         flagPromise.then(flag => {
-                            if(!flag){
+                            if (!flag) {
                                 close();
                                 return;
                             }
                             require(['Modal'], function (m) {
                                 m.Modal.confirm({
-                                    msg:  msg,
+                                    msg: msg,
                                     btns: btn ? btn : ['不关闭', '关闭'],
                                     callback: (flag: boolean) => {
-                                        if(flag){
+                                        if (flag) {
                                             tools.isFunction(noHandler) && noHandler();
-                                        }else{
+                                        } else {
                                             close();
                                         }
                                     }
@@ -58,7 +58,7 @@ namespace BW{
                     history.back();
                 },
                 set closeConfirm(obj: ICloseConfirmPara) {
-                    if(obj) {
+                    if (obj) {
                         closeConfirmConfig = Object.assign({msg: '是否关闭页面？'}, obj);
                     } else {
                         closeConfirmConfig = null;
@@ -90,9 +90,9 @@ namespace BW{
                     toast('您的设备暂不支持复制');
                 },
                 getGps: function (callback: Function) {
-                    callback({gps:{},success:true});
+                    callback({gps: {}, success: true});
                 },
-                openGps: function(){
+                openGps: function () {
 
                 },
                 update: function () {
@@ -112,9 +112,9 @@ namespace BW{
                     a = null;
                 },
                 firePreviousPage: function () {
-                    
+
                 },
-                fire : function (type : string, data? : obj,) {
+                fire: function (type: string, data?: obj,) {
                     tools.event.fire(type, data, window);
                 },
                 getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
@@ -135,8 +135,13 @@ namespace BW{
                     });
                     input.click();
                 },
-                reOpen: function (o: winOpen){
+                reOpen: function (o: winOpen) {
                     sys.window.open(o);
+                },
+                refreshHome() {
+                    sys.window.open({
+                        url: BW.CONF.url.main
+                    })
                 }
             }
         })(this);
