@@ -19,6 +19,7 @@ export function InventoryBtn(btn: Button, bwTable: BwTableModule,) {
     let rBtn: R_Button = btn.data;
     let session;
     if (rBtn.openType === 'rfid_down') {
+        //盘点下载
         //获取下载地址
         let uploadUrl: string = "";
         bwTable.ui.subButtons.forEach((value, index) => {
@@ -39,6 +40,7 @@ export function InventoryBtn(btn: Button, bwTable: BwTableModule,) {
 
         //btn.content = btn.content.replace(/上传/g,"更新");
     } else if (rBtn.openType === 'rfid_begin' || rBtn.openType === 'rfid_stop') {
+        //开始盘点
         start(rBtn.openType, btn, bwTable);
         //检索数据中FIELD是行数
 

@@ -1210,10 +1210,10 @@ export class BwTableModule extends Component {
         d.prepend(this.wrapper, <div className="table-module-report">{reportCaption}</div>);
     }
 
-    private countElements: objOf<HTMLElement> = {};
+    private countElements: objOf<HTMLElement> = {}; //存储哈希表 表列头的结构
     private OLD_DIFFAMOUNT: number = 0;
 
-//根据列头实时更新方法
+//根据列头实时更新统计
     public rfidColthead() {
 
         let rfidCols = this.ui.rfidCols,
@@ -1300,7 +1300,7 @@ export class BwTableModule extends Component {
         }
     }
 
-//下载更新后列统计
+//下载更新后表列头统计
     public rfidDownAndUpInitHead() {
         let rfidCols = this.ui.rfidCols,
             ftable = this.ftable;
@@ -1394,6 +1394,7 @@ export class BwTableModule extends Component {
         return sum;
     }
 
+    //进入盘点页面 初始化
     public rfidColInit() {
         let rfidCols = this.ui.rfidCols,
             ftable = this.ftable,
@@ -1426,6 +1427,7 @@ export class BwTableModule extends Component {
             }
 
         }
+        //创建表列头  页面结构
         let wrapper = <div className="table-module-amount">{
 
             Array.isArray(rfidCols.calcData) && rfidCols.calcData.map((val) => {
@@ -1439,6 +1441,7 @@ export class BwTableModule extends Component {
 
         }
         </div>;
+        // 盘点需要配置的 已扫描量字段 scanField
         if (rfidCols.scanFieldName) {
             let scan = <span>0</span>;
             this.countElements['scanyet'] = scan;
@@ -1451,11 +1454,12 @@ export class BwTableModule extends Component {
             }
         }
 
-        //监听渲染
+        //监听表格 渲染数据
         ftable.on(FastTable.EVT_RENDERED, () => {
             let subBtn = this.ui.subButtons;
             //if (Array.isArray(subBtn) && subBtn.some(btn => btn.openType === 'rfid_begin')) {
 
+            //调用壳接口 获取扫到的数据 与表格数据做判断  如果已经有该条数据 就更新,如果没有就渲染添加
             if (rfidCols.inventoryKey && rfidCols.classify) {
                 let column = ftable.columnGet(rfidCols.classify.toUpperCase());
                 Shell.inventory.getData(rfidCols.inventoryKey, rfidCols.classify.toUpperCase(), (res) => {
@@ -1510,9 +1514,10 @@ export class BwTableModule extends Component {
                     }
                 }
             });
-            let inventory = rfidCols.inventoryKey ? rfidCols.inventoryKey : "key";
+            let inventory = rfidCols.inventoryKey ? rfidCols.inventoryKey : "key"; //盘点单 作为参数传入壳接口
             if (tools.isNotEmpty(rfidCols.calc)) {
                 Shell.inventory.columnCountOn(when, 1, inventory, true, false, (res) => {
+                    //渲染表列头数据，以及根据后台配置的规则进行计算
                     let resData = typeof res.data !== 'object' ? {} : res.data || {};
 
                     if (tools.isEmpty(resData)) {
@@ -1545,6 +1550,7 @@ export class BwTableModule extends Component {
                         colHeadStr['SCANAMOUNT'] = ((resData.Calculate === undefined) ? "0" : resData.CalculateScan);
                     }
                     colHeadStr['OLD_DIFFAMOUNT'] = this.OLD_DIFFAMOUNT;
+
                     setTimeout(() => {
                         calcRule.forEach(calc => {
                             let {field, rule} = calc;

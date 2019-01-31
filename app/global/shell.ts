@@ -336,9 +336,21 @@ namespace G{
             returnEpcbyTime(epcs : string[] | null, time : number, turn, back){
                 return ShellBase.handler('rfid',{type:'returnEpcbyTime', epcs, time, turn},back);
             },
+            /**
+             *
+             * @param {obj} value - 盘点模式设置值
+             * @param {G.IShellEventHandler} back
+             * @returns {boolean}
+             */
             setPwm (value:obj,back:IShellEventHandler) {
                 return ShellBase.handler('rfid',{type:'setPwm',value},back);
             },
+            /**
+             *
+             * 获取当前盘点模式的值
+             * @param {G.IShellEventHandler} back
+             * @returns {boolean}
+             */
             getPwn (back:IShellEventHandler) {
                 return ShellBase.handler('rfid',{type:'getPwm'},back);
             },
@@ -376,9 +388,21 @@ namespace G{
             getData(inventoryKey :string,field:string,back:IShellEventHandler) {
                 return ShellBase.handler('getData',{inventoryKey,field}, back,null,false);
             },
+            /**
+             *
+             * @param {obj} value - 获取盘点已扫描量
+             * * @param {G.IShellEventHandler} back
+             * @returns {boolean}
+             */
             getScanCount(summary:string,back:IShellEventHandler) {
                 return ShellBase.handler('getScanCount',{summary}, back,null,false);
             },
+            /**
+             *
+             * @param {obj}  - 获取表列头统计的数值
+             * * @param {G.IShellEventHandler} back
+             * @returns {boolean}
+             */
             columnCountOn (when:obj,time:number,inventoryKey :string,once:boolean,out:boolean,back:IShellEventHandler) {
                 return ShellBase.handler('getColumnCount',{when:when,time:time,turn:true,inventory:inventoryKey,once:once,out:out},back,null,false);
             },
