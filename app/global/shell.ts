@@ -537,16 +537,10 @@ namespace G{
         }
     })(window, document);
 
-    interface IPostMessage {
-        action : string,
-        data? : string,
-        back? : string,
-        info? : string
-    }
     declare const AppShell: {
         syncFunction(name: string, data: string): string;
         asyncFunction(name: string, data: string, back: string, infor?:string): boolean;
-        postMessage(para : IPostMessage);   // ios仅支持传一个json对象
+        postMessage(para : {action : string, data? : string, back? : string, info? : string});   // ios仅支持传一个json对象
         postMessage(action : string, data : string);  // android or pc
     };
 
