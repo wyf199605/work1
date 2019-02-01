@@ -190,7 +190,7 @@ gulp.task('js', function() {
         'listDetail/editDetailModule',
         'listDetail/DetailBase',
         'listDetail/DetailFormModule',
-        'listDetail/ListItemDetailMain',
+        'listDetail/DetailMain',
         'listDetail/EditDetail',
     ], 'listDetail.js');
 

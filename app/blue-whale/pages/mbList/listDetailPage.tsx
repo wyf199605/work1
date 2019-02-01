@@ -1,32 +1,19 @@
 /// <amd-module name="ListDetailPage"/>
 import BasicPage from "../basicPage";
-import {ListItemDetail} from "../../module/listDetail/ListItemDetail";
 import {BwRule} from "../../common/rule/BwRule";
-import {EditDetailModule} from "../../module/listDetail/editDetailModule";
+import {DetailMain} from "../../module/listDetail/DetailMain";
 
 export class ListDetailPage extends BasicPage {
     constructor(para: EditPagePara) {
         super(para);
-        let details = ['edit_detail', 'noedit_detail','edit_view'];
-        if (~details.indexOf(para.uiType)) {
-            let editDetail = new EditDetailModule({
-                container: para.dom,
-                isEdit: para.uiType === 'edit_detail',
-                fm: para.fm,
-                uiType: para.uiType,
-                url: this.url
-            });
+        let detailModule = new DetailMain(Object.assign({}, para, {
+            dom: para.dom,
+            url: this.url
+        }));
+        if (para.uiType !== 'detail') {
             this.on(BwRule.EVT_REFRESH, () => {
-                editDetail.refresh();
+                detailModule.refresh();
             })
-        } else {
-            let detailItem = new ListItemDetail(Object.assign({}, para, {url: this.url, container: para.dom}));
-            // 刷新非detail页面，detail页面的刷新在页面内完成
-            if (para.uiType !== 'detail') {
-                this.on(BwRule.EVT_REFRESH, () => {
-                    detailItem.refresh();
-                })
-            }
         }
     }
 }
