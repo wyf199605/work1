@@ -52,6 +52,9 @@ namespace G{
             },
             wxShare(data : string){
                 return ShellBase.handler('wxShare', {data});
+            },
+            testAPI(data : string,  back : IShellEventHandler,info : IShellEventHandler){
+                return ShellBase.handler('testAPI',{data}, back, info);
             }
         };
 
@@ -534,12 +537,21 @@ namespace G{
         }
     })(window, document);
 
-
+    interface IPostMessage {
+        action : string,
+        data? : string,
+        back? : string,
+        info? : string
+    }
     declare const AppShell: {
         syncFunction(name: string, data: string): string;
         asyncFunction(name: string, data: string, back: string, infor?:string): boolean;
-        postMessage(name: string, data: string, back: string, infor?:string): boolean;
+        postMessage(para : IPostMessage);   // ios仅支持传一个json对象
+        postMessage(action : string, data : string);  // android or pc
     };
+
+    declare const webkit : any;
+
     enum ShellTypes {
         IOS,
         ANDROID,
@@ -575,15 +587,16 @@ namespace G{
             events.forEach(event => d.off(window, event));
             delete events[action];
         }
-
         function windowsHandler<IShellHandler>(action:string, data, back?, infor?, isAutoOff = true) {
-            if(typeof AppShell === 'object' && tools.isFunction(AppShell.asyncFunction) && tools.isFunction(AppShell.syncFunction)) {
+            if(typeof AppShell === 'object' && (tools.isFunction(AppShell.postMessage) ||
+                tools.os.ios && tools.isFunction(webkit.messageHandlers.AppShell.postMessage ||
+                    tools.isFunction(AppShell.asyncFunction) && tools.isFunction(AppShell.syncFunction)))) {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
 
                 if(tools.isEmpty(back) && tools.isEmpty(infor)){
                     return JSON.parse(AppShell.syncFunction(action, dataStr));
+                    // return JSON.parse(AppShell.postMessage({action, data : dataStr}));
                 }else{
-
                     // 生成唯一事件名称
                     let eventBack = back ? eventNameGet() : '',
                         eventInfor = infor ? eventNameGet() : '';
@@ -601,7 +614,7 @@ namespace G{
                                 infor(typeof detail === 'string' ? JSON.parse(detail) : detail);
                             }catch (e){
                                 console.log(detail);
-                                console.log(e, 'JSON解析错误');
+                                console.log(e);
                                 alert('JSON解析错误')
                             }
                         })
@@ -630,8 +643,14 @@ namespace G{
                     }
 
                     // 异步调用
-                    let flag = AppShell.asyncFunction(action, dataStr, eventBack, eventInfor);
-
+                    let flag, shellData = {data : dataStr, back : eventBack, info : eventInfor};
+                    if(tools.os.ios){
+                        // ios只有异步调用
+                        flag = webkit.messageHandlers.AppShell.postMessage(Object.assign(shellData,{action}));
+                    }else{
+                        flag = AppShell.asyncFunction(action, dataStr, eventBack, eventInfor);
+                        // flag = AppShell.postMessage(action, JSON.stringify(shellData));
+                    }
                     // 过程通知
                     if(!flag) {
                         // alert('Shell失败');
