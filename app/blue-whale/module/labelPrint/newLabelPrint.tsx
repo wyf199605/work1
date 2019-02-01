@@ -208,9 +208,11 @@ export class NewLabelPrint {
         })
     }
 
+    protected tmpResults: obj[] = [];
     // 获取模板数据与需打印的表格数据
     getPrintData(): Promise<{ tmp: ILabelPrintResponse, data: obj[], title: string }> {
         let index = this.printModal.getData('labelType'),
+            tmpPromise: Promise<any>,
             dataAddr = this.ui.printList[index].dataAddr,
             caption = this.ui.printList[index].caption,
             templateLink = this.ui.printList[index].templateLink,
@@ -231,9 +233,20 @@ export class NewLabelPrint {
             }
             ajaxData = JSON.stringify(ajaxData);
         }
+
+        // 判断tmp模板是否已请求
+        if(index in this.tmpResults){
+            tmpPromise = Promise.resolve(this.tmpResults[index]);
+        }else{
+            tmpPromise = BwRule.Ajax.fetch(CONF.siteUrl + templateLink.dataAddr).then((result) => {
+                this.tmpResults[index] = result;
+                return result;
+            });
+        }
+
         return new Promise((resolve, reject) => {
             Promise.all([
-                BwRule.Ajax.fetch(CONF.siteUrl + templateLink.dataAddr),
+                tmpPromise,
                 BwRule.Ajax.fetch(CONF.siteUrl + addr, {
                     data2url: dataAddr.varType !== 3,
                     // type: 'GET',
@@ -297,13 +310,19 @@ export class NewLabelPrint {
 
     print(){
         return new Promise((resolve, reject) => {
+            if(!('BlueWhaleShell' in window || 'AppShell' in window)){
+                Modal.alert('无法连接到打印机');
+                resolve();
+                return ;
+            }
+
             this.getLabels().then(({svgList, tmp, data}) => {
                 let copies = this.printModal.getData('copies'),
                     promises: Promise<string>[] = [];
 
                 for(let svg of svgList){
 
-                    promises.push(new Promise<string>((resolve, reject) => {
+                    promises.push(new Promise<string>((resolve) => {
                         // svg.svgEl.style.transformOrigin = '0 0';
                         // svg.svgEl.style.transform = 'scale(10)';
 
@@ -332,6 +351,7 @@ export class NewLabelPrint {
                                     cxt.fillRect(0, 0, printCanvas.width, printCanvas.height);
                                     cxt.drawImage(canvas, 0, 0);
                                     d.remove(canvas);
+                                    canvas = null;
                                     // new Modal({
                                     //     body: printCanvas,
                                     //     header: '展示',
@@ -339,7 +359,17 @@ export class NewLabelPrint {
                                     let dataURL = printCanvas.toDataURL("image/png", 1),
                                         url = dataURL.replace('data:image/png;base64,', '');
                                     // console.log(dataURL);
-                                    resolve(url);
+                                    if ('BlueWhaleShell' in window) {
+                                        BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + url + '"}');
+                                    } else if ('AppShell' in window) {
+                                        let code = this.printModal.getData('printer');
+                                        Shell.printer.labelPrint(copies, code, url, () => {
+                                            Modal.toast('打印成功');
+                                        })
+                                    } else {
+                                        Modal.alert('无法连接到打印机');
+                                    }
+                                    resolve();
                                 }
                             });
                         });
@@ -347,21 +377,7 @@ export class NewLabelPrint {
 
                 }
 
-                Promise.all(promises).then((urls) => {
-                    if ('BlueWhaleShell' in window) {
-                        urls.forEach((url) => {
-                            BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + url + '"}');
-                        });
-                    } else if ('AppShell' in window) {
-                        let code = this.printModal.getData('printer');
-                        urls.forEach((url) => {
-                            Shell.printer.labelPrint(copies, code, url, () => {
-                                Modal.toast('打印成功');
-                            })
-                        });
-                    } else {
-                        Modal.alert('无法连接到打印机');
-                    }
+                Promise.all(promises).then(() => {
                     resolve();
                 }).catch((e) => {
                     reject(e);
