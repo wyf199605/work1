@@ -216,7 +216,8 @@ export class LabelPrintModal extends Component{
                     onSet: function (item, index) {
                     },
                     className: 'selectInput',
-                    clickType: 0
+                    clickType: 0,
+                    readonly: true
                 });
                 break;
             case 'port':
@@ -227,7 +228,8 @@ export class LabelPrintModal extends Component{
                     onSet: function (item, index) {
                     },
                     className: 'selectInput',
-                    clickType: 0
+                    clickType: 0,
+                    readonly: true
                 });
                 break;
             case 'paper':
@@ -243,7 +245,8 @@ export class LabelPrintModal extends Component{
                         }
                     },
                     className: 'selectInput',
-                    clickType: 0
+                    clickType: 0,
+                    readonly: true
                 });
                 break;
             case 'scale':
@@ -416,6 +419,7 @@ export class LabelPrintModal extends Component{
                     className: 'selectInput',
                     clickType: 0,
                     data: this.selectInputJson.printList,
+                    readonly: true
                 });
                 break;
         }
