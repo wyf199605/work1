@@ -322,3 +322,16 @@ window.cancelAnimationFrame = (function(){
             window.clearTimeout(id);
         };
 })();
+
+/*
+* ts编译模板字符串方法会默认调用__makeTemplateObject方法
+* 列如：fun`${name} is 18!`
+* */
+let __makeTemplateObject = (window && window['__makeTemplateObject']) || function (cooked, raw) {
+    if (Object.defineProperty) {
+        Object.defineProperty(cooked, "raw", { value: raw });
+    } else {
+        cooked.raw = raw;
+    }
+    return cooked;
+};
