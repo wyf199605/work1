@@ -19,7 +19,7 @@ path.module = path.root + 'module/';
  */
 gulp.task("server", function() {
     // browserSync.init({
-    //     proxy: "http://192.168.1.243/sf"
+    //     proxy: "http://127.0.0.1:8080/sf"
     // });
 });
 
@@ -312,7 +312,12 @@ gulp.task('js', function() {
         'changeProject/changeProject',
     ], 'changeProject.js');
 
-    /*page*/
+
+    //收藏
+    gulpTsModule([
+            "collect/collect.mb"
+        ], "collect.js")
+        /*page*/
 
     gulpTsPage('index/password', 'personPassword.js');
     gulpTsPage('form/formPage', 'form-page.js');
