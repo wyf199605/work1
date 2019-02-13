@@ -170,7 +170,7 @@ export class RfidInventory {
             });
             if(name[0] === 'BARCODE'){
                 let caption = this.recentData[this.ui.nameField];
-                value = value + ' ' + (caption ? caption : '')
+                value = value + (caption ? caption : '')
             }
             el.innerHTML = value;
         });
@@ -289,7 +289,8 @@ export class RfidInventory {
                 this.alert('分类数据不能为空');
                 return;
             }
-            if(this._keyFildEl && this._keyFildEl.innerHTML === ''){
+
+            if(this._keyFildEl && G.tools.isEmpty(this._keyFildEl.innerHTML)){
                 this.alert('条码数据不能为空');
                 return;
             }
