@@ -297,6 +297,8 @@ gulp.task('js', function() {
     gulpTsModule('mbListModule/mbListModule', 'MbListModule.js');
     gulpTsModule('mbListModule/mbListView', 'MbListView.js');
 
+    gulpTsModule('detailModule/*', 'detailModule.js');
+
     // 客户化查询器
     gulpTsModule([
         'newQuery/NewQueryModalMb',
@@ -374,7 +376,7 @@ gulp.task('js', function() {
     gulpTsPage('attendance/checkIn', 'checkIn.js');
     gulpTsPage('attendance/changePassword', 'changePassword.js');
 
-    gulpTsPage('tabs/tabsPage', 'tabsPage.js');
+    gulpTsPage('groupTabs/GroupTabsPage', 'groupTabs.js');
     gulpTsPage('basicPage', 'basicPage.js');
     gulpTsPage('rfid/RfidSetting/RfidSetting', 'RfidSetting.js');
 

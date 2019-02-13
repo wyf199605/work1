@@ -70,8 +70,8 @@ interface IBW_Table{
     tableAddr?: IBW_TableAddr;    // 表格编辑数据
     uiType: string;
     relateType? : string,         // 值为P为时表示交叉制表
-    subTableList?:IBW_Table[];    // 子表
-    aggrList?:R_Aggr[];           // 聚合字段地址
+    subTableList?: IBW_Table[];    // 子表
+    aggrList?: R_Aggr[];           // 聚合字段地址
     inputs? : R_Input[];          // 快捷输入
     autoRefresh?:number;          // 回到本页面时表格是否自动刷新
     scannableField?: string // 扫码
@@ -86,6 +86,29 @@ interface IBW_Table{
     subTableAddr?:R_ReqAddr; //移动化
     layoutDrill?:R_ReqAddr; // 下钻地址
 }
+
+interface IBW_Detail{
+    caption?: string;//panel 标题，有可能为空
+    fields?: R_Field [];//面板中元素列表  input date 下拉等
+    subButtons?: R_Button[];//操作按钮列表
+    defDataAddrList?: R_ReqAddr[];//默认值获取地址列表
+    dataAddr?: R_ReqAddr;//获取数据后台地址
+    updatefileData?: R_ReqAddr;
+    groupInfo?: IGroupInfo[];
+    signField?: string;
+    inputs?: R_Input[];
+    scannableTime?: number;
+    subTableList?: IBW_Slave[];
+}
+
+interface IBW_SubTableAddr{
+    caption: string;
+    multPage: number;
+    uiAddr: R_ReqAddr;
+}
+
+type IBW_Slave = (IBW_Detail | IBW_Table | IBW_SubTableAddr)[];
+
 
 interface IBW_Layout{
     body?:string[];
