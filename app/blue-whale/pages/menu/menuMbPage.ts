@@ -17,17 +17,6 @@ function setBadge(badge, num) {
 }
 export = class menuMbPage {
     constructor(public para) {
-        // mui.init({
-        //     gestureConfig: {
-        //         longtap: true //默认为false
-        //     }
-        // });
-        // mui('.mui-scroll-wrapper').scroll();
-        //     gpsInfo = result;
-        // });
-        // window.addEventListener('putGps', function (e:CustomEvent) {
-        //     gpsInfo = JSON.parse(e.detail).msg;
-        // });
         d.on(d.query('#list'), 'click', 'li.mui-table-view-cell[data-href]', function () {
             sys.window.open({ url: CONF.siteUrl + this.dataset.href, gps: !!parseInt(this.dataset.gps) });
         });
@@ -35,7 +24,7 @@ export = class menuMbPage {
         d.on(d.query('#list'), 'press', 'li.mui-table-view-cell', function () {
             let test = true;
             if (test) {
-                Collect.addCollect({
+                new Collect().addCollect({
                     dom:this,
                     favid: this.dataset.favid,
                     link: this.dataset.href

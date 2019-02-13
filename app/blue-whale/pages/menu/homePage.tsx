@@ -83,7 +83,7 @@ export = class homePage {
                 }
                 let test = false;
                 if (test) {
-                    Collect.editCollectGroup(pValue);
+                    new Collect().editCollectGroup(pValue,this);
                 } else {
                     popoverToggle(MENU_FAVORITE.favEditDom);
                     MENU_FAVORITE.valueObtain = pValue;
@@ -123,7 +123,7 @@ export = class homePage {
             tabParent: content,
             panelParent: content,
             onChange: (index) => {
-                console.log(index);
+               
             },
             isPulldownRefresh: isAndroid4 ? -1 : 0,
             tabs: [
@@ -149,12 +149,10 @@ export = class homePage {
                                 BwRule.Ajax.fetch(CONF.ajaxUrl.menuFavor, {
                                     data: ajaxData
                                 }).then(({ response }) => {
-                                    console.log(response);
                                     resolve({
                                         data: response.data || [],
                                         total: response.head ? (response.head.totalNum || 0) : 0,
                                     });
-                                    // fav.appendChild(fragment);
                                 })
                             })
                         }
@@ -191,7 +189,6 @@ export = class homePage {
                 }
             ],
         });
-
         // 添加样式
         let tabWrapper = this.slideTab.tabContainer,
             panelWrapper = this.slideTab.panelContainer;
@@ -214,7 +211,7 @@ export = class homePage {
             let type = 'cancel';
             let test = true;
             if (test) {
-                Collect.addCollect({
+                new Collect().addCollect({
                     dom: this,
                     favid: this.dataset.favid,
                     link: this.dataset.href

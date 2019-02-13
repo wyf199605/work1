@@ -2,7 +2,7 @@
 import { Modal } from "global/components/feedback/modal/Modal";
 import { ActionSheet } from "global/components/ui/actionSheet/actionSheet";
 import { Button } from 'global/components/general/button/Button';
-import {BaseCollect} from  "./collect";
+import { BaseCollect } from "./collect";
 import tools = G.tools;
 import d = G.d
 interface CollectPara {
@@ -12,8 +12,7 @@ interface CollectPara {
 }
 export class Collect extends BaseCollect {
   //新增和取消收藏
-  static addCollect(para: CollectPara) {
-    console.log(para.dom)
+  addCollect(para: CollectPara) {
     let type = tools.isEmpty(para.favid) ? 'add' : 'cancel';
     let arr = [];
     if (type == "cancel") {
@@ -27,24 +26,25 @@ export class Collect extends BaseCollect {
       arr = [{
         content: "添加收藏",
         onClick: () => {
-
-          let arr = [{
-            content: "取消", onClick: () => {
-              m.isShow = false;
+          let arr = [
+            {
+              content: "取消",
+              onClick: () => {
+                m.isShow = false;
+              }
+            },
+            {
+              content: "确定",
+              onClick: () => {
+                this.req_addCollect(para.link, m, para.dom)
+              }
             }
-          }, {
-            content: "确定", onClick: () => {
-              Collect.req_addCollect(para.link, m, para.dom)
-            }
-          }];
+          ];
           let dom = G.d.create(`
                 <div class="collect_modal-body">
                     <div class="collect_select">
                         <div class="collect">
-                            <select class="select_group">
-                              <option value="">默认分组</option>
-                              <option value="">默认分组22</option>
-                            </select>
+                            <select class="select_group"></select>
                             <span class="mui-icon mui-icon-plusempty add_s"></span>
                         </div>
                     </div>
@@ -68,11 +68,10 @@ export class Collect extends BaseCollect {
               rightPanel: arr
             }
           })
-          Collect.req_groupName();
+          this.req_groupName();
           let collect_select = d.query(".collect_select")
           let collect_input = d.query(".collect_input")
           d.on(d.query(".add_s"), 'click', function () {
-            console.log("dd")
             collect_select.style.display = 'none';
             collect_input.style.display = 'block';
 
@@ -88,7 +87,7 @@ export class Collect extends BaseCollect {
     new ActionSheet({ buttons: arr }).isShow = true
   }
   //分组管理（重命名和删除）
-  static editCollectGroup(GroupName: string) {
+  editCollectGroup(GroupName: string,HandleDOM:HTMLElement) {
     let dom = G.d.create(`
         <div class="collect_modal-body">
           <div class="mui-input-row">
@@ -109,12 +108,10 @@ export class Collect extends BaseCollect {
     let wrapper = d.query(".group_btn")
     let Input = <HTMLInputElement>d.query(".group_input");
     Input.value = GroupName;
-
     let arr = [
       {
         content: "取消",
         container: wrapper,
-        color:"",
         onClick: () => {
           m.isShow = false
         }
@@ -122,17 +119,17 @@ export class Collect extends BaseCollect {
       {
         content: "删除",
         container: wrapper,
-        className:"del_btn",
+        className: "del_btn",
         onClick: () => {
-          Collect.req_delGroup(GroupName, m)
+          this.req_delGroup(GroupName, m)
         }
       },
       {
         content: "重命名",
         container: wrapper,
-        className:"rename_btn",
+        className: "rename_btn",
         onClick: () => {
-          Collect.req_rename(GroupName, m)
+          this.req_rename(GroupName, m,HandleDOM)
         }
       }
     ];
@@ -140,5 +137,4 @@ export class Collect extends BaseCollect {
       new Button(item)
     })
   }
-
 }

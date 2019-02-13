@@ -45,39 +45,8 @@ export class TreeNodeBase<T = any> {
             }
             return root;
         }else{
-            this.init(para);
+         this.init(para);
         }
-
-        // if(!para[parent]) { // 根节点, 广度遍历初始化树，以免初始化时无法找到父节点
-        //     let paraQueue: IBasicTreePara[] = [para],
-        //         root: this = null;
-        //
-        //     while (paraQueue[0]) {
-        //         let currentPara = paraQueue.shift();
-        //         //
-        //         if(root === null){
-        //             currentPara[parent] = 'nothing'; // hack 根元素 防止无限递归
-        //         }
-        //         let node = this.nodeCreate(currentPara);
-        //         if(root === null){
-        //             root = node
-        //         }
-        //
-        //         if(Array.isArray(currentPara.children)){
-        //             // currentPara.children.forEach(child => {
-        //             //     child[parent] = node;
-        //             // });
-        //
-        //             paraQueue.push(...currentPara.children.map(child => {
-        //                 child[parent] = node;
-        //                 return child;
-        //             }));
-        //         }
-        //     }
-        //     return root;
-        // }else{
-        //     this.init(para);
-        // }
     }
 
     protected init(para?: IBasicTreePara<T>){

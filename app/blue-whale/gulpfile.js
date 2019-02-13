@@ -314,6 +314,7 @@ gulp.task('js', function() {
 
 
     //收藏
+    gulpTsModule(["collect/collect"], "BaseCollect.js");
     gulpTsModule([
             "collect/collect.mb"
         ], "collect.js")
@@ -354,6 +355,7 @@ gulp.task('js', function() {
     gulpTsPage('detail/versionPage', 'versionPage.js');
     gulpTsPage('detail/contactPage', 'contactPage.js');
     gulpTsPage(['main/mainPage', 'main/sideBar'], 'mainPage.js');
+    gulpTsPage("collectMain/collectPage", "CollectPage.js");
 
     // gulpTsPage('main/defaultTab', 'defaultTab.js');
 
