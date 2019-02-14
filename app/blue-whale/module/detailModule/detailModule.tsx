@@ -11,34 +11,48 @@ import CONF = BW.CONF;
 import sys = BW.sys;
 import {EditModule} from "../edit/editModule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {IGroupTabItem} from "../../pages/groupTabs/GroupTabsPage";
+import {DetailDataManager} from "./detailDataManager";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {DetailEditModule} from "./detailEditModule";
 
 export interface IDetailModulePara extends IComponentPara {
     ui: IBW_Detail;
-    current?: number;
 }
 
-export class DetailModule extends Component {
+export class DetailModule extends Component implements IGroupTabItem{
     protected wrapperInit() {
         return <div className="detail-wrapper">
             <div className="detail-content"/>
         </div>;
     }
 
+    public linkedData = {};
+    protected dataManager: DetailDataManager;
     protected ui: IBW_Detail;
     protected fields: R_Field[];
-    protected items: DetailItem[];
-    protected current: number = 1;
-    protected total: number = -1;
+    items: DetailItem[];
+
+    protected _btnWrapper: HTMLElement;
+    get btnWrapper(){
+        if(!this._btnWrapper){
+            this._btnWrapper = <div className="detail-btn-group"/>;
+            d.append(this.wrapper, this._btnWrapper);
+        }
+        return this._btnWrapper
+    }
 
     constructor(para: IDetailModulePara) {
         super(para);
         console.log(para);
-        this.current = para.current || 1;
         this.ui = para.ui;
         BwRule.beforeHandle.detail(this.ui);
         this.fields = this.ui.fields;
 
-        this.initItems();
+        let content = d.query('.detail-content', this.wrapper);
+        this.items = this.initItems(content);
+        this.initDataManager();
         this.refresh().catch(e => {
             console.log(e);
         });
@@ -46,13 +60,67 @@ export class DetailModule extends Component {
         this.clickEvent.on();
     }
 
-    protected initItems() {
-        let content = d.query('.detail-content', this.wrapper);
-        this.items = this.fields.map((field) => {
-            return <DetailItem field={field} detail={this} container={content}
-                               format={(f, cellData, rowData) => {
-                                   return this.format(f, cellData, rowData);
-                               }}/>
+    static EVT_RENDERED = '__event_detail_rendered';
+    get total(){
+        return this.dataManager ? this.dataManager.total : 0;
+    }
+    protected initDataManager(){
+        this.dataManager = new DetailDataManager({
+            render: () => {
+                this.render(this.dataManager.data[0] || {});
+            },
+            container: this.wrapper,
+            ajax: {
+                auto: false,
+                resetCurrent: false,
+                fun: ({pageSize, current, sort, custom}) => {
+                    return new Promise((resolve, reject) => {
+                        let ui = this.ui,
+                            url = tools.isNotEmpty(ui.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(ui.dataAddr) : '';
+                        current ++;
+                        if (tools.isNotEmpty(url)) {
+                            Promise.all([
+                                BwRule.Ajax.fetch(url, {
+                                    data: Object.assign({
+                                        pageparams: '{"index"=' + current + ', "size"=' + pageSize + ',"total"=1}'
+                                    }, custom),
+                                    needGps: ui.dataAddr.needGps,
+                                    timeout: 30000,
+                                    loading: {
+                                        msg: '数据加载中...',
+                                        disableEl: this.wrapper
+                                    }
+                                }),
+                                this.lookup
+                            ]).then(([{response}]) => {
+                                console.log(response);
+                                let data = tools.keysVal(response, 'data') || [{}],
+                                    total = tools.keysVal(response, 'head', 'totalNum');
+                                // this.detailData = data;
+                                BwRule.addOldField(this.getOldField(), data);
+                                resolve({
+                                    data,
+                                    total
+                                });
+                            }).catch((e) => {
+                                reject(e);
+                            })
+                        }else{
+                            reject();
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    initItems(container: HTMLElement): DetailItem[] {
+        return this.fields.map((field) => {
+            return <DetailItem field={field} detail={this} container={container}
+                format={(f, cellData, rowData) => {
+                   return this.format(f, cellData, rowData);
+                }}
+            />
         })
     }
 
@@ -63,9 +131,23 @@ export class DetailModule extends Component {
     }
 
     protected clickEvent = (() => {
+        return {
+            on: () => {
+                this.linkManager.on();
+                this.imgManager.on();
+            },
+            off: () => {
+                this.linkManager.off();
+                this.imgManager.off();
+            }
+        }
+    })();
+
+    protected linkManager = (() => {
         let handler;
         return {
             on: () => {
+                d.off(this.wrapper, 'click', '.cell-link .detail-item-content', handler);
                 d.on(this.wrapper, 'click', '.cell-link .detail-item-content', handler = (e) => {
                     let itemEl = d.closest(e.target as HTMLElement, '.detail-item');
                     if(itemEl){
@@ -79,6 +161,26 @@ export class DetailModule extends Component {
             },
             off: () => {
                 d.off(this.wrapper, 'click', '.cell-link .detail-item-content', handler);
+            }
+        }
+    })();
+
+    protected imgManager = (() => {
+        let handler;
+        return {
+            on: () => {
+                d.off(this.wrapper, 'click', '.cell-img img', handler);
+                d.on(this.wrapper, 'click', '.cell-img img', handler = (e) => {
+                    let img = e.target as HTMLImageElement,
+                        url = img.src;
+                    let imgData: ImgModalPara = {
+                        img: [url]
+                    };
+                    ImgModal.show(imgData);
+                })
+            },
+            off: () => {
+                d.off(this.wrapper, 'click', '.cell-img img', handler);
             }
         }
     })();
@@ -130,14 +232,8 @@ export class DetailModule extends Component {
         return BwRule.getOldField(varList);
     }
 
-    protected _detailData: obj = {};
-    get detailData(){
-        return this._detailData;
-    }
-    set detailData(data){
-        this._detailData = data;
-        BwRule.addOldField(this.getOldField(), data);
-        this.render(data);
+    get detailData(): obj{
+        return this.dataManager ? this.dataManager.data[0] || {} : {};
     }
 
     get data(){
@@ -148,48 +244,31 @@ export class DetailModule extends Component {
         return data;
     }
 
-    protected ajaxData = {};
-    refresh(ajaxData: obj = this.ajaxData): Promise<any> {
-        return new Promise((resolve, reject) => {
-            this.ajaxData = ajaxData;
-
-            let ui = this.ui,
-                url = tools.isNotEmpty(ui.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(ui.dataAddr, ajaxData) : '';
-            if (tools.isNotEmpty(url)) {
-                Promise.all([
-                    BwRule.Ajax.fetch(url, {
-                        data: {
-                            pageparams: '{"index"=' + this.current + ', "size"=' + 1 + ',"total"=1}'
-                        },
-                        needGps: ui.dataAddr.needGps,
-                        timeout: 30000,
-                        loading: {
-                            msg: '数据加载中...',
-                            disableEl: this.wrapper
-                        }
-                    }),
-                    this.lookup
-                ]).then(([{response}]) => {
-                    console.log(response);
-                    let data = tools.keysVal(response, 'data', 0) || {};
-                    this.total = tools.keysVal(response, 'head', 'totalNum');
-                    this.detailData = data;
-                    resolve();
-                }).catch((e) => {
-                    reject(e);
-                })
-            }else{
-                reject();
-            }
-        })
+    refresh(ajaxData: obj = {}): Promise<any> {
+        return this.dataManager ? this.dataManager.refresh(ajaxData) : Promise.reject('未实例化dataManager控件');
     }
 
+    protected currentPage = -1;
     render(data: obj = this.detailData) {
+        let noData = tools.isEmpty(data),
+            content = d.query('.detail-content', this.wrapper);
+        this.wrapper.classList.toggle('no-data', noData);
+        if(noData){
+            content.classList.add('hide');
+            return
+        }
+        content.classList.remove('hide');
         Array.isArray(this.items) && this.items.forEach((item: DetailItem) => {
             let field: R_Field = item.custom,
                 name = field.name;
             item.itemData = data[name];
-        })
+        });
+        this.trigger(DetailModule.EVT_RENDERED);
+        let current = this.dataManager ? this.dataManager.current : 0;
+        if(this.currentPage !== current){
+            this.currentPage = current;
+            content.scrollTop = 0;
+        }
     }
 
     private _lookUpData: objOf<ListItem[]> = {};
@@ -220,68 +299,149 @@ export class DetailModule extends Component {
     set editing(flag: boolean){
         this._editing = flag;
         this.wrapper.classList.toggle('editing', flag);
+        this.detailEdit.start();
     }
 
-    protected edit = (() => {
-        let editModule: EditModule,
-            btn: R_Button;
-        let start = (subBtn: R_Button) => {
-            btn = subBtn;
-            this.editing = true;
-            this.clickEvent.off();
-            editModule = new EditModule({
-                auto: true,
-                type: 'table',
-                fields: this.items.map(item => {
-                    let contentEl = item.contentEl;
-                    contentEl && (contentEl.innerHTML = '');
-                    return {
-                        dom: contentEl,
-                        field: item.custom
-                    }
-                }),
-                container: this.container,
-                cols: this.fields
-            });
-            editModule.set(this.detailData);
-            this.fields.forEach(() => {
-
-            })
-        };
-        let save = () => {
-            if(editModule && btn){
-                let data = Object.assign({}, this.detailData, editModule.get());
-                ButtonAction.get().clickHandle(btn, data, response => {
-                    if(response){
-                        btn.buttonType = 2;
-                        let data = response.data && response.data[0] ? response.data[0] : null;
-                        cancel();
-                        this.detailData = data;
-
-                        // typeof callback === 'function' && callback(response);
-                    }
-                },this.pageUrl);
-            }
-        };
-        let cancel = () => {
-            this.editing = false;
-            this.clickEvent.on();
-            editModule && editModule.destroy();
-            editModule = null;
-        };
-        return {
-            start: (btn) => {
-                start(btn);
-            },
-            save: () => {
-                save();
-            },
-            cancel: () => {
-                cancel();
-                this.render();
-            }
+    protected _detailEdit: DetailEditModule;
+    get detailEdit(){
+        if(this._detailEdit) {
+            return this._detailEdit;
         }
-    })();
+
+        let tableAddr = this.ui.tableAddr;
+        if(tools.isEmpty(tableAddr && tableAddr.param)){
+            return null;
+        }
+        this._detailEdit = new DetailEditModule({
+            url: tableAddr.dataAddr,
+            editType: tableAddr.openType,
+            editParam: tableAddr.param[0],
+            detail: this,
+            caption: this.ui.caption
+        })
+
+    }
+
+
+    // protected edit = (() => {
+    //     let editModule: EditModule;
+    //     let start = (items = this.items) => {
+    //         if(this.editing){
+    //             return;
+    //         }
+    //         this.editing = true;
+    //         this.clickEvent.off();
+    //         editModule = new EditModule({
+    //             auto: false,
+    //             type: 'table',
+    //             fields: this.fields.map(field => {
+    //                 return {
+    //                     dom: null,
+    //                     field: field
+    //                 }
+    //             }),
+    //             container: this.container,
+    //             cols: this.fields
+    //         });
+    //         items.forEach((item) => {
+    //             item.edit.init((field, item) => {
+    //                 let com = editModule.init(field.name, {
+    //                     dom: item.contentEl,
+    //                     data: this.detailData,
+    //                     field,
+    //                     onExtra: (data, relateCols, isEmptyClear = false) => {
+    //                         if (tools.isEmpty(data) && isEmptyClear) {
+    //                             // table.edit.modifyTd(td, '');
+    //                             com.set('');
+    //                             return;
+    //                         }
+    //                         for (let key in data) {
+    //                             let hCom = editModule.getDom(key);
+    //                             if (hCom && hCom !== com) {
+    //                                 let cellData = data[key];
+    //                                 if (hCom.get() != cellData) {
+    //                                     hCom.set(cellData || '');
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 });
+    //                 return com;
+    //             })
+    //         });
+    //         let data = this.detailData;
+    //         editModule.set(data);
+    //         items.forEach((item) => {
+    //             let field = item.custom;
+    //             if(field.elementType === 'lookup'){
+    //                 let options = this.lookUpData[field.name] || [];
+    //                 for (let opt of options) {
+    //                     if (opt.value == data[field.lookUpKeyField]) {
+    //                         let com = editModule.getDom(field.name);
+    //                         com && com.set(opt.value);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //
+    //     };
+    //     let save = (btn: R_Button) => {
+    //         return new Promise((resolve, reject) => {
+    //             if(editModule && btn){
+    //                 btn.refresh = 0;
+    //                 let data = Object.assign({}, this.detailData, editModule.get());
+    //                 ButtonAction.get().clickHandle(btn, data, response => {
+    //                     this.refresh().then(() => {
+    //                         resolve();
+    //                     }).catch(e => {
+    //                         console.log(e);
+    //                         reject();
+    //                     });
+    //                 },this.pageUrl);
+    //             }else{
+    //                 reject();
+    //             }
+    //         })
+    //
+    //     };
+    //     let del = (btn: R_Button) => {
+    //         btn.refresh = 0;
+    //         ButtonAction.get().clickHandle(btn, this.detailData, () => {
+    //             // 删除后显示下一页，如果已是最后一页，则显示上一页
+    //             // if (self.isKeyStep === true) {
+    //             //     let keyStepData = self.keyStepData || [];
+    //             //     keyStepData.splice(self.currentPage - 1, 1);
+    //             //     self.keyStepData = keyStepData;
+    //             // }
+    //             // let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
+    //             // self.totalNumber = self.totalNumber - 1;
+    //             this.refresh().catch(e => {
+    //                 console.log(e);
+    //             });
+    //         });
+    //     };
+    //     let cancel = () => {
+    //         this.editing = false;
+    //         this.clickEvent.on();
+    //         editModule && editModule.destroy();
+    //         editModule = null;
+    //     };
+    //     return {
+    //         start: (items = this.items) => {
+    //             start(items);
+    //         },
+    //         save: (btn) => {
+    //             return save(btn);
+    //         },
+    //         del: (btn) => {
+    //             del(btn);
+    //         },
+    //         cancel: () => {
+    //             cancel();
+    //             this.render();
+    //         }
+    //     }
+    // })();
 
     protected pageContainer: HTMLElement;
     protected _pageUrl: string;
@@ -299,6 +459,7 @@ export class DetailModule extends Component {
     }
 
     format(field: R_Field, cellData: any, rowData: obj): Promise<IDetailFormatData> {
+        // console.log(rowData);
         return new Promise((resolve, reject) => {
             let text: string | Node = cellData, // 文字 或 Node
                 data = null,
@@ -311,7 +472,8 @@ export class DetailModule extends Component {
 
                 if (isImg && field.link) {
                     // 缩略图
-                    let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData, true, true);
+                    let ajaxData = this.dataManager ? this.dataManager.ajaxData : {};
+                    let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), ajaxData, true, true);
                     url = tools.url.addObj(url, {version: new Date().getTime()});
 
                     text = <img src={url}/>;
@@ -359,7 +521,6 @@ export class DetailModule extends Component {
                     color = 'blue';
                     if (cellData) {
                         BwRule.getFileInfo(field.name, cellData).then(({response}) => {
-                            console.log(response);
                             response = JSON.parse(response);
                             if (response && response.dataArr && response.dataArr[0]) {
                                 let data = response.dataArr[0],

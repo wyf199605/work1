@@ -6,6 +6,8 @@ import d = G.d;
 import tools = G.tools;
 import {DetailModule} from "./detailModule";
 import {BwRule} from "../../common/rule/BwRule";
+import {FormCom} from "../../../global/components/form/basic";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IDetailFormatData{
     text: string | Node,
@@ -91,7 +93,7 @@ export class DetailItem extends Component{
         this.render(data);
     }
 
-    render(data: any){
+    render(data: any = this.itemData){
         this.format && this.format(this.custom, data, this.detail.detailData).then(({text, color, classes, bgColor}) => {
             let contentEl = this.contentEl;
             if(contentEl){
@@ -108,8 +110,44 @@ export class DetailItem extends Component{
             this.color = color;
             this.background = bgColor;
         })
-
     }
+
+    static EVT_EDIT = '__event_data_change__';
+
+    edit = (() => {
+        let com: FormCom;
+        return {
+            init: (inputInit: (field: R_Field, item: DetailItem) => FormCom) => {
+                let field = this.custom,
+                    isEdit = !field.noEdit;
+
+                this.contentEl && (this.contentEl.innerHTML = '');
+                com = inputInit(this.custom, this);
+
+                if(com instanceof FormCom){
+                    com.onSet = () => {
+                        this.trigger(DetailItem.EVT_EDIT, com);
+                    }
+                }else{
+                    this.render();
+                }
+
+                if(tools.isMb && !isEdit && com){
+                    com.disabled = true;
+                    com.wrapper && com.wrapper.addEventListener('click', () => {
+                        Modal.toast(field.caption + '不可编辑');
+                    });
+                }
+            },
+            cancel: () => {
+                if(com){
+                    this.itemData = com.get();
+                    com.destroy();
+                    com = null;
+                }
+            }
+        }
+    })();
 
     // 设置颜色
     set color(color: string) {

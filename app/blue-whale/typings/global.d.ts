@@ -99,6 +99,7 @@ interface IBW_Detail{
     inputs?: R_Input[];
     scannableTime?: number;
     subTableList?: IBW_Slave[];
+    tableAddr?: IBW_TableAddr;    // 表格编辑数据
 }
 
 interface IBW_SubTableAddr{
@@ -162,7 +163,10 @@ interface IBW_TableRfidCol{
 }
 interface IBW_TableAddr{
     dataAddr : string;	//后台地址
-    param: IBW_TableAddrParam[]
+    param: IBW_TableAddrParam[];
+
+    openType?: 'current' | 'modal';
+    autoEdit?: boolean;
 }
 
 interface IBW_TableAddrParam{

@@ -41,7 +41,7 @@ export class InputBox extends Component {
 
     private init(inputBox: IInputBoxPara) {
         // debugger;
-        this.limitCount = inputBox.limitCount || 4;
+        this.limitCount = inputBox.limitCount || -1;
         this.isVertical = !!inputBox.isVertical;
         this.wrapper.classList.add(this.isVertical ? 'input-box-vertical' : 'input-box-horizontal');
 
@@ -218,7 +218,7 @@ export class InputBox extends Component {
         for(let i = 0; i < this.children.length; i++){
             let c = this.children[i];
             childrenWidth += c.wrapper.offsetWidth;
-            if(childrenWidth > wrapperWidth){
+            if((this.limitCount !== -1 && i >= this.limitCount) || childrenWidth > wrapperWidth){
                 if(isFirst){
                     isFirst = false;
                     this._lastNotMoreIndex = i;
