@@ -2810,19 +2810,25 @@ export class FastTable extends Component {
                     if(table.body && table.body.rows)
                         table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
-                this.render(0, void 0);
+
+                this.edit.addIndex.del();
+                this.edit.delIndex.del();
+                this.edit.changeIndex.del();
                 this.tablesEach(table => {
                     if(table.body && table.body.rows)
                         table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this._rows = this.rows.filter(row => tools.isNotEmpty(row));
-                this.edit.addIndex.del();
-                this.edit.delIndex.del();
-                this.edit.changeIndex.del();
                 this._drawSelectedCells();
                 this.rows.forEach((row) => {
                     row.isAdd = false;
-                })
+                });
+
+                Promise.all(this.tableBases.map((table) => table.renderPromise())).then(() => {
+                    console.log(this.data);
+                    this.render(0, void 0);
+                });
+
             }
         }
     }
@@ -2891,6 +2897,8 @@ export class FastTable extends Component {
             table.off(TableBase.EVT_EDITED);
             table.off(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index]);
         });
+
+
     }
 
     protected initDisabledEditorRow(row) {

@@ -344,6 +344,7 @@ export class TableDataCell extends TableCell {
         this.editing && (this.editing = false);
         this.render();
         this.renderPromise.finally(() => {
+            this.rendering = false;
             let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
             tools.isNotEmpty(events) && events.forEach((fun) => {
                 typeof fun === 'function' && fun(this.table.editing);
