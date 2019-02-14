@@ -909,6 +909,9 @@ export class AtVarBuilder{
                     para['autoHeight'] = true;
                     para['maxHeight'] = '90px';
                 }
+                if(conf.atrrs && conf.atrrs.readOnlyFlag === 1){
+                    para['readonly'] = true;
+                }
                 let com = inputTransFactory(null, para, inputType, container, sys.isMb);
                 com.set(value);
 
@@ -934,15 +937,11 @@ export class AtVarBuilder{
         });
 
         d.append(this.para.resultDom, row);
-        if(conf.atrrs && conf.atrrs.readOnlyFlag === 1){
-            row.classList.add('disabled-none');
-        }else {
-            if(this.isFirst){
-                let input = d.query('input', row) || d.query('textarea', row);
-                if(input){
-                    input.focus();
-                    this.isFirst = false;
-                }
+        if(!conf.atrrs && conf.atrrs.readOnlyFlag !== 1 && this.isFirst){
+            let input = d.query('input', row) || d.query('textarea', row);
+            if(input){
+                input.focus();
+                this.isFirst = false;
             }
         }
     }

@@ -130,9 +130,7 @@ export class RfidInventory {
         if(scanCode.success){
             data = scanCode.data[0]
         }else {
-            Modal.alert(scanCode.msg, null, () => {
-                this.focus();
-            });
+            this.alert(scanCode.msg);
             return;
         }
         // 若扫入条码
@@ -143,7 +141,7 @@ export class RfidInventory {
             }else {
                 // 若分类为空，不可设置条码值
                 if(this.isSortEmpty()){
-                    Modal.alert('分类为空，需先扫入分类值', null, () => this.focus());
+                    this.alert('分类为空，需先扫入分类值');
                     return
                 }
                 this.setValue(data)
@@ -172,7 +170,7 @@ export class RfidInventory {
             });
             if(name[0] === 'BARCODE'){
                 let caption = this.recentData[this.ui.nameField];
-                value = value + ' ' + (caption ? caption : '')
+                value = value + (caption ? caption : '')
             }
             el.innerHTML = value;
         });
@@ -219,6 +217,10 @@ export class RfidInventory {
                 setting: res.setting
             });
         });
+    }
+
+    private alert(msg : string){
+        Modal.alert(msg, null, () => this.focus());
     }
 
     private stop() {
@@ -278,15 +280,18 @@ export class RfidInventory {
     private commit() {
         return new Promise(resolve => {
             if(!this.epc[0]){
-                Modal.alert('无盘点数据', null, () => {
-                    this.focus();
-                });
+                this.alert('无盘点数据');
                 resolve();
                 return;
             }
 
             if(this.isSortEmpty()){
-                Modal.alert('分类数据不能为空', null, () => this.focus());
+                this.alert('分类数据不能为空');
+                return;
+            }
+
+            if(this._keyFildEl && G.tools.isEmpty(this._keyFildEl.innerHTML)){
+                this.alert('条码数据不能为空');
                 return;
             }
 
@@ -330,6 +335,7 @@ export class RfidInventory {
 
     private uniqueFlag : string;
     private ui : ISortUiPara;
+    private _keyFildEl : HTMLElement;
     private sortUi() {
         let loading = new Loading({
             msg : '下载数据中',
@@ -354,7 +360,7 @@ export class RfidInventory {
             if(this.ui && this.ui.keyField){
                 d.append(this.sortEl, <div className="rfid-li">
                     <div>{this.ui.keyName}：</div>
-                    <div data-name={this.ui.keyField}/>
+                    {this._keyFildEl = <div data-name={this.ui.keyField}/>}
                 </div>)
             }
             this.titleEl.innerHTML = this.ui && this.ui.title || '';
