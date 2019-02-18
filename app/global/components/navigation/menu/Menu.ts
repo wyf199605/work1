@@ -13,7 +13,7 @@ export interface IMenuPara extends IElementTreeNodePara {
   isOutline?: boolean; // 是否展开到外部    默认false ,继承
   isHorizontal?: boolean; // 是否水平展示      默认false ,继承
   isHoverExpand?: boolean; // 是否鼠标移入展示  默认false  ,继承
-
+  
   ajax?: IElementTreeAjax<Menu, IMenuPara>; // 继承
   // onOpen?(node: Menu): void; // 继承
 }

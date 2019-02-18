@@ -95,9 +95,6 @@ export default class SideBarMrg {
       if (node.isLeaf) {
         let addr = <R_ReqAddr>node.content.menuPath;
         if (addr) {
-          console.log(addr)
-          console.log(CONF.siteUrl)
-          console.log("-----------------")
           let url = CONF.siteUrl + BwRule.reqAddr(addr);
           this.openWindow(url, node.content.menuName);
         }
@@ -119,7 +116,6 @@ export default class SideBarMrg {
     d.append(d.query("#customNavMenu"), d.create(collectDom));
     d.on(d.query(".collect_item"), "click", () => {
       let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=collect" });
-      console.log(url)
       sys.window.open({ url })
     })
   }

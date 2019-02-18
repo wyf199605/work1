@@ -15,7 +15,6 @@
 @import 'components/popUp';
 @import 'components/checkbox';
 @import 'components/black';
-
 // modules
 @import "../module/query/query.pc";
 @import "../module/mail/mail";
@@ -29,13 +28,10 @@
 @import "../module/changeProject/changeProject";
 @import "../module/rfidConfig/rfidConfig";
 @import "../module/rfidConfig/rfidInventory";
-
-
 //Pages
 @import '../pages/detail/detailPage.pc';
 @import '../pages/drill/drillPage.pc';
 @import '../pages/index/exception.pc';
-
 @import '../pages/form/formPage.g';
 @import '../pages/form/formPage.pc';
 //@import '../pages/imgRotation';
@@ -55,9 +51,6 @@
 @import "../pages/list/mailPage";
 @import "../pages/plan/PlanPage";
 @import "../pages/msgList/msgListPage";
-
-
-
 //@import "../../global/style/common";
 //labelPrint
 @import "../module/labelPrint/labelPrintModule.pc";
@@ -71,18 +64,14 @@
 @import "../module/statistic/analysis.pc";
 //chart
 @import "../module/statistic/chart.pc";
-
 //chat
 @import "../module/chat/chat.pc";
-
 @import "../module/listDetail/listDetail.pc";
-
 @import "../module/DrawPoint/DrawPoint";
-
-
 //changePassword
 @import "../pages/index/password";
-
 @import "../module/mbListModule/mbListModule.pc";
 @import "../module/query/customModule";
 @import "../module/listDetail/editDetailModule.pc";
+@import "../pages//collectMain/collectPage";
+@import "../module/collect/collect.pc";

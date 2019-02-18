@@ -316,8 +316,9 @@ gulp.task('js', function() {
     //收藏
     gulpTsModule(["collect/collect"], "BaseCollect.js");
     gulpTsModule([
-            "collect/collect.mb"
-        ], "collect.js")
+        "collect/collect.mb"
+    ], "collect.js")
+    gulpTsModule(["collect/collect.pc"], "CollectPC.js")
         /*page*/
 
     gulpTsPage('index/password', 'personPassword.js');

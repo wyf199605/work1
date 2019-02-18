@@ -19,7 +19,14 @@ export class Collect extends BaseCollect {
       arr = [{
         content: "取消收藏",
         onClick: () => {
-          this.req_delCollect(para.favid, para.dom)
+          this.req_delCollect(para.favid).then(response => {
+            if (para.dom.parentNode.nodeName.toString() == "DIV") {
+              para.dom.remove();
+            } else {
+              para.dom.dataset.favid = "";
+            }
+            Modal.toast("取消收藏成功");
+          })
         }
       }]
     } else {
@@ -36,7 +43,34 @@ export class Collect extends BaseCollect {
             {
               content: "确定",
               onClick: () => {
-                this.req_addCollect(para.link, m, para.dom)
+                let InputBlock = <HTMLElement>d.query(".collect_input"),
+                  InputDom = <HTMLInputElement>d.query(".inp_name"),
+                  SelectBlock = <HTMLSelectElement>d.query(".select_group"),
+                  newval = null;
+                if (InputBlock.style.display === "block") {
+                  let options = SelectBlock.options;
+                  let tValue = InputDom.value.trim();
+                  let exist: Boolean = false;
+                  for (let i = 0; i < options.length; i++) {
+                    if (options[i].text == tValue) {
+                      exist = true;
+                    }
+                  }
+                  if (tValue === "") {
+                    Modal.alert("内容不能为空！");
+                  } else if (exist) {
+                    Modal.alert("该命名已存在！");
+                  } else {
+                    newval = tValue;
+                  }
+                } else {
+                  newval = SelectBlock.options[SelectBlock.selectedIndex].value;
+                }
+                this.req_addCollect(para.link, newval).then(({ response }) => {
+                  Modal.toast("收藏成功");
+                  para.dom.dataset.favid = response.data[0].favid;
+                  m.isShow = false;
+                })
               }
             }
           ];
@@ -87,7 +121,7 @@ export class Collect extends BaseCollect {
     new ActionSheet({ buttons: arr }).isShow = true
   }
   //分组管理（重命名和删除）
-  editCollectGroup(GroupName: string,HandleDOM:HTMLElement) {
+  editCollectGroup(GroupName: string, HandleDOM: HTMLElement) {
     let dom = G.d.create(`
         <div class="collect_modal-body">
           <div class="mui-input-row">
@@ -121,7 +155,10 @@ export class Collect extends BaseCollect {
         container: wrapper,
         className: "del_btn",
         onClick: () => {
-          this.req_delGroup(GroupName, m)
+          this.req_delGroup(GroupName).then(() => {
+            Modal.toast("删除成功");
+            m.isShow = false;
+          })
         }
       },
       {
@@ -129,7 +166,38 @@ export class Collect extends BaseCollect {
         container: wrapper,
         className: "rename_btn",
         onClick: () => {
-          this.req_rename(GroupName, m,HandleDOM)
+          let renameDom = <HTMLInputElement>d.query(".group_input"),
+            rename = renameDom.value.trim(),
+            len = G.tools.str.utf8Len(rename);
+          if (len === 0) {
+            Modal.alert("命名不能为空！");
+          } else if (len > 20) {
+            Modal.alert("超出命名长度！");
+          } else if (
+            GroupName === rename ||
+            (GroupName === "" && rename === "默认分组")
+          ) {
+            m.isShow = false;
+          } else {
+            this.req_rename(GroupName, rename).then(() => {
+              let dataName = HandleDOM.querySelector('[data-edit="' + rename + '"]');
+              let fragment = document.createDocumentFragment();
+              // console.log(HandleDOM);
+              // HandleDOM.previousSibling.
+              HandleDOM.parentNode.querySelector(".conFavGroup").innerHTML = rename;
+              if (dataName) {
+                let liDom = HandleDOM.querySelectorAll("li[data-favid]"),
+                  len = liDom.length;
+                for (let i = 0; i <= len - 1; i++) {
+                  fragment.appendChild(liDom[i]);
+                }
+                dataName.parentNode.parentNode.appendChild(fragment);
+                HandleDOM.remove();
+              }
+              Modal.toast("重命名成功");
+              m.isShow = false;
+            })
+          }
         }
       }
     ];

@@ -6,6 +6,22 @@ import { BwRule } from "../../common/rule/BwRule";
 import sys = BW.sys;
 import tools = G.tools;
 import d = G.d;
+import CONF = BW.CONF;
+interface favsObj {
+  url: string;
+  caption: string;
+  gps: number;
+  icon: string;
+  type: string;
+  favid: string | number;
+}
+interface addResponse {
+  favid: any;
+}
+export interface dataObj {
+  tag: string;
+  favs: Array<favsObj>
+}
 export class BaseCollect {
   //新增收藏时候 拉取分组名 插入到select下
   req_groupName() {
@@ -39,123 +55,70 @@ export class BaseCollect {
     });
   }
   //添加收藏  发起接口请求
-  req_addCollect(link: string, modal: Modal, itemDom: HTMLElement) {
-    let InputBlock = <HTMLElement>d.query(".collect_input");
-    let InputDom = <HTMLInputElement>d.query(".inp_name");
-    let SelectBlock = <HTMLSelectElement>d.query(".select_group");
-    let newval = null;
-    if (InputBlock.style.display === "block") {
-      let options = SelectBlock.options;
-      let tValue = InputDom.value.trim();
-      let exist: Boolean = false;
-      for (let i = 0; i < options.length; i++) {
-        if (options[i].text == tValue) {
-          exist = true;
-        }
-      }
-      if (tValue === "") {
-        Modal.alert("内容不能为空！");
-      } else if (exist) {
-        Modal.alert("该命名已存在！");
-      } else {
-        newval = tValue;
-      }
-    } else {
-      newval = SelectBlock.options[SelectBlock.selectedIndex].value;
-    }
-    BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
+  req_addCollect(link: string, newVal: string): Promise<{ response: { data: Array<addResponse> } }> {
+    return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
       type: "POST",
       data2url: true,
       data: {
         action: "add",
         link: link,
-        tag: newval.trim()
+        tag: newVal.trim()
       }
-    }).then(({ response }) => {
-      Modal.toast("收藏成功");
-      itemDom.dataset.favid = response.data[0].favid;
-      modal.isShow = false;
-    });
+    })
   }
   //取消收藏
-  req_delCollect(favid: string | number, itemDom: HTMLElement) {
-    let ajaxData = {
-      action: "del",
-      favid: favid
-    };
-    BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
-      data: ajaxData,
-      data2url: true,
-      type: "POST"
-    }).then(({ response }) => {
-      if (itemDom.parentNode.nodeName.toString() == "DIV") {
-        itemDom.remove();
-      } else {
-        itemDom.dataset.favid = "";
-      }
-      Modal.toast("取消收藏成功");
-    });
+  req_delCollect(favid: string | number) {
+    return new Promise((resolve, reject) => {
+      let ajaxData = {
+        action: "del",
+        favid: favid
+      };
+      BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
+        data: ajaxData,
+        data2url: true,
+        type: "POST"
+      }).then(({ response }) => {
+        resolve(response)
+      });
+    })
+
   }
   //分组重命名
-  req_rename(beforeName: string, modal: Modal, itemDom: HTMLElement) {
-    let renameDom = <HTMLInputElement>d.query(".group_input"),
-      rename = renameDom.value.trim(),
-      len = G.tools.str.utf8Len(rename);
-    if (len === 0) {
-      Modal.alert("命名不能为空！");
-    } else if (len > 20) {
-      Modal.alert("超出命名长度！");
-    } else if (
-      beforeName === rename ||
-      (beforeName === "" && rename === "默认分组")
-    ) {
-      modal.isShow = false;
-    } else {
-      BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
-        data2url: true,
-        data: {
-          action: "renameTag",
-          tag: beforeName,
-          rename: rename
-        }
-      }).then(({ response }) => {
-        let dom = itemDom;
-        let dataName = dom.querySelector('[data-edit="' + rename + '"]');
-        let fragment = document.createDocumentFragment();
-        dom.querySelector(".conFavGroup").innerHTML = rename;
-        if (dataName) {
-          let liDom = dom.querySelectorAll("li[data-favid]"),
-            len = liDom.length;
-          for (let i = 0; i <= len - 1; i++) {
-            fragment.appendChild(liDom[i]);
-          }
-          dataName.parentNode.parentNode.appendChild(fragment);
-          dom.remove();
-        }
-        Modal.toast("重命名成功");
-        modal.isShow = false;
-      });
-    }
+  req_rename(beforeName: string, rename: string) {
+    return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
+      data2url: true,
+      data: {
+        action: "renameTag",
+        tag: beforeName,
+        rename: rename
+      }
+    })
   }
   //删除分组
-  req_delGroup(beforeName: string, modal: Modal) {
+  req_delGroup(beforeName: string): any {
     if (beforeName == "")
       Modal.confirm({
         msg: "确认删除？",
         callback: index => {
           if (index) {
-            BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
+            return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
               data2url: true,
               data: {
                 action: "delTag",
                 tag: beforeName
               }
-            }).then(() => {
-              Modal.toast("删除成功");
-              modal.isShow = false;
-            });
+            })
           }
         }
       });
+  }
+  req_getFavoi(obj: { index: number, size: number }): Promise<{ response: { data: Array<dataObj> } }> {
+    let ajaxData = {
+      pageparams: '{"index"=' + obj.index + ', "size"=' + obj.size + '}',
+      action: 'query'
+    };
+    return BwRule.Ajax.fetch(CONF.ajaxUrl.menuFavor, {
+      data: ajaxData
+    })
   }
 }

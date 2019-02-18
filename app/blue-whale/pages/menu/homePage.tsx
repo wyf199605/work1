@@ -81,7 +81,7 @@ export = class homePage {
                 else {
                     txt_edit.value = pValue;
                 }
-                let test = false;
+                let test = true;
                 if (test) {
                     new Collect().editCollectGroup(pValue,this);
                 } else {
