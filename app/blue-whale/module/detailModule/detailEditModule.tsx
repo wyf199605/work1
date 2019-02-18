@@ -31,7 +31,7 @@ export class DetailEditModule{
         this.url = para.url;
         this.caption = para.caption || '';
         this.editParam = para.editParam;
-        this.editType = para.editType || 'current';
+        this.editType = para.editType || 'modal';
 
         switch (this.editType){
             case 'modal':
@@ -144,7 +144,7 @@ export class DetailEditModule{
                     this.fetch('delete');
                 }
             }
-        })
+        });
     }
 
     protected fetch(type: 'insert' | 'edit' | 'delete'): Promise<any>{
@@ -220,7 +220,7 @@ export class DetailEditModule{
 
     protected _modal: Modal;
     get modal(){
-        if(this._modal){
+        if(!this._modal){
             let modal = this._modal = new Modal({
                 header:  this.caption + '编辑',
                 isMb: tools.isMb,

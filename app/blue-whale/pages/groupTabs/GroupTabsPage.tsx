@@ -19,6 +19,7 @@ export class GroupTabsPage extends BasicPage{
     protected subUi;
 
     protected main: IGroupTabItem;
+    protected sub: IGroupTabItem[];
 
     constructor(para: IGroupTabsPagePara){
         super(para);

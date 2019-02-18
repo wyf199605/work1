@@ -299,7 +299,7 @@ export class DetailModule extends Component implements IGroupTabItem{
     set editing(flag: boolean){
         this._editing = flag;
         this.wrapper.classList.toggle('editing', flag);
-        this.detailEdit.start();
+        this.detailEdit && this.detailEdit.start();
     }
 
     protected _detailEdit: DetailEditModule;
