@@ -24,7 +24,7 @@ interface IGroupTabsPagePara extends BasicPagePara {
 /**
  * @author WUML
  * @date 2019/2/18
- * @Description: 主从类，所有的主从关系走从这里分支
+ * @Description: 主从类，所有的主从关系都从这里分支
  */
 export class GroupTabsPage extends BasicPage {
     protected ui: IBW_Slave_Ui;
@@ -41,6 +41,7 @@ export class GroupTabsPage extends BasicPage {
         this.ui.uiType = this.ui.uiType || para.ui.uiType;
         this.subUi = this.ui.subTableList || [];
         delete this.ui.subTableList;
+        // 当前子表数组为空，则为表格/单页，否则为主从
         // if (tools.isNotEmpty(this.subUi)) {
         //     // tab  panel
         //
