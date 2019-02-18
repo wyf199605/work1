@@ -1,6 +1,6 @@
 /// <amd-module name="DetailBtnModule"/>
 
-import {DetailModule} from "./detailModule";
+import {DetailModule, IDetailModulePara} from "./detailModule";
 import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
 import {Button} from "../../../global/components/general/button/Button";
@@ -10,7 +10,7 @@ import {ListItemDetail} from "../listDetail/ListItemDetail";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 
 export class DetailBtnModule extends DetailModule{
-    constructor(para){
+    constructor(para:IDetailModulePara){
         super(para);
         let subButton = this.ui.subButtons || [];
         this.btnManager.init();
