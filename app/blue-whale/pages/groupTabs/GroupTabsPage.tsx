@@ -21,6 +21,11 @@ interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
 }
 
+/**
+ * @author WUML
+ * @date 2019/2/18
+ * @Description: 主从类，所有的主从关系走从这里分支
+ */
 export class GroupTabsPage extends BasicPage {
     protected ui: IBW_Slave_Ui;
     protected subUi: IBW_Slave[] = [];
@@ -51,7 +56,12 @@ export class GroupTabsPage extends BasicPage {
         });
     }
 
-    initPanel() {
+    /**
+     * @author WUML
+     * @date 2019/2/18
+     * @Description: Panel格式的主从
+     */
+    protected initPanel() {
         let tables = [this.ui, ...this.subUi];
         this.tab = new Panel({
             panelItems: tables.map((item) => {
@@ -68,7 +78,12 @@ export class GroupTabsPage extends BasicPage {
         })
     }
 
-    initTab() {
+    /**
+     * @author WUML
+     * @date 2019/2/18
+     * @Description: Tab格式的主从
+     */
+    protected initTab() {
         let tables = [this.ui, ...this.subUi];
         this.tab = new Tab({
             tabs: tables.map((item) => {
@@ -83,22 +98,32 @@ export class GroupTabsPage extends BasicPage {
         })
     }
 
+    /**
+     * @author WUML
+     * @date 2019/2/18
+     * @Description: 切换Tab或者Panel
+     */
     protected createTabItem(index: number, wrapper: HTMLElement) {
         if (index === 0) {
             // 主表
             if (tools.isEmpty(this.main)) {
-                this.main = this.createTable(this.ui, wrapper);
+                this.main = GroupTabsPage.createTable(this.ui, wrapper);
             }
         } else {
             let sub = this.subs[index - 1];
             if (tools.isEmpty(sub)) {
                 this.getUi(this.subUi[index - 1]).then((ui) => {
-                    this.subs[index - 1] = this.createTable(ui, wrapper);
+                    this.subs[index - 1] = GroupTabsPage.createTable(ui, wrapper);
                 });
             }
         }
     }
 
+    /**
+     * @author WUML
+     * @date 2019/2/18
+     * @Description: 获取从表UI
+     */
     getUi(sub: IBW_Slave): Promise<IBW_Slave_Ui> {
         return new Promise((resolve, reject) => {
             if ('uiAddr' in sub) {
@@ -116,7 +141,12 @@ export class GroupTabsPage extends BasicPage {
         });
     }
 
-    createTable(tableUi: IBW_Slave_Ui, wrapper: HTMLElement): IGroupTabItem {
+    /**
+     * @author WUML
+     * @date 2019/2/18
+     * @Description: 根据UI创建表格/单页
+     */
+    static createTable(tableUi: IBW_Slave_Ui, wrapper: HTMLElement): IGroupTabItem {
         let item;
         switch (tableUi.uiType) {
             case 'table': {
@@ -138,10 +168,17 @@ export class GroupTabsPage extends BasicPage {
         return item;
     }
 
+    /**
+     * @author WUML
+     * @date 2019/2/18
+     * @Description: 子表刷新
+     */
     subRefresh() {
         if (tools.isNotEmpty(this.subs)) {
             this.subs.forEach((sub) => {
-                sub.refresh(this.main.getData());
+                sub.refresh(this.main.getData()).catch(()=>{
+
+                });
             })
         }
     }
