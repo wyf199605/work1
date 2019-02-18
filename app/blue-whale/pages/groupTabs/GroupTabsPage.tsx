@@ -7,6 +7,7 @@ import {NewTableModule} from "../../module/table/newTableModule";
 import {Panel} from "../../../global/components/view/panel/Panel";
 import {Tab} from "../../../global/components/ui/tab/tab";
 import d = G.d;
+import tools = G.tools;
 
 export interface IGroupTabItem {
     refresh(data: obj): Promise<any>;
@@ -35,15 +36,19 @@ export class GroupTabsPage extends BasicPage {
         this.ui.uiType = this.ui.uiType || para.ui.uiType;
         this.subUi = this.ui.subTableList || [];
         delete this.ui.subTableList;
-        if (tools.isNotEmpty(this.subUi)) {
-            // tab  panel
-
-        } else {
-            this.main = window['d'] = new DetailBtnModule({
-                ui: this.ui,
-                container: para.dom
-            });
-        }
+        // if (tools.isNotEmpty(this.subUi)) {
+        //     // tab  panel
+        //
+        // } else {
+        //     this.main = window['d'] = new DetailBtnModule({
+        //         ui: this.ui,
+        //         container: para.dom
+        //     });
+        // }
+        this.main = window['d'] = new DetailBtnModule({
+            ui: this.ui,
+            container: para.dom
+        });
     }
 
     initPanel() {
