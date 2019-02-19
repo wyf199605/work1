@@ -6,6 +6,7 @@ import { BwRule } from "../../common/rule/BwRule";
 import d = G.d;
 import sysPcHistory = BW.sysPcHistory;
 import { DragDeform } from "../../../global/components/ui/dragDeform/dragDeform";
+import { CollectPC } from "../../module/collect/collect.pc";
 import {
   IMenuPara,
   Menu
@@ -25,9 +26,9 @@ interface SideBarMrgPara {
 export default class SideBarMrg {
   private menu: Menu = null;
   private favRecTree: Menu = null;
-
+  protected CollectObj: CollectPC;
   constructor(private para: SideBarMrgPara) {
-    this.initMainNavMenu();
+    this.initMainNavMenu()
     // this.initFavRecent();
 
     // if (!~location.href.indexOf('bw.sanfu.com')) {
@@ -91,19 +92,26 @@ export default class SideBarMrg {
         );
       }
     });
-    Menu.CollectFunc=function(event){
-      console.log(event)
+    Menu.CollectFunc = (dom: any, node: any) => {
+      // console.log(dom)
+      // console.log(node.content.menuPath.dataAddr)
+      // console.log(dom.title)
+      if (!this.CollectObj) {
+        this.CollectObj = new CollectPC();
+      }
+      this.CollectObj.GroupName = dom.title ? dom.title : "";
+      this.CollectObj.show(false)
     },
 
-    this.menu.onOpen = tools.pattern.throttling(node => {
-      if (node.isLeaf) {
-        let addr = <R_ReqAddr>node.content.menuPath;
-        if (addr) {
-          let url = CONF.siteUrl + BwRule.reqAddr(addr);
-          this.openWindow(url, node.content.menuName);
+      this.menu.onOpen = tools.pattern.throttling(node => {
+        if (node.isLeaf) {
+          let addr = <R_ReqAddr>node.content.menuPath;
+          if (addr) {
+            let url = CONF.siteUrl + BwRule.reqAddr(addr);
+            this.openWindow(url, node.content.menuName);
+          }
         }
-      }
-    }, 300);
+      }, 300);
     let collectDom = `
      <div class="collect_wrap">
         <div class="collect_item">

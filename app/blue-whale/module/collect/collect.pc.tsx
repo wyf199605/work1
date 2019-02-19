@@ -16,6 +16,7 @@ export class CollectPC extends BaseCollect {
   private cancelBtn: Button;
   private newMenuBtn: Button;
   private _GroupName: string;
+  private Item: { value: string, text: string }[] = [];
   private pageUrl: string = CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=collect";
   set GroupName(groupName: string) {
     this._GroupName = groupName;
@@ -27,15 +28,27 @@ export class CollectPC extends BaseCollect {
   show(isEdit?: boolean, GroupName?: string) {
     if (this.modal) {
       this.appendFoot(isEdit);
-      this.groupItem.style.display = "none";
-      this.menuItem.style.display = "block";
-      this.modal.isShow = true;
     } else {
       this.addCollect();
-      this.groupItem.style.display = "none";
-      this.menuItem.style.display = "block";
       this.appendFoot(isEdit);
     }
+    if (isEdit) {
+      this.groupItem.style.display = "none";
+      this.menuItem.style.display = "block";
+    } else {
+      let inputEl = d.query(".menu_name", this.groupItem) as HTMLInputElement;
+      inputEl.value = this.GroupName;
+      this.req_groupName().then(({response}) => {
+        // console.log(response)
+        this.Item = response.data.map(item => {
+          return { value: item.tag?item.tag:"默认分组", text: item.tag?item.tag:"默认分组" }
+        })
+        console.log(this.Item)
+      })
+      this.groupItem.style.display = "block";
+      this.menuItem.style.display = "none";
+    }
+    this.modal.isShow = true;
   }
   // isEdit 是否编辑  true: 分组管理  false: 非自身分组
   appendFoot(isEdit?: boolean) {
@@ -149,13 +162,12 @@ export class CollectPC extends BaseCollect {
         isDrag: false
       },
       width: '360px',
-      isShow: true,
       top: 160,
     });
     let select = d.query(".select_comp", this.body);
     new SelectInput({
       container: select,
-      data: [{ value: 0, text: '默认分组' }, { value: 1, text: '测试' }],
+      data: this.Item,
       readonly: true,
       clickType: 0,
       onSet: function (item) {

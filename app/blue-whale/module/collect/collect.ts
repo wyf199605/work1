@@ -25,34 +25,12 @@ export interface dataObj {
 export class BaseCollect {
   //新增收藏时候 拉取分组名 插入到select下
   req_groupName() {
-    BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
+   return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
       data2url: true,
       data: {
         action: "tags"
       }
-    }).then(({ response }) => {
-      let set_s = d.query(".select_group");
-      set_s.innerHTML = "";
-      let len = response.data ? response.data.length : 0;
-      if (len === 0) {
-        let nopt = document.createElement("option");
-        nopt.setAttribute("value", "默认分组");
-        nopt.text = "默认分组";
-        set_s.appendChild(nopt);
-      }
-      for (let i = 0; i <= len - 1; i++) {
-        let opt = document.createElement("option");
-        if (response.data[i].tag) {
-          let tagg = response.data[i].tag;
-          opt.setAttribute("value", tagg);
-          opt.text = tagg;
-        } else {
-          opt.setAttribute("value", "默认分组");
-          opt.text = "默认分组";
-        }
-        set_s.appendChild(opt);
-      }
-    });
+    })
   }
   //添加收藏  发起接口请求
   req_addCollect(link: string, newVal: string): Promise<{ response: { data: Array<addResponse> } }> {

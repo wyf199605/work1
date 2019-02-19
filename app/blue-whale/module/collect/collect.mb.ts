@@ -102,7 +102,29 @@ export class Collect extends BaseCollect {
               rightPanel: arr
             }
           })
-          this.req_groupName();
+          this.req_groupName().then(({ response }) => {
+            let set_s = d.query(".select_group");
+            set_s.innerHTML = "";
+            let len = response.data ? response.data.length : 0;
+            if (len === 0) {
+              let nopt = document.createElement("option");
+              nopt.setAttribute("value", "默认分组");
+              nopt.text = "默认分组";
+              set_s.appendChild(nopt);
+            }
+            for (let i = 0; i <= len - 1; i++) {
+              let opt = document.createElement("option");
+              if (response.data[i].tag) {
+                let tagg = response.data[i].tag;
+                opt.setAttribute("value", tagg);
+                opt.text = tagg;
+              } else {
+                opt.setAttribute("value", "默认分组");
+                opt.text = "默认分组";
+              }
+              set_s.appendChild(opt);
+            }
+          })
           let collect_select = d.query(".collect_select")
           let collect_input = d.query(".collect_input")
           d.on(d.query(".add_s"), 'click', function () {

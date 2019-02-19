@@ -20,7 +20,7 @@ export interface IMenuPara extends IElementTreeNodePara {
  * 菜单组件对象
  */
 export class Menu extends ElementTreeNode {
-  static CollectFunc: (dom:HTMLElement) => void;
+  static CollectFunc: (dom: any,node:any) => void;
   constructor(para: IMenuPara) {
     super(para);
   }
@@ -85,8 +85,11 @@ export class Menu extends ElementTreeNode {
     } else {
       d.on(this.textWrapper, "click", (event: MouseEvent) => {
         event.stopPropagation();
-        if (this.isCollect || event.srcElement.getAttribute("class") == 'collect_btn') {
-          Menu.CollectFunc(event.srcElement);
+        if (this.isCollect && event.srcElement.getAttribute("class") == 'collect_btn') {
+          // console.log(event.srcElement.parentNode)
+          // console.log(this)
+    
+          Menu.CollectFunc(event.srcElement.parentNode,this);
         } else {
           this.expand = !this.expand;
           //   (!this.children) && (this.selected = !this.selected);
