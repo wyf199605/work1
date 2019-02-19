@@ -18,7 +18,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {DetailEditModule} from "./detailEditModule";
 
 export interface IDetailModulePara extends IComponentPara {
-    ui: IBW_Detail;
+    ui: IBW_Detail; // 根据ui生成detail页
 }
 
 export class DetailModule extends Component implements IGroupTabItem{
@@ -28,12 +28,13 @@ export class DetailModule extends Component implements IGroupTabItem{
         </div>;
     }
 
-    public linkedData = {};
-    protected dataManager: DetailDataManager;
-    protected ui: IBW_Detail;
-    protected fields: R_Field[];
-    items: DetailItem[];
+    public linkedData = {}; // 关联数据
+    protected dataManager: DetailDataManager; // 数据管理
+    protected ui: IBW_Detail; // ui 数据
+    protected fields: R_Field[]; // ui 中的fields字段数据，用于构建detailItem
+    items: DetailItem[]; // 存放实例化的detailItem
 
+    // 放置按钮的元素
     protected _btnWrapper: HTMLElement;
     get btnWrapper(){
         if(!this._btnWrapper){
@@ -47,7 +48,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         super(para);
         console.log(para);
         this.ui = para.ui;
-        BwRule.beforeHandle.detail(this.ui);
+        BwRule.beforeHandle.detail(this.ui); // 处理ui的fields字段
         this.fields = this.ui.fields;
 
         let content = d.query('.detail-content', this.wrapper);
@@ -58,6 +59,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         });
 
         this.clickEvent.on();
+
     }
 
     static EVT_RENDERED = '__event_detail_rendered';
@@ -65,14 +67,16 @@ export class DetailModule extends Component implements IGroupTabItem{
         return this.dataManager ? this.dataManager.total : 0;
     }
     protected initDataManager(){
+        // 初始化数据管理模块
         this.dataManager = new DetailDataManager({
             render: () => {
+                // 渲染方法
                 this.render(this.dataManager.data[0] || {});
             },
             container: this.wrapper,
             ajax: {
                 auto: false,
-                resetCurrent: false,
+                resetCurrent: false, // 是否重新设置当前页
                 fun: ({pageSize, current, sort, custom}) => {
                     return new Promise((resolve, reject) => {
                         let ui = this.ui,
@@ -91,12 +95,14 @@ export class DetailModule extends Component implements IGroupTabItem{
                                         disableEl: this.wrapper
                                     }
                                 }),
-                                this.lookup
+                                this.lookup // 获取lookup数据
                             ]).then(([{response}]) => {
                                 console.log(response);
-                                let data = tools.keysVal(response, 'data') || [{}],
-                                    total = tools.keysVal(response, 'head', 'totalNum');
+                                let data = tools.keysVal(response, 'data') || [{}], // 数据
+                                    total = tools.keysVal(response, 'head', 'totalNum'); // 总条数
                                 // this.detailData = data;
+
+                                // 生成`old_${name}`数据
                                 BwRule.addOldField(this.getOldField(), data);
                                 resolve({
                                     data,
@@ -114,6 +120,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         })
     }
 
+    // 初始化detailItem
     initItems(container: HTMLElement): DetailItem[] {
         return this.fields.map((field) => {
             return <DetailItem field={field} detail={this} container={container}
@@ -124,12 +131,14 @@ export class DetailModule extends Component implements IGroupTabItem{
         })
     }
 
+    // 根据field name获取对应的detailItem
     getDetailItem(name: string): DetailItem{
         return this.items ? this.items.filter((item) => {
             return item.name === name;
         })[0] || null : null;
     }
 
+    // 事件管理
     protected clickEvent = (() => {
         return {
             on: () => {
@@ -143,6 +152,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         }
     })();
 
+    // 下钻事件管理
     protected linkManager = (() => {
         let handler;
         return {
@@ -165,6 +175,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         }
     })();
 
+    // 查看图片事件管理
     protected imgManager = (() => {
         let handler;
         return {
@@ -185,6 +196,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         }
     })();
 
+    // detailItem点击事件
     itemClick(field: R_Field, rowData){
         if (!field) {
             return;
@@ -220,6 +232,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         }
     }
 
+    // 获取`old_${name}`数据
     getOldField(){
         let btns = this.ui.subButtons,
             varList: R_VarList[] = [];
@@ -244,15 +257,19 @@ export class DetailModule extends Component implements IGroupTabItem{
         return data;
     }
 
+    // 刷新方法
     refresh(ajaxData: obj = {}): Promise<any> {
         return this.dataManager ? this.dataManager.refresh(ajaxData) : Promise.reject('未实例化dataManager控件');
     }
 
-    protected currentPage = -1;
+    protected currentPage = -1; // 当前页
+    noData = false; // 有没有数据
+    // 渲染方法
     render(data: obj = this.detailData) {
-        let noData = tools.isEmpty(data),
+        let noData = this.noData = tools.isEmpty(data),
             content = d.query('.detail-content', this.wrapper);
         this.wrapper.classList.toggle('no-data', noData);
+        // 判断是否有数据，没有则隐藏数据展示的元素
         if(noData){
             content.classList.add('hide');
             return
@@ -265,17 +282,19 @@ export class DetailModule extends Component implements IGroupTabItem{
         });
         this.trigger(DetailModule.EVT_RENDERED);
         let current = this.dataManager ? this.dataManager.current : 0;
+        // 当前页与数据管理的页面不一致，则滚动到头部
         if(this.currentPage !== current){
             this.currentPage = current;
             content.scrollTop = 0;
         }
     }
 
+    // 存放lookup数据
     private _lookUpData: objOf<ListItem[]> = {};
     get lookUpData() {
         return this._lookUpData || {};
     }
-
+    // 获取lookup数据
     private get lookup(): Promise<void> {
         if (tools.isEmpty(this._lookUpData)) {
             let allPromise = this.fields.filter(col => col.elementType === 'lookup')
@@ -292,6 +311,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         }
     }
 
+    // 设置编辑状态
     protected _editing: boolean = false;
     get editing(){
         return this._editing;
@@ -302,6 +322,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         this.detailEdit && this.detailEdit.start();
     }
 
+    // detailEdit模块
     protected _detailEdit: DetailEditModule;
     get detailEdit(){
         if(this._detailEdit) {
@@ -458,6 +479,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         return this._pageUrl;
     }
 
+    // 格式化数据
     format(field: R_Field, cellData: any, rowData: obj): Promise<IDetailFormatData> {
         // console.log(rowData);
         return new Promise((resolve, reject) => {
