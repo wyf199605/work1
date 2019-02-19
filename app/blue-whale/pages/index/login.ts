@@ -3,58 +3,59 @@ import sys = BW.sys;
 import tools = G.tools;
 import CONF = BW.CONF;
 import d = G.d;
-import {Modal} from "global/components/feedback/modal/Modal";
-import {User} from "../../../global/entity/User";
-import {Device} from "../../../global/entity/Device";
-import {BwRule} from "../../common/rule/BwRule";
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {Button} from "../../../global/components/general/button/Button";
-import {UnBinding} from "../../module/unBinding/UnBinding";
-import {NewFinger} from "../../module/fingerPrint/NewFinger";
+import { Modal } from "global/components/feedback/modal/Modal";
+import { User } from "../../../global/entity/User";
+import { Device } from "../../../global/entity/Device";
+import { BwRule } from "../../common/rule/BwRule";
+import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
+import { Button } from "../../../global/components/general/button/Button";
+import { UnBinding } from "../../module/unBinding/UnBinding";
+import { NewFinger } from "../../module/fingerPrint/NewFinger";
 import Shell = G.Shell;
-import {Spinner} from "../../../global/components/ui/spinner/spinner";
-
+import { Spinner } from "../../../global/components/ui/spinner/spinner";
+import { QrCode } from "../../../global/utils/QRCode";
 interface IProps {
     drive?: string,
-    responseBean : obj,
-    loginButton : HTMLElement | Button,
-    userId : HTMLInputElement,
-    password : HTMLInputElement,
-    saveButton : HTMLElement | CheckBox,
-    regButton : HTMLElement | Button,
-    fingerMbBtn ?: HTMLElement,
-    fingerPcBtn ?: HTMLElement,
-    wxButton ?: HTMLElement,
-    utButton ?: Button,
+    responseBean: obj,
+    loginButton: HTMLElement | Button,
+    userId: HTMLInputElement,
+    password: HTMLInputElement,
+    saveButton: HTMLElement | CheckBox,
+    regButton: HTMLElement | Button,
+    fingerMbBtn?: HTMLElement,
+    fingerPcBtn?: HTMLElement,
+    wxButton?: HTMLElement,
+    utButton?: Button,
     SMSBtn?: HTMLElement | Button;
     fqaBtn?: Button,
+    scanButton?: HTMLElement
 }
 /**
  * 移动和电脑的登录页面
  */
-export class LoginPage{
-
+export class LoginPage {
+    private LoginModal: Modal;
     constructor(private props: IProps) {
         tools.isMb && this.getVersion();
         let response = props.responseBean;
         this.device = Device.get();
         this.deviceUpdate();
 
-        if(response && response.body && response.body.bodyList && response.body.bodyList[0]){
+        if (response && response.body && response.body.bodyList && response.body.bodyList[0]) {
             let dataList = response.body.bodyList[0].dataList;
             let meta = response.body.bodyList[0].meta;
             response.data = BwRule.getCrossTableData(meta, dataList);
-            if(response.data && response.data[0] && response.data[0].AUTH_CODE){
+            if (response.data && response.data[0] && response.data[0].AUTH_CODE) {
                 this.device.auth_code = response.data[0].AUTH_CODE;
-            }else{
+            } else {
                 this.device.auth_code = '';
             }
-        }else{
+        } else {
             this.device.auth_code = '';
         }
         this.loadPassword();
         this.initEvent(props);
-        if(sys.isMb){
+        if (sys.isMb) {
             sys.window.close = double_back;
         }
         // sys.window.getGps(() =>{});
@@ -64,8 +65,8 @@ export class LoginPage{
         // });
     }
 
-    protected getVersion(){
-        G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({response}) => {
+    protected getVersion() {
+        G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({ response }) => {
             response = JSON.parse(response);
             sys.window.uploadVersion(response.data.version);
         }).catch((e) => {
@@ -75,7 +76,7 @@ export class LoginPage{
     /*
     * 手机短信验证登录
     * */
-    protected phoneVerify(){
+    protected phoneVerify() {
         // 初始化页面
         let body = d.create('<div class="login-wrapper modal-body-login"></div>');
         let title = d.create('<div class="login-title">短信验证码登录</div>');
@@ -99,17 +100,17 @@ export class LoginPage{
             content: '获取验证码',
             className: 'get-code-btn',
             onClick: () => {
-                if(tools.valid.isTel(tel.value)){
+                if (tools.valid.isTel(tel.value)) {
                     let time = 60;
                     checkCodeBtn.isDisabled = true;
                     checkCodeBtn.content = time + 's后重新获取';
                     let timer = setInterval(() => {
-                        time --;
-                        if(time === 0){
+                        time--;
+                        if (time === 0) {
                             clearInterval(timer);
-                            checkCodeBtn.content =  '获取验证码';
+                            checkCodeBtn.content = '获取验证码';
                             checkCodeBtn.isDisabled = false;
-                        }else{
+                        } else {
                             checkCodeBtn.content = time + 's后重新获取';
                         }
                     }, 1000);
@@ -121,14 +122,14 @@ export class LoginPage{
                         },
                         data2url: true,
                         type: 'POST',
-                        headers: {uuid: this.device.uuid}
+                        headers: { uuid: this.device.uuid }
                     }).catch(() => {
                         // 发送失败时，获取验证码按钮不进入倒计时。
                         clearInterval(timer);
-                        checkCodeBtn.content =  '获取验证码';
+                        checkCodeBtn.content = '获取验证码';
                         checkCodeBtn.isDisabled = false;
                     });
-                }else{
+                } else {
                     Modal.alert('请输入正确的手机号码');
                 }
             }
@@ -163,11 +164,11 @@ export class LoginPage{
             let telVal = tel.value,
                 codeVal = code.value;
             // 验证是否输入手机号与短信验证码
-            if(!tools.valid.isTel(telVal)){
+            if (!tools.valid.isTel(telVal)) {
                 Modal.alert('请输入正确的手机号码');
-            }else if(tools.isEmpty(codeVal)){
+            } else if (tools.isEmpty(codeVal)) {
                 Modal.alert('请输入短信验证码');
-            }else{
+            } else {
                 loginBtn.isLoading = true;
                 loginBtn.isDisabled = true;
                 loginBtn.content = '登陆中...';
@@ -177,7 +178,7 @@ export class LoginPage{
                     check_code: codeVal,
                 }, (result) => {
                     return new Promise((resolve, reject) => {
-                        if(result.success) {
+                        if (result.success) {
                             //身份验证通过时，提示是否绑定微信；
                             this.bindWeChat(telVal, () => resolve());
                         } else {
@@ -202,24 +203,24 @@ export class LoginPage{
     /*
     * 绑定微信
     * */
-    protected bindWeChat(mobile: string, callback: Function){
+    protected bindWeChat(mobile: string, callback: Function) {
         // 绑定微信方法
         let bindWeChat = () => {
             sys.window.wechatin((e) => {
                 let result = JSON.parse(e.detail);
-                if(result.success){
+                if (result.success) {
                     // 获取openId成功
-                    let response = Object.assign({}, result.msg || {}, {mobile});// 请求数据
+                    let response = Object.assign({}, result.msg || {}, { mobile });// 请求数据
                     BwRule.Ajax.fetch(BW.CONF.ajaxUrl.bindWeChat, {
                         type: 'post',
                         timeout: 1500,
                         data: [response]
                     }).then((ev) => {
-                        if(ev.body && tools.isNotEmpty(ev.body)) {
+                        if (ev.body && tools.isNotEmpty(ev.body)) {
                             // 绑定成功
                             Modal.toast('绑定成功！');
                             callback();
-                        }else{
+                        } else {
                             // 绑定失败
                             bindError();
                         }
@@ -227,7 +228,7 @@ export class LoginPage{
                         // ajax请求失败时
                         bindError();
                     });
-                }else{
+                } else {
                     // 获取openid失败
                     bindError();
                 }
@@ -250,15 +251,15 @@ export class LoginPage{
         };
 
         BwRule.Ajax.fetch(BW.CONF.ajaxUrl.bindWeChat, {
-            data: {mobile}
-        }).then(({response}) => {
+            data: { mobile }
+        }).then(({ response }) => {
             let body = response.body || {},
                 bodyList = body.bodyList ? body.bodyList[0] : {},
                 flag = bodyList.flag;
-            if(flag === 1){
+            if (flag === 1) {
                 // 已经绑定微信，直接跳转到首页
                 callback();
-            }else if(flag === 2){
+            } else if (flag === 2) {
                 // 未绑定微信，提示是否绑定
                 Modal.confirm({
                     msg: '您的手机尚未绑定微信，是否需要绑定微信账号？',
@@ -272,7 +273,7 @@ export class LoginPage{
                         }
                     }
                 });
-            }else{
+            } else {
                 Modal.alert(response.msg, '温馨提示', () => {
                     callback();
                 });
@@ -287,7 +288,7 @@ export class LoginPage{
     /*
     * 解绑
     * */
-    protected unBindling(){
+    protected unBindling() {
         // 初始化页面
         let body = d.create('<div class="login-wrapper modal-body-login"></div>');
         let title = d.create('<div class="login-title">短信获取解绑信息</div>');
@@ -315,17 +316,17 @@ export class LoginPage{
             content: '获取验证码',
             className: 'get-code-btn',
             onClick: () => {
-                if(tools.valid.isTel(tel.value)){
+                if (tools.valid.isTel(tel.value)) {
                     let time = 60;
                     checkCodeBtn.isDisabled = true;
                     checkCodeBtn.content = time + 's后重新获取';
                     let timer = setInterval(() => {
-                        time --;
-                        if(time === 0){
+                        time--;
+                        if (time === 0) {
                             clearInterval(timer);
-                            checkCodeBtn.content =  '获取验证码';
+                            checkCodeBtn.content = '获取验证码';
                             checkCodeBtn.isDisabled = false;
-                        }else{
+                        } else {
                             checkCodeBtn.content = time + 's后重新获取';
                         }
                     }, 1000);
@@ -337,14 +338,14 @@ export class LoginPage{
                         },
                         data2url: true,
                         type: 'POST',
-                        headers: {uuid: this.device.uuid}
+                        headers: { uuid: this.device.uuid }
                     }).catch(() => {
                         // 发送失败时，获取验证码按钮不进入倒计时。
                         clearInterval(timer);
-                        checkCodeBtn.content =  '获取验证码';
+                        checkCodeBtn.content = '获取验证码';
                         checkCodeBtn.isDisabled = false;
                     });
-                }else{
+                } else {
                     Modal.alert('请输入正确的手机号码');
                 }
             }
@@ -380,25 +381,25 @@ export class LoginPage{
                 codeVal = code.value,
                 userVal = user.value;
             // 验证是否输入手机号与短信验证码
-            if(tools.isEmpty(userVal)){
+            if (tools.isEmpty(userVal)) {
                 Modal.alert('请输入员工号');
-            } else if(!tools.valid.isTel(telVal)){
+            } else if (!tools.valid.isTel(telVal)) {
                 Modal.alert('请输入正确的手机号码');
-            }else if(tools.isEmpty(codeVal)){
+            } else if (tools.isEmpty(codeVal)) {
                 Modal.alert('请输入短信验证码');
-            }else{
+            } else {
                 loginBtn.isLoading = true;
                 loginBtn.isDisabled = true;
                 loginBtn.content = '前往中...';
                 // 前端验证通过后向后台发送数据
-                BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding,{
-                    data : {
+                BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
+                    data: {
                         mobile: telVal,
                         check_code: codeVal,
                         userid: userVal
                     },
-                    type : 'get'
-                }).then(({response}) => {
+                    type: 'get'
+                }).then(({ response }) => {
                     new UnBinding(response.data)
                 }).finally(() => {
                     loginBtn.isLoading = false;
@@ -453,7 +454,7 @@ export class LoginPage{
                         fingertype: fdata.type,
                         verify: fdata.verify
                     }, (ev) => {
-                        if(ev.success){
+                        if (ev.success) {
                             let data = ev.data.dataArr;
                             let finger = '';
                             if (tools.isNotEmpty(data)) {
@@ -537,17 +538,17 @@ export class LoginPage{
 
     private loginByFinger() {
         // debugger;
-        if(!this.validReg()) {
+        if (!this.validReg()) {
             return;
         }
         let result = ('BlueWhaleShell' in window || 'AppShell' in window) ?
-                // JSON.parse(BlueWhaleShell.postMessage('callFinger','{"type":"0"}'))
-            {success: true,  msg:'yes'}
-            : {success:false, msg:'必须在客户端内使用'};
+            // JSON.parse(BlueWhaleShell.postMessage('callFinger','{"type":"0"}'))
+            { success: true, msg: 'yes' }
+            : { success: false, msg: '必须在客户端内使用' };
 
         // textEl.innerHTML = `<span${result.success ? '' : ' class="red"'}>${result.msg}</span><br/>`;
 
-        if(!result.success) {
+        if (!result.success) {
             Modal.alert(result.msg);
             return;
         }
@@ -559,26 +560,26 @@ export class LoginPage{
      */
     private touchidClick() {
         let loginPage = this;
-        if(!loginPage.validReg()){
+        if (!loginPage.validReg()) {
             return;
         }
         sys.window.touchid((e) => {
             let json = JSON.parse(e.detail);
-            if(json.success) {
+            if (json.success) {
                 BwRule.Ajax.fetch(CONF.ajaxUrl.passwordEncrypt, {
-                    data: {str: loginPage.device.auth_code}
-                }).then(({response}) => {
+                    data: { str: loginPage.device.auth_code }
+                }).then(({ response }) => {
                     let authCode = response.body.bodyList[0];
                     loginPage.ajaxLogin(CONF.ajaxUrl.loginTouchID, {
                         password: authCode
                     });
                 })
             } else {
-                if(json.msg == 1) {
+                if (json.msg == 1) {
                     Modal.toast("指纹匹配不正确");
-                }else if(json.msg == 2) {
+                } else if (json.msg == 2) {
                     Modal.toast("该设备不支持指纹");
-                }else{
+                } else {
                     Modal.toast(json.msg);
                 }
             }
@@ -589,24 +590,24 @@ export class LoginPage{
      * 微信登录
      */
     private wechatChick = () => {
-        if(!this.validReg()){
+        if (!this.validReg()) {
             return;
         }
         if (sys.os === 'ad' || sys.os === 'ip') {
-            sys.window.wechatin((e)=>{
+            sys.window.wechatin((e) => {
                 let json = JSON.parse(e.detail);
-                if(json.success){
+                if (json.success) {
                     this.ajaxLogin(CONF.ajaxUrl.loginWeiXin, {
                         openid: json.msg.unionid
                     });
-                }else{
-                    if(json.msg==1){
+                } else {
+                    if (json.msg == 1) {
                         Modal.toast("操作取消");
-                    }else if(json.msg==2){
+                    } else if (json.msg == 2) {
                         Modal.toast("登录请求被微信拒绝");
-                    }else if(json.msg==3){
+                    } else if (json.msg == 3) {
                         Modal.toast("请安装微信客户端后再使用");
-                    }else{
+                    } else {
                         Modal.toast(json.msg);
                     }
                 }
@@ -617,44 +618,44 @@ export class LoginPage{
     /**
      * 密码登录
      */
-    private loginClick()  {
+    private loginClick() {
         let loginPage = this,
             saveBtn = loginPage.props.saveButton,
             isSavePw = saveBtn instanceof CheckBox ? saveBtn.checked : (<HTMLInputElement>saveBtn).checked,
             password = loginPage.props.password.value,
             userId = loginPage.props.userId.value.replace(/\s+/g, "");
-        if(tools.isEmpty(userId)){
+        if (tools.isEmpty(userId)) {
             Modal.alert('请填写用户名');
             return;
         }
-        if(tools.isEmpty(password)){
+        if (tools.isEmpty(password)) {
             Modal.alert('请填写密码');
             return;
         }
         loginPage.device.isSavePassword = isSavePw;
 
         BwRule.Ajax.fetch(CONF.ajaxUrl.passwordEncrypt, {
-            data: {str: password}
-        }).then(({response}) => {
+            data: { str: password }
+        }).then(({ response }) => {
             let encodePassword = response.body.bodyList[0];
 
             loginPage.ajaxLogin(CONF.ajaxUrl.loginPassword, {
-                    userid: userId.toUpperCase(),
-                    password: encodePassword
-                }, () => {
-                    return new Promise((resolve) => {
-                        loginPage.device.userid = userId.toUpperCase();
-                        loginPage.device.password = password;
-                        resolve();
-                    });
+                userid: userId.toUpperCase(),
+                password: encodePassword
+            }, () => {
+                return new Promise((resolve) => {
+                    loginPage.device.userid = userId.toUpperCase();
+                    loginPage.device.password = password;
+                    resolve();
                 });
+            });
         })
     }
 
     /**
      * 登录ajax
      */
-    ajaxLogin(url:string, loginData, callback = (result)=>Promise.resolve()) {
+    ajaxLogin(url: string, loginData, callback = (result) => Promise.resolve()) {
         let loginPage = this,
             loginBtn = loginPage.props.loginButton,
             login = loginBtn instanceof Button ? loginBtn.wrapper : loginBtn;
@@ -664,13 +665,13 @@ export class LoginPage{
         // let shell:any = ShellAction.get();
         loginPage.loginBtnState(1);
         // let loginUrl = tools.url.addObj(url, loginData);
-        let result = {success: false, data: null};
+        let result = { success: false, data: null };
         return new Promise((resolve, reject) => {
             BwRule.Ajax.fetch(url, {
                 type: 'post',
                 data: [loginData],
-                headers: {'auth_code': loginPage.device.auth_code, 'uuid': loginPage.device.uuid}
-            }).then(({response}) => {
+                headers: { 'auth_code': loginPage.device.auth_code, 'uuid': loginPage.device.uuid }
+            }).then(({ response }) => {
                 result.success = true;
                 result.data = response;
                 let token = response.head.accessToken || '';
@@ -692,9 +693,9 @@ export class LoginPage{
                             user.username = col.VALUE;
                         } else if (col.NAME === 'auth_code') {
                             loginPage.device.auth_code = col.VALUE;
-                        } else if (col.NAME === 'hideBaseMenu'){
+                        } else if (col.NAME === 'hideBaseMenu') {
                             noShow = col.VALUE.split(',');
-                        }else if(col.NAME === 'PLATFORM_NAME'){
+                        } else if (col.NAME === 'PLATFORM_NAME') {
                             user.platformName = col.VALUE;
                         }
                     });
@@ -718,74 +719,77 @@ export class LoginPage{
         })
     }
 
-    private initEvent(props: IProps){
+    private initEvent(props: IProps) {
         let loginPage = this;
-        if(props.regButton){
+        if (props.regButton) {
             let registerHandler = () => {
-                if(tools.isEmpty(loginPage.device.auth_code)){
+                if (tools.isEmpty(loginPage.device.auth_code)) {
                     sys.window.load(CONF.url.reg);
-                }else{
+                } else {
                     Modal.toast('您的设备已注册');
                 }
             };
-            if(props.regButton instanceof Button){
+            if (props.regButton instanceof Button) {
                 props.regButton.onClick = () => {
                     registerHandler();
                 };
-            }else{
+            } else {
                 d.on(props.regButton, 'click', () => {
                     registerHandler();
                 });
             }
         }
-        if(props.loginButton) {
-            if(props.loginButton instanceof Button){
+        if (props.loginButton) {
+            if (props.loginButton instanceof Button) {
                 props.loginButton.onClick = () => {
                     loginPage.loginClick()
                 }
-            }else{
+            } else {
                 d.on(props.loginButton, 'click', () => {
                     loginPage.loginClick()
                 });
             }
         }
 
-        if(props.wxButton) {
-            if(tools.isEmpty(this.device.auth_code)){
+        if (props.wxButton) {
+            if (tools.isEmpty(this.device.auth_code)) {
                 d.remove(props.wxButton);
                 props.wxButton = null;
-            }else{
+            } else {
                 d.on(props.wxButton, 'click', () => {
                     loginPage.wechatChick()
                 });
             }
         }
-        if(props.fingerMbBtn){
+        if (props.fingerMbBtn) {
             d.on(props.fingerMbBtn, 'click', () => {
                 loginPage.touchidClick()
             });
         }
-        if(props.fingerPcBtn){
-            d.on(props.fingerPcBtn, 'click',  () => {
+        if (props.scanButton) {
+            d.on(props.scanButton, "click", this.scanHandle)
+        }
+        if (props.fingerPcBtn) {
+            d.on(props.fingerPcBtn, 'click', () => {
                 loginPage.loginByFinger()
             });
         }
 
-        if(props.SMSBtn){
-            if(props.SMSBtn instanceof Button){
+        if (props.SMSBtn) {
+            if (props.SMSBtn instanceof Button) {
                 props.SMSBtn.onClick = tools.pattern.throttling(() => {
                     this.phoneVerify();
-                 }, 1000)
+                }, 1000)
             }
         }
 
-        if(props.utButton){
+        if (props.utButton) {
             props.utButton.onClick = tools.pattern.throttling(() => {
                 this.unBindling();
             }, 1000)
         }
 
-        if(props.fqaBtn){
+        if (props.fqaBtn) {
             props.fqaBtn.onClick = tools.pattern.throttling(() => {
                 // 使用异步加载fqa模块，防止一进入页面直接加载，堵塞
                 props.fqaBtn.disabled = true;
@@ -795,13 +799,13 @@ export class LoginPage{
                 });
                 spinner.show();
                 new Promise((resolve, reject) => {
-                    if(tools.isMb){
+                    if (tools.isMb) {
                         require(['FqaModal'], (f) => {
                             new f.FqaModal({});
                             resolve();
                         });
                     }
-                    else{
+                    else {
                         require(['FqaPcModal'], (f) => {
                             new f.FqaPcModal({});
                             resolve();
@@ -813,11 +817,11 @@ export class LoginPage{
                 })
             }, 1000);
         }
-        let usertap = 0,maxtap = 5;
+        let usertap = 0, maxtap = 5;
         let type = tools.isMb ? 'touchstart' : 'click';
-        (tools.isMb ? d.query('.login-logo') :  d.query('[data-action="selectServer"]')).addEventListener(type,() => {
-            usertap += 1 ;
-            if(usertap === maxtap){
+        (tools.isMb ? d.query('.login-logo') : d.query('[data-action="selectServer"]')).addEventListener(type, () => {
+            usertap += 1;
+            if (usertap === maxtap) {
                 sys.window.load(CONF.url.selectServer);
                 usertap = 0;
             }
@@ -827,7 +831,7 @@ export class LoginPage{
     /**
      * 验证是否注册过
      */
-    private validReg():boolean {
+    private validReg(): boolean {
         if (tools.isEmpty(this.device.auth_code)) {
             Modal.confirm({
                 msg: '设备未注册',
@@ -846,7 +850,7 @@ export class LoginPage{
     /**
      * 改变登录状态
      */
-    private loginBtnState(type:number){
+    private loginBtnState(type: number) {
         let btn = this.props.loginButton,
             login = btn instanceof Button ? btn.wrapper : btn,
             loginText = login;
@@ -857,9 +861,9 @@ export class LoginPage{
                 break;
             case 1:
                 login.classList.add('disabled');
-                if(sys.isMb){
+                if (sys.isMb) {
                     loginText.innerHTML = '<span style="width:22px;height:22px;vertical-align:sub" class="mui-spinner"></span> 登录中...';
-                }else{
+                } else {
                     loginText.innerHTML = '登录中...';
                 }
                 break;
@@ -891,8 +895,8 @@ export class LoginPage{
      * 设备升级uuid获取
      */
     private deviceUpdate() {
-        if('BlueWhaleShell' in window){
-            let versionText = BlueWhaleShell.postMessage('getVersion','');
+        if ('BlueWhaleShell' in window) {
+            let versionText = BlueWhaleShell.postMessage('getVersion', '');
             // Rule.ajax(CONF.ajaxUrl.pcVersion, {
             //     data : {getversion : versionText},
             //     silent : true,
@@ -905,45 +909,69 @@ export class LoginPage{
             //     }
             // });
             BwRule.Ajax.fetch(CONF.ajaxUrl.pcVersion, {
-                data: {getversion: versionText},
+                data: { getversion: versionText },
                 silent: true,
-            }).then(({response}) => {
-                BlueWhaleShell.postMessage('downloadFile',JSON.stringify(response.data[0]));
+            }).then(({ response }) => {
+                BlueWhaleShell.postMessage('downloadFile', JSON.stringify(response.data[0]));
             });
 
-            let json = BlueWhaleShell.postMessage('getDevice','');
-            if(!tools.isEmpty(json)){
+            let json = BlueWhaleShell.postMessage('getDevice', '');
+            if (!tools.isEmpty(json)) {
                 this.device.uuid = JSON.parse(json).msg.uuid;
-            }else{
+            } else {
                 Modal.toast("获取不到设备信息");
             }
-        }else if(sys.os==='ip'){
+        } else if (sys.os === 'ip') {
             sys.window.getDevice("uuid");
-            window.addEventListener('getDevice', (e:CustomEvent) => {
+            window.addEventListener('getDevice', (e: CustomEvent) => {
                 let json = JSON.parse(e.detail);
-                if(json.success){
+                if (json.success) {
                     this.device.uuid = json.msg.uuid;
-                }else{
+                } else {
                     Modal.toast(json.msg);
                 }
             });
-        }else if(sys.os==='ad'){
+        } else if (sys.os === 'ad') {
             this.device.uuid = sys.window.getDevice("uuid").msg;
-        }else if('AppShell' in window && tools.isPc) {
+        } else if ('AppShell' in window && tools.isPc) {
             let base = Shell.base;
-            base.versionUpdate(CONF.ajaxUrl.pcVersion, () => {}, () => {});
+            base.versionUpdate(CONF.ajaxUrl.pcVersion, () => { }, () => { });
 
             let result = base.device;
-            if(result.success){
+            if (result.success) {
                 this.device.uuid = result.data.uuid;
                 // console.log(this.device.uuid);
-            }else{
+            } else {
                 Modal.toast("获取不到设备信息");
             }
-        } else{
+        } else {
             //this.device.uuid = '28-D2-44-0C-4E-B5';
         }
     }
+    //扫码登陆
+    private scanHandle() {
 
-    private device:Device;
+        d.query(".login-wrapper", document.body).style.display = "none";
+        let wrap = d.query(".code_login", document.body)
+        if (wrap) {
+            wrap.style.display = "none";
+        }
+        let code = d.create(`<div class='code_login'>
+           <div id='code_login'></div>
+           <p>请打开速狮APP扫码登录</p>
+           <div id="close">其他方式</div>
+        </div>`)
+        let close = d.query("#close", code);
+
+        d.append(d.query(".login-page-container"), code)
+        d.on(close, "click", () => {
+            console.log("xxxxx")
+            d.query(".login-wrapper", document.body).style.display = "block";
+            code.parentNode.removeChild(code)
+        })
+        QrCode.toCanvas("http://www.baidu.com", 150, 150, d.query("#code_login"))
+
+    }
+
+    private device: Device;
 }

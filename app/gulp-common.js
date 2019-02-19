@@ -220,7 +220,7 @@ module.exports = class Compiler {
         src = src.map(s => `${s}.scss`);
         watchSrc = watchSrc.map(s => `${s}.scss`);
 
-        this.gulpTask(rname, src, sass, rname, target, watchSrc);
+        this.gulpTask(rname, src, css, rname, target, watchSrc);
     }
 
     static compressor(type, src, target) {
