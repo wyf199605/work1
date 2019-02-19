@@ -36,7 +36,7 @@ interface IElementTreeAjaxHandler<T, K> {
 export type IElementTreeAjax<
   T extends ElementTreeNode,
   K extends IElementTreeNodePara
-> = IElementTreeAjaxHandler<T, K> | false;
+  > = IElementTreeAjaxHandler<T, K> | false;
 
 export class ElementTreeNode extends TreeNodeBase implements IComponentPara {
   protected _wrapper: HTMLElement;
@@ -310,15 +310,6 @@ export class ElementTreeNode extends TreeNodeBase implements IComponentPara {
       ).then(() => {
         this.childrenEl.classList.toggle("hide", !this._expand);
         this.onExpand && this.onExpand(this, this._expand);
-        let list = G.d.queryAll("#mainNavMenu>.element-tree-node>.tree-child-wrapper>.element-tree-node")
-        for (var i = 0; i < list.length; i++) {
-          if(!list[i].querySelector(".element-tree-node>.tree-text-wrapper>.invisible")){
-            let collect= list[i].querySelector(".element-tree-node>.tree-text-wrapper>.collect_btn");
-            if(collect){
-              collect.parentNode.removeChild(collect);
-            }
-          }
-        }
       });
     }, 10);
 
@@ -494,7 +485,6 @@ export class ElementTreeNode extends TreeNodeBase implements IComponentPara {
       `<div class="element-tree-node">
                 <div class="tree-text-wrapper">
                     <span data-role="text" class="tree-text"></span>
-                     <span class="collect_btn"></span>
                 </div>
                 <div data-role="children" class="tree-child-wrapper hide"></div>
             </div>`

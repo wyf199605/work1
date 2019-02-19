@@ -95,22 +95,15 @@ export class BaseCollect {
     })
   }
   //删除分组
-  req_delGroup(beforeName: string): any {
-    if (beforeName == "")
-      Modal.confirm({
-        msg: "确认删除？",
-        callback: index => {
-          if (index) {
-            return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
-              data2url: true,
-              data: {
-                action: "delTag",
-                tag: beforeName
-              }
-            })
-          }
-        }
-      });
+  req_delGroup(beforeName: string) {
+    return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
+      data2url: true,
+      data: {
+        action: "delTag",
+        tag: beforeName
+      }
+    })
+
   }
   req_getFavoi(obj: { index: number, size: number }): Promise<{ response: { data: Array<dataObj> } }> {
     let ajaxData = {

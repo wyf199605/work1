@@ -9,25 +9,32 @@ import {
 
 export interface IMenuPara extends IElementTreeNodePara {
   children?: IMenuPara[];
-
   isOutline?: boolean; // 是否展开到外部    默认false ,继承
   isHorizontal?: boolean; // 是否水平展示      默认false ,继承
   isHoverExpand?: boolean; // 是否鼠标移入展示  默认false  ,继承
-  
+  isCollect?: boolean;//是否含有收藏功能
   ajax?: IElementTreeAjax<Menu, IMenuPara>; // 继承
   // onOpen?(node: Menu): void; // 继承
 }
-
 /**
  * 菜单组件对象
  */
 export class Menu extends ElementTreeNode {
+  static CollectFunc: (dom:HTMLElement) => void;
   constructor(para: IMenuPara) {
     super(para);
   }
 
   protected init(para: IMenuPara) {
-    super.init(para);
+    super.init(para)
+    // 收藏按钮  引入isCollect 
+    if (this.isCollect) {
+      if ((this.deep == 1 && para.isLeaf) || this.deep !== 1) {
+        d.query(".tree-text-wrapper", this.wrapper).appendChild(d.create('<span class="collect_btn"/>'))
+      }
+    }
+
+
     if (para.container) {
       this.container = para.container;
       para.width && (this.wrapper.style.width = `${para.width}px`);
@@ -78,15 +85,15 @@ export class Menu extends ElementTreeNode {
     } else {
       d.on(this.textWrapper, "click", (event: MouseEvent) => {
         event.stopPropagation();
-
-        if (event.srcElement.getAttribute("class") == 'collect_btn') {
-          alert("收藏")
+        if (this.isCollect || event.srcElement.getAttribute("class") == 'collect_btn') {
+          Menu.CollectFunc(event.srcElement);
         } else {
           this.expand = !this.expand;
           //   (!this.children) && (this.selected = !this.selected);
           this.selected = true;
           this.onOpen && this.onOpen(this);
         }
+
 
       });
       // d.on(d.query(".collect_btn", this.textWrapper),"click",(event:MouseEvent)=>{
@@ -174,6 +181,17 @@ export class Menu extends ElementTreeNode {
   protected wrapperCreate() {
     let wrapper = super.wrapperCreate();
     wrapper.classList.add("menu-node");
+    // if (this.deep == 1) {
+    //   let list = G.d.queryAll("#mainNavMenu>.element-tree-node>.tree-child-wrapper>.element-tree-node")
+    //   for (var i = 0; i < list.length; i++) {
+    //     if (!list[i].querySelector(".element-tree-node>.tree-text-wrapper>.invisible")) {
+    //       let collect = list[i].querySelector(".element-tree-node>.tree-text-wrapper>.collect_btn");
+    //       if (collect) {
+    //         collect.parentNode.removeChild(collect);
+    //       }
+    //     }
+    //   }
+    // }
     d.data(wrapper, this);
     return wrapper;
   }

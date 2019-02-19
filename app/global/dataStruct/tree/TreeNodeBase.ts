@@ -3,8 +3,9 @@ import tools = G.tools;
 
 export interface IBasicTreePara<T = any> {
     // parent?: BasicTreeNode;
-    content?:T;
-    children?: IBasicTreePara<T>[]
+    content?: T;
+    children?: IBasicTreePara<T>[];
+    isCollect?:boolean;
     // tnode?: BasicTreeNode;
 }
 const isInit = '__IS_INIT__',
@@ -16,8 +17,10 @@ export class TreeNodeBase<T = any> {
      * para[parent] - 不用parent作为参数接口的属性 是防止外部调用是误传此参数.
      * @param {IBasicTreePara} para
      */
+    protected isCollect: boolean;//配置收藏按钮
     constructor(para: IBasicTreePara<T> = {}) {
-        if(!para[isInit]) { // 根节点, 广度遍历初始化树，以免初始化时无法找到父节点
+        this.isCollect = para.isCollect?para.isCollect:false;
+        if (!para[isInit]) { // 根节点, 广度遍历初始化树，以免初始化时无法找到父节点
             let paraQueue: IBasicTreePara<T>[] = [para],
                 root: this = null;
 
@@ -25,17 +28,17 @@ export class TreeNodeBase<T = any> {
                 let currentPara = paraQueue.shift();
                 //
                 currentPara[isInit] = true;
-                if(root === null){
+                if (root === null) {
                     currentPara[parent] = currentPara[parent] || 'nothing'; // hack 根元素 防止无限递归
                 }
                 let node = this.nodeCreate(currentPara);
                 delete currentPara[isInit];
 
-                if(root === null){
+                if (root === null) {
                     root = node
                 }
 
-                if(Array.isArray(currentPara.children)){
+                if (Array.isArray(currentPara.children)) {
 
                     paraQueue.push(...currentPara.children.map(child => {
                         child[parent] = node;
@@ -44,13 +47,13 @@ export class TreeNodeBase<T = any> {
                 }
             }
             return root;
-        }else{
-         this.init(para);
+        } else {
+            this.init(para);
         }
     }
 
-    protected init(para?: IBasicTreePara<T>){
-        if(para[parent] instanceof TreeNodeBase){
+    protected init(para?: IBasicTreePara<T>) {
+        if (para[parent] instanceof TreeNodeBase) {
             this.parent = para[parent];
             delete para[parent];
         }
@@ -58,18 +61,19 @@ export class TreeNodeBase<T = any> {
     }
 
     protected nodeCreate(para: IBasicTreePara<T> = {}): this {
+        para.isCollect=this.isCollect;
         return new (<any>this.constructor)(para);
     }
 
     // 获取当前节点深度
-    get deep(){
+    get deep() {
         let deep = 0,
             current = this;
 
-        while(current = current.parent){
-            deep ++;
+        while (current = current.parent) {
+            deep++;
             // 防止死循环
-            if(deep > 10000){
+            if (deep > 10000) {
                 return null
             }
         }
@@ -107,13 +111,13 @@ export class TreeNodeBase<T = any> {
     // }
 
     // 内容
-    public content:any = null;
+    public content: any = null;
 
     // 父
     protected _parent: this = null;
-    set parent (tnode: this) {
+    set parent(tnode: this) {
         // TODO 判断是否会引起回路(tnode 是否为当前树的根节点)
-        if(tnode) {
+        if (tnode) {
             tnode.childrenAdd(this);
 
         } else {
@@ -121,20 +125,20 @@ export class TreeNodeBase<T = any> {
             this._parent && this._parent.childrenRemove(this);
         }
     }
-    get parent(){
+    get parent() {
         return this._parent;
     }
 
-    get siblings() : this[]{
+    get siblings(): this[] {
         return this.parent ? this.parent.children.filter(node => node !== this) : null;
     }
 
     // 子
     protected _children: this[];
-    set children(tnode: this[]){
+    set children(tnode: this[]) {
         this.childrenSet(tnode);
     }
-    get children(){
+    get children() {
         return this._children && [...this._children];
     }
     /**
@@ -151,7 +155,7 @@ export class TreeNodeBase<T = any> {
         this.childrenAdd(tnode);
     }
 
-    childrenAdd(nodePara: this | IBasicTreePara<T> | (this | IBasicTreePara<T>)[]):this[] {
+    childrenAdd(nodePara: this | IBasicTreePara<T> | (this | IBasicTreePara<T>)[]): this[] {
         let add = (tnodes: this[]) => {
             if (tools.isEmpty(tnodes)) {
                 return;
@@ -169,9 +173,9 @@ export class TreeNodeBase<T = any> {
 
         paraArr.forEach((para) => {
             // let node: this = null;
-            if(para instanceof TreeNodeBase){
+            if (para instanceof TreeNodeBase) {
                 nodes.push(para);
-            }else {
+            } else {
                 // para[parent] = 'noting';
                 para[parent] = this;
                 this.nodeCreate(para);
@@ -187,13 +191,13 @@ export class TreeNodeBase<T = any> {
 
         let nodes = tools.toArray(tnode);
 
-        for(let i = 0, node:this = null; node = nodes[i]; i++) {
-            if(this._children && node){
+        for (let i = 0, node: this = null; node = nodes[i]; i++) {
+            if (this._children && node) {
                 let index = this._children.indexOf(node);
-                if(index > -1){
+                if (index > -1) {
                     this._children.splice(index, 1);
                     node._parent = null;
-                    i --;
+                    i--;
                 }
             }
         }
@@ -215,11 +219,11 @@ export class TreeNodeBase<T = any> {
      * @param {number} maxDeep
      * @return {this[]}
      */
-    find(filterCb:(tnode: this) => boolean, maxDeep = -1): this[]{
+    find(filterCb: (tnode: this) => boolean, maxDeep = -1): this[] {
         let tnodes: this[] = null;
-        this.each((t:this, deep) => {
-            if(maxDeep < 0 || deep <= maxDeep){
-                if(filterCb(t)) {
+        this.each((t: this, deep) => {
+            if (maxDeep < 0 || deep <= maxDeep) {
+                if (filterCb(t)) {
                     tnodes = tnodes || [];
                     tnodes.push(t);
                 }
@@ -233,19 +237,19 @@ export class TreeNodeBase<T = any> {
      * @param {(tnode: this) => boolean} filterCb
      * @returns {this}
      */
-    backFind(filterCb:(tnode: this) => boolean): this{
+    backFind(filterCb: (tnode: this) => boolean): this {
         let result = this,
             deep = 0;
 
-        while (result){
-            deep ++;
-            if(filterCb(result)){
+        while (result) {
+            deep++;
+            if (filterCb(result)) {
                 return result
-            }else{
+            } else {
                 result = result.parent
             }
 
-            if(deep > 100){
+            if (deep > 100) {
                 return;
             }
         }
@@ -289,12 +293,12 @@ export class TreeNodeBase<T = any> {
      * 遍历树（前序遍历）
      * @param {(tnode: BasicTreeNode, deep: number) => void} cb
      */
-    each(cb: (tnode: this, deep:number) => void) {
+    each(cb: (tnode: this, deep: number) => void) {
 
-        let each = (tnode:this, cb: (tnode: this, deep:number) => void, startDeep = 0) => {
-            if(tnode) {
+        let each = (tnode: this, cb: (tnode: this, deep: number) => void, startDeep = 0) => {
+            if (tnode) {
                 cb(tnode, startDeep);
-                startDeep ++;
+                startDeep++;
 
                 let children = tnode.children;
                 Array.isArray(children) && children.forEach(t => {
@@ -311,9 +315,9 @@ export class TreeNodeBase<T = any> {
      * @param {number[]} path
      * @return TreeNodeBase
      */
-    nodeGetByPath(path: number[]){
+    nodeGetByPath(path: number[]) {
         let getByPath = (tnode: this, path: number[]) => {
-            if(tnode && Array.isArray(tnode.children) && path && path.length){
+            if (tnode && Array.isArray(tnode.children) && path && path.length) {
                 let first = path.shift();
                 return getByPath(tnode.children[first], path);
             } else {

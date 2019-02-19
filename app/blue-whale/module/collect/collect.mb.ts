@@ -155,10 +155,19 @@ export class Collect extends BaseCollect {
         container: wrapper,
         className: "del_btn",
         onClick: () => {
-          this.req_delGroup(GroupName).then(() => {
-            Modal.toast("删除成功");
-            m.isShow = false;
-          })
+          if (GroupName !== "") {
+            Modal.confirm({
+              msg: "确认删除？",
+              callback: index => {
+                if (index) {
+                  this.req_delGroup(GroupName).then(() => {
+                    Modal.toast("删除成功");
+                    m.isShow = false;
+                  })
+                }
+              }
+            });
+          }
         }
       },
       {
@@ -184,7 +193,7 @@ export class Collect extends BaseCollect {
               let fragment = document.createDocumentFragment();
               // console.log(HandleDOM);
               // HandleDOM.previousSibling.
-              HandleDOM.parentNode.querySelector(".conFavGroup").innerHTML = rename;
+              // HandleDOM.parentNode.querySelector(".conFavGroup").innerHTML = rename;
               if (dataName) {
                 let liDom = HandleDOM.querySelectorAll("li[data-favid]"),
                   len = liDom.length;

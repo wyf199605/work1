@@ -70,6 +70,7 @@ export default class SideBarMrg {
       isAccordion: true,
       content: this.para.menuUrl,
       isLeaf: false,
+      isCollect: true,
       // isShowCheckBox: true,
       ajax: (node): Promise<any> => {
         let content = node.content,
@@ -90,6 +91,9 @@ export default class SideBarMrg {
         );
       }
     });
+    Menu.CollectFunc=function(event){
+      console.log(event)
+    },
 
     this.menu.onOpen = tools.pattern.throttling(node => {
       if (node.isLeaf) {
