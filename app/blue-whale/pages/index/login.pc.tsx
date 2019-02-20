@@ -65,7 +65,7 @@ export class LoginPcPage extends LoginPage {
                 设备注册
                 </a>
             <a href="#" className="scanLogin">
-                <i className="iconfont icon-scan" />
+                <i class="iconfont icon-scan"></i>
                 扫码登陆
                 </a>
         </div>;
@@ -102,10 +102,10 @@ export class LoginPcPage extends LoginPage {
             saveButton: checkBox,
             fingerMbBtn: d.query('.zhiwen', loginOption),
             regButton: d.query('.device', loginOption),
-            scanButton:d.query(".scanLogin",loginOption),
+            scanButton: d.query(".scanLogin", loginOption),
             fqaBtn
         });
-    
+
     }
-    
+
 }

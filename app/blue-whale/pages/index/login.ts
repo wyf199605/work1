@@ -767,7 +767,9 @@ export class LoginPage {
             });
         }
         if (props.scanButton) {
-            d.on(props.scanButton, "click", this.scanHandle)
+            d.on(props.scanButton, "click", ()=>{
+                this.scanHandle(true)
+            })
         }
         if (props.fingerPcBtn) {
             d.on(props.fingerPcBtn, 'click', () => {
@@ -949,28 +951,53 @@ export class LoginPage {
         }
     }
     //扫码登陆
-    private scanHandle() {
-
+    private scanHandle = (status:boolean=false) => {
         d.query(".login-wrapper", document.body).style.display = "none";
+        // isLogin 判断是否初次登录,code 整个弹窗 close 关闭按钮
+        let isLogin = status, code = null, close = null;
+        if (isLogin) {
+            code = this.renderLogined();
+            close = d.query("#js_other", code);
+        } else {
+            code = this.renderUnLogin();
+            close = d.query("#close", code);
+        }
+        // 其他方式登录
+        d.on(close, "click", () => {
+            d.query(".login-wrapper", document.body).style.display = "block";
+            code.parentNode.removeChild(code)
+        })
+        //切换用户按钮
+        let cueUser = d.query("#js_cue", code);
+        d.on(cueUser, "click", () => {
+            code.remove();
+            this.scanHandle(false)
+        })
+    }
+    renderUnLogin() {
         let wrap = d.query(".code_login", document.body)
         if (wrap) {
             wrap.style.display = "none";
         }
-        let code = d.create(`<div class='code_login'>
-           <div id='code_login'></div>
-           <p>请打开速狮APP扫码登录</p>
-           <div id="close">其他方式</div>
+        let dom = d.create(`<div class='code_login'>
+        <div id='code_login'></div>
+        <p>请打开速狮APP扫码登录</p>
+        <div id="close">其他方式</div>
         </div>`)
-        let close = d.query("#close", code);
-
-        d.append(d.query(".login-page-container"), code)
-        d.on(close, "click", () => {
-            console.log("xxxxx")
-            d.query(".login-wrapper", document.body).style.display = "block";
-            code.parentNode.removeChild(code)
-        })
+        d.append(d.query(".login-page-container"), dom);
         QrCode.toCanvas("http://www.baidu.com", 150, 150, d.query("#code_login"))
-
+        return dom;
+    }
+    renderLogined() {
+        let dom = d.create(`<div class="has_logined">
+                <p>当前用户</p>
+                <p class="current_name">wjb</p>
+                <button id="js_login_btn">登录</button>
+                <div id="js_cue">切换用户</div>
+                <div id="js_other">其他方式登录</div>
+            </div>`)
+        d.append(d.query(".login-page-container"), dom);
+        return dom;
     }
 
     private device: Device;

@@ -7,7 +7,7 @@ import { Search } from "../../module/search/search";
 import d = G.d;
 import { SlideTab } from "../../../global/components/ui/slideTab/slideTab";
 import { Modal } from "../../../global/components/feedback/modal/Modal";
-
+import {ShellAction} from "../../../global/action/ShellAction";
 export = class homePage {
 
     protected slideTab: SlideTab;
@@ -97,7 +97,14 @@ export = class homePage {
 
     constructor(private para) {
         let scanBtn = d.query("#scan_btn");
+       
         d.on(scanBtn, "click", () => {
+            ShellAction.get().device().scan({
+                callback: (e) => {
+                    alert(e.detail);
+                }
+            });
+            return false;
             d.query("#slider").style.visibility = "hidden"
             d.query("#header").style.visibility = "hidden"
 
@@ -105,13 +112,17 @@ export = class homePage {
                 <p className="login_pic"><i class="iconfont icon-weibiaoti-"></i></p>
                 <p className="login_tip">将在电脑上登录速狮软件</p>
                 <button className="login_btn">登录</button>
-                <p className="login_cancel">取消登录</p>
+                <p className="login_cancel" id="js_cancal_login">取消登录</p>
             </div>;
+
             if (!d.query(".isLogin_modal")) {
                 d.append(d.query(".mui-content"), dom);
+                let cancelBtn= d.query("#js_cancal_login")
+                d.on(cancelBtn,"click",()=>{
+                    d.query("#slider").style.visibility = "visible"
+                    d.query("#header").style.visibility = "visible"
+                })
             }
-
-            // d.append(dom, modal)
         })
         let content = <div className="slide-panel-wrapper" />;
         d.append(para.container, content);
