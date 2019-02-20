@@ -83,6 +83,13 @@ interface IBW_Table {
     layout?: IBW_Layout; // 移动化
     subTableAddr?: R_ReqAddr; //移动化
     layoutDrill?: R_ReqAddr; // 下钻地址
+    operationType?: {
+        autoEdit: boolean;
+        editType: 'current' | 'modal';
+    };
+    exhibitionType: {
+        showType: 'tab' | 'panel'
+    }
 }
 
 interface IBW_Detail {
@@ -99,6 +106,13 @@ interface IBW_Detail {
     scannableTime?: number;
     subTableList?: IBW_Slave[];
     tableAddr?: IBW_TableAddr;    // 表格编辑数据
+    operationType?: {
+        autoEdit: boolean;
+        editType: 'current' | 'modal';
+    };
+    exhibitionType: {
+        showType: 'tab' | 'panel'
+    }
 }
 
 interface IBW_SubTableAddr {
@@ -164,9 +178,6 @@ interface IBW_TableRfidCol {
 interface IBW_TableAddr {
     dataAddr: string;	//后台地址
     param: IBW_TableAddrParam[];
-
-    openType?: 'current' | 'modal';
-    autoEdit?: boolean;
 }
 
 interface IBW_TableAddrParam {

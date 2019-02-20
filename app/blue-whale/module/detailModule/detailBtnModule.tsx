@@ -103,31 +103,9 @@ export class DetailBtnModule extends DetailModule{
             return new Button({
                 content: btn.caption,
                 onClick: () => {
-                    switch (btn.subType){
-                        case 'update_save': {
-                            this.editing = true;
-                            box && box.wrapper.classList.add('hide');
-                            this.editBtn.init(btn);
-                            this.editBtn.onFinish = () => {
-                                box && box.wrapper.classList.remove('hide');
-                            };
-                            break;
-                        }
-                        case 'delete_save': {
-                            if(this.dataManager && this.dataManager.total !== 0){
-                                this.detailEdit && this.detailEdit.del()
-                            }else{
-                                Modal.alert('没有数据可以删除！');
-                            }
-                            break;
-                        }
-                        default: {
-                            let data = this.detailData;
-                            ButtonAction.get().clickHandle(btn, data, () => {
-                            }, this.pageUrl || '');
-                            break;
-                        }
-                    }
+                    let data = this.detailData;
+                    ButtonAction.get().clickHandle(btn, data, () => {
+                    }, this.pageUrl || '');
                 }
             })
         };

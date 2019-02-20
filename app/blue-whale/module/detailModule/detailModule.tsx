@@ -335,7 +335,7 @@ export class DetailModule extends Component implements IGroupTabItem{
         }
         this._detailEdit = new DetailEditModule({
             url: tableAddr.dataAddr,
-            editType: tableAddr.openType,
+            editType: this.ui.operationType.editType,
             editParam: tableAddr.param[0],
             detail: this,
             caption: this.ui.caption
