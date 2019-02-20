@@ -346,24 +346,28 @@ export class RfidInventory {
             url = element.downloadAddr.dataAddr;
         this.uniqueFlag = element.uniqueFlag;
         Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
-            this.ui = result.data;
-             let info = this.ui.classifyInfo;
-            console.log(this.ui,'这是下载数据');
-            Array.isArray(info) && info.forEach(obj => {
-                let keys = Object.keys(obj),
-                    li = <div class="rfid-li"> 
-                        <div>{obj[keys[0]]}：</div>
-                        <div data-name={keys.join(',')}/>
-                    </div>;
-                d.append(this.sortEl, li);
-            });
-            if(this.ui && this.ui.keyField){
-                d.append(this.sortEl, <div className="rfid-li">
-                    <div>{this.ui.keyName}：</div>
-                    {this._keyFildEl = <div data-name={this.ui.keyField}/>}
-                </div>)
+            if(result && result.success){
+                this.ui = result.data;
+                let info = this.ui && this.ui.classifyInfo;
+                // console.log(this.ui,'这是下载数据');
+                Array.isArray(info) && info.forEach(obj => {
+                    let keys = Object.keys(obj),
+                        li = <div class="rfid-li">
+                            <div>{obj[keys[0]]}：</div>
+                            <div data-name={keys.join(',')}/>
+                        </div>;
+                    d.append(this.sortEl, li);
+                });
+                if(this.ui && this.ui.keyField){
+                    d.append(this.sortEl, <div className="rfid-li">
+                        <div>{this.ui.keyName}：</div>
+                        {this._keyFildEl = <div data-name={this.ui.keyField}/>}
+                    </div>)
+                }
+                this.titleEl.innerHTML = this.ui && this.ui.title || '';
+            }else {
+                Modal.alert('下载数据失败', null, () => this.focus());
             }
-            this.titleEl.innerHTML = this.ui && this.ui.title || '';
             loading.destroy();
             this.focus();
         });
