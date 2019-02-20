@@ -163,25 +163,30 @@
             text-align: center;
             margin: 0 auto 10px;
           }
+          &.zhiwen,
+          &.device,
+          &.scanLogin {
+            .iconfont {
+              line-height: 50px;
+              font-size: 27px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+          }
           &.zhiwen {
             .iconfont {
               background-color: #ffb400;
-              line-height: 50px;
-              font-size: 27px;
             }
           }
           &.device {
             .iconfont {
               background-color: #33c3a2;
-              line-height: 52px;
-              font-size: 35px;
             }
           }
           &.scanLogin {
             .iconfont {
               background-color: lightblue;
-              line-height: 52px;
-              font-size: 35px;
             }
           }
         }

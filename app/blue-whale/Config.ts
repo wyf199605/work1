@@ -106,6 +106,14 @@ namespace BW {
             queryTest:'ui/select/node_nobugs?output=json',
 
             fileInfo: 'rest/attachment/info/file', // 文件信息
+
+            /**扫码登录 */
+            scanToken:'app_sanfu_retail/null/codelogin/code',//获取扫码二维码
+            scanState:"app_sanfu_retail/null/codelogin/state ",//获取用户是否扫码的状态  轮询请求
+            scanFirstCode:"app_sanfu_retail/null/common/scan",//pc初次登录：手机扫码获得lgToken并访问 
+            scanSecondCode:"/app_sanfu_retail/null/codelogin/code",//pc非初次登录 
+            scanMbSure:"/app_sanfu_retail/null/codelogin/change",//手机扫码后点击确认登录 
+
         },
 
         init(siteUrl: string, appid: string, version: string, webscoket) {

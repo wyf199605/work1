@@ -7,8 +7,9 @@ import { Search } from "../../module/search/search";
 import d = G.d;
 import { SlideTab } from "../../../global/components/ui/slideTab/slideTab";
 import { Modal } from "../../../global/components/feedback/modal/Modal";
-import {ShellAction} from "../../../global/action/ShellAction";
-export = class homePage {
+import { ShellAction } from "../../../global/action/ShellAction";
+import BasicPage from "../../pages/basicPage";
+export = class homePage extends BasicPage{
 
     protected slideTab: SlideTab;
     protected homeList: HTMLElement;
@@ -96,34 +97,8 @@ export = class homePage {
     }
 
     constructor(private para) {
-        let scanBtn = d.query("#scan_btn");
-       
-        d.on(scanBtn, "click", () => {
-            ShellAction.get().device().scan({
-                callback: (e) => {
-                    alert(e.detail);
-                }
-            });
-            return false;
-            d.query("#slider").style.visibility = "hidden"
-            d.query("#header").style.visibility = "hidden"
-
-            let dom = <div className="isLogin_modal">
-                <p className="login_pic"><i class="iconfont icon-weibiaoti-"></i></p>
-                <p className="login_tip">将在电脑上登录速狮软件</p>
-                <button className="login_btn">登录</button>
-                <p className="login_cancel" id="js_cancal_login">取消登录</p>
-            </div>;
-
-            if (!d.query(".isLogin_modal")) {
-                d.append(d.query(".mui-content"), dom);
-                let cancelBtn= d.query("#js_cancal_login")
-                d.on(cancelBtn,"click",()=>{
-                    d.query("#slider").style.visibility = "visible"
-                    d.query("#header").style.visibility = "visible"
-                })
-            }
-        })
+        super(para);
+        // this.initScan();
         let content = <div className="slide-panel-wrapper" />;
         d.append(para.container, content);
         let isAndroid4 = false;
@@ -250,7 +225,71 @@ export = class homePage {
         sys.window.wake("refreshHomeData", null);
 
     }
+    // initScan() {
+    //     let scanBtn = d.query("#scan_btn");
 
+    //     d.on(scanBtn, "click", () => {
+    //         // ShellAction.get().device().scan({
+    //         //     callback: (e) => {
+    //         //         alert(e.detail);//e.detail.data == lgToken
+    //         //     }
+    //         // });
+    //         // return false;
+    //         d.query("#slider").style.visibility = "hidden"
+    //         d.query("#header").style.visibility = "hidden"
+
+    //         let dom = <div className="isLogin_modal">
+    //             <p className="login_pic"><i class="iconfont icon-weibiaoti-"></i></p>
+    //             <p className="login_tip">将在电脑上登录速狮软件</p>
+    //             <button className="login_btn">登录</button>
+    //             <p className="login_cancel" id="js_cancal_login">取消登录</p>
+    //         </div>;
+
+    //         if (!d.query(".isLogin_modal")) {
+    //             d.append(d.query(".mui-content"), dom);
+    //             let cancelBtn = d.query("#js_cancal_login")
+    //             d.on(cancelBtn, "click", () => {
+    //                 d.query("#slider").style.visibility = "visible"
+    //                 d.query("#header").style.visibility = "visible"
+    //             })
+    //             let loginBtn = d.query(".login_btn", dom);
+    //             d.on(loginBtn, "click", () => {
+    //                 this.req_scanType().then(res => {
+    //                     console.log(res)
+    //                     switch (res.data.codetype) {
+    //                         case "qrcodelogin":
+    //                             this.req_scanLogin().then(res => {
+    //                                 alert("确认登录")
+    //                                 d.query("#slider").style.visibility = "visible"
+    //                                 d.query("#header").style.visibility = "visible"
+    //                             })
+    //                             break;
+    //                         default:
+    //                             break;
+    //                     }
+    //                 })
+
+    //             })
+    //         }
+    //     })
+    // }
+    // req_scanType(): Promise<{ data: { msg: string, errorCode: number, codetype: string } }> {
+    //     return new Promise((resolve, reject) => {
+    //         resolve({
+    //             data: {
+    //                 "errorCode": 0,
+    //                 "msg": "相关说明",
+    //                 "codetype": "qrcodelogin"
+    //             }
+    //         })
+    //     })
+    // }
+    // req_scanLogin() {
+    //     //lgtoken=XXXXXX&userid=xxx  & token=XXXX
+    //     return new Promise((resolve, reject) => {
+    //         resolve(200)
+    //     })
+    // }
     protected getHomeData(para) {
         BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.menu, { output: 'json' }), {
             loading: {

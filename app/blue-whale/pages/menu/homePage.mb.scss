@@ -3,33 +3,6 @@
     padding: 0;
     margin: 0;
   }
-  .isLogin_modal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .login_tip {
-      margin: 10px auto;
-    }
-    .login_btn {
-      width: 51%;
-      background-color: rgba(22, 155, 213, 1);
-      padding: 6px;
-      color: white;
-      text-align: center;
-      border-radius: 6px;
-      margin-top: 12vh;
-    }
-    .login_cancel {
-      margin: 40px auto;
-    }
-    .login_pic {
-      margin-top: 28vh;
-      margin-bottom: 28px;
-      .iconfont {
-        font-size: 143px;
-      }
-    }
-  }
   .conFavGroup {
     border-left: 5px solid #007aff;
     margin-left: 5px;

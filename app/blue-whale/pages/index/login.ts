@@ -35,6 +35,7 @@ interface IProps {
  */
 export class LoginPage {
     private LoginModal: Modal;
+    private Interval: number;
     constructor(private props: IProps) {
         tools.isMb && this.getVersion();
         let response = props.responseBean;
@@ -767,8 +768,10 @@ export class LoginPage {
             });
         }
         if (props.scanButton) {
-            d.on(props.scanButton, "click", ()=>{
-                this.scanHandle(true)
+            d.on(props.scanButton, "click", () => {
+                // console.log(this.props.userId.value.replace(/\s+/g, ""))
+                let userName = this.props.userId.value.replace(/\s+/g, "")
+                this.scanHandle(tools.isEmpty(userName) ? false : true);
             })
         }
         if (props.fingerPcBtn) {
@@ -951,7 +954,7 @@ export class LoginPage {
         }
     }
     //扫码登陆
-    private scanHandle = (status:boolean=false) => {
+    private scanHandle = (status: boolean = false) => {
         d.query(".login-wrapper", document.body).style.display = "none";
         // isLogin 判断是否初次登录,code 整个弹窗 close 关闭按钮
         let isLogin = status, code = null, close = null;
@@ -964,6 +967,9 @@ export class LoginPage {
         }
         // 其他方式登录
         d.on(close, "click", () => {
+            if (this.Interval) {
+                clearInterval(this.Interval)
+            }
             d.query(".login-wrapper", document.body).style.display = "block";
             code.parentNode.removeChild(code)
         })
@@ -974,7 +980,7 @@ export class LoginPage {
             this.scanHandle(false)
         })
     }
-    renderUnLogin() {
+    renderUnLogin = () => {
         let wrap = d.query(".code_login", document.body)
         if (wrap) {
             wrap.style.display = "none";
@@ -985,10 +991,10 @@ export class LoginPage {
         <div id="close">其他方式</div>
         </div>`)
         d.append(d.query(".login-page-container"), dom);
-        QrCode.toCanvas("http://www.baidu.com", 150, 150, d.query("#code_login"))
+        this.req_getLgToken();
         return dom;
     }
-    renderLogined() {
+    renderLogined = () => {
         let dom = d.create(`<div class="has_logined">
                 <p>当前用户</p>
                 <p class="current_name">wjb</p>
@@ -997,8 +1003,51 @@ export class LoginPage {
                 <div id="js_other">其他方式登录</div>
             </div>`)
         d.append(d.query(".login-page-container"), dom);
+        d.query(".current_name", dom).innerText = this.props.userId.value.replace(/\s+/g, "")
+        let loginBtn = d.query("#js_login_btn");
+        d.on(loginBtn, "click", () => {
+            this.req_sendServer();
+        })
+
         return dom;
     }
+    // 点击登录 --非初次登录 通知服务端该用户点击登录了
+    req_sendServer() {
+        //userid=XXX 
+        return new Promise((resolve, reject) => {
+            resolve({
+                data: {
+                    "errorCode": 0,
+                    "msg": "请求成功",
+                    "lgtoken": "xxxxx"
+                }
+            })
+        })
+    }
+    //扫码登录获取LgToken
+    req_getLgToken = () => {
 
+        G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({ response }) => {
+            QrCode.toCanvas("http://www.baidu.com", 150, 150, d.query("#code_login"));
+            let i = 10;
+            this.Interval = setInterval(() => {
+                this.req_polling().then(res => {
+                    console.log(res)
+                    i--;
+                    if (i === 1) {
+                        clearInterval(this.Interval)
+                    }
+                })
+            }, 1000)
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
+    //轮询
+    req_polling() {
+        return new Promise((resolve, reject) => {
+            resolve(1111)
+        })
+    }
     private device: Device;
 }
