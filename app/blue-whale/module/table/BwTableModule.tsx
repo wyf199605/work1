@@ -132,7 +132,7 @@ export class BwTableModule extends Component {
         this.ftable && (this.ftable.btnShow = flag);
     }
 
-    private get baseFtablePara(): IFastBtnTablePara {
+    protected getBaseFtablePara(): IFastBtnTablePara {
         // 基本配置
         return {
             isWrapLine: tools.isMb && (this.ui.cols ? this.ui.cols.some((col) => col.atrrs.displayWidth > 0) : false),
@@ -275,7 +275,7 @@ export class BwTableModule extends Component {
     private ftableInit(ajaxData?: obj) {
         let ui = this.ui;
         this.ftable = new FastBtnTable(
-            Object.assign(this.baseFtablePara, {
+            Object.assign(this.getBaseFtablePara(), {
                 exportTitle: this.ui.caption,
                 cols: BwTableModule.colParaGet(this._cols), // 把fields转为表格的参数
                 ajax: {
@@ -541,7 +541,7 @@ export class BwTableModule extends Component {
             }
             response.data = this.addOldData(response.data);
             this.ftable = new FastBtnTable(
-                Object.assign(this.baseFtablePara, {
+                Object.assign(this.getBaseFtablePara(), {
                     exportTitle: this.ui.caption,
                     cols: BwRule.createCrossTableCols(response.meta, this._cols),
                     data: response.data

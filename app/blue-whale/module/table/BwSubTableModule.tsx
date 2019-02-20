@@ -14,6 +14,14 @@ export class BwSubTableModule extends BwTableModule{
         super.ftableReady();
     }
 
+    protected getBaseFtablePara(){
+        let data = super.getBaseFtablePara();
+        if(tools.isMb){
+            data.btn = null;
+        }
+        return data;
+    }
+
     protected _btnWrapper: HTMLElement;
     get btnWrapper(){
         if (!this._btnWrapper) {
