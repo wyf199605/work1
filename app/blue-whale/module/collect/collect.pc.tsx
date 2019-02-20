@@ -8,43 +8,39 @@ import d = G.d
 import CONF = BW.CONF;
 import sys = BW.sys;
 export class CollectPC extends BaseCollect {
-  private modal: Modal;
-  private body: HTMLElement;
-  private groupItem: HTMLElement;
-  private menuItem: HTMLElement;
-  private footer: HTMLElement;
+  private modal: Modal;//模态框
+  private body: HTMLElement; //模态框body的dom
+  private groupItem: HTMLElement; //分组dom
+  private menuItem: HTMLElement; //菜单dom
+  private footer: HTMLElement; //底部dom
   private cancelBtn: Button;
   private newMenuBtn: Button;
   private _GroupName: string;
   private Item: { value: string, text: string }[] = [];
+  private selectVal: any;
   private pageUrl: string = CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=collect";
+  private _menuUrl: string;
   set GroupName(groupName: string) {
     this._GroupName = groupName;
   }
   get GroupName() {
     return this._GroupName;
   }
+  set menuUrl(menuUrl: string) {
+    this._menuUrl = menuUrl
+  }
+  get menuUrl() {
+    return this._menuUrl;
+  }
   // isEdit 是否编辑编
   show(isEdit?: boolean, GroupName?: string) {
-    if (this.modal) {
-      this.appendFoot(isEdit);
-    } else {
-      this.addCollect();
-      this.appendFoot(isEdit);
-    }
+    this.addCollect();
+    this.appendFoot(isEdit);
     if (isEdit) {
       this.groupItem.style.display = "none";
       this.menuItem.style.display = "block";
     } else {
-      let inputEl = d.query(".menu_name", this.groupItem) as HTMLInputElement;
-      inputEl.value = this.GroupName;
-      this.req_groupName().then(({response}) => {
-        // console.log(response)
-        this.Item = response.data.map(item => {
-          return { value: item.tag?item.tag:"默认分组", text: item.tag?item.tag:"默认分组" }
-        })
-        console.log(this.Item)
-      })
+      this.Item = [];
       this.groupItem.style.display = "block";
       this.menuItem.style.display = "none";
     }
@@ -62,7 +58,6 @@ export class CollectPC extends BaseCollect {
           container: this.footer,
           className: "cancel_btn",
           onClick: () => {
-
             let url = CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=collect";
             sys.window.refresh(url)
             this.modal.isShow = false;
@@ -73,7 +68,17 @@ export class CollectPC extends BaseCollect {
           container: this.footer,
           className: "sure_btn",
           onClick: () => {
-            console.log(this.newMenuBtn.isDisabled)
+            // console.log(this.newMenuBtn.isDisabled)
+            if (this.newMenuBtn.isDisabled) {
+
+            } else {
+              console.log(this.menuUrl)
+              console.log(this.selectVal)
+              this.req_addCollect(this.menuUrl, this.selectVal.text).then(() => {
+                sys.window.refresh(this.pageUrl)
+                this.modal.isShow = false;
+              })
+            }
           }
         }
       ]
@@ -137,7 +142,7 @@ export class CollectPC extends BaseCollect {
     this.groupItem = <div className="colect_body_group">
       <div>
         <label>名称</label>
-        <input placeholder="菜单名称" type="text" class="menu_name" disabled />
+        <input placeholder="菜单名称" type="text" class="menu_name" id="inputDom" disabled />
       </div>
       <div>
         <label>收藏夹</label>
@@ -155,25 +160,37 @@ export class CollectPC extends BaseCollect {
       </div>
       <div class="modal_footer" />
     </div>
-    this.modal = new Modal({
-      body: this.body,
-      header: {
-        title: '收藏',
-        isDrag: false
-      },
-      width: '360px',
-      top: 160,
-    });
+    if (!this.modal) {
+      this.modal = new Modal({
+        body: this.body,
+        header: {
+          title: '收藏',
+          isDrag: false
+        },
+        width: '360px',
+        top: 160,
+      });
+    }
     let select = d.query(".select_comp", this.body);
-    new SelectInput({
-      container: select,
-      data: this.Item,
-      readonly: true,
-      clickType: 0,
-      onSet: function (item) {
-
-      }
-    });
+    this.req_groupName().then(({ response }) => {
+      this.Item = response.data.map(item => {
+        return { value: item.tag ? item.tag : "默认分组", text: item.tag ? item.tag : "默认分组" }
+      })
+      let inputEl = d.query("#inputDom", this.groupItem) as HTMLInputElement;
+      console.log(inputEl)
+      console.log(this.GroupName+"------")
+      inputEl.value = this.GroupName;
+      new SelectInput({
+        container: select,
+        data: this.Item,
+        readonly: true,
+        clickType: 0,
+        onSet: (item) => {
+          this.selectVal = item;
+        }
+      });
+    })
+   
 
   }
   toggleBody(isGroup: boolean) {

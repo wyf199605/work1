@@ -20,7 +20,7 @@ export interface IMenuPara extends IElementTreeNodePara {
  * 菜单组件对象
  */
 export class Menu extends ElementTreeNode {
-  static CollectFunc: (dom: any,node:any) => void;
+  static CollectFunc: (dom: any, node: any) => void;
   constructor(para: IMenuPara) {
     super(para);
   }
@@ -30,7 +30,15 @@ export class Menu extends ElementTreeNode {
     // 收藏按钮  引入isCollect 
     if (this.isCollect) {
       if ((this.deep == 1 && para.isLeaf) || this.deep !== 1) {
-        d.query(".tree-text-wrapper", this.wrapper).appendChild(d.create('<span class="collect_btn"/>'))
+        let dom = "";
+        if (this.content.favid) {
+          dom = `<i class="collect_btn iconfont icon-zhiwen"/>`
+        } else {
+          dom = `<i class="collect_btn iconfont icon-device-mb"/>`
+
+        }
+        d.query(".tree-text-wrapper", this.wrapper).appendChild(d.create(dom))
+
       }
     }
 
@@ -88,8 +96,8 @@ export class Menu extends ElementTreeNode {
         if (this.isCollect && event.srcElement.getAttribute("class") == 'collect_btn') {
           // console.log(event.srcElement.parentNode)
           // console.log(this)
-    
-          Menu.CollectFunc(event.srcElement.parentNode,this);
+
+          Menu.CollectFunc(event.srcElement.parentNode, this);
         } else {
           this.expand = !this.expand;
           //   (!this.children) && (this.selected = !this.selected);

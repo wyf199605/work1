@@ -55,8 +55,6 @@ export default class SideBarMrg {
     if (sysPcHistory.indexOf(url) >= 0) {
       sys.window.refresh(url);
     }
-    console.log(url)
-    console.log(title)
     sys.window.open({ url, title });
   };
   /**
@@ -99,8 +97,10 @@ export default class SideBarMrg {
       if (!this.CollectObj) {
         this.CollectObj = new CollectPC();
       }
-      this.CollectObj.GroupName = dom.title ? dom.title : "";
-      this.CollectObj.show(false)
+      // this.CollectObj.GroupName = dom.title ? dom.title : "";
+      // this.CollectObj.menuUrl=node.content.menuPath.dataAddr;
+      // console.log(dom.title)
+      // this.CollectObj.show(false)
     },
 
       this.menu.onOpen = tools.pattern.throttling(node => {
