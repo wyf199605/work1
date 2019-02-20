@@ -111,7 +111,7 @@ interface IBW_Detail {
         editType: 'current' | 'modal';
     };
     exhibitionType: {
-        showType: 'tab' | 'panel'
+        showType: 'tab' | 'panel-on' | 'panel-off'
     }
 }
 

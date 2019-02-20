@@ -9,35 +9,38 @@ import tools = G.tools;
 import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
 import CONF = BW.CONF;
 import sys = BW.sys;
-import {EditModule} from "../edit/editModule";
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
-import {IGroupTabItem} from "../../pages/groupTabs/GroupTabsPage";
 import {DetailDataManager} from "./detailDataManager";
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {DetailEditModule} from "./detailEditModule";
+import AGroupTabItem = BW.AGroupTabItem;
+import IGroupTabItemPara = BW.IGroupTabItemPara;
 
-export interface IDetailModulePara extends IComponentPara {
+export interface IDetailModulePara extends IGroupTabItemPara {
     ui: IBW_Detail; // 根据ui生成detail页
+    ajaxData?: obj;
 }
 
-export class DetailModule extends Component implements IGroupTabItem{
+export class DetailModule extends AGroupTabItem {
     protected wrapperInit() {
         return <div className="detail-wrapper">
             <div className="detail-content"/>
         </div>;
     }
 
-    public linkedData = {}; // 关联数据
+    public ajaxData = {}; // 关联数据
     protected dataManager: DetailDataManager; // 数据管理
     protected ui: IBW_Detail; // ui 数据
     protected fields: R_Field[]; // ui 中的fields字段数据，用于构建detailItem
     items: DetailItem[]; // 存放实例化的detailItem
+    editType: 'current' | 'modal'; // 存放实例化的detailItem
+
+    onRender: Function;
+    onDataChange: Function;
 
     // 放置按钮的元素
     protected _btnWrapper: HTMLElement;
-    get btnWrapper(){
-        if(!this._btnWrapper){
+    get btnWrapper() {
+        if (!this._btnWrapper) {
             this._btnWrapper = <div className="detail-btn-group"/>;
             d.append(this.wrapper, this._btnWrapper);
         }
@@ -46,10 +49,11 @@ export class DetailModule extends Component implements IGroupTabItem{
 
     constructor(para: IDetailModulePara) {
         super(para);
-        console.log(para);
-        this.ui = para.ui;
+        this.ui = para.ui as IBW_Detail;
+        this.ajaxData = para.ajaxData || {};
         BwRule.beforeHandle.detail(this.ui); // 处理ui的fields字段
         this.fields = this.ui.fields;
+        this.editType = this.ui.operationType.editType || 'current';
 
         let content = d.query('.detail-content', this.wrapper);
         this.items = this.initItems(content);
@@ -62,11 +66,13 @@ export class DetailModule extends Component implements IGroupTabItem{
 
     }
 
-    static EVT_RENDERED = '__event_detail_rendered';
-    get total(){
+    static EVT_RENDERED = '__event_detail_rendered__';
+
+    get total() {
         return this.dataManager ? this.dataManager.total : 0;
     }
-    protected initDataManager(){
+
+    protected initDataManager() {
         // 初始化数据管理模块
         this.dataManager = new DetailDataManager({
             render: () => {
@@ -81,7 +87,7 @@ export class DetailModule extends Component implements IGroupTabItem{
                     return new Promise((resolve, reject) => {
                         let ui = this.ui,
                             url = tools.isNotEmpty(ui.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(ui.dataAddr) : '';
-                        current ++;
+                        current++;
                         if (tools.isNotEmpty(url)) {
                             Promise.all([
                                 BwRule.Ajax.fetch(url, {
@@ -111,7 +117,7 @@ export class DetailModule extends Component implements IGroupTabItem{
                             }).catch((e) => {
                                 reject(e);
                             })
-                        }else{
+                        } else {
                             reject();
                         }
                     })
@@ -124,15 +130,15 @@ export class DetailModule extends Component implements IGroupTabItem{
     initItems(container: HTMLElement): DetailItem[] {
         return this.fields.map((field) => {
             return <DetailItem field={field} detail={this} container={container}
-                format={(f, cellData, rowData) => {
-                   return this.format(f, cellData, rowData);
-                }}
+                               format={(f, cellData, rowData) => {
+                                   return this.format(f, cellData, rowData);
+                               }}
             />
         })
     }
 
     // 根据field name获取对应的detailItem
-    getDetailItem(name: string): DetailItem{
+    getDetailItem(name: string): DetailItem {
         return this.items ? this.items.filter((item) => {
             return item.name === name;
         })[0] || null : null;
@@ -160,10 +166,10 @@ export class DetailModule extends Component implements IGroupTabItem{
                 d.off(this.wrapper, 'click', '.cell-link .detail-item-content', handler);
                 d.on(this.wrapper, 'click', '.cell-link .detail-item-content', handler = (e) => {
                     let itemEl = d.closest(e.target as HTMLElement, '.detail-item');
-                    if(itemEl){
+                    if (itemEl) {
                         let name = itemEl.dataset.name,
                             item = this.getDetailItem(name);
-                        if(item){
+                        if (item) {
                             this.itemClick(item.custom, this.detailData);
                         }
                     }
@@ -197,7 +203,7 @@ export class DetailModule extends Component implements IGroupTabItem{
     })();
 
     // detailItem点击事件
-    itemClick(field: R_Field, rowData){
+    itemClick(field: R_Field, rowData) {
         if (!field) {
             return;
         }
@@ -208,7 +214,7 @@ export class DetailModule extends Component implements IGroupTabItem{
             return;
         }
 
-        if(BwRule.isNewFile(dataType)){
+        if (BwRule.isNewFile(dataType)) {
             let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                 "md5_field": field.name,
                 [field.name]: rowData[field.name],
@@ -233,33 +239,30 @@ export class DetailModule extends Component implements IGroupTabItem{
     }
 
     // 获取`old_${name}`数据
-    getOldField(){
+    getOldField() {
         let btns = this.ui.subButtons,
             varList: R_VarList[] = [];
         Array.isArray(btns) && btns.forEach(btn => {
             let addr = btn.actionAddr;
-            if(addr && Array.isArray(addr.varList)){
+            if (addr && Array.isArray(addr.varList)) {
                 varList = varList.concat(addr.varList)
             }
         });
         return BwRule.getOldField(varList);
     }
 
-    get detailData(): obj{
+    get detailData(): obj {
         return this.dataManager ? this.dataManager.data[0] || {} : {};
     }
 
-    get data(){
-        let data = {};
-        this.items && this.items.forEach((item) => {
-            data[item.name] = item.data;
-        });
-        return data;
+    getData() {
+        return this.detailData;
     }
 
     // 刷新方法
-    refresh(ajaxData: obj = {}): Promise<any> {
-        return this.dataManager ? this.dataManager.refresh(ajaxData) : Promise.reject('未实例化dataManager控件');
+    refresh(ajaxData?: obj): Promise<any> {
+        this.ajaxData = ajaxData || this.ajaxData;
+        return this.dataManager ? this.dataManager.refresh(this.ajaxData) : Promise.reject('未实例化dataManager控件');
     }
 
     protected currentPage = -1; // 当前页
@@ -270,7 +273,7 @@ export class DetailModule extends Component implements IGroupTabItem{
             content = d.query('.detail-content', this.wrapper);
         this.wrapper.classList.toggle('no-data', noData);
         // 判断是否有数据，没有则隐藏数据展示的元素
-        if(noData){
+        if (noData) {
             content.classList.add('hide');
             return
         }
@@ -281,11 +284,13 @@ export class DetailModule extends Component implements IGroupTabItem{
             item.itemData = data[name];
         });
         this.trigger(DetailModule.EVT_RENDERED);
+        this.onRender && this.onRender();
         let current = this.dataManager ? this.dataManager.current : 0;
         // 当前页与数据管理的页面不一致，则滚动到头部
-        if(this.currentPage !== current){
+        if (this.currentPage !== current) {
             this.currentPage = current;
             content.scrollTop = 0;
+            this.onDataChange && this.onDataChange();
         }
     }
 
@@ -294,6 +299,7 @@ export class DetailModule extends Component implements IGroupTabItem{
     get lookUpData() {
         return this._lookUpData || {};
     }
+
     // 获取lookup数据
     private get lookup(): Promise<void> {
         if (tools.isEmpty(this._lookUpData)) {
@@ -313,10 +319,11 @@ export class DetailModule extends Component implements IGroupTabItem{
 
     // 设置编辑状态
     protected _editing: boolean = false;
-    get editing(){
+    get editing() {
         return this._editing;
     }
-    set editing(flag: boolean){
+
+    set editing(flag: boolean) {
         this._editing = flag;
         this.wrapper.classList.toggle('editing', flag);
         this.detailEdit && this.detailEdit.start();
@@ -324,145 +331,24 @@ export class DetailModule extends Component implements IGroupTabItem{
 
     // detailEdit模块
     protected _detailEdit: DetailEditModule;
-    get detailEdit(){
-        if(this._detailEdit) {
+    get detailEdit() {
+        if (this._detailEdit) {
             return this._detailEdit;
         }
 
         let tableAddr = this.ui.tableAddr;
-        if(tools.isEmpty(tableAddr && tableAddr.param)){
+        if (tools.isEmpty(tableAddr && tableAddr.param)) {
             return null;
         }
         this._detailEdit = new DetailEditModule({
             url: tableAddr.dataAddr,
-            editType: this.ui.operationType.editType,
             editParam: tableAddr.param[0],
             detail: this,
-            caption: this.ui.caption
-        })
+            field: this.fields
+        });
+        return this._detailEdit;
 
     }
-
-
-    // protected edit = (() => {
-    //     let editModule: EditModule;
-    //     let start = (items = this.items) => {
-    //         if(this.editing){
-    //             return;
-    //         }
-    //         this.editing = true;
-    //         this.clickEvent.off();
-    //         editModule = new EditModule({
-    //             auto: false,
-    //             type: 'table',
-    //             fields: this.fields.map(field => {
-    //                 return {
-    //                     dom: null,
-    //                     field: field
-    //                 }
-    //             }),
-    //             container: this.container,
-    //             cols: this.fields
-    //         });
-    //         items.forEach((item) => {
-    //             item.edit.init((field, item) => {
-    //                 let com = editModule.init(field.name, {
-    //                     dom: item.contentEl,
-    //                     data: this.detailData,
-    //                     field,
-    //                     onExtra: (data, relateCols, isEmptyClear = false) => {
-    //                         if (tools.isEmpty(data) && isEmptyClear) {
-    //                             // table.edit.modifyTd(td, '');
-    //                             com.set('');
-    //                             return;
-    //                         }
-    //                         for (let key in data) {
-    //                             let hCom = editModule.getDom(key);
-    //                             if (hCom && hCom !== com) {
-    //                                 let cellData = data[key];
-    //                                 if (hCom.get() != cellData) {
-    //                                     hCom.set(cellData || '');
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 });
-    //                 return com;
-    //             })
-    //         });
-    //         let data = this.detailData;
-    //         editModule.set(data);
-    //         items.forEach((item) => {
-    //             let field = item.custom;
-    //             if(field.elementType === 'lookup'){
-    //                 let options = this.lookUpData[field.name] || [];
-    //                 for (let opt of options) {
-    //                     if (opt.value == data[field.lookUpKeyField]) {
-    //                         let com = editModule.getDom(field.name);
-    //                         com && com.set(opt.value);
-    //                     }
-    //                 }
-    //             }
-    //         });
-    //
-    //     };
-    //     let save = (btn: R_Button) => {
-    //         return new Promise((resolve, reject) => {
-    //             if(editModule && btn){
-    //                 btn.refresh = 0;
-    //                 let data = Object.assign({}, this.detailData, editModule.get());
-    //                 ButtonAction.get().clickHandle(btn, data, response => {
-    //                     this.refresh().then(() => {
-    //                         resolve();
-    //                     }).catch(e => {
-    //                         console.log(e);
-    //                         reject();
-    //                     });
-    //                 },this.pageUrl);
-    //             }else{
-    //                 reject();
-    //             }
-    //         })
-    //
-    //     };
-    //     let del = (btn: R_Button) => {
-    //         btn.refresh = 0;
-    //         ButtonAction.get().clickHandle(btn, this.detailData, () => {
-    //             // 删除后显示下一页，如果已是最后一页，则显示上一页
-    //             // if (self.isKeyStep === true) {
-    //             //     let keyStepData = self.keyStepData || [];
-    //             //     keyStepData.splice(self.currentPage - 1, 1);
-    //             //     self.keyStepData = keyStepData;
-    //             // }
-    //             // let currentPage = self.currentPage >= self.totalNumber ? self.currentPage - 1 : self.currentPage;
-    //             // self.totalNumber = self.totalNumber - 1;
-    //             this.refresh().catch(e => {
-    //                 console.log(e);
-    //             });
-    //         });
-    //     };
-    //     let cancel = () => {
-    //         this.editing = false;
-    //         this.clickEvent.on();
-    //         editModule && editModule.destroy();
-    //         editModule = null;
-    //     };
-    //     return {
-    //         start: (items = this.items) => {
-    //             start(items);
-    //         },
-    //         save: (btn) => {
-    //             return save(btn);
-    //         },
-    //         del: (btn) => {
-    //             del(btn);
-    //         },
-    //         cancel: () => {
-    //             cancel();
-    //             this.render();
-    //         }
-    //     }
-    // })();
 
     protected pageContainer: HTMLElement;
     protected _pageUrl: string;

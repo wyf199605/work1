@@ -1,4 +1,4 @@
-.detail-wrapper{
+.detail-wrapper, .detail-edit-modal{
   height: 100%;
   overflow: auto;
 
@@ -137,15 +137,47 @@
 }
 
 .fl-mobile{
-  .detail-wrapper{
-    padding-bottom: 60px;
+  &.panel-off-main-sub{
+    .mui-content{
+      padding-bottom: 50px;
+      .panel-wrapper{
+        overflow: auto;
+        height: 100%;
+      }
+    }
+  }
+  &.panel-on-main-sub{
+    .mui-content{
+      .panel-wrapper{
+        overflow: auto;
+        height: 100%;
+        .detail-wrapper{
+          padding-bottom: 0;
+          .detail-btn-group{
+            position: relative;
+          }
+        }
+      }
+    }
+  }
+  .detail-edit-modal{
+    .modal-footer{
+      display: block;
+      bottom: 0;
+      position: fixed;
+      height: 50px;
+      width: 100%;
+    }
+  }
+  .detail-wrapper, .detail-edit-modal{
+    padding-bottom: 50px;
     .detail-btn-group{
       position: fixed;
       bottom: 0;
       right: 0;
       left: 0;
       width: 100%;
-      height: 60px;
+      height: 50px;
       background-color: #fff;
       border-top: 1px solid #ddd;
       .input-box{
@@ -160,9 +192,10 @@
           font-size: 14px;
           height: 40px;
           //margin-left: 15px;
-          padding: 0 20px;
           border-color: #005bac;
           color: #005bac;
+          padding: 0 14px;
+          max-width: 25%;
         }
       }
     }

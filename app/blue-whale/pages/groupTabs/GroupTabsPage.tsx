@@ -8,14 +8,7 @@ import {Panel} from "../../../global/components/view/panel/Panel";
 import {Tab} from "../../../global/components/ui/tab/tab";
 import d = G.d;
 import tools = G.tools;
-
-export interface IGroupTabItem {
-    refresh(data: obj): Promise<any>;
-
-    linkedData: obj;
-    btnWrapper: HTMLElement;
-    getData?: () => obj;
-}
+import AGroupTabItem = BW.AGroupTabItem;
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -30,28 +23,43 @@ export class GroupTabsPage extends BasicPage {
     protected ui: IBW_Slave_Ui;
     protected subUi: IBW_Slave[] = [];
 
-    protected main: IGroupTabItem;
-    protected subs: IGroupTabItem[] = [];
+    protected main: AGroupTabItem;
+    protected subs: AGroupTabItem[] = [];
 
     protected tab: Tab | Panel;
+    protected wrapper: HTMLElement;
+    protected subIndexes = [];
+    protected styleType: string;
 
     constructor(para: IGroupTabsPagePara) {
         super(para);
-        this.dom = para.dom;
+        window['d'] = this;
         this.ui = para.ui.body.elements[0];
         this.ui.uiType = this.ui.uiType || para.ui.uiType;
         this.subUi = this.ui.subTableList || [];
         delete this.ui.subTableList;
+
+        console.log(para.ui);
+        console.log(this.subUi);
+        this.wrapper = tools.isPc ? this.dom : d.query('body > .mui-content');
+        this.wrapper.classList.add('group-tab-page');
         // 当前子表数组为空，则为表格/单页，否则为主从
+        this.styleType = (this.ui.exhibitionType && this.ui.exhibitionType.showType) || 'tab';
         if (tools.isNotEmpty(this.subUi)) {
-            // tab  panel
-            // this.initTab();
-            this.initPanel();
+            this.styleType = 'panel-on';
+            this.dom.classList.add(this.styleType + '-main-sub');
+            switch (this.styleType){
+                case 'panel-on':
+                case 'panel-off':
+                    this.initPanel();
+                    break;
+                case 'tab':
+                default:
+                    this.initTab();
+                    break;
+            }
         } else {
-            this.main = window['d'] = new DetailBtnModule({
-                ui: this.ui,
-                container: para.dom
-            });
+            this.createTabItem(0, this.wrapper);
         }
     }
 
@@ -68,20 +76,22 @@ export class GroupTabsPage extends BasicPage {
                     title: item.caption
                 }
             }),
-            isOpenFirst: false,
+            isOpenFirst: true,
             onChange: ({index, isSelected, item}) => {
                 if (isSelected) {
                     let panel = this.tab as Panel;
-                    panel.panelItems.forEach((panelItem) => {
-                        if(panelItem !== item){
-                            panelItem.selected = false;
-                        }
-                    });
+                    if(this.styleType === 'panel-off'){
+                        panel.panelItems.forEach((panelItem) => {
+                            if(panelItem !== item){
+                                panelItem.selected = false;
+                            }
+                        });
+                    }
                     this.createTabItem(index, item.contentEl);
                 }
             },
-            container: this.dom
-        })
+            container: this.wrapper
+        });
     }
 
     /**
@@ -97,12 +107,12 @@ export class GroupTabsPage extends BasicPage {
                     title: item.caption
                 }
             }),
-            onChange: (index) => {
-                let wrapper = d.query(`div.tab-pane[data-index="${index}"]`, this.dom);
+            onClick: (index) => {
+                let wrapper = d.query(`div.tab-pane[data-index="${index}"]`, this.wrapper);
                 this.createTabItem(index, wrapper);
             },
-            tabParent: this.dom,
-            panelParent: this.dom
+            tabParent: this.wrapper,
+            panelParent: this.wrapper
         });
     }
 
@@ -114,16 +124,36 @@ export class GroupTabsPage extends BasicPage {
     protected createTabItem(index: number, wrapper: HTMLElement) {
         if (index === 0) {
             // 主表
-            if (tools.isEmpty(this.main)) {
-                this.main = GroupTabsPage.createTable(this.ui, wrapper);
+            if (tools.isNotEmpty(this.main)) {
+                return;
+            }
+            this.main = GroupTabsPage.createTable(this.ui, wrapper);
+            this.main.onDataChange = () => {
+                this.subIndexes = [];
+            };
+
+            this.main.onRender = () => {
+                if(this.styleType === 'panel-on' && this.tab instanceof Panel){
+                    this.tab.toggleAll(true);
+                }
+                this.main.onRender = null;
             }
         } else {
             let sub = this.subs[index - 1];
-            if (tools.isEmpty(sub)) {
-                this.getUi(this.subUi[index - 1]).then((ui) => {
-                    this.subs[index - 1] = GroupTabsPage.createTable(ui, wrapper);
-                });
+            if (tools.isNotEmpty(sub)) {
+                if(!((index - 1) in this.subIndexes)){
+                    sub.refresh(this.main.getData()).then(() => {
+                        this.subIndexes[index - 1] = index - 1;
+                    }).catch((e) => {
+                        console.log(e);
+                    });
+                }
+                return;
             }
+            this.getUi(this.subUi[index - 1]).then((ui) => {
+                this.subs[index - 1] = GroupTabsPage.createTable(ui, wrapper, this.main.getData());
+                this.subIndexes[index - 1] = index - 1;
+            });
         }
     }
 
@@ -156,13 +186,14 @@ export class GroupTabsPage extends BasicPage {
      * @date 2019/2/18
      * @Description: 根据UI创建表格/单页
      */
-    static createTable(tableUi: IBW_Slave_Ui, wrapper: HTMLElement): IGroupTabItem {
+    static createTable(tableUi: IBW_Slave_Ui, wrapper: HTMLElement, ajaxData?): AGroupTabItem {
         let item;
         switch (tableUi.uiType) {
             case 'table': {
                 item = new NewTableModule({
                     bwEl: tableUi as IBW_Table,
-                    container: wrapper
+                    container: wrapper,
+                    ajaxData
                 });
             }
                 break;
@@ -170,7 +201,8 @@ export class GroupTabsPage extends BasicPage {
             case 'view': {
                 item = new DetailBtnModule({
                     container: wrapper,
-                    ui: tableUi as IBW_Detail
+                    ui: tableUi as IBW_Detail,
+                    ajaxData
                 });
             }
                 break;
