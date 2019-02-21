@@ -914,7 +914,7 @@ export class BwTableModule extends Component {
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
                                 BwRule.isNewImg(dataType) && (cell.data = images.filter((a) => !!a).join(','));
-                                console.log(cell.data);
+                                cell.triggerEditCancel();
                                 resolve();
                             });
                         }

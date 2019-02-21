@@ -540,16 +540,20 @@ export class TableDataCell extends TableCell {
                     }
                     // let isChange = this.row.cells.some((cell: TableDataCell) => cell.isEdited);
 
-                    this.renderPromise.finally(() => {
-                        let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
-                        tools.isNotEmpty(events) && events.forEach((fun) => {
-                            typeof fun === 'function' && fun(this);
-                        });
-                    });
+                   this.triggerEditCancel();
                 }
             }
         }
 
+    }
+
+    triggerEditCancel(){
+        this.renderPromise.finally(() => {
+            let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
+            tools.isNotEmpty(events) && events.forEach((fun) => {
+                typeof fun === 'function' && fun(this);
+            });
+        });
     }
 }
 
