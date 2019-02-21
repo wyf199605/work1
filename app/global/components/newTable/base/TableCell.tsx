@@ -344,7 +344,6 @@ export class TableDataCell extends TableCell {
         this.editing && (this.editing = false);
         this.render();
         this.renderPromise.finally(() => {
-            this.rendering = false;
             let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
             tools.isNotEmpty(events) && events.forEach((fun) => {
                 typeof fun === 'function' && fun(this.table.editing);
@@ -410,6 +409,7 @@ export class TableDataCell extends TableCell {
                 });
             }
         }).then(() => {
+            this.rendering = false;
             !this.table.isWrapLine && this.initMoreBtn();
 
             if(this.table.editing){
@@ -537,10 +537,10 @@ export class TableDataCell extends TableCell {
 
                         this.input.destroy();
                         this.input = null;
+                        this.triggerEditCancel();
                     }
                     // let isChange = this.row.cells.some((cell: TableDataCell) => cell.isEdited);
 
-                   this.triggerEditCancel();
                 }
             }
         }
@@ -548,6 +548,7 @@ export class TableDataCell extends TableCell {
     }
 
     triggerEditCancel(){
+        debugger;
         this.renderPromise.finally(() => {
             let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
             tools.isNotEmpty(events) && events.forEach((fun) => {
