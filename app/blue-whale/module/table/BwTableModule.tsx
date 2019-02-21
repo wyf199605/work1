@@ -2138,7 +2138,7 @@ export class BwTableModule extends Component {
                             if (btn.data.title == "停止记录") {
                                 let status = false;
                                 for (var i = 0; i < btnList.length; i++) {
-                                    if (btnList[i].classList.value.toString().indexOf("disabled") > -1) {
+                                    if (btnList[i].classList.contains("disabled")) {
                                         status = true;
                                     }
                                 }
