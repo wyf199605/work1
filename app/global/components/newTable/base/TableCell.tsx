@@ -548,7 +548,6 @@ export class TableDataCell extends TableCell {
     }
 
     triggerEditCancel(){
-        debugger;
         this.renderPromise.finally(() => {
             let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
             tools.isNotEmpty(events) && events.forEach((fun) => {
