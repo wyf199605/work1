@@ -965,7 +965,7 @@ export class LoginPage {
             code = this.renderUnLogin();
             close = d.query("#close", code);
         }
-        // 其他方式登录
+        // 其他方式登录,退回旧的登录弹窗
         d.on(close, "click", () => {
             if (this.Interval) {
                 clearInterval(this.Interval)
@@ -973,7 +973,7 @@ export class LoginPage {
             d.query(".login-wrapper", document.body).style.display = "block";
             code.parentNode.removeChild(code)
         })
-        //切换用户按钮
+        //切换用户按钮(转到未登录，生成二维码)
         let cueUser = d.query("#js_cue", code);
         d.on(cueUser, "click", () => {
             code.remove();
@@ -986,10 +986,10 @@ export class LoginPage {
             wrap.style.display = "none";
         }
         let dom = d.create(`<div class='code_login'>
-        <div id='code_login'></div>
-        <p>请打开速狮APP扫码登录</p>
-        <div id="close">其他方式</div>
-        </div>`)
+                <div id='code_login_cav'></div>
+                <p>请打开速狮APP扫码登录</p>
+                <div id="close">其他方式</div>
+         </div>`)
         d.append(d.query(".login-page-container"), dom);
         this.req_getLgToken();
         return dom;
@@ -1006,12 +1006,14 @@ export class LoginPage {
         d.query(".current_name", dom).innerText = this.props.userId.value.replace(/\s+/g, "")
         let loginBtn = d.query("#js_login_btn");
         d.on(loginBtn, "click", () => {
-            this.req_sendServer();
+            this.req_sendServer().then(()=>{
+                Modal.toast('请在手机上确认登录');
+            })
         })
 
         return dom;
     }
-    // 点击登录 --非初次登录 通知服务端该用户点击登录了
+    // 点击登录 --非初次登录 通知服务端该用户点击登录了，服务端websocket给userid对应的用户弹出确认登录弹窗
     req_sendServer() {
         //userid=XXX 
         return new Promise((resolve, reject) => {
@@ -1028,7 +1030,7 @@ export class LoginPage {
     req_getLgToken = () => {
 
         G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({ response }) => {
-            QrCode.toCanvas("http://www.baidu.com", 150, 150, d.query("#code_login"));
+            QrCode.toCanvas("http://www.baidu.com", 150, 150, d.query("#code_login_cav"));
             let i = 10;
             this.Interval = setInterval(() => {
                 this.req_polling().then(res => {
