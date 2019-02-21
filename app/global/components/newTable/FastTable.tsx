@@ -36,6 +36,7 @@ export interface IFastTablePara extends IComponentPara {
     pseudo?: { // 是否开启伪列, 默认不开,
         type: PseudoTableType;
         isShow?: boolean;
+        isAll?: boolean; // 是否开启全选
         multi?: boolean; // 点击时单选还是多选, 默认单选
     },
     ajax?: IDataManagerAjax;
@@ -160,11 +161,13 @@ export class FastTable extends Component {
         this.tablesEach(table => {
             table.adjustColWidth();
         });
+        this.isWrapLine && this.setRowsHeight();
         this.calcWidth();
         this.setMainTableWidth();
+        this.changeScrollWidth(0);
     }
 
-    private mutiSelect: boolean;
+    protected mutiSelect: boolean;
 
     // 初始化
     protected init(para: IFastTablePara) {
@@ -203,8 +206,8 @@ export class FastTable extends Component {
         // 索引列
 
         if (para.pseudo) {
-            let {type, isShow} = para.pseudo;
-            this.initPseudoTable(type, isShow);
+            let {type, isShow, isAll} = para.pseudo;
+            this.initPseudoTable(type, isShow, isAll);
         }
         // else {
         //     this.pseudoTable = null;
@@ -540,9 +543,7 @@ export class FastTable extends Component {
             if (this.leftTable) {
                 width += this.leftTable.width;
                 let widthStr = 'calc(100% - ' + width + 'px)';
-                if(!('CSS' in window && CSS.supports
-                    && (CSS.supports('width: ' + widthStr)
-                    || CSS.supports('width', widthStr)))){
+                if(!tools.cssSupports('width', widthStr)){
                     let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
                     if(offsetWidth == 0){
                         setTimeout(() => {
@@ -558,9 +559,7 @@ export class FastTable extends Component {
                 this.colCount && (this.mainTable.foot.innerWrapper.style.width = widthStr);
             }else{
                 let widthStr = this.isLockRight ? 'calc(100% - 10px)' : '100%';
-                if(!('CSS' in window && CSS.supports
-                    && (CSS.supports('width: ' + widthStr)
-                        || CSS.supports('width', widthStr)))){
+                if(!tools.cssSupports('width', widthStr)){
                     let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
                     if(offsetWidth == 0){
                         setTimeout(() => {
@@ -585,12 +584,13 @@ export class FastTable extends Component {
         return this._pseudoTable;
     }
 
-    private initPseudoTable(type: PseudoTableType, isShow: boolean) {
+    private initPseudoTable(type: PseudoTableType, isShow: boolean, isAll = true) {
         // let count = this.mainTable.body.rows ? this.mainTable.body.rows.length : 0;
         this._pseudoTable = this.mainTable._createAnnexedTable({
             fastTable: this,
             type,
             isShow,
+            isAll,
             multiHeadRow: this.mainTable.head.rows.length,
             colCount: this.colCount && {text: ' '}
         }, FastPseudoTable, 0) as FastPseudoTable;
@@ -1417,6 +1417,7 @@ export class FastTable extends Component {
             row.selected = false;
         });
         this.pseudoTable && this.pseudoTable.setCheckBoxStatus();
+        // this.pseudoTable && this.pseudoTable.clearPresentSelected();
         this._drawSelectedCells();
     }
 
@@ -1737,18 +1738,20 @@ export class FastTable extends Component {
         // }
     }
 
+    protected rendering = false;
     // 渲染
     render(indexes: number[], position?: number): void
     render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
     render(x, y?, w?, z = true) {
+        if(this.rendering){
+            return;
+        }
+        this.rendering = true;
+
+        let promiseList: Promise<any>[] = [];
         this.wrapper.style.display = 'none';
         this.tablesEach(table => {
-            table.render(x, y, w, z);
-            if (this.tableData.serverMode) {
-                table.adjustColWidth(/*tools.isMb ? Math.max(0, len - this.tableData.pageSize) :*/ 0);
-            } else {
-                table.adjustColWidth(0);
-            }
+            promiseList.push(table.render(x, y, w, z));
         });
         // debugger;
         let indexes = this.mainTable.body.rows.map(row => row ? row.index : null);
@@ -1810,11 +1813,19 @@ export class FastTable extends Component {
         this.noData.toggle(Object.keys(this.tableData.data).length === 0);
 
         this.wrapper.style.display = 'block';
-        this.isWrapLine && this.setRowsHeight();
-        //   监听滚动事件
-
-        this.calcWidth();
-        this.setMainTableWidth();
+        // this.tablesEach((table) => {
+        //     table.adjustColWidth(0);
+        //     // if (this.tableData.serverMode) {
+        //     //     table.adjustColWidth(/*tools.isMb ? Math.max(0, len - this.tableData.pageSize) :*/ 0);
+        //     // } else {
+        //     //     table.adjustColWidth(0);
+        //     // }
+        // });
+        // this.isWrapLine && this.setRowsHeight();
+        // //   监听滚动事件
+        //
+        // this.calcWidth();
+        // this.setMainTableWidth();
 
         this.rows && this.rows.forEach((row) => {
             row.format();
@@ -1822,7 +1833,6 @@ export class FastTable extends Component {
         if (tools.isPc) {
             // PC端
             this.scrollEvent.off();
-            this.changeScrollWidth(0);
             this.scrollEvent.on();
         } else {
             //  移动端
@@ -1836,8 +1846,13 @@ export class FastTable extends Component {
         Array.isArray(handlers) && handlers.forEach(handler => {
             handler();
         });
+        Promise.all(promiseList).then(() => {}).catch((e) => {
+            console.log(e);
+        }).finally(() => {
+            this.recountWidth();
+            this.rendering = false;
+        });
     }
-
 
     loadedError = () => {
         let clickHandler = null;
@@ -2016,11 +2031,12 @@ export class FastTable extends Component {
         for (let index in uniIndex) {
             let status = 0,
                 row = this.rowGet(parseInt(index)),
-                len = uniIndex[index];
+                len = uniIndex[index],
+                length = row.cells.filter((cell) => cell.show && !cell.isVirtual).length;
             row && row._rowSelectedWidthDraw(false, false);
-            if (len > 0 && len < row.cells.length) {
+            if (len > 0 && len < length) {
                 status = 2;
-            } else if (row && row.cells.length === len) {
+            } else if (row && length <= len) {
                 status = 1;
             }
             if (status > 0) {
@@ -2794,19 +2810,25 @@ export class FastTable extends Component {
                     if(table.body && table.body.rows)
                         table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
-                this.render(0, void 0);
+
+                this.edit.addIndex.del();
+                this.edit.delIndex.del();
+                this.edit.changeIndex.del();
                 this.tablesEach(table => {
                     if(table.body && table.body.rows)
                         table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this._rows = this.rows.filter(row => tools.isNotEmpty(row));
-                this.edit.addIndex.del();
-                this.edit.delIndex.del();
-                this.edit.changeIndex.del();
                 this._drawSelectedCells();
                 this.rows.forEach((row) => {
                     row.isAdd = false;
-                })
+                });
+
+                Promise.all(this.tableBases.map((table) => table.renderPromise())).then(() => {
+                    console.log(this.data);
+                    this.render(0, void 0);
+                });
+
             }
         }
     }
@@ -2875,6 +2897,8 @@ export class FastTable extends Component {
             table.off(TableBase.EVT_EDITED);
             table.off(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index]);
         });
+
+
     }
 
     protected initDisabledEditorRow(row) {

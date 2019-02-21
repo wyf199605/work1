@@ -31,6 +31,7 @@ import {BwUploader} from "../uploadModule/bwUploader";
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
 import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
+import {FastTableColumn} from "../../../global/components/newTable/FastTabelColumn";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -201,8 +202,9 @@ export class BwTableModule extends Component {
                 colMulti: 1,
                 title: '锁定/解锁列',
                 onClick: (cell) => {
-                    let isFixed = cell.column.isFixed;
-                    cell.column.isFixed = !isFixed;
+                    let column = cell.column as FastTableColumn,
+                        isFixed = column.isFixed;
+                    column.isFixed = !isFixed;
                     Modal.toast(!isFixed ? '已锁定' : '已解锁');
                 }
             }, {

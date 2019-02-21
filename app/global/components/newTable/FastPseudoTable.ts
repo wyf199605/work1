@@ -14,6 +14,7 @@ interface IFastPseudoTablePara extends ITableBasePara {
     isShow?: boolean;
     fastTable: FastTable;
     multiHeadRow?: number;
+    isAll?: boolean;
 }
 
 export class FastPseudoTable extends TableBase {
@@ -47,32 +48,42 @@ export class FastPseudoTable extends TableBase {
 
         let multiHead = tools.isEmpty(para.multiHeadRow) ? 1 : para.multiHeadRow;
 
-        this.head.rows[0].cells[0].wrapper.style.height = multiHead * 40 + 1 + 'px';
+        let allCheckBoxWrapper = this.head.rows[0].cells[0].wrapper;
+        allCheckBoxWrapper.style.height = multiHead * 40 + 1 + 'px';
+        let div = d.query('.cell-content', allCheckBoxWrapper);
+        if(div){
+            div.style.height = multiHead * 40 + 'px';
+            div.style.lineHeight = multiHead * 40 + 'px';
+        }
 
-        this.checkAllBox = new CheckBox({
-            container: d.query('div.cell-content', this.head.rows[0].cells[0].wrapper),
-            onClick: (isChecked) => {
-                if( this._type === 'number') {
-                    this.body.rows && this.body.rows.forEach((row) => {
-                        if(row){
-                            let index = row.index;
-                            typeof index === 'number' && this._setCellsSelected(index, isChecked ? 1 : 0);
-                        }
-                    });
+        let isAll = tools.isEmpty(para.isAll) ? true : para.isAll;
+        if(isAll){
+            this.checkAllBox = new CheckBox({
+                container: d.query('div.cell-content', this.head.rows[0].cells[0].wrapper),
+                onClick: (isChecked) => {
+                    if( this._type === 'number') {
+                        this.body.rows && this.body.rows.forEach((row) => {
+                            if(row){
+                                let index = row.index;
+                                typeof index === 'number' && this._setCellsSelected(index, isChecked ? 1 : 0);
+                            }
+                        });
 
-                    isChecked ? this.fastTable.rows.forEach((row) => {
-                        row && row._selectedInnerRowSet(isChecked);
-                    }) : this.fastTable._clearAllSelectedCells();
+                        isChecked ? this.fastTable.rows.forEach((row) => {
+                            row && row._selectedInnerRowSet(isChecked);
+                        }) : this.fastTable._clearAllSelectedCells();
 
-                    this.fastTable._drawSelectedCells();
-                }else{
-                    this.allCheckBox && this.allCheckBox.forEach((btn) => {
-                        btn.checked = isChecked;
-                    });
+                        this.fastTable._drawSelectedCells();
+                    }else{
+                        this.allCheckBox && this.allCheckBox.forEach((btn) => {
+                            btn.checked = isChecked;
+                        });
+                    }
+                    this.fastTable.trigger(FastTable.EVT_SELECTED);
                 }
-                this.fastTable.trigger(FastTable.EVT_SELECTED);
-            }
-        });
+            });
+        }
+
     }
 
     protected preSelCell: TableDataCell = null;
@@ -123,15 +134,17 @@ export class FastPseudoTable extends TableBase {
                 });
             }
 
-            if(flag){
-                this.checkAllBox.status = 1;
-            }else if(!flag && flagCount > 0){
-                this.checkAllBox.status = 2;
-            }else{
-                this.checkAllBox.status = 0;
+            if(this.checkAllBox){
+                if(flag){
+                    this.checkAllBox.status = 1;
+                }else if(!flag && flagCount > 0){
+                    this.checkAllBox.status = 2;
+                }else{
+                    this.checkAllBox.status = 0;
+                }
             }
         }else{
-            this.checkAllBox.status = 0;
+            this.checkAllBox && (this.checkAllBox.status = 0);
         }
 
     }
@@ -211,6 +224,7 @@ export class FastPseudoTable extends TableBase {
         this.tableData.set(this.tableData.get().filter((item) => {
             return typeof item !== 'undefined';
         }));
+        return Promise.resolve();
     }
 
     private _isShow: boolean;

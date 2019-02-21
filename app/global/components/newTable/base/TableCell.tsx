@@ -136,6 +136,11 @@ export abstract class TableCell {
         this.wrapper.rowSpan = rowspan;
         if(this.rowspan !== 1){
             this.wrapper.style.height = rowspan * 40 + 'px';
+            let div = d.query('.cell-content', this.wrapper);
+            if(div){
+                div.style.height = rowspan * 40 + 'px';
+                div.style.lineHeight = rowspan * 40 + 'px';
+            }
         }
     }
 
@@ -231,7 +236,7 @@ export abstract class TableCell {
     // protected _editing:
 
     // 指向tableBase对象
-    get table(){
+    get table(): TableBase{
         let table = null;
         if(this.row){
             table = this.row.section.table;
@@ -284,7 +289,7 @@ export class TableDataCell extends TableCell {
                     html = this.text;
                 }
             }
-            this.wrapper && (this.wrapper.innerHTML = html);
+            this.wrapper && (this.wrapper.innerHTML = tools.isEmpty(html) ? '' : html);
             this.initMoreBtn();
         }
     }
@@ -338,15 +343,26 @@ export class TableDataCell extends TableCell {
         }
         this.editing && (this.editing = false);
         this.render();
-
-        let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
-        tools.isNotEmpty(events) && events.forEach((fun) => {
-            typeof fun === 'function' && fun(this.table.editing);
+        this.renderPromise.finally(() => {
+            this.rendering = false;
+            let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
+            tools.isNotEmpty(events) && events.forEach((fun) => {
+                typeof fun === 'function' && fun(this.table.editing);
+            });
         });
     }
 
+    protected rendering = false;
+    protected renderPromise: Promise<any> = Promise.resolve();
     render(cellData?){
         // debugger
+        if(this.rendering){
+            return;
+        }
+        this.rendering = true;
+        setTimeout(() => {
+            this.rendering = false;
+        }, 200);
         let data = tools.isEmpty(cellData) ? this.data : cellData;
 
         // 移除 除了moreBtn以外的所有dom
@@ -364,7 +380,7 @@ export class TableDataCell extends TableCell {
             }
         }
         // this.wrapper && (this.wrapper.innerHTML = '');
-        new Promise((resolve) => {
+        this.table.addStack(this.renderPromise = new Promise((resolve) => {
             if(data instanceof Node) {
                 this.wrapper && d.append(this.wrapper, data);
                 resolve();
@@ -375,8 +391,11 @@ export class TableDataCell extends TableCell {
                         if(text instanceof Node){
                             this.wrapper && d.append(this.wrapper, text);
                         }else {
+                            text = tools.isEmpty(text) ? '' : text;
                             this._text = text + '';
-                            this.wrapper && d.append(this.wrapper, document.createTextNode(this._text));
+                            if(this.wrapper){
+                                d.append(this.wrapper, document.createTextNode(this._text));
+                            }
                         }
                         this.width = getTextWidth(this.text);
                         this.initMoreBtn();
@@ -407,7 +426,7 @@ export class TableDataCell extends TableCell {
                 // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
                 this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
             }
-        })
+        }))
     }
 
     tagName() {
@@ -520,9 +539,12 @@ export class TableDataCell extends TableCell {
                         this.input = null;
                     }
                     // let isChange = this.row.cells.some((cell: TableDataCell) => cell.isEdited);
-                    let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
-                    tools.isNotEmpty(events) && events.forEach((fun) => {
-                        typeof fun === 'function' && fun(this);
+
+                    this.renderPromise.finally(() => {
+                        let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
+                        tools.isNotEmpty(events) && events.forEach((fun) => {
+                            typeof fun === 'function' && fun(this);
+                        });
                     });
                 }
             }
@@ -541,6 +563,7 @@ export class TableHeaderCell extends TableCell{
     constructor(para: ITableHeaderCellPara) {
         super(para);
         this.text = para.text;
+        this.rowspan = para.rowspan;
     }
 
     protected _text:string;

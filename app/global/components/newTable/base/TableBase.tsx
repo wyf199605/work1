@@ -66,7 +66,8 @@ interface ITableColPara {    // 创建列对象参数
     content?: any;
     // inputInit?(cell: TableDataCell, col: TableColumn): FormCom;
     isVirtual?: boolean;
-    isCanSort?: boolean
+    isCanSort?: boolean;
+    sortName?: string;
 }
 
 
@@ -782,15 +783,25 @@ export class TableBase extends Component {
 
     // private _allData: obj[];
     // private current: [number, number];
-    render(indexes: number[], position?: number): void
-    render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
-    render(x, y, w?, z = true) {
+    _promiseList: Promise<any>[] = [];
+    addStack(promise: Promise<any>){
+        this._promiseList.push(promise);
+    }
+    renderPromise(){
+        return Promise.all(this._promiseList);
+    }
+
+    render(indexes: number[], position?: number): Promise<any>
+    render(start: number, length: number, position?: number, isUpdateFoot?: boolean): Promise<any>
+    render(x, y, w?, z = true): Promise<any> {
+        this._promiseList = [];
         this.body.render(x, y, w, z);
+        return this.renderPromise();
     }
 
     public sortByIndex(sortRule: ISortRule) {
         this.tableData.sortByIndex(sortRule);
-        this.render(0, this.tableData.get().length);
+        // this.render(0, this.tableData.get().length);
     }
 
     public colCountByIndex(indexes: Array<number>) {
