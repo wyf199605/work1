@@ -22,7 +22,7 @@ interface SYS_Window{
     getDevice( key?:string) :any;
     openImg( url:string) :void;
     download(url:string, fileName?: string): void;
-    opentab(userid?:string, accessToken?:string, noShow?: string[]) :void;
+    opentab(userid?:string, accessToken?:string, noShow?: string[], data?: obj) :void;
     firePreviousPage(event : string , data? : obj, url? : string) : void;
     fire(event :string, data? : obj, url? : string);
 
