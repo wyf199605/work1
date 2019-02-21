@@ -4,7 +4,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {IQueryItem, IResult, NewQueryItem} from "./NewQueryItem";
 import tools = G.tools;
 import {Button} from "../../../global/components/general/button/Button";
-import {QueryModule, QueryModulePara} from "../query/queryModule";
+import {QueryModule} from "../query/queryModule";
 
 interface INewQueryPara {
     queryItems?: IQueryItem[];
@@ -37,7 +37,7 @@ export class NewQueryModalMb {
             if (tools.os.ios) {
                 let inputs = Array.prototype.slice.call(document.querySelectorAll('input'));
                 inputs.forEach(input => {
-                    input.onblur = function (e) {
+                    input.onblur = function () {
                         document.body.scrollTop = 0;
                     }
                 })
