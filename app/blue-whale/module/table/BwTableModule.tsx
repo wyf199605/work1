@@ -1,37 +1,37 @@
 /// <amd-module name="BwTableModule"/>
-import {BwRule} from "../../common/rule/BwRule";
+import { BwRule } from "../../common/rule/BwRule";
 import IComponentPara = G.IComponentPara;
 import Component = G.Component;
 import d = G.d;
 import tools = G.tools;
 import sys = BW.sys;
-import {FastTable, IFastTableCol} from "../../../global/components/newTable/FastTable";
+import { FastTable, IFastTableCol } from "../../../global/components/newTable/FastTable";
 import CONF = BW.CONF;
-import {FastBtnTable, IFastBtnTablePara} from "../../../global/components/FastBtnTable/FastBtnTable";
-import {ITableCol, TableBase} from "../../../global/components/newTable/base/TableBase";
-import {InputBox} from "../../../global/components/general/inputBox/InputBox";
-import {Button, IButton} from "../../../global/components/general/button/Button";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {FastTableCell} from "../../../global/components/newTable/FastTableCell";
-import {InventoryBtn, ontimeRefresh} from "./InventoryBtn";
-import {Loading} from "../../../global/components/ui/loading/loading";
-import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
-import {NewTableModule} from "./newTableModule";
+import { FastBtnTable, IFastBtnTablePara } from "../../../global/components/FastBtnTable/FastBtnTable";
+import { ITableCol, TableBase } from "../../../global/components/newTable/base/TableBase";
+import { InputBox } from "../../../global/components/general/inputBox/InputBox";
+import { Button, IButton } from "../../../global/components/general/button/Button";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { FastTableCell } from "../../../global/components/newTable/FastTableCell";
+import { InventoryBtn, ontimeRefresh } from "./InventoryBtn";
+import { Loading } from "../../../global/components/ui/loading/loading";
+import { LayoutImage } from "../../../global/components/view/LayoutImg/LayoutImage";
+import { NewTableModule } from "./newTableModule";
 import Shell = G.Shell;
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
-import {Inputs} from "../inputs/inputs";
-import {FlowDesigner} from "../flowDesigner/FlowDesigner";
-import {PasswdModal} from "../changePassword/passwdModal";
-import {Spinner} from "../../../global/components/ui/spinner/spinner";
-import {FormCom} from "../../../global/components/form/basic";
-import {EditModule} from "../edit/editModule";
-import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {BwUploader} from "../uploadModule/bwUploader";
-import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
-import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
-import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
-import {FastTableColumn} from "../../../global/components/newTable/FastTabelColumn";
+import { ButtonAction } from "../../common/rule/ButtonAction/ButtonAction";
+import { Inputs } from "../inputs/inputs";
+import { FlowDesigner } from "../flowDesigner/FlowDesigner";
+import { PasswdModal } from "../changePassword/passwdModal";
+import { Spinner } from "../../../global/components/ui/spinner/spinner";
+import { FormCom } from "../../../global/components/form/basic";
+import { EditModule } from "../edit/editModule";
+import { TableDataCell } from "../../../global/components/newTable/base/TableCell";
+import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
+import { BwUploader } from "../uploadModule/bwUploader";
+import { ImgModal, ImgModalPara } from "../../../global/components/ui/img/img";
+import { BwLayoutImg } from "../uploadModule/bwLayoutImg";
+import { TableDataRow } from "../../../global/components/newTable/base/TableRow";
+import { FastTableColumn } from "../../../global/components/newTable/FastTabelColumn";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -51,7 +51,7 @@ export class BwTableModule extends Component {
     static EVT_READY = '__TABLE_READY__';  // 创建fastTable完成后的事件
 
     protected wrapperInit(para: IBwTableModulePara): HTMLElement {
-        return <div className="table-module-wrapper"/>;
+        return <div className="table-module-wrapper" />;
     }
 
     protected readonly isDrill: boolean;   // 是否钻取
@@ -155,20 +155,20 @@ export class BwTableModule extends Component {
                 name: null,
                 isReplaceTable: this.isDrill,
             } : {
-                name: [this.isRfid ? null : 'search', 'statistic', 'export'],
-                type: tools.isMb ? "dropdown" : "button",
-                target: tools.isMb ? d.query('[data-target="popover"]>[data-action="down-menu"]') : void 0,
-                isReplaceTable: this.isDrill,
-            },
+                    name: [this.isRfid ? null : 'search', 'statistic', 'export'],
+                    type: tools.isMb ? "dropdown" : "button",
+                    target: tools.isMb ? d.query('[data-target="popover"]>[data-action="down-menu"]') : void 0,
+                    isReplaceTable: this.isDrill,
+                },
             cellFormat: (cellData, cell: FastTableCell) => {
                 let col = cell.column,
                     promise: Promise<any>,
                     rowData = this.ftable.tableData.rowDataGet(cell.row.index); // 行数据
-                if(col){
+                if (col) {
                     promise = this.cellFormat(col.content, cellData, rowData);
-                }else{
+                } else {
                     promise = new Promise((resolve) => {
-                        resolve({text: cellData});
+                        resolve({ text: cellData });
                     })
                 }
                 return promise;
@@ -183,7 +183,7 @@ export class BwTableModule extends Component {
                     let colorVal = rowData[name];
                     if (colorVal) {
                         // 显示颜色
-                        let {r, g, b} = tools.val2RGB(colorVal),
+                        let { r, g, b } = tools.val2RGB(colorVal),
                             colorStr = `rgb(${r},${g},${b})`;
                         if (i === 0) {
                             bgColor = colorStr
@@ -192,7 +192,7 @@ export class BwTableModule extends Component {
                         }
                     }
                 });
-                return {color, bgColor, attr};
+                return { color, bgColor, attr };
             },
             page: this.ui.multPage === 0 ? null : {
                 size: 50,
@@ -282,7 +282,7 @@ export class BwTableModule extends Component {
                     ajaxData,
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
                     auto: !this.hasQuery,    // 有查询器时不自动查询
-                    fun: ({pageSize, current, sort, custom}) => {
+                    fun: ({ pageSize, current, sort, custom }) => {
                         let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
                         pageSize = pageSize === -1 ? 3000 : pageSize;
 
@@ -303,8 +303,8 @@ export class BwTableModule extends Component {
                             }),
                             // 获取lookup数据
                             this.lookup
-                        ]).then(([{response}]) => {
-                            let {data, head} = response;
+                        ]).then(([{ response }]) => {
+                            let { data, head } = response;
                             // 选项查询处理(wbf)
                             this.sectionField(response);
                             data = this.addOldData(data);
@@ -434,8 +434,8 @@ export class BwTableModule extends Component {
                 container: this.container
             });
             this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(this.ui.dataAddr), {
-                data: Object.assign({}, ajaxData, {pageparams: `{"index"=1,"size"=3000,"total"=1}`})  //设置初始分页条件
-            }).then(({response}) => {
+                data: Object.assign({}, ajaxData, { pageparams: `{"index"=1,"size"=3000,"total"=1}` })  //设置初始分页条件
+            }).then(({ response }) => {
                 resolve(response);
             }).catch((e) => {
                 reject(e);
@@ -639,7 +639,7 @@ export class BwTableModule extends Component {
             return;
         }
 
-        if(BwRule.isNewFile(dataType)){
+        if (BwRule.isNewFile(dataType)) {
             let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                 "md5_field": field.name,
                 [field.name]: rowData[field.name],
@@ -665,7 +665,7 @@ export class BwTableModule extends Component {
         // 是否为钻取
         let url = drillUrlGet(field, rowData, this.ui.keyField);
         if (url) {
-            sys.window.open({url});
+            sys.window.open({ url });
         }
     };
 
@@ -710,9 +710,9 @@ export class BwTableModule extends Component {
 
             let row = ftable.rows[index],
                 cell = row ? row.cellGet(name) : null;
-            if(self.ftable.editing){
+            if (self.ftable.editing) {
                 self.imgManager.open(cell);
-            }else{
+            } else {
                 self.imgManager.showImg(cell);
             }
 
@@ -757,7 +757,7 @@ export class BwTableModule extends Component {
                     data = cell.data,
                     row = cell.row,
                     field = column.content as R_Field;
-                if(BwRule.isNewImg(field.atrrs.dataType)){
+                if (BwRule.isNewImg(field.atrrs.dataType)) {
                     if (data && typeof data === 'string') {
                         data.split(',').forEach((data) => {
                             urls.push(tools.url.addObj(CONF.ajaxUrl.fileDownload, {
@@ -767,14 +767,14 @@ export class BwTableModule extends Component {
                             }))
                         });
                     }
-                }else if(BwRule.isOldImg(field.atrrs.dataType)){
+                } else if (BwRule.isOldImg(field.atrrs.dataType)) {
                     let picAddrList = this.ui.pictureAddrList;
 
                     if (tools.isNotEmptyArray(picAddrList)) {
 
                         let rowData = this.ftable.tableData.rowDataGet(row.index),
                             url: string = '';
-                        if(rowData[field.name]){
+                        if (rowData[field.name]) {
                             url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                                 // name_field: nameField,
                                 md5_field: 'FILE_ID',
@@ -783,7 +783,7 @@ export class BwTableModule extends Component {
                                 down: 'allow'
 
                             });
-                        }else{
+                        } else {
                             url = picAddrList.map(addr =>
                                 tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
                             )[0] || '';
@@ -798,13 +798,13 @@ export class BwTableModule extends Component {
 
         return {
             getImg,
-            showImg(cell : FastTableCell) {
-                if(!cell || !cell.column){
+            showImg(cell: FastTableCell) {
+                if (!cell || !cell.column) {
                     return;
                 }
 
                 let urls = getImg(cell);
-                if(tools.isNotEmpty(urls)){
+                if (tools.isNotEmpty(urls)) {
                     let imgData: ImgModalPara = {
                         img: urls
                     };
@@ -813,19 +813,19 @@ export class BwTableModule extends Component {
                         name = field.name,
                         len = cell.ftable.data.length;
 
-                    if(len > 1){
+                    if (len > 1) {
                         imgData.turnPage = (next) => {
                             let getCell = (i) => {
                                 let rows = cell.ftable.rows,
                                     row = rows[i + 1];
-                                if(!next){
+                                if (!next) {
                                     row = rows[i - 1];
                                 }
                                 let curCell = row && row.cellGet(name);
-                                if(curCell){
-                                    if(!getImg(curCell)[0]) {
-                                        getCell(next ? index ++ : index --);
-                                    }else {
+                                if (curCell) {
+                                    if (!getImg(curCell)[0]) {
+                                        getCell(next ? index++ : index--);
+                                    } else {
                                         ImgModal.destroy();
                                         this.showImg(curCell);
                                         cell.selected = false;
@@ -837,14 +837,14 @@ export class BwTableModule extends Component {
                         }
                     }
                     ImgModal.show(imgData);
-                }else{
+                } else {
                     Modal.toast('无图片')
                 }
             },
             open: (cell: FastTableCell) => {
                 layoutImg && layoutImg.destroy();
                 let images = [];
-                if(cell && cell.column){
+                if (cell && cell.column) {
                     let field = cell.column.content as R_Field,
                         row = this.ftable.rowGet(cell.row.index),
                         dataType = field.dataType || field.atrrs.dataType,
@@ -864,7 +864,7 @@ export class BwTableModule extends Component {
                             delete images[index];
                         },
                         onSuccess: (res) => {
-                            if(BwRule.isOldImg(dataType)){
+                            if (BwRule.isOldImg(dataType)) {
 
                                 let data = res.data,
                                     md5Data = {};
@@ -873,10 +873,10 @@ export class BwTableModule extends Component {
                                 }
                                 images = [md5Data[field.name]];
                                 row.data = Object.assign({}, row.data, md5Data);
-                            }else if(BwRule.isNewImg(dataType)){
-                                if(multi){
+                            } else if (BwRule.isNewImg(dataType)) {
+                                if (multi) {
                                     images.push(res.data.unique);
-                                }else{
+                                } else {
                                     images = [res.data.unique];
                                 }
                             }
@@ -891,7 +891,7 @@ export class BwTableModule extends Component {
                     });
 
                     layoutImg.set(getImg(cell));
-                    if(cell.data && typeof cell.data === 'string'){
+                    if (cell.data && typeof cell.data === 'string') {
                         images = cell.data.split(',');
                     }
                     layoutImg.modalShow = true;
@@ -952,7 +952,7 @@ export class BwTableModule extends Component {
                 if (tools.isNotEmpty(defAddrs)) {
                     Promise.all(defAddrs.map(url => {
                         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(url))
-                            .then(({response}) => {
+                            .then(({ response }) => {
                                 // TODO data可能不存在
                                 let resultData = tools.keysVal(response, 'data', 0) || {};
                                 data = Object.assign(data, resultData);
@@ -1031,7 +1031,7 @@ export class BwTableModule extends Component {
             if (!Array.isArray(this.ui.aggrList) || !this.ui.aggrList[0]) {
                 return false;
             }
-            aggrWrap = <div className="aggr-wrapper"/>;
+            aggrWrap = <div className="aggr-wrapper" />;
             d.before(this.ftable.wrapper, aggrWrap);
             return true;
         };
@@ -1050,14 +1050,14 @@ export class BwTableModule extends Component {
                 let valSpan = <span>{aggr.caption}:</span>;
                 d.append(aggrWrap, valSpan);
                 BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(aggr.dataAddr, urlData))
-                    .then(({response}) => {
+                    .then(({ response }) => {
                         let value = tools.keysVal(response, 'data', 0, tools.keysVal(response, 'meta', 0));
                         valSpan.innerHTML = `${aggr.caption}:${value || 0} &nbsp;&nbsp;`;
                     });
             });
         };
 
-        return {get};
+        return { get };
     })();
 
     protected filter = (() => {
@@ -1078,14 +1078,14 @@ export class BwTableModule extends Component {
             if (builder === null) {
                 let body = tools.isMb ?
                     <div className="mui-content">
-                        <ul className="mui-table-view" data-query-name="local"/>
+                        <ul className="mui-table-view" data-query-name="local" />
                         <div data-action="add" data-name="local" className="mui-btn mui-btn-block mui-btn-primary">
-                            <span className="mui-icon mui-icon-plusempty"/> 添加条件
+                            <span className="mui-icon mui-icon-plusempty" /> 添加条件
                         </div>
                     </div>
                     :
                     <div className="filter-form" data-query-name="local">
-                        <span data-action="add" className="iconfont blue icon-jiahao"/>
+                        <span data-action="add" className="iconfont blue icon-jiahao" />
                     </div>;
 
                 modal = new Modal({
@@ -1219,7 +1219,7 @@ export class BwTableModule extends Component {
     private countElements: objOf<HTMLElement> = {}; //存储哈希表 表列头的结构
     private OLD_DIFFAMOUNT: number = 0;
 
-//根据列头实时更新统计
+    //根据列头实时更新统计
     public rfidColthead() {
 
         let rfidCols = this.ui.rfidCols,
@@ -1229,7 +1229,7 @@ export class BwTableModule extends Component {
             let calcCols = rfidCols.calc.cols || {},
                 when = rfidCols.calc.when || {},
                 countElements = this.countElements,
-                {calculate, calculateScan, calculateDiff, calculateAdd} = calcCols,
+                { calculate, calculateScan, calculateDiff, calculateAdd } = calcCols,
                 calcRule = rfidCols.calc.calcRule || [],
                 calculateEl = countElements[calculate],
                 calculateScanEL = countElements[calculateScan],
@@ -1288,7 +1288,7 @@ export class BwTableModule extends Component {
                 }
 
                 calcRule.forEach(calc => {
-                    let {field, rule} = calc;
+                    let { field, rule } = calc;
                     if (rule.slice(0, 3) == 'SUM') {
                         let sum = this.countCalcSum(ftable, field),
                             el = countElements[field];
@@ -1306,7 +1306,7 @@ export class BwTableModule extends Component {
         }
     }
 
-//下载更新后表列头统计
+    //下载更新后表列头统计
     public rfidDownAndUpInitHead() {
         let rfidCols = this.ui.rfidCols,
             ftable = this.ftable;
@@ -1321,7 +1321,7 @@ export class BwTableModule extends Component {
             let calcCols = rfidCols.calc.cols || {},
                 when = rfidCols.calc.when || {},
                 countElements = this.countElements,
-                {calculate, calculateScan, calculateDiff, calculateAdd} = calcCols,
+                { calculate, calculateScan, calculateDiff, calculateAdd } = calcCols,
                 calcRule = rfidCols.calc.calcRule || [],
                 calculateEl = countElements[calculate],
                 calculateScanEL = countElements[calculateScan],
@@ -1369,7 +1369,7 @@ export class BwTableModule extends Component {
                     colHeadStr[rfidCols.scanField.toUpperCase()] = countElements['scanyet'].innerHTML;
                 }
                 calcRule.forEach(calc => {
-                    let {field, rule} = calc;
+                    let { field, rule } = calc;
                     if (rule.slice(0, 3) == 'SUM') {
                         let sum = this.countCalcSum(ftable, field),
                             el = countElements[field];
@@ -1503,7 +1503,7 @@ export class BwTableModule extends Component {
             let calcCols = rfidCols.calc.cols || {},
                 when = rfidCols.calc.when || {},
                 countElements = this.countElements,
-                {calculate, calculateScan, calculateDiff, calculateAdd} = calcCols,
+                { calculate, calculateScan, calculateDiff, calculateAdd } = calcCols,
                 calcRule = rfidCols.calc.calcRule || [],
                 calculateEl = countElements[calculate],
                 calculateScanEL = countElements[calculateScan],
@@ -1559,7 +1559,7 @@ export class BwTableModule extends Component {
 
                     setTimeout(() => {
                         calcRule.forEach(calc => {
-                            let {field, rule} = calc;
+                            let { field, rule } = calc;
                             if (rule.slice(0, 3) == 'SUM') {
                                 let sum = this.countCalcSum(ftable, field),
                                     el = countElements[field];
@@ -1602,9 +1602,9 @@ export class BwTableModule extends Component {
                 if (isImg && field.link) {
                     // 缩略图
                     let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData, true, true);
-                    url = tools.url.addObj(url, {version: new Date().getTime()});
+                    url = tools.url.addObj(url, { version: new Date().getTime() });
 
-                    text = <img src={url}/>;
+                    text = <img src={url} />;
                     classes.push('cell-img');
 
                 } else if (BwRule.isNewImg(dataType)) {
@@ -1623,7 +1623,7 @@ export class BwTableModule extends Component {
                                 return <img style={{
                                     maxWidth: width - 2 + '%',
                                     marginRight: '2%'
-                                }} src={url} alt=""/>
+                                }} src={url} alt="" />
                             })}
                         </div>;
                     }
@@ -1638,29 +1638,29 @@ export class BwTableModule extends Component {
 
                         // 多图缩略图控件
                         if (tools.isNotEmptyArray(urls)) {
-                            text = new LayoutImage({urls}).wrapper;
+                            text = new LayoutImage({ urls }).wrapper;
                         }
                     }
 
                     classes.push('cell-img');
 
-                } else if(BwRule.isNewFile(dataType)){
+                } else if (BwRule.isNewFile(dataType)) {
                     classes.push('cell-link');
                     color = 'blue';
-                    if(cellData){
-                        BwRule.getFileInfo(field.name, cellData).then(({response}) => {
+                    if (cellData) {
+                        BwRule.getFileInfo(field.name, cellData).then(({ response }) => {
                             console.log(response);
                             response = JSON.parse(response);
-                            if(response && response.dataArr && response.dataArr[0]){
+                            if (response && response.dataArr && response.dataArr[0]) {
                                 let data = response.dataArr[0],
                                     filename = data.filename;
                                 text = filename;
                             }
-                            resolve({text, classes, bgColor, color, data});
+                            resolve({ text, classes, bgColor, color, data });
                         }).catch(() => {
-                            resolve({text, classes, bgColor, color, data});
+                            resolve({ text, classes, bgColor, color, data });
                         });
-                        return ;
+                        return;
                     }
                 } else if (dataType === '50') {
                     // 打钩打叉
@@ -1671,7 +1671,7 @@ export class BwTableModule extends Component {
 
                 } else if (field.name === 'STDCOLORVALUE') {
                     // 显示颜色
-                    let {r, g, b} = tools.val2RGB(cellData);
+                    let { r, g, b } = tools.val2RGB(cellData);
                     text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
 
                 } else if (field.elementType === 'lookup') {
@@ -1726,13 +1726,13 @@ export class BwTableModule extends Component {
                 let when = field.backWhen;
                 if (when) {
                     if (eval(tools.str.parseTpl(when, rowData))) {
-                        let {r, g, b} = tools.val2RGB(field.backColor);
+                        let { r, g, b } = tools.val2RGB(field.backColor);
                         bgColor = `rgb(${r},${g},${b})`
                     }
                 }
             }
 
-            resolve({text, classes, bgColor, color, data});
+            resolve({ text, classes, bgColor, color, data });
         })
     }
 
@@ -1742,8 +1742,8 @@ export class BwTableModule extends Component {
 
         let imgCreate = (url: string, md5: string, isClose: boolean = true) => {
             return <div className="img">
-                {isClose ? <div className="appcommon app-guanbi1 img-close" data-md5={md5}/> : ''}
-                <img src={url}/>
+                {isClose ? <div className="appcommon app-guanbi1 img-close" data-md5={md5} /> : ''}
+                <img src={url} />
             </div>
         };
 
@@ -1781,7 +1781,7 @@ export class BwTableModule extends Component {
             let btnWrapper: HTMLElement = null,
                 imgWrapper: HTMLElement = null,
                 wrapper = <div className="table-img-wrapper">
-                    {btnWrapper = <div className="table-img-wrapper-btns"/>}
+                    {btnWrapper = <div className="table-img-wrapper-btns" />}
                     {imgWrapper = <div className="table-img">
                         {md5Arr.map(md5 => imgCreate(BwRule.fileUrlGet(md5, fieldName), md5, updatable))}
                     </div>}
@@ -1820,7 +1820,7 @@ export class BwTableModule extends Component {
             let dataType = field.dataType || field.atrrs.dataType,
                 isSign = dataType === BwRule.DT_SIGN;
             if (updatable) {
-                let imgContainer = <div className="table-img-uploader"/>;
+                let imgContainer = <div className="table-img-uploader" />;
                 d.append(btnWrapper, imgContainer);
                 uploadModule = new BwUploader({
                     uploadType: isSign ? 'sign' : 'file',
@@ -1866,7 +1866,7 @@ export class BwTableModule extends Component {
 
         };
 
-        return {show};
+        return { show };
     })();
 
     // 单图查看与编辑
@@ -1939,9 +1939,9 @@ export class BwTableModule extends Component {
         let imgWrapperGet = (field: R_Field, imgIndex: number) => {
             let nameField = field.name,
                 wrapper = <div className="table-img-wrapper" data-field={nameField}>
-                    <div className="table-img-wrapper-btns"/>
+                    <div className="table-img-wrapper-btns" />
                     <div className="table-img">
-                        <img data-index={imgIndex} style="max-height:500px;max-width:700px"/>
+                        <img data-index={imgIndex} style="max-height:500px;max-width:700px" />
                     </div>
                 </div>;
 
@@ -1994,7 +1994,7 @@ export class BwTableModule extends Component {
                     onClick: () => {
                         // this.md5s[nameField] = '';
                         img.src = '';
-                        tools.isFunction(onUploaded) && onUploaded({[nameField]: ''});
+                        tools.isFunction(onUploaded) && onUploaded({ [nameField]: '' });
                     }
                 });
             }
@@ -2077,7 +2077,7 @@ export class BwTableModule extends Component {
             handler = null;
 
         let btnRefresh = () => {
-            if(ftable && ftable.selectedRows){
+            if (ftable && ftable.selectedRows) {
                 let selectedLen = ftable.selectedRows.length,
                     rowData = ftable.selectedRowsData[0],
                     allLen = ftable.rows.length;
@@ -2117,15 +2117,66 @@ export class BwTableModule extends Component {
             });
 
             Array.isArray(btnsUi) && btnsUi.forEach((btnUi) => {
+
                 let btn = new Button({
                     icon: btnUi.icon,
                     content: btnUi.title,
                     isDisabled: !(btnUi.multiselect === 0 || btnUi.multiselect === 2 && btnUi.selectionFlag),
+                    className: btnUi.title == '停止记录' || btnUi.title == '开始记录' ? 'recode_btn' : '',
                     data: btnUi,
                     onClick: () => {
                         if (btn.data.openType.indexOf('rfid') > -1) {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
+
+                        } else if (btn.data.openType === 'newwin') {
+                            let btnList = d.queryAll(".recode_btn", wrapper)
+                            let token = localStorage.getItem('token');
+                            if(!token){
+                                Modal.alert("请登录后操作")
+                            }
+                            if (btn.data.title == "停止记录") {
+                                let status = false;
+                                for (var i = 0; i < btnList.length; i++) {
+                                    if (btnList[i].classList.value.toString().indexOf("disabled") > -1) {
+                                        status = true;
+                                    }
+                                }
+                                if (!status) {
+                                    Modal.toast("请先选择开始记录")
+                                } else {
+                                    let url = BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=stop"
+                                    BwRule.Ajax.fetch(url, {
+                                        type: 'POST',
+                                        data: {
+                                            req_type: "stop",
+                                            token
+                                        },
+                                    }).then(() => {
+                                        for (var i = 0; i < btnList.length; i++) {
+                                            btnList[i].classList.add("disabled")
+                                        }
+                                    })
+                                }
+                            } else {
+                                let url = BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=start"
+                                BwRule.Ajax.fetch(url, {
+                                    type: 'POST',
+                                    data: {
+                                        req_type: "start",
+                                        token
+                                    },
+                                }).then(() => {
+                                    for (var i = 0; i < btnList.length; i++) {
+                                        if (btnList[i].innerHTML.indexOf("开始记录") > -1) {
+                                            btnList[i].classList.add("disabled")
+                                        } else {
+                                            btnList[i].classList.remove("disabled")
+                                        }
+                                    }
+                                })
+                            }
+
 
                         } else if (btn.data.openType === 'passwd') {
                             let selectData = ftable.selectedRowsData[0];
@@ -2155,10 +2206,10 @@ export class BwTableModule extends Component {
                                                 ajaxData['up' + key] = res[key];
                                             }
                                         }
-                                        return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, {isAdmin: 1}, false), {
+                                        return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, { isAdmin: 1 }, false), {
                                             type: 'POST',
                                             data: JSON.stringify([ajaxData])
-                                        }).then(({response}) => {
+                                        }).then(({ response }) => {
                                             return new Promise((resolve) => {
                                                 if (response.errorCode === 0) {
                                                     resolve(true);
@@ -2177,7 +2228,7 @@ export class BwTableModule extends Component {
                         } else if (btn.data.openType.indexOf('flow') > -1) {
                             // 流程引擎操作按钮
                             let btnUi = btn.data as R_Button,
-                                {multiselect, selectionFlag} = btnUi,
+                                { multiselect, selectionFlag } = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
                             let select = multiselect === 1 ? selectedData[0] : selectedData,
@@ -2201,7 +2252,7 @@ export class BwTableModule extends Component {
                             let field = btn.data.openType.split('-')[1];
                             switch (field) {
                                 case 'look': {
-                                    BwRule.Ajax.fetch(dataAddr).then(({response}) => {
+                                    BwRule.Ajax.fetch(dataAddr).then(({ response }) => {
                                         new FlowDesigner(response, field);
                                     }).catch(err => {
                                         console.log(err);
@@ -2211,7 +2262,7 @@ export class BwTableModule extends Component {
                                 case 'design': {
                                     BwRule.Ajax.fetch(dataAddr, {
                                         type: 'GET'
-                                    }).then(({response}) => {
+                                    }).then(({ response }) => {
                                         new FlowDesigner(response, field);
                                     }).catch(err => {
                                         console.log(err);
@@ -2247,7 +2298,7 @@ export class BwTableModule extends Component {
                             });
                             spinner.show();
                             let btnUi = btn.data as R_Button,
-                                {multiselect, selectionFlag} = btnUi,
+                                { multiselect, selectionFlag } = btnUi,
                                 selectedData = multiselect === 2 && selectionFlag ?
                                     ftable.unselectedRowsData : ftable.selectedRowsData;
                             let linkedData = this.linkedData || {};
@@ -2415,14 +2466,14 @@ export class BwTableModule extends Component {
             // debugger;
             if (tools.isMb) {
                 d.classAdd(this.wrapper, 'has-footer-btn');
-                this._btnWrapper = <footer className="mui-bar mui-bar-footer"/>;
+                this._btnWrapper = <footer className="mui-bar mui-bar-footer" />;
                 //
                 d.append(this.wrapper, this._btnWrapper);
                 if (this.tableModule && ((this.tableModule.editType === 'linkage'
-                        && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
-                        || (this.tableModule.editType === 'self')
-                        && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
-                    let btnWrapper = <div className="all-btn"/>;
+                    && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
+                    || (this.tableModule.editType === 'self')
+                    && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
+                    let btnWrapper = <div className="all-btn" />;
 
                     new CheckBox({
                         className: 'edit-toggle',
@@ -2430,7 +2481,7 @@ export class BwTableModule extends Component {
                         onClick: (isChecked) => {
                             this.subBtns.box.isShow = !isChecked;
                             this.modify.box.isShow = isChecked;
-                            if(!isChecked){
+                            if (!isChecked) {
                                 this.subBtns.box.responsive();
                             }
                         }
@@ -2538,7 +2589,7 @@ export class BwTableModule extends Component {
 
                                     if (hField.assignSelectFields && hField.assignAddr) {
                                         BwTableModule.initAssignData(hField.assignAddr, row ? row.data : {})
-                                            .then(({response}) => {
+                                            .then(({ response }) => {
                                                 let data = response.data;
                                                 if (data && data[0]) {
                                                     hField.assignSelectFields.forEach((name) => {
@@ -2655,23 +2706,23 @@ export class BwTableModule extends Component {
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr/* && tools.isNotEmpty(rowData[name])*/) {
-                    if(checkLinkCell && Array.isArray(this.ui.cols)){
+                    if (checkLinkCell && Array.isArray(this.ui.cols)) {
                         let chkName = field.name;
-                        for(let col of this.ui.cols){
+                        for (let col of this.ui.cols) {
                             // 不存在chkAddr不继续验证
-                            if(!col.chkAddr || !Array.isArray(col.chkAddr.varList)){
+                            if (!col.chkAddr || !Array.isArray(col.chkAddr.varList)) {
                                 continue;
                             }
                             let varList = col.chkAddr.varList,
                                 fieldName = col.name;
 
                             // 字段名一样不继续验证
-                            if(fieldName === name || fieldName === chkName) {
+                            if (fieldName === name || fieldName === chkName) {
                                 continue;
                             }
 
                             // chkAdd.varList包含修改的cell的字段则不继续验证
-                            if(!varList.some(({varName}) => varName === chkName)){
+                            if (!varList.some(({ varName }) => varName === chkName)) {
                                 continue;
                             }
                             let linkCell: FastTableCell = row ? row.cellGet(fieldName) as FastTableCell : null;
@@ -2691,9 +2742,9 @@ export class BwTableModule extends Component {
                         }
                     }, name)
                         .then((res) => {
-                            let {errors, okNames} = res;
+                            let { errors, okNames } = res;
                             Array.isArray(errors) && errors.forEach(err => {
-                                let {name, msg} = err,
+                                let { name, msg } = err,
                                     cell = fastRow.cellGet(name);
                                 if (cell) {
                                     cell.errorMsg = msg;

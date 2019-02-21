@@ -184,8 +184,7 @@ export class ButtonAction {
      * openTyp="popup";//弹出新窗口,"newwin";//打开新窗口,"none";//保持在原界面
      * 处理按钮规则buttonType=0:get,1:post,2put,3delete
      */
-    private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
-    }, url?: string, avtData?: obj) {
+    private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {}, url?: string, avtData?: obj) {
         let {addr, data} = BwRule.reqAddrFull(btn.actionAddr, dataObj),
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
