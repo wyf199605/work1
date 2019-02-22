@@ -2128,11 +2128,10 @@ export class BwTableModule extends Component {
                         if (btn.data.openType.indexOf('rfid') > -1) {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
-
                         } else if (btn.data.openType === 'newwin') {
                             let btnList = d.queryAll(".recode_btn", wrapper)
                             let token = localStorage.getItem('token');
-                            if(!token){
+                            if (!token) {
                                 Modal.alert("请登录后操作")
                             }
                             if (btn.data.title == "停止记录") {
@@ -2145,30 +2144,31 @@ export class BwTableModule extends Component {
                                 if (!status) {
                                     Modal.toast("请先选择开始记录")
                                 } else {
-                                    let url =BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=stop";//"http://192.168.1.240:8080/sf/app_sanfu_retail/null/record"// 
-                                    BwRule.Ajax.fetch(url, {
-                                        type: 'POST',
-                                        data: {
-                                            req_type: "stop",
-                                            token
-                                        },
-                                    }).then(() => {
-                                        G.Shell.base.stopRecord()
+                                    G.Shell.location.stopRecord(()=>{
+                                        Modal.toast("已结束发送位置")
                                         for (var i = 0; i < btnList.length; i++) {
-                                            btnList[i].classList.add("disabled")
+                                            if (btnList[i].innerHTML.indexOf("开始记录") > -1) {
+                                                btnList[i].classList.remove("disabled")
+                                            } else {
+                                                btnList[i].classList.add("disabled")
+                                            }
                                         }
                                     })
+                                    // let url =BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=stop";//"http://192.168.1.240:8080/sf/app_sanfu_retail/null/record"// 
+                                    // BwRule.Ajax.fetch(url, {
+                                    //     type: 'POST',
+                                    //     data: {
+                                    //         req_type: "stop",
+                                    //         token
+                                    //     },
+                                    // }).then(() => {
+
+                                    // })
                                 }
                             } else {
-                                let url = BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=start";//"http://192.168.1.240:8080/sf/app_sanfu_retail/null/record"
-                                BwRule.Ajax.fetch(url, {
-                                    type: 'POST',
-                                    data: {
-                                        req_type: "start",
-                                        token
-                                    },
-                                }).then(() => {
-                                    G.Shell.base.startRecord()
+                                // Modal.alert(G.Shell.location.startRecord())
+                                G.Shell.location.startRecord(() => {
+                                    Modal.toast("已开始发送位置")
                                     for (var i = 0; i < btnList.length; i++) {
                                         if (btnList[i].innerHTML.indexOf("开始记录") > -1) {
                                             btnList[i].classList.add("disabled")
@@ -2177,6 +2177,23 @@ export class BwTableModule extends Component {
                                         }
                                     }
                                 })
+                                // let url = BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=start";//"http://192.168.1.240:8080/sf/app_sanfu_retail/null/record"
+                                // BwRule.Ajax.fetch(url, {
+                                //     type: 'POST',
+                                //     data: {
+                                //         req_type: "start",
+                                //         token
+                                //     },
+                                // }).then(() => {
+                                //     G.Shell.base.startRecord()
+                                //     for (var i = 0; i < btnList.length; i++) {
+                                //         if (btnList[i].innerHTML.indexOf("开始记录") > -1) {
+                                //             btnList[i].classList.add("disabled")
+                                //         } else {
+                                //             btnList[i].classList.remove("disabled")
+                                //         }
+                                //     }
+                                // })
                             }
                         } else if (btn.data.openType === 'passwd') {
                             let selectData = ftable.selectedRowsData[0];
