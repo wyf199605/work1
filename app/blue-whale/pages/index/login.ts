@@ -1006,7 +1006,8 @@ export class LoginPage {
         d.query(".current_name", dom).innerText = this.props.userId.value.replace(/\s+/g, "")
         let loginBtn = d.query("#js_login_btn");
         d.on(loginBtn, "click", () => {
-            this.req_sendServer().then(()=>{
+            this.req_sendServer().then((res)=>{
+                console.log(res)
                 Modal.toast('请在手机上确认登录');
             })
         })
@@ -1014,17 +1015,15 @@ export class LoginPage {
         return dom;
     }
     // 点击登录 --非初次登录 通知服务端该用户点击登录了，服务端websocket给userid对应的用户弹出确认登录弹窗
-    req_sendServer() {
+    req_sendServer():Promise<any> {
         //userid=XXX 
-        return new Promise((resolve, reject) => {
-            resolve({
-                data: {
-                    "errorCode": 0,
-                    "msg": "请求成功",
-                    "lgtoken": "xxxxx"
-                }
-            })
+       return BwRule.Ajax.fetch(CONF.siteUrl + CONF.ajaxUrl, {
+            type: 'POST',
+            data: {
+                userid: this.props.userId.value
+            }
         })
+       
     }
     //扫码登录获取LgToken
     req_getLgToken = () => {
