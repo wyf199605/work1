@@ -787,13 +787,16 @@ export class TableBase extends Component {
     addStack(promise: Promise<any>){
         this._promiseList.push(promise);
     }
+    renderPromise(){
+        return Promise.all(this._promiseList);
+    }
 
     render(indexes: number[], position?: number): Promise<any>
     render(start: number, length: number, position?: number, isUpdateFoot?: boolean): Promise<any>
     render(x, y, w?, z = true): Promise<any> {
         this._promiseList = [];
         this.body.render(x, y, w, z);
-        return Promise.all(this._promiseList);
+        return this.renderPromise();
     }
 
     public sortByIndex(sortRule: ISortRule) {

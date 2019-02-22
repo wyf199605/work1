@@ -83,6 +83,7 @@ interface IBW_Table {
     layout?: IBW_Layout; // 移动化
     subTableAddr?: R_ReqAddr; //移动化
     layoutDrill?: R_ReqAddr; // 下钻地址
+    rowLinkField?: string;
     operationType?: {
         autoEdit: boolean;
         editType: 'current' | 'modal';

@@ -377,6 +377,7 @@ export class BwTableModule extends Component {
         // rfid初始化 (lyq)
         this.rfidColInit();
         this.reportCaptionInit();
+        this.trClickInit();
 
         tools.isFunction(this._ftableReadyHandler) && this._ftableReadyHandler();
         this.isFtableReady = true;
@@ -627,7 +628,36 @@ export class BwTableModule extends Component {
         }
     }
 
-    protected tdClickHandler(field: R_Field, rowData: obj) {
+    trClickInit(){
+        let ui = this.ui,
+            field = ui.cols,
+            ftable = this.ftable,
+            rowLinkField = ui.rowLinkField,
+            selector = '.section-inner-wrapper:not(.pseudo-table) tbody tr td:not(.cell-link):not(.cell-img)';
+
+        if(!rowLinkField){
+            return
+        }
+
+        ftable.click.add(selector, (e: MouseEvent) => {
+            if (e.altKey || e.ctrlKey || e.shiftKey) {
+                return;
+            }
+
+            let target = e.target as HTMLTableCellElement,
+                rowIndex = parseInt(target.parentElement.dataset.index),
+                row = ftable.rowGet(rowIndex),
+                rowData = row.data;
+            for(let field of this.cols){
+                if(field.name === rowLinkField){
+                    this.tdClickHandler(field, rowData, true);
+                    break;
+                }
+            }
+        })
+    }
+
+    protected tdClickHandler(field: R_Field, rowData: obj, empty = false) {
         // 判断是否为link
         if (!field) {
             return;
@@ -635,7 +665,7 @@ export class BwTableModule extends Component {
         let link = field.link,
             dataType = field.dataType || (field.atrrs && field.atrrs.dataType);
 
-        if (tools.isEmpty(rowData[field.name])) {
+        if (!empty && tools.isEmpty(rowData[field.name])) {
             return;
         }
 
@@ -884,7 +914,6 @@ export class BwTableModule extends Component {
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
                                 BwRule.isNewImg(dataType) && (cell.data = images.filter((a) => !!a).join(','));
-                                console.log(cell.data);
                                 resolve();
                             });
                         }
@@ -2456,6 +2485,7 @@ export class BwTableModule extends Component {
 
 
         let cancel = () => {
+            closeCellInput();
             this.ftable && this.ftable.editorCancel();
             validList = [];
         };

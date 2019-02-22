@@ -315,7 +315,8 @@ export = class contactsPage {
 
                 let simData = [];
                 if(para.levelField === ''){
-                    let parent = d.query('a[data-id]', dom);
+                    let parent = d.query('a[data-id]', dom),
+                        id = parent && parent.dataset.id;
                     if(para.recursion === 1){
                         subId = treeField[0];
                         // subName = treeField[2];
@@ -352,10 +353,10 @@ export = class contactsPage {
                                 }else {
                                     let name = '';
                                     if(key === treeField[level]){
-                                        for(let m = 0; m < level; m++ ){
+                                        for(let m = level > 2 ? level - 2 : 0; m < level; m++ ){
                                             name += obj[treeField[m]];
                                         }
-                                        if(name === parent.dataset.id){
+                                        if(name === id){
                                             simData.push(obj);
                                         }
                                     }

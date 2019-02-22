@@ -79,7 +79,7 @@ namespace BW {
                     dict.event = event;
                     self.handle('wake', dict);
                 },
-                opentab: function (userid = '', accessToken = '', noShow?: string[]) {
+                opentab: function (userid = '', accessToken = '', noShow?: string[], data = {}) {
                     let ja = [
                         {icon: "home", name: "首页", url: BW.CONF.url.home, show: 0},
                         {icon: "contacts", name: "通讯", url: BW.CONF.url.contact, show: 0},
@@ -99,6 +99,9 @@ namespace BW {
                         userid,
                         accessToken
                     };
+                    for(let key in data){
+                        dict[key] = data[key];
+                    }
                     self.handle('opentab', dict);
                 },
                 logout: function (url: string = CONF.url.login) {

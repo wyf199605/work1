@@ -428,7 +428,7 @@ export class ButtonAction {
                             if (!('hintAfterAction' in btn) || btn.hintAfterAction) {
                                 if (data && data.showText) {
                                     Modal.alert(data.showText);
-                                } else if (btn.openType !== 'popup') {
+                                } else if (btn.openType !== 'popup' && btn.subType !== 'import') {
                                     Modal.toast(response.msg || `${btn.title}成功`);
                                 }
                             }

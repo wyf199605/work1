@@ -25,8 +25,8 @@ export class BwMainTableModule extends BwTableModule{
         }
     }
 
-    protected tdClickHandler(field: R_Field, rowData: obj)  {
-        super.tdClickHandler(field, rowData);
+    protected tdClickHandler(field: R_Field, rowData: obj, empty = false)  {
+        super.tdClickHandler(field, rowData, empty);
         // linkName 快捷点击按键
         if(!field) return;
 

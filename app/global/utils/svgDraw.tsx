@@ -295,7 +295,8 @@ export class SvgDraw{
 
         new QRCode(groupEl, {
             useSVG: true,
-            text: data
+            text: data,
+            correctLevel: QRCode.CorrectLevel.L
         });
 
         group.select('svg')

@@ -13,9 +13,12 @@ import {ShellAction} from "../../../global/action/ShellAction";
 
 export = class CheckInPage extends BasicPage {
     protected passwordEl: HTMLElement = null;
+    protected userid: string;
 
     constructor(private para) {
         super(para);
+        this.userid = tools.url.getPara('userid', this.url) || '';
+        console.log(this.userid);
         let parent = para.dom.parentNode;
         let height: number = parent.offsetHeight - parent.firstChild.offsetHeight;
         para.dom.style.height = height + 'px';
@@ -44,6 +47,8 @@ export = class CheckInPage extends BasicPage {
             placeholder: '请输入用户名',
             icons: ['iconfont icon-avatar']
         });
+        // 设置默认用户id
+        text.set(this.userid);
         let password = new TextInput({
             container: self.passwordEl.querySelector('[data-type="password"]'),
             type: 'password',
@@ -95,12 +100,20 @@ export = class CheckInPage extends BasicPage {
                     if (tools.isEmpty(text.get())) {
                         Modal.toast('员工号不能为空');
                     } else {
-                        finger.style.opacity = '1';
-                        let userid = text.get().toUpperCase();
-                        if('AppShell' in window) {
-                            fingerPrint(userid);
-                        }else if('BlueWhaleShell' in window) {
-                            oldFingerPrint(userid)
+                        let flag = false;
+                        if('AppShell' in window || 'BlueWhaleShell' in window){
+                            let userid = text.get().toUpperCase();
+                            if('AppShell' in window) {
+                                flag = fingerPrint(userid);
+                            }else if('BlueWhaleShell' in window) {
+                                flag = oldFingerPrint(userid)
+                            }
+                        }
+                        if(flag){
+                            finger.style.opacity = '1';
+                        }else{
+                            finger.style.opacity = '0';
+                            Modal.alert('无法使用指纹设备')
                         }
                     }
                 }, 500),
@@ -138,13 +151,17 @@ export = class CheckInPage extends BasicPage {
             container: main.bodyWrapper.querySelector('[data-type="text"]'),
             type: 'text'
         });
-        text.focus();
+        if(this.userid){
+            text.set(this.userid);
+        }else{
+            text.focus();
+        }
 
         //指纹登记
         function fingerPrint(userid) {
             let msg = finger.querySelector('[data-msg="msg"]');
             G.Shell.finger.cancel();
-            G.Shell.finger.get({
+            let flag = G.Shell.finger.get({
                 type: 1,
                 option: 1
             }, (e) => {
@@ -205,6 +222,7 @@ export = class CheckInPage extends BasicPage {
             }, (ev) => {
                 msg.innerHTML = '<span>' + ev.data.text + '</span>';
             }, true);
+            return flag;
         }
 
         function oldFingerPrint(userid) {
@@ -254,6 +272,7 @@ export = class CheckInPage extends BasicPage {
                     }
                 }
             });
+            return true;
         }
     }
 
