@@ -431,9 +431,7 @@ export class DetailModule extends AGroupTabItem {
                         BwRule.getFileInfo(field.name, cellData).then(({response}) => {
                             response = JSON.parse(response);
                             if (response && response.dataArr && response.dataArr[0]) {
-                                let data = response.dataArr[0],
-                                    filename = data.filename;
-                                text = filename;
+                                text = response.dataArr[0].filename;
                             }
                             resolve({text, classes, bgColor, color, data});
                         }).catch(() => {
