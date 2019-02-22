@@ -37,9 +37,15 @@
       top: 8px;
       width: 20px;
       height: 20px;
-      // background-image: url("../img/collect.png");
-      // background-repeat: no-repeat;
-      // background-size: 80%;
+      .iconfont {
+        font-size: 18px;
+      }
+      .has_collect {
+        color: red;
+      }
+      .un_collect {
+        color: lightgray
+      }
     }
   }
   &:after {

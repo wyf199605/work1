@@ -13,6 +13,9 @@
     justify-content: space-between;
     margin: 6px 15px;
     border-bottom: 1px solid #00000024;
+    .edit_btn {
+      cursor: pointer;
+    }
   }
   .collect_nav span {
     display: inline-block;

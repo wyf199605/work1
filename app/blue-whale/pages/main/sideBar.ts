@@ -90,17 +90,13 @@ export default class SideBarMrg {
         );
       }
     });
-    Menu.CollectFunc = (dom: any, node: any) => {
-      // console.log(dom)
-      // console.log(node.content.menuPath.dataAddr)
-      // console.log(dom.title)
+    Menu.CollectFunc = (node: any) => {
       if (!this.CollectObj) {
         this.CollectObj = new CollectPC();
       }
-      // this.CollectObj.GroupName = dom.title ? dom.title : "";
-      // this.CollectObj.menuUrl=node.content.menuPath.dataAddr;
-      // console.log(dom.title)
-      // this.CollectObj.show(false)
+      this.CollectObj.GroupName = node.content.menuName;
+      this.CollectObj.menuUrl = node.content.menuPath.dataAddr;
+      this.CollectObj.show(false)
     },
 
       this.menu.onOpen = tools.pattern.throttling(node => {
@@ -119,7 +115,7 @@ export default class SideBarMrg {
             <p>收藏<p>
         </div>
         <div>
-            <div class="icon icon_time"></div>
+            <div class="icon icon_time" id="js_react"></div>
             <p>最近<p>
             </div>
         </div>
@@ -127,11 +123,22 @@ export default class SideBarMrg {
     `;
     d.append(d.query("#customNavMenu"), d.create(collectDom));
     d.on(d.query(".collect_item"), "click", () => {
-      let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=collect" });
-      sys.window.open({ url })
+      this.href();
+    })
+    d.on(d.query("#js_react"), "click", () => {
+      console.log("111")
+      this.href();
     })
   }
 
+  private href = () => {
+    let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=collect" });
+    // sys.window.open({ url })
+    if (sysPcHistory.indexOf(url) >= 0) {
+      sys.window.refresh(url);
+    }
+    sys.window.open({ url });
+  }
   /**
    * 初始化最近与收藏
    */

@@ -20,7 +20,7 @@ export interface IMenuPara extends IElementTreeNodePara {
  * 菜单组件对象
  */
 export class Menu extends ElementTreeNode {
-  static CollectFunc: (dom: any, node: any) => void;
+  static CollectFunc: (node: any) => void;
   constructor(para: IMenuPara) {
     super(para);
   }
@@ -32,13 +32,11 @@ export class Menu extends ElementTreeNode {
       if ((this.deep == 1 && para.isLeaf) || this.deep !== 1) {
         let dom = "";
         if (this.content.favid) {
-          dom = `<i class="collect_btn iconfont icon-zhiwen"/>`
+          dom = `<span class="collect_btn"><i class="iconfont icon-shoucang1 has_collect"/></span>`
         } else {
-          dom = `<i class="collect_btn iconfont icon-device-mb"/>`
-
+          dom = `<span class="collect_btn"><i class="iconfont icon-shoucang1-copy un_collect"/></span>`
         }
         d.query(".tree-text-wrapper", this.wrapper).appendChild(d.create(dom))
-
       }
     }
 
@@ -72,18 +70,14 @@ export class Menu extends ElementTreeNode {
         event.preventDefault();
         this.expand = true;
       });
-
       d.on(this.wrapper, "mouseleave", event => {
         event.stopPropagation();
         if (this.parent) {
           this.expand = false;
         }
       });
-
       d.on(this.textWrapper, "click", event => {
         event.stopPropagation();
-
-        // this.expand = !this.expand;
         if (this.isLeaf && !this.isOnTop) {
           this.parent.expand = !this.parent.expand;
         }
@@ -93,11 +87,12 @@ export class Menu extends ElementTreeNode {
     } else {
       d.on(this.textWrapper, "click", (event: MouseEvent) => {
         event.stopPropagation();
-        if (this.isCollect && event.srcElement.getAttribute("class") == 'collect_btn') {
-          // console.log(event.srcElement.parentNode)
-          // console.log(this)
-
-          Menu.CollectFunc(event.srcElement.parentNode, this);
+        let list = event.srcElement.classList
+        let status = list.contains("icon-shoucang1") || list.contains("icon-shoucang1-copy") || list.contains("collect_btn")
+        if (this.isCollect && status) {
+          console.log(this)
+          
+          Menu.CollectFunc(this);
         } else {
           this.expand = !this.expand;
           //   (!this.children) && (this.selected = !this.selected);
