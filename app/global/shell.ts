@@ -5,6 +5,12 @@ namespace G{
 
         let _device:obj;
         const base = {
+            startRecord( ) {
+                return ShellBase.handler('startRecord',{});
+            },
+            stopRecord( ) {
+                return ShellBase.handler('stopRecord',{});
+            },
             get device() {
                 if(!_device){
                     _device = ShellBase.handler('deviceGet', {});

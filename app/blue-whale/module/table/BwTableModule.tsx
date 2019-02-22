@@ -2145,7 +2145,7 @@ export class BwTableModule extends Component {
                                 if (!status) {
                                     Modal.toast("请先选择开始记录")
                                 } else {
-                                    let url = BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=stop"
+                                    let url =BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=stop";//"http://192.168.1.240:8080/sf/app_sanfu_retail/null/record"// 
                                     BwRule.Ajax.fetch(url, {
                                         type: 'POST',
                                         data: {
@@ -2153,13 +2153,14 @@ export class BwTableModule extends Component {
                                             token
                                         },
                                     }).then(() => {
+                                        G.Shell.base.stopRecord()
                                         for (var i = 0; i < btnList.length; i++) {
                                             btnList[i].classList.add("disabled")
                                         }
                                     })
                                 }
                             } else {
-                                let url = BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=start"
+                                let url = BW.CONF.siteUrl + btn.data.actionAddr.dataAddr + "?req_type=start";//"http://192.168.1.240:8080/sf/app_sanfu_retail/null/record"
                                 BwRule.Ajax.fetch(url, {
                                     type: 'POST',
                                     data: {
@@ -2167,6 +2168,7 @@ export class BwTableModule extends Component {
                                         token
                                     },
                                 }).then(() => {
+                                    G.Shell.base.startRecord()
                                     for (var i = 0; i < btnList.length; i++) {
                                         if (btnList[i].innerHTML.indexOf("开始记录") > -1) {
                                             btnList[i].classList.add("disabled")
@@ -2176,8 +2178,6 @@ export class BwTableModule extends Component {
                                     }
                                 })
                             }
-
-
                         } else if (btn.data.openType === 'passwd') {
                             let selectData = ftable.selectedRowsData[0];
                             if (selectData) {
