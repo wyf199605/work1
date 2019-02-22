@@ -430,7 +430,9 @@ export class EditModule {
 
         let com = this.comTnit[type](initP);
         this.assign.init(com, initP);
-
+        if(com instanceof FormCom){
+            com.onSet = initP.onSet
+        }
         return com;
     };
 

@@ -54,37 +54,41 @@ export class OfflineBtn{
     private btnGroup: BtnGroup;
     private btnModule : DetailBtnModule;
     private btn : R_Button;
-    private option: number; // 1.逐一 2.替换 3.累加
+    private option: string; // 1.逐一 2.替换 3.累加
     private para : IGeneralPara;
 
     init(btn : R_Button, btnModule : DetailBtnModule){
         console.log(btn);
         this.btnModule = btnModule;
         this.btn = btn;
-        this.para = {
-            ui : btnModule.uiPara,
-            numName : btnModule.uiPara.correlation.numberName,
-            uniqueFlag :  btn.actionAddr.dataAddr
-        };
+        // this.para = {
+        //     ui : btnModule.uiPara,
+        //     numName : btnModule.uiPara.correlation.numberName,
+        //     uniqueFlag :  btn.actionAddr.dataAddr
+        // };
         // this.barCode();
-        this.setting();
+        // this.setting();
+        this.deleteData();
         switch (btn.openType) {
             case 'barcode':
                 this.barCode();
                 break;
-            case 'setting':
+            case 'import-number-set':
                 this.setting();
                 break;
-            case 'uploadData':
+            case 'import-upload':
                 this.uploadData();
                 break;
-            case 'deleteData':
+            case 'import-download':
+                this.downData();
+                break;
+            case 'import-delete':
                 this.deleteData();
                 break;
-            case 'singleScan':
+            case 'import-scanning-single':
                 this.scan();
                 break;
-            case 'continueScan':
+            case 'import-scanning-many':
                 this.scan(true);
                 break;
             default:
@@ -99,12 +103,13 @@ export class OfflineBtn{
     }
 
     query(value : string, reScan = false){
-        Shell.imports.operateScanTable(value, this.option, this.para.uniqueFlag, this.para.ui.fields, this.para.numName, this.btnModule.getNum(), (result) => {
-            if(result.success){
-                this.btnModule.render(result.data);
-                reScan && this.scan(reScan);
-            }
-        });
+        // Shell.imports.operateScanTable(value, this.option, this.para.uniqueFlag,
+        //     this.para.ui.fields, this.para.numName, this.btnModule.getNum(), (result) => {
+        //     if(result.success){
+        //         this.btnModule.render(result.data);
+        //         reScan && this.scan(reScan);
+        //     }
+        // });
     }
 
     private getHeadTable() {
@@ -137,8 +142,6 @@ export class OfflineBtn{
         let loading = new Loading({
             msg: "下载数据中"
         });
-        // let downUrl = BW.CONF.siteUrl + this.p.data.downUrl,
-        //     uploadUrl = BW.CONF.siteUrl + this.p.data.uploadUrl;
         Shell.imports.downloadbarcode(this.para.uniqueFlag, false, (res) => {
             loading.destroy();
             if (res.success) {
@@ -232,63 +235,53 @@ export class OfflineBtn{
             }
 
         })
-
     }
 
     uploadData() {
-        let body = <div data-code="updataModal">
-
-        </div>;
-        this.modalInit('uploadData', '上传数据', body, () => {
-        }, {
-            rightPanel: [{
-                content: "上传",
-                onClick: () => {
-                    // let field = para.picFields,
-                    //     IMAOBJ = {};
-                    // IMAOBJ[field] = this.photoImgData;
-                    // let IMA = [];
-                    // IMA.push(IMAOBJ);
-                    let s = new Loading({
-                        msg: '上传中'
-                    });
-                    s.show();
-                    // let typeValue = {};
-                    // typeValue[typeName] = updataEl.getText()? updataEl.getText() : null;
-                    // console.log( updataEl.getText());
-                    // let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picAddr,(tools.isNotEmpty(para.picFields)) ? IMA : '','atvarparams',JSON.stringify(typeValue),(res) => {
-                    //     d.query('.total-rfid>.bar-code-scan>span').innerText = 0 + '';
-                    //     this.stepArry = [];
-                    //     s.destroy();
-                    //     // alert('再次返回上传接口数据')
-                    //     if (!res.success) {
-                    //         alert('上传失败');
-                    //     } else {
-                    //         this.domHash['scanamout'].innerHTML = 0 + '';
-                    //         this.domHash['count'].innerHTML = 0 + '';
-                    //         alert(res.msg);
-                    //     }
-                    // })
-                }
-            }]
+        Shell.imports.uploadcodedata(this.para.uniqueFlag, (result) => {
+            if(result.success){
+                Modal.alert('上传成功');
+            }else {
+                Modal.alert('上传失败');
+            }
         });
     }
 
     deleteData() {
         let body = <div data-code="deleteModal"/>;
+        let itemid = '条码', itemid2 = '货号';
+        let data = [{
+            text : '所有',
+            value : ''
+        },{
+            text : itemid,
+            value : ''
+        },{
+            text : itemid2,
+            value : ''
+        }];
+        data.push({
+            text : '所有',
+            value : 'itemId'
+        });
         let select = new SelectInputMb({
             container: body,
-            data: []
+            data: data
         });
         this.modalInit('deleteData', '请选择删除数据范围', <div className="rfid-barCode-set"/>, () => {
             select.get();
+            Shell.imports.operateTable(this.para.uniqueFlag, '', {}, {}, 'delete', result => {
+
+            });
         });
+
     }
 
     setting() {
         let body = <div className="barcode-setting"/>,
             operation = this.btn.operation,
-            data = operation && operation.content || [{text: "逐一", value: "1"}, {text: "替换", value: "2"}, {text: "累加", value: "3"}];
+            data = operation && operation.content ||
+                [{text: "逐一", value: "1"}, {text: "替换", value: "2"}, {text: "累加", value: "3"}];
         let selectBox = new SelectBox({
             container: body,
             select: {
@@ -305,8 +298,8 @@ export class OfflineBtn{
         selectBox.set([index]);
 
         this.modalInit('setting', '请输入设置', body, () => {
-            this.option = Number(selectBox.getSelect()[0].value);
-            this.btnModule.invesetCount(this.option);
+            this.option = selectBox.getSelect()[0].value;
+            // this.btnModule.invesetCount(this.option);
         });
     }
 

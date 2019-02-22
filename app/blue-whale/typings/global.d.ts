@@ -83,6 +83,7 @@ interface IBW_Table {
     layout?: IBW_Layout; // 移动化
     subTableAddr?: R_ReqAddr; //移动化
     layoutDrill?: R_ReqAddr; // 下钻地址
+    offline? : boolean // 是否为离线
     operationType?: {
         autoEdit: boolean;
         editType: 'current' | 'modal';
@@ -107,12 +108,13 @@ interface IBW_Detail {
     subTableList?: IBW_Slave[];
     tableAddr?: IBW_TableAddr;    // 表格编辑数据
     keyField : string; // 主键
+    offline? : boolean // 是否为离线
     operationType?: {
         autoEdit: boolean;
         editType: 'current' | 'modal';
     };
     exhibitionType: {
-        showType: 'tab' | 'panel-on' | 'panel-off'
+        showType: 'tab' | 'panel-on' | 'panel-off' | 'panel-one'
     };
     correlation : {  // 替换累加
         numberName: string,
