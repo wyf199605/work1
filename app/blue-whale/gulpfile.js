@@ -278,6 +278,9 @@ gulp.task('js', function() {
     gulpTsModule(['rfid/RfidConfig'], 'rfidConfig.js');
     gulpTsModule(['rfid/RfidInventory'], 'rfidInventory.js');
 
+    //offline
+    gulpTsModule(['offlineBtn/OfflineBtn'], 'offlineBtn.js');
+
     gulpTsModule('webscoket/webscoket', 'webscoket.js');
 
     //BugReport

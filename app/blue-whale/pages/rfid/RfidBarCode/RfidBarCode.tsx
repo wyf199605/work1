@@ -102,8 +102,9 @@ export class RfidBarCode extends Component {
                 <div class="rfid-barCode-inventory">
 
                 </div>
-                <div className="rfid-shelf-number"><span
-                    className="shelf-category"></span><span className="shelf-number"></span>
+                <div className="rfid-shelf-number">
+                    <span className="shelf-category"/>
+                    <span className="shelf-number"/>
                 </div>
                 <div class="rfid-barCode-content">
                     <div class="rfid-barCode-left">
@@ -336,7 +337,7 @@ export class RfidBarCode extends Component {
                                         }
 
 
-                                    }}></Toggle>
+                                    }}/>
                         </div>
                         <div className="set-row">
                             <div>累加</div>
@@ -383,7 +384,7 @@ export class RfidBarCode extends Component {
                                         }
 
 
-                                    }}></Toggle>
+                                    }}/>
                         </div>
                     </div>,
                             footer: {},

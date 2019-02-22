@@ -106,13 +106,24 @@ interface IBW_Detail {
     scannableTime?: number;
     subTableList?: IBW_Slave[];
     tableAddr?: IBW_TableAddr;    // 表格编辑数据
+    keyField : string; // 主键
     operationType?: {
         autoEdit: boolean;
         editType: 'current' | 'modal';
     };
     exhibitionType: {
         showType: 'tab' | 'panel-on' | 'panel-off'
-    }
+    };
+    correlation : {  // 替换累加
+        numberName: string,
+        default : string, // 默认选中值 2、3时候隐藏
+        caption : string, // 如数量
+    },
+    aggrList : {
+        caption : string,
+        expression : string,
+        fieldName : string
+    }[]
 }
 
 interface IBW_SubTableAddr {

@@ -198,6 +198,11 @@
           max-width: 25%;
         }
       }
+      .detail-count{
+        .detail-row{
+          display: inline-block;
+        }
+      }
     }
 
     .detail-content{
@@ -222,5 +227,44 @@
         }
       }
     }
+    &.has-count{
+      padding-bottom: 140px;
+      .detail-btn-group{
+        height: 140px;
+        .input-box{
+          align-items: inherit;
+        }
+        .barcode-count{
+          .barcode-row{
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            .barcode-cell{
+              display: inline-block;
+              &.barcode-right{
+                float: right;
+                margin-right: 10px;
+              }
+              .text-input{
+                width: 80px;
+                height: 25px;
+              }
+              &>div{
+                display: inline-block;
+              }
+            }
+          }
+        }
+      }
+    }
+    &.hide-count{
+      padding-bottom: 100px;
+      .detail-btn-group{
+        height: 100px;
+        .count{
+          display: none;
+        }
+      }
+    }
   }
+
 }
