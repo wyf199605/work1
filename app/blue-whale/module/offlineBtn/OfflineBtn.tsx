@@ -12,6 +12,8 @@ import Shell = G.Shell;
 import tools = G.tools;
 import Component = G.Component;
 import {DetailBtnModule} from "../detailModule/detailBtnModule";
+import {GroupTabsPage} from "../../pages/groupTabs/GroupTabsPage";
+import {EditModule} from "../edit/editModule";
 
 interface IBtnModulePara {
     subButtons: R_Button[]
@@ -43,34 +45,55 @@ interface IparaCode {
     num?: number //替换的数据
 }
 interface IGeneralPara {
-    ui : IBW_Detail;
-    numName : string; // 替换逐一累加对应的name
-    uniqueFlag : string; // 地址作为唯一键
+    ui? : IBW_Slave_Ui;
+    numName? : string; // 替换逐一累加对应的name
+    uniqueFlag? : string; // 地址作为唯一键
+    mainId : string
+    subId : string
+    mainKey : R_Field
+    subKey : R_Field
 }
 /**
  * 离线按钮操作：如条码盘点
  */
 export class OfflineBtn{
     private btnGroup: BtnGroup;
-    private btnModule : DetailBtnModule;
+    private groupTabsPage : GroupTabsPage;
     private btn : R_Button;
     private option: string; // 1.逐一 2.替换 3.累加
     private para : IGeneralPara;
 
-    init(btn : R_Button, btnModule : DetailBtnModule){
-        console.log(btn);
-        this.btnModule = btnModule;
+    init(btn : R_Button, groupTabsPage : GroupTabsPage, itemId : string){
+        this.groupTabsPage = groupTabsPage;
         this.btn = btn;
-        // this.para = {
-        //     ui : btnModule.uiPara,
-        //     numName : btnModule.uiPara.correlation.numberName,
-        //     uniqueFlag :  btn.actionAddr.dataAddr
-        // };
+        console.log(btn);
+        let mainUi = this.groupTabsPage.imports.mainUiGet(),
+            subUi = this.groupTabsPage.imports.subUiGet();
+
+        this.para = {
+            mainId : mainUi.itemId,
+            subId : subUi.itemId,
+            mainKey : mainUi.fields.map(e => {
+                if(e.name === mainUi.keyField){
+                    return e
+                }
+            })[0],
+            subKey : subUi.fields.map(e => {
+                if(e.name === subUi.keyField){
+                    return e
+                }
+            })[0]
+        };
+        let {ui} = this.getKeyField(itemId);  // 当前按钮对应的ui
+        this.para.ui = ui;
+        this.para.numName = ui.correlation && ui.correlation.numberName;
+        this.para.uniqueFlag = ui.uniqueFlag;
+        console.log(btn, ui);
+
         // this.barCode();
         // this.setting();
-        this.deleteData();
         switch (btn.openType) {
-            case 'barcode':
+            case 'import-manual-input':
                 this.barCode();
                 break;
             case 'import-number-set':
@@ -94,22 +117,84 @@ export class OfflineBtn{
             default:
                 // Modal.alert('未知类型openType');
         }
+        if(ui.supportRfid){
+            this.openRfid();
+        }
+    }
+
+    private openRfid(){
+        Shell.inventory.startEpc(null, (result) => {
+            this.query(result.data);
+        })
     }
 
     private scan(reScan = false) {
-        Shell.inventory.openScanCode(1, (res) => {
-            this.query(res.data, reScan);
+        Shell.inventory.openScanCode(1, (result) => {
+            this.query(result.data, reScan);
         })
     }
 
     query(value : string, reScan = false){
-        // Shell.imports.operateScanTable(value, this.option, this.para.uniqueFlag,
-        //     this.para.ui.fields, this.para.numName, this.btnModule.getNum(), (result) => {
-        //     if(result.success){
-        //         this.btnModule.render(result.data);
-        //         reScan && this.scan(reScan);
-        //     }
-        // });
+        let keyField = this.para.mainKey.name;
+        Shell.imports.operateScanTable(value, this.option, this.para.uniqueFlag, {
+            [keyField] : this.groupTabsPage.imports.editModule.main.get(keyField)[keyField]
+        }, this.para.numName, this.groupTabsPage.imports.getNum(), (result) => {
+            if(result.success){
+                let data = result.data;
+                if(data.itemid === this.para.mainId){
+                    this.groupTabsPage.imports.editModule.main.set(data.array);
+                }
+                reScan && this.scan(reScan);
+                this.groupTabsPage.imports.clearText();
+                this.getCountData();
+                this.getAggrData();
+            }
+        });
+    }
+
+    private fieldName = 'amountcount ';
+    private getCountData(){
+        let data = this.groupTabsPage.imports.getTextPara(),
+            id = data.itemId,
+            {keyField, value} = this.getKeyField(id);
+
+        Shell.imports.getCountData(this.para.uniqueFlag, data.itemId, this.fieldName, data.expression, {
+            [keyField] : value
+        }, result => {
+            if(result.success){
+                this.groupTabsPage.imports.setAmount(result.data[this.fieldName]);
+            }
+        });
+    }
+
+    private getKeyField(itemId : string) : {keyField : string, value : string, ui : IBW_Slave_Ui, edit : EditModule}{
+        let keyField, ui, edit, value;
+        if(itemId === this.para.subId){
+            keyField = this.para.subKey.name;
+            value = this.groupTabsPage.imports.editModule.sub.get(keyField);
+            ui = this.groupTabsPage.imports.subUiGet() as IBW_Slave_Ui;
+            edit = this.groupTabsPage.imports.editModule.sub;
+        }else {
+            keyField = this.para.mainKey.name;
+            value = this.groupTabsPage.imports.editModule.main.get(keyField);
+            ui = this.groupTabsPage.imports.mainUiGet() as IBW_Slave_Ui;
+            edit = this.groupTabsPage.imports.editModule.main;
+        }
+        return {keyField,value, ui, edit}
+    }
+
+    private getAggrData(){
+        this.groupTabsPage.imports.aggrArr.forEach(arr => {
+            let  id = arr.itemId,
+                {keyField, value} = this.getKeyField(id);
+            Shell.imports.getCountData(this.para.uniqueFlag, id, this.fieldName, arr.expression, {
+                [keyField] : value
+            }, result => {
+                if(result.success){
+                    this.groupTabsPage.imports.setAggr(result.data[this.fieldName], id, keyField);
+                }
+            });
+        })
     }
 
     private getHeadTable() {
@@ -142,137 +227,67 @@ export class OfflineBtn{
         let loading = new Loading({
             msg: "下载数据中"
         });
-        Shell.imports.downloadbarcode(this.para.uniqueFlag, false, (res) => {
+        Shell.imports.downloadbarcode(this.btn.actionAddr.dataAddr,this.para.uniqueFlag, false, (result) => {
             loading.destroy();
-            if (res.success) {
-                let data = G.Shell.inventory.getTableInfo(this.para.uniqueFlag);
-                let pageName = data.data;
-
-                //只需要注册一个监听事件
-                // this.rigisterRifd();
-                //判断状态
-                //造数据条件
-            }
-            else {
-                //发现有未上传数据
-                let mode1 = new Modal({
-                    isMb: false,
-                    position: "center",
-                    header: '提示',
-                    zIndex: 1022,
-                    isOnceDestroy: true,
-                    isBackground: true,
-                    body: <div><h5>有未上传数据，是否继续</h5></div>,
-                    footer: {},
-                    onOk: () => {
-                        // this.getHeadTable();
-                        // let ScanData =  G.Shell.inventory.getScanData(this.uniqueFlag);
-                        // if(ScanData.success){
-                        //     loading.destroy();
-                        //     let res = ScanData.data.data;
-                        //     //重新定义数据
-                        //     //存储obj数据结构 跟 res数据比对 拼接 以及重新刷新条件传值参数
-                        //
-                        //
-                        //     if(res){
-                        //         let str = '';
-                        //         for(let val in this.DataclassInfoCp[0]) {
-                        //             for(let obj in res[0]){
-                        //                 // alert(obj + 'ppp');
-                        //                 if (obj == val) {
-                        //                     str += res[0][val];
-                        //                     // alert(data[i][val] + 'oo')
-                        //                 }
-                        //             }
-                        //             // alert(str + '字符串')
-                        //             this.domHash['categoryVal1'].innerHTML = str;
-                        //         }
-                        //         let strs = '';
-                        //
-                        //         for(let val in  this.DataclassInfoCp[1]){
-                        //             for(let obj in res[0]){
-                        //                 if(obj == val){
-                        //                     strs += res[0][val];
-                        //                 }
-                        //             }
-                        //             this.domHash['categoryVal2'].innerHTML = strs;
-                        //         }
-                        //         let strss = '';
-                        //
-                        //         for(let val in  this.DataclassInfoCp[2]){
-                        //             for(let obj in res[0]){
-                        //                 if(obj == val){
-                        //                     strss += res[0][val];
-                        //                 }
-                        //             }
-                        //             this.domHash['categoryVal3'].innerHTML = strss;
-                        //         }
-                        //
-                        //     }
-                        //     //更新数据条件
-                        //     this.domHash['barcode'].innerHTML =  res[0][this.keyField];
-                        //     this.domHash['Commodity'].innerHTML = res[0][this.nameField];
-                        //     this.domHash['count'].innerHTML = res[0]['AMOUNT'] ? res[0]['AMOUNT']: 0 + '';
-                        //
-                        // }
-
-                        //
-                        mode1.destroy();
-                    },
-                    onClose: () => {
-                        // G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,true, (res=>{
-                        //     alert(res.msg)
-                        //     if(res.success){
-                        //         loading.destroy();
-                        //         this.getHeadTable(para);
-                        //     }
-                        // }))
-                        //Modal.toast('输入成功');
-
-                    }
-
-                })
-            }
-
+            Modal.toast(result.msg)
         })
     }
 
     uploadData() {
+        let loading = new Loading({
+            msg: "数据上传中"
+        });
         Shell.imports.uploadcodedata(this.para.uniqueFlag, (result) => {
             if(result.success){
-                Modal.alert('上传成功');
+                Modal.toast('上传成功');
             }else {
-                Modal.alert('上传失败');
+                Modal.toast('上传失败');
             }
+            loading.destroy();
         });
     }
 
     deleteData() {
-        let body = <div data-code="deleteModal"/>;
-        let itemid = '条码', itemid2 = '货号';
+        let body = <div data-code="delete-modal"/>;
+        let mainKey = this.para.mainKey && this.para.mainKey.name,
+            subKey = this.para.subKey && this.para.subKey.name,
+            main = {[this.para.mainId] : mainKey},
+            sub = {[this.para.subId] : subKey};
+
         let data = [{
             text : '所有',
-            value : ''
+            value : mainKey + ',' + subKey,
+            data : Object.assign(main, sub)
         },{
-            text : itemid,
-            value : ''
+            text : this.para.mainKey.caption,
+            value : mainKey,
+            data : main
         },{
-            text : itemid2,
-            value : ''
+            text : this.para.subKey.caption,
+            value : subKey,
+            data : sub
         }];
-        data.push({
-            text : '所有',
-            value : 'itemId'
-        });
-        let select = new SelectInputMb({
+        let select = new SelectBox({
             container: body,
-            data: data
+            className : 'imports-select',
+            data: data,
+            select : {
+                multi : false,
+            }
         });
-        this.modalInit('deleteData', '请选择删除数据范围', <div className="rfid-barCode-set"/>, () => {
-            select.get();
-            Shell.imports.operateTable(this.para.uniqueFlag, '', {}, {}, 'delete', result => {
+        let del = (itemId : string, keyField : string) => {
+            let {edit} = this.getKeyField(itemId);
+            Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, {
+                [keyField] : edit.get(keyField)[keyField]
+            }, 'delete', result => {
 
             });
+        };
+        this.modalInit('deleteData', '请选择删除数据范围', body, () => {
+            let data = select.getSelect()[0].data as obj;
+            for(let item in data){
+                del(item, data[item]);
+            }
         });
 
     }
@@ -280,9 +295,8 @@ export class OfflineBtn{
     setting() {
         let body = <div className="barcode-setting"/>,
             operation = this.btn.operation,
-            data = operation && operation.content ||
-                [{text: "逐一", value: "1"}, {text: "替换", value: "2"}, {text: "累加", value: "3"}];
-        let selectBox = new SelectBox({
+            data = operation && operation.content,
+            selectBox = new SelectBox({
             container: body,
             select: {
                 multi: false,
@@ -298,8 +312,8 @@ export class OfflineBtn{
         selectBox.set([index]);
 
         this.modalInit('setting', '请输入设置', body, () => {
-            this.option = selectBox.getSelect()[0].value;
-            // this.btnModule.invesetCount(this.option);
+            this.option = selectBox.data[selectBox.getChecked()[0]].value;
+            this.groupTabsPage.imports.setCount(this.option);
         });
     }
 
@@ -321,8 +335,9 @@ export class OfflineBtn{
         });
     }
 
+    private modal : Modal;
     modalInit(name: string, title: string, body: HTMLElement, onOk: () => void, footer = {}) {
-      new Modal({
+      this.modal = new Modal({
             isMb: false,
             isOnceDestroy : true,
             position: "center",
@@ -333,7 +348,9 @@ export class OfflineBtn{
                 onOk();
                 this.destroy();
             },
-            onClose: this.destroy
+            onClose : () => {
+                this.destroy();
+            }
         });
     }
 
@@ -367,6 +384,8 @@ export class OfflineBtn{
     destroy() {
         this.btnGroup && this.btnGroup.destroy();
         this.btnGroup = null;
+        this.modal && this.modal.destroy();
+        this.modal = null;
     }
 
 }

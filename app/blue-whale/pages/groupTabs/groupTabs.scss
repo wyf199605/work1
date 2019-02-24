@@ -11,6 +11,98 @@
     .detail-btn-group{
       display: none;
     }
+    .panel-wrapper{
+      &:after{
+        background: white;
+      }
+      .panel-item-wrapper.selected{
+        &:after{
+          display: none;
+        }
+      }
+    }
+
+    padding-bottom: 140px;
+    .inventory-footer{
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 140px;
+        background-color: #fff;
+        border-top: 1px solid #ddd;
+        .inventory-group-btn{
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          left: 0;
+          width: 100%;
+          height: 50px;
+          background-color: #fff;
+          border-top: 1px solid #ddd;
+          .btn-group-container{
+            .btn{
+              height: 50px;
+            }
+          }
+          .input-box{
+            height: 100%;
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+            justify-content: center;
+
+            .btn{
+              font-size: 14px;
+              height: 40px;
+              //margin-left: 15px;
+              border-color: #005bac;
+              color: #005bac;
+              padding: 0 14px;
+              max-width: 25%;
+            }
+          }
+          .detail-count{
+            .detail-row{
+              display: inline-block;
+            }
+          }
+          .input-box{
+            align-items: inherit;
+          }
+        }
+       .barcode-count{
+        .barcode-row{
+          padding: 10px;
+          border-bottom: 1px solid #eee;
+          height: 45px;
+          .barcode-cell{
+            display: inline-block;
+            &.barcode-right{
+              float: right;
+              margin-right: 20px;
+            }
+            .text-input{
+              width: 80px;
+              height: 25px;
+            }
+            &>div{
+              display: inline-block;
+            }
+          }
+        }
+      }
+    }
+    &.hide-count{
+      padding-bottom: 90px;
+      .inventory-footer{
+        height: 90px;
+        .count{
+          display: none;
+        }
+      }
+    }
   }
   .group-tab-page{
     ul.nav.nav-tabs.nav-tabs-line {

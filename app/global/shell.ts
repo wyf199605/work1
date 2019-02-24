@@ -494,8 +494,8 @@ namespace G{
          */
         const imports = {
             //条码扫码下载的
-            downloadbarcode(downUrl:string, defaultUpload:boolean, back:IShellEventHandler){
-                return ShellBase.handler('downloadbarcode',{downUrl,defaultUpload},back,null,false);
+            downloadbarcode(uniqueFlag:string, downUrl:string, defaultUpload:boolean, back:IShellEventHandler){
+                return ShellBase.handler('downloadbarcode',{uniqueFlag,downUrl,defaultUpload},back,null,false);
             },
             //上传条码数据
             uploadcodedata(uploadUrl:string, back:IShellEventHandler){
@@ -511,7 +511,7 @@ namespace G{
             operateTable(uniqueFlag:string, itemid:string, params:obj, where:obj, type: string,back:IShellEventHandler){
                 return ShellBase.handler('operateTable',{uniqueFlag, itemid, params, where,type},back)
             },
-            operateScanTable(sancode:string, option: number, uniqueFlag:string, keyfield:obj, numName: string, num: number, back:IShellEventHandler){
+            operateScanTable(sancode:string, option: string, uniqueFlag:string, keyfield:obj, numName: string, num: string, back:IShellEventHandler){
                 return ShellBase.handler('operateScanTable',{sancode, keyfield, uniqueFlag, option, numName, num},back)
             },
 

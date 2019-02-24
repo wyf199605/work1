@@ -213,15 +213,7 @@ export class ButtonAction {
                 res = JSON.stringify(tmp);
             }
         }
-        let openType = btn.openType;
-        if(openType.indexOf('import-')){
-            require(['OfflineBtn'], (e) => {
-                let offBtn = new e.OfflineBtn();
-                offBtn.init(btn, btnModule);
-            });
-            return;
-        }
-        switch (openType) {
+        switch (btn.openType) {
             case 'none' :
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');

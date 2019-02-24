@@ -90,6 +90,8 @@ interface R_Aggr{
     caption: string;
     dataAddr: R_ReqAddr;
     fieldName: string;
+    itemId? : string // 前端自己加的属性
+    expression? : string
 }
 
 interface R_VarList{
