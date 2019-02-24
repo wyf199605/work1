@@ -90,6 +90,8 @@ interface R_Aggr{
     caption: string;
     dataAddr: R_ReqAddr;
     fieldName: string;
+    itemId? : string // 前端自己加的属性
+    expression? : string
 }
 
 interface R_VarList{
@@ -179,6 +181,10 @@ interface R_Button extends Btn {
     inventoryKey?:string;
     haveRoll? : boolean; // 是否有翻页
     icon?:string; // 图标
+    operation? : {  // 单选
+        content : ListItem[]; // 单选数据
+        default : string; // 默认选中数据
+    }
 
     // 前端自己加的属性
     hintAfterAction?: boolean; //点击按钮后是否提示

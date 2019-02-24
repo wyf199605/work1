@@ -17,6 +17,7 @@ export interface IDataManagerAjax {
     auto?: boolean; // 是否初始化时触发ajax
     once?: boolean; // 是否只执行一次ajax
     ajaxData?: obj;
+    resetCurrent?: boolean;
 }
 
 export interface IDataManagerAjaxStatus {
@@ -144,8 +145,8 @@ export class DataManager {
         this._loading = null;
     }
 
-    private _pagination: Pagination = null;
-    private get pagination() {
+    protected _pagination: Pagination = null;
+    protected get pagination() {
         if(this.pageConf && !this._pagination){
             let mainWrapper = this.pageConf.container,
                 isPulldownRefresh = this.pageConf.isPulldownRefresh || false;
@@ -204,7 +205,7 @@ export class DataManager {
     refresh(ajaxData?: obj): Promise<void> {
         this._ajaxData = ajaxData || this._ajaxData;
         return this.pagination ?
-            this.pagination.refresh() :
+            this.pagination.refresh(this.ajax.resetCurrent) :
             this.dataFetch(true).then(() => {
                 this.render(0, this.pageSize === -1 ? this.data.length : this.pageSize);
             }).catch(() => {

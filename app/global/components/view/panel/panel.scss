@@ -72,13 +72,14 @@
       }
 
       &::after {
-        font-family: Muiicons;
+        font-family: "iconfont";
         font-size: inherit;
         line-height: 1;
         position: absolute;
         right: 15px;
-        content: '\e581';
+        content: '\e64c';
         color: #bbb!important;
+        transition: transform 0.5s;
       }
     }
 
@@ -117,7 +118,8 @@
         z-index: 5;
         background-color: #eee;
         &::after {
-          content: '\e580';
+          //content: '\e580';
+          transform: rotate(-180deg);
         }
       }
       .panel-item-btn-group {

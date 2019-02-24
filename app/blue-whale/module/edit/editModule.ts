@@ -430,7 +430,9 @@ export class EditModule {
 
         let com = this.comTnit[type](initP);
         this.assign.init(com, initP);
-
+        if(com instanceof FormCom){
+            com.onSet = initP.onSet
+        }
         return com;
     };
 
@@ -810,11 +812,19 @@ export class EditModule {
         });
     }
 
-    destroy(name: string) {
-        if (this.coms[name]) {
-            this.coms[name].destroy();
-            this.comsExtraData[name] = null;
-            delete this.coms[name];
+    destroy(name?: string) {
+        if(name){
+            if (this.coms[name]) {
+                this.coms[name].destroy();
+                this.comsExtraData[name] = null;
+                delete this.coms[name];
+            }
+        }else{
+            for(let name in this.coms){
+                this.coms[name].destroy();
+                this.comsExtraData[name] = null;
+                delete this.coms[name];
+            }
         }
     }
 }

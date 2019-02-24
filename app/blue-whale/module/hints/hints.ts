@@ -167,6 +167,15 @@ export class Hints{
 
     destroy(){
         this.modal.destroy();
+        this.modal = null;
+        this.tab = null;
+        this.index = null;
+        this.len = null;
+        this.upButton = null;
+        this.nextButton = null;
+        this.openButton = null;
+        this.noWarmButton = null;
+        this.dataMap = null;
     }
 
     private ajax = new BwRule.Ajax();

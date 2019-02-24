@@ -22,7 +22,7 @@ export class BtnGroup extends Component {
         return this._maxBtn;
     }
     set maxBtn(maxBtn: number) {
-        this.wrapper.innerHTML = ''
+        this.wrapper.innerHTML = '';
         let len = this._buttons.length;
         this._buttons.forEach((btn, i) => {
             if (maxBtn > i) {

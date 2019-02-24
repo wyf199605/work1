@@ -3,6 +3,7 @@ import {BwTableModule, IBwTableModulePara} from "./BwTableModule";
 import tools = G.tools;
 import d = G.d;
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import {IFastBtnTablePara} from "../../../global/components/FastBtnTable/FastBtnTable";
 
 export class BwSubTableModule extends BwTableModule{
     constructor(para: IBwTableModulePara) {
@@ -12,6 +13,12 @@ export class BwSubTableModule extends BwTableModule{
     protected ftableReady() {
         tools.isNotEmpty(this.ui.subButtons) && this.subBtns.init(this.btnWrapper);
         super.ftableReady();
+    }
+
+    protected getBaseFtablePara(){
+        let data = super.getBaseFtablePara();
+        data.btn = null;
+        return data;
     }
 
     protected _btnWrapper: HTMLElement;

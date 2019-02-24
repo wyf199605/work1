@@ -286,8 +286,8 @@ export class Pagination extends Component {
         tools.isEmpty(this.paging) && this.spinner === null && this.initSpinner();
     }
 
-    refresh() {
-        this._current = 0;
+    refresh(reset = true) {
+        (reset || this._current === -1) && (this._current = 0);
         return this.changedPage(true);
     }
 

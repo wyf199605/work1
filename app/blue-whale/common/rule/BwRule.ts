@@ -718,7 +718,10 @@ export class BwRule extends Rule {
 
             return null;
         },
-        fields(cols: R_Field[], uiType: string) {
+        detail(detailUi: IBW_Detail): void {
+            !tools.isEmpty(detailUi && detailUi.fields) && BwRule.beforeHandle.fields(detailUi.fields);
+        },
+        fields(cols: R_Field[], uiType?: string) {
 
             for (let col of cols) {
 

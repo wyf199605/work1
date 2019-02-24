@@ -1,12 +1,13 @@
 //导入工具包
 let gulp = require('gulp'),
+    livereload = require('gulp-livereload'),
     GulpCommon = require('../gulp-common'),
     config = require('./gulp.conf'),
-    browserSync = require("browser-sync"),
-    reload = browserSync.reload,
+    //browserSync = require("browser-sync"),
+    //reload = browserSync.reload,
     compiler = new GulpCommon('../tsconfig.json', '../global/', config, [
         'typings/*.d', 'index'
-    ], reload);
+    ]);
 
 let path = config.path;
 path.page = path.root + 'pages/';
@@ -23,7 +24,11 @@ gulp.task("server", function() {
     // });
 });
 
-
+gulp.task('watch', function() {
+    livereload.listen();
+    gulp.watch(['../../dist/**']).on('change', livereload.changed);
+    // gulp.watch(['../../dist/**']).on("change", reload);
+});
 /**
  * ------------ css -------------
  */
@@ -190,7 +195,7 @@ gulp.task('js', function() {
         'listDetail/editDetailModule',
         'listDetail/DetailBase',
         'listDetail/DetailFormModule',
-        'listDetail/ListItemDetailMain',
+        'listDetail/DetailMain',
         'listDetail/EditDetail',
     ], 'listDetail.js');
 
@@ -275,8 +280,8 @@ gulp.task('js', function() {
     gulpTsModule(['gesture/gesture'], 'gesture.js');
 
     //rfidConfig
-    gulpTsModule(['rfidConfig/RfidConfig'], 'rfidConfig.js');
-    gulpTsModule(['rfidConfig/RfidInventory'], 'rfidInventory.js');
+    gulpTsModule(['rfid/RfidConfig'], 'rfidConfig.js');
+    gulpTsModule(['rfid/RfidInventory'], 'rfidInventory.js');
 
     gulpTsModule('webscoket/webscoket', 'webscoket.js');
 
@@ -296,6 +301,8 @@ gulp.task('js', function() {
     gulpTsModule('mobileScan/MobileScan', 'MobileScan.js');
     gulpTsModule('mbListModule/mbListModule', 'MbListModule.js');
     gulpTsModule('mbListModule/mbListView', 'MbListView.js');
+
+    gulpTsModule('detailModule/*', 'detailModule.js');
 
     // 客户化查询器
     gulpTsModule([
@@ -382,7 +389,7 @@ gulp.task('js', function() {
     gulpTsPage('attendance/checkIn', 'checkIn.js');
     gulpTsPage('attendance/changePassword', 'changePassword.js');
 
-    gulpTsPage('tabs/tabsPage', 'tabsPage.js');
+    gulpTsPage('groupTabs/GroupTabsPage', 'groupTabs.js');
     gulpTsPage('basicPage', 'basicPage.js');
     gulpTsPage('rfid/RfidSetting/RfidSetting', 'RfidSetting.js');
 
@@ -399,7 +406,7 @@ gulp.task('js', function() {
  * ------------ Js ---------------
  */
 //定义默认任务
-gulp.task('BW_Watch', ['js', 'css', 'server'], function() {
+gulp.task('BW_Watch', ['js', 'css', 'watch'], function() {
     // for(var i=0,len = pathSrc.length; i <= len - 1; i++){
     //     gulp.watch(pathSrc[i], [str[i]]);
     // }

@@ -13,6 +13,8 @@ export interface ITextInputPara extends ITextInputBasicPara {
     isScan?: boolean;
 
     on2dScan?(code: string): void
+
+    blur?() : void
 }
 
 export interface ITextInputBasicPara extends IFormComPara {
@@ -58,10 +60,12 @@ export class TextInput extends FormCom {
         if (tools.isMb) {
             d.on(this.input, 'blur', () => {
                 document.body.scrollTop = 0;
+                typeof this.para.blur === 'function' && this.para.blur();
             })
         }
 
     }
+
 
     protected keyHandle = (e: KeyboardEvent) => {
     };

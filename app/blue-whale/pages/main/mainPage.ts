@@ -17,7 +17,7 @@ import {BugReportModal} from "../../module/BugReport/BugReport";
 import sysPcHistory = BW.sysPcHistory;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {Notify} from "../../../global/components/feedback/notify/Notify";
-import {RfidConfig} from "../../module/rfidConfig/RfidConfig";
+import {RfidConfig} from "../../module/rfid/RfidConfig";
 
 interface IProps {
     pageContainer: HTMLDivElement;
