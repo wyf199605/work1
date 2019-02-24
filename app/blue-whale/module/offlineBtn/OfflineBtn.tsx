@@ -1,57 +1,22 @@
 /// <amd-module name="OfflineBtn"/>
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
-import {IButton} from "../../../global/components/general/button/Button";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {ManagerImages} from "../uploadModule/ManagerImages";
 import {Loading} from "../../../global/components/ui/loading/loading";
-import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {TextInput} from "../../../global/components/form/text/text";
-import IComponentPara = G.IComponentPara;
 import Shell = G.Shell;
 import tools = G.tools;
-import Component = G.Component;
-import {DetailBtnModule} from "../detailModule/detailBtnModule";
 import {GroupTabsPage} from "../../pages/groupTabs/GroupTabsPage";
 import {EditModule} from "../edit/editModule";
 
-interface IBtnModulePara {
-    subButtons: R_Button[]
-    container: HTMLElement
-    data?: IRfidBarCode
-    btn : R_Button
-}
-
-interface IRfidBarCode extends IComponentPara {
-    ajaxData?: object[];
-    nameId?: string,
-    codeStype?: object[],
-    url?: string,
-    SHO_ID?: string,
-    USERID?: string
-    uniqueFlag?: string,
-    downUrl: string,
-    uploadUrl: string,
-    analysis?: string
-    picFields?: string
-    picAddr?: string
-}
-
-interface IparaCode {
-    value: string //扫到的数据
-    uniqueFlag?: string //主键
-    where?: obj //条件
-    option?: number //状态
-    num?: number //替换的数据
-}
 interface IGeneralPara {
-    ui? : IBW_Slave_Ui;
+    ui? : IBW_Slave_Ui;  // 当前按钮对应ui
     numName? : string; // 替换逐一累加对应的name
-    uniqueFlag? : string; // 地址作为唯一键
-    mainId : string
-    subId : string
-    mainKey : R_Field
-    subKey : R_Field
+    uniqueFlag? : string; // 当前按钮对应唯一键
+    mainId : string   // 主表主键id
+    subId : string   // 子表主键id
+    mainKey : R_Field  // 主表主键
+    subKey : R_Field  // 子表主键
 }
 /**
  * 离线按钮操作：如条码盘点
@@ -59,7 +24,7 @@ interface IGeneralPara {
 export class OfflineBtn{
     private btnGroup: BtnGroup;
     private groupTabsPage : GroupTabsPage;
-    private btn : R_Button;
+    private btn : R_Button;  // 当前按钮ui
     private option: string; // 1.逐一 2.替换 3.累加
     private para : IGeneralPara;
 
@@ -90,8 +55,6 @@ export class OfflineBtn{
         this.para.uniqueFlag = ui.uniqueFlag;
         console.log(btn, ui);
 
-        // this.barCode();
-        // this.setting();
         switch (btn.openType) {
             case 'import-manual-input':
                 this.barCode();
@@ -115,7 +78,7 @@ export class OfflineBtn{
                 this.scan(true);
                 break;
             default:
-                // Modal.alert('未知类型openType');
+                Modal.alert('未知类型openType');
         }
         if(ui.supportRfid){
             this.openRfid();
@@ -145,7 +108,7 @@ export class OfflineBtn{
                     this.groupTabsPage.imports.editModule.main.set(data.array);
                 }
                 reScan && this.scan(reScan);
-                this.groupTabsPage.imports.clearText();
+                this.groupTabsPage.imports.setText('');
                 this.getCountData();
                 this.getAggrData();
             }
@@ -184,10 +147,10 @@ export class OfflineBtn{
     }
 
     private getAggrData(){
-        this.groupTabsPage.imports.aggrArr.forEach(arr => {
-            let  id = arr.itemId,
+        this.groupTabsPage.imports.aggrArr.forEach(aggr => {
+            let  id = aggr.itemId,
                 {keyField, value} = this.getKeyField(id);
-            Shell.imports.getCountData(this.para.uniqueFlag, id, this.fieldName, arr.expression, {
+            Shell.imports.getCountData(this.para.uniqueFlag, id, this.fieldName, aggr.expression, {
                 [keyField] : value
             }, result => {
                 if(result.success){
@@ -197,31 +160,31 @@ export class OfflineBtn{
         })
     }
 
-    private getHeadTable() {
-        let data = G.Shell.inventory.getTableInfo(this.para.uniqueFlag)
-
-    }
-
-    private registRfid() {
-        G.Shell.inventory.openRegistInventory(0, {}, (res) => {
-            // this.operateTbaleD.value = res.data;
-            //实时更新方法
-            // this.registerTable(this.operateTbaleD);
-        })
-    }
-
-    private registerTable(data: IparaCode) {
-        G.Shell.inventory.codedataOperate(data.value, data.uniqueFlag, data.where, data.option, data.num, (res) => {
-            let data = res.data.data;
-            if (res.success) {
-                //判断是否是替换 如果是替换value值不变 如果是其他的状态需要清空为0
-            }
-        })
-    }
-
-    private randNum() {
-        return new Date().getTime() + Math.random() * 10 + '.jpg';
-    }
+    // private getHeadTable() {
+    //     let data = G.Shell.inventory.getTableInfo(this.para.uniqueFlag)
+    //
+    // }
+    //
+    // private registRfid() {
+    //     G.Shell.inventory.openRegistInventory(0, {}, (res) => {
+    //         // this.operateTbaleD.value = res.data;
+    //         //实时更新方法
+    //         // this.registerTable(this.operateTbaleD);
+    //     })
+    // }
+    //
+    // private registerTable(data: IparaCode) {
+    //     G.Shell.inventory.codedataOperate(data.value, data.uniqueFlag, data.where, data.option, data.num, (res) => {
+    //         let data = res.data.data;
+    //         if (res.success) {
+    //             //判断是否是替换 如果是替换value值不变 如果是其他的状态需要清空为0
+    //         }
+    //     })
+    // }
+    //
+    // private randNum() {
+    //     return new Date().getTime() + Math.random() * 10 + '.jpg';
+    // }
 
     private downData() {
         let loading = new Loading({
@@ -237,7 +200,7 @@ export class OfflineBtn{
         let loading = new Loading({
             msg: "数据上传中"
         });
-        Shell.imports.uploadcodedata(this.para.uniqueFlag, (result) => {
+        Shell.imports.uploadcodedata(this.para.uniqueFlag, this.btn.actionAddr.dataAddr, (result) => {
             if(result.success){
                 Modal.toast('上传成功');
             }else {
@@ -285,6 +248,7 @@ export class OfflineBtn{
         };
         this.modalInit('deleteData', '请选择删除数据范围', body, () => {
             let data = select.getSelect()[0].data as obj;
+            console.log(data);
             for(let item in data){
                 del(item, data[item]);
             }
@@ -320,10 +284,8 @@ export class OfflineBtn{
     barCode() {
         let textInput: TextInput,
             body = <div data-code="barcodeModal">
-                <form className="barcode-form">
-                    <label>条码:</label>
-                    {textInput = <TextInput className='set-rfid-code'/>}
-                </form>
+                <label>{this.para.mainKey.caption + ":"}</label>
+                {textInput = <TextInput className='set-rfid-code'/>}
             </div>;
         this.modalInit('barcode', '请输入条码', body, () => {
             let val = textInput.get();

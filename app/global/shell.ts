@@ -498,8 +498,8 @@ namespace G{
                 return ShellBase.handler('downloadbarcode',{uniqueFlag,downUrl,defaultUpload},back,null,false);
             },
             //上传条码数据
-            uploadcodedata(uploadUrl:string, back:IShellEventHandler){
-                return ShellBase.handler('uploadcodedata',{uploadUrl},back,null,false);
+            uploadcodedata(uniqueFlag:string,uploadUrl:string, back:IShellEventHandler){
+                return ShellBase.handler('uploadcodedata',{uniqueFlag, uploadUrl},back,null,false);
             },
             //条码扫码总量统计
             getCountData(uniqueFlag:string,itemid: string, fieldname: string, expression: string, where:obj,back:IShellEventHandler){

@@ -141,21 +141,6 @@ export class GroupTabsPage extends BasicPage {
                     {this.imports.btnWrapper = <div class="inventory-group-btn"/>}
                 </div>;
 
-
-            let btnParaGet = (btns : R_Button[], data : obj, itemId : string) : IButton[] => {
-                return btns.map(btn => {
-                    return {
-                        content : btn.caption,
-                        onClick: () => {
-                            require(['OfflineBtn'], (e) => {
-                                let offBtn = new e.OfflineBtn();
-                                offBtn.init(btn, this, itemId);
-                            });
-                        }
-                    };
-                })
-            };
-
             if(!this.imports.editModule.main){
                 this.imports.editModule = {
                     main: new EditModule({
@@ -189,8 +174,8 @@ export class GroupTabsPage extends BasicPage {
                         dom: item.contentEl,
                         field: field,
                         data: main.getData(),
-                        onSet: (val) => {
-                            console.log(val);
+                        onSet: () => {
+                            this.imports.operateTable(mainUi.uniqueFlag, mainUi.itemId, field.name, mainUi.keyField, this.imports.editModule.main);
                         }
                     })
                 });
@@ -200,22 +185,43 @@ export class GroupTabsPage extends BasicPage {
                         dom: item.contentEl,
                         field: field,
                         data: sub.getData(),
-                        onSet: (val) => {
-                            console.log(val);
-
+                        onSet: () => {
+                            this.imports.operateTable(subUi.uniqueFlag, subUi.itemId, field.name, subUi.keyField, this.imports.editModule.sub);
                         }
                     })
                 })
-
             }
 
             new BtnGroup({
                 container : this.imports.btnWrapper,
-                buttons : [...btnParaGet(this.subBtn.main, this.imports.editModule.main, mainUi.itemId),
-                    ...btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId)]
+                buttons : [...this.imports.btnParaGet(this.subBtn.main, this.imports.editModule.main, mainUi.itemId),
+                    ...this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId)]
             });
             d.append(this.dom, wrapper);
             d.append(this.wrapper, this.imports.footer);
+        },
+        btnParaGet : (btns : R_Button[], data : obj, itemId : string) : IButton[] => {
+            return btns.map(btn => {
+                return {
+                    content : btn.caption,
+                    onClick: () => {
+                        require(['OfflineBtn'], (e) => {
+                            let offBtn = new e.OfflineBtn();
+                            offBtn.init(btn, this, itemId);
+                        });
+                    }
+                };
+            })
+        },
+        operateTable : (uniqueFlag : string, itemId : string, field : string, keyField : string, edit : EditModule) => {
+            console.log(field,edit.get(field), edit.get(field)[field]);
+            Shell.imports.operateTable(uniqueFlag,itemId,{
+                [field] : edit.get(field)[field]
+            },{
+                [keyField] : edit.get(keyField)[keyField]
+            }, 'updata', result => {
+
+            });
         },
         mainUiGet : () : IBW_Slave_Ui => {
             return this.ui;
@@ -237,8 +243,8 @@ export class GroupTabsPage extends BasicPage {
         setAmount(value : string){
             this.amountEl.innerHTML = value;
         },
-        clearText(){
-            this.countText.set('');
+        setText(value : string){
+            this.countText.set(value);
         },
         setCount : (option : string) => {
             let el = this.imports.countTextEl;

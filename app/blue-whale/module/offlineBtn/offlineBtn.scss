@@ -5,8 +5,11 @@
 }
 .delete-modal{
   .radio-wrapper{
-    .select-box{
+    &.select-box{
       display: block;
     }
   }
+}
+.set-rfid-code{
+  display: inline-block;
 }
