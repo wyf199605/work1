@@ -37,50 +37,43 @@ export class CollectPage extends BasicPage {
     })
   }
   private eventBind() {
-    let list = d.queryAll(".collect_li")
-    list.forEach(item => {
-      d.on(item, "click", (event) => {
-        this.open(event.srcElement);
-      })
-    })
-    let editList = d.queryAll(".edit_btn");
-    editList.forEach(item => {
-      d.on(item, "click", (event) => {
-        this.open(event.srcElement, "collect_nav")
-      })
-    })
-
-  }
-  open(e: any, className: string = "collect_li") {
-    if (e.className.toLowerCase().indexOf(className) > -1) {
-      if (className == "collect_li") {
-        let url = CONF.siteUrl + e.dataset.href
-        sys.window.open({ url: url })
-      } else {
-        this.Collect.GroupName = e.childNodes[0].innerText
-        this.Collect.show(true)
-      }
-    } else if (e.className.toLowerCase().indexOf("collect_delete") > -1) {
-      Modal.confirm({
-        msg: "确认删除？",
-        callback: index => {
-          if (index) {
-            this.Collect.req_delCollect(e.parentNode.dataset.favid).then(() => {
-              sys.window.refresh(this.pageUrl)
-            })
+    let wrap = d.query("#collect_page_wrap");
+    d.on(wrap, "click", (e) => {
+      let target: any = e.srcElement || e.target;
+      if (e.srcElement.classList.contains("collect_delete")) {
+        Modal.confirm({
+          msg: "确认删除？",
+          callback: index => {
+            if (index) {
+              this.Collect.req_delCollect(target.parentNode.dataset.favid).then(() => {
+                sys.window.refresh(this.pageUrl)
+              })
+            }
           }
+        });
+      } else if (e.srcElement.classList.contains("edit_btn")) {
+        this.Collect.GroupName = target.previousSibling.innerText
+        this.Collect.show(true)
+      } else {
+        while (target.tagName !== 'LI') {
+          if (target.tagName === 'UL' || target.classList.contains("collect_block")) {
+            target = null
+            break;
+          }
+          target = target.parentNode
         }
-      });
-
-    } else if (e.parentNode) {
-      this.open(e.parentNode, className)
-    }
+        if (target) {
+          let url = CONF.siteUrl + target.dataset.href
+          sys.window.open({ url: url })
+        }
+      }
+    })
   }
   render(item: Array<dataObj>) {
     return item.map((child) => {
       return <div class="collect_block">
         <div class="collect_nav">
-          <span>{child.tag}</span>
+          <span>{child.tag ? child.tag : '默认分组'}</span>
           <span class="edit_btn"></span>
         </div>
         <ul class="collect_item">
@@ -97,7 +90,7 @@ export class CollectPage extends BasicPage {
                   <span className={`self_icon  ${menu.icon} `}></span>
                   <div className="collect_caption">{menu.caption}</div>
                 </a>
-                <span className="collect_delete" />
+                <span className="collect_delete"/>
               </li>;
             })
           }

@@ -90,8 +90,6 @@ export class Menu extends ElementTreeNode {
         let list = event.srcElement.classList
         let status = list.contains("icon-shoucang1") || list.contains("icon-shoucang1-copy") || list.contains("collect_btn")
         if (this.isCollect && status) {
-          console.log(this)
-          
           Menu.CollectFunc(this);
         } else {
           this.expand = !this.expand;

@@ -94,9 +94,15 @@ export default class SideBarMrg {
       if (!this.CollectObj) {
         this.CollectObj = new CollectPC();
       }
-      this.CollectObj.GroupName = node.content.menuName;
-      this.CollectObj.menuUrl = node.content.menuPath.dataAddr;
-      this.CollectObj.show(false)
+      this.CollectObj.collectDom = node;
+      if (!node.content.favid) {
+        this.CollectObj.GroupName = node.content.menuName;
+        this.CollectObj.menuUrl = node.content.menuPath.dataAddr;
+        this.CollectObj.show(false)
+      } else {
+        this.CollectObj.delete()
+      }
+
     },
 
       this.menu.onOpen = tools.pattern.throttling(node => {
