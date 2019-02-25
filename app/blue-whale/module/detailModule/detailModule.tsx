@@ -77,7 +77,8 @@ export class DetailModule extends AGroupTabItem {
     editInit(inputInit: (field: R_Field, item: DetailItem) => FormCom){
         this.items.forEach((item) => {
             item.edit.init(inputInit);
-        })
+        });
+        this.clickEvent.off();
     }
 
     static EVT_RENDERED = '__event_detail_rendered__';
