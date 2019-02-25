@@ -107,6 +107,7 @@ export class NewLabelPrint {
         this.getData = para.getData;
         this.getSelectedData = para.getSelectedData;
         this.container = para.container;
+        this.scale = getDpi() / 10;
 
         // 根据printList生成打印标签类型
         let printList: { text: string, value: any }[] = [];
@@ -152,10 +153,15 @@ export class NewLabelPrint {
                         promise = this.setDefaultProp();
                         break;
                     case 'print':
-                        promise = this.print().catch((e) => {
-                            console.log(e);
-                            Modal.alert('打印失败');
-                        });
+                        if(!('BlueWhaleShell' in window || 'AppShell' in window)){
+                            Modal.alert('无法连接到打印机');
+                            promise = Promise.reject();
+                        }else{
+                            promise = this.preview(true).catch((e) => {
+                                console.log(e);
+                                Modal.alert('打印失败');
+                            });
+                        }
                         break;
                     case 'preview':
                     default:
@@ -308,7 +314,52 @@ export class NewLabelPrint {
         });
     }
 
-    print(){
+    print(svgEl: SVGSVGElement){
+        require(['canvg', 'rgbcolor', 'stackblur-canvas'], (canvg) => {
+            // console.log(canvg);
+            let scale = 5,
+                svg = d3.select(svgEl);
+
+            let canvas = <canvas/>,
+                copies = this.printModal.getData('copies');
+
+            svgEl.innerHTML = new Array(8).join(svgEl.innerHTML);
+            d.append(document.body, canvas);
+
+            canvg(canvas, svgEl.outerHTML, {
+                renderCallback: () => {
+                    let scale = 2,
+                        printCanvas = <canvas width={canvas.width * scale} height={canvas.height * scale}/>,
+                        cxt = printCanvas.getContext('2d');
+                    cxt.scale(scale, scale);
+                    cxt.fillStyle = "#fff";
+                    cxt.fillRect(0, 0, printCanvas.width, printCanvas.height);
+                    cxt.drawImage(canvas, 0, 0);
+                    d.remove(canvas);
+                    canvas = null;
+                    // new Modal({
+                    //     body: printCanvas,
+                    //     header: '展示',
+                    // });
+                    let dataURL = printCanvas.toDataURL("image/png", 1),
+                        url = dataURL.replace('data:image/png;base64,', '');
+                    // console.log(dataURL);
+                    if ('BlueWhaleShell' in window) {
+                        BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + url + '"}');
+                    } else if ('AppShell' in window) {
+                        let code = this.printModal.getData('printer');
+                        Shell.printer.labelPrint(copies, code, url, () => {
+                            Modal.toast('打印成功');
+                        })
+                    } else {
+                        Modal.alert('无法连接到打印机');
+                    }
+                }
+            });
+        });
+    }
+
+    /*print(){
         return new Promise((resolve, reject) => {
             if(!('BlueWhaleShell' in window || 'AppShell' in window)){
                 Modal.alert('无法连接到打印机');
@@ -386,13 +437,13 @@ export class NewLabelPrint {
                 reject(e);
             });
         })
-    }
+    }*/
 
     // 预览方法
-    preview(){
+    preview(isPrint = false){
         return this.getLabels().then(({svgList, tmp, data, title}) => {
             let settingData: obj = this.printModal.data,
-                dpi = getDpi() / 10, // 分辨率，宽高边距均为毫米，乘分辨率便为像素
+                dpi = this.scale, // 分辨率，宽高边距均为毫米，乘分辨率便为像素
                 width = settingData.width * dpi,
                 height = settingData.height * dpi,
                 paddingLeft = settingData.left * dpi,
@@ -429,7 +480,7 @@ export class NewLabelPrint {
                             .style('transform', `translate(${x}px, ${y}px) scale(${scale})`)
                     });
 
-            let wrapper = <div className="label-print-content" style={{
+            let wrapper = <svg className="label-print-content" style={{
                 width: width + 'px',
                 height: height + 'px',
                 "-webkit-flex-direction": isLengthWays ? 'column' : 'row',
@@ -437,8 +488,8 @@ export class NewLabelPrint {
                 padding: `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`
             }}/>;
 
-            let svgHeight = tmp.height * NewLabelPrint.scale,
-                svgWidth = tmp.width * NewLabelPrint.scale,
+            let svgHeight = tmp.height * this.scale,
+                svgWidth = tmp.width * this.scale,
                 row = Math.floor((height - paddingTop - paddingBottom + rowSpace) / (svgHeight + rowSpace)),
                 col = Math.floor((width - paddingLeft - paddingRight + colSpace) / (svgWidth + colSpace)),
                 pageSize = (row * col) || 1,
@@ -530,6 +581,15 @@ export class NewLabelPrint {
             d3.select(modal.bodyWrapper).call(zoom);
             d3.select(wrapper)
                 .style('transform', `translate(0, 0) scale(${scale})`);
+
+            if(isPrint){
+                this.print(wrapper);
+                while(current < total){
+                    current ++;
+                    toPageSvg(current);
+                    this.print(wrapper);
+                }
+            }
         });
     }
 
@@ -540,7 +600,7 @@ export class NewLabelPrint {
             lableDatas = tmp.lableDatas,
             lableCodes = tmp.lableCodes,
             lableGraphs = tmp.lableGraphs,
-            scale = NewLabelPrint.scale;
+            scale = this.scale;
 
         let svg = new SvgDraw({
             height: height * scale,
@@ -595,7 +655,7 @@ export class NewLabelPrint {
                         height: item.height * scale,
                         x: item.leftPos * scale,
                         y: item.topPos * scale,
-                        barCodeWidth: 1,
+                        barCodeWidth: 1 * scale,
                         align: NewLabelPrint.alignTag[item.alignment], // 对齐方式
                         format: NewLabelPrint.codeType[type] // 条形码类型
                     });
@@ -620,7 +680,7 @@ export class NewLabelPrint {
         return svg;
     }
 
-    static scale = 1; // 固定放大倍数
+    protected scale = 1; // 固定放大倍数
     static iconSuffix = {
         1: '.bmp',
         2: '.bmp',
