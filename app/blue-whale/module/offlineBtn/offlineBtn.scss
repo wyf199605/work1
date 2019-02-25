@@ -9,6 +9,28 @@
       display: block;
     }
   }
+  .delete-cell{
+    padding: 5px 10px;
+    .delete-text{
+      display: inline-block;
+    }
+    .delete-input{
+      width: 120px;
+      margin-bottom: 0;
+      padding-bottom: 0;
+      height: 25px;
+      border: none;
+      display: inline-block;
+    }
+    .delete-check{
+      display: inline-block;
+      position: absolute;
+      right: 40px;
+    }
+  }
+
+
+
 }
 .set-rfid-code{
   display: inline-block;

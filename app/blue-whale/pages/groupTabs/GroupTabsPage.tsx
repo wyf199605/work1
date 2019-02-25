@@ -17,6 +17,7 @@ import {InputBox} from "../../../global/components/general/inputBox/InputBox";
 import {Button, IButton} from "../../../global/components/general/button/Button";
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
 import Shell = G.Shell;
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -58,7 +59,7 @@ export class GroupTabsPage extends BasicPage {
         // 当前子表数组为空，则为表格/单页，否则为主从
         this.styleType = (this.ui.exhibitionType && this.ui.exhibitionType.showType) || 'tab';
 
-        if(this.styleType === 'panel-one'){
+        if(['panel-one', 'panel-none'].includes(this.styleType)){
             this.styleType = 'panel-on';
             this.isInventory = true;
             this.dom.classList.add('inventory');
@@ -90,6 +91,7 @@ export class GroupTabsPage extends BasicPage {
         btnWrapper : null as HTMLElement,
         footer : null as HTMLElement,
         aggrArr : [] as R_Aggr[],
+        pictures : {},
         editModule : {
             main: null as EditModule,
             sub: null as EditModule
@@ -113,6 +115,9 @@ export class GroupTabsPage extends BasicPage {
                     <div className="barcode-count">
                         <div className="barcode-row count">
                             {corArr.map(cor => {
+                                if(cor.default === '1'){
+                                    d.classAdd(this.dom, 'hide-count');
+                                }
                                 if(cor.numberName){
                                     return <div>
                                         <div className="barcode-cell">
@@ -132,7 +137,7 @@ export class GroupTabsPage extends BasicPage {
                         {this.imports.aggrEl = <div className="barcode-row aggr-list">
                             {this.imports.aggrArr.map((list,i) => {
                                 return <div data-item={list.itemId} className={"barcode-cell " + (i/2 === 0 ? 'barcode-right' : '')}>
-                                    <div>{list.caption + ':'}</div>
+                                    <div>{list.caption + '：'}</div>
                                     <div data-name={list.fieldName}/>
                                 </div>
                             })}
@@ -175,7 +180,7 @@ export class GroupTabsPage extends BasicPage {
                         field: field,
                         data: main.getData(),
                         onSet: () => {
-                            this.imports.operateTable(mainUi.uniqueFlag, mainUi.itemId, field.name, mainUi.keyField, this.imports.editModule.main);
+                            this.imports.operateTable(mainUi.uniqueFlag, mainUi.itemId, field, mainUi.keyField, this.imports.editModule.main);
                         }
                     })
                 });
@@ -186,7 +191,7 @@ export class GroupTabsPage extends BasicPage {
                         field: field,
                         data: sub.getData(),
                         onSet: () => {
-                            this.imports.operateTable(subUi.uniqueFlag, subUi.itemId, field.name, subUi.keyField, this.imports.editModule.sub);
+                            this.imports.operateTable(subUi.uniqueFlag, subUi.itemId, field, subUi.keyField, this.imports.editModule.sub);
                         }
                     })
                 })
@@ -213,15 +218,34 @@ export class GroupTabsPage extends BasicPage {
                 };
             })
         },
-        operateTable : (uniqueFlag : string, itemId : string, field : string, keyField : string, edit : EditModule) => {
-            console.log(field,edit.get(field), edit.get(field)[field]);
-            Shell.imports.operateTable(uniqueFlag,itemId,{
-                [field] : edit.get(field)[field]
-            },{
-                [keyField] : edit.get(keyField)[keyField]
-            }, 'updata', result => {
+        operateTable : (uniqueFlag : string, itemId : string, field : R_Field, keyField : string, edit : EditModule) => {
+            let name = field.name,
+                value = edit.get(name)[name];
+            console.log(field,edit.get(name), value, field);
+            // Modal.alert({
+            //     0: uniqueFlag,
+            //     1: itemId,
+            //     2: {
+            //         [name] : edit.get(name)[name]
+            //     },
+            //     3:{
+            //         [keyField] : edit.get(keyField)[keyField]
+            //     }
+            // });
 
-            });
+            // 若图片，需将图片的base64保存起来，最终上传时候统一传送
+            if(field.dataType === '20'){
+                this.imports.pictures[keyField] = value;
+            }else {
+                Shell.imports.operateTable(uniqueFlag,itemId,{
+                    [name] : value
+                },{
+                    [keyField] : edit.get(keyField)[keyField]
+                }, 'updata', result => {
+
+                });
+            }
+
         },
         mainUiGet : () : IBW_Slave_Ui => {
             return this.ui;
@@ -353,8 +377,13 @@ export class GroupTabsPage extends BasicPage {
                 if(this.styleType === 'panel-on' && this.tab instanceof Panel){
                     this.tab.toggleAll(true);
                 }
+
+                if(!tools.isNotEmptyArray(this.subUi)){
+                    this.imports.init();
+                }
                 this.main.onRender = null;
-            }
+            };
+
         } else {
             let sub = this.subs[index - 1];
             if (tools.isNotEmpty(sub)) {
@@ -367,6 +396,7 @@ export class GroupTabsPage extends BasicPage {
                 }
                 return;
             }
+
             this.getUi(this.subUi[index - 1]).then((ui) => {
                 this.subUi[index - 1] = ui;
                 if(this.isInventory){
