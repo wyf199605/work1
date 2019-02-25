@@ -14,6 +14,7 @@ import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {DetailEditModule} from "./detailEditModule";
 import AGroupTabItem = BW.AGroupTabItem;
 import IGroupTabItemPara = BW.IGroupTabItemPara;
+import {FormCom} from "../../../global/components/form/basic";
 
 export interface IDetailModulePara extends IGroupTabItemPara {
     ui: IBW_Detail; // 根据ui生成detail页
@@ -53,17 +54,30 @@ export class DetailModule extends AGroupTabItem {
         this.ajaxData = para.ajaxData || {};
         BwRule.beforeHandle.detail(this.ui); // 处理ui的fields字段
         this.fields = this.ui.fields;
-        this.editType = this.ui.operationType.editType || 'current';
+        this.editType = (this.ui.operationType && this.ui.operationType.editType) || 'current';
 
         let content = d.query('.detail-content', this.wrapper);
         this.items = this.initItems(content);
         this.initDataManager();
-        this.refresh().catch(e => {
-            console.log(e);
-        });
+
+        let autoLoad = tools.isEmpty(para.autoLoad) ? true : para.autoLoad;
+
+        autoLoad
+            ? this.refresh().catch(e => {
+                console.log(e);
+            })
+            : setTimeout(() => {
+                this.render({});
+            }, 100);
 
         this.clickEvent.on();
 
+    }
+
+    editInit(inputInit: (field: R_Field, item: DetailItem) => FormCom){
+        this.items.forEach((item) => {
+            item.edit.init(inputInit);
+        })
     }
 
     static EVT_RENDERED = '__event_detail_rendered__';
@@ -267,31 +281,39 @@ export class DetailModule extends AGroupTabItem {
 
     protected currentPage = -1; // 当前页
     noData = false; // 有没有数据
+
+    protected _promises: Promise<any>[] = [];
+    addPromise(promise: Promise<any>){
+        this._promises.push(promise);
+    }
     // 渲染方法
     render(data: obj = this.detailData) {
         let noData = this.noData = tools.isEmpty(data),
             content = d.query('.detail-content', this.wrapper);
-        this.wrapper.classList.toggle('no-data', noData);
-        // 判断是否有数据，没有则隐藏数据展示的元素
-        if (noData) {
-            content.classList.add('hide');
-            return
-        }
+        // this.wrapper.classList.toggle('no-data', noData);
+        // // 判断是否有数据，没有则隐藏数据展示的元素
+        // if (noData) {
+        //     content.classList.add('hide');
+        //     return
+        // }
         content.classList.remove('hide');
         Array.isArray(this.items) && this.items.forEach((item: DetailItem) => {
             let field: R_Field = item.custom,
                 name = field.name;
             item.itemData = data[name];
         });
-        this.trigger(DetailModule.EVT_RENDERED);
-        this.onRender && this.onRender();
-        let current = this.dataManager ? this.dataManager.current : 0;
-        // 当前页与数据管理的页面不一致，则滚动到头部
-        if (this.currentPage !== current) {
-            this.currentPage = current;
-            content.scrollTop = 0;
-            this.onDataChange && this.onDataChange();
-        }
+        Promise.all(this._promises).then(() => {
+            this.trigger(DetailModule.EVT_RENDERED);
+            this.onRender && this.onRender();
+            let current = this.dataManager ? this.dataManager.current : 0;
+            // 当前页与数据管理的页面不一致，则滚动到头部
+            if (this.currentPage !== current) {
+                this.currentPage = current;
+                content.scrollTop = 0;
+                this.onDataChange && this.onDataChange();
+            }
+        });
+
     }
 
     // 存放lookup数据

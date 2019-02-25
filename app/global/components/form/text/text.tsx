@@ -60,7 +60,7 @@ export class TextInput extends FormCom {
         if (tools.isMb) {
             d.on(this.input, 'blur', () => {
                 document.body.scrollTop = 0;
-                typeof this.para.blur === 'function' && this.para.blur()
+                typeof this.para.blur === 'function' && this.para.blur();
             })
         }
 

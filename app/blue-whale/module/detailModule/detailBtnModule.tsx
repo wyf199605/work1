@@ -177,7 +177,7 @@ export class DetailBtnModule extends DetailModule{
             return new Button({
                 content: btn.caption,
                 onClick: () => {
-                    let data = this.detailData;
+                    let data = this.getData();
                     ButtonAction.get().clickHandle(btn, data, () => {
                     }, this.pageUrl || '');
                 }

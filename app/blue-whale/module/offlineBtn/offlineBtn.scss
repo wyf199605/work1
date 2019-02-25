@@ -3,3 +3,13 @@
     display: block;
   }
 }
+.delete-modal{
+  .radio-wrapper{
+    &.select-box{
+      display: block;
+    }
+  }
+}
+.set-rfid-code{
+  display: inline-block;
+}
