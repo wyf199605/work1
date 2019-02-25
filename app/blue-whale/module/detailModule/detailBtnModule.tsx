@@ -20,7 +20,14 @@ export class DetailBtnModule extends DetailModule{
 
         subButton.forEach((btn) => {
             this.btnManager.addBtn(btn);
-        })
+        });
+
+        // this.on(DetailModule.EVT_RENDERED, () => {
+        //     if (this.dataManager.total <= 1){
+        //         this.btnManager.box.delItem('next');
+        //         this.btnManager.box.delItem('prev');
+        //     }
+        // })
     }
 
     protected paging = (() => {
@@ -32,20 +39,22 @@ export class DetailBtnModule extends DetailModule{
                 if(!prevBtn) {
                     prevBtn = new Button({
                         content: '上一页',
+                        key:'prev',
                         onClick: tools.pattern.throttling(() => {
                             this.dataManager && !this.dataManager.toPrev()
                         }, 500)
                     });
-                    box.addItem(prevBtn);
+                    box.addItem(prevBtn,0);
                 }
                 if(!nextBtn){
                     nextBtn = new Button({
                         content: '下一页',
+                        key:'next',
                         onClick: tools.pattern.throttling(() => {
                             this.dataManager && !this.dataManager.toNext()
                         }, 500)
                     });
-                    box.addItem(nextBtn);
+                    box.addItem(nextBtn,1);
                 }
                 this.off(DetailModule.EVT_RENDERED, handler);
                 this.on(DetailModule.EVT_RENDERED, handler = () => {
@@ -168,7 +177,7 @@ export class DetailBtnModule extends DetailModule{
             return new Button({
                 content: btn.caption,
                 onClick: () => {
-                    let data = this.detailData;
+                    let data = this.getData();
                     ButtonAction.get().clickHandle(btn, data, () => {
                     }, this.pageUrl || '');
                 }
