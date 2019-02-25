@@ -366,6 +366,6 @@ export class SelectBox extends FormCom{
     }
 
     protected wrapperInit(para: ISelectBoxPara): HTMLElement {
-        return undefined;
+        return para.container || undefined;
     }
 }

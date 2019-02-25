@@ -21,8 +21,10 @@
         }
       }
     }
-
     padding-bottom: 140px;
+    &.no-sub{
+      padding-bottom: 90px;
+    }
     .inventory-footer{
         position: fixed;
         bottom: 0;
@@ -97,6 +99,9 @@
     }
     &.hide-count{
       padding-bottom: 90px;
+      &.no-sub{
+        padding-bottom: 40px;
+      }
       .inventory-footer{
         height: 90px;
         .count{

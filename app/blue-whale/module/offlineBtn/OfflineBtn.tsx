@@ -11,7 +11,6 @@ import {EditModule} from "../edit/editModule";
 import CONF = BW.CONF;
 import d = G.d;
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {BwRule} from "../../common/rule/BwRule";
 
 interface IGeneralPara {
     ui?: IBW_Slave_Ui;  // 当前按钮对应ui
@@ -31,26 +30,24 @@ export class OfflineBtn {
     private btnGroup: BtnGroup;
     private groupTabsPage: GroupTabsPage;
     private btn: R_Button;  // 当前按钮ui
-    private option: string; // 1.逐一 2.替换 3.累加
     private para: IGeneralPara;
 
     init(btn: R_Button, groupTabsPage: GroupTabsPage, itemId: string) {
         this.groupTabsPage = groupTabsPage;
         this.btn = btn;
-        let mainUi = this.groupTabsPage.imports.mainUiGet(),
-            subUi = this.groupTabsPage.imports.subUiGet();
+        let mainUi = this.imports.mainUiGet(),
+            subUi = this.imports.subUiGet();
 
-        this.option = mainUi.correlation.default;
         this.para = {
             mainId: mainUi.itemId,
-            subId: subUi.itemId,
+            subId: subUi && subUi.itemId,
             numName: mainUi.correlation.numberName,
             mainKey: mainUi.fields.map(e => {
                 if (e.name === mainUi.keyField) {
                     return e
                 }
             })[0],
-            subKey: subUi.fields.map(e => {
+            subKey: subUi && subUi.fields.map(e => {
                 if (e.name === subUi.keyField) {
                     return e
                 }
@@ -113,20 +110,10 @@ export class OfflineBtn {
      */
     query(value: string, type = 0) {
         let keyField = this.para.mainKey.name;
-        // Modal.alert({
-        //     0: value,
-        //     1: this.option,
-        //     2: this.para.uniqueFlag,
-        //     3: {
-        //         [keyField]: this.groupTabsPage.imports.editModule.main.get(keyField)[keyField]
-        //     },
-        //     4: this.para.numName,
-        //     5: this.groupTabsPage.imports.getNum()
-        // });
-        Shell.imports.operateScanTable(value, this.option, this.para.uniqueFlag, {
-            [keyField]: this.groupTabsPage.imports.editModule.main.get(keyField)[keyField]
-        }, this.para.numName, this.groupTabsPage.imports.getNum(), (result) => {
-            // Modal.alert(result);
+        Shell.imports.operateScanTable(value, this.imports.getOption(), this.para.uniqueFlag, {
+            [keyField]: this.imports.editModule.main.get(keyField)[keyField]
+        }, this.para.numName, this.imports.getNum(), (result) => {
+            Modal.alert(result);
             if (result.success) {
                 let data = result.data;
                 data.forEach(obj => {
@@ -134,7 +121,7 @@ export class OfflineBtn {
                     let {edit} = this.getKeyField(item);
                     Modal.alert(obj.array[0]);
                     edit.set(obj.array[0]);
-                    this.groupTabsPage.imports.setText('');
+                    this.imports.setText('');
                     this.getCountData();
                     this.getAggrData(item);
                 });
@@ -149,7 +136,7 @@ export class OfflineBtn {
      * 请求shell查询count数据
      */
     private getCountData() {
-        let data = this.groupTabsPage.imports.getTextPara(),
+        let data = this.imports.getTextPara(),
             id = data.itemId,
             {keyField, value} = this.getKeyField(id);
 
@@ -157,7 +144,7 @@ export class OfflineBtn {
             [keyField]: value
         }, result => {
             if (result.success) {
-                this.groupTabsPage.imports.setAmount(result.data[this.fieldName]);
+                this.imports.setAmount(result.data[this.fieldName]);
             }
         });
     }
@@ -167,21 +154,21 @@ export class OfflineBtn {
         if (itemId === this.para.subId) {
             key = this.para.subKey;
             keyField = key.name;
-            value = this.groupTabsPage.imports.editModule.sub.get(keyField);
-            ui = this.groupTabsPage.imports.subUiGet() as IBW_Slave_Ui;
-            edit = this.groupTabsPage.imports.editModule.sub;
+            value = this.imports.editModule.sub.get(keyField);
+            ui = this.imports.subUiGet() as IBW_Slave_Ui;
+            edit = this.imports.editModule.sub;
         } else {
             key = this.para.mainKey;
             keyField = this.para.mainKey.name;
-            value = this.groupTabsPage.imports.editModule.main.get(keyField);
-            ui = this.groupTabsPage.imports.mainUiGet() as IBW_Slave_Ui;
-            edit = this.groupTabsPage.imports.editModule.main;
+            value = this.imports.editModule.main.get(keyField);
+            ui = this.imports.mainUiGet() as IBW_Slave_Ui;
+            edit = this.imports.editModule.main;
         }
         return {keyField, value, ui, edit, key}
     }
 
     private getAggrData(item : string) {
-        this.groupTabsPage.imports.aggrArr.forEach(aggr => {
+        this.imports.aggrArr.forEach(aggr => {
             let id = aggr.itemId,
                 {keyField, value} = this.getKeyField(id);
 
@@ -192,7 +179,7 @@ export class OfflineBtn {
                 [keyField]: value
             }, result => {
                 if (result.success) {
-                    this.groupTabsPage.imports.setAggr(result.data[this.fieldName], id, keyField);
+                    this.imports.setAggr(result.data[this.fieldName], id, keyField);
                 }
             });
         })
@@ -237,73 +224,51 @@ export class OfflineBtn {
     }
 
     uploadData() {
-        let pa = {
-            BARCODE: '30003',
-            GOODSNAME : '货架三',
-            PICTURE : 'null',
-            AMOUNT: '2',
-            PATTERNCOUNT: 'null',
-            NEEDREJECT: '0',
-            STOCKAMOUNT: 'null'
-        };
-
-        this.groupTabsPage.imports.editModule.sub.set(pa);
-        // let loading = new Loading({
-        //     msg: "数据上传中"
-        // });
-        //
-        // // TODO 图片替换
-        BwRule.Ajax.fetch('',{
-            ajaxData : this.groupTabsPage.imports.pictures,
-            type : 'json',
-        }).then(({response}) => {
-            let data = [{
-                keyField : '1'
-            }];
-            // this.getKeyField()
-            // data.forEach(obj => {
-            //     Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, 'updata', result => {
-            //         Modal.toast(result.msg);
-            //     });
-            // })
+        let loading = new Loading({
+            msg: "数据上传中"
         });
-        //
-        // let url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
-        // Shell.imports.uploadcodedata(this.para.uniqueFlag, url, (result) => {
-        //     if (result.success) {
-        //         Modal.toast('上传成功');
-        //     } else {
-        //         Modal.toast('上传失败');
-        //     }
-        //     loading.destroy();
-        // });
+
+        let url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
+        Shell.imports.uploadcodedata(this.para.uniqueFlag, url, (result) => {
+            if (result.success) {
+                Modal.toast('上传成功');
+            } else {
+                Modal.toast('上传失败');
+            }
+            loading.destroy();
+        });
     }
 
     deleteData() {
         let body = <div className="delete-modal"/>;
         let mainKey = this.para.mainKey && this.para.mainKey.name,
             subKey = this.para.subKey && this.para.subKey.name,
-            mainValue = this.groupTabsPage.imports.editModule.main.get(mainKey),
-            subValue = this.groupTabsPage.imports.editModule.sub.get(subKey),
+            mainValue = this.imports.editModule.main.get(mainKey),
+            subValue = this.imports.editModule.sub && this.imports.editModule.sub.get(subKey),
             mainId = this.para.mainId,
-            subId = this.para.subId;
+            subId = this.para.subId,
+            mainObj = {
+                text: this.para.mainKey.caption,
+                value: mainValue,
+                name: mainKey,
+                item: mainId
+            };
 
         let data = [{
             text: '所有',
-            value: Object.assign({}, mainValue, subValue),
+            value: Object.assign({}, mainValue, subValue || {}),
             name: mainKey + ',' + subKey,
             item: ''
-        }, {
-            text: this.para.mainKey.caption,
-            value: mainValue,
-            name: mainKey,
-            item: mainId
-        }, {
+        }, mainObj, {
             text: this.para.subKey.caption,
             value: subValue,
             name: subKey,
             item: subId
         }];
+
+        if(!this.para.subId){
+            data = [mainObj];
+        }
         let checks: CheckBox[] = [], inputEl: HTMLInputElement;
         data.forEach((m, i) => {
             let checkBox: CheckBox,
@@ -338,7 +303,10 @@ export class OfflineBtn {
                 }
             });
             if (index === 0) {
-                arr.push({id: mainId}, {id: subId});
+                arr.push({id: mainId});
+                if(this.para.subId){
+                    arr.push({id: subId});
+                }
             } else {
                 let value = inputEl.value,
                     id = inputEl.dataset.item,
@@ -393,11 +361,15 @@ export class OfflineBtn {
 
         this.modalInit('setting', '设置', body, () => {
             let value = selectBox.data[selectBox.getChecked()[0]].value;
-            if(value !== this.option){
-                this.option = value;
-                this.groupTabsPage.imports.setCount(this.option);
+            if(value !== this.imports.getOption()){
+                this.imports.setCount(value);
+                this.imports.setText('');
             }
         });
+    }
+    
+    get imports(){
+        return this.groupTabsPage.imports;
     }
 
     barCode() {

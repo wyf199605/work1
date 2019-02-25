@@ -126,15 +126,18 @@ interface IBW_Detail {
     exhibitionType: {
         showType: 'tab' | 'panel-on' | 'panel-off' | 'panel-one'
     };
-    correlation : {  // 替换累加
-        numberName: string,
-        default : string, // 默认选中值 2、3时候隐藏
-        caption : string, // 如数量
-    },
+    correlation : IBW_Detail_Cor,
     aggrList: R_Aggr[]
     uniqueFlag : string
     itemId? : string
     supportRfid? : string // 是否开启rfid
+}
+
+interface IBW_Detail_Cor{
+    numberName: string,
+    default : string, // 默认选中值 2、3时候隐藏
+    caption : string, // 如数量
+    itemId? : string
 }
 
 interface IBW_SubTableAddr {
