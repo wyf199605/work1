@@ -2122,47 +2122,38 @@ export class BwTableModule extends Component {
                     icon: btnUi.icon,
                     content: btnUi.title,
                     isDisabled: !(btnUi.multiselect === 0 || btnUi.multiselect === 2 && btnUi.selectionFlag),
-                    className: btnUi.title == '停止记录' || btnUi.title == '开始记录' ? 'recode_btn' : '',
                     data: btnUi,
                     onClick: () => {
+                        let stopBtn = d.query(".stop_location", wrapper)
+                        let startBtn = d.query(".start_location", wrapper);
+                        let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
                         if (btn.data.openType.indexOf('rfid') > -1) {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
                         } else if (btn.data.openType === 'stopLocation') {
-                            let btnList = d.queryAll(".recode_btn", wrapper)
-                            let status = false;
-                            for (var i = 0; i < btnList.length; i++) {
-                                if (btnList[i].classList.contains("disabled")) {
-                                    status = true;
-                                }
-                            }
-                            if (!status) {
+                            if (!btnStatus) {
                                 Modal.toast("请先选择开始记录")
                             } else {
-                                G.Shell.location.stopRecord(() => {
+                                let keStatus = G.Shell.location.stopRecord(() => { })
+                                if (keStatus) {
                                     Modal.toast("已结束发送位置")
-                                    for (var i = 0; i < btnList.length; i++) {
-                                        if (btnList[i].innerHTML.indexOf("开始记录") > -1) {
-                                            btnList[i].classList.remove("disabled")
-                                        } else {
-                                            btnList[i].classList.add("disabled")
-                                        }
-                                    }
-                                })
+                                    stopBtn.classList.add("disabled")
+                                    startBtn.classList.remove("disabled")
+                                } else {
+                                    Modal.toast("结束发送位置失败")
+                                }
                             }
                         } else if (btn.data.openType === 'startLocation') {
-                            let btnList = d.queryAll(".recode_btn", wrapper);
-                            G.Shell.location.startRecord(() => {
+                            let keStatus = G.Shell.location.startRecord(() => { })
+                            if (keStatus) {
                                 Modal.toast("已开始发送位置")
-                                for (var i = 0; i < btnList.length; i++) {
-                                    if (btnList[i].innerHTML.indexOf("开始记录") > -1) {
-                                        btnList[i].classList.add("disabled")
-                                    } else {
-                                        btnList[i].classList.remove("disabled")
-                                    }
-                                }
-                            })
-                        }else if (btn.data.openType === 'passwd') {
+                                stopBtn.classList.remove("disabled")
+                                startBtn.classList.add("disabled")
+                            } else {
+                                Modal.toast("发送位置失败")
+                            }
+
+                        } else if (btn.data.openType === 'passwd') {
                             let selectData = ftable.selectedRowsData[0];
                             if (selectData) {
                                 let res = G.Rule.varList(btn.data.actionAddr.varList, selectData, true),
@@ -2343,6 +2334,12 @@ export class BwTableModule extends Component {
                         }
                     }
                 });
+                if (btn.data.openType === 'stopLocation') {
+                    btn.className = "stop_location"
+                }
+                if (btn.data.openType === 'startLocation') {
+                    btn.className = "start_location"
+                }
                 box.addItem(btn);
             });
 
