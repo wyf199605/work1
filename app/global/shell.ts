@@ -610,7 +610,7 @@ namespace G{
             delete events[action];
         }
         function windowsHandler<IShellHandler>(action:string, data, back?, infor?, isAutoOff = true) {
-            if(typeof AppShell === 'object' || (tools.os.ios && typeof webkit.messageHandlers.AppShell === 'object')) {
+            if(typeof AppShell === 'object' || (tools.os.ios && webkit && typeof webkit.messageHandlers.AppShell === 'object')) {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
 
                 if(tools.isEmpty(back) && tools.isEmpty(infor)){
