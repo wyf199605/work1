@@ -38,14 +38,18 @@ export class UploadImages extends FormCom {
             case '27': {
                 let uniArr = value.reverse().filter(v => v.isError === false),
                     uni = uniArr.filter(u => tools.isNotEmpty(u.unique))[0];
-                finalVal = tools.isNotEmpty(uni) ? uni.unique : '';
+                finalVal = tools.isNotEmpty(uni) ? (uni.isOnLine ? uni.unique : uni.localUrl) : '';
             }
                 break;
             case '28': {
                 let trueVal = [];
                 value.forEach(v => {
                     if (!v.isError && tools.isNotEmpty(v.unique)) {
-                        trueVal.push(v.unique)
+                        if(v.isOnLine){
+                            trueVal.push(v.unique)
+                        }else{
+                            trueVal.push(v.localUrl)
+                        }
                     }
                 });
                 finalVal = trueVal.join(',')
@@ -209,7 +213,7 @@ export class UploadImages extends FormCom {
         });
         this.uploader = uploader;
         // 文件加入到上传队列，开始上传
-        this.uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: File[]) => {
+        this.uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: CustomFile[]) => {
             if (files.length > 0) {
                 if(this.autoUpload){
                     //开始上传
@@ -230,28 +234,33 @@ export class UploadImages extends FormCom {
                             break;
                     }
                 }else{
+                    console.log(files);
                     Promise.all(files.map((file) => {
                         return new Promise((resolve, reject) => {
                             let reader = new FileReader();
-                            reader.readAsDataURL(file);
+                            reader.readAsDataURL(file.blob);
                             reader.onload = function (e) {
                                 resolve(reader.result);
                             };
-                            reader.onerror = () => {
-                                reject()
+                            reader.onerror = (e) => {
+                                reject(e)
                             }
                         });
-                    })).then((strs) => {
+                    })).then((strs: string[]) => {
                         console.log(strs);
-                        this.imgs = strs;
-                    }).catch(() => {
+                        this.imgs = strs.map((str) => ({
+                            localUrl: str,
+                            isOnLine: false,
+                        }));
+                    }).catch((e) => {
+                        console.log(e);
                         Modal.alert('图片获取失败');
                     })
                 }
             }
         });
         // 上传错误时调用
-        uploader.on(BwUploader.EVT_UPLOAD_ERROR, (file) => {
+        uploader.on(BwUploader.EVT_UPLOAD_ERROR, (file: CustomFile) => {
             let imageObj: IImage = {
                 unique: '',
                 isError: true,
