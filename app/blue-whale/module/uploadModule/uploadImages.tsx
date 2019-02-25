@@ -234,7 +234,7 @@ export class UploadImages extends FormCom {
                             break;
                     }
                 }else{
-                    console.log(files);
+
                     Promise.all(files.map((file) => {
                         return new Promise((resolve, reject) => {
                             let reader = new FileReader();
@@ -247,13 +247,17 @@ export class UploadImages extends FormCom {
                             }
                         });
                     })).then((strs: string[]) => {
-                        console.log(strs);
-                        this.imgs = strs.map((str) => ({
+                        let isMulti = this.imgType === '28';
+                        let imgs: IImage[] = strs.map((str) => ({
                             localUrl: str,
                             isOnLine: false,
                             isError: false,
                             unique: '',
                         }));
+                        if(isMulti){
+                            imgs = [...this.imgs, ...imgs];
+                        }
+                        this.imgs = imgs;
                     }).catch((e) => {
                         console.log(e);
                         Modal.alert('图片获取失败');
@@ -332,7 +336,7 @@ export class UploadImages extends FormCom {
             item.disabled = this.disabled;
         });
 
-        this.onSet && this.onSet(this._value);
+        this.onSet && this.onSet(this.value);
     }
 
     refreshIndex() {
@@ -384,6 +388,7 @@ export class UploadImages extends FormCom {
             this._listItems.splice(i, 1);
             this._imgs.splice(i, 1);
             this.refreshIndex();
+            this.onSet && this.onSet(this.value);
         }
     }
 
