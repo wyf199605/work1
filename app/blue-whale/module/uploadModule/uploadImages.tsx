@@ -38,7 +38,22 @@ export class UploadImages extends FormCom {
             case '27': {
                 let uniArr = value.reverse().filter(v => v.isError === false),
                     uni = uniArr[0];
-                finalVal = tools.isNotEmpty(uni) ? (uni.isOnLine ? uni.unique || '' : uni.localUrl) : '';
+
+                if(tools.isEmpty(uni)){
+                    break;
+                }
+                if(uni.isOnLine){
+                    finalVal = uni.unique || '';
+                    break;
+                }
+                if(uni.localUrl){
+                    if(~uni.localUrl.indexOf(',')){
+                        finalVal = uni.localUrl.split(',')[1];
+                    }else{
+                        finalVal = uni.localUrl;
+                    }
+                    break;
+                }
             }
                 break;
             case '28': {
@@ -47,8 +62,12 @@ export class UploadImages extends FormCom {
                     if (!v.isError) {
                         if(v.isOnLine){
                             tools.isNotEmpty(v.unique) && trueVal.push(v.unique)
-                        }else{
-                            trueVal.push(v.localUrl)
+                        }else if(v.localUrl){
+                            if(~v.localUrl.indexOf(',')){
+                                trueVal.push(v.localUrl.split(',')[1]);
+                            }else{
+                                trueVal.push(v.localUrl);
+                            }
                         }
                     }
                 });
