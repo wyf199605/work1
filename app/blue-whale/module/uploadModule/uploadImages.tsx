@@ -298,6 +298,8 @@ export class UploadImages extends FormCom {
         this.listItems.forEach(item => {
             item.disabled = this.disabled;
         });
+
+        this.onSet && this.onSet(this._value);
     }
 
     refreshIndex() {

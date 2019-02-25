@@ -1,295 +1,266 @@
 /// <amd-module name="OfflineBtn"/>
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
-import {IButton} from "../../../global/components/general/button/Button";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {ManagerImages} from "../uploadModule/ManagerImages";
 import {Loading} from "../../../global/components/ui/loading/loading";
-import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
 import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {TextInput} from "../../../global/components/form/text/text";
-import IComponentPara = G.IComponentPara;
 import Shell = G.Shell;
 import tools = G.tools;
-import Component = G.Component;
-import {DetailBtnModule} from "../detailModule/detailBtnModule";
+import {GroupTabsPage} from "../../pages/groupTabs/GroupTabsPage";
+import {EditModule} from "../edit/editModule";
 
-interface IBtnModulePara {
-    subButtons: R_Button[]
-    container: HTMLElement
-    data?: IRfidBarCode
-    btn : R_Button
-}
-
-interface IRfidBarCode extends IComponentPara {
-    ajaxData?: object[];
-    nameId?: string,
-    codeStype?: object[],
-    url?: string,
-    SHO_ID?: string,
-    USERID?: string
-    uniqueFlag?: string,
-    downUrl: string,
-    uploadUrl: string,
-    analysis?: string
-    picFields?: string
-    picAddr?: string
-}
-
-interface IparaCode {
-    value: string //扫到的数据
-    uniqueFlag?: string //主键
-    where?: obj //条件
-    option?: number //状态
-    num?: number //替换的数据
-}
 interface IGeneralPara {
-    ui : IBW_Detail;
-    numName : string; // 替换逐一累加对应的name
-    uniqueFlag : string; // 地址作为唯一键
+    ui? : IBW_Slave_Ui;  // 当前按钮对应ui
+    numName? : string; // 替换逐一累加对应的name
+    uniqueFlag? : string; // 当前按钮对应唯一键
+    mainId : string   // 主表主键id
+    subId : string   // 子表主键id
+    mainKey : R_Field  // 主表主键
+    subKey : R_Field  // 子表主键
 }
 /**
  * 离线按钮操作：如条码盘点
  */
 export class OfflineBtn{
     private btnGroup: BtnGroup;
-    private btnModule : DetailBtnModule;
-    private btn : R_Button;
-    private option: number; // 1.逐一 2.替换 3.累加
+    private groupTabsPage : GroupTabsPage;
+    private btn : R_Button;  // 当前按钮ui
+    private option: string; // 1.逐一 2.替换 3.累加
     private para : IGeneralPara;
 
-    init(btn : R_Button, btnModule : DetailBtnModule){
-        console.log(btn);
-        this.btnModule = btnModule;
+    init(btn : R_Button, groupTabsPage : GroupTabsPage, itemId : string){
+        this.groupTabsPage = groupTabsPage;
         this.btn = btn;
+        console.log(btn);
+        let mainUi = this.groupTabsPage.imports.mainUiGet(),
+            subUi = this.groupTabsPage.imports.subUiGet();
+
         this.para = {
-            ui : btnModule.uiPara,
-            numName : btnModule.uiPara.correlation.numberName,
-            uniqueFlag :  btn.actionAddr.dataAddr
+            mainId : mainUi.itemId,
+            subId : subUi.itemId,
+            mainKey : mainUi.fields.map(e => {
+                if(e.name === mainUi.keyField){
+                    return e
+                }
+            })[0],
+            subKey : subUi.fields.map(e => {
+                if(e.name === subUi.keyField){
+                    return e
+                }
+            })[0]
         };
-        // this.barCode();
-        this.setting();
+        let {ui} = this.getKeyField(itemId);  // 当前按钮对应的ui
+        this.para.ui = ui;
+        this.para.numName = ui.correlation && ui.correlation.numberName;
+        this.para.uniqueFlag = ui.uniqueFlag;
+        console.log(btn, ui);
+
         switch (btn.openType) {
-            case 'barcode':
+            case 'import-manual-input':
                 this.barCode();
                 break;
-            case 'setting':
+            case 'import-number-set':
                 this.setting();
                 break;
-            case 'uploadData':
+            case 'import-upload':
                 this.uploadData();
                 break;
-            case 'deleteData':
+            case 'import-download':
+                this.downData();
+                break;
+            case 'import-delete':
                 this.deleteData();
                 break;
-            case 'singleScan':
+            case 'import-scanning-single':
                 this.scan();
                 break;
-            case 'continueScan':
+            case 'import-scanning-many':
                 this.scan(true);
                 break;
             default:
-                // Modal.alert('未知类型openType');
+                Modal.alert('未知类型openType');
+        }
+        if(ui.supportRfid){
+            this.openRfid();
         }
     }
 
+    private openRfid(){
+        Shell.inventory.startEpc(null, (result) => {
+            this.query(result.data);
+        })
+    }
+
     private scan(reScan = false) {
-        Shell.inventory.openScanCode(1, (res) => {
-            this.query(res.data, reScan);
+        Shell.inventory.openScanCode(1, (result) => {
+            this.query(result.data, reScan);
         })
     }
 
     query(value : string, reScan = false){
-        Shell.imports.operateScanTable(value, this.option, this.para.uniqueFlag, this.para.ui.fields, this.para.numName, this.btnModule.getNum(), (result) => {
+        let keyField = this.para.mainKey.name;
+        Shell.imports.operateScanTable(value, this.option, this.para.uniqueFlag, {
+            [keyField] : this.groupTabsPage.imports.editModule.main.get(keyField)[keyField]
+        }, this.para.numName, this.groupTabsPage.imports.getNum(), (result) => {
             if(result.success){
-                this.btnModule.render(result.data);
+                let data = result.data;
+                if(data.itemid === this.para.mainId){
+                    this.groupTabsPage.imports.editModule.main.set(data.array);
+                }
                 reScan && this.scan(reScan);
+                this.groupTabsPage.imports.setText('');
+                this.getCountData();
+                this.getAggrData();
             }
         });
     }
 
-    private getHeadTable() {
-        let data = G.Shell.inventory.getTableInfo(this.para.uniqueFlag)
+    private fieldName = 'amountcount ';
+    private getCountData(){
+        let data = this.groupTabsPage.imports.getTextPara(),
+            id = data.itemId,
+            {keyField, value} = this.getKeyField(id);
 
-    }
-
-    private registRfid() {
-        G.Shell.inventory.openRegistInventory(0, {}, (res) => {
-            // this.operateTbaleD.value = res.data;
-            //实时更新方法
-            // this.registerTable(this.operateTbaleD);
-        })
-    }
-
-    private registerTable(data: IparaCode) {
-        G.Shell.inventory.codedataOperate(data.value, data.uniqueFlag, data.where, data.option, data.num, (res) => {
-            let data = res.data.data;
-            if (res.success) {
-                //判断是否是替换 如果是替换value值不变 如果是其他的状态需要清空为0
+        Shell.imports.getCountData(this.para.uniqueFlag, data.itemId, this.fieldName, data.expression, {
+            [keyField] : value
+        }, result => {
+            if(result.success){
+                this.groupTabsPage.imports.setAmount(result.data[this.fieldName]);
             }
+        });
+    }
+
+    private getKeyField(itemId : string) : {keyField : string, value : string, ui : IBW_Slave_Ui, edit : EditModule}{
+        let keyField, ui, edit, value;
+        if(itemId === this.para.subId){
+            keyField = this.para.subKey.name;
+            value = this.groupTabsPage.imports.editModule.sub.get(keyField);
+            ui = this.groupTabsPage.imports.subUiGet() as IBW_Slave_Ui;
+            edit = this.groupTabsPage.imports.editModule.sub;
+        }else {
+            keyField = this.para.mainKey.name;
+            value = this.groupTabsPage.imports.editModule.main.get(keyField);
+            ui = this.groupTabsPage.imports.mainUiGet() as IBW_Slave_Ui;
+            edit = this.groupTabsPage.imports.editModule.main;
+        }
+        return {keyField,value, ui, edit}
+    }
+
+    private getAggrData(){
+        this.groupTabsPage.imports.aggrArr.forEach(aggr => {
+            let  id = aggr.itemId,
+                {keyField, value} = this.getKeyField(id);
+            Shell.imports.getCountData(this.para.uniqueFlag, id, this.fieldName, aggr.expression, {
+                [keyField] : value
+            }, result => {
+                if(result.success){
+                    this.groupTabsPage.imports.setAggr(result.data[this.fieldName], id, keyField);
+                }
+            });
         })
     }
 
-    private randNum() {
-        return new Date().getTime() + Math.random() * 10 + '.jpg';
-    }
+    // private getHeadTable() {
+    //     let data = G.Shell.inventory.getTableInfo(this.para.uniqueFlag)
+    //
+    // }
+    //
+    // private registRfid() {
+    //     G.Shell.inventory.openRegistInventory(0, {}, (res) => {
+    //         // this.operateTbaleD.value = res.data;
+    //         //实时更新方法
+    //         // this.registerTable(this.operateTbaleD);
+    //     })
+    // }
+    //
+    // private registerTable(data: IparaCode) {
+    //     G.Shell.inventory.codedataOperate(data.value, data.uniqueFlag, data.where, data.option, data.num, (res) => {
+    //         let data = res.data.data;
+    //         if (res.success) {
+    //             //判断是否是替换 如果是替换value值不变 如果是其他的状态需要清空为0
+    //         }
+    //     })
+    // }
+    //
+    // private randNum() {
+    //     return new Date().getTime() + Math.random() * 10 + '.jpg';
+    // }
 
     private downData() {
         let loading = new Loading({
             msg: "下载数据中"
         });
-        // let downUrl = BW.CONF.siteUrl + this.p.data.downUrl,
-        //     uploadUrl = BW.CONF.siteUrl + this.p.data.uploadUrl;
-        Shell.imports.downloadbarcode(this.para.uniqueFlag, false, (res) => {
+        Shell.imports.downloadbarcode(this.btn.actionAddr.dataAddr,this.para.uniqueFlag, false, (result) => {
             loading.destroy();
-            if (res.success) {
-                let data = G.Shell.inventory.getTableInfo(this.para.uniqueFlag);
-                let pageName = data.data;
-
-                //只需要注册一个监听事件
-                // this.rigisterRifd();
-                //判断状态
-                //造数据条件
-            }
-            else {
-                //发现有未上传数据
-                let mode1 = new Modal({
-                    isMb: false,
-                    position: "center",
-                    header: '提示',
-                    zIndex: 1022,
-                    isOnceDestroy: true,
-                    isBackground: true,
-                    body: <div><h5>有未上传数据，是否继续</h5></div>,
-                    footer: {},
-                    onOk: () => {
-                        // this.getHeadTable();
-                        // let ScanData =  G.Shell.inventory.getScanData(this.uniqueFlag);
-                        // if(ScanData.success){
-                        //     loading.destroy();
-                        //     let res = ScanData.data.data;
-                        //     //重新定义数据
-                        //     //存储obj数据结构 跟 res数据比对 拼接 以及重新刷新条件传值参数
-                        //
-                        //
-                        //     if(res){
-                        //         let str = '';
-                        //         for(let val in this.DataclassInfoCp[0]) {
-                        //             for(let obj in res[0]){
-                        //                 // alert(obj + 'ppp');
-                        //                 if (obj == val) {
-                        //                     str += res[0][val];
-                        //                     // alert(data[i][val] + 'oo')
-                        //                 }
-                        //             }
-                        //             // alert(str + '字符串')
-                        //             this.domHash['categoryVal1'].innerHTML = str;
-                        //         }
-                        //         let strs = '';
-                        //
-                        //         for(let val in  this.DataclassInfoCp[1]){
-                        //             for(let obj in res[0]){
-                        //                 if(obj == val){
-                        //                     strs += res[0][val];
-                        //                 }
-                        //             }
-                        //             this.domHash['categoryVal2'].innerHTML = strs;
-                        //         }
-                        //         let strss = '';
-                        //
-                        //         for(let val in  this.DataclassInfoCp[2]){
-                        //             for(let obj in res[0]){
-                        //                 if(obj == val){
-                        //                     strss += res[0][val];
-                        //                 }
-                        //             }
-                        //             this.domHash['categoryVal3'].innerHTML = strss;
-                        //         }
-                        //
-                        //     }
-                        //     //更新数据条件
-                        //     this.domHash['barcode'].innerHTML =  res[0][this.keyField];
-                        //     this.domHash['Commodity'].innerHTML = res[0][this.nameField];
-                        //     this.domHash['count'].innerHTML = res[0]['AMOUNT'] ? res[0]['AMOUNT']: 0 + '';
-                        //
-                        // }
-
-                        //
-                        mode1.destroy();
-                    },
-                    onClose: () => {
-                        // G.Shell.inventory.downloadbarcode(para.uniqueFlag, BW.CONF.siteUrl + para.downUrl, BW.CONF.siteUrl + para.uploadUrl,true, (res=>{
-                        //     alert(res.msg)
-                        //     if(res.success){
-                        //         loading.destroy();
-                        //         this.getHeadTable(para);
-                        //     }
-                        // }))
-                        //Modal.toast('输入成功');
-
-                    }
-
-                })
-            }
-
+            Modal.toast(result.msg)
         })
-
     }
 
     uploadData() {
-        let body = <div data-code="updataModal">
-
-        </div>;
-        this.modalInit('uploadData', '上传数据', body, () => {
-        }, {
-            rightPanel: [{
-                content: "上传",
-                onClick: () => {
-                    // let field = para.picFields,
-                    //     IMAOBJ = {};
-                    // IMAOBJ[field] = this.photoImgData;
-                    // let IMA = [];
-                    // IMA.push(IMAOBJ);
-                    let s = new Loading({
-                        msg: '上传中'
-                    });
-                    s.show();
-                    // let typeValue = {};
-                    // typeValue[typeName] = updataEl.getText()? updataEl.getText() : null;
-                    // console.log( updataEl.getText());
-                    // let mes = G.Shell.inventory.uploadcodedata(para.uniqueFlag, para.picAddr,(tools.isNotEmpty(para.picFields)) ? IMA : '','atvarparams',JSON.stringify(typeValue),(res) => {
-                    //     d.query('.total-rfid>.bar-code-scan>span').innerText = 0 + '';
-                    //     this.stepArry = [];
-                    //     s.destroy();
-                    //     // alert('再次返回上传接口数据')
-                    //     if (!res.success) {
-                    //         alert('上传失败');
-                    //     } else {
-                    //         this.domHash['scanamout'].innerHTML = 0 + '';
-                    //         this.domHash['count'].innerHTML = 0 + '';
-                    //         alert(res.msg);
-                    //     }
-                    // })
-                }
-            }]
+        let loading = new Loading({
+            msg: "数据上传中"
+        });
+        Shell.imports.uploadcodedata(this.para.uniqueFlag, this.btn.actionAddr.dataAddr, (result) => {
+            if(result.success){
+                Modal.toast('上传成功');
+            }else {
+                Modal.toast('上传失败');
+            }
+            loading.destroy();
         });
     }
 
     deleteData() {
-        let body = <div data-code="deleteModal"/>;
-        let select = new SelectInputMb({
+        let body = <div data-code="delete-modal"/>;
+        let mainKey = this.para.mainKey && this.para.mainKey.name,
+            subKey = this.para.subKey && this.para.subKey.name,
+            main = {[this.para.mainId] : mainKey},
+            sub = {[this.para.subId] : subKey};
+
+        let data = [{
+            text : '所有',
+            value : mainKey + ',' + subKey,
+            data : Object.assign(main, sub)
+        },{
+            text : this.para.mainKey.caption,
+            value : mainKey,
+            data : main
+        },{
+            text : this.para.subKey.caption,
+            value : subKey,
+            data : sub
+        }];
+        let select = new SelectBox({
             container: body,
-            data: []
+            className : 'imports-select',
+            data: data,
+            select : {
+                multi : false,
+            }
         });
-        this.modalInit('deleteData', '请选择删除数据范围', <div className="rfid-barCode-set"/>, () => {
-            select.get();
+        let del = (itemId : string, keyField : string) => {
+            let {edit} = this.getKeyField(itemId);
+            Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, {
+                [keyField] : edit.get(keyField)[keyField]
+            }, 'delete', result => {
+
+            });
+        };
+        this.modalInit('deleteData', '请选择删除数据范围', body, () => {
+            let data = select.getSelect()[0].data as obj;
+            console.log(data);
+            for(let item in data){
+                del(item, data[item]);
+            }
         });
+
     }
 
     setting() {
         let body = <div className="barcode-setting"/>,
             operation = this.btn.operation,
-            data = operation && operation.content || [{text: "逐一", value: "1"}, {text: "替换", value: "2"}, {text: "累加", value: "3"}];
-        let selectBox = new SelectBox({
+            data = operation && operation.content,
+            selectBox = new SelectBox({
             container: body,
             select: {
                 multi: false,
@@ -305,18 +276,16 @@ export class OfflineBtn{
         selectBox.set([index]);
 
         this.modalInit('setting', '请输入设置', body, () => {
-            this.option = Number(selectBox.getSelect()[0].value);
-            this.btnModule.invesetCount(this.option);
+            this.option = selectBox.data[selectBox.getChecked()[0]].value;
+            this.groupTabsPage.imports.setCount(this.option);
         });
     }
 
     barCode() {
         let textInput: TextInput,
             body = <div data-code="barcodeModal">
-                <form className="barcode-form">
-                    <label>条码:</label>
-                    {textInput = <TextInput className='set-rfid-code'/>}
-                </form>
+                <label>{this.para.mainKey.caption + ":"}</label>
+                {textInput = <TextInput className='set-rfid-code'/>}
             </div>;
         this.modalInit('barcode', '请输入条码', body, () => {
             let val = textInput.get();
@@ -328,8 +297,9 @@ export class OfflineBtn{
         });
     }
 
+    private modal : Modal;
     modalInit(name: string, title: string, body: HTMLElement, onOk: () => void, footer = {}) {
-      new Modal({
+      this.modal = new Modal({
             isMb: false,
             isOnceDestroy : true,
             position: "center",
@@ -340,7 +310,9 @@ export class OfflineBtn{
                 onOk();
                 this.destroy();
             },
-            onClose: this.destroy
+            onClose : () => {
+                this.destroy();
+            }
         });
     }
 
@@ -374,6 +346,8 @@ export class OfflineBtn{
     destroy() {
         this.btnGroup && this.btnGroup.destroy();
         this.btnGroup = null;
+        this.modal && this.modal.destroy();
+        this.modal = null;
     }
 
 }

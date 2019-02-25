@@ -100,7 +100,7 @@ export class BasicCheckBox extends FormCom {
     static initCom(guid, text?: string, type = 'checkbox', name: string = guid) {
         return <div id={guid} title={text} className={type + '-wrapper select-box'}>
             <input type={type} name={name}/>
-            <span className={`check-span label-${type}`}></span>
+            <span className={`check-span label-${type}`}/>
             {text ? <span className="check-text">{text}</span> : null}
         </div>;
     }
