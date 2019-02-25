@@ -153,15 +153,19 @@ export class NewLabelPrint {
                         promise = this.setDefaultProp();
                         break;
                     case 'print':
-                        if(!('BlueWhaleShell' in window || 'AppShell' in window)){
-                            Modal.alert('无法连接到打印机');
-                            promise = Promise.reject();
-                        }else{
-                            promise = this.preview(true).catch((e) => {
-                                console.log(e);
-                                Modal.alert('打印失败');
-                            });
-                        }
+                        // if(!('BlueWhaleShell' in window || 'AppShell' in window)){
+                        //     Modal.alert('无法连接到打印机');
+                        //     promise = Promise.reject();
+                        // }else{
+                        //     promise = this.preview(true).catch((e) => {
+                        //         console.log(e);
+                        //         Modal.alert('打印失败');
+                        //     });
+                        // }
+                        promise = this.preview(true).catch((e) => {
+                            console.log(e);
+                            Modal.alert('打印失败');
+                        });
                         break;
                     case 'preview':
                     default:
@@ -317,8 +321,6 @@ export class NewLabelPrint {
     print(svgEl: SVGSVGElement){
         require(['canvg', 'rgbcolor', 'stackblur-canvas'], (canvg) => {
             // console.log(canvg);
-            let scale = 5,
-                svg = d3.select(svgEl);
 
             let canvas = <canvas/>,
                 copies = this.printModal.getData('copies');
@@ -328,7 +330,7 @@ export class NewLabelPrint {
 
             canvg(canvas, svgEl.outerHTML, {
                 renderCallback: () => {
-                    let scale = 2,
+                    let scale = 1,
                         printCanvas = <canvas width={canvas.width * scale} height={canvas.height * scale}/>,
                         cxt = printCanvas.getContext('2d');
                     cxt.scale(scale, scale);
@@ -337,13 +339,13 @@ export class NewLabelPrint {
                     cxt.drawImage(canvas, 0, 0);
                     d.remove(canvas);
                     canvas = null;
-                    // new Modal({
-                    //     body: printCanvas,
-                    //     header: '展示',
-                    // });
+                    new Modal({
+                        body: printCanvas,
+                        header: '展示',
+                    });
                     let dataURL = printCanvas.toDataURL("image/png", 1),
                         url = dataURL.replace('data:image/png;base64,', '');
-                    // console.log(dataURL);
+
                     if ('BlueWhaleShell' in window) {
                         BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + url + '"}');
                     } else if ('AppShell' in window) {
@@ -357,6 +359,7 @@ export class NewLabelPrint {
                 }
             });
         });
+
     }
 
     /*print(){
@@ -452,7 +455,7 @@ export class NewLabelPrint {
                 paddingBottom = settingData.down * dpi,
                 rowSpace = this.printModal.getData('rowSpace') * dpi,
                 colSpace = this.printModal.getData('colSpace') * dpi,
-                isLengthWays = settingData.horizontalRank,
+                isLengthWays = !settingData.horizontalRank,
                 isHorizontal = !settingData.direction[0], // 横向时，将宽高互换
                 scale = settingData.scale;
 
@@ -583,12 +586,13 @@ export class NewLabelPrint {
                 .style('transform', `translate(0, 0) scale(${scale})`);
 
             if(isPrint){
-                this.print(wrapper);
-                while(current < total){
+                this.print(wrapper.cloneNode(true));
+                while(current < total - 1){
                     current ++;
                     toPageSvg(current);
-                    this.print(wrapper);
+                    this.print(wrapper.cloneNode(true));
                 }
+                modal.isShow = false;
             }
         });
     }
