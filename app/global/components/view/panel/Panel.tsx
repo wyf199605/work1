@@ -60,6 +60,11 @@ export class Panel extends Component {
             this._panelItems[i].selected = flag;
         });
     }
+    toggleAll(flag: boolean){
+        this._panelItems.forEach((item) => {
+            item.selected = flag;
+        });
+    }
 
     protected event = (() => {
         let clickHandler = (ev) => {

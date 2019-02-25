@@ -16,6 +16,7 @@ import {RingProgress} from "../../../../global/components/ui/progress/ringProgre
 import Shell = G.Shell;
 import {Spinner} from "../../../../global/components/ui/spinner/spinner";
 import {TextInput} from "../../../../global/components/form/text/text";
+import {DetailBtnModule} from "../../../module/detailModule/detailBtnModule";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -29,7 +30,7 @@ export class ButtonAction {
      * button点击后业务操作规则
      */
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
-    }, url?: string, itemId?: string, atvData?: obj) {
+    }, url?: string, itemId?: string, atvData?: obj, btnModule? : DetailBtnModule) {
         let self = this;
         if (btn.subType === 'excel') {
             callback(null);
@@ -114,12 +115,12 @@ export class ButtonAction {
                     msg: `确定要${word}吗?`,
                     callback: (index) => {
                         if (index === true) {
-                            self.btnAction(btn, data, callback, url);
+                            self.btnAction(btn, data, callback, url, null, btnModule);
                         }
                     }
                 });
             } else {
-                self.btnAction(btn, data, callback, url, atvData);
+                self.btnAction(btn, data, callback, url, atvData, btnModule);
             }
         }
     }
@@ -185,8 +186,9 @@ export class ButtonAction {
      * 处理按钮规则buttonType=0:get,1:post,2put,3delete
      */
     private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
-    }, url?: string, avtData?: obj) {
-        let {addr, data} = BwRule.reqAddrFull(btn.actionAddr, dataObj),
+    }, url?: string, avtData?: obj, btnModule? : DetailBtnModule) {
+        let actionAddr = btn.actionAddr,
+            {addr, data} = actionAddr && BwRule.reqAddrFull(actionAddr, dataObj) || {addr : null, data : null},
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
@@ -196,7 +198,7 @@ export class ButtonAction {
         if (avtData) {
             addr && (addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())}));
         }
-        let varType = btn.actionAddr.varType, res: any = data;
+        let varType = actionAddr && actionAddr.varType, res: any = data;
 
         if (varType === 3 && typeof data !== 'string') {
             // 如果varType === 3 则都转为数组传到后台
@@ -262,7 +264,7 @@ export class ButtonAction {
                 }
 
                 break;
-            case  'barcode_inventory':
+            case 'barcode_inventory':
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;

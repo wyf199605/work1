@@ -8,16 +8,26 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import tools = G.tools;
 import {ListItemDetail} from "../listDetail/ListItemDetail";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {DetailEditModule} from "./detailEditModule";
 
 export class DetailBtnModule extends DetailModule{
     constructor(para:IDetailModulePara){
         super(para);
         let subButton = this.ui.subButtons || [];
         this.btnManager.init();
-        this.paging.init(this.btnManager.box);
+        this.ui.uiType !== 'view' && this.paging.init(this.btnManager.box);
+        this.editBtn.init(this.btnManager.box);
+
         subButton.forEach((btn) => {
             this.btnManager.addBtn(btn);
-        })
+        });
+
+        // this.on(DetailModule.EVT_RENDERED, () => {
+        //     if (this.dataManager.total <= 1){
+        //         this.btnManager.box.delItem('next');
+        //         this.btnManager.box.delItem('prev');
+        //     }
+        // })
     }
 
     protected paging = (() => {
@@ -29,20 +39,22 @@ export class DetailBtnModule extends DetailModule{
                 if(!prevBtn) {
                     prevBtn = new Button({
                         content: '上一页',
+                        key:'prev',
                         onClick: tools.pattern.throttling(() => {
                             this.dataManager && !this.dataManager.toPrev()
                         }, 500)
                     });
-                    box.addItem(prevBtn);
+                    box.addItem(prevBtn,0);
                 }
                 if(!nextBtn){
                     nextBtn = new Button({
                         content: '下一页',
+                        key:'next',
                         onClick: tools.pattern.throttling(() => {
                             this.dataManager && !this.dataManager.toNext()
                         }, 500)
                     });
-                    box.addItem(nextBtn);
+                    box.addItem(nextBtn,1);
                 }
                 this.off(DetailModule.EVT_RENDERED, handler);
                 this.on(DetailModule.EVT_RENDERED, handler = () => {
@@ -60,39 +72,101 @@ export class DetailBtnModule extends DetailModule{
     })();
 
     protected editBtn = (() => {
-        let onFinish;
-        return {
-            init: (btn: R_Button) => {
-                let inputBox = new InputBox({
-                        container: this.btnWrapper
-                    }),
-                    saveBtn = new Button({
-                        content: '保存',
-                        onClick: () => {
-                            // this.edit.save(btn).then(() => {
-                            //     onFinish && onFinish();
-                            //     inputBox.destroy();
-                            // }).catch(() => {
-                            //     Modal.alert('保存失败')
-                            // });
-                            this.detailEdit && this.detailEdit.save();
-                        }
-                    }),
-                    cancelBtn = new Button({
-                        content: '取消',
-                        onClick: () => {
-                            // this.edit.cancel();
-                            this.detailEdit && this.detailEdit.cancel();
-                            onFinish && onFinish();
-                            inputBox.destroy();
-                        }
-                    });
-                inputBox.addItem(saveBtn);
-                inputBox.addItem(cancelBtn);
-            },
-            set onFinish(flag){
-                onFinish = flag;
+        let editBox: InputBox,
+            detailEdit: DetailEditModule;
+        let initEditState = () => {
+            let inputBox = new InputBox({
+                    container: this.btnWrapper
+                }),
+                saveBtn = new Button({
+                    content: '保存',
+                    onClick: () => {
+                        // this.edit.save(btn).then(() => {
+                        //     onFinish && onFinish();
+                        //     inputBox.destroy();
+                        // }).catch(() => {
+                        //     Modal.alert('保存失败')
+                        // });
+                        this.detailEdit && this.detailEdit.save().then(() => {
+                            close();
+                            this.refresh().then(() => {
+                                Modal.toast('保存成功');
+                            }).catch((e) => {
+                                console.log(e);
+                            });
+                        }).catch((e) => {
+                            console.log(e);
+                            Modal.alert('保存失败')
+                        });
+                    }
+                }),
+                cancelBtn = new Button({
+                    content: '取消',
+                    onClick: () => {
+                        // this.edit.cancel();
+                        close();
+                        this.render();
+                    }
+                });
+            inputBox.addItem(saveBtn);
+            inputBox.addItem(cancelBtn);
+            editBox.wrapper.classList.add('hide');
+            let close = () => {
+
+                this.detailEdit && this.detailEdit.cancel();
+                inputBox.destroy();
+                editBox.wrapper.classList.remove('hide');
             }
+        };
+        return {
+            init: (box: InputBox) => {
+                let editType = this.editType;
+                detailEdit = this.detailEdit;
+                editBox = box;
+                if(detailEdit){
+                    if(detailEdit.isUpdate){
+                        box.addItem(new Button({
+                            key: 'edit',
+                            content: '编辑',
+                            onClick: () => {
+                                detailEdit.start(editType);
+                                if(editType !== 'modal'){
+                                    initEditState();
+                                }
+                            }
+                        }))
+                    }
+                    if(detailEdit.isDelete){
+                        box.addItem(new Button({
+                            content: '删除',
+                            key: 'del',
+                            onClick: () => {
+                                Modal.confirm({
+                                    msg: '确定要删除吗？',
+                                    callback: (flag) => {
+                                        if(flag){
+                                            detailEdit.del().then(() => {
+                                                Modal.alert('删除成功');
+                                                this.refresh();
+                                            }).catch(() => {
+                                                Modal.alert('删除失败');
+                                            })
+                                        }
+                                    }
+                                });
+                            }
+                        }))
+                    }
+                    if(detailEdit.isInsert){
+                        box.addItem(new Button({
+                            content: '新增',
+                            key: 'insert',
+                            onClick: () => {
+                            }
+                        }))
+                    }
+                }
+            },
         }
     })();
 
@@ -103,31 +177,9 @@ export class DetailBtnModule extends DetailModule{
             return new Button({
                 content: btn.caption,
                 onClick: () => {
-                    switch (btn.subType){
-                        case 'update_save': {
-                            this.editing = true;
-                            box && box.wrapper.classList.add('hide');
-                            this.editBtn.init(btn);
-                            this.editBtn.onFinish = () => {
-                                box && box.wrapper.classList.remove('hide');
-                            };
-                            break;
-                        }
-                        case 'delete_save': {
-                            if(this.dataManager && this.dataManager.total !== 0){
-                                this.detailEdit && this.detailEdit.del()
-                            }else{
-                                Modal.alert('没有数据可以删除！');
-                            }
-                            break;
-                        }
-                        default: {
-                            let data = this.detailData;
-                            ButtonAction.get().clickHandle(btn, data, () => {
-                            }, this.pageUrl || '');
-                            break;
-                        }
-                    }
+                    let data = this.getData();
+                    ButtonAction.get().clickHandle(btn, data, () => {
+                    }, this.pageUrl || '');
                 }
             })
         };

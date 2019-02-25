@@ -229,7 +229,7 @@ export class Modal extends Component {
         this._header = header;
     }
 
-    protected modalHidden() {
+    modalHidden() {
         if (this.closeMsg) {
             Modal.confirm({
                 msg: this.closeMsg,

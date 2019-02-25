@@ -489,6 +489,34 @@ namespace G{
             }
         };
 
+        /**
+         * 离线操作
+         */
+        const imports = {
+            //条码扫码下载的
+            downloadbarcode(uniqueFlag:string, downUrl:string, defaultUpload:boolean, back:IShellEventHandler){
+                return ShellBase.handler('downloadbarcode',{uniqueFlag,downUrl,defaultUpload},back,null,false);
+            },
+            //上传条码数据
+            uploadcodedata(uniqueFlag:string,uploadUrl:string, back:IShellEventHandler){
+                return ShellBase.handler('uploadcodedata',{uniqueFlag, uploadUrl},back,null,false);
+            },
+            //条码扫码总量统计
+            getCountData(uniqueFlag:string,itemid: string, fieldname: string, expression: string, where:obj,back:IShellEventHandler){
+                return ShellBase.handler('getCountData',{uniqueFlag, itemid, fieldname, expression, where},back);
+            },
+            calculateData(uniqueFlag: string, itemid: string, fieldname: string, expression: string, back:IShellEventHandler){
+                return ShellBase.handler('calculateData',{uniqueFlag, itemid, fieldname, expression},back);
+            },
+            operateTable(uniqueFlag:string, itemid:string, params:obj, where:obj, type: string,back:IShellEventHandler){
+                return ShellBase.handler('operateTable',{uniqueFlag, itemid, params, where,type},back)
+            },
+            operateScanTable(sancode:string, option: string, uniqueFlag:string, keyfield:obj, numName: string, num: string, back:IShellEventHandler){
+                return ShellBase.handler('operateScanTable',{sancode, keyfield, uniqueFlag, option, numName, num},back)
+            },
+
+        };
+
         const image = {
             // 拍照
             photograph(callback: (file: CustomFile[]) => void, error?: (msg: string) => void){
@@ -533,7 +561,7 @@ namespace G{
 
         return {
 
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image
+            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, imports, image
         }
     })(window, document);
 
@@ -572,8 +600,8 @@ namespace G{
             action2eventName:objOf<string[]> = {};
 
 
-        function eventNameGet() {
-            return  '__SHELL_EVENT__' + tools.getGuid();
+        function eventNameGet(action : string) {
+            return   '__SHELL_EVENT__' + tools.getGuid();
         }
 
         function eventOff(action: string) {
@@ -582,9 +610,7 @@ namespace G{
             delete events[action];
         }
         function windowsHandler<IShellHandler>(action:string, data, back?, infor?, isAutoOff = true) {
-            if(typeof AppShell === 'object' && (tools.isFunction(AppShell.postMessage) ||
-                tools.os.ios && tools.isFunction(webkit.messageHandlers.AppShell.postMessage ||
-                    tools.isFunction(AppShell.asyncFunction) && tools.isFunction(AppShell.syncFunction)))) {
+            if(typeof AppShell === 'object' || (tools.os.ios && typeof webkit.messageHandlers.AppShell === 'object')) {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
 
                 if(tools.isEmpty(back) && tools.isEmpty(infor)){
@@ -592,8 +618,8 @@ namespace G{
                     // return JSON.parse(AppShell.postMessage({action, data : dataStr}));
                 }else{
                     // 生成唯一事件名称
-                    let eventBack = back ? eventNameGet() : '',
-                        eventInfor = infor ? eventNameGet() : '';
+                    let eventBack = back ? eventNameGet(action) : '',
+                        eventInfor = infor ? eventNameGet(action) : '';
                     if (!isAutoOff) {
                         action2eventName[action] = action2eventName[action] || [];
                         let events = action2eventName[action];
@@ -613,7 +639,6 @@ namespace G{
                             }
                         })
                     }
-
                     // 异步完成通知
                     if (eventBack) {
                         d.on(window, eventBack, function (e: CustomEvent) {
@@ -637,7 +662,7 @@ namespace G{
                     }
 
                     // 异步调用
-                    let flag, shellData = {data : dataStr, back : eventBack, info : eventInfor};
+                    let flag, shellData = Object.assign({data : dataStr} || {}, {back : eventBack, info : eventInfor});
                     if(tools.os.ios){
                         // ios只有异步调用
                         flag = webkit.messageHandlers.AppShell.postMessage(Object.assign(shellData,{action}));
@@ -646,7 +671,7 @@ namespace G{
                         // flag = AppShell.postMessage(action, JSON.stringify(shellData));
                     }
                     // 过程通知
-                    if(!flag) {
+                    if(!flag && !tools.os.ios) {
                         // alert('Shell失败');
                         d.off(window, eventInfor);
                         d.off(window, eventBack);

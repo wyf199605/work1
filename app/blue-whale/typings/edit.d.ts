@@ -2,7 +2,7 @@ interface ComInitP {
     dom: HTMLElement;
     field: R_Field;
     data?: obj;
-
+    onSet?: (val: any) => void;
     onExtra?(data: obj, relateCols: string[], isEmptyClear?, isValid?, isReplace?): void
 }
 

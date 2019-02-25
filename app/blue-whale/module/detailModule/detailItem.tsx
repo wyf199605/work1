@@ -94,7 +94,7 @@ export class DetailItem extends Component{
     }
 
     render(data: any = this.itemData){
-        this.format && this.format(this.custom, data, this.detail.detailData).then(({text, color, classes, bgColor}) => {
+        this.format && this.detail.addPromise(this.format(this.custom, data, this.detail.detailData).then(({text, color, classes, bgColor}) => {
             let contentEl = this.contentEl;
             if(contentEl){
                 contentEl.innerHTML = '';
@@ -109,7 +109,7 @@ export class DetailItem extends Component{
             this.classes = classes;
             this.color = color;
             this.background = bgColor;
-        })
+        }));
     }
 
     static EVT_EDIT = '__event_data_change__';
@@ -125,7 +125,9 @@ export class DetailItem extends Component{
                 com = inputInit(this.custom, this);
 
                 if(com instanceof FormCom){
-                    com.onSet = () => {
+                    let onSet = com.onSet;
+                    com.onSet = (val) => {
+                        onSet && onSet(val);
                         this.trigger(DetailItem.EVT_EDIT, com);
                     }
                 }else{

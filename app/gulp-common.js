@@ -20,9 +20,8 @@ module.exports = class Compiler {
      * @param tsConfig - ts配置
      * @param globalPath - 全局目录
      * @param commonTsSrc - 需要一起编译的公共ts文件src
-     * @param reload  -刷新浏览器
      */
-    constructor(tsConfig, globalPath, requireConfig, commonTsSrc, reload) {
+    constructor(tsConfig, globalPath, requireConfig, commonTsSrc) {
         this.tsConfig = tsConfig;
         this.allTask = []; // 当前所有任务
 
@@ -34,7 +33,6 @@ module.exports = class Compiler {
 
 
         this.once = true; //只执行一次生成require.config.js
-        this.reload = reload;
     }
 
     /**
@@ -66,11 +64,6 @@ module.exports = class Compiler {
             funs.pipe(gulp.dest(target))
         });
         gulp.watch(watchSrc, [name]);
-        //兼容global打包
-        if (this.reload) {
-            gulp.watch(watchSrc).on("change", this.reload);
-        }
-        // gulpWatch(src,name);
         return task;
     }
 
@@ -196,10 +189,6 @@ module.exports = class Compiler {
         });
 
         gulp.watch(watchSrc, [rname]);
-        //兼容global打包
-        if (this.reload) {
-            gulp.watch(watchSrc).on("change", this.reload);
-        }
 
         function addext(srcs) {
             return [...srcs].map(src => `${src}.{ts,tsx}`) //.concat([...srcs].map(src => `${src}.tsx`));
