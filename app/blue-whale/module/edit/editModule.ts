@@ -366,7 +366,14 @@ export class EditModule {
                 });
             } else {
                 if (sys.isMb) {
-                    return new Toggle({container: p.dom, custom: p.field});
+                    return new Toggle({
+                        container: p.dom,
+                        custom: p.field,
+                        customStyle: {
+                            check: 'on',
+                            noCheck: 'off'
+                        }
+                    });
                 } else {
                     return new CheckBox({container: p.dom, custom: p.field});
                 }

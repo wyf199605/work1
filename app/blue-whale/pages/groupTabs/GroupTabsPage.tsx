@@ -145,7 +145,7 @@ export class GroupTabsPage extends BasicPage {
                 this.imports.editModule = {
                     main: new EditModule({
                         auto: false,
-                        type: 'table',
+                        type: 'detail',
                         fields: mainUi.fields.map((field) => {
                             return {
                                 dom: null,
@@ -157,7 +157,7 @@ export class GroupTabsPage extends BasicPage {
                     }),
                     sub:  new EditModule({
                         auto: false,
-                        type: 'table',
+                        type: 'detail',
                         fields: subUi.fields.map((field) => {
                             return {
                                 dom: null,
