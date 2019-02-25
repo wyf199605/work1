@@ -282,7 +282,8 @@ export class BwTableModule extends Component {
                     ajaxData,
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
                     auto: !this.hasQuery,    // 有查询器时不自动查询
-                    fun: ({pageSize, current, sort, custom}) => {
+                    timeout:this.ui.timeOut,
+                    fun: ({pageSize, current, sort, custom,timeout}) => {
                         let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
                         pageSize = pageSize === -1 ? 3000 : pageSize;
 
@@ -295,7 +296,7 @@ export class BwTableModule extends Component {
                             // 获取表格数据
                             this.ajax.fetch(url, {
                                 needGps: ui.dataAddr.needGps,
-                                timeout: 30000,
+                                timeout: timeout,
                                 data: Object.assign({
                                     pageparams: `{"index"=${current + 1},"size"=${pageSize},"total"=1}`,
                                     pagesortparams

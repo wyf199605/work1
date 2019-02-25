@@ -18,6 +18,7 @@ export interface IDataManagerAjax {
     once?: boolean; // 是否只执行一次ajax
     ajaxData?: obj;
     resetCurrent?: boolean;
+    timeout?:number;
 }
 
 export interface IDataManagerAjaxStatus {
@@ -26,6 +27,7 @@ export interface IDataManagerAjaxStatus {
     isRefresh: boolean;
     sort: [[string, SortType]] // true升序, false降序
     custom: obj;
+    timeout?:number;
 }
 export interface IDataManagerPageConf{
     size: number;
@@ -90,6 +92,7 @@ export class DataManager {
             once = ajax && ajax.once,
             fun = ajax && ajax.fun,
             pageSize = once ? -1 : this.pageSize,
+            timeout = tools.isNotEmpty(ajax.timeout) ? (ajax.timeout > 0 ? ajax.timeout*1000 : 30000) : 30000,
             isSetData = isRefresh || this._serverMode && !this.isMb; // 是否重新设置本地数据
 
         let promise: Promise<number>;
@@ -102,7 +105,7 @@ export class DataManager {
                 custom = this.ajaxData;
 
             promise = new Promise((resolve, reject) => {
-                fun({current, pageSize, isRefresh, sort, custom})
+                fun({current, pageSize, isRefresh, sort, custom,timeout})
                     .then(({data, total}) => {
                         if (isSetData) {
                             this.data = data;
