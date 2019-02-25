@@ -48,6 +48,7 @@ namespace BW {
             msgList : 'newPage/MsgListPage',
         },
         ajaxUrl: {
+            systemMenu: 'common/othersystem/getallsystem', // 打开系统按钮
             getVersion: 'rest/version/fastlion', // 获取版本号
             personalmenu: `common/personalmenu`, // 个人中心按钮
             personPassword: `common/modpwd`, // 修改密码

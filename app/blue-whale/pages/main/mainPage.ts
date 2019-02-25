@@ -56,6 +56,7 @@ export = class MainPage {
             recentUrl: CONF.ajaxUrl.menuHistory,
             menuUrl: CONF.ajaxUrl.menu
         });
+        MainPage.systemMenu.init();
         MainPage.topNavMenu.init();
         MainPage.myselfMenu.init();
         MainPage.rightSidebar.init();
@@ -311,6 +312,19 @@ export = class MainPage {
             }
         }
     }());
+
+    protected static systemMenu = (() => {
+        let init = () => {
+            BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({response}) => {
+                console.log(response);
+                // let container = d.query('.content-tabs'),
+                //     li = d.create(`<li class="dropdown pull-left"><a href="#">打开系统</a></li>`);
+                // d.prepend(container, li);
+            })
+        };
+
+        return {init}
+    })();
 
     private static myselfMenu = (function () {
         //顶部个人信息下拉窗口点击事件

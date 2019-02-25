@@ -215,6 +215,7 @@ namespace G{
                 return ShellBase.handler('labelPrint', {quantity, driveCode, image}, back);
             }
         };
+
         const inventory = {
             getDeviceAddress(){
                 return ShellBase.handler('getDeviceAddress',function (res) {
@@ -559,9 +560,27 @@ namespace G{
             }
         };
 
+        const openSystem = (path: string, param: string, back: IShellEventHandler) => {
+            return ShellBase.handler('openExe', {
+                path: path,
+                params: param
+            }, back)
+        };
+
         return {
 
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, imports, image
+            base,
+            finger,
+            file,
+            casio,
+            sqlite,
+            printer,
+            rfid,
+            inventory,
+            startUp,
+            imports,
+            image,
+            openSystem
         }
     })(window, document);
 
