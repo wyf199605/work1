@@ -124,7 +124,7 @@ export class EditModule {
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 pageData: this.defaultData,
                 field: p.field,
-                autoUpload: false
+                autoUpload: !p.isOffLine
                 // unique: tools.isNotEmpty(p.data) ?  p.data[p.field.name] : ''
             })
         },

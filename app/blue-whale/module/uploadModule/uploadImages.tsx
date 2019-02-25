@@ -37,16 +37,16 @@ export class UploadImages extends FormCom {
             case '26':
             case '27': {
                 let uniArr = value.reverse().filter(v => v.isError === false),
-                    uni = uniArr.filter(u => tools.isNotEmpty(u.unique))[0];
-                finalVal = tools.isNotEmpty(uni) ? (uni.isOnLine ? uni.unique : uni.localUrl) : '';
+                    uni = uniArr[0];
+                finalVal = tools.isNotEmpty(uni) ? (uni.isOnLine ? uni.unique || '' : uni.localUrl) : '';
             }
                 break;
             case '28': {
                 let trueVal = [];
                 value.forEach(v => {
-                    if (!v.isError && tools.isNotEmpty(v.unique)) {
+                    if (!v.isError) {
                         if(v.isOnLine){
-                            trueVal.push(v.unique)
+                            tools.isNotEmpty(v.unique) && trueVal.push(v.unique)
                         }else{
                             trueVal.push(v.localUrl)
                         }
@@ -251,6 +251,8 @@ export class UploadImages extends FormCom {
                         this.imgs = strs.map((str) => ({
                             localUrl: str,
                             isOnLine: false,
+                            isError: false,
+                            unique: '',
                         }));
                     }).catch((e) => {
                         console.log(e);
