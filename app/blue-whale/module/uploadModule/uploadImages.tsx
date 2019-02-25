@@ -21,6 +21,7 @@ interface IUploadImages extends IBwUploaderPara {
     unique?: string;
     field?: R_Field; //字段
     pageData?: obj;//页面数据
+    autoUpload?: boolean;
 }
 
 export class UploadImages extends FormCom {
@@ -129,9 +130,11 @@ export class UploadImages extends FormCom {
     }
 
     public uploader: BwUploader = null;
+    protected autoUpload: boolean;
 
     constructor(private para: IUploadImages) {
         super(para);
+        this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
         this.pageData = para.pageData || {};
         this.imgType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.unique;
@@ -208,23 +211,42 @@ export class UploadImages extends FormCom {
         // 文件加入到上传队列，开始上传
         this.uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: File[]) => {
             if (files.length > 0) {
-
-                //开始上传
-                switch (this.imgType) {
-                    case '20':
-                    case '26':
-                    case '27': {
-                        if (files.length = 1) {
-                            this.uploader.upload();
-                        } else {
-                            Modal.alert('请只上传一张图片!');
+                if(this.autoUpload){
+                    //开始上传
+                    switch (this.imgType) {
+                        case '20':
+                        case '26':
+                        case '27': {
+                            if (files.length = 1) {
+                                this.uploader.upload();
+                            } else {
+                                Modal.alert('请只上传一张图片!');
+                            }
                         }
+                            break;
+                        case '28': {
+                            this.uploader.upload();
+                        }
+                            break;
                     }
-                        break;
-                    case '28': {
-                        this.uploader.upload();
-                    }
-                        break;
+                }else{
+                    Promise.all(files.map((file) => {
+                        return new Promise((resolve, reject) => {
+                            let reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            reader.onload = function (e) {
+                                resolve(reader.result);
+                            };
+                            reader.onerror = () => {
+                                reject()
+                            }
+                        });
+                    })).then((strs) => {
+                        console.log(strs);
+                        this.imgs = strs;
+                    }).catch(() => {
+                        Modal.alert('图片获取失败');
+                    })
                 }
             }
         });

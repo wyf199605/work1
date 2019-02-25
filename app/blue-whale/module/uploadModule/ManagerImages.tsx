@@ -7,13 +7,32 @@ import Component = G.Component;
 import IComponentPara = G.IComponentPara;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwLayoutImg} from "./bwLayoutImg";
+import {FormCom} from "../../../global/components/form/basic";
 
 export interface IManagerImagesPara extends IBwUploaderPara {
     imagesContainer: HTMLElement;
     onFinish?: (files: CustomFile[]) => void;
 }
 
-export class ManagerImages {
+export class ManagerImages extends FormCom{
+
+    protected wrapperInit(){
+        return null;
+    }
+
+    get(){
+
+    }
+    set(value){
+
+    }
+
+    get value(){
+        return this.get();
+    }
+    set value(value){
+        this.set(value)
+    }
 
     protected multi: boolean;
     protected files: CustomFile[] = [];
@@ -22,6 +41,7 @@ export class ManagerImages {
     protected bwUpload: BwUploader;
 
     constructor(para: IManagerImagesPara) {
+        super(para);
         this.multi = tools.isEmpty(para.multi) ? true : para.multi;
         this.onFinish = para.onFinish || function () {
             return Promise.resolve();
