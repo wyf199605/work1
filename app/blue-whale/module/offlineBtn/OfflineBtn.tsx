@@ -2,12 +2,10 @@
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {Loading} from "../../../global/components/ui/loading/loading";
-import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {TextInput} from "../../../global/components/form/text/text";
 import Shell = G.Shell;
 import tools = G.tools;
 import {GroupTabsPage} from "../../pages/groupTabs/GroupTabsPage";
-import {EditModule} from "../edit/editModule";
 import CONF = BW.CONF;
 import d = G.d;
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
@@ -56,7 +54,7 @@ export class OfflineBtn {
             })[0],
             itemId
         };
-        let {ui} = this.getKeyField(itemId);  // 当前按钮对应的ui
+        let {ui} = this.imports.getKeyField(itemId);  // 当前按钮对应的ui
         this.para.ui = ui;
         console.log(btn, ui);
 
@@ -85,129 +83,19 @@ export class OfflineBtn {
             default:
                 Modal.alert('未知类型openType');
         }
-        if (ui.supportRfid) {
-            this.openRfid();
-        }
-    }
-
-    private openRfid() {
-        Shell.inventory.startEpc(null, (result) => {
-            if (result.success) {
-                this.query(result.data);
-            } else {
-                Modal.toast(result.msg);
-            }
-        })
     }
 
     private scan(type: number) {
         Shell.inventory.openScanCode(type, (result) => {
             if (result.success) {
-                this.query(result.data, type);
+                this.imports.query(result.data);
             } else {
                 Modal.toast(result.msg);
             }
         })
     }
 
-    /**
-     * 数据查询
-     * @param value
-     * @param type
-     */
-    private query(value: string, type = 0) {
-        let keyField = this.para.mainKey.name;
-        Shell.imports.operateScanTable(value, this.imports.getOption(), this.para.uniqueFlag, {
-            [keyField]: this.imports.editModule.main.get(keyField)[keyField]
-        }, this.para.numName, this.imports.getNum(), (result) => {
-            if (result.success) {
-                let data = result.data;
-                data.forEach(obj => {
-                    let item = obj.itemid;
-                    if (!item) {
-                        return
-                    }
-                    let {edit} = this.getKeyField(item);
-                    edit.set(obj.array[0]);
-                    this.imports.setText('');
-                    this.getCountData();
-                    this.getAggrData(item);
-                });
-            } else {
-                Modal.toast(result.msg);
-            }
-        });
-    }
 
-    // 标识值，从壳获取count时候需要用到
-    private fieldName = 'amountcount';
-
-    /**
-     * 请求shell查询count数据
-     */
-    private getCountData() {
-        let data = this.imports.getTextPara(),
-            id = data.itemId,
-            {value} = this.getKeyField(id);
-
-
-        Shell.imports.getCountData(this.para.uniqueFlag, data.itemId, this.fieldName, data.expression, value, result => {
-            if (result.success) {
-                this.imports.setAmount(result.data[this.fieldName]);
-            } else {
-                Modal.toast(result.msg);
-            }
-        });
-    }
-
-    /**
-     * 获取itemId对应的相关字段，
-     * keyField：主键
-     * value：主键对应的值
-     * ui：当前表ui
-     * edit：当前表对应的详情模块
-     * key：主键字段
-     * @param itemId
-     */
-    private getKeyField(itemId: string): { keyField: string, value: obj, ui: IBW_Slave_Ui, edit: EditModule, key: R_Field } {
-        let keyField, ui, edit, value, key;
-        if (itemId === this.para.subId) {
-            key = this.para.subKey;
-            keyField = key.name;
-            value = this.imports.editModule.sub.get(keyField);
-            ui = this.imports.subUiGet() as IBW_Slave_Ui;
-            edit = this.imports.editModule.sub;
-        } else {
-            key = this.para.mainKey;
-            keyField = this.para.mainKey.name;
-            value = this.imports.editModule.main.get(keyField);
-            ui = this.imports.mainUiGet() as IBW_Slave_Ui;
-            edit = this.imports.editModule.main;
-        }
-        return {keyField, value, ui, edit, key}
-    }
-
-    /**
-     * 从壳获取新的aggr值
-     * @param item
-     */
-    private getAggrData(item: string) {
-        this.imports.aggrArr.forEach(aggr => {
-            let id = aggr.itemId,
-                {value} = this.getKeyField(id);
-
-            if (item !== id) {
-                return;
-            }
-            Shell.imports.getCountData(this.para.uniqueFlag, id, this.fieldName, aggr.expression, value, result => {
-                if (result.success) {
-                    this.imports.setAggr(result.data[this.fieldName], id, aggr.fieldName);
-                } else {
-                    Modal.toast(result.msg);
-                }
-            });
-        })
-    }
 
     private downData() {
         let loading = new Loading({
@@ -238,7 +126,7 @@ export class OfflineBtn {
     }
 
     private deleteData() {
-        let body = <div className="delete-modal"/>;
+        let body = <div className="delete-modal" />;
         let mainKey = this.para.mainKey && this.para.mainKey.name,
             subKey = this.para.subKey && this.para.subKey.name,
             mainValue = this.imports.editModule.main.get(mainKey),
@@ -312,7 +200,7 @@ export class OfflineBtn {
                 let value = inputEl.value,
                     id = inputEl.dataset.item,
                     name = inputEl.dataset.name,
-                    {edit} = this.getKeyField(id);
+                    {edit} = this.imports.getKeyField(id);
 
                 if (tools.isEmpty(value)) {
                     value = edit.get(name)[name];
@@ -375,7 +263,7 @@ export class OfflineBtn {
     }
 
     private barCode() {
-        let {key} = this.getKeyField(this.para.itemId),
+        let {key} = this.imports.getKeyField(this.para.itemId),
             textInput: TextInput,
             body = <div data-code="barcodeModal">
                 <label>{key.caption + ":"}</label>
@@ -387,7 +275,7 @@ export class OfflineBtn {
                 Modal.alert('条码不能为空');
                 return;
             }
-            this.query(val);
+            this.imports.query(val);
         });
     }
 

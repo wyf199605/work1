@@ -15,6 +15,7 @@ import {DetailItem} from "../../module/detailModule/detailItem";
 import {IButton} from "../../../global/components/general/button/Button";
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
 import Shell = G.Shell;
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -87,6 +88,7 @@ export class GroupTabsPage extends BasicPage {
         aggrEl : null as HTMLElement,
         btnWrapper : null as HTMLElement,
         footer : null as HTMLElement,
+        fieldName : 'amountcount', // 标识值，从壳获取count时候需要用到
         aggrArr : [] as R_Aggr[], // 主表+子表的aggrList合并的字段， TODO 非两条数据情况可能样式需要调整，添加滚动条
         editModule : {
             main: null as EditModule,
@@ -209,6 +211,129 @@ export class GroupTabsPage extends BasicPage {
             });
             d.append(this.dom, wrapper);
             d.append(this.wrapper, this.imports.footer);
+
+            if (this.ui.supportRfid) {
+                this.imports.openRfid();
+            }
+        },
+        openRfid() {
+            Shell.inventory.scan2dOn((result) => {
+                if(result.success){
+                    this.query(result.data);
+                } else {
+                    Modal.toast(result.msg);
+                }
+            });
+        },
+        /**
+         * 数据查询
+         * @param value
+         */
+        query : (value: string) => {
+            let keyField = this.ui.keyField;
+            Shell.imports.operateScanTable(value, this.imports.getOption(), this.ui.uniqueFlag, {
+                [keyField]: this.imports.editModule.main.get(keyField)[keyField]
+            }, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
+                if (result.success) {
+                    let data = result.data;
+                    data.forEach(obj => {
+                        let item = obj.itemid;
+                        if (!item) {
+                            return
+                        }
+                        let edit : EditModule;
+                        if(item !== this.ui.itemId){
+                            edit = this.imports.editModule.sub
+                        }else {
+                            edit = this.imports.editModule.main
+                        }
+                        // TODO
+                        let data = obj.array[0];
+                        delete data.PICTURE_28;
+
+                        edit.set(obj.array[0]);
+                        this.imports.setText('');
+
+                        this.imports.getCountData();
+                        this.imports.getAggrData(item);
+                    });
+                } else {
+                    Modal.toast(result.msg);
+                }
+            });
+        },
+        /**
+         * 获取itemId对应的相关字段，
+         * keyField：主键
+         * value：主键对应的值
+         * ui：当前表ui
+         * edit：当前表对应的详情模块
+         * key：主键字段
+         * @param itemId
+         */
+        getKeyField : (itemId: string): { keyField: string, value: obj, ui: IBW_Slave_Ui, edit: EditModule, key: R_Field } => {
+            let keyField, ui, edit, value, key;
+
+            if (itemId !== this.ui.itemId) {
+                ui = this.imports.subUiGet() as IBW_Slave_Ui;
+                key = ui.fields.map(e => {
+                    if (e.name === ui.keyField) {
+                        return e
+                    }
+                })[0];
+                keyField = key.name;
+                value = this.imports.editModule.sub.get(keyField);
+                edit = this.imports.editModule.sub;
+            } else {
+                ui = this.imports.mainUiGet() as IBW_Slave_Ui;
+                key = ui.fields.map(e => {
+                    if (e.name === ui.keyField) {
+                        return e
+                    }
+                })[0];
+                keyField = key.name;
+                value = this.imports.editModule.main.get(keyField);
+                edit = this.imports.editModule.main;
+            }
+            return {keyField, value, ui, edit, key}
+        },
+        /**
+         * 请求shell查询count数据
+         */
+        getCountData : () => {
+            let data = this.imports.getTextPara(),
+                id = data.itemId,
+                {value} = this.imports.getKeyField(id);
+
+
+            Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
+                if (result.success) {
+                    this.imports.setAmount(result.data[this.imports.fieldName]);
+                } else {
+                    Modal.toast(result.msg);
+                }
+            });
+        },
+        /**
+         * 从壳获取新的aggr值
+         * @param item
+         */
+        getAggrData : (item: string) => {
+            this.imports.aggrArr.forEach(aggr => {
+                let id = aggr.itemId,
+                    {value} = this.imports.getKeyField(id);
+
+                if (item !== id) {
+                    return;
+                }
+                Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression, value, result => {
+                    if (result.success) {
+                        this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
+                    } else {
+                        Modal.toast(result.msg);
+                    }
+                });
+            })
         },
         btnParaGet : (btns : R_Button[], data : obj, itemId : string) : IButton[] => {
             return btns.map(btn => {
@@ -332,7 +457,7 @@ export class GroupTabsPage extends BasicPage {
                 if (isSelected) {
                     let panel = this.tab as Panel;
                     if(this.styleType === 'panel-off'){
-                        panel.panelItems.forEach((panelItem) => {
+                        tools.isNotEmptyArray(panel && panel.panelItems) && panel.panelItems.forEach((panelItem) => {
                             if(panelItem !== item){
                                 panelItem.selected = false;
                             }
