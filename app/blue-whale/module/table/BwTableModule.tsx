@@ -1816,7 +1816,6 @@ export class BwTableModule extends Component {
                         {md5Arr.map(md5 => imgCreate(BwRule.fileUrlGet(md5, fieldName), md5, updatable))}
                     </div>}
                 </div>;
-
             modal = new Modal({
                 header: '图片查看',
                 top: 80,
@@ -2080,7 +2079,7 @@ export class BwTableModule extends Component {
                 // debugger;
                 imgs.forEach((img, i) => {
                     img.src = md5s[i] ? imgUrlCreate(md5s[i]) : imgsUrl[i];
-                    // img.src = md5s[i] ? this.imgUrlCreate(md5s[i]) : tools.url.addObj(urls[i], {'_': Date.now()});
+                    // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
                 })
             }
             currentRowIndex = rowIndex;
