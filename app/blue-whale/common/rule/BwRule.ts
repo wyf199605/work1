@@ -147,13 +147,14 @@ export class BwRule extends Rule {
                     super.fetch(url, setting).then((result) => {
                         // debugger;
                         let {response, xhr} = result;
+                        response.errorCode=response.errorCode?Number(response.errorCode):null;
                         if (tools.isEmpty(response)) {
                             alert('后台数据为空');
                             reject(Ajax.errRes(xhr, 'emptyData', ''));
                             return;
                         }
-
                         if (typeof response === 'object') {
+                        
                             let isLogout = response.errorCode === 50001;
                             if (isLogout) {
                                 Modal.confirm({
@@ -168,6 +169,7 @@ export class BwRule extends Rule {
                                 return;
                             }
                             if (response.errorCode && response.errorCode !== 0 && !isLogout) {
+                                console.log("1111")
                                 if (tools.isPc || (response.errorCode >= 10000 && response.errorCode <= 100001)) {
                                     alert(response.msg || response.errorMsg || '后台错误');
                                 } else {

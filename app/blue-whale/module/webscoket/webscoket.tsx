@@ -11,6 +11,7 @@ import sysPcHistory = BW.sysPcHistory;
 import CONF = BW.CONF;
 import { BwRule } from "../../common/rule/BwRule";
 import localMsg = G.localMsg;
+import { ShellAction } from "../../../global/action/ShellAction";
 declare let ReconnectingWebSocket: any;
 
 export = class webscoket {
@@ -171,7 +172,7 @@ export = class webscoket {
                 });
                 break;
             case "qrcodelogin":
-                this.scanHandle();
+                this.openLoginModal(data.data);
                 break;
             default:
                 console.info("后台返回未知的消息类型.");
@@ -182,65 +183,78 @@ export = class webscoket {
         let scanBtn = d.query("#scan_btn");
         d.on(scanBtn, "click", () => {
             // ShellAction.get().device().scan({
-            //     callback: (e) => {
-            //         alert(e.detail);//e.detail.data == lgToken
+            //     callback: (e: { detail: { data: string } }) => {
+            //         this.handleUrl(e.detail.data)
             //     }
             // });
-            // return false;
-            // d.query("#slider").style.visibility = "hidden"
-            // d.query("#header").style.visibility = "hidden"
 
-            let dom = <div class="login_modal_page">
-                <div className="isLogin_modal">
-                    <p className="login_pic"><i class="iconfont icon-weibiaoti-"></i></p>
-                    <p className="login_tip">将在电脑上登录速狮软件</p>
-                    <button className="login_btn">登录</button>
-                    <p className="login_cancel" id="js_cancal_login">取消登录</p>
-                </div>;
-    
-            </div>
-            if (!d.query(".isLogin_modal")) {
-                d.append(document.body, dom);
-                let cancelBtn = d.query("#js_cancal_login")
-                d.on(cancelBtn, "click", () => {
-                    d.query(".login_modal_page").remove();
-                })
-                let loginBtn = d.query(".login_btn", dom);
-                d.on(loginBtn, "click", () => {
-                    this.req_scanType().then(res => {
-                        console.log(res)
-                        switch (res.data.codetype) {
-                            case "qrcodelogin":
-                                this.req_scanLogin().then(res => {
-                                    alert("确认登录")
-                                    d.query("#slider").style.visibility = "visible"
-                                    d.query("#header").style.visibility = "visible"
-                                })
-                                break;
-                            default:
-                                break;
-                        }
-                    })
+            this.handleUrl("l111111");
 
-                })
+        })
+    }
+    private handleUrl(code: string) {
+        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/commonsvc/scan", {
+            data: {
+                code: code
+            }
+        }).then(({ response }) => {
+            let list = response.next.vars
+            if (list && list.indexOf("code") > -1) {
+                this.requestUrl(CONF.siteUrl + response.next.url, code)
+            }
+        }).catch(() => {
+            Modal.toast("无对应的路由规则")
+        })
+    }
+    private requestUrl(url: string, code: string | number) {
+        BwRule.Ajax.fetch(url, {
+            data: {
+                code: code
+            }
+        }).then(({ response }) => {
+            if (Number(response.state) === 1) {
+                this.openLoginModal(code);
+            } else {
+                Modal.toast(response.msg)
             }
         })
     }
-    private req_scanType(): Promise<{ data: { msg: string, errorCode: number, codetype: string } }> {
-        return new Promise((resolve, reject) => {
-            resolve({
-                data: {
-                    "errorCode": 0,
-                    "msg": "相关说明",
-                    "codetype": "qrcodelogin"
-                }
+    //打开确认登录的弹窗，1：用户手动点击扫码  2：webscoket自动推送扫描
+    private openLoginModal(lgToken: string | number) {
+        let dom = <div class="login_modal_page">
+            <div className="isLogin_modal">
+                <p className="login_pic"><i class="iconfont icon-weibiaoti-"></i></p>
+                <p className="login_tip">将在电脑上登录速狮软件</p>
+                <button className="login_btn" id="js_scan_login">登录</button>
+                <p className="login_cancel" id="js_cancal_login">取消登录</p>
+            </div>;
+
+        </div>
+        if (!d.query(".isLogin_modal")) {
+            d.append(document.body, dom);
+            let cancelBtn = d.query("#js_cancal_login")
+            d.on(cancelBtn, "click", () => {
+                d.query(".login_modal_page").remove();
             })
-        })
+            let loginBtn = d.query("#js_scan_login", dom);
+            d.on(loginBtn, "click", () => {
+                this.req_sureLogin(lgToken);
+            })
+        }
     }
-    private req_scanLogin() {
-        //lgtoken=XXXXXX&userid=xxx  & token=XXXX
-        return new Promise((resolve, reject) => {
-            resolve(200)
+    private req_sureLogin(lgtoken: string | number) {
+        //lgtoken=XXXXXX&userid=xxx  & token=XXXXX
+        let userid = JSON.parse(localStorage.getItem("userInfo")).userid,
+            token = localStorage.getItem("token");
+        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/change", {
+            data: {
+                code: lgtoken,
+                userid: userid,
+                token: token
+            }
+        }).then(({ response }) => {
+            d.query(".login_modal_page").remove();
+            console.log(response)
         })
     }
     private messageDom(listData) {

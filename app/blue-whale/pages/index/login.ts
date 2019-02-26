@@ -1006,48 +1006,98 @@ export class LoginPage {
         d.query(".current_name", dom).innerText = this.props.userId.value.replace(/\s+/g, "")
         let loginBtn = d.query("#js_login_btn");
         d.on(loginBtn, "click", () => {
-            this.req_sendServer().then((res)=>{
-                console.log(res)
-                Modal.toast('请在手机上确认登录');
-            })
+            this.req_sendServer()
+            // .then((res)=>{
+            //     console.log(res)
+            //     Modal.toast('请在手机上确认登录');
+            // })
         })
 
         return dom;
     }
     // 点击登录 --非初次登录 通知服务端该用户点击登录了，服务端websocket给userid对应的用户弹出确认登录弹窗
-    req_sendServer():Promise<any> {
+    req_sendServer() {
         //userid=XXX 
-       return BwRule.Ajax.fetch(CONF.siteUrl + CONF.ajaxUrl, {
-            type: 'POST',
+        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
             data: {
                 userid: this.props.userId.value
             }
+        }).then(({ response }) => {
+            Modal.toast("请打开速狮APP确认登录")
+            this.req_countdown(response.lgToken, () => {
+
+            })
         })
-       
+
     }
     //扫码登录获取LgToken
     req_getLgToken = () => {
-
-        G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({ response }) => {
-            QrCode.toCanvas("http://www.baidu.com", 150, 150, d.query("#code_login_cav"));
-            let i = 10;
-            this.Interval = setInterval(() => {
-                this.req_polling().then(res => {
-                    console.log(res)
-                    i--;
-                    if (i === 1) {
-                        clearInterval(this.Interval)
-                    }
-                })
-            }, 1000)
+        G.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code ").then(({ response }) => {
+            response = JSON.parse(response)
+            QrCode.toCanvas(response.lgToken, 150, 150, d.query("#code_login_cav"));
+            this.req_countdown(response.lgToken, () => {
+                let dom = d.query("#code_login_cav")
+                dom.innerHTML = "";
+                this.req_getLgToken()
+            })
         }).catch((e) => {
             console.log(e);
         })
     }
+
+    req_countdown(lgToken, cb) {
+        let i = 10;
+        this.Interval = setInterval(() => {
+            this.req_polling(lgToken).then(({ response }) => {
+                if (response.head) {
+                    let user = User.get(),
+                        noShow = [];
+                    user.clearStorage();
+                    response.dataArr.forEach((col, index) => {
+                        if (col.NAME === 'are_id') {
+                            user.are_id = col.VALUE;
+                        } else if (col.NAME === 'userid') {
+                            user.userid = col.VALUE;
+                        } else if (col.NAME === 'USERNAME') {
+                            user.department = col.VALUE;
+                            user.username = col.VALUE;
+                        } else if (col.NAME === 'hideBaseMenu') {
+                            noShow = col.VALUE.split(',');
+                        } else if (col.NAME === 'PLATFORM_NAME') {
+                            user.platformName = col.VALUE;
+                        }
+                    });
+                    if (sys.os === 'ad' || sys.os === 'ip') {
+                        let accessToken = response.head.accessToken || '';
+                        sys.window.opentab(user.userid, accessToken.toString(), noShow);
+                    } else {
+                        BW.sysPcHistory.setLockKey(user.userid);
+                        BW.sysPcHistory.setInitType('1');
+                        sys.window.opentab(void 0, void 0, noShow);
+                        // BW.sysPcHistory.remainLockOnly(() => sys.window.opentab());
+                    }
+                }
+                if (Number(response.state) === 1) {
+                    i--;
+                    if (i === 1) {
+                        cb();
+                        clearInterval(this.Interval)
+                    }
+                } else if (Number(response.state) !== 0) {
+                    Modal.toast(response.msg)
+                    clearInterval(this.Interval)
+                }
+            }).catch(() => {
+                clearInterval(this.Interval)
+            })
+        }, 1000)
+    }
     //轮询
-    req_polling() {
-        return new Promise((resolve, reject) => {
-            resolve(1111)
+    req_polling(lgToken: string) {
+        return BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/state", {
+            data: {
+                lgtoken: lgToken
+            }
         })
     }
     private device: Device;
