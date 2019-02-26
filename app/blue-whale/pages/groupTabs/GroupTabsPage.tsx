@@ -106,8 +106,8 @@ export class GroupTabsPage extends BasicPage {
                     subUi && Object.assign({}, subId,  subUi.correlation) || []] as IBW_Detail_Cor[],
                 main = this.main,
                 sub = this.subs[0];
-                this.imports.aggrArr = [...mainUi.aggrList.map(list => Object.assign({},mainId, list)),
-                    ...(subUi && subUi.aggrList.map(list => Object.assign({}, subId, list)) || [])];
+                this.imports.aggrArr = [...(mainUi && mainUi.aggrList && mainUi.aggrList.map(list => Object.assign({},mainId, list)) || []),
+                    ...(subUi && subUi.aggrList && subUi.aggrList.map(list => Object.assign({}, subId, list)) || [])];
 
                 this.imports.footer = <div class="inventory-footer">
                     <div className="barcode-count">
@@ -266,10 +266,13 @@ export class GroupTabsPage extends BasicPage {
         getNum(): string{
             return this.countText.get();
         },
+        getOption(): string{
+            return this.countTextEl.dataset.value;
+        },
         /**
          * 拼接查询count（累加替换）数据时候需要的参数
          */
-        getTextPara() : obj{
+        getTextPara() : {itemId : string, name : string, expression : string}{
           let data = this.countTextEl.dataset;
           return {
               itemId : data.item,
@@ -297,14 +300,11 @@ export class GroupTabsPage extends BasicPage {
             }
             el.dataset.value = option;
         },
-        getOption : () : string => {
-            return this.imports.countTextEl.dataset.value;
-        },
         /**
          * 设置aggrList的值
          * @param value
          * @param itemId 指定id
-         * @param keyField 指定主键
+         * @param keyField 修改的字段
          */
         setAggr : (value : string, itemId : string, keyField : string) => {
             let el = d.query(`[data-item=${itemId}] [data-name=${keyField}]`, this.imports.aggrEl);
