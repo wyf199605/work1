@@ -457,7 +457,7 @@ export class GroupTabsPage extends BasicPage {
                 if (isSelected) {
                     let panel = this.tab as Panel;
                     if(this.styleType === 'panel-off'){
-                        tools.isNotEmptyArray(panel && panel.panelItems) && panel.panelItems.forEach((panelItem) => {
+                        tools.isNotEmpty(panel) && panel.panelItems.forEach((panelItem) => {
                             if(panelItem !== item){
                                 panelItem.selected = false;
                             }
