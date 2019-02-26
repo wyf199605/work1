@@ -1989,7 +1989,8 @@ export class BwTableModule extends Component {
                     uploadType: isSign ? 'sign' : 'file',
                     nameField,
                     loading: {
-                        msg: '图片上传中...'
+                        msg: '图片上传中...',
+                        disableEl:document.body
                     },
                     thumbField: thumbField,
                     container: imgContainer,
