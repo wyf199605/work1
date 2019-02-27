@@ -324,12 +324,19 @@ li:last-child .item-content .item-inner {
     background-position: center;
     cursor: pointer;
   }
-  .icon_collect {
-    background-image: url(../../../img/collect.png);
-  }
+  .icon_collect,
   .icon_time {
-    background-image: url(../../../img/time.png);
+    color: red;
+    text-align: center;
+    line-height: 53px;
   }
+  .icon-shoucang1:before,
+  .icon-date-2:before {
+    zoom: 2;
+  }
+  // .icon_time {
+  //   background-image: url(../../../img/time.png);
+  // }
   p {
     text-align: center;
     font-size: 12px;

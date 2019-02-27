@@ -28,9 +28,10 @@
   .collect_nav>span:nth-child(2) {
     width: 30px;
     height: 30px;
-    background-image: url(../../../img/edit.png);
-    background-repeat: no-repeat;
-    background-size: 70%;
+    color: #007AFF;
+  }
+  .icon-shenpiguanli:before {
+    zoom: 1.4;
   }
   .collect_item {
     padding: 0px;

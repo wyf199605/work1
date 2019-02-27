@@ -118,11 +118,11 @@ export default class SideBarMrg {
     let collectDom = `
      <div class="collect_wrap">
         <div class="collect_item">
-           <div class="icon icon_collect"></div>
+           <div class="icon icon_collect iconfont icon-shoucang1"></div>
             <p>收藏<p>
         </div>
         <div>
-            <div class="icon icon_time" id="js_react"></div>
+            <div class="icon icon_collect iconfont icon-date-2" id="js_react"></div>
             <p>最近<p>
             </div>
         </div>

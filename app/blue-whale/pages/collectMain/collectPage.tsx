@@ -74,7 +74,7 @@ export class CollectPage extends BasicPage {
       return <div class="collect_block">
         <div class="collect_nav">
           <span>{child.tag ? child.tag : '默认分组'}</span>
-          <span class="edit_btn"></span>
+          <span class="edit_btn iconfont icon-shenpiguanli"></span>
         </div>
         <ul class="collect_item">
           {
