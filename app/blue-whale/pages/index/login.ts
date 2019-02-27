@@ -1051,7 +1051,7 @@ export class LoginPage {
     }
 
     req_countdown(lgToken, cb) {
-        let i = 10;
+        let i = 60;
         this.Interval = setInterval(() => {
             this.req_polling(lgToken).then(({ response }) => {
                 if (response.head) {
