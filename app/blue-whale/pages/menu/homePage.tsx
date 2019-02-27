@@ -9,6 +9,7 @@ import { SlideTab } from "../../../global/components/ui/slideTab/slideTab";
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { ShellAction } from "../../../global/action/ShellAction";
 import BasicPage from "../../pages/basicPage";
+import { Collect } from "../../module/collect/collect.mb";
 export = class homePage extends BasicPage{
 
     protected slideTab: SlideTab;
