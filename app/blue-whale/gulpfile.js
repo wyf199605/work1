@@ -1,12 +1,13 @@
 //导入工具包
 let gulp = require('gulp'),
+    livereload = require('gulp-livereload'),
     GulpCommon = require('../gulp-common'),
     config = require('./gulp.conf'),
-    browserSync = require("browser-sync"),
-    reload = browserSync.reload,
+    //browserSync = require("browser-sync"),
+    //reload = browserSync.reload,
     compiler = new GulpCommon('../tsconfig.json', '../global/', config, [
         'typings/*.d', 'index'
-    ], reload);
+    ]);
 
 let path = config.path;
 path.page = path.root + 'pages/';
@@ -18,12 +19,16 @@ path.module = path.root + 'module/';
  * ------------ 动态代理 -------------
  */
 gulp.task("server", function() {
-    // browserSync.init({
-    //     proxy: "http://192.168.1.243/sf"
-    // });
+    browserSync.init({
+        proxy: "http://127.0.0.1:8080/sf"
+    });
 });
 
-
+gulp.task('watch', function() {
+    livereload.listen();
+    gulp.watch(['../../dist/**']).on('change', livereload.changed);
+    // gulp.watch(['../../dist/**']).on("change", reload);
+});
 /**
  * ------------ css -------------
  */
@@ -278,9 +283,6 @@ gulp.task('js', function() {
     gulpTsModule(['rfid/RfidConfig'], 'rfidConfig.js');
     gulpTsModule(['rfid/RfidInventory'], 'rfidInventory.js');
 
-    //offline
-    gulpTsModule(['offlineBtn/OfflineBtn'], 'offlineBtn.js');
-
     gulpTsModule('webscoket/webscoket', 'webscoket.js');
 
     //BugReport
@@ -396,7 +398,7 @@ gulp.task('js', function() {
  * ------------ Js ---------------
  */
 //定义默认任务
-gulp.task('BW_Watch', ['js', 'css', 'server'], function() {
+gulp.task('BW_Watch', ['js', 'css', 'watch'], function() {
     // for(var i=0,len = pathSrc.length; i <= len - 1; i++){
     //     gulp.watch(pathSrc[i], [str[i]]);
     // }

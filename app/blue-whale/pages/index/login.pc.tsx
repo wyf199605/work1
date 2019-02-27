@@ -1,8 +1,8 @@
 /// <amd-module name="LoginPcPage"/>
 
-import {LoginPage} from "./login";
-import {Button} from "../../../global/components/general/button/Button";
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import { LoginPage } from "./login";
+import { Button } from "../../../global/components/general/button/Button";
+import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
 import d = G.d;
 
 export class LoginPcPage extends LoginPage {
@@ -10,20 +10,20 @@ export class LoginPcPage extends LoginPage {
     constructor(para) {
         // 初始化头部logo和注册按钮
         let logoWrapper = <div className="logo">
-            <img data-action="selectServer" src={G.requireBaseUrl + '../img/login-logo.png'} alt="fastlion"/>
+            <img data-action="selectServer" src={G.requireBaseUrl + '../img/login-logo.png'} alt="fastlion" />
         </div>;
 
         // 初始化表单内容（输入框、按钮等）
         let form = <form className="login-form">
             <div className="form-group">
-                <input id="username" type="text" placeholder="请输入员工号/手机号码"/>
+                <input id="username" type="text" placeholder="请输入员工号/手机号码" />
             </div>
             <div className="form-group">
-                <input id="password" type="password" placeholder="请输入密码"/>
+                <input id="password" type="password" placeholder="请输入密码" />
             </div>
-            <div className="form-group checkbox-group"/>
-            <div className="btn-group"/>
-            <button type="submit" className="hide"/>
+            <div className="form-group checkbox-group" />
+            <div className="btn-group" />
+            <button type="submit" className="hide" />
         </form>;
 
         d.on(form, 'submit', (e) => {
@@ -56,17 +56,23 @@ export class LoginPcPage extends LoginPage {
 
         // 指纹登录和设备注册按钮
         let loginOption = <div className="login-option">
-                <a href="#" className="zhiwen">
-                    <i className="iconfont icon-zhiwen"/>
-                    指纹登录
+            <a href="#" className="zhiwen">
+                <i className="iconfont icon-zhiwen" />
+                指纹登录
                 </a>
-                <a href="#" className="device">
-                    <i className="iconfont icon-device-mb"/>
-                    设备注册
+            <a href="#" className="device">
+                <i className="iconfont icon-device-mb" />
+                设备注册
+                </a>
+            <a href="#" className="scanLogin">
+                <i class="iconfont icon-scan"></i>
+                扫码登陆
                 </a>
         </div>;
 
         d.append(form, loginOption);
+
+
 
         let footer = <div className="footer">
             <div className="login-fqa"></div>
@@ -96,7 +102,10 @@ export class LoginPcPage extends LoginPage {
             saveButton: checkBox,
             fingerMbBtn: d.query('.zhiwen', loginOption),
             regButton: d.query('.device', loginOption),
+            scanButton: d.query(".scanLogin", loginOption),
             fqaBtn
         });
+
     }
+
 }

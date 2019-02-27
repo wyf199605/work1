@@ -1,0 +1,56 @@
+.login_modal_page {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  z-index: 9999;
+  background-color: white;
+  animation-name: slideInUp;
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+  .isLogin_modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .login_tip {
+      margin: 10px auto;
+    }
+    .login_btn {
+      width: 51%;
+      background-color: rgba(22, 155, 213, 1);
+      padding: 6px;
+      color: white;
+      text-align: center;
+      border-radius: 6px;
+      margin-top: 12vh;
+    }
+    .login_cancel {
+      margin: 20px auto;
+      display: inline-block;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    .login_pic {
+      margin-top: 28vh;
+      margin-bottom: 28px;
+      .iconfont {
+        font-size: 143px;
+      }
+    }
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+    visibility: visible;
+  }
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
