@@ -48,7 +48,7 @@ export class DataManager {
 
     private _serverMode: boolean;
     get serverMode(): boolean {
-        return this._serverMode;
+        return this._serverMode && this.total > this.pageSize;
     }
 
     constructor(para: IDataManagerPara) {
@@ -92,7 +92,7 @@ export class DataManager {
             once = ajax && ajax.once,
             fun = ajax && ajax.fun,
             pageSize = once ? -1 : this.pageSize,
-            timeout = tools.isNotEmpty(ajax.timeout) ? (ajax.timeout > 0 ? ajax.timeout*1000 : 30000) : 30000,
+            timeout = tools.isNotEmpty(ajax && ajax.timeout) ? (ajax.timeout > 0 ? ajax.timeout * 1000 : 30000) : 30000,
             isSetData = isRefresh || this._serverMode && !this.isMb; // 是否重新设置本地数据
 
         let promise: Promise<number>;
@@ -112,7 +112,7 @@ export class DataManager {
                         } else {
                             this.dataAdd(data);
                         }
-
+                        this._total = total;
                         resolve(total);
                     })
                     .catch(() => {
@@ -197,8 +197,12 @@ export class DataManager {
         this.pagination && (this.pagination.disabled = frag);
     }
 
+    protected _total = -1;
     set total(num: number){
         this.pagination && (this.pagination.total = num);
+    }
+    get total(){
+        return this._total;
     }
 
     protected _ajaxData:obj = {};

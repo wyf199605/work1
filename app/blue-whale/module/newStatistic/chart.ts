@@ -278,7 +278,7 @@ export = class NewChartBasic{
                     onSet : function(item,index){
                     },
                     className : 'selectInput',
-                    clickType : 1,
+                    clickType : 0,
                     readonly : true
                 });
                 break;
