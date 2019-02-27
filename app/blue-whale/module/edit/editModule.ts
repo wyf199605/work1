@@ -373,10 +373,21 @@ export class EditModule {
                         customStyle: {
                             check: 'on',
                             noCheck: 'off'
+                        },
+                        values: {
+                            true: (p.field.atrrs && p.field.atrrs.trueExpr) || true,
+                            false: (p.field.atrrs && p.field.atrrs.falseExpr) || false,
                         }
                     });
                 } else {
-                    return new CheckBox({container: p.dom, custom: p.field});
+                    return new CheckBox({
+                        container: p.dom,
+                        custom: p.field,
+                        values: {
+                            true: (p.field.atrrs && p.field.atrrs.trueExpr) || true,
+                            false: (p.field.atrrs && p.field.atrrs.falseExpr) || false,
+                        }
+                    });
                 }
             }
         },

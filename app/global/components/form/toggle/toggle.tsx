@@ -9,6 +9,10 @@ interface ITogglePara extends IFormComPara{
     size?: number;
     onClick?(isChecked: boolean): void;
     onSet?(isChecked: boolean): void;
+    values?: {
+        true?: any,
+        false?: any
+    }
 }
 interface ICustom {
     check?: string;
@@ -50,7 +54,10 @@ export class Toggle extends FormCom{
     protected offset: number;
     protected ballWidth: number;
     protected currentWidth: number;
-
+    protected  values: {
+        true?: any,
+        false?: any
+    };
 
     protected wrapperInit(): HTMLElement {
         let wrapper = <div className="toggle-wrapper">
@@ -66,6 +73,7 @@ export class Toggle extends FormCom{
     constructor(para: ITogglePara){
         super(para);
 
+        this.values = para.values || {};
         this.customStyle = para.customStyle;
         this.checked = para.checked;
         this.onClick = para.onClick;
@@ -235,7 +243,12 @@ export class Toggle extends FormCom{
     }
 
     get value() {
-        return this.checked;
+        let trueVal = this.values && this.values.true,
+            falseVal = this.values && this.values.false;
+
+        return this.checked
+            ? (tools.isEmpty(trueVal) ? true : trueVal)
+            : (tools.isEmpty(falseVal) ? false : falseVal);
     }
 
     set value(flag: number | boolean ){
