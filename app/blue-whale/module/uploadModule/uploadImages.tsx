@@ -100,15 +100,27 @@ export class UploadImages extends FormCom {
                     // 第一次设置值
                     let addrArr = val.split(','),
                         arr = [];
-                    addrArr.forEach(md5 => {
-                        // 根据md5获取文件地址
-                        arr.push({
-                            unique: md5,
-                            isError: false,
-                            localUrl: '',
-                            isOnLine: true
+                    if(this.autoUpload){
+                        addrArr.forEach(md5 => {
+                            // 根据md5获取文件地址
+                            arr.push({
+                                unique: md5,
+                                isError: false,
+                                localUrl: '',
+                                isOnLine: true
+                            });
                         });
-                    });
+                    }else{
+                        addrArr.forEach(url => {
+                            // 根据md5获取文件地址
+                            arr.push({
+                                unique: '',
+                                isError: false,
+                                localUrl: 'data:image/png;base64,' + url,
+                                isOnLine: false
+                            });
+                        });
+                    }
                     this.imgs = arr;
                 }
                     break;
