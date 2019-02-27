@@ -19,9 +19,9 @@ path.module = path.root + 'module/';
  * ------------ 动态代理 -------------
  */
 gulp.task("server", function() {
-    browserSync.init({
-        proxy: "http://127.0.0.1:8080/sf"
-    });
+    // browserSync.init({
+    //     proxy: "http://127.0.0.1:8080/sf"
+    // });
 });
 
 gulp.task('watch', function() {
@@ -283,6 +283,9 @@ gulp.task('js', function() {
     gulpTsModule(['rfid/RfidConfig'], 'rfidConfig.js');
     gulpTsModule(['rfid/RfidInventory'], 'rfidInventory.js');
 
+    //offline
+    gulpTsModule(['offlineBtn/OfflineBtn'], 'offlineBtn.js');
+
     gulpTsModule('webscoket/webscoket', 'webscoket.js');
 
     //BugReport
@@ -319,7 +322,14 @@ gulp.task('js', function() {
         'changeProject/changeProject',
     ], 'changeProject.js');
 
-    /*page*/
+
+    //收藏
+    gulpTsModule(["collect/collect"], "BaseCollect.js");
+    gulpTsModule([
+        "collect/collect.mb"
+    ], "collect.js")
+    gulpTsModule(["collect/collect.pc"], "CollectPC.js")
+        /*page*/
 
     gulpTsPage('index/password', 'personPassword.js');
     gulpTsPage('form/formPage', 'form-page.js');
@@ -356,7 +366,8 @@ gulp.task('js', function() {
     gulpTsPage('detail/versionPage', 'versionPage.js');
     gulpTsPage('detail/contactPage', 'contactPage.js');
     gulpTsPage(['main/mainPage', 'main/sideBar'], 'mainPage.js');
-
+    gulpTsPage("collectMain/collectPage", "CollectPage.js");
+    gulpTsPage("index/recentPage", "RecentPage.js");
     // gulpTsPage('main/defaultTab', 'defaultTab.js');
 
     gulpTsPage('main/mainMbPage', 'mainMbPage.js');

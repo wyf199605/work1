@@ -447,8 +447,8 @@ namespace G {
                 return ShellBase.handler('uploadcodedata', { nameId: nameId, uploadUrl: uploadUrl, images: images, typeName: typeName, typeValue: typeValue }, back, null, false);
             },
             //移动端打开摄像头扫码
-            openScanCode(type: number, back: IShellEventHandler) {
-                return ShellBase.handler('scanCode', { type: type }, back)
+            openScanCode(type: number, back: IShellEventHandler, info?: IShellEventHandler) {
+                return ShellBase.handler('scanCode', { type: type }, back, info)
             },
             //获取盘点数据
             getTableInfo(uniqueFlag: string) {
@@ -579,7 +579,7 @@ namespace G {
             },
         }
         return {
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location
+            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports
         }
     })(window, document);
 
