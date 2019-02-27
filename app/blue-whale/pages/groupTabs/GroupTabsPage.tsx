@@ -100,8 +100,7 @@ export class GroupTabsPage extends BasicPage {
                 return;
             }
             console.log(this.ui, this.subUi);
-            let wrapper = <div/>,
-                mainUi = this.ui as IBW_Detail,
+            let mainUi = this.ui as IBW_Detail,
                 subUi = this.subUi[0] as IBW_Detail,
                 subId = subUi ? {itemId : subUi.itemId} : {},
                 mainId = {itemId : mainUi.itemId},
@@ -216,7 +215,7 @@ export class GroupTabsPage extends BasicPage {
                 buttons : [...this.imports.btnParaGet(this.subBtn.main, this.imports.editModule.main, mainUi.itemId),
                     ...(subUi && this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId) || [])]
             });
-            d.append(this.dom, wrapper);
+
             d.append(this.wrapper, this.imports.footer);
 
             if (this.ui.supportRfid) {
@@ -262,9 +261,9 @@ export class GroupTabsPage extends BasicPage {
             });
         },
         editSet(edit : EditModule, value : obj){
-            this.imports.isOnSet = false;
+            this.isOnSet = false;
             edit.set(value);
-            this.imports.isOnSet = true;
+            this.isOnSet = true;
         },
         /**
          * 获取itemId对应的相关字段，
