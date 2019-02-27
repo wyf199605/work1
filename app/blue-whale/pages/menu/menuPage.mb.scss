@@ -1,5 +1,5 @@
-.menuPage{
-  .mui-grid-view.mui-grid-9{
+.menuPage {
+  .mui-grid-view.mui-grid-9 {
     background-color: #fff;
   }
   .mui-table-view-cell .mui-badge {
@@ -9,17 +9,18 @@
     left: auto;
     min-width: 18px;
   }
-  .mui-grid-view .mui-table-view-cell:not([data-favid=""]){
+  .mui-grid-view .mui-table-view-cell:not([data-favid=""]) {
     background-color: #feffd9;
   }
-  .mui-grid-view.mui-grid-9 .mui-media  .mui-icon, .mui-grid-view.mui-grid-9 .mui-media  .mui-icon-extra{
+  .mui-grid-view.mui-grid-9 .mui-media .mui-icon,
+  .mui-grid-view.mui-grid-9 .mui-media .mui-icon-extra {
     font-size: 1.3em;
   }
-  .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body{
+  .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body {
     font-size: 12px;
   }
-  header{
-    .icon-sousuo{
+  header {
+    .icon-sousuo {
       float: right;
       left: 9px;
     }

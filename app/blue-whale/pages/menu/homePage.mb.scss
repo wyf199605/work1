@@ -1,27 +1,24 @@
-.homePage{
-  ul{
+.homePage {
+  ul {
     padding: 0;
     margin: 0;
   }
-  //.tab-pane:not([data-index="0"]) {
-  //  -webkit-overflow-scrolling: auto;
-  //}
-  .conFavGroup{
-    border-left:5px solid #007aff;
-    margin-left:5px;
-    margin-top:5px;
-    color:inherit;
-    padding-left:6px;
-    font-size:16px;
-    font-weight:bold
+  .conFavGroup {
+    border-left: 5px solid #007aff;
+    margin-left: 5px;
+    margin-top: 5px;
+    color: inherit;
+    padding-left: 6px;
+    font-size: 16px;
+    font-weight: bold
   }
-  .editBook{
+  .editBook {
     float: right;
     font-size: 26px;
     padding-right: 1%;
     margin-top: -3px;
   }
-  .mui-grid-view.mui-grid-9{
+  .mui-grid-view.mui-grid-9 {
     background-color: #fff;
     border-top-color: #e3e3e3;
     border-bottom: 1px solid #e3e3e3;
@@ -33,16 +30,17 @@
     -webkit-transform: translateY(-50%);
     transform: translateY(-50%);
   }
-  .mui-grid-view.mui-grid-9 .mui-media  .mui-icon, .mui-grid-view.mui-grid-9 .mui-media  .mui-icon-extra{
+  .mui-grid-view.mui-grid-9 .mui-media .mui-icon,
+  .mui-grid-view.mui-grid-9 .mui-media .mui-icon-extra {
     font-size: 1.3em;
   }
-  .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body{
+  .mui-table-view.mui-grid-view .mui-table-view-cell .mui-media-body {
     font-size: 12px;
   }
-  .mui-table-view-cell .mui-navigate-right>.mui-badge{
+  .mui-table-view-cell .mui-navigate-right>.mui-badge {
     right: 40px;
   }
-  .mui-table-view-cell:active{
+  .mui-table-view-cell:active {
     background-color: #eee;
   }
   .nodata {
@@ -54,11 +52,11 @@
   //  line-height: 1;
   //  color: #999;
   //}
-  .slide-panel-wrapper{
+  .slide-panel-wrapper {
     height: 100%;
     position: relative;
     padding-top: 40px;
-    .nav-tabs{
+    .nav-tabs {
       text-align: center;
       position: absolute;
       border-bottom: 1px solid #ccc;
@@ -71,26 +69,24 @@
       display: flex;
       -webkit-justify-content: space-around;
       justify-content: space-around;
-
-      &>li{
+      &>li {
         display: inline-block;
         padding: 0 18px;
       }
     }
-    .slide-tab-wrapper{
+    .slide-tab-wrapper {
       position: relative;
       top: 0;
       height: 100%;
-      .tab-pane{
+      .tab-pane {
         overflow: auto;
         height: 100%;
         -webkit-overflow-scrolling: auto;
       }
     }
   }
-
-  .home-load-error{
-    &::before{
+  .home-load-error {
+    &::before {
       font-family: "appcommon" !important;
       font-style: normal;
       -webkit-font-smoothing: antialiased;
@@ -105,7 +101,7 @@
       transform: scale(1);
       background-color: transparent;
     }
-    &::after{
+    &::after {
       content: "数据加载错误, 点击重新加载";
       display: block;
       font-size: 20px;
@@ -118,9 +114,8 @@
       background-color: transparent;
     }
   }
-
-  .no-data{
-    &::after{
+  .no-data {
+    &::after {
       font-family: "appcommon" !important;
       font-style: normal;
       -webkit-font-smoothing: antialiased;
@@ -137,7 +132,7 @@
       background-color: transparent!important;
     }
   }
-  .mui-bar.mui-bar-nav{
+  .mui-bar.mui-bar-nav {
     background-color: #fff;
     //background: rgba(241,244,250,1);
     //background: -moz-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
@@ -146,9 +141,9 @@
     //background: -o-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
     //background: -ms-radial-gradient(center, ellipse cover, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
     //background: radial-gradient(ellipse at center, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=1 );
+    // filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=1);
   }
-  .mui-content .mui-slider{
+  .mui-content .mui-slider {
     background-color: #fff;
     //background: rgba(241,244,250,1);
     //background: -moz-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
@@ -157,54 +152,52 @@
     //background: -o-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
     //background: -ms-linear-gradient(top, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
     //background: linear-gradient(to bottom, rgba(241,244,250,1) 0%, rgba(180,212,245,1) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=0 );
+    // filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#f1f4fa', endColorstr='#b4d4f5', GradientType=0);
   }
-  .mui-grid-view.mui-grid-9{
+  .mui-grid-view.mui-grid-9 {
     background: transparent;
     border-bottom: none;
   }
-  #favorites .mui-grid-view.mui-grid-9{
+  #favorites .mui-grid-view.mui-grid-9 {
     padding-top: 14px;
   }
-
-  .mui-slider-indicator.mui-segmented-control{
+  .mui-slider-indicator.mui-segmented-control {
     background: transparent;
   }
-  .mui-pull-bottom-tips{
+  .mui-pull-bottom-tips {
     background: none;
     margin-top: -1px;
   }
-  #favorites .mui-grid-view .mui-table-view-cell[data-favid=""]{
+  #favorites .mui-grid-view .mui-table-view-cell[data-favid=""] {
     display: none;
   }
-  .badge-red{
+  .badge-red {
     top: 5%!important;
     background: red;
   }
-  .badge-none{
+  .badge-none {
     display: none;
   }
-  header{
-    .icon-sousuo{
+  header {
+    .icon-sousuo {
       float: right;
       left: 9px;
     }
   }
-
 }
 
 // 新的首页菜单样式
-.homePage, .menuPage {
-
-  .mui-table-view{
+.homePage,
+.menuPage {
+  .mui-table-view {
     border-top: none!important;
-    .mui-table-view-cell{
+    .mui-table-view-cell {
       padding: 0;
       border: none;
       overflow: visible;
-      &>a{
+      &>a {
         padding: 8px 0 0!important;
-        &>span{
+        &>span {
           display: block;
           margin: 0 auto;
           height: 46px;
@@ -214,7 +207,6 @@
           background-color: #4ea6f1;
           text-align: center;
           line-height: 46px;
-
           &.green {
             background-color: $green;
           }
@@ -234,21 +226,20 @@
             background-color: $grey;
           }
         }
-        .mui-media-body{
+        .mui-media-body {
           height: auto;
         }
       }
-
     }
   }
 }
 
-#favSheet{
-  .mui-table-view-cell{
+#favSheet {
+  .mui-table-view-cell {
     position: relative;
     overflow: hidden;
     padding: 11px 15px;
-    a{
+    a {
       padding: inherit!important;
     }
   }
