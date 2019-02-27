@@ -366,6 +366,10 @@ export class EditModule {
                     ]
                 });
             } else {
+                let values = {
+                    true: (p.field && p.field.atrrs && p.field.atrrs.trueExpr) || true,
+                    false: (p.field && p.field.atrrs && p.field.atrrs.falseExpr) || false,
+                };
                 if (sys.isMb) {
                     return new Toggle({
                         container: p.dom,
@@ -374,19 +378,13 @@ export class EditModule {
                             check: 'on',
                             noCheck: 'off'
                         },
-                        values: {
-                            true: (p.field.atrrs && p.field.atrrs.trueExpr) || true,
-                            false: (p.field.atrrs && p.field.atrrs.falseExpr) || false,
-                        }
+                        values: values
                     });
                 } else {
                     return new CheckBox({
                         container: p.dom,
                         custom: p.field,
-                        values: {
-                            true: (p.field.atrrs && p.field.atrrs.trueExpr) || true,
-                            false: (p.field.atrrs && p.field.atrrs.falseExpr) || false,
-                        }
+                        values: values
                     });
                 }
             }
