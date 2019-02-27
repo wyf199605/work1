@@ -9,6 +9,7 @@ import { SlideTab } from "../../../global/components/ui/slideTab/slideTab";
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { ShellAction } from "../../../global/action/ShellAction";
 import BasicPage from "../../pages/basicPage";
+import { Collect } from "../../module/collect/collect.mb";
 export = class homePage extends BasicPage{
 
     protected slideTab: SlideTab;
@@ -74,7 +75,7 @@ export = class homePage extends BasicPage{
             editBook.addEventListener('click', function () {
                 let txt_edit = document.querySelector('.txt_edit') as HTMLInputElement,
                     pValue = p.innerHTML;
-                popoverToggle(MENU_FAVORITE.favEditDom);
+               // popoverToggle(MENU_FAVORITE.favEditDom);
                 // mui().popover('toggle');
                 //                               txt_edit.focus();
                 if (this.dataset.edit === "") {
@@ -83,13 +84,20 @@ export = class homePage extends BasicPage{
                 else {
                     txt_edit.value = pValue;
                 }
-                MENU_FAVORITE.valueObtain = pValue;
-                MENU_FAVORITE.parentNode = this;
-                if (MENU_FAVORITE.funcNumber) {
-                    MENU_FAVORITE.toggleConGroup();
-                    MENU_FAVORITE.toggleEditGroup();
-                    MENU_FAVORITE.funcNumber = false;
-                }
+                new Collect().editCollectGroup(pValue,this);
+                // let test = true;
+                // if (test) {
+                //     new Collect().editCollectGroup(pValue,this);
+                // } else {
+                //     popoverToggle(MENU_FAVORITE.favEditDom);
+                //     MENU_FAVORITE.valueObtain = pValue;
+                //     MENU_FAVORITE.parentNode = this;
+                //     if (MENU_FAVORITE.funcNumber) {
+                //         MENU_FAVORITE.toggleConGroup();
+                //         MENU_FAVORITE.toggleEditGroup();
+                //         MENU_FAVORITE.funcNumber = false;
+                //     }
+                // }
 
             });
         });
@@ -121,7 +129,7 @@ export = class homePage extends BasicPage{
             tabParent: content,
             panelParent: content,
             onChange: (index) => {
-                console.log(index);
+               
             },
             isPulldownRefresh: isAndroid4 ? -1 : 0,
             tabs: [
@@ -147,12 +155,10 @@ export = class homePage extends BasicPage{
                                 BwRule.Ajax.fetch(CONF.ajaxUrl.menuFavor, {
                                     data: ajaxData
                                 }).then(({ response }) => {
-                                    console.log(response);
                                     resolve({
                                         data: response.data || [],
                                         total: response.head ? (response.head.totalNum || 0) : 0,
                                     });
-                                    // fav.appendChild(fragment);
                                 })
                             })
                         }
@@ -189,7 +195,6 @@ export = class homePage extends BasicPage{
                 }
             ],
         });
-
         // 添加样式
         let tabWrapper = this.slideTab.tabContainer,
             panelWrapper = this.slideTab.panelContainer;
@@ -210,10 +215,20 @@ export = class homePage extends BasicPage{
 
         d.on(d.query('.tab-pane[data-index="1"]', panelWrapper), 'press', 'li.mui-table-view-cell', function () {
             let type = 'cancel';
-            MENU_FAVORITE.toggleFavSheet(this, type, {
-                favid: this.dataset.favid,
-                link: this.dataset.href
-            });
+            let test = true;
+            if (test) {
+                new Collect().addCollect({
+                    dom: this,
+                    favid: this.dataset.favid,
+                    link: this.dataset.href
+                });
+            } else {
+                MENU_FAVORITE.toggleFavSheet(this, type, {
+                    favid: this.dataset.favid,
+                    link: this.dataset.href
+                });
+            }
+
         });
 
         this.getHomeData(para);
