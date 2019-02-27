@@ -48,7 +48,8 @@ export class DataManager {
 
     private _serverMode: boolean;
     get serverMode(): boolean {
-        return this._serverMode;
+        debugger;
+        return this._serverMode && this.total > this.pageSize;
     }
 
     constructor(para: IDataManagerPara) {
@@ -112,7 +113,7 @@ export class DataManager {
                         } else {
                             this.dataAdd(data);
                         }
-
+                        this._total = total;
                         resolve(total);
                     })
                     .catch(() => {
@@ -197,8 +198,12 @@ export class DataManager {
         this.pagination && (this.pagination.disabled = frag);
     }
 
+    protected _total = -1;
     set total(num: number){
         this.pagination && (this.pagination.total = num);
+    }
+    get total(){
+        return this._total;
     }
 
     protected _ajaxData:obj = {};

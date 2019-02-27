@@ -197,6 +197,7 @@ export class BwTableModule extends Component {
             page: this.ui.multPage === 0 ? null : {
                 size: 50,
                 options: [50, 100, 500],
+                isPulldownRefresh: true
             },
             menu: [this.isPivot ? null : {
                 colMulti: 1,
