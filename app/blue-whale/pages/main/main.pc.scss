@@ -1,28 +1,26 @@
 @import "../../style/helpers/parameters";
 @import "navHeader.pc";
 @import "sideBar.pc";
-
-
 #app {
-  .app-content{
+  .app-content {
     position: relative;
     top: $nav-height;
     margin-left: 190px;
     overflow: hidden;
-      .page-container{
-        overflow-y: auto;
-        overflow-x: hidden;
-        height: calc(100vh - 40px);
-        &.iframe{
-          background: #fff;
-          & > iframe{
-            border: none;
-            height: calc(100% - 5px);
-          }
+    .page-container {
+      overflow-y: auto;
+      overflow-x: hidden;
+      height: calc(100vh - 40px);
+      &.iframe {
+        background: #fff;
+        &>iframe {
+          border: none;
+          height: calc(100% - 5px);
         }
       }
     }
-  & > footer {
+  }
+  &>footer {
     background-color: $color-background-default;
     border-top: 1px solid #c8c7cc;
     bottom: 0;
@@ -33,41 +31,39 @@
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
     z-index: 1088;
-
     .footer-inner {
       padding: 0 20px;
       line-height: 50px;
     }
   }
-
   @media (min-width: 992px) {
-    & > footer{
+    &>footer {
       margin-left: 200px;
     }
-    &.app-sidebar-closed > footer {
+    &.app-sidebar-closed>footer {
       margin-left: 70px;
     }
-    &.app-sidebar-closed  .app-content{
+    &.app-sidebar-closed .app-content {
       margin-left: 0;
     }
-    &.app-footer-fixed > footer {
+    &.app-footer-fixed>footer {
       position: fixed;
     }
   }
   @media (max-width: 991px) {
-    & > footer {
+    &>footer {
       z-index: 0;
     }
-    &.app-slide-off, &.app-offsidebar-open {
-      & > footer{
+    &.app-slide-off,
+    &.app-offsidebar-open {
+      &>footer {
         display: none;
       }
     }
-    .app-content{
+    .app-content {
       padding-left: 0;
       margin-left: 0;
     }
-
   }
 }
 
@@ -104,8 +100,7 @@
   min-height: 100%;
   overflow-x: hidden;
   position: relative!important;
-
-  &>div>div{
+  &>div>div {
     padding-top: 5px;
     padding-bottom: 15px;
   }
@@ -116,8 +111,8 @@
     width: 100% !important;
     margin-left: 0;
   }
-
-  .app-navbar-fixed .main-content:before, .app-navbar-fixed .main-content:after {
+  .app-navbar-fixed .main-content:before,
+  .app-navbar-fixed .main-content:after {
     content: " ";
     display: table;
   }
@@ -128,6 +123,7 @@
     margin-left: 0;
   }
 }
+
 @media (max-width: 991px) {
   .main-content {
     padding-top: 0;
@@ -135,14 +131,12 @@
   }
 }
 
-.app-sidebar-closed{
-  .sidebar.app-aside{
+.app-sidebar-closed {
+  .sidebar.app-aside {
     display: none;
   }
 }
 
-.home-self-menu{
+.home-self-menu {
   z-index: 2000;
 }
-
-

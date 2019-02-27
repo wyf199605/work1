@@ -1,0 +1,46 @@
+.collect_modal-body {
+  .collect {
+    display: flex;
+    align-items: center;
+    .select_group {
+      margin-bottom: 0px;
+      background: #f7f7f7 url(http://127.0.0.1:8080/img/img/sort_desc.png) no-repeat fixed right center;
+    }
+    .inp_name {
+      margin-bottom: 0px;
+    }
+    .add_i {
+      font-size: 30px;
+      vertical-align: sub!important;
+    }
+    .add_i:before {
+      content: '\e468';
+      display: inline-block;
+      transform: rotate(45deg);
+    }
+    .add_s {
+      font-size: 30px;
+      vertical-align: sub!important;
+    }
+    .add_s:before {
+      content: '\e468';
+    }
+  }
+  .collect_input {
+    display: none;
+  }
+  .group_btn button {
+    margin-right: 15px;
+  }
+  .group_btn button:last-child {
+    margin-right: 0px;
+  }
+  .del_btn {
+    background-color: #DD524D;
+    color: white;
+  }
+  .rename_btn {
+    background-color: #007AFF;
+    color: white;
+  }
+}
