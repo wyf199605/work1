@@ -48,7 +48,6 @@ export class DataManager {
 
     private _serverMode: boolean;
     get serverMode(): boolean {
-        debugger;
         return this._serverMode && this.total > this.pageSize;
     }
 
@@ -93,7 +92,7 @@ export class DataManager {
             once = ajax && ajax.once,
             fun = ajax && ajax.fun,
             pageSize = once ? -1 : this.pageSize,
-            timeout = tools.isNotEmpty(ajax.timeout) ? (ajax.timeout > 0 ? ajax.timeout*1000 : 30000) : 30000,
+            timeout = tools.isNotEmpty(ajax && ajax.timeout) ? (ajax.timeout > 0 ? ajax.timeout * 1000 : 30000) : 30000,
             isSetData = isRefresh || this._serverMode && !this.isMb; // 是否重新设置本地数据
 
         let promise: Promise<number>;
