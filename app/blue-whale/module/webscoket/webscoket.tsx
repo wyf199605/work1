@@ -41,7 +41,7 @@ export = class webscoket {
             start: function () {
                 this.serverTimeoutObj = setInterval(function () {
                     if ( self.ws.readyState == 1) {
-                        console.log("连接状态，发送消息保持连接");
+                        // console.log("连接状态，发送消息保持连接");
                         self.ws.send(JSON.stringify({reqType:"ping"}));
                         heartCheck.reset().start();    // 如果获取到消息，说明连接是正常的，重置心跳检测
                     }
@@ -52,17 +52,17 @@ export = class webscoket {
         // console.info("创建websocket对象成功.");
         self.ws.onopen = () => {
             heartCheck.reset().start();
-            console.info("websocket 连接打开.");
+            // console.info("websocket 连接打开.");
         };
         self.ws.onmessage = (r) => {
             heartCheck.reset().start();
             self.onMessage(r);
         };
         self.ws.onerror = function(e){
-            console.warn("websocket出现异常."+e);
+            // console.warn("websocket出现异常."+e);
         };
         self.ws.onclose = function(e){
-            console.info("websocket连接关闭.");
+            // console.info("websocket连接关闭.");
         };
         document.addEventListener("netchange", () => {
             // console.log('检查网络变化.');
@@ -91,10 +91,7 @@ export = class webscoket {
     }
 
     private onMessage(r){
-        //console.info("后台返回的数据:"+r.data);
-
         let data = JSON.parse(r.data),type = data.respType,self = this;
-        console.log(data);
         switch(type){
             case "notify" :
                 let dataMap = data.data.dataMap[0];

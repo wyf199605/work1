@@ -119,7 +119,7 @@ namespace BW {
                         }
                     }));
                 },
-                opentab: function (userid = '', accessToken = '', noShow?: string[]) {
+                opentab: function (userid = '', accessToken = '', noShow?: string[], data = {}) {
                     let ja = [
                         {icon: "home", name: "首页", url: CONF.url.home, show: 0},
                         {icon: "contacts", name: "通讯", url: CONF.url.contact, show: 0},
@@ -138,6 +138,9 @@ namespace BW {
                         userid,
                         accessToken
                     };
+                    for(let key in data){
+                        dict[key] = data[key];
+                    }
                     self.handle('opentab', JSON.stringify(dict));
                 },
                 logout: function (url: string = CONF.url.index) {

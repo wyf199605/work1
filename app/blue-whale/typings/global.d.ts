@@ -83,10 +83,11 @@ interface IBW_Table {
     layout?: IBW_Layout; // 移动化
     subTableAddr?: R_ReqAddr; //移动化
     layoutDrill?: R_ReqAddr; // 下钻地址
-    offline? : boolean // 是否为离线
-    uniqueFlag? : string // 唯一值，离线调用shell接口使用
+    offline?: boolean // 是否为离线
+    uniqueFlag?: string // 唯一值，离线调用shell接口使用
     fields?: R_Field [];//面板中元素列表  input date 下拉等
-    supportRfid? : string // 是否开启rfid
+    supportRfid?: string // 是否开启rfid
+    rowLinkField?: string;
     operationType?: {
         autoEdit: boolean;
         editType: 'current' | 'modal';
@@ -94,12 +95,12 @@ interface IBW_Table {
     exhibitionType: {
         showType: 'tab' | 'panel'
     },
-    correlation : {  // 替换累加
+    correlation: {  // 替换累加
         numberName: string,
-        default : string, // 默认选中值 2、3时候隐藏
-        caption : string, // 如数量
+        default: string, // 默认选中值 2、3时候隐藏
+        caption: string, // 如数量
     },
-
+    timeOut?: number; // 超时时间
 }
 
 interface IBW_Detail {
@@ -116,8 +117,8 @@ interface IBW_Detail {
     scannableTime?: number;
     subTableList?: IBW_Slave[];
     tableAddr?: IBW_TableAddr;    // 表格编辑数据
-    keyField : string; // 主键
-    offline? : boolean // 是否为离线
+    keyField: string; // 主键
+    offline?: boolean // 是否为离线
     operationType?: {
         autoEdit: boolean;
         editType: 'current' | 'modal';
@@ -125,15 +126,19 @@ interface IBW_Detail {
     exhibitionType: {
         showType: 'tab' | 'panel-on' | 'panel-off' | 'panel-one'
     };
-    correlation : {  // 替换累加
-        numberName: string,
-        default : string, // 默认选中值 2、3时候隐藏
-        caption : string, // 如数量
-    },
+    correlation: IBW_Detail_Cor,
     aggrList: R_Aggr[]
-    uniqueFlag : string
-    itemId? : string
-    supportRfid? : string // 是否开启rfid
+    uniqueFlag: string
+    itemId?: string
+    supportRfid?: string // 是否开启rfid
+    timeOut?: number; // 超时时间
+}
+
+interface IBW_Detail_Cor {
+    numberName: string,
+    default: string, // 默认选中值 2、3时候隐藏
+    caption: string, // 如数量
+    itemId?: string
 }
 
 interface IBW_SubTableAddr {
@@ -141,8 +146,8 @@ interface IBW_SubTableAddr {
     multPage: number;
     uiAddr: R_ReqAddr;
     fields?: R_Field [];//面板中元素列表  input date 下拉等
-    keyField? : string
-    itemId? : string
+    keyField?: string
+    itemId?: string
 }
 
 type IBW_Slave = IBW_Detail | IBW_Table | IBW_SubTableAddr;

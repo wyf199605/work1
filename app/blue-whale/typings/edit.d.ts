@@ -3,6 +3,7 @@ interface ComInitP {
     field: R_Field;
     data?: obj;
     onSet?: (val: any) => void;
+    isOffLine?: boolean;
     onExtra?(data: obj, relateCols: string[], isEmptyClear?, isValid?, isReplace?): void
 }
 

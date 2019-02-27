@@ -21,6 +21,7 @@ interface IUploadImages extends IBwUploaderPara {
     unique?: string;
     field?: R_Field; //字段
     pageData?: obj;//页面数据
+    autoUpload?: boolean;
 }
 
 export class UploadImages extends FormCom {
@@ -36,15 +37,38 @@ export class UploadImages extends FormCom {
             case '26':
             case '27': {
                 let uniArr = value.reverse().filter(v => v.isError === false),
-                    uni = uniArr.filter(u => tools.isNotEmpty(u.unique))[0];
-                finalVal = tools.isNotEmpty(uni) ? uni.unique : '';
+                    uni = uniArr[0];
+
+                if(tools.isEmpty(uni)){
+                    break;
+                }
+                if(uni.isOnLine){
+                    finalVal = uni.unique || '';
+                    break;
+                }
+                if(uni.localUrl){
+                    if(~uni.localUrl.indexOf(',')){
+                        finalVal = uni.localUrl.split(',')[1];
+                    }else{
+                        finalVal = uni.localUrl;
+                    }
+                    break;
+                }
             }
                 break;
             case '28': {
                 let trueVal = [];
                 value.forEach(v => {
-                    if (!v.isError && tools.isNotEmpty(v.unique)) {
-                        trueVal.push(v.unique)
+                    if (!v.isError) {
+                        if(v.isOnLine){
+                            tools.isNotEmpty(v.unique) && trueVal.push(v.unique)
+                        }else if(v.localUrl){
+                            if(~v.localUrl.indexOf(',')){
+                                trueVal.push(v.localUrl.split(',')[1]);
+                            }else{
+                                trueVal.push(v.localUrl);
+                            }
+                        }
                     }
                 });
                 finalVal = trueVal.join(',')
@@ -129,9 +153,11 @@ export class UploadImages extends FormCom {
     }
 
     public uploader: BwUploader = null;
+    protected autoUpload: boolean;
 
     constructor(private para: IUploadImages) {
         super(para);
+        this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
         this.pageData = para.pageData || {};
         this.imgType = para.field.dataType || para.field.atrrs.dataType;
         this.value = para.unique;
@@ -206,30 +232,60 @@ export class UploadImages extends FormCom {
         });
         this.uploader = uploader;
         // 文件加入到上传队列，开始上传
-        this.uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: File[]) => {
+        this.uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: CustomFile[]) => {
             if (files.length > 0) {
-
-                //开始上传
-                switch (this.imgType) {
-                    case '20':
-                    case '26':
-                    case '27': {
-                        if (files.length = 1) {
-                            this.uploader.upload();
-                        } else {
-                            Modal.alert('请只上传一张图片!');
+                if(this.autoUpload){
+                    //开始上传
+                    switch (this.imgType) {
+                        case '20':
+                        case '26':
+                        case '27': {
+                            if (files.length = 1) {
+                                this.uploader.upload();
+                            } else {
+                                Modal.alert('请只上传一张图片!');
+                            }
                         }
+                            break;
+                        case '28': {
+                            this.uploader.upload();
+                        }
+                            break;
                     }
-                        break;
-                    case '28': {
-                        this.uploader.upload();
-                    }
-                        break;
+                }else{
+
+                    Promise.all(files.map((file) => {
+                        return new Promise((resolve, reject) => {
+                            let reader = new FileReader();
+                            reader.readAsDataURL(file.blob);
+                            reader.onload = function (e) {
+                                resolve(reader.result);
+                            };
+                            reader.onerror = (e) => {
+                                reject(e)
+                            }
+                        });
+                    })).then((strs: string[]) => {
+                        let isMulti = this.imgType === '28';
+                        let imgs: IImage[] = strs.map((str) => ({
+                            localUrl: str,
+                            isOnLine: false,
+                            isError: false,
+                            unique: '',
+                        }));
+                        if(isMulti){
+                            imgs = [...this.imgs, ...imgs];
+                        }
+                        this.imgs = imgs;
+                    }).catch((e) => {
+                        console.log(e);
+                        Modal.alert('图片获取失败');
+                    })
                 }
             }
         });
         // 上传错误时调用
-        uploader.on(BwUploader.EVT_UPLOAD_ERROR, (file) => {
+        uploader.on(BwUploader.EVT_UPLOAD_ERROR, (file: CustomFile) => {
             let imageObj: IImage = {
                 unique: '',
                 isError: true,
@@ -299,7 +355,7 @@ export class UploadImages extends FormCom {
             item.disabled = this.disabled;
         });
 
-        this.onSet && this.onSet(this._value);
+        this.onSet && this.onSet(this.value);
     }
 
     refreshIndex() {
@@ -351,6 +407,7 @@ export class UploadImages extends FormCom {
             this._listItems.splice(i, 1);
             this._imgs.splice(i, 1);
             this.refreshIndex();
+            this.onSet && this.onSet(this.value);
         }
     }
 

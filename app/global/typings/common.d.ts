@@ -171,7 +171,7 @@ interface winOpen {
 interface R_Button extends Btn {
     actionAddr: R_ReqAddr;// 操作提交后台地址
     buttonType: number;// 按钮类型: 新增、删除、修改、查询
-    subType: string;// 对应哪种 方法
+    subType: string;// 对应哪种 方法  import时候默认不提示
     openType: string;// 打开方式 见UiConst
     hintBeforeAction?: boolean;// 操作前是否提示信息
     refresh: number;// 是否刷新

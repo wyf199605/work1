@@ -77,7 +77,8 @@ export class DetailModule extends AGroupTabItem {
     editInit(inputInit: (field: R_Field, item: DetailItem) => FormCom){
         this.items.forEach((item) => {
             item.edit.init(inputInit);
-        })
+        });
+        this.clickEvent.off();
     }
 
     static EVT_RENDERED = '__event_detail_rendered__';
@@ -97,7 +98,8 @@ export class DetailModule extends AGroupTabItem {
             ajax: {
                 auto: false,
                 resetCurrent: false, // 是否重新设置当前页
-                fun: ({pageSize, current, sort, custom}) => {
+                timeout:this.ui.timeOut,
+                fun: ({pageSize, current, sort, custom,timeout}) => {
                     return new Promise((resolve, reject) => {
                         let ui = this.ui,
                             url = tools.isNotEmpty(ui.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(ui.dataAddr) : '';
@@ -109,7 +111,7 @@ export class DetailModule extends AGroupTabItem {
                                         pageparams: '{"index"=' + current + ', "size"=' + pageSize + ',"total"=1}'
                                     }, custom),
                                     needGps: ui.dataAddr.needGps,
-                                    timeout: 30000,
+                                    timeout: timeout,
                                     loading: {
                                         msg: '数据加载中...',
                                         disableEl: this.wrapper
@@ -453,9 +455,7 @@ export class DetailModule extends AGroupTabItem {
                         BwRule.getFileInfo(field.name, cellData).then(({response}) => {
                             response = JSON.parse(response);
                             if (response && response.dataArr && response.dataArr[0]) {
-                                let data = response.dataArr[0],
-                                    filename = data.filename;
-                                text = filename;
+                                text = response.dataArr[0].filename;
                             }
                             resolve({text, classes, bgColor, color, data});
                         }).catch(() => {

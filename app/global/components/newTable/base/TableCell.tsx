@@ -409,6 +409,7 @@ export class TableDataCell extends TableCell {
                 });
             }
         }).then(() => {
+            this.rendering = false;
             !this.table.isWrapLine && this.initMoreBtn();
 
             if(this.table.editing){
@@ -536,19 +537,23 @@ export class TableDataCell extends TableCell {
 
                         this.input.destroy();
                         this.input = null;
+                        this.triggerEditCancel();
                     }
                     // let isChange = this.row.cells.some((cell: TableDataCell) => cell.isEdited);
 
-                    this.renderPromise.finally(() => {
-                        let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
-                        tools.isNotEmpty(events) && events.forEach((fun) => {
-                            typeof fun === 'function' && fun(this);
-                        });
-                    });
                 }
             }
         }
 
+    }
+
+    triggerEditCancel(){
+        this.renderPromise.finally(() => {
+            let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
+            tools.isNotEmpty(events) && events.forEach((fun) => {
+                typeof fun === 'function' && fun(this);
+            });
+        });
     }
 }
 

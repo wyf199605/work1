@@ -282,7 +282,8 @@ export class BwTableModule extends Component {
                     ajaxData,
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
                     auto: !this.hasQuery,    // 有查询器时不自动查询
-                    fun: ({pageSize, current, sort, custom}) => {
+                    timeout:this.ui.timeOut,
+                    fun: ({pageSize, current, sort, custom,timeout}) => {
                         let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
                         pageSize = pageSize === -1 ? 3000 : pageSize;
 
@@ -295,7 +296,7 @@ export class BwTableModule extends Component {
                             // 获取表格数据
                             this.ajax.fetch(url, {
                                 needGps: ui.dataAddr.needGps,
-                                timeout: 30000,
+                                timeout: timeout,
                                 data: Object.assign({
                                     pageparams: `{"index"=${current + 1},"size"=${pageSize},"total"=1}`,
                                     pagesortparams
@@ -377,6 +378,7 @@ export class BwTableModule extends Component {
         // rfid初始化 (lyq)
         this.rfidColInit();
         this.reportCaptionInit();
+        this.trClickInit();
 
         tools.isFunction(this._ftableReadyHandler) && this._ftableReadyHandler();
         this.isFtableReady = true;
@@ -627,7 +629,36 @@ export class BwTableModule extends Component {
         }
     }
 
-    protected tdClickHandler(field: R_Field, rowData: obj) {
+    trClickInit(){
+        let ui = this.ui,
+            field = ui.cols,
+            ftable = this.ftable,
+            rowLinkField = ui.rowLinkField,
+            selector = '.section-inner-wrapper:not(.pseudo-table) tbody tr td:not(.cell-link):not(.cell-img)';
+
+        if(!rowLinkField){
+            return
+        }
+
+        ftable.click.add(selector, (e: MouseEvent) => {
+            if (e.altKey || e.ctrlKey || e.shiftKey) {
+                return;
+            }
+
+            let target = e.target as HTMLTableCellElement,
+                rowIndex = parseInt(target.parentElement.dataset.index),
+                row = ftable.rowGet(rowIndex),
+                rowData = row.data;
+            for(let field of this.cols){
+                if(field.name === rowLinkField){
+                    this.tdClickHandler(field, rowData, true);
+                    break;
+                }
+            }
+        })
+    }
+
+    protected tdClickHandler(field: R_Field, rowData: obj, empty = false) {
         // 判断是否为link
         if (!field) {
             return;
@@ -635,7 +666,7 @@ export class BwTableModule extends Component {
         let link = field.link,
             dataType = field.dataType || (field.atrrs && field.atrrs.dataType);
 
-        if (tools.isEmpty(rowData[field.name])) {
+        if (!empty && tools.isEmpty(rowData[field.name])) {
             return;
         }
 
@@ -884,7 +915,6 @@ export class BwTableModule extends Component {
                         onFinish: () => {
                             return new Promise<any>((resolve) => {
                                 BwRule.isNewImg(dataType) && (cell.data = images.filter((a) => !!a).join(','));
-                                console.log(cell.data);
                                 resolve();
                             });
                         }
@@ -1786,7 +1816,6 @@ export class BwTableModule extends Component {
                         {md5Arr.map(md5 => imgCreate(BwRule.fileUrlGet(md5, fieldName), md5, updatable))}
                     </div>}
                 </div>;
-
             modal = new Modal({
                 header: '图片查看',
                 top: 80,
@@ -1960,7 +1989,8 @@ export class BwTableModule extends Component {
                     uploadType: isSign ? 'sign' : 'file',
                     nameField,
                     loading: {
-                        msg: '图片上传中...'
+                        msg: '图片上传中...',
+                        disableEl:document.body
                     },
                     thumbField: thumbField,
                     container: imgContainer,
@@ -2050,7 +2080,7 @@ export class BwTableModule extends Component {
                 // debugger;
                 imgs.forEach((img, i) => {
                     img.src = md5s[i] ? imgUrlCreate(md5s[i]) : imgsUrl[i];
-                    // img.src = md5s[i] ? this.imgUrlCreate(md5s[i]) : tools.url.addObj(urls[i], {'_': Date.now()});
+                    // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
                 })
             }
             currentRowIndex = rowIndex;
@@ -2456,6 +2486,7 @@ export class BwTableModule extends Component {
 
 
         let cancel = () => {
+            closeCellInput();
             this.ftable && this.ftable.editorCancel();
             validList = [];
         };
