@@ -226,7 +226,7 @@ export class OfflineBtn {
                 if(result.success){
                     Modal.toast('删除表（' + itemId + ')成功');
                     let {edit} = this.imports.getKeyField(itemId);
-                    edit.set({});
+                    this.imports.editSet(edit, {});
                 }else {
                     Modal.toast('删除表（' + itemId + ')失败');
                 }
