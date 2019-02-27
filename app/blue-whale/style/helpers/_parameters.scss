@@ -3,35 +3,25 @@
 // Colors
 $color-default: #007AFF;
 $color-primary: #666;
-
 //Colors font
 $color-default-font: #8e8e93;
-
 //Background Color
 $color-background-default: #ffffff;
-
 // Borders
 $border-default: solid 1px #f1f1f1;
 $border-light: solid 1px rgba(0, 0, 0, .05);
-
 // Font Size
 $font-size-default: 13px;
 $font-size-min: 12px;
 $font-size-max: 14px;
-
 // Spacing
-
 // Media queries
-$desktop: 800px; $tablet: 600px; $mobile: 480px;
-
+$desktop: 800px;
+$tablet: 600px;
+$mobile: 480px;
 // Font Family
-
-
 // Animation
-
-
 // Skin
-
 //nav-header
 $nav-height: 40px;
 $nav-receive-height: $nav-height - 1px;
@@ -41,4 +31,3 @@ $nav-padding1: round($nav-height/10*3-5);
 $nav-padding2: round($nav-height/5*2-11);
 $nav-calc: calc(100vh - #{$nav-height});
 $spinner-font: $nav-height/2;
-

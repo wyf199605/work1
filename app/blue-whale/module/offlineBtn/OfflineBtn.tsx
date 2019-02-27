@@ -75,18 +75,28 @@ export class OfflineBtn {
                 this.deleteData();
                 break;
             case 'import-scanning-single':
-                this.scan(0);
+                this.scan();
                 break;
             case 'import-scanning-many':
-                this.scan(1);
+                this.manyScan();
                 break;
             default:
                 Modal.alert('未知类型openType');
         }
     }
 
-    private scan(type: number) {
-        Shell.inventory.openScanCode(type, (result) => {
+    private manyScan(){
+        Shell.inventory.openScanCode(1, () => {},(result) => {
+            if (result.success) {
+                this.imports.query(result.data);
+            } else {
+                Modal.toast(result.msg);
+            }
+        });
+    }
+
+    private scan() {
+        Shell.inventory.openScanCode(0, (result) => {
             if (result.success) {
                 this.imports.query(result.data);
             } else {
@@ -94,8 +104,6 @@ export class OfflineBtn {
             }
         })
     }
-
-
 
     private downData() {
         let loading = new Loading({
@@ -233,11 +241,12 @@ export class OfflineBtn {
 
     }
 
+    private selectBox : SelectInputMb;
     private setting() {
         let body = <div className="barcode-setting"/>,
             operation = this.btn.operation,
-            data = operation && operation.content,
-            selectBox = new SelectInputMb({
+            data = operation && operation.content;
+            this.selectBox = new SelectInputMb({
                 container: body,
                 data,
             });
@@ -247,10 +256,10 @@ export class OfflineBtn {
                 index = i;
             }
         });
-        selectBox.set(value);
+        this.selectBox.set(value);
 
         this.modalInit('设置', body, () => {
-            let value = selectBox.get();
+            let value = this.selectBox.get();
             if (value !== this.imports.getOption()) {
                 this.imports.setCount(value);
                 this.imports.setText('');
@@ -301,8 +310,12 @@ export class OfflineBtn {
 
     destroy() {
         this.btnGroup && this.btnGroup.destroy();
-        this.btnGroup = null;
         this.modal && this.modal.destroy();
+        this.selectBox && this.selectBox.destroy();
+        this.selectBox = null;
+        this.btnGroup = null;
         this.modal = null;
+        this.btn = null;
+        this.para = null;
     }
 }

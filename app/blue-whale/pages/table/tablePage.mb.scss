@@ -1,16 +1,14 @@
 .tablePage {
-  & > header.mui-bar-nav.mui-bar {
-    [data-action="indexCol"]{
+  &>header.mui-bar-nav.mui-bar {
+    [data-action="indexCol"] {
       margin-left: 0;
     }
-
     h1.mui-title {
       [data-action="down-menu"] {
         display: inline-block;
         position: absolute;
         width: 30px;
         height: 44px;
-
         &:before {
           content: ' ';
           border-bottom: 1px solid #000;
@@ -25,12 +23,10 @@
           left: 8px;
         }
       }
-
     }
   }
-
-  .text-input{
-    &>input{
+  .text-input {
+    &>input {
       margin-bottom: 0;
     }
   }
@@ -44,16 +40,14 @@
     font-weight: bold;
     white-space: nowrap;
   }
-
   header [data-action="indexCol"] .select-box {
-
     display: block;
     .check-span {
       padding-left: 35px;
       line-height: 25px;
       font-size: 20px;
-
-      &:before, &:after {
+      &:before,
+      &:after {
         font-family: "iconfont";
         background: transparent;
         border: none;
@@ -62,59 +56,53 @@
         //line-height: 25px;
         //text-align: center;
       }
-      &:before{
+      &:before {
         content: "\e652";
       }
-
     }
-    input:checked + .check-span {
-      &:before{
+    input:checked+.check-span {
+      &:before {
         content: "\e63e";
       }
-
       &:after {
         content: "";
       }
     }
   }
-
   .mui-content {
-    height: 100% ;
+    height: 100%;
   }
-  .mobileTableWrapper{
+  .mobileTableWrapper {
     min-height: 100%;
   }
   .search-input {
     border-bottom: 1px solid #ccc;
     margin-bottom: 1px;
   }
-
   .nodata {
     width: 100vw;
   }
   .mui-indexed-list-search {
     border-bottom: 1px #ddd solid;
   }
-
   .mui-indexed-list-search input {
     border-radius: 0;
     margin: 0;
     background-color: #fafafa;
   }
-
   .mui-indexed-list-search.mui-search:before {
     margin-top: -10px;
   }
-
-  .table-module-wrapper footer, .sub-btn-wrapper.mui-bar-footer{
-    .edit-toggle{
+  .table-module-wrapper footer,
+  .sub-btn-wrapper.mui-bar-footer {
+    .edit-toggle {
       vertical-align: top;
       display: inline-block;
       width: 45px;
       height: 35px;
-      text-align:center;
+      text-align: center;
       border-right: 1px solid #e1e1e1;
-      .check-span{;
+      .check-span {
         line-height: 30px;
         height: 30px;
         padding: 0 15px;
@@ -123,25 +111,30 @@
         background: #007aff;
         border-radius: 50%;
         margin-top: 5px;
-        &:before,&:after{
+        &:before,
+        &:after {
           font-family: "iconfont";
           background: transparent;
           border: none;
         }
-        &:before{
-          content:"\e627";
+        &:before {
+          content: "\e627";
+          display: inline-block;
+          margin-left: 5px;
         }
       }
-      input:checked + .check-span{
-        &:before{
-          content:"\e75d";
+      input:checked+.check-span {
+        &:before {
+          content: "\e75d";
+          display: inline-block;
+          margin-left: 5px;
         }
-        &:after{
-           content:"";
-         }
+        &:after {
+          content: "";
+        }
       }
     }
-    .all-btn{
+    .all-btn {
       display: inline-block;
       width: calc(100% - 38px);
     }
