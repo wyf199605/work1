@@ -198,7 +198,7 @@ export class GroupTabsPage extends BasicPage {
                         isOffLine : true,
                         data: sub.getData(),
                         onSet: () => {
-                            this.imports.operateTable(subUi.uniqueFlag, subUi.itemId, field, subUi.keyField, this.imports.editModule.sub);
+                            this.imports.operateTable(mainUi.uniqueFlag, subUi.itemId, field, subUi.keyField, this.imports.editModule.sub);
                         }
                     })
                 })
@@ -228,10 +228,11 @@ export class GroupTabsPage extends BasicPage {
         /**
          * 数据查询
          * @param value
+         * @param option
          */
-        query : (value: string) => {
+        query : (value: string, option? : string) => {
             let keyField = this.ui.keyField;
-            Shell.imports.operateScanTable(value, this.imports.getOption(), this.ui.uniqueFlag, {
+            Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag, {
                 [keyField]: this.imports.editModule.main.get(keyField)[keyField]
             }, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                 if (result.success) {
@@ -350,16 +351,7 @@ export class GroupTabsPage extends BasicPage {
             let name = field.name;
 
             console.log(edit.get(name));
-            // Modal.alert({
-            //     0: uniqueFlag,
-            //     1: itemId,
-            //     2: {
-            //         [name] : edit.get(name)[name]
-            //     },
-            //     3:{
-            //         [keyField] : edit.get(keyField)[keyField]
-            //     }
-            // });
+
 
             Shell.imports.operateTable(uniqueFlag,itemId,{
                 [name] : edit.get(name)[name]
