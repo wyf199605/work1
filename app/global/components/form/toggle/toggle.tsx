@@ -148,22 +148,15 @@ export class Toggle extends FormCom{
         };
     })();
 
-    get(): any {
-        return this.checked;
-    }
-
-    set(flag: number | boolean = 0): void {
-        this.checked = !!flag;
-        if (typeof this.onSet === 'function') {
-            this.onSet(!!flag);
-        }
-    }
-
     protected _checked:boolean = false;
     set checked(e: boolean){
         if(this._checked !== e && tools.isNotEmpty(e)){
             this._checked = e;
             this.change();
+
+            if (typeof this.onSet === 'function') {
+                this.onSet(this._checked);
+            }
         }
     }
     get checked(){
@@ -233,14 +226,19 @@ export class Toggle extends FormCom{
 
     }
 
+    get(): any {
+        return this.value;
+    }
+
+    set(flag: number | boolean = 0): void {
+        this.value = flag
+    }
+
     get value() {
         return this.checked;
     }
 
     set value(flag: number | boolean ){
         this.checked = !!flag;
-        if (typeof this.onSet === 'function') {
-            this.onSet(!!flag);
-        }
     }
 }

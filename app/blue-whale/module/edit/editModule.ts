@@ -124,6 +124,7 @@ export class EditModule {
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
                 pageData: this.defaultData,
                 field: p.field,
+                autoUpload: !p.isOffLine
                 // unique: tools.isNotEmpty(p.data) ?  p.data[p.field.name] : ''
             })
         },
@@ -366,7 +367,14 @@ export class EditModule {
                 });
             } else {
                 if (sys.isMb) {
-                    return new Toggle({container: p.dom, custom: p.field});
+                    return new Toggle({
+                        container: p.dom,
+                        custom: p.field,
+                        customStyle: {
+                            check: 'on',
+                            noCheck: 'off'
+                        }
+                    });
                 } else {
                     return new CheckBox({container: p.dom, custom: p.field});
                 }
@@ -430,8 +438,12 @@ export class EditModule {
 
         let com = this.comTnit[type](initP);
         this.assign.init(com, initP);
-        if(com instanceof FormCom){
-            com.onSet = initP.onSet
+        if(initP && com instanceof FormCom){
+            let onSet = com.onSet;
+            com.onSet = (val) => {
+                onSet && onSet(val);
+                initP.onSet && initP.onSet(val);
+            }
         }
         return com;
     };

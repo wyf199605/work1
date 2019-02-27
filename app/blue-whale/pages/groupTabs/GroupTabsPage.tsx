@@ -12,11 +12,10 @@ import AGroupTabItem = BW.AGroupTabItem;
 import {TextInput} from "../../../global/components/form/text/text";
 import {EditModule} from "../../module/edit/editModule";
 import {DetailItem} from "../../module/detailModule/detailItem";
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
-import {InputBox} from "../../../global/components/general/inputBox/InputBox";
-import {Button, IButton} from "../../../global/components/general/button/Button";
+import {IButton} from "../../../global/components/general/button/Button";
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
 import Shell = G.Shell;
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -58,7 +57,7 @@ export class GroupTabsPage extends BasicPage {
         // 当前子表数组为空，则为表格/单页，否则为主从
         this.styleType = (this.ui.exhibitionType && this.ui.exhibitionType.showType) || 'tab';
 
-        if(this.styleType === 'panel-one'){
+        if(['panel-one', 'panel-none'].includes(this.styleType)){
             this.styleType = 'panel-on';
             this.isInventory = true;
             this.dom.classList.add('inventory');
@@ -83,13 +82,14 @@ export class GroupTabsPage extends BasicPage {
 
     protected isInventory = false;
     imports = {
-        countText : null as TextInput,
+        countText : null as TextInput, // 累加替换输入框
         countTextEl : null as HTMLElement,
-        amountEl : null as HTMLElement,
+        amountEl : null as HTMLElement, // 数量的值容器
         aggrEl : null as HTMLElement,
         btnWrapper : null as HTMLElement,
         footer : null as HTMLElement,
-        aggrArr : [] as R_Aggr[],
+        fieldName : 'amountcount', // 标识值，从壳获取count时候需要用到
+        aggrArr : [] as R_Aggr[], // 主表+子表的aggrList合并的字段， TODO 非两条数据情况可能样式需要调整，添加滚动条
         editModule : {
             main: null as EditModule,
             sub: null as EditModule
@@ -102,17 +102,23 @@ export class GroupTabsPage extends BasicPage {
             let wrapper = <div/>,
                 mainUi = this.ui as IBW_Detail,
                 subUi = this.subUi[0] as IBW_Detail,
-                corArr = [Object.assign({itemId : mainUi.itemId}, mainUi.correlation),
-                    Object.assign({itemId : subUi.itemId}, subUi.correlation)],
+                subId = subUi ? {itemId : subUi.itemId} : {},
+                mainId = {itemId : mainUi.itemId},
+                corArr = [Object.assign({}, mainId, mainUi.correlation),
+                    subUi && Object.assign({}, subId,  subUi.correlation) || []] as IBW_Detail_Cor[],
                 main = this.main,
                 sub = this.subs[0];
-                this.imports.aggrArr = [...mainUi.aggrList.map(list => Object.assign({itemId : mainUi.itemId}, list)),
-                    ...subUi.aggrList.map(list => Object.assign({itemId : subUi.itemId}, list))];
+                this.imports.aggrArr = [...(mainUi && mainUi.aggrList && mainUi.aggrList.map(list => Object.assign({},mainId, list)) || []),
+                    ...(subUi && subUi.aggrList && subUi.aggrList.map(list => Object.assign({}, subId, list)) || [])];
 
                 this.imports.footer = <div class="inventory-footer">
                     <div className="barcode-count">
                         <div className="barcode-row count">
+                            {/* corArr虽为数组，这里仅支持一条数据，主表或子表合并起来有且有一条数据 */}
                             {corArr.map(cor => {
+                                if(cor.default === '1'){
+                                    d.classAdd(this.dom, 'hide-count');
+                                }
                                 if(cor.numberName){
                                     return <div>
                                         <div className="barcode-cell">
@@ -131,8 +137,8 @@ export class GroupTabsPage extends BasicPage {
                         </div>
                         {this.imports.aggrEl = <div className="barcode-row aggr-list">
                             {this.imports.aggrArr.map((list,i) => {
-                                return <div data-item={list.itemId} className={"barcode-cell " + (i/2 === 0 ? 'barcode-right' : '')}>
-                                    <div>{list.caption + ':'}</div>
+                                return <div data-item={list.itemId} className={"barcode-cell " + (i%2 !== 0 ? 'barcode-right' : '')}>
+                                    <div>{list.caption + '：'}</div>
                                     <div data-name={list.fieldName}/>
                                 </div>
                             })}
@@ -141,11 +147,15 @@ export class GroupTabsPage extends BasicPage {
                     {this.imports.btnWrapper = <div class="inventory-group-btn"/>}
                 </div>;
 
+            if(!subUi){
+                d.classAdd(this.dom, 'no-sub');
+            }
+
             if(!this.imports.editModule.main){
                 this.imports.editModule = {
                     main: new EditModule({
                         auto: false,
-                        type: 'table',
+                        type: 'detail',
                         fields: mainUi.fields.map((field) => {
                             return {
                                 dom: null,
@@ -153,11 +163,11 @@ export class GroupTabsPage extends BasicPage {
                             }
                         }),
                         container: main.container,
-                        cols: mainUi.fields
+                        cols: mainUi.fields,
                     }),
-                    sub:  new EditModule({
+                    sub: subUi && new EditModule({
                         auto: false,
-                        type: 'table',
+                        type: 'detail',
                         fields: subUi.fields.map((field) => {
                             return {
                                 dom: null,
@@ -174,19 +184,21 @@ export class GroupTabsPage extends BasicPage {
                         dom: item.contentEl,
                         field: field,
                         data: main.getData(),
+                        isOffLine : true,
                         onSet: () => {
-                            this.imports.operateTable(mainUi.uniqueFlag, mainUi.itemId, field.name, mainUi.keyField, this.imports.editModule.main);
+                            this.imports.operateTable(mainUi.uniqueFlag, mainUi.itemId, field, mainUi.keyField, this.imports.editModule.main);
                         }
                     })
                 });
 
-                sub.editInit((field: R_Field, item: DetailItem) => {
+                subUi && sub.editInit((field: R_Field, item: DetailItem) => {
                     return this.imports.editModule.sub.init(field.name, {
                         dom: item.contentEl,
                         field: field,
+                        isOffLine : true,
                         data: sub.getData(),
                         onSet: () => {
-                            this.imports.operateTable(subUi.uniqueFlag, subUi.itemId, field.name, subUi.keyField, this.imports.editModule.sub);
+                            this.imports.operateTable(subUi.uniqueFlag, subUi.itemId, field, subUi.keyField, this.imports.editModule.sub);
                         }
                     })
                 })
@@ -195,10 +207,133 @@ export class GroupTabsPage extends BasicPage {
             new BtnGroup({
                 container : this.imports.btnWrapper,
                 buttons : [...this.imports.btnParaGet(this.subBtn.main, this.imports.editModule.main, mainUi.itemId),
-                    ...this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId)]
+                    ...(subUi && this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId) || [])]
             });
             d.append(this.dom, wrapper);
             d.append(this.wrapper, this.imports.footer);
+
+            if (this.ui.supportRfid) {
+                this.imports.openRfid();
+            }
+        },
+        openRfid() {
+            Shell.inventory.scan2dOn((result) => {
+                if(result.success){
+                    this.query(result.data);
+                } else {
+                    Modal.toast(result.msg);
+                }
+            });
+        },
+        /**
+         * 数据查询
+         * @param value
+         */
+        query : (value: string) => {
+            let keyField = this.ui.keyField;
+            Shell.imports.operateScanTable(value, this.imports.getOption(), this.ui.uniqueFlag, {
+                [keyField]: this.imports.editModule.main.get(keyField)[keyField]
+            }, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
+                if (result.success) {
+                    let data = result.data;
+                    data.forEach(obj => {
+                        let item = obj.itemid;
+                        if (!item) {
+                            return
+                        }
+                        let edit : EditModule;
+                        if(item !== this.ui.itemId){
+                            edit = this.imports.editModule.sub
+                        }else {
+                            edit = this.imports.editModule.main
+                        }
+                        // TODO
+                        let data = obj.array[0];
+                        delete data.PICTURE_28;
+
+                        edit.set(obj.array[0]);
+                        this.imports.setText('');
+
+                        this.imports.getCountData();
+                        this.imports.getAggrData(item);
+                    });
+                } else {
+                    Modal.toast(result.msg);
+                }
+            });
+        },
+        /**
+         * 获取itemId对应的相关字段，
+         * keyField：主键
+         * value：主键对应的值
+         * ui：当前表ui
+         * edit：当前表对应的详情模块
+         * key：主键字段
+         * @param itemId
+         */
+        getKeyField : (itemId: string): { keyField: string, value: obj, ui: IBW_Slave_Ui, edit: EditModule, key: R_Field } => {
+            let keyField, ui, edit, value, key;
+
+            if (itemId !== this.ui.itemId) {
+                ui = this.imports.subUiGet() as IBW_Slave_Ui;
+                key = ui.fields.map(e => {
+                    if (e.name === ui.keyField) {
+                        return e
+                    }
+                })[0];
+                keyField = key.name;
+                value = this.imports.editModule.sub.get(keyField);
+                edit = this.imports.editModule.sub;
+            } else {
+                ui = this.imports.mainUiGet() as IBW_Slave_Ui;
+                key = ui.fields.map(e => {
+                    if (e.name === ui.keyField) {
+                        return e
+                    }
+                })[0];
+                keyField = key.name;
+                value = this.imports.editModule.main.get(keyField);
+                edit = this.imports.editModule.main;
+            }
+            return {keyField, value, ui, edit, key}
+        },
+        /**
+         * 请求shell查询count数据
+         */
+        getCountData : () => {
+            let data = this.imports.getTextPara(),
+                id = data.itemId,
+                {value} = this.imports.getKeyField(id);
+
+
+            Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
+                if (result.success) {
+                    this.imports.setAmount(result.data[this.imports.fieldName]);
+                } else {
+                    Modal.toast(result.msg);
+                }
+            });
+        },
+        /**
+         * 从壳获取新的aggr值
+         * @param item
+         */
+        getAggrData : (item: string) => {
+            this.imports.aggrArr.forEach(aggr => {
+                let id = aggr.itemId,
+                    {value} = this.imports.getKeyField(id);
+
+                if (item !== id) {
+                    return;
+                }
+                Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression, value, result => {
+                    if (result.success) {
+                        this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
+                    } else {
+                        Modal.toast(result.msg);
+                    }
+                });
+            })
         },
         btnParaGet : (btns : R_Button[], data : obj, itemId : string) : IButton[] => {
             return btns.map(btn => {
@@ -213,13 +348,34 @@ export class GroupTabsPage extends BasicPage {
                 };
             })
         },
-        operateTable : (uniqueFlag : string, itemId : string, field : string, keyField : string, edit : EditModule) => {
-            console.log(field,edit.get(field), edit.get(field)[field]);
+        /**
+         * 调用shell保存修改的字段值
+         * @param uniqueFlag 唯一键
+         * @param itemId 当前对应id
+         * @param field 当前字段
+         * @param keyField 当前表对应主键
+         * @param edit 当前编辑内容模块
+         */
+        operateTable : (uniqueFlag : string, itemId : string, field : R_Field, keyField : string, edit : EditModule) => {
+            let name = field.name;
+
+            console.log(edit.get(name));
+            // Modal.alert({
+            //     0: uniqueFlag,
+            //     1: itemId,
+            //     2: {
+            //         [name] : edit.get(name)[name]
+            //     },
+            //     3:{
+            //         [keyField] : edit.get(keyField)[keyField]
+            //     }
+            // });
+
             Shell.imports.operateTable(uniqueFlag,itemId,{
-                [field] : edit.get(field)[field]
+                [name] : edit.get(name)[name]
             },{
                 [keyField] : edit.get(keyField)[keyField]
-            }, 'updata', result => {
+            }, 'updata', () => {
 
             });
         },
@@ -229,10 +385,19 @@ export class GroupTabsPage extends BasicPage {
         subUiGet : () : IBW_Slave => {
             return this.subUi[0]
         },
+        /**
+         * 获取累加替换值
+         */
         getNum(): string{
             return this.countText.get();
         },
-        getTextPara() : obj{
+        getOption(): string{
+            return this.countTextEl.dataset.value;
+        },
+        /**
+         * 拼接查询count（累加替换）数据时候需要的参数
+         */
+        getTextPara() : {itemId : string, name : string, expression : string}{
           let data = this.countTextEl.dataset;
           return {
               itemId : data.item,
@@ -260,6 +425,12 @@ export class GroupTabsPage extends BasicPage {
             }
             el.dataset.value = option;
         },
+        /**
+         * 设置aggrList的值
+         * @param value
+         * @param itemId 指定id
+         * @param keyField 修改的字段
+         */
         setAggr : (value : string, itemId : string, keyField : string) => {
             let el = d.query(`[data-item=${itemId}] [data-name=${keyField}]`, this.imports.aggrEl);
             if(el){
@@ -286,7 +457,7 @@ export class GroupTabsPage extends BasicPage {
                 if (isSelected) {
                     let panel = this.tab as Panel;
                     if(this.styleType === 'panel-off'){
-                        panel.panelItems.forEach((panelItem) => {
+                        tools.isNotEmpty(panel) && panel.panelItems.forEach((panelItem) => {
                             if(panelItem !== item){
                                 panelItem.selected = false;
                             }
@@ -353,8 +524,13 @@ export class GroupTabsPage extends BasicPage {
                 if(this.styleType === 'panel-on' && this.tab instanceof Panel){
                     this.tab.toggleAll(true);
                 }
+
+                if(!tools.isNotEmptyArray(this.subUi)){
+                    this.imports.init();
+                }
                 this.main.onRender = null;
-            }
+            };
+
         } else {
             let sub = this.subs[index - 1];
             if (tools.isNotEmpty(sub)) {
@@ -367,6 +543,7 @@ export class GroupTabsPage extends BasicPage {
                 }
                 return;
             }
+
             this.getUi(this.subUi[index - 1]).then((ui) => {
                 this.subUi[index - 1] = ui;
                 if(this.isInventory){

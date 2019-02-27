@@ -215,6 +215,7 @@ namespace G{
                 return ShellBase.handler('labelPrint', {quantity, driveCode, image}, back);
             }
         };
+
         const inventory = {
             getDeviceAddress(){
                 return ShellBase.handler('getDeviceAddress',function (res) {
@@ -493,7 +494,7 @@ namespace G{
          * 离线操作
          */
         const imports = {
-            //条码扫码下载的
+            //条码扫码下载
             downloadbarcode(uniqueFlag:string, downUrl:string, defaultUpload:boolean, back:IShellEventHandler){
                 return ShellBase.handler('downloadbarcode',{uniqueFlag,downUrl,defaultUpload},back,null,false);
             },
@@ -508,6 +509,15 @@ namespace G{
             calculateData(uniqueFlag: string, itemid: string, fieldname: string, expression: string, back:IShellEventHandler){
                 return ShellBase.handler('calculateData',{uniqueFlag, itemid, fieldname, expression},back);
             },
+            /**
+             *
+             * @param uniqueFlag 唯一值
+             * @param itemid 对应表
+             * @param params 要操作的字段
+             * @param where 条件如：{keyField ：value} 主键及值
+             * @param type “delete”，“updata”，“query”分别 表示删改查
+             * @param back
+             */
             operateTable(uniqueFlag:string, itemid:string, params:obj, where:obj, type: string,back:IShellEventHandler){
                 return ShellBase.handler('operateTable',{uniqueFlag, itemid, params, where,type},back)
             },
@@ -559,9 +569,27 @@ namespace G{
             }
         };
 
+        const openSystem = (path: string, param: string, back: IShellEventHandler) => {
+            return ShellBase.handler('openExe', {
+                path: path,
+                params: param
+            }, back)
+        };
+
         return {
 
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, imports, image
+            base,
+            finger,
+            file,
+            casio,
+            sqlite,
+            printer,
+            rfid,
+            inventory,
+            startUp,
+            imports,
+            image,
+            openSystem
         }
     })(window, document);
 
@@ -610,7 +638,7 @@ namespace G{
             delete events[action];
         }
         function windowsHandler<IShellHandler>(action:string, data, back?, infor?, isAutoOff = true) {
-            if(typeof AppShell === 'object' || (tools.os.ios && typeof webkit.messageHandlers.AppShell === 'object')) {
+            if(typeof AppShell === 'object' || (tools.os.ios && 'webkit' in window && typeof webkit.messageHandlers.AppShell === 'object')) {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
 
                 if(tools.isEmpty(back) && tools.isEmpty(infor)){

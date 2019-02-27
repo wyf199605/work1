@@ -41,9 +41,9 @@ export = class webscoket {
             },
             start: function () {
                 this.serverTimeoutObj = setInterval(function () {
-                    if (self.ws.readyState == 1) {
-                        console.log("连接状态，发送消息保持连接");
-                        self.ws.send(JSON.stringify({ reqType: "ping" }));
+                    if ( self.ws.readyState == 1) {
+                        // console.log("连接状态，发送消息保持连接");
+                        self.ws.send(JSON.stringify({reqType:"ping"}));
                         heartCheck.reset().start();    // 如果获取到消息，说明连接是正常的，重置心跳检测
                     }
                 }, this.timeout)
@@ -60,11 +60,11 @@ export = class webscoket {
             heartCheck.reset().start();
             self.onMessage(r);
         };
-        self.ws.onerror = function (e) {
-            console.warn("websocket出现异常." + e);
+        self.ws.onerror = function(e){
+            // console.warn("websocket出现异常."+e);
         };
-        self.ws.onclose = function (e) {
-            console.info("websocket连接关闭.");
+        self.ws.onclose = function(e){
+            // console.info("websocket连接关闭.");
         };
         document.addEventListener("netchange", () => {
             // console.log('检查网络变化.');
@@ -92,13 +92,10 @@ export = class webscoket {
         });
     }
 
-    private onMessage(r) {
-        //console.info("后台返回的数据:"+r.data);
-
-        let data = JSON.parse(r.data), type = data.respType, self = this;
-        console.log(data);
-        switch (type) {
-            case "notify":
+    private onMessage(r){
+        let data = JSON.parse(r.data),type = data.respType,self = this;
+        switch(type){
+            case "notify" :
                 let dataMap = data.data.dataMap[0];
                 //let messageAction = new MessageAction();
                 let message = new Message({

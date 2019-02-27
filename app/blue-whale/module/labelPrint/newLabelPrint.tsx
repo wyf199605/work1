@@ -208,10 +208,13 @@ export class NewLabelPrint {
         })
     }
 
-    getPrintData(): Promise<{ tmp: ILabelPrintResponse, data: obj[] }> {
-        // 获取模板数据与需打印的表格数据
+    protected tmpResults: obj[] = [];
+    // 获取模板数据与需打印的表格数据
+    getPrintData(): Promise<{ tmp: ILabelPrintResponse, data: obj[], title: string }> {
         let index = this.printModal.getData('labelType'),
+            tmpPromise: Promise<any>,
             dataAddr = this.ui.printList[index].dataAddr,
+            caption = this.ui.printList[index].caption,
             templateLink = this.ui.printList[index].templateLink,
             isAll = !!this.printModal.getData('printData')[0],
             tableData = isAll ? this.getSelectedData() : this.getData(), //获取选中数据或全部数据
@@ -230,9 +233,20 @@ export class NewLabelPrint {
             }
             ajaxData = JSON.stringify(ajaxData);
         }
+
+        // 判断tmp模板是否已请求
+        if(index in this.tmpResults){
+            tmpPromise = Promise.resolve(this.tmpResults[index]);
+        }else{
+            tmpPromise = BwRule.Ajax.fetch(CONF.siteUrl + templateLink.dataAddr).then((result) => {
+                this.tmpResults[index] = result;
+                return result;
+            });
+        }
+
         return new Promise((resolve, reject) => {
             Promise.all([
-                BwRule.Ajax.fetch(CONF.siteUrl + templateLink.dataAddr),
+                tmpPromise,
                 BwRule.Ajax.fetch(CONF.siteUrl + addr, {
                     data2url: dataAddr.varType !== 3,
                     // type: 'GET',
@@ -243,7 +257,8 @@ export class NewLabelPrint {
                     data = tools.keysVal(response2, 'data') as obj[];
                 resolve({
                     tmp: tmp,
-                    data: data
+                    data: data,
+                    title: caption
                 })
             }).catch((e) => {
                 reject(e);
@@ -252,10 +267,10 @@ export class NewLabelPrint {
     }
 
     // 根据模板数据与表格数据，获取全部生成的svg标签
-    getLabels(): Promise<{svgList: SvgDraw[], wrapper: HTMLElement, tmp: ILabelPrintResponse, data: obj[]}>{
+    getLabels(): Promise<{svgList: SvgDraw[], wrapper: HTMLElement, tmp: ILabelPrintResponse, data: obj[], title: string}>{
         return new Promise((resolve, reject) => {
 
-            this.getPrintData().then(({tmp, data}) => {
+            this.getPrintData().then(({tmp, data, title}) => {
                 let svgList: SvgDraw[] = [],
                     wrapper = <div/>;
 
@@ -279,11 +294,13 @@ export class NewLabelPrint {
                     d.append(wrapper, svg.svgEl);
                 });
 
+
                 resolve({
                     svgList,
                     wrapper,
                     tmp,
-                    data
+                    data,
+                    title
                 })
             }).catch((e) => {
                 reject(e);
@@ -293,13 +310,19 @@ export class NewLabelPrint {
 
     print(){
         return new Promise((resolve, reject) => {
+            if(!('BlueWhaleShell' in window || 'AppShell' in window)){
+                Modal.alert('无法连接到打印机');
+                resolve();
+                return ;
+            }
+
             this.getLabels().then(({svgList, tmp, data}) => {
                 let copies = this.printModal.getData('copies'),
                     promises: Promise<string>[] = [];
 
                 for(let svg of svgList){
 
-                    promises.push(new Promise<string>((resolve, reject) => {
+                    promises.push(new Promise<string>((resolve) => {
                         // svg.svgEl.style.transformOrigin = '0 0';
                         // svg.svgEl.style.transform = 'scale(10)';
 
@@ -328,6 +351,7 @@ export class NewLabelPrint {
                                     cxt.fillRect(0, 0, printCanvas.width, printCanvas.height);
                                     cxt.drawImage(canvas, 0, 0);
                                     d.remove(canvas);
+                                    canvas = null;
                                     // new Modal({
                                     //     body: printCanvas,
                                     //     header: '展示',
@@ -335,7 +359,17 @@ export class NewLabelPrint {
                                     let dataURL = printCanvas.toDataURL("image/png", 1),
                                         url = dataURL.replace('data:image/png;base64,', '');
                                     // console.log(dataURL);
-                                    resolve(url);
+                                    if ('BlueWhaleShell' in window) {
+                                        BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + url + '"}');
+                                    } else if ('AppShell' in window) {
+                                        let code = this.printModal.getData('printer');
+                                        Shell.printer.labelPrint(copies, code, url, () => {
+                                            Modal.toast('打印成功');
+                                        })
+                                    } else {
+                                        Modal.alert('无法连接到打印机');
+                                    }
+                                    resolve();
                                 }
                             });
                         });
@@ -343,21 +377,7 @@ export class NewLabelPrint {
 
                 }
 
-                Promise.all(promises).then((urls) => {
-                    if ('BlueWhaleShell' in window) {
-                        urls.forEach((url) => {
-                            BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + url + '"}');
-                        });
-                    } else if ('AppShell' in window) {
-                        let code = this.printModal.getData('printer');
-                        urls.forEach((url) => {
-                            Shell.printer.labelPrint(copies, code, url, () => {
-                                Modal.toast('打印成功');
-                            })
-                        });
-                    } else {
-                        Modal.alert('无法连接到打印机');
-                    }
+                Promise.all(promises).then(() => {
                     resolve();
                 }).catch((e) => {
                     reject(e);
@@ -370,7 +390,7 @@ export class NewLabelPrint {
 
     // 预览方法
     preview(){
-        return this.getLabels().then(({svgList, tmp, data}) => {
+        return this.getLabels().then(({svgList, tmp, data, title}) => {
             let settingData: obj = this.printModal.data,
                 dpi = getDpi() / 10, // 分辨率，宽高边距均为毫米，乘分辨率便为像素
                 width = settingData.width * dpi,
@@ -489,9 +509,11 @@ export class NewLabelPrint {
 
             inputBox.addItem(prevBtn);
             inputBox.addItem(nextBtn);
+
+            title = title ? '预览 - ' + title : '预览';
             let modal = new Modal({
                 header: {
-                    title: '预览',
+                    title: title,
                     isFullScreen: true
                 },
                 container: this.container,
@@ -564,7 +586,7 @@ export class NewLabelPrint {
                         x: item.leftPos * scale,
                         y: item.topPos * scale,
                         data: NewLabelPrint.getTmpData(item.codeData, data)
-                    })
+                    });
                 } else {
                     // 其余为条形码
                     svg.drawBarCode({
@@ -576,7 +598,7 @@ export class NewLabelPrint {
                         barCodeWidth: 1,
                         align: NewLabelPrint.alignTag[item.alignment], // 对齐方式
                         format: NewLabelPrint.codeType[type] // 条形码类型
-                    })
+                    });
                 }
 
             }

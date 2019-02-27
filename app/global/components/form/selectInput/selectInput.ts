@@ -22,7 +22,7 @@ export interface ISelectInputPara extends ITextInputBasicPara {
 }
 
 export class SelectInput extends TextInput {
-    onSet: (val) => {};
+    onSet: (item: ListItem, index?: number) => {};
 
     private defaultVal: any;
 
@@ -77,11 +77,11 @@ export class SelectInput extends TextInput {
                 this.input.value = '';
                 this.defaultVal = '';
             }
-            this.para.onSet && this.para.onSet(selected, index);
+            this.onSet && this.onSet(selected, index);
 
         }): (dropPara['onSelect'] =(item, index) => {
             this.input.value = this.para.useInputVal ? item.value.toString() : item.text;
-            this.para.onSet && this.para.onSet(item, index);
+            this.onSet && this.onSet(item, index);
         });
 
         this.dropdown = new DropDown(dropPara);

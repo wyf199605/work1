@@ -115,10 +115,10 @@ export class BasicCheckBox extends FormCom {
 
     protected _value: any;
     get value(){
-        return this._value;
+        return this.get();
     }
     set value(value: any){
-        this._value = value;
+        this.set(value);
     }
 
     protected _clickArea: 'all' | 'box';

@@ -42,7 +42,7 @@ export class PickModule extends TextInput {
 
         super({
             icons: ['iconfont icon-arrow-down'],
-            readonly : true,
+            readonly : false,
             iconHandle: () => {
                 this.pickInit();
             },

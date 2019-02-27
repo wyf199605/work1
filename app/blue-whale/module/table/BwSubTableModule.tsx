@@ -17,7 +17,9 @@ export class BwSubTableModule extends BwTableModule{
 
     protected getBaseFtablePara(){
         let data = super.getBaseFtablePara();
-        data.btn = null;
+        if(tools.isMb){
+            data.btn = null;
+        }
         return data;
     }
 
