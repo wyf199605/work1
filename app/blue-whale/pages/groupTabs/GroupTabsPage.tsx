@@ -236,29 +236,20 @@ export class GroupTabsPage extends BasicPage {
             }, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                 if (result.success) {
                     let data = result.data;
-                    data.forEach(obj => {
+                    Array.isArray(data) && data.forEach(obj => {
                         let item = obj.itemid;
                         if (!item) {
                             return
                         }
-                        let edit : EditModule;
-                        if(item !== this.ui.itemId){
-                            edit = this.imports.editModule.sub
-                        }else {
-                            edit = this.imports.editModule.main
-                        }
-                        // // TODO
-                        // let data = obj.array[0];
-                        // delete data.PICTURE_28;
 
+                        let {edit} = this.imports.getKeyField(item);
                         edit.set(obj.array[0]);
                         this.imports.setText('');
-
                         this.imports.getCountData();
                         this.imports.getAggrData(item);
                     });
                 } else {
-                    Modal.toast(result.msg);
+                    Modal.toast('查询失败，请确认已下载数据');
                 }
             });
         },
