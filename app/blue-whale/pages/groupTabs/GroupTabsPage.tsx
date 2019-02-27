@@ -88,8 +88,8 @@ export class GroupTabsPage extends BasicPage {
         aggrEl : null as HTMLElement,
         btnWrapper : null as HTMLElement,
         footer : null as HTMLElement,
-        fieldName : 'amountcount', // 标识值，从壳获取count时候需要用到
-        aggrArr : [] as R_Aggr[], // 主表+子表的aggrList合并的字段， TODO 非两条数据情况可能样式需要调整，添加滚动条
+        fieldName : 'amountcount', // 标识值，从壳获取count时候需壳以改字段作为属性键值
+        aggrArr : [] as R_Aggr[], // 主表+子表的aggrList合并的字段
         editModule : {
             main: null as EditModule,
             sub: null as EditModule
@@ -247,9 +247,9 @@ export class GroupTabsPage extends BasicPage {
                         }else {
                             edit = this.imports.editModule.main
                         }
-                        // TODO
-                        let data = obj.array[0];
-                        delete data.PICTURE_28;
+                        // // TODO
+                        // let data = obj.array[0];
+                        // delete data.PICTURE_28;
 
                         edit.set(obj.array[0]);
                         this.imports.setText('');
@@ -304,7 +304,6 @@ export class GroupTabsPage extends BasicPage {
             let data = this.imports.getTextPara(),
                 id = data.itemId,
                 {value} = this.imports.getKeyField(id);
-
 
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
                 if (result.success) {
