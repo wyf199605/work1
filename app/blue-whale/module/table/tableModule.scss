@@ -25,7 +25,11 @@
 
     .sub-tab-navbar{
       padding-right: 90px;
-      min-height: 42px;
+      min-height: 30px;
+      height: 30px;
+      &>li>a{
+        padding: 4px 15px;
+      }
     }
     .sub-icon-navbar{
       position: absolute;
@@ -35,7 +39,7 @@
 
       .sub-icon {
         float: right;
-        line-height: 42px;
+        line-height: 30px;
         margin-right: 10px;
         cursor: pointer;
       }
