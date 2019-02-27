@@ -19,7 +19,6 @@ export class CollectPage extends BasicPage {
     let wrap = d.query("#recent_wrap");
     d.on(wrap, "click", (e) => {
       let target: any = e.srcElement || e.target;
-      console.log(target)
       while (target.tagName !== 'LI') {
         if (target.tagName === 'UL') {
           target = null
@@ -39,7 +38,8 @@ export class CollectPage extends BasicPage {
       data: { action: "query" }
     }).then(({ response }) => {
       let dom = <ul class="recent_parent" id="recent_wrap">
-        {
+        {  
+          response.data&&response.data.length>0?
           response.data.map(menu => {
             return <li
               style="border-style: none"
@@ -53,7 +53,7 @@ export class CollectPage extends BasicPage {
                 <div className="collect_caption">{menu.caption}</div>
               </a>
             </li>;
-          })
+          }):<div>暂无数据</div>
         }
       </ul>
       G.d.append(this.container, dom);

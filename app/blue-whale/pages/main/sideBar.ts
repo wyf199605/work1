@@ -28,7 +28,6 @@ export default class SideBarMrg {
   private favRecTree: Menu = null;
   protected CollectObj: CollectPC;
   constructor(private para: SideBarMrgPara) {
-    console.log(para)
     this.initMainNavMenu()
     // this.initFavRecent();
 

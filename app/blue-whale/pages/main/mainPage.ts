@@ -316,7 +316,7 @@ export = class MainPage {
     protected static systemMenu = (() => {
         let init = () => {
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({response}) => {
-                console.log(response);
+               // console.log(response);
                 // let container = d.query('.content-tabs'),
                 //     li = d.create(`<li class="dropdown pull-left"><a href="#">打开系统</a></li>`);
                 // d.prepend(container, li);
