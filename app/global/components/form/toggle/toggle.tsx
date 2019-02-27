@@ -251,7 +251,10 @@ export class Toggle extends FormCom{
             : (tools.isEmpty(falseVal) ? false : falseVal);
     }
 
-    set value(flag: number | boolean ){
+    set value(flag: number | boolean | string){
+        if(flag === '0'){
+            flag = false
+        }
         this.checked = !!flag;
     }
 }

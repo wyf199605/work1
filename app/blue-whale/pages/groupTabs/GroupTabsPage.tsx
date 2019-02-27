@@ -218,7 +218,7 @@ export class GroupTabsPage extends BasicPage {
 
             d.append(this.wrapper, this.imports.footer);
 
-            if (this.ui.supportRfid) {
+            if (this.ui.supportRfid && Shell.inventory.can2dScan) {
                 this.imports.openRfid();
             }
         },
@@ -237,12 +237,17 @@ export class GroupTabsPage extends BasicPage {
          * @param option
          */
         query : (value: string, option? : string) => {
-            let keyField = this.ui.keyField;
-            Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag, {
-                [keyField]: this.imports.editModule.main.get(keyField)[keyField]
-            }, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
+            let keyField = this.ui.keyField,
+                field = {[keyField]: this.imports.editModule.main.get(keyField)[keyField]};
+            if(!this.subUi[0]){
+                field = {};
+            }
+
+            Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag,
+                field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                 if (result.success) {
                     let data = result.data;
+                    console.log(result.data, 'operateScanTable');
                     Array.isArray(data) && data.forEach(obj => {
                         let item = obj.itemid;
                         if (!item) {
@@ -309,6 +314,7 @@ export class GroupTabsPage extends BasicPage {
                 {value} = this.imports.getKeyField(id);
 
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
+                console.log(result.data, 'getCountData');
                 if (result.success) {
                     this.imports.setAmount(result.data[this.imports.fieldName]);
                 } else {
@@ -329,6 +335,7 @@ export class GroupTabsPage extends BasicPage {
                     return;
                 }
                 Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression, value, result => {
+                    console.log(result.data, 'getAggrData');
                     if (result.success) {
                         this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
                     } else {

@@ -223,6 +223,7 @@ export class OfflineBtn {
             }
 
             Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, 'delete', result => {
+                console.log(result.data, 'operateTable删除表');
                 if(result.success){
                     Modal.toast('删除表（' + itemId + ')成功');
                     let {edit} = this.imports.getKeyField(itemId);
