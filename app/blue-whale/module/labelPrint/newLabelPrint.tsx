@@ -494,14 +494,14 @@ export class NewLabelPrint {
             let svgHeight = tmp.height * this.scale,
                 svgWidth = tmp.width * this.scale,
                 row = Math.floor((height - paddingTop - paddingBottom + rowSpace) / (svgHeight + rowSpace)),
-                col = Math.floor((width - paddingLeft - paddingRight + colSpace) / (svgWidth + colSpace)),
-                pageSize = (row * col) || 1,
+                col = Math.floor((width - paddingLeft - paddingRight + colSpace) / (svgWidth + colSpace));
+            if(isLengthWays){
+                [row, col] = [col, row];
+            }
+            let pageSize = (row * col) || 1,
                 total = Math.ceil(data.length / (pageSize)),
                 marginRight = 'marginRight',
                 marginBottom = 'marginBottom';
-            if(isLengthWays){
-                [marginRight, marginBottom] = [marginBottom, marginRight]
-            }
 
             svgList.slice(0, pageSize).forEach((svg, index, {length}) => {
                 if((index + 1) % col !== 0){

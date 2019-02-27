@@ -686,7 +686,7 @@ export class TableBase extends Component {
         function addCol(length) {
             for (let i = 0; i < length; i++) {
                 let row = self.body.rows[i],
-                    cellData = data ? data[i] || '' : '';
+                    cellData = data ? (tools.isEmpty(data[i]) ?  '' : data[i]) : '';
                 self.tableData.get(i)[col.name] = cellData;
                 if (row) {
                     row.cellAdd(new TableDataCell({

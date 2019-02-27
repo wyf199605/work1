@@ -2549,9 +2549,9 @@ export class BwTableModule extends Component {
                             for (let key in data) {
                                 let hCell = row.cellGet(key);
                                 if (hCell && (isReplace || hCell !== cell)) {
-                                    let cellData = data[key];
+                                    let cellData = tools.isEmpty(data[key]) ? '' : data[key];
                                     if (hCell.data != cellData) {
-                                        hCell.data = cellData || '';
+                                        hCell.data = cellData;
                                     }
                                 }
                             }
@@ -2846,7 +2846,7 @@ export class BwTableModule extends Component {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
                                         resolve(saveData);
-                                    }).catch(() => reject());
+                                    }).catch((msg) => reject(msg));
                                 }, 100);
                             }).catch(() => reject('noMessage')).finally(() => {
                                 loading && loading.hide();
@@ -2931,11 +2931,11 @@ export class BwTableModule extends Component {
 
     get saveVerify() {
         return new Promise((resolve, reject) => {
-            let isSave = this.ftable.isSave;
-            if (isSave) {
-                resolve()
+            let errorMsg = this.ftable.errorMsg;
+            if (!errorMsg) {
+                resolve();
             } else {
-                reject();
+                reject(errorMsg);
             }
         });
     }
