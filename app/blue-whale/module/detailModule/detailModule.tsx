@@ -98,7 +98,8 @@ export class DetailModule extends AGroupTabItem {
             ajax: {
                 auto: false,
                 resetCurrent: false, // 是否重新设置当前页
-                fun: ({pageSize, current, sort, custom}) => {
+                timeout:this.ui.timeOut,
+                fun: ({pageSize, current, sort, custom,timeout}) => {
                     return new Promise((resolve, reject) => {
                         let ui = this.ui,
                             url = tools.isNotEmpty(ui.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(ui.dataAddr) : '';
@@ -110,7 +111,7 @@ export class DetailModule extends AGroupTabItem {
                                         pageparams: '{"index"=' + current + ', "size"=' + pageSize + ',"total"=1}'
                                     }, custom),
                                     needGps: ui.dataAddr.needGps,
-                                    timeout: 30000,
+                                    timeout: timeout,
                                     loading: {
                                         msg: '数据加载中...',
                                         disableEl: this.wrapper

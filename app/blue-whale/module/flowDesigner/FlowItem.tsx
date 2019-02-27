@@ -75,6 +75,8 @@ export class FlowItem extends Component {
             this.isEnd = false;
             this.wrapper.style.left = (x - 20) + 'px';
             this.wrapper.style.top = (y - 20) + 'px';
+            this.width = 20;
+            this.height = 20;
             this.wrapper.classList.add('start-circle');
             this.wrapper.appendChild(<div className="inner-circle"/>);
             this.rectNode = FlowDesigner.PAPER.circle(x, y, 20).attr(this.getDefaultAttr(x, y));
@@ -82,6 +84,8 @@ export class FlowItem extends Component {
             // 结束节点
             this.isEnd = true;
             this.isStart = false;
+            this.width = 20;
+            this.height = 20;
             this.wrapper.style.left = (x - 20) + 'px';
             this.wrapper.style.top = (y - 20) + 'px';
             this.wrapper.classList.add('end-circle');
@@ -391,7 +395,6 @@ export class FlowItem extends Component {
             FlowDesigner.PAPER.setSize(boundary.width, boundary.height);
             d.query('#design-canvas').style.width = boundary.width + 'px';
             d.query('#design-canvas').style.height = boundary.height + 'px';
-
             let diamondArr = ['decision', 'fork', 'join'];
             if (diamondArr.indexOf(_this.para.type) >= 0) {
                 this.transform('r45');

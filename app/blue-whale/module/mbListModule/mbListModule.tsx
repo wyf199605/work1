@@ -286,7 +286,7 @@ export class MbListModule extends Component {
                     this.mbList.render(this.getListData(this.layout, data, this.captions));
                 },
                 auto: !this.hasQuery,
-                ajaxFun: ({current, pageSize, isRefresh, sort, custom}) => {
+                ajaxFun: ({current, pageSize, isRefresh, sort, custom,timeout}) => {
                     return new Promise<{ data: obj[], total: number }>((resolve) => {
                         let dataAddr: R_ReqAddr = this.para.ui.body.elements[0].dataAddr,
                             url = BW.CONF.siteUrl + BwRule.reqAddr(dataAddr);
