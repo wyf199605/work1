@@ -75,7 +75,7 @@ export = class homePage extends BasicPage{
             editBook.addEventListener('click', function () {
                 let txt_edit = document.querySelector('.txt_edit') as HTMLInputElement,
                     pValue = p.innerHTML;
-                popoverToggle(MENU_FAVORITE.favEditDom);
+               // popoverToggle(MENU_FAVORITE.favEditDom);
                 // mui().popover('toggle');
                 //                               txt_edit.focus();
                 if (this.dataset.edit === "") {
@@ -84,19 +84,20 @@ export = class homePage extends BasicPage{
                 else {
                     txt_edit.value = pValue;
                 }
-                let test = true;
-                if (test) {
-                    new Collect().editCollectGroup(pValue,this);
-                } else {
-                    popoverToggle(MENU_FAVORITE.favEditDom);
-                    MENU_FAVORITE.valueObtain = pValue;
-                    MENU_FAVORITE.parentNode = this;
-                    if (MENU_FAVORITE.funcNumber) {
-                        MENU_FAVORITE.toggleConGroup();
-                        MENU_FAVORITE.toggleEditGroup();
-                        MENU_FAVORITE.funcNumber = false;
-                    }
-                }
+                new Collect().editCollectGroup(pValue,this);
+                // let test = true;
+                // if (test) {
+                //     new Collect().editCollectGroup(pValue,this);
+                // } else {
+                //     popoverToggle(MENU_FAVORITE.favEditDom);
+                //     MENU_FAVORITE.valueObtain = pValue;
+                //     MENU_FAVORITE.parentNode = this;
+                //     if (MENU_FAVORITE.funcNumber) {
+                //         MENU_FAVORITE.toggleConGroup();
+                //         MENU_FAVORITE.toggleEditGroup();
+                //         MENU_FAVORITE.funcNumber = false;
+                //     }
+                // }
 
             });
         });
