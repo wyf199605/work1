@@ -1,0 +1,63 @@
+.recent_parent {
+  padding: 0px;
+  margin: 10px 15px;
+  li {
+    display: inline-block;
+    position: relative;
+    padding-right: 30px;
+    text-align: center;
+    margin-bottom: 15px;
+    a {
+      text-align: center;
+    }
+    .self_icon {
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      background-color: $blue;
+      border-radius: 50%;
+    }
+    .self_icon:before {
+      zoom: 2;
+      color: white;
+      margin-top: 50%;
+      display: inline-block;
+      transform: translateY(-50%)
+    }
+    .collect_caption {
+      color: #333333;
+      font-size: 14px;
+      margin: 5px auto;
+    }
+    .blue {
+      background-color: $blue;
+    }
+    .green {
+      background-color: $green;
+    }
+    .yellow {
+      background-color: $yellow;
+    }
+    .red {
+      background-color: $red;
+    }
+    .purple {
+      background-color: $purple;
+    }
+    .black {
+      background-color: $black;
+    }
+    .grey {
+      background-color: $grey;
+    }
+  }
+  li:hover {
+    .collect_delete {
+      display: inline-block;
+      cursor: pointer;
+    }
+    .collect_caption {
+      color: $blue;
+    }
+  }
+}

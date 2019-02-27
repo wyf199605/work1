@@ -28,6 +28,7 @@ export default class SideBarMrg {
   private favRecTree: Menu = null;
   protected CollectObj: CollectPC;
   constructor(private para: SideBarMrgPara) {
+    console.log(para)
     this.initMainNavMenu()
     // this.initFavRecent();
 
@@ -129,16 +130,21 @@ export default class SideBarMrg {
     `;
     d.append(d.query("#customNavMenu"), d.create(collectDom));
     d.on(d.query(".collect_item"), "click", () => {
-      this.href();
+      this.href(0);
     })
     d.on(d.query("#js_react"), "click", () => {
-      console.log("111")
-      this.href();
+      this.href(1);
     })
   }
 
-  private href = () => {
-    let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=collect" });
+  private href = (type: number) => {
+    let url = "";
+    if (type === 1) {
+      url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=recent" });
+    } else {
+      url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=collect" });
+    }
+
     // sys.window.open({ url })
     if (sysPcHistory.indexOf(url) >= 0) {
       sys.window.refresh(url);

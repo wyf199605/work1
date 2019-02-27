@@ -90,7 +90,6 @@ export class CollectPage extends BasicPage {
                   <span className={`self_icon  ${menu.icon} `}></span>
                   <div className="collect_caption">{menu.caption}</div>
                 </a>
-                <span className="collect_delete"/>
               </li>;
             })
           }

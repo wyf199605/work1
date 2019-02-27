@@ -364,7 +364,7 @@ gulp.task('js', function() {
     gulpTsPage('detail/contactPage', 'contactPage.js');
     gulpTsPage(['main/mainPage', 'main/sideBar'], 'mainPage.js');
     gulpTsPage("collectMain/collectPage", "CollectPage.js");
-
+    gulpTsPage("index/recentPage", "RecentPage.js");
     // gulpTsPage('main/defaultTab', 'defaultTab.js');
 
     gulpTsPage('main/mainMbPage', 'mainMbPage.js');

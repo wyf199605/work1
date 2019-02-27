@@ -183,6 +183,7 @@ export class Collect extends BaseCollect {
               callback: index => {
                 if (index) {
                   this.req_delGroup(GroupName).then(() => {
+                    HandleDOM.parentNode.parentNode.parentNode.removeChild(HandleDOM.parentNode.parentNode)
                     Modal.toast("删除成功");
                     m.isShow = false;
                   })
@@ -215,7 +216,7 @@ export class Collect extends BaseCollect {
               let fragment = document.createDocumentFragment();
               // console.log(HandleDOM);
               // HandleDOM.previousSibling.
-              // HandleDOM.parentNode.querySelector(".conFavGroup").innerHTML = rename;
+              HandleDOM.previousSibling.textContent = rename;
               if (dataName) {
                 let liDom = HandleDOM.querySelectorAll("li[data-favid]"),
                   len = liDom.length;
