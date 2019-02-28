@@ -39,14 +39,16 @@
     li {
       display: inline-block;
       position: relative;
-      padding-right: 30px;
       text-align: center;
-      margin-bottom: 15px;
+      margin: 6px 8px 6px;
+      width: 100px;
+      vertical-align: top;
       a {
         text-align: center;
       }
       .self_icon {
-        display: inline-block;
+        display: block;
+        margin: auto;
         width: 60px;
         height: 60px;
         background-color: $blue;
