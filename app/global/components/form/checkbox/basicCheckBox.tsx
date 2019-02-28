@@ -264,7 +264,14 @@ export class BasicCheckBox extends FormCom {
             : (tools.isEmpty(falseVal) ? false : falseVal);
     }
 
-    set(flag: number | boolean = 0): void {
+    set(flag: number | boolean | string = 0): void {
+        let trueVal = this.values && this.values.true,
+            falseVal = this.values && this.values.false;
+        if(flag === trueVal){
+            flag = true;
+        }else if(flag === falseVal){
+            flag = false;
+        }
         this.checked = !!flag;
         // if (typeof this.onSet === 'function') {
         //     this.onSet(!!flag);

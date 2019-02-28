@@ -252,8 +252,12 @@ export class Toggle extends FormCom{
     }
 
     set value(flag: number | boolean | string){
-        if(flag === '0'){
-            flag = false
+        let trueVal = this.values && this.values.true,
+            falseVal = this.values && this.values.false;
+        if(flag === trueVal){
+            flag = true;
+        }else if(flag === falseVal){
+            flag = false;
         }
         this.checked = !!flag;
     }
