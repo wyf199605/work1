@@ -38,14 +38,17 @@
       width: 20px;
       height: 20px;
       .iconfont {
-        font-size: 18px;
+        font-size: 15px;
       }
       .has_collect {
-        color: red;
+        color: #FFB400;
       }
       .un_collect {
         color: lightgray
       }
+    }
+    .un_collect_btn {
+      visibility: hidden!important;
     }
   }
   &:after {
@@ -72,6 +75,12 @@
   i {
     width: auto;
     height: auto;
+  }
+}
+
+.element-tree-node:hover {
+  &>.tree-text-wrapper>.un_collect_btn {
+    visibility: visible!important;
   }
 }
 

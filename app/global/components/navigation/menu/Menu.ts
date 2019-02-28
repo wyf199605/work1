@@ -32,9 +32,9 @@ export class Menu extends ElementTreeNode {
       if ((this.deep == 1 && para.isLeaf) || this.deep !== 1) {
         let dom = "";
         if (this.content.favid) {
-          dom = `<span class="collect_btn"><i class="iconfont icon-shoucang1 has_collect"/></span>`
+          dom = `<span class="collect_btn"><i class="iconfont icon-shoucang_fill has_collect"/></span>`
         } else {
-          dom = `<span class="collect_btn"><i class="iconfont icon-shoucang1-copy un_collect"/></span>`
+          dom = `<span class="collect_btn un_collect_btn"><i class="iconfont icon-shoucang un_collect"/></span>`
         }
         d.query(".tree-text-wrapper", this.wrapper).appendChild(d.create(dom))
       }
@@ -88,7 +88,7 @@ export class Menu extends ElementTreeNode {
       d.on(this.textWrapper, "click", (event: MouseEvent) => {
         event.stopPropagation();
         let list = event.srcElement.classList
-        let status = list.contains("icon-shoucang1") || list.contains("icon-shoucang1-copy") || list.contains("collect_btn")
+        let status = list.contains("collect_btn") || list.contains("icon-shoucang_fill") || list.contains("icon-shoucang")
         if (this.isCollect && status) {
           Menu.CollectFunc(this);
         } else {

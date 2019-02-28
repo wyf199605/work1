@@ -313,30 +313,11 @@ li:last-child .item-content .item-inner {
   display: flex;
   justify-content: space-around;
   background-color: #f7f7f8;
-  margin-bottom: 10px;
-  .icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #2c363f;
-    background-repeat: no-repeat;
-    background-size: 50%;
-    background-position: center;
+  padding-bottom: 10px;
+  .collect_item {
+    text-align: center;
     cursor: pointer;
   }
-  .icon_collect,
-  .icon_time {
-    color: red;
-    text-align: center;
-    line-height: 53px;
-  }
-  .icon-shoucang1:before,
-  .icon-date-2:before {
-    zoom: 2;
-  }
-  // .icon_time {
-  //   background-image: url(../../../img/time.png);
-  // }
   p {
     text-align: center;
     font-size: 12px;

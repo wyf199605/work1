@@ -44,11 +44,11 @@ export class CollectPC extends BaseCollect {
     let node = this.collectDom;
     let dom = d.query(".collect_btn>.iconfont", node.wrapper) as HTMLElement;
     if (dom.classList.contains("un_collect")) {
-      let newNode = d.create(`<i class="iconfont icon-shoucang1 has_collect"/>`);
+      let newNode = d.create(`<i class="iconfont icon-shoucang_fill  has_collect"/>`);
       dom.parentNode.replaceChild(newNode, dom)
       node.content.favid = favid;
     } else {
-      let newNode = d.create(`<i class="iconfont icon-shoucang1-copy un_collect"/>`);
+      let newNode = d.create(`<i class="iconfont icon-shoucang un_collect"/>`);
       dom.parentNode.replaceChild(newNode, dom)
       node.content.favid = null;
     }

@@ -116,22 +116,21 @@ export default class SideBarMrg {
       }, 300);
     let collectDom = `
      <div class="collect_wrap">
-        <div class="collect_item">
-           <div class="icon icon_collect iconfont icon-shoucang1"></div>
+        <div class="collect_item" id="js_collect_btn">
+           <div class="icon iconfont icon-shoucang"></div>
             <p>收藏<p>
         </div>
-        <div>
-            <div class="icon icon_collect iconfont icon-date-2" id="js_react"></div>
+        <div class="collect_item" id="js_react_btn">
+            <div class="icon iconfont icon-zuijin"></div>
             <p>最近<p>
-            </div>
         </div>
      </div>
     `;
     d.append(d.query("#customNavMenu"), d.create(collectDom));
-    d.on(d.query(".collect_item"), "click", () => {
+    d.on(d.query("#js_collect_btn"), "click", () => {
       this.href(0);
     })
-    d.on(d.query("#js_react"), "click", () => {
+    d.on(d.query("#js_react_btn"), "click", () => {
       this.href(1);
     })
   }
