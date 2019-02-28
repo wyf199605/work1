@@ -172,10 +172,7 @@ export class OfflineBtn {
                 input: HTMLInputElement,
                 el = <div className="delete-cell">
                     <div className="delete-text">{m.text}</div>
-                    {i !== 0 ? (input =
-                        <input data-name={m.name} data-item={m.item} className="delete-input" type="text">
-                            {m.value[m.name]}
-                        </input>) : ``}
+                    {i !== 0 ? (input = <input value={m.value[m.name] || ''} data-name={m.name} data-item={m.item} className="delete-input" type="text"/>) : ``}
                     {checkBox = <CheckBox value={m.value} onClick={() => {
                         checks.forEach(check => {
                             check.checked = false;
@@ -217,7 +214,7 @@ export class OfflineBtn {
             }
             return arr;
         };
-        let del = (itemId: string, keyField: string, value: string) => {
+        let del = (itemId: string, keyField: string, value: string = '') => {
             let where = {
                 [keyField]: value
             };
@@ -226,8 +223,11 @@ export class OfflineBtn {
             }
 
             Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, 'delete', result => {
+                console.log(result.data, 'operateTable删除表');
                 if(result.success){
                     Modal.toast('删除表（' + itemId + ')成功');
+                    let {edit} = this.imports.getKeyField(itemId);
+                    this.imports.editSet(edit, {});
                 }else {
                     Modal.toast('删除表（' + itemId + ')失败');
                 }

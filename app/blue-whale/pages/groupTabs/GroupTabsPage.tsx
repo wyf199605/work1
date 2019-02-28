@@ -90,6 +90,7 @@ export class GroupTabsPage extends BasicPage {
         footer : null as HTMLElement,
         fieldName : 'amountcount', // 标识值，从壳获取count时候需壳以改字段作为属性键值
         aggrArr : [] as R_Aggr[], // 主表+子表的aggrList合并的字段
+        isOnSet : true,
         editModule : {
             main: null as EditModule,
             sub: null as EditModule
@@ -99,8 +100,7 @@ export class GroupTabsPage extends BasicPage {
                 return;
             }
             console.log(this.ui, this.subUi);
-            let wrapper = <div/>,
-                mainUi = this.ui as IBW_Detail,
+            let mainUi = this.ui as IBW_Detail,
                 subUi = this.subUi[0] as IBW_Detail,
                 subId = subUi ? {itemId : subUi.itemId} : {},
                 mainId = {itemId : mainUi.itemId},
@@ -186,6 +186,9 @@ export class GroupTabsPage extends BasicPage {
                         data: main.getData(),
                         isOffLine : true,
                         onSet: () => {
+                            if(!this.imports.isOnSet){
+                                return;
+                            }
                             this.imports.operateTable(mainUi.uniqueFlag, mainUi.itemId, field, mainUi.keyField, this.imports.editModule.main);
                         }
                     })
@@ -198,7 +201,10 @@ export class GroupTabsPage extends BasicPage {
                         isOffLine : true,
                         data: sub.getData(),
                         onSet: () => {
-                            this.imports.operateTable(subUi.uniqueFlag, subUi.itemId, field, subUi.keyField, this.imports.editModule.sub);
+                            if(!this.imports.isOnSet){
+                                return;
+                            }
+                            this.imports.operateTable(mainUi.uniqueFlag, subUi.itemId, field, subUi.keyField, this.imports.editModule.sub);
                         }
                     })
                 })
@@ -209,10 +215,10 @@ export class GroupTabsPage extends BasicPage {
                 buttons : [...this.imports.btnParaGet(this.subBtn.main, this.imports.editModule.main, mainUi.itemId),
                     ...(subUi && this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId) || [])]
             });
-            d.append(this.dom, wrapper);
+
             d.append(this.wrapper, this.imports.footer);
 
-            if (this.ui.supportRfid) {
+            if (this.ui.supportRfid && Shell.inventory.can2dScan) {
                 this.imports.openRfid();
             }
         },
@@ -228,14 +234,20 @@ export class GroupTabsPage extends BasicPage {
         /**
          * 数据查询
          * @param value
+         * @param option
          */
-        query : (value: string) => {
-            let keyField = this.ui.keyField;
-            Shell.imports.operateScanTable(value, this.imports.getOption(), this.ui.uniqueFlag, {
-                [keyField]: this.imports.editModule.main.get(keyField)[keyField]
-            }, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
+        query : (value: string, option? : string) => {
+            let keyField = this.ui.keyField,
+                field = {[keyField]: this.imports.editModule.main.get(keyField)[keyField]};
+            if(!this.subUi[0]){
+                field = {};
+            }
+
+            Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag,
+                field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                 if (result.success) {
                     let data = result.data;
+                    console.log(result.data, 'operateScanTable');
                     Array.isArray(data) && data.forEach(obj => {
                         let item = obj.itemid;
                         if (!item) {
@@ -243,7 +255,7 @@ export class GroupTabsPage extends BasicPage {
                         }
 
                         let {edit} = this.imports.getKeyField(item);
-                        edit.set(obj.array[0]);
+                        this.imports.editSet(edit, obj.array[0]);
                         this.imports.setText('');
                         this.imports.getCountData();
                         this.imports.getAggrData(item);
@@ -252,6 +264,11 @@ export class GroupTabsPage extends BasicPage {
                     Modal.toast('查询失败，请确认已下载数据');
                 }
             });
+        },
+        editSet(edit : EditModule, value : obj){
+            this.isOnSet = false;
+            edit.set(value);
+            this.isOnSet = true;
         },
         /**
          * 获取itemId对应的相关字段，
@@ -297,6 +314,7 @@ export class GroupTabsPage extends BasicPage {
                 {value} = this.imports.getKeyField(id);
 
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
+                console.log(result.data, 'getCountData');
                 if (result.success) {
                     this.imports.setAmount(result.data[this.imports.fieldName]);
                 } else {
@@ -317,6 +335,7 @@ export class GroupTabsPage extends BasicPage {
                     return;
                 }
                 Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression, value, result => {
+                    console.log(result.data, 'getAggrData');
                     if (result.success) {
                         this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
                     } else {
@@ -350,16 +369,6 @@ export class GroupTabsPage extends BasicPage {
             let name = field.name;
 
             console.log(edit.get(name));
-            // Modal.alert({
-            //     0: uniqueFlag,
-            //     1: itemId,
-            //     2: {
-            //         [name] : edit.get(name)[name]
-            //     },
-            //     3:{
-            //         [keyField] : edit.get(keyField)[keyField]
-            //     }
-            // });
 
             Shell.imports.operateTable(uniqueFlag,itemId,{
                 [name] : edit.get(name)[name]
@@ -566,6 +575,7 @@ export class GroupTabsPage extends BasicPage {
                 let url = tools.url.addObj(BW.CONF.siteUrl + BwRule.reqAddr((sub as IBW_SubTableAddr).uiAddr), {
                     output: 'json'
                 });
+                url = tools.url.addObj(url, G.Rule.parseVarList(sub.uiAddr.parseVarList, {}));
                 BwRule.Ajax.fetch(url).then(({response}: { response: IBW_UI<IBW_Slave_Ui> }) => {
                     let ui = response.body.elements[0];
                     ui.uiType = ui.uiType || response.uiType;

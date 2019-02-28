@@ -14,6 +14,10 @@ export interface IBasicBoxPara extends IFormComPara {
     onSet?(isChecked: boolean): void;
     customStyle?: ICustomCheck;
     value?: any;
+    values?: {
+        true?: any,
+        false?: any
+    }
 }
 export interface ICustomCheck {
     check?: string;
@@ -64,11 +68,15 @@ export class BasicCheckBox extends FormCom {
     static EVT_CHECK_BOX_CHANGE = 'EVENT_SELECT_BOX_CHECKED';
     protected input: HTMLInputElement;
     protected checkSpan: HTMLElement;
+    protected  values: {
+        true?: any,
+        false?: any
+    };
 
     constructor(para: IBasicBoxPara) {
         super(para);
 
-        // this.container = para.container;
+        this.values = para.values;
         this.customStyle = para.customStyle;
         this._value = para.value;
         this.size = para.size;
@@ -248,10 +256,22 @@ export class BasicCheckBox extends FormCom {
     }
 
     get(): any {
-        return this.checked;
+        let trueVal = this.values && this.values.true,
+            falseVal = this.values && this.values.false;
+
+        return this.checked
+            ? (tools.isEmpty(trueVal) ? true : trueVal)
+            : (tools.isEmpty(falseVal) ? false : falseVal);
     }
 
-    set(flag: number | boolean = 0): void {
+    set(flag: number | boolean | string = 0): void {
+        let trueVal = this.values && this.values.true,
+            falseVal = this.values && this.values.false;
+        if(flag === trueVal){
+            flag = true;
+        }else if(flag === falseVal){
+            flag = false;
+        }
         this.checked = !!flag;
         // if (typeof this.onSet === 'function') {
         //     this.onSet(!!flag);
