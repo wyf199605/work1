@@ -570,6 +570,14 @@ namespace G {
                 return ShellBase.handler('saveImg', { img })
             }
         };
+
+        const openSystem = (path: string, param: string, back: IShellEventHandler) => {
+            return ShellBase.handler('openExe', {
+                path: path,
+                params: param
+            }, back)
+        };
+
         const location = {
             startRecord(back: IShellEventHandler) {
                 return ShellBase.handler('startRecord', { "timestep": "5000" },back);
@@ -577,9 +585,9 @@ namespace G {
             stopRecord(back: IShellEventHandler) {
                 return ShellBase.handler('stopRecord', {},back);
             },
-        }
+        };
         return {
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports
+            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem
         }
     })(window, document);
 
