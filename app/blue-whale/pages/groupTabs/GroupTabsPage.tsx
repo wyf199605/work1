@@ -128,7 +128,7 @@ export class GroupTabsPage extends BasicPage {
                                             {this.imports.countText = <TextInput type='number' placeholder="请输入"/>}
                                         </div>
                                         <div className="barcode-cell barcode-right">
-                                            <div>{cor.caption + ':'}</div>
+                                            <div>{cor.caption + '：'}</div>
                                             {this.imports.amountEl = <div/>}
                                         </div>
                                     </div>
@@ -386,9 +386,11 @@ export class GroupTabsPage extends BasicPage {
             },{
                 [keyField] : edit.get(keyField)[keyField]
             }, 'updata', result => {
-                Modal.alert(result);
+                console.log(result);
                 if(result.success){
                     this.imports.editSet(edit, result.data);
+                }else {
+                    Modal.toast(result.msg);
                 }
             });
         },
