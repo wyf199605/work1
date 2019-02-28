@@ -283,8 +283,8 @@ export class BwTableModule extends Component {
                     ajaxData,
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
                     auto: !this.hasQuery,    // 有查询器时不自动查询
-                    timeout:this.ui.timeOut,
-                    fun: ({pageSize, current, sort, custom,timeout}) => {
+                    timeout: this.ui.timeOut,
+                    fun: ({ pageSize, current, sort, custom, timeout }) => {
                         let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
                         pageSize = pageSize === -1 ? 3000 : pageSize;
 
@@ -630,14 +630,14 @@ export class BwTableModule extends Component {
         }
     }
 
-    trClickInit(){
+    trClickInit() {
         let ui = this.ui,
             field = ui.cols,
             ftable = this.ftable,
             rowLinkField = ui.rowLinkField,
             selector = '.section-inner-wrapper:not(.pseudo-table) tbody tr td:not(.cell-link):not(.cell-img)';
 
-        if(!rowLinkField){
+        if (!rowLinkField) {
             return
         }
 
@@ -650,8 +650,8 @@ export class BwTableModule extends Component {
                 rowIndex = parseInt(target.parentElement.dataset.index),
                 row = ftable.rowGet(rowIndex),
                 rowData = row.data;
-            for(let field of this.cols){
-                if(field.name === rowLinkField){
+            for (let field of this.cols) {
+                if (field.name === rowLinkField) {
                     this.tdClickHandler(field, rowData, true);
                     break;
                 }
@@ -1991,7 +1991,7 @@ export class BwTableModule extends Component {
                     nameField,
                     loading: {
                         msg: '图片上传中...',
-                        disableEl:document.body
+                        disableEl: document.body
                     },
                     thumbField: thumbField,
                     container: imgContainer,
@@ -2155,13 +2155,14 @@ export class BwTableModule extends Component {
                     isDisabled: !(btnUi.multiselect === 0 || btnUi.multiselect === 2 && btnUi.selectionFlag),
                     data: btnUi,
                     onClick: () => {
-                        let stopBtn = d.query(".stop_location", wrapper)
-                        let startBtn = d.query(".start_location", wrapper);
-                        let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
+
                         if (btn.data.openType.indexOf('rfid') > -1) {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
                         } else if (btn.data.openType === 'stopLocation') {
+                            let stopBtn = d.query(".stop_location", wrapper)
+                            let startBtn = d.query(".start_location", wrapper);
+                            let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
                             if (!btnStatus) {
                                 Modal.toast("请先选择开始记录")
                             } else {
@@ -2175,6 +2176,9 @@ export class BwTableModule extends Component {
                                 }
                             }
                         } else if (btn.data.openType === 'startLocation') {
+                            let stopBtn = d.query(".stop_location", wrapper)
+                            let startBtn = d.query(".start_location", wrapper);
+                            let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
                             let keStatus = G.Shell.location.startRecord(() => { })
                             if (keStatus) {
                                 Modal.toast("已开始发送位置")
