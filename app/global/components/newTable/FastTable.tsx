@@ -148,12 +148,25 @@ export class FastTable extends Component {
 
     }
 
-    get isSave(){
-        return this.rows ? this.rows.every((row) => {
-            return row.cells.every((cell) => {
-                return (!cell.show || cell.isVirtual) ? true : tools.isEmpty(cell.errorMsg);
-            })
-        }) : true;
+    get errorMsg(){
+        let errorMsg = null;
+        for(let row of this.rows){
+            if(errorMsg){
+                break;
+            }
+            for(let cell of row.cells){
+                if(cell.show && !cell.isVirtual && tools.isNotEmpty(cell.errorMsg)){
+                    errorMsg = cell.errorMsg;
+                    break;
+                }
+            }
+        }
+        return errorMsg;
+        // return this.rows ? this.rows.every((row) => {
+        //     return row.cells.every((cell) => {
+        //         return (!cell.show || cell.isVirtual) ? true : tools.isEmpty(cell.errorMsg);
+        //     })
+        // }) : true;
     }
 
     // 重新计算表格宽度
@@ -681,53 +694,46 @@ export class FastTable extends Component {
                     return 0;
                 }
             });
-            let notRowDelIndexes = [],
+            let isCanDel = this.editing ? index.every((i) => this.editor.rowCanInit(this.rows[i])) : true,
                 tableData = this.tableData.data;
-            for (let value of index) {
-                if (this.editing) {
-                    if (!this.editor.rowCanInit(this.rows[value])) {
-                        if (notRowDelIndexes.indexOf(value + 1) === -1)
-                            notRowDelIndexes.push(value + 1);
-                        continue;
+            if(isCanDel){
+                for (let value of index) {
+                    row.push(this.rows[value]);
+                    let data = Object.assign({}, tableData[value]);
+                    let guidIndex = this.editing ? data[TableBase.GUID_INDEX] : null;
+                    this.tablesEach(table => {
+                        if (table) {
+                            table.body.rowDel(value);
+                        }
+                    });
+                    if (this.editing) {
+                        let addIndexObj = this.edit.addIndex,
+                            changeIndexObj = this.edit.changeIndex;
+                        if (addIndexObj.get().indexOf(guidIndex) > -1) {
+                            // 删除行时，若是新增的行则从新增的行中去除
+                            addIndexObj.del(guidIndex);
+                        } else if (changeIndexObj.get().indexOf(guidIndex) > -1) {
+                            // 删除行时，若行已编辑过，则先清除编辑的行，再添加至删除的行中
+                            changeIndexObj.del(guidIndex);
+                            this.edit.delIndex.add(guidIndex, data);
+                        } else {
+                            // 添加删除的行
+                            this.edit.delIndex.add(guidIndex, data);
+                        }
                     }
+                    this.rows.splice(value, 1, null);
                 }
-                row.push(this.rows[value]);
-                let data = Object.assign({}, tableData[value]);
-                let guidIndex = this.editing ? data[TableBase.GUID_INDEX] : null;
-                this.tablesEach(table => {
-                    if (table) {
-                        table.body.rowDel(value);
-                    }
-                });
-                if (this.editing) {
-                    let addIndexObj = this.edit.addIndex,
-                        changeIndexObj = this.edit.changeIndex;
-                    if (addIndexObj.get().indexOf(guidIndex) > -1) {
-                        // 删除行时，若是新增的行则从新增的行中去除
-                        addIndexObj.del(guidIndex);
-                    } else if (changeIndexObj.get().indexOf(guidIndex) > -1) {
-                        // 删除行时，若行已编辑过，则先清除编辑的行，再添加至删除的行中
-                        changeIndexObj.del(guidIndex);
-                        this.edit.delIndex.add(guidIndex, data);
-                    } else {
-                        // 添加删除的行
-                        this.edit.delIndex.add(guidIndex, data);
-                    }
+                this._rows = this._rows.filter(row => row !== null);
+                this.resetRowIndex();
+                if (this.pseudoTable) {
+                    this.pseudoTable.render();
                 }
-                this.rows.splice(value, 1, null);
+                this.noData.toggle(Object.keys(this.tableData.data).length === 0);
+                return row.length === 1 ? row[0] : row;
+            }else{
+                Modal.alert('系统禁止删除当前记录');
             }
-            this._rows = this._rows.filter(row => row !== null);
-            this.resetRowIndex();
-            if (this.pseudoTable) {
-                this.pseudoTable.render();
-            }
-            this.noData.toggle(Object.keys(this.tableData.data).length === 0);
-            if (notRowDelIndexes.length !== 0) {
-                notRowDelIndexes.reverse();
-                let str = notRowDelIndexes.join('、');
-                Modal.alert('第' + str + '行无法删除');
-            }
-            return row.length === 1 ? row[0] : row;
+
         }else{
             return null;
         }
