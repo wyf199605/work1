@@ -88,6 +88,10 @@ export class EditModule {
     }
 
 
+    get col(){
+        return this.cols;
+    }
+
     private pickOnGet(cip: ComInitP, dataArr: obj[], otherField: string) {
         let name = cip.field.name,
             fieldNames = otherField ? otherField.split(',') : [];
