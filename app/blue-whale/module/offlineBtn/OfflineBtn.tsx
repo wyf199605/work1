@@ -143,28 +143,25 @@ export class OfflineBtn {
             subId = this.para.subId,
             checks: CheckBox[] = [],
             inputEl: HTMLInputElement,
-            data = [],
-            mainObj = {
-                text: this.para.mainKey.caption + '：',
-                value: mainValue,
-                name: mainKey,
-                item: mainId
-            };
-
-        if (!this.para.subId) {
-            data = [mainObj];
-        } else {
             data = [{
                 text: '所有',
                 value: Object.assign({}, mainValue, subValue || {}),
                 name: mainKey + ',' + subKey,
                 item: ''
-            }, mainObj, {
+            },{
+                text: this.para.mainKey.caption + '：',
+                value: mainValue,
+                name: mainKey,
+                item: mainId
+            }];
+
+        if (this.para.subId) {
+            data.push({
                 text: this.para.subKey.caption + '：',
                 value: subValue,
                 name: subKey,
                 item: subId
-            }];
+            });
         }
 
         data.forEach((m, i) => {

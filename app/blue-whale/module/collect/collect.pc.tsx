@@ -44,22 +44,24 @@ export class CollectPC extends BaseCollect {
     let node = this.collectDom;
     let dom = d.query(".collect_btn>.iconfont", node.wrapper) as HTMLElement;
     if (dom.classList.contains("un_collect")) {
-      let newNode = d.create(`<i class="iconfont icon-shoucang_fill  has_collect"/>`);
-      dom.parentNode.replaceChild(newNode, dom)
+      let newNode = d.create(`<i class="iconfont icon-shoucang_fill  has_collect"/>`) as HTMLElement;
+      dom.parentNode.replaceChild(newNode, dom);
+      (newNode.parentNode as HTMLElement).classList.remove("un_collect_btn")
       node.content.favid = favid;
     } else {
-      let newNode = d.create(`<i class="iconfont icon-shoucang un_collect"/>`);
-      dom.parentNode.replaceChild(newNode, dom)
+      let newNode = d.create(`<i class="iconfont icon-shoucang un_collect"/>`) as HTMLElement;
+      dom.parentNode.replaceChild(newNode, dom);
+      (newNode.parentNode as HTMLElement).classList.add("un_collect_btn");
       node.content.favid = null;
     }
     console.log(node)
   }
-  delete(){
-     this.req_delCollect(this.collectDom.content.favid).then(()=>{
-        this.refreshDom();
-        Modal.toast("成功取消删除");
-        sys.window.refresh(this.pageUrl)
-     })
+  delete() {
+    this.req_delCollect(this.collectDom.content.favid).then(() => {
+      this.refreshDom();
+      Modal.toast("成功取消删除");
+      sys.window.refresh(this.pageUrl)
+    })
   }
   // isEdit 是否编辑编
   show(isEdit?: boolean, GroupName?: string) {
@@ -98,16 +100,15 @@ export class CollectPC extends BaseCollect {
             let status = d.query(".new_group_btn").classList.contains("disabled")
             if (status) {
               let group = d.query("#js_new_groupName") as HTMLInputElement;
-              this.req_addCollect(this.menuUrl, group.value).then(() => {
+              this.req_addCollect(this.menuUrl, group.value).then(({ response }) => {
                 sys.window.refresh(this.pageUrl)
-
+                this.refreshDom(response.data[0].favid)
                 Modal.toast("添加成功")
                 this.modal.isShow = false;
               })
             } else {
               this.req_addCollect(this.menuUrl, this.selectVal.text).then(({ response }) => {
                 sys.window.refresh(this.pageUrl)
-                console.log(response)
                 this.refreshDom(response.data[0].favid)
                 Modal.toast("添加成功")
                 this.modal.isShow = false;
