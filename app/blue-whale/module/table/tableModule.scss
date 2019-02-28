@@ -18,6 +18,9 @@
 }
 
 .fl-pc .table-module-has-sub {
+  .tab-content{
+    margin-top: 0;
+  }
   .sub-table-tab-wrapper {
     overflow: hidden;
     height: calc(45% - 10px);

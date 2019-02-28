@@ -253,10 +253,10 @@
       &.navbar-right {
         &.content-tabs {
           margin: 0;
-          padding-right: 28px;
+          //padding-right: 28px;
         }
         &>li {
-          &.dropdown.pull-left {
+          &.dropdown.user-info {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -386,7 +386,7 @@
     }
     .top-navbar-menu {
       position: relative;
-      width: calc(100% - 270px);
+      width: calc(100% - 280px);
       @media (min-width: 768px) {
         .page-tabs-content > li {
           //float: left;

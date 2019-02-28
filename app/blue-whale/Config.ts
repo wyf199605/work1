@@ -49,6 +49,7 @@ namespace BW {
         },
         ajaxUrl: {
             systemMenu: 'common/othersystem/getallsystem', // 打开系统按钮
+            systemMsg: 'common/othersystem/getsystem', // 获取系统信息
             getVersion: 'rest/version/fastlion', // 获取版本号
             personalmenu: `common/personalmenu`, // 个人中心按钮
             personPassword: `common/modpwd`, // 修改密码

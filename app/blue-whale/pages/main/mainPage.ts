@@ -18,6 +18,7 @@ import sysPcHistory = BW.sysPcHistory;
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {Notify} from "../../../global/components/feedback/notify/Notify";
 import {RfidConfig} from "../../module/rfid/RfidConfig";
+import Shell = G.Shell;
 
 interface IProps {
     pageContainer: HTMLDivElement;
@@ -315,12 +316,63 @@ export = class MainPage {
 
     protected static systemMenu = (() => {
         let init = () => {
+            let container = d.query('.content-tabs'),
+                li = d.create(`<li class="dropdown pull-right"><a href="#">打开系统</a></li>`);
+            d.append(container, li);
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({response}) => {
-               // console.log(response);
-                // let container = d.query('.content-tabs'),
-                //     li = d.create(`<li class="dropdown pull-left"><a href="#">打开系统</a></li>`);
-                // d.prepend(container, li);
-            })
+                console.log(response);
+                let data = tools.keysVal(response, 'body', 'bodyList');
+                if(tools.isNotEmpty(data)){
+                    let popover = new Popover({
+                        target: li,
+                        // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
+                        isWatch: true,
+                        items: data.map((item) => {
+                            return {
+                                title: item.systemName,
+                                onClick: () => {
+                                    BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.systemMsg, {
+                                        tdsourcetag: 's_pctim_aiomsg',
+                                        systemid: item.systemId
+                                    })).then(({response}) => {
+                                        console.log(response);
+                                        let loading: Loading,
+                                            path = tools.keysVal(response, 'LOGIN_VAR', 'SYSTEM_PATH') || '',
+                                            params = tools.keysVal(response, 'LOGIN_VAR', 'PARAMS') || '';
+
+                                        let flag = Shell.openSystem(path, params, (result) => {
+                                            loading && loading.hide();
+                                            loading = null;
+                                            if(!result.success){
+                                                Modal.alert('打开失败');
+                                            }
+                                        });
+
+                                        if(flag){
+                                            loading = new Loading({
+                                                msg: '打开中...',
+                                                duration: 10
+                                            });
+                                            loading.show();
+                                        }else{
+                                            Modal.alert('打开失败');
+                                        }
+                                    })
+                                }
+                            }
+                        }),
+                        isBackground: false,
+                        onClick: function (index, content) {
+                            popover.show = false;
+                        }
+                    });
+                }else{
+                    d.on(li, 'click', () => {
+                        Modal.toast('无相关系统信息');
+                    })
+                }
+
+            });
         };
 
         return {init}
