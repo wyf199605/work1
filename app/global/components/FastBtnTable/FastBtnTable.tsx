@@ -641,6 +641,9 @@ export class FastBtnTable extends FastTable{
     protected btnNameGroup = [];
     btnAdd(name: string, btn?: IButton, index?: number) {
         let btnGroup: any = this.isButton ? this.inputBox : this.popover;
+        if(!btnGroup){
+            return false;
+        }
         if(FastBtnTable.names.indexOf(name) > -1){
             switch (name){
                 case 'search':
@@ -671,6 +674,7 @@ export class FastBtnTable extends FastTable{
                 typeof index === 'number' ? this.btnNameGroup.splice(index, 0, name) : this.btnNameGroup.push(name);
             }
         }
+        return true;
     }
 
     btnRemove(name: string){

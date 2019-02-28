@@ -142,6 +142,7 @@ interface R_Field extends COL {
     fileInfo?:R_ReqAddr; // 文件信息地址
     backWhen? : string   // 后台计算规则表格单元格显示 true：显示backColor颜色
     backColor? : number  // 色码
+    caculateExpr? : string // 数据渲染完成后调用计算规则
 
 }
 interface R_SubTable_Field{

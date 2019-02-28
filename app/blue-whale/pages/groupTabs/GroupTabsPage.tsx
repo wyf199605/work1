@@ -179,34 +179,27 @@ export class GroupTabsPage extends BasicPage {
                     })
                 };
 
-                main.editInit((field: R_Field, item: DetailItem) => {
-                    return this.imports.editModule.main.init(field.name, {
-                        dom: item.contentEl,
-                        field: field,
-                        data: main.getData(),
+                let init = (edit : EditModule, field : R_Field, item: DetailItem, ui : IBW_Detail, data) => {
+                    return edit.init(field.name, {
+                        dom : item.contentEl,
+                        field,
+                        data,
                         isOffLine : true,
-                        onSet: () => {
+                        onSet : () => {
                             if(!this.imports.isOnSet){
                                 return;
                             }
-                            this.imports.operateTable(mainUi.uniqueFlag, mainUi.itemId, field, mainUi.keyField, this.imports.editModule.main);
+                            this.imports.operateTable(mainUi.uniqueFlag, ui.itemId, field, ui.keyField, edit);
                         }
                     })
+                };
+
+                main.editInit((field: R_Field, item: DetailItem) => {
+                    return init(this.imports.editModule.main, field, item, mainUi, main.getData())
                 });
 
                 subUi && sub.editInit((field: R_Field, item: DetailItem) => {
-                    return this.imports.editModule.sub.init(field.name, {
-                        dom: item.contentEl,
-                        field: field,
-                        isOffLine : true,
-                        data: sub.getData(),
-                        onSet: () => {
-                            if(!this.imports.isOnSet){
-                                return;
-                            }
-                            this.imports.operateTable(mainUi.uniqueFlag, subUi.itemId, field, subUi.keyField, this.imports.editModule.sub);
-                        }
-                    })
+                    return init(this.imports.editModule.sub, field, item, subUi, sub.getData())
                 })
             }
 
@@ -265,9 +258,27 @@ export class GroupTabsPage extends BasicPage {
                 }
             });
         },
+        /**
+         * 计算规则，在数据渲染结束之后调用
+         * @param edit
+         */
+        caculate(edit : EditModule){
+            let cols = edit.col,
+                data = edit.get();
+            cols.forEach(col => {
+                let expr = col.caculateExpr;
+                expr && edit.set({[col.name] : eval(tools.str.parseTpl(expr, data, true, 1,/\%\S+?%/g))})
+            })
+        },
+        /**
+         * 编辑模块set值，但不触发onSet事件
+         * @param edit
+         * @param value
+         */
         editSet(edit : EditModule, value : obj){
             this.isOnSet = false;
             edit.set(value);
+            this.caculate(edit);
             this.isOnSet = true;
         },
         /**
@@ -374,8 +385,11 @@ export class GroupTabsPage extends BasicPage {
                 [name] : edit.get(name)[name]
             },{
                 [keyField] : edit.get(keyField)[keyField]
-            }, 'updata', () => {
-
+            }, 'updata', result => {
+                Modal.alert(result);
+                if(result.success){
+                    this.imports.editSet(edit, result.data);
+                }
             });
         },
         mainUiGet : () : IBW_Slave_Ui => {

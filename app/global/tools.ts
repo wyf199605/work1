@@ -255,13 +255,15 @@ namespace G {
              * @param tpl
              * @param data
              * @param isEncode
+             * @param regExp
+             * @param num 1:{}  2:{{}}
              * @return {string}
              */
-            parseTpl: function (tpl: string, data: obj, isEncode = true) {
-                let parseReg = /\{\{\S+?}}/g,
+            parseTpl: function (tpl: string, data: obj, isEncode = true, num : number = 2, regExp? : RegExp) {
+                let parseReg = regExp || /\{\{\S+?}}/g,
                     self = this;
                 return tpl.replace(parseReg, function (param) {
-                    param = param.slice(2, -2);
+                    param = param.slice(num, -num);
 
                     let [key, param1] = param.split(','),
                         isEn = param1 ? param1 === '1' : isEncode,

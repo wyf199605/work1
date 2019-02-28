@@ -88,6 +88,10 @@ export class EditModule {
     }
 
 
+    get col(){
+        return this.cols;
+    }
+
     private pickOnGet(cip: ComInitP, dataArr: obj[], otherField: string) {
         let name = cip.field.name,
             fieldNames = otherField ? otherField.split(',') : [];
@@ -685,7 +689,11 @@ export class EditModule {
             if (coms[name]) {
                 pageData = tools.obj.merge(pageData, allDateGet(name));
             } else {
-                pageData = tools.obj.merge(pageData, {[name]: this.defaultData[name] || ''});
+                pageData = tools.obj.merge(pageData, {
+                    [name]: tools.isEmpty(this.defaultData[name])
+                        ? ''
+                        : this.defaultData[name]
+                });
             }
         }
         return pageData;
