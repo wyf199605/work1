@@ -256,6 +256,7 @@
           //padding-right: 28px;
         }
         &>li {
+          &.dropdown.pull-left,
           &.dropdown.user-info {
             display: flex;
             justify-content: center;
