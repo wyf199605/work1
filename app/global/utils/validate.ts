@@ -1,5 +1,6 @@
 /// <amd-module name="Validate"/>
 import tools = G.tools;
+
 export interface ValidateRule {
     rule: string; // maxLength, maxValue, minLength, minValue, requieredFlag, regExp
     errMsg?: string;
@@ -28,11 +29,11 @@ let errMsgs = {
 
 const strategies = {
     validChars: function (data, value: string) {
-        if(typeof data === 'string' && tools.isNotEmpty(data)){
+        if (typeof data === 'string' && tools.isNotEmpty(data)) {
             return data.split('').every((char) => {
                 return value.indexOf(char) > -1;
             });
-        }else{
+        } else {
             return true;
         }
     },
@@ -96,7 +97,6 @@ export class Validate {
                 if (name in data && (data[name] !== undefined || r.rule === 'requieredFlag')) {
                     if (!strategies[r.rule](data[name], r.value)) {
                         let err = r.errMsg ? r.errMsg : errMsgs[r.rule];
-
                         err = G.tools.str.parseTpl(err, {
                             title: r.title,
                             value: r.value

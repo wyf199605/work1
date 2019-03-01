@@ -164,9 +164,9 @@ export class BwTableModule extends Component {
                 let col = cell.column,
                     promise: Promise<any>,
                     rowData = this.ftable.tableData.rowDataGet(cell.row.index); // 行数据
-                if(col){
+                if (col) {
                     promise = this.cellFormat(col.content, cellData, rowData);
-                }else{
+                } else {
                     promise = new Promise((resolve) => {
                         resolve({text: cellData});
                     })
@@ -628,14 +628,14 @@ export class BwTableModule extends Component {
         }
     }
 
-    trClickInit(){
+    trClickInit() {
         let ui = this.ui,
             field = ui.cols,
             ftable = this.ftable,
             rowLinkField = ui.rowLinkField,
             selector = '.section-inner-wrapper:not(.pseudo-table) tbody tr td:not(.cell-link):not(.cell-img)';
 
-        if(!rowLinkField){
+        if (!rowLinkField) {
             return
         }
 
@@ -648,8 +648,8 @@ export class BwTableModule extends Component {
                 rowIndex = parseInt(target.parentElement.dataset.index),
                 row = ftable.rowGet(rowIndex),
                 rowData = row.data;
-            for(let field of this.cols){
-                if(field.name === rowLinkField){
+            for (let field of this.cols) {
+                if (field.name === rowLinkField) {
                     this.tdClickHandler(field, rowData, true);
                     break;
                 }
@@ -669,7 +669,7 @@ export class BwTableModule extends Component {
             return;
         }
 
-        if(BwRule.isNewFile(dataType)){
+        if (BwRule.isNewFile(dataType)) {
             let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                 "md5_field": field.name,
                 [field.name]: rowData[field.name],
@@ -740,9 +740,9 @@ export class BwTableModule extends Component {
 
             let row = ftable.rows[index],
                 cell = row ? row.cellGet(name) : null;
-            if(self.ftable.editing){
+            if (self.ftable.editing) {
                 self.imgManager.open(cell);
-            }else{
+            } else {
                 self.imgManager.showImg(cell);
             }
 
@@ -787,7 +787,7 @@ export class BwTableModule extends Component {
                     data = cell.data,
                     row = cell.row,
                     field = column.content as R_Field;
-                if(BwRule.isNewImg(field.atrrs.dataType)){
+                if (BwRule.isNewImg(field.atrrs.dataType)) {
                     if (data && typeof data === 'string') {
                         data.split(',').forEach((data) => {
                             urls.push(tools.url.addObj(CONF.ajaxUrl.fileDownload, {
@@ -797,14 +797,14 @@ export class BwTableModule extends Component {
                             }))
                         });
                     }
-                }else if(BwRule.isOldImg(field.atrrs.dataType)){
+                } else if (BwRule.isOldImg(field.atrrs.dataType)) {
                     let picAddrList = this.ui.pictureAddrList;
 
                     if (tools.isNotEmptyArray(picAddrList)) {
 
                         let rowData = this.ftable.tableData.rowDataGet(row.index),
                             url: string = '';
-                        if(rowData[field.name]){
+                        if (rowData[field.name]) {
                             url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                                 // name_field: nameField,
                                 md5_field: 'FILE_ID',
@@ -813,7 +813,7 @@ export class BwTableModule extends Component {
                                 down: 'allow'
 
                             });
-                        }else{
+                        } else {
                             url = picAddrList.map(addr =>
                                 tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
                             )[0] || '';
@@ -828,13 +828,13 @@ export class BwTableModule extends Component {
 
         return {
             getImg,
-            showImg(cell : FastTableCell) {
-                if(!cell || !cell.column){
+            showImg(cell: FastTableCell) {
+                if (!cell || !cell.column) {
                     return;
                 }
 
                 let urls = getImg(cell);
-                if(tools.isNotEmpty(urls)){
+                if (tools.isNotEmpty(urls)) {
                     let imgData: ImgModalPara = {
                         img: urls
                     };
@@ -843,19 +843,19 @@ export class BwTableModule extends Component {
                         name = field.name,
                         len = cell.ftable.data.length;
 
-                    if(len > 1){
+                    if (len > 1) {
                         imgData.turnPage = (next) => {
                             let getCell = (i) => {
                                 let rows = cell.ftable.rows,
                                     row = rows[i + 1];
-                                if(!next){
+                                if (!next) {
                                     row = rows[i - 1];
                                 }
                                 let curCell = row && row.cellGet(name);
-                                if(curCell){
-                                    if(!getImg(curCell)[0]) {
-                                        getCell(next ? index ++ : index --);
-                                    }else {
+                                if (curCell) {
+                                    if (!getImg(curCell)[0]) {
+                                        getCell(next ? index++ : index--);
+                                    } else {
                                         ImgModal.destroy();
                                         this.showImg(curCell);
                                         cell.selected = false;
@@ -867,14 +867,14 @@ export class BwTableModule extends Component {
                         }
                     }
                     ImgModal.show(imgData);
-                }else{
+                } else {
                     Modal.toast('无图片')
                 }
             },
             open: (cell: FastTableCell) => {
                 layoutImg && layoutImg.destroy();
                 let images = [];
-                if(cell && cell.column){
+                if (cell && cell.column) {
                     let field = cell.column.content as R_Field,
                         row = this.ftable.rowGet(cell.row.index),
                         dataType = field.dataType || field.atrrs.dataType,
@@ -894,7 +894,7 @@ export class BwTableModule extends Component {
                             delete images[index];
                         },
                         onSuccess: (res) => {
-                            if(BwRule.isOldImg(dataType)){
+                            if (BwRule.isOldImg(dataType)) {
 
                                 let data = res.data,
                                     md5Data = {};
@@ -903,10 +903,10 @@ export class BwTableModule extends Component {
                                 }
                                 images = [md5Data[field.name]];
                                 row.data = Object.assign({}, row.data, md5Data);
-                            }else if(BwRule.isNewImg(dataType)){
-                                if(multi){
+                            } else if (BwRule.isNewImg(dataType)) {
+                                if (multi) {
                                     images.push(res.data.unique);
-                                }else{
+                                } else {
                                     images = [res.data.unique];
                                 }
                             }
@@ -920,7 +920,7 @@ export class BwTableModule extends Component {
                     });
 
                     layoutImg.set(getImg(cell));
-                    if(cell.data && typeof cell.data === 'string'){
+                    if (cell.data && typeof cell.data === 'string') {
                         images = cell.data.split(',');
                     }
                     layoutImg.modalShow = true;
@@ -1673,14 +1673,14 @@ export class BwTableModule extends Component {
 
                     classes.push('cell-img');
 
-                } else if(BwRule.isNewFile(dataType)){
+                } else if (BwRule.isNewFile(dataType)) {
                     classes.push('cell-link');
                     color = 'blue';
-                    if(cellData){
+                    if (cellData) {
                         BwRule.getFileInfo(field.name, cellData).then(({response}) => {
                             console.log(response);
                             response = JSON.parse(response);
-                            if(response && response.dataArr && response.dataArr[0]){
+                            if (response && response.dataArr && response.dataArr[0]) {
                                 let data = response.dataArr[0],
                                     filename = data.filename;
                                 text = filename;
@@ -1689,7 +1689,7 @@ export class BwTableModule extends Component {
                         }).catch(() => {
                             resolve({text, classes, bgColor, color, data});
                         });
-                        return ;
+                        return;
                     }
                 } else if (dataType === '50') {
                     // 打钩打叉
@@ -2106,7 +2106,7 @@ export class BwTableModule extends Component {
             handler = null;
 
         let btnRefresh = () => {
-            if(ftable && ftable.selectedRows){
+            if (ftable && ftable.selectedRows) {
                 let selectedLen = ftable.selectedRows.length,
                     rowData = ftable.selectedRowsData[0],
                     allLen = ftable.rows.length;
@@ -2459,7 +2459,7 @@ export class BwTableModule extends Component {
                         onClick: (isChecked) => {
                             this.subBtns.box.isShow = !isChecked;
                             this.modify.box.isShow = isChecked;
-                            if(!isChecked){
+                            if (!isChecked) {
                                 this.subBtns.box.responsive();
                             }
                         }
@@ -2685,23 +2685,23 @@ export class BwTableModule extends Component {
                     resolve();
                     // callback(td, false);
                 } else if (field.chkAddr/* && tools.isNotEmpty(rowData[name])*/) {
-                    if(checkLinkCell && Array.isArray(this.ui.cols)){
+                    if (checkLinkCell && Array.isArray(this.ui.cols)) {
                         let chkName = field.name;
-                        for(let col of this.ui.cols){
+                        for (let col of this.ui.cols) {
                             // 不存在chkAddr不继续验证
-                            if(!col.chkAddr || !Array.isArray(col.chkAddr.varList)){
+                            if (!col.chkAddr || !Array.isArray(col.chkAddr.varList)) {
                                 continue;
                             }
                             let varList = col.chkAddr.varList,
                                 fieldName = col.name;
 
                             // 字段名一样不继续验证
-                            if(fieldName === name || fieldName === chkName) {
+                            if (fieldName === name || fieldName === chkName) {
                                 continue;
                             }
 
                             // chkAdd.varList包含修改的cell的字段则不继续验证
-                            if(!varList.some(({varName}) => varName === chkName)){
+                            if (!varList.some(({varName}) => varName === chkName)) {
                                 continue;
                             }
                             let linkCell: FastTableCell = row ? row.cellGet(fieldName) as FastTableCell : null;
