@@ -172,7 +172,7 @@ export = class webscoket {
                 this.openLoginModal(data.data);
                 break;
             default:
-                console.info("后台返回未知的消息类型.");
+                console.info("后台返回未知的消息("+ type +")类型.");
                 break;
         }
     }
