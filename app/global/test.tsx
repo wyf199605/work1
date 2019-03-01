@@ -21,4 +21,3 @@ const result = fn`${version} was a major update`;
 
 console.log(result);
 
-
