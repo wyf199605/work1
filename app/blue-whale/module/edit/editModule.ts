@@ -88,7 +88,7 @@ export class EditModule {
     }
 
 
-    get col(){
+    get col() {
         return this.cols;
     }
 
@@ -451,7 +451,7 @@ export class EditModule {
 
         let com = this.comTnit[type](initP);
         this.assign.init(com, initP);
-        if(initP && com instanceof FormCom){
+        if (initP && com instanceof FormCom) {
             let onSet = com.onSet;
             com.onSet = (val) => {
                 onSet && onSet(val);
@@ -751,24 +751,24 @@ export class EditModule {
             v.add(field.name, rules);
         };
 
-        let valid = (name: string, data?: any) => {
+        let valid = (name: string, data?: any,lookupName?) => {
             let com = this.coms[name],
                 f = this.nameFields[name];
 
             if (f) {
                 ruleAdd(f.field);
                 data = tools.isUndefined(data) ? (com ? this.get(f.field.name)[f.field.name] : null) : data;
-                return v.start({[name]: data});
+                return v.start({[name]: data},lookupName);
             }
         };
 
-        let start = (name?: string, data?: any) => {
+        let start = (name?: string, data?: any, lookupName?) => {
             if (v === null) {
                 init();
             }
             let result: ValidateResult = {};
             if (name) {
-                result = valid(name, data);
+                result = valid(name, data, lookupName);
             } else {
                 this.para.fields.forEach(f => {
                     result = tools.obj.merge(valid(f.field.name), result);
@@ -842,14 +842,14 @@ export class EditModule {
     }
 
     destroy(name?: string) {
-        if(name){
+        if (name) {
             if (this.coms[name]) {
                 this.coms[name].destroy();
                 this.comsExtraData[name] = null;
                 delete this.coms[name];
             }
-        }else{
-            for(let name in this.coms){
+        } else {
+            for (let name in this.coms) {
                 this.coms[name].destroy();
                 this.comsExtraData[name] = null;
                 delete this.coms[name];
