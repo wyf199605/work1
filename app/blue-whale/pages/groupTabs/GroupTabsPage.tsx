@@ -214,6 +214,13 @@ export class GroupTabsPage extends BasicPage {
             if (this.ui.supportRfid && Shell.inventory.can2dScan) {
                 this.imports.openRfid();
             }
+
+            // 初始化界面查询是否有上次操作未完成的数据
+            let result = Shell.inventory.getScanData(mainUi.uniqueFlag);
+            if (result.success) {
+                console.log(result.data, 'getScanData');
+                this.imports.scanRender(result.data);
+            }
         },
         openRfid() {
             Shell.inventory.scan2dOn((result) => {
@@ -224,6 +231,22 @@ export class GroupTabsPage extends BasicPage {
                 }
             });
         },
+
+        scanRender : (data) => {
+            Array.isArray(data) && data.forEach(obj => {
+                let item = obj.itemid;
+                if (!item) {
+                    return
+                }
+
+                let {edit} = this.imports.getKeyField(item);
+                this.imports.editSet(edit, obj.array[0]);
+                this.imports.setText('');
+                this.imports.getCountData();
+                this.imports.getAggrData(item);
+            });
+        }
+        ,
         /**
          * 数据查询
          * @param value
@@ -239,21 +262,9 @@ export class GroupTabsPage extends BasicPage {
             Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag,
                 field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                 if (result.success) {
-                    let data = result.data;
                     console.log(result.data, 'operateScanTable');
-                    Array.isArray(data) && data.forEach(obj => {
-                        let item = obj.itemid;
-                        if (!item) {
-                            return
-                        }
-
-                        let {edit} = this.imports.getKeyField(item);
-                        this.imports.editSet(edit, obj.array[0]);
-                        this.imports.setText('');
-                        this.imports.getCountData();
-                        this.imports.getAggrData(item);
-                    });
-                } else {
+                    this.imports.scanRender(result.data);
+                }else {
                     Modal.toast('查询失败，请确认已下载数据');
                 }
             });

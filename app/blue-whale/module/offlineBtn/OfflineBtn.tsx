@@ -80,9 +80,16 @@ export class OfflineBtn {
             case 'import-scanning-many':
                 this.manyScan();
                 break;
+            case 'import-commit':
+                this.commit();
+                break;
             default:
                 Modal.alert('未知类型openType');
         }
+    }
+
+    private commit(){
+        this.imports.getCountData();
     }
 
     private manyScan(){
