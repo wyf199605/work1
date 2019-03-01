@@ -7,6 +7,8 @@
       height: 40px!important;
     }
     .select_group {
+      appearance: none;
+      /*清除select下拉框默认样式*/
       margin-bottom: 0px;
       width: 68%;
       background: #f7f7f7 url(https://bwt.sanfu.com/web-pe/img/sort_desc.png) no-repeat 100% 27%;

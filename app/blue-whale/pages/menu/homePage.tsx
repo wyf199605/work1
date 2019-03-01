@@ -215,19 +215,24 @@ export = class homePage extends BasicPage{
 
         d.on(d.query('.tab-pane[data-index="1"]', panelWrapper), 'press', 'li.mui-table-view-cell', function () {
             let type = 'cancel';
-            let test = true;
-            if (test) {
-                new Collect().addCollect({
-                    dom: this,
-                    favid: this.dataset.favid,
-                    link: this.dataset.href
-                });
-            } else {
-                MENU_FAVORITE.toggleFavSheet(this, type, {
-                    favid: this.dataset.favid,
-                    link: this.dataset.href
-                });
-            }
+            new Collect().addCollect({
+                dom: this,
+                favid: this.dataset.favid,
+                link: this.dataset.href
+            });
+            // let test = true;
+            // if (test) {
+            //     new Collect().addCollect({
+            //         dom: this,
+            //         favid: this.dataset.favid,
+            //         link: this.dataset.href
+            //     });
+            // } else {
+            //     MENU_FAVORITE.toggleFavSheet(this, type, {
+            //         favid: this.dataset.favid,
+            //         link: this.dataset.href
+            //     });
+            // }
 
         });
 
@@ -312,7 +317,6 @@ export = class homePage extends BasicPage{
             },
             timeout: 10000 // 10秒
         }).then(({ response }) => {
-            console.log(response);
             let data = tools.keysVal(response, 'body', 'elements'),
                 nodeId = response.nodeId || '';
 
