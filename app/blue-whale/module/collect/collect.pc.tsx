@@ -13,15 +13,14 @@ export class CollectPC extends BaseCollect {
   private groupItem: HTMLElement; //分组dom
   private menuItem: HTMLElement; //菜单dom
   private footer: HTMLElement; //底部dom
-  private cancelBtn: Button;
-  private newMenuBtn: Button;
-  private _GroupName: string;
+  private newMenuBtn: Button;//收藏夹按钮
+  private _GroupName: string; //编辑分组名
   private Item: { value: string, text: string }[] = [];
-  private selectVal: any;
+  private selectVal: any; //选中的分组
   private pageUrl: string = CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=collect";
-  private _menuUrl: string;
-  private sel: SelectInput;
-  private _collectDom: any;
+  private _menuUrl: string; //收藏块的地址
+  private sel: SelectInput; 
+  private _collectDom: any; //选中收藏的MenuItem
   set GroupName(groupName: string) {
     this._GroupName = groupName;
   }
@@ -40,11 +39,12 @@ export class CollectPC extends BaseCollect {
   get collectDom() {
     return this._collectDom
   }
+  //成功和取消收藏后都要去刷新右侧的星星
   refreshDom(favid?: number | string) {
     let node = this.collectDom;
     let dom = d.query(".collect_btn>.iconfont", node.wrapper) as HTMLElement;
     if (dom.classList.contains("un_collect")) {
-      let newNode = d.create(`<i class="iconfont icon-shoucang_fill  has_collect"/>`) as HTMLElement;
+      let newNode = d.create(`<i class="iconfont icon-shoucang_fill has_collect"/>`) as HTMLElement;
       dom.parentNode.replaceChild(newNode, dom);
       (newNode.parentNode as HTMLElement).classList.remove("un_collect_btn")
       node.content.favid = favid;
@@ -54,8 +54,8 @@ export class CollectPC extends BaseCollect {
       (newNode.parentNode as HTMLElement).classList.add("un_collect_btn");
       node.content.favid = null;
     }
-    console.log(node)
   }
+  //取消收藏
   delete() {
     this.req_delCollect(this.collectDom.content.favid).then(() => {
       this.refreshDom();
@@ -218,9 +218,14 @@ export class CollectPC extends BaseCollect {
     inputEl.value = this.GroupName;
     let select = d.query(".select_comp", this.body);
     this.req_groupName().then(({ response }) => {
-      this.Item = response.data.map(item => {
-        return { value: item.tag ? item.tag : "默认分组", text: item.tag ? item.tag : "默认分组" }
-      })
+      if(Array.isArray(response.data)){
+        this.Item = response.data.map(item => {
+          return { value: item.tag ? item.tag : "默认分组", text: item.tag ? item.tag : "默认分组" }
+        })
+      }else{
+        this.Item=[{value:"默认分组",text:"默认分组"}]
+      }
+      
       if (this.sel) {
         this.sel.value = {}
         this.sel = null;

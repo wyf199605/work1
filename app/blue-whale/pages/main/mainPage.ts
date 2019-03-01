@@ -320,7 +320,6 @@ export = class MainPage {
                 li = d.create(`<li class="dropdown pull-right"><a href="#">打开系统</a></li>`);
             d.append(container, li);
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({response}) => {
-                console.log(response);
                 let data = tools.keysVal(response, 'body', 'bodyList');
                 if(tools.isNotEmpty(data)){
                     let popover = new Popover({

@@ -53,7 +53,7 @@ export class CollectPage extends BasicPage {
                 <div className="collect_caption">{menu.caption}</div>
               </a>
             </li>;
-          }):<div>暂无数据</div>
+          }):<div className="recent_null">暂无数据</div>
         }
       </ul>
       G.d.append(this.container, dom);
