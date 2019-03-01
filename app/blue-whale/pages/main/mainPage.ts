@@ -315,6 +315,8 @@ export = class MainPage {
     }());
 
     protected static systemMenu = (() => {
+        let result = {};
+
         let init = () => {
             let container = d.query('.content-tabs'),
                 li = d.create(`<li class="dropdown pull-right"><a href="#">打开系统</a></li>`);
@@ -330,10 +332,7 @@ export = class MainPage {
                             return {
                                 title: item.systemName,
                                 onClick: () => {
-                                    BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.systemMsg, {
-                                        tdsourcetag: 's_pctim_aiomsg',
-                                        systemid: item.systemId
-                                    })).then(({response}) => {
+                                    getSystemMsg(item.systemId).then((response) => {
                                         console.log(response);
                                         let loading: Loading,
                                             path = tools.keysVal(response, 'LOGIN_VAR', 'SYSTEM_PATH') || '',
@@ -343,7 +342,7 @@ export = class MainPage {
                                             loading && loading.hide();
                                             loading = null;
                                             if(!result.success){
-                                                Modal.alert('打开失败');
+                                                Modal.alert(result.msg || '打开失败');
                                             }
                                         });
 
@@ -372,6 +371,20 @@ export = class MainPage {
                 }
 
             });
+        };
+
+        let getSystemMsg = (systemId: string): Promise<any> => {
+            if(systemId in result){
+                return Promise.resolve(result[systemId]);
+            }else{
+                return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.systemMsg, {
+                    tdsourcetag: 's_pctim_aiomsg',
+                    systemid: systemId
+                })).then(({response}) => {
+                    result[systemId] = response;
+                    return response;
+                });
+            }
         };
 
         return {init}
