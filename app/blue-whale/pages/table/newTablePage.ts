@@ -40,6 +40,9 @@ export class NewTablePage extends BasicPage{
             bwTable.tableModule && bwTable.tableModule.refresh();
         });
         // 显示当前页时触发的事件
+        // d.on(this.dom,BW.EVT_SHOW_PAGE,'',()=>{
+        //     bwTable.tableModule.responsive();
+        // });
         this.on(BW.EVT_SHOW_PAGE, () => {
             bwTable.tableModule.responsive();
         })
