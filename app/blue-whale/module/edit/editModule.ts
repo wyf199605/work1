@@ -751,24 +751,24 @@ export class EditModule {
             v.add(field.name, rules);
         };
 
-        let valid = (name: string, data?: any,lookupName?) => {
+        let valid = (name: string, data?: any) => {
             let com = this.coms[name],
                 f = this.nameFields[name];
 
             if (f) {
                 ruleAdd(f.field);
                 data = tools.isUndefined(data) ? (com ? this.get(f.field.name)[f.field.name] : null) : data;
-                return v.start({[name]: data},lookupName);
+                return v.start({[name]: data});
             }
         };
 
-        let start = (name?: string, data?: any, lookupName?) => {
+        let start = (name?: string, data?: any) => {
             if (v === null) {
                 init();
             }
             let result: ValidateResult = {};
             if (name) {
-                result = valid(name, data, lookupName);
+                result = valid(name, data);
             } else {
                 this.para.fields.forEach(f => {
                     result = tools.obj.merge(valid(f.field.name), result);

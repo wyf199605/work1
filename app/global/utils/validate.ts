@@ -88,7 +88,7 @@ export class Validate {
         return this.name2Rules[dataName];
     }
 
-    start(data: obj,lookupName?) {
+    start(data: obj) {
         let result: ValidateResult = null;
         for (let name in this.name2Rules) {
             let rules = this.name2Rules[name];
@@ -98,7 +98,7 @@ export class Validate {
                         let err = r.errMsg ? r.errMsg : errMsgs[r.rule];
 
                         err = G.tools.str.parseTpl(err, {
-                            title: lookupName || r.title,
+                            title: r.title,
                             value: r.value
                         });
 

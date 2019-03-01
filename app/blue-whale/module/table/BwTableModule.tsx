@@ -2706,7 +2706,7 @@ export class BwTableModule extends Component {
                     lookUpCell = fastRow.cellGet(field.lookUpKeyField);
                     if (lookUpCell && lookUpCell.column) {
                         field = lookUpCell.column.content;
-                        result = editModule.validate.start(lookUpCell.name, lookUpCell.data, field.caption);
+                        result = editModule.validate.start(lookUpCell.name, lookUpCell.data);
                     }
                 } else if (field.assignSelectFields && field.assignSelectFields[0]) {
                     lookUpCell = fastRow.cellGet(field.assignSelectFields[0]);
