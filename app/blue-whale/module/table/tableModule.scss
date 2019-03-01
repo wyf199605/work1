@@ -51,9 +51,12 @@
       height: 100% !important;
     }
     .tab-content {
-      height: calc(100% - 42px);
+      height: calc(100% - 30px);
       .tab-pane {
         height: 100%;
+        .fast-table-container.table-width-full.paging-content{
+          padding-bottom: 0;
+        }
       }
     }
   }
