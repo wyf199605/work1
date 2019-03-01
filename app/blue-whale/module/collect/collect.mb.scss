@@ -2,12 +2,18 @@
   .collect {
     display: flex;
     align-items: center;
+    justify-content: center;
+    .collect_mb_btn {
+      height: 40px!important;
+    }
     .select_group {
       margin-bottom: 0px;
-      background: #f7f7f7 url(http://127.0.0.1:8080/img/img/sort_desc.png) no-repeat fixed right center;
+      width: 68%;
+      background: #f7f7f7 url(https://bwt.sanfu.com/web-pe/img/sort_desc.png) no-repeat 100% 27%;
     }
     .inp_name {
       margin-bottom: 0px;
+      width: 68%;
     }
     .add_i {
       font-size: 30px;
@@ -21,10 +27,19 @@
     .add_s {
       font-size: 30px;
       vertical-align: sub!important;
+      cursor: pointer;
     }
     .add_s:before {
       content: '\e468';
     }
+  }
+  .group_input {
+    width: 78%;
+    margin-bottom: 26px;
+    border: none!important;
+    border-radius: 0px;
+    padding: 0px;
+    border-bottom: 1px solid rgba(0, 0, 0, .2)!important;
   }
   .collect_input {
     display: none;

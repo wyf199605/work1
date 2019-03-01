@@ -27,7 +27,10 @@ export class CollectPage extends BasicPage {
         target = target.parentNode
       }
       if (target) {
-        let url = CONF.siteUrl + target.dataset.href
+        let url = CONF.siteUrl + target.dataset.href;
+        // sys.window.redirect({url:url})
+        // return false;
+        // debugger;
         sys.window.open({ url: url })
       }
 
@@ -38,22 +41,22 @@ export class CollectPage extends BasicPage {
       data: { action: "query" }
     }).then(({ response }) => {
       let dom = <ul class="recent_parent" id="recent_wrap">
-        {  
-          response.data&&response.data.length>0?
-          response.data.map(menu => {
-            return <li
-              style="border-style: none"
-              data-favid={menu.favid}
-              data-href={menu.url}
-              data-gps={menu.gps}
-              className="collect_li"
-            >
-              <a>
-                <span className={`self_icon  ${menu.icon} `}></span>
-                <div className="collect_caption">{menu.caption}</div>
-              </a>
-            </li>;
-          }):<div className="recent_null">暂无数据</div>
+        {
+          response.data && response.data.length > 0 ?
+            response.data.map(menu => {
+              return <li
+                style="border-style: none"
+                data-favid={menu.favid}
+                data-href={menu.url}
+                data-gps={menu.gps}
+                className="collect_li"
+              >
+                <a>
+                  <span className={`self_icon  ${menu.icon} `}></span>
+                  <div className="collect_caption">{menu.caption}</div>
+                </a>
+              </li>;
+            }) : <div className="recent_null">暂无数据</div>
         }
       </ul>
       G.d.append(this.container, dom);

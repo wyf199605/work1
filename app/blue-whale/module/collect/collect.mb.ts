@@ -11,6 +11,7 @@ interface CollectPara {
   link: string;
 }
 export class Collect extends BaseCollect {
+  private ModalContent: Modal;
   //新增和取消收藏
   addCollect(para: CollectPara) {
     let type = tools.isEmpty(para.favid) ? 'add' : 'cancel';
@@ -37,7 +38,7 @@ export class Collect extends BaseCollect {
             {
               content: "取消",
               onClick: () => {
-                m.isShow = false;
+                this.ModalContent.isShow = false;
               }
             },
             {
@@ -69,7 +70,7 @@ export class Collect extends BaseCollect {
                 this.req_addCollect(para.link, newval).then(({ response }) => {
                   Modal.toast("收藏成功");
                   para.dom.dataset.favid = response.data[0].favid;
-                  m.isShow = false;
+                  this.ModalContent.isShow = false;
                 })
               }
             }
@@ -90,18 +91,21 @@ export class Collect extends BaseCollect {
                     </div>
                 </div>
           `)
-          let m = new Modal({
-            isOnceDestroy: true,
-            header: "收藏分组",
-            width: '300px',
-            position: 'center',
-            className: 'modal-prompt',
-            body: dom,
-            isMb: false,
-            footer: {
-              rightPanel: arr
-            }
-          })
+          if (!this.ModalContent) {
+            this.ModalContent = new Modal({
+              isOnceDestroy: true,
+              header: "收藏分组",
+              width: '300px',
+              position: 'center',
+              className: 'modal-prompt',
+              body: dom,
+              isMb: false,
+              footer: {
+                rightPanel: arr
+              }
+            })
+          }
+
           this.req_groupName().then(({ response }) => {
             let set_s = d.query(".select_group");
             set_s.innerHTML = "";
@@ -152,30 +156,36 @@ export class Collect extends BaseCollect {
           <div class="group_btn"></div>
         </div>
     `)
-    let m = new Modal({
-      isOnceDestroy: true,
-      header: "分组管理",
-      width: '300px',
-      position: 'center',
-      className: 'modal-prompt',
-      body: dom,
-      isMb: false
-    })
+    if (!this.ModalContent) {
+      this.ModalContent = new Modal({
+        isOnceDestroy: true,
+        header: "分组管理",
+        width: '300px',
+        position: 'center',
+        className: 'modal-prompt',
+        body: dom,
+        isMb: false
+      })
+    }
+
     let wrapper = d.query(".group_btn")
     let Input = <HTMLInputElement>d.query(".group_input");
     Input.value = GroupName;
     let arr = [
       {
         content: "取消",
+        size: "large",
+        className: "collect_mb_btn",
         container: wrapper,
         onClick: () => {
-          m.isShow = false
+          this.ModalContent.isShow = false
         }
       },
       {
         content: "删除",
         container: wrapper,
-        className: "del_btn",
+        size: "large",
+        className: "del_btn collect_mb_btn",
         onClick: () => {
           if (GroupName !== "") {
             Modal.confirm({
@@ -185,7 +195,7 @@ export class Collect extends BaseCollect {
                   this.req_delGroup(GroupName).then(() => {
                     HandleDOM.parentNode.parentNode.parentNode.removeChild(HandleDOM.parentNode.parentNode)
                     Modal.toast("删除成功");
-                    m.isShow = false;
+                    this.ModalContent.isShow = false;
                   })
                 }
               }
@@ -196,7 +206,8 @@ export class Collect extends BaseCollect {
       {
         content: "重命名",
         container: wrapper,
-        className: "rename_btn",
+        size: "large",
+        className: "rename_btn collect_mb_btn",
         onClick: () => {
           let renameDom = <HTMLInputElement>d.query(".group_input"),
             rename = renameDom.value.trim(),
@@ -209,13 +220,11 @@ export class Collect extends BaseCollect {
             GroupName === rename ||
             (GroupName === "" && rename === "默认分组")
           ) {
-            m.isShow = false;
+            this.ModalContent.isShow = false;
           } else {
             this.req_rename(GroupName, rename).then(() => {
               let dataName = HandleDOM.querySelector('[data-edit="' + rename + '"]');
               let fragment = document.createDocumentFragment();
-              // console.log(HandleDOM);
-              // HandleDOM.previousSibling.
               HandleDOM.previousSibling.textContent = rename;
               if (dataName) {
                 let liDom = HandleDOM.querySelectorAll("li[data-favid]"),
@@ -227,7 +236,7 @@ export class Collect extends BaseCollect {
                 HandleDOM.remove();
               }
               Modal.toast("重命名成功");
-              m.isShow = false;
+              this.ModalContent.isShow = false;
             })
           }
         }

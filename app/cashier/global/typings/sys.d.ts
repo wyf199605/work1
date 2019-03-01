@@ -5,6 +5,7 @@ interface SYS_Type {
     isMb: boolean;
 }
 interface SYS_Window{
+    redirect(obj:winOpen):void;
     open( obj:winOpen, refer? : string) :void;
     close( event?:string, data?:obj, url? : string) :void;
     load( url:string, data?:obj) :void;
