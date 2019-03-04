@@ -424,14 +424,13 @@ export = class MainPage {
             {
                 title: '<a href="javascript:void(0)" data-action="check">清理缓存</a>',
                 onClick: () => {
-                    let flag = Shell.clearCache((result) => {
-                        if (!result.success) {
+                    Shell.clearCache((result) => {
+                        if (result.success) {
                             Modal.alert(result.msg || '成功清理缓存');
+                        } else {
+                            Modal.alert(result.msg || '清理缓存失败')
                         }
                     });
-                    if (!flag) {
-                        Modal.alert('清理缓存失败')
-                    } 
                 }
             },
             {
