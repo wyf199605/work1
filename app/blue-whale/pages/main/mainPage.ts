@@ -5,19 +5,19 @@ import sys = BW.sys;
 import CONF = BW.CONF;
 import localMsg = G.localMsg;
 import d = G.d;
-import {Modal} from 'global/components/feedback/modal/Modal';
-import {User} from "../../../global/entity/User";
-import {Device} from "../../../global/entity/Device";
-import {Search} from "../../module/search/search";
-import {SearchInput} from "../../../global/components/form/searchInput/searchInput";
-import {Loading} from "../../../global/components/ui/loading/loading";
-import {BwRule} from "../../common/rule/BwRule";
-import {IPopoverItemPara, Popover} from "../../../global/components/ui/popover/popover";
-import {BugReportModal} from "../../module/BugReport/BugReport";
+import { Modal } from 'global/components/feedback/modal/Modal';
+import { User } from "../../../global/entity/User";
+import { Device } from "../../../global/entity/Device";
+import { Search } from "../../module/search/search";
+import { SearchInput } from "../../../global/components/form/searchInput/searchInput";
+import { Loading } from "../../../global/components/ui/loading/loading";
+import { BwRule } from "../../common/rule/BwRule";
+import { IPopoverItemPara, Popover } from "../../../global/components/ui/popover/popover";
+import { BugReportModal } from "../../module/BugReport/BugReport";
 import sysPcHistory = BW.sysPcHistory;
-import {Spinner} from "../../../global/components/ui/spinner/spinner";
-import {Notify} from "../../../global/components/feedback/notify/Notify";
-import {RfidConfig} from "../../module/rfid/RfidConfig";
+import { Spinner } from "../../../global/components/ui/spinner/spinner";
+import { Notify } from "../../../global/components/feedback/notify/Notify";
+import { RfidConfig } from "../../module/rfid/RfidConfig";
 import Shell = G.Shell;
 
 interface IProps {
@@ -93,7 +93,7 @@ export = class MainPage {
                                 currentNode: props.nodeId,
                                 keywords: recentValue
                             }
-                        }).then(({response}) => {
+                        }).then(({ response }) => {
                             menuPanel(response.body.bodyList);
                         });
 
@@ -139,7 +139,7 @@ export = class MainPage {
                     if (badge) {
                         num = parseInt(badge.textContent);
                     }
-                    let data = badge ? {badge: num} : {};
+                    let data = badge ? { badge: num } : {};
                     BW.sys.window.open({
                         url: CONF.siteUrl + this.dataset.href,
                         data: data
@@ -276,7 +276,7 @@ export = class MainPage {
             });
 
             $(tabBar).on('click', 'li[data-href]', function () {
-                sys.window.open({url: this.dataset.href});
+                sys.window.open({ url: this.dataset.href });
             }).on('click', '.close[data-href]', function (e) {
                 sys.window.close('', null, this.dataset.href);
                 navScroll.toggleBtn();
@@ -299,7 +299,7 @@ export = class MainPage {
                     case 'closeAll':
                         sys.window.closeAll();
                         break;
-                    case  'closeOther':
+                    case 'closeOther':
                         sys.window.closeOther();
                         break;
                 }
@@ -321,9 +321,9 @@ export = class MainPage {
             let container = d.query('.content-tabs'),
                 li = d.create(`<li class="dropdown pull-right"><a href="#">打开系统</a></li>`);
             d.append(container, li);
-            BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({response}) => {
+            BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({ response }) => {
                 let data = tools.keysVal(response, 'body', 'bodyList');
-                if(tools.isNotEmpty(data)){
+                if (tools.isNotEmpty(data)) {
                     let popover = new Popover({
                         target: li,
                         // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
@@ -341,18 +341,18 @@ export = class MainPage {
                                         let flag = Shell.openSystem(path, params, (result) => {
                                             loading && loading.hide();
                                             loading = null;
-                                            if(!result.success){
+                                            if (!result.success) {
                                                 Modal.alert(result.msg || '打开失败');
                                             }
                                         });
 
-                                        if(flag){
+                                        if (flag) {
                                             loading = new Loading({
                                                 msg: '打开中...',
                                                 duration: 10
                                             });
                                             loading.show();
-                                        }else{
+                                        } else {
                                             Modal.alert('打开失败');
                                         }
                                     })
@@ -364,7 +364,7 @@ export = class MainPage {
                             popover.show = false;
                         }
                     });
-                }else{
+                } else {
                     d.on(li, 'click', () => {
                         Modal.toast('无相关系统信息');
                     })
@@ -374,35 +374,35 @@ export = class MainPage {
         };
 
         let getSystemMsg = (systemId: string): Promise<any> => {
-            if(systemId in result){
+            if (systemId in result) {
                 return Promise.resolve(result[systemId]);
-            }else{
+            } else {
                 return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.systemMsg, {
                     tdsourcetag: 's_pctim_aiomsg',
                     systemid: systemId
-                })).then(({response}) => {
+                })).then(({ response }) => {
                     result[systemId] = response;
                     return response;
                 });
             }
         };
 
-        return {init}
+        return { init }
     })();
 
     private static myselfMenu = (function () {
         //顶部个人信息下拉窗口点击事件
-        let rfid : RfidConfig,
+        let rfid: RfidConfig,
             conf = window.localStorage.getItem('rfidConf');
         !conf && window.localStorage.setItem('rfidConf', JSON.stringify({
-            line : 0,
-            ip : '192.168.1.200',
-            port : 100,
-            com : 'COM1',
-            baud : 115200,
-            mode : 1,
-            buzz : false,
-            led : false,
+            line: 0,
+            ip: '192.168.1.200',
+            port: 100,
+            com: 'COM1',
+            baud: 115200,
+            mode: 1,
+            buzz: false,
+            led: false,
         }));
         let items: IPopoverItemPara[] = [
             {
@@ -420,8 +420,21 @@ export = class MainPage {
                 onClick: () => {
                     sys.window.update();
                 }
-            },{
-                title : '<a href="javascript:void(0)" data-action="check">RFID设置</a>',
+            },
+            {
+                title: '<a href="javascript:void(0)" data-action="check">清理缓存</a>',
+                onClick: () => {
+                    Shell.clearCache((result) => {
+                        if (result.success) {
+                            Modal.alert(result.msg || '成功清理缓存');
+                        } else {
+                            Modal.alert(result.msg || '清理缓存失败')
+                        }
+                    });
+                }
+            },
+            {
+                title: '<a href="javascript:void(0)" data-action="check">RFID设置</a>',
                 onClick: () => rfid ? rfid.show() : rfid = new RfidConfig()
             }
             // {
@@ -475,7 +488,7 @@ export = class MainPage {
             if (sysPcHistory.indexOf(url) >= 0) {
                 sys.window.refresh(url);
             }
-            sys.window.open({url, title})
+            sys.window.open({ url, title })
         }
 
         function init() {
@@ -486,7 +499,7 @@ export = class MainPage {
                 type: Spinner.SHOW_TYPE.cover
             });
             spinner.show();
-            G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+            G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({ response }) => {
                 response = JSON.parse(response);
                 let menus = response.body && response.body.elements;
                 // console.log('in pc');
@@ -511,13 +524,13 @@ export = class MainPage {
                 toggleEl.classList.remove('disabled');
                 if (CONF.appid === 'app_fastlion_retail') {
                     items = items.concat([{
-                            title: '<a href="javascript:void(0)" data-page-name="changePassword" data-action="changePassword">修改个人密码</a>',
-                            onClick: () => {
-                                sys.window.open({
-                                    url: CONF.url.changePassword
-                                });
-                            }
-                        }]
+                        title: '<a href="javascript:void(0)" data-page-name="changePassword" data-action="changePassword">修改个人密码</a>',
+                        onClick: () => {
+                            sys.window.open({
+                                url: CONF.url.changePassword
+                            });
+                        }
+                    }]
                     );
                 }
 
@@ -550,7 +563,7 @@ export = class MainPage {
                     unreadMsgNum.innerText = num + '';
                 }
                 d.on(msgDom, 'click', function () {
-                    sys.window.open({url: CONF.url.msgList, title: '消息'});
+                    sys.window.open({ url: CONF.url.msgList, title: '消息' });
                 });
             });
         }

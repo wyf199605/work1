@@ -12,6 +12,7 @@ interface CollectPara {
 }
 export class Collect extends BaseCollect {
   private ModalContent: Modal;
+  private Sheet: ActionSheet;
   //新增和取消收藏
   addCollect(para: CollectPara) {
     let type = tools.isEmpty(para.favid) ? 'add' : 'cancel';
@@ -20,6 +21,8 @@ export class Collect extends BaseCollect {
       arr = [{
         content: "取消收藏",
         onClick: () => {
+          this.Sheet.destroy();
+          this.Sheet = null;
           this.req_delCollect(para.favid).then(response => {
             if (para.dom.parentNode.nodeName.toString() == "DIV") {
               para.dom.remove();
@@ -34,6 +37,8 @@ export class Collect extends BaseCollect {
       arr = [{
         content: "添加收藏",
         onClick: () => {
+          this.Sheet.destroy();
+          this.Sheet = null;
           let arr = [
             {
               content: "取消",
@@ -90,7 +95,7 @@ export class Collect extends BaseCollect {
                       </div>
                     </div>
                 </div>
-          `)
+              `)
           if (!this.ModalContent) {
             this.ModalContent = new Modal({
               isOnceDestroy: true,
@@ -105,7 +110,6 @@ export class Collect extends BaseCollect {
               }
             })
           }
-
           this.req_groupName().then(({ response }) => {
             let set_s = d.query(".select_group");
             set_s.innerHTML = "";
@@ -128,6 +132,12 @@ export class Collect extends BaseCollect {
               }
               set_s.appendChild(opt);
             }
+            d.on(set_s, "blur", () => {
+              window.scroll(0, 0);
+            })
+            d.on(set_s, "change", () => {
+              window.scroll(0, 0);
+            })
           })
           let collect_select = d.query(".collect_select")
           let collect_input = d.query(".collect_input")
@@ -144,7 +154,8 @@ export class Collect extends BaseCollect {
       }]
     }
 
-    new ActionSheet({ buttons: arr }).isShow = true
+    this.Sheet = new ActionSheet({ buttons: arr });
+    this.Sheet.isShow = true
   }
   //分组管理（重命名和删除）
   editCollectGroup(GroupName: string, HandleDOM: HTMLElement) {

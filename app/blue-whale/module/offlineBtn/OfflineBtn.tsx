@@ -13,7 +13,6 @@ import {SelectInputMb} from "../../../global/components/form/selectInput/selectI
 
 interface IGeneralPara {
     ui?: IBW_Slave_Ui;  // 当前按钮对应ui
-    numName?: string; // 主表替换逐一累加对应的name
     uniqueFlag?: string; // 当前按钮对应唯一键
     mainId: string   // 主表主键id
     subId: string   // 子表主键id
@@ -40,17 +39,12 @@ export class OfflineBtn {
         this.para = {
             mainId: mainUi.itemId,
             subId: subUi && subUi.itemId,
-            numName: this.imports.getTextPara().name,
             uniqueFlag : mainUi.uniqueFlag,
             mainKey: mainUi.fields.map(e => {
-                if (e.name === mainUi.keyField) {
-                    return e
-                }
+                if (e.name === mainUi.keyField) return e
             })[0],
             subKey: subUi && subUi.fields.map(e => {
-                if (e.name === subUi.keyField) {
-                    return e
-                }
+                if (e.name === subUi.keyField) return e
             })[0],
             itemId
         };
@@ -66,7 +60,7 @@ export class OfflineBtn {
                 this.setting();
                 break;
             case 'import-upload':
-                this.uploadData();
+                this.uploadCheck();
                 break;
             case 'import-download':
                 this.downData();
@@ -89,7 +83,9 @@ export class OfflineBtn {
     }
 
     private commit(){
-        this.imports.getCountData();
+        let {keyField, value} = this.imports.getKeyField(this.para.itemId);
+        this.imports.query(value[keyField]);
+        this.imports.isModify = false;
     }
 
     private manyScan(){
@@ -122,6 +118,21 @@ export class OfflineBtn {
             loading.destroy();
             Modal.toast(result.msg)
         })
+    }
+
+    private uploadCheck(){
+        let option = this.imports.getOption();
+        if(['2', '3'].includes(option) && this.imports.isModify){
+            Modal.confirm({
+                msg : '有数据未提交，是否提交？',
+                callback : flag => {
+                    flag && this.commit();
+                    this.uploadData();
+                }
+            })
+        }else {
+            this.uploadData();
+        }
     }
 
     private uploadData() {
@@ -268,6 +279,7 @@ export class OfflineBtn {
                 this.imports.setCount(value);
                 this.imports.setText('');
             }
+            this.imports.toggleComBtn(value);
         });
     }
 
@@ -284,10 +296,7 @@ export class OfflineBtn {
             </div>;
         this.modalInit('请输入', body, () => {
             let val = textInput.get();
-            if (tools.isEmpty(val)) {
-                Modal.alert('条码不能为空');
-                return;
-            }
+            if (tools.isEmpty(val)) return Modal.alert('条码不能为空');
             this.imports.query(val);
         });
     }

@@ -109,6 +109,18 @@
         }
       }
     }
+    &.no-aggr, &.no-cor{
+      padding-bottom: 95px;
+      .inventory-footer{
+        height: 95px;
+      }
+      &.no-cor{
+        padding-bottom: 40px;
+        .inventory-footer{
+          height: 40px;
+        }
+      }
+    }
   }
 
   .group-tab-page{
