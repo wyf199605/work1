@@ -19,7 +19,7 @@ export class CollectPC extends BaseCollect {
   private selectVal: any; //选中的分组
   private pageUrl: string = CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=collect";
   private _menuUrl: string; //收藏块的地址
-  private sel: SelectInput; 
+  private sel: SelectInput;
   private _collectDom: any; //选中收藏的MenuItem
   set GroupName(groupName: string) {
     this._GroupName = groupName;
@@ -59,7 +59,7 @@ export class CollectPC extends BaseCollect {
   delete() {
     this.req_delCollect(this.collectDom.content.favid).then(() => {
       this.refreshDom();
-      Modal.toast("成功取消删除");
+      Modal.toast("取消收藏成功");
       sys.window.refresh(this.pageUrl)
     })
   }
@@ -97,23 +97,21 @@ export class CollectPC extends BaseCollect {
           container: this.footer,
           className: "sure_btn",
           onClick: () => {
-            let status = d.query(".new_group_btn").classList.contains("disabled")
+            let status = d.query(".new_group_btn").classList.contains("disabled");
+            let groupName = "";
             if (status) {
               let group = d.query("#js_new_groupName") as HTMLInputElement;
-              this.req_addCollect(this.menuUrl, group.value).then(({ response }) => {
-                sys.window.refresh(this.pageUrl)
-                this.refreshDom(response.data[0].favid)
-                Modal.toast("添加成功")
-                this.modal.isShow = false;
-              })
+              groupName = group.value;
             } else {
-              this.req_addCollect(this.menuUrl, this.selectVal.text).then(({ response }) => {
-                sys.window.refresh(this.pageUrl)
-                this.refreshDom(response.data[0].favid)
-                Modal.toast("添加成功")
-                this.modal.isShow = false;
-              })
+              groupName = this.selectVal.text;
             }
+            this.req_addCollect(this.menuUrl, groupName).then(({ response }) => {
+              sys.window.refresh(this.pageUrl)
+              this.refreshDom(response.data[0].favid)
+              Modal.toast("收藏成功")
+              this.modal.isShow = false;
+            })
+
           }
         }
       ]
@@ -218,14 +216,14 @@ export class CollectPC extends BaseCollect {
     inputEl.value = this.GroupName;
     let select = d.query(".select_comp", this.body);
     this.req_groupName().then(({ response }) => {
-      if(Array.isArray(response.data)){
+      if (Array.isArray(response.data)) {
         this.Item = response.data.map(item => {
           return { value: item.tag ? item.tag : "默认分组", text: item.tag ? item.tag : "默认分组" }
         })
-      }else{
-        this.Item=[{value:"默认分组",text:"默认分组"}]
+      } else {
+        this.Item = [{ value: "默认分组", text: "默认分组" }]
       }
-      
+
       if (this.sel) {
         this.sel.value = {}
         this.sel = null;

@@ -577,7 +577,11 @@ namespace G {
                 params: param
             }, back)
         };
-
+        //pc清理缓存
+        const clearCache = (back: IShellEventHandler) => {
+            return ShellBase.handler('clear', {}, back)
+        };
+        //表格上方的发送位置-停止发送
         const location = {
             startRecord(back: IShellEventHandler) {
                 return ShellBase.handler('startRecord', { "timestep": "5000" },back);
@@ -587,7 +591,7 @@ namespace G {
             },
         };
         return {
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem
+            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem,clearCache
         }
     })(window, document);
 

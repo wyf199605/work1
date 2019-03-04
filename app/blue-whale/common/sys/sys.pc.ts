@@ -17,16 +17,16 @@ namespace BW {
         private navBar: HTMLDivElement;
         private inMain: boolean;
 
-        private tabMenu:TabMenuI[] = [{
+        private tabMenu: TabMenuI[] = [{
             title: '刷新',
-            callback: (url:string) => {
+            callback: (url: string) => {
                 this.window.refresh(url);
             }
-        },{
+        }, {
             title: '锁定/解锁',
             callback: (url) => {
                 let tab = this.tabs.getTab(url);
-                if(tab) {
+                if (tab) {
                     this.window.lockToggle(url, !tab.classList.contains('locked'));
                 }
             }
@@ -44,16 +44,16 @@ namespace BW {
                 setTimeout(() => {
                     let hash = location.hash,
                         autoUrl = '';
-                    if(hash) {
+                    if (hash) {
                         hash = hash.substring(1);
                         let [page, url] = hash.split('=');
-                        if(page === 'page' && url){
+                        if (page === 'page' && url) {
 
                             autoUrl = CONF.siteAppVerUrl + url;
                         }
                     }
                     location.hash = '';
-                    if(sysPcHistory.isUseLockInit()) {
+                    if (sysPcHistory.isUseLockInit()) {
                         sysPcHistory.setInitType('0');
 
                         setTimeout(() => {
@@ -67,7 +67,7 @@ namespace BW {
                                     return tab;
                                 });
 
-                                if(autoUrl) {
+                                if (autoUrl) {
                                     let autoTab = {
                                         isLock: false,
                                         title: '',
@@ -80,13 +80,13 @@ namespace BW {
                                 // debugger;
                                 this.tabs.initHistory(tabArr);
 
-                                if(tools.isNotEmpty(tabArr)){
-                                    this.window.open({url: tabArr.pop().url});
+                                if (tools.isNotEmpty(tabArr)) {
+                                    this.window.open({ url: tabArr.pop().url });
                                 }
                             });
                         }, 200);
                     } else {
-                        if(autoUrl) {
+                        if (autoUrl) {
                             let autoTab = {
                                 isLock: false,
                                 title: '',
@@ -100,7 +100,7 @@ namespace BW {
                                 let tabs: UrlData[] = [],
                                     menus = sysPcHistory.getMenuOrder();
 
-                                for(let url in menus){
+                                for (let url in menus) {
                                     let menu = menus[url];
                                     tabs.push({
                                         url: url,
@@ -113,7 +113,7 @@ namespace BW {
 
                                 return tabs;
                             })());
-                            this.window.open({url: lastUrl});
+                            this.window.open({ url: lastUrl });
                         }
                     }
                 }, 100)
@@ -128,23 +128,29 @@ namespace BW {
         public isMb: boolean;
         public window = (function (self) {
             return {
+                redirect: function (o: winOpen) {
+                    this.close()
+                    setTimeout(() => {
+                        this.open(o)
+                    },100);
+                },
                 open: function (o: winOpen, refer?: string) {
                     let url = o.url;
                     if (self.inMain) {
                         let isNew = self.pages.open(o),
                             isNotBtl = url.indexOf('newPage') > -1;
-                        if(isNotBtl){ // 不走btl模板的页面
+                        if (isNotBtl) { // 不走btl模板的页面
                             let title = o.title;
                             self.tabs.open(url, title);
-                            sysPcHistory.add({url: url, refer, title: title});
-                        }else {
+                            sysPcHistory.add({ url: url, refer, title: title });
+                        } else {
                             self.tabs.open(o.url);
-                            sysPcHistory.add({url: url, refer, title: ''});
+                            sysPcHistory.add({ url: url, refer, title: '' });
                         }
                         if (!isNew) {
-                            if(isNotBtl){
+                            if (isNotBtl) {
                                 self.window.refresh(url);
-                            }else {
+                            } else {
                                 self.window.fire('wake', self.pages.get(url).dom, url);
                             }
                         }
@@ -153,7 +159,6 @@ namespace BW {
                     }
                     localStorage.setItem('viewData', JSON.stringify(o.extras));
                 },
-
                 close: function (event: string = '', data: any = null, url?: string) {
                     let lastUrl = sysPcHistory.last();
                     typeof url === 'undefined' && (url = lastUrl);
@@ -167,7 +172,7 @@ namespace BW {
                         self.tabs.close(url);
                         // 如果关闭当前打开的页面，则关闭后打开历史倒数第二位置的页面
                         if (sysPcHistory.len() > 0 && isLast) {
-                            self.window.open({url: sysPcHistory.last()});
+                            self.window.open({ url: sysPcHistory.last() });
                         }
                     }
                 },
@@ -191,7 +196,7 @@ namespace BW {
                 uploadVersion: function () {
 
                 },
-                refresh: function (url: string, callback?:Function) {
+                refresh: function (url: string, callback?: Function) {
                     self.pages.refresh(url, () => {
                         // self.window.setBreadcrumb(url);
                         typeof callback === 'function' && callback();
@@ -223,18 +228,18 @@ namespace BW {
                 logout: function () {
                     let uuid = '',
                         json = this.getDevice();
-                    if(json){
+                    if (json) {
                         uuid = json.uuid;
                     }
-                    window.location.assign(tools.url.addObj(CONF.url.index, {uuid}));
+                    window.location.assign(tools.url.addObj(CONF.url.index, { uuid }));
                 },
 
                 firePreviousPage: function (...any) {
 
                 },
-                getDevice: function (key?: string): obj{
+                getDevice: function (key?: string): obj {
                     let data = SYSPC.handle('getDevice');
-                    if('AppShell' in window){
+                    if ('AppShell' in window) {
                         data = Shell.base.device
                     }
                     return data && data.msg;
@@ -247,19 +252,19 @@ namespace BW {
                 quit: function () {
                 },
                 copy: function (text: string) {
-                   tools.copy(text);
+                    tools.copy(text);
                 },
                 getGps: function (callback?: Function) {
-                    callback({gps:{},success:true});
+                    callback({ gps: {}, success: true });
                 },
-                openGps: function(){
+                openGps: function () {
 
                 },
                 update: function () {
                     // G.Modal.toast('已经是最新版本');
-                    if('AppShell' in window){
+                    if ('AppShell' in window) {
                         Shell.base.versionUpdate(CONF.ajaxUrl.pcVersion, (e) => {
-                            if(!e.success){
+                            if (!e.success) {
                                 require(['Modal'], (m) => {
                                     m.Modal.toast('已经是最新版本');
                                 })
@@ -267,7 +272,7 @@ namespace BW {
                         }, (e) => {
                             console.log(e);
                         });
-                    }else{
+                    } else {
                         require(['Modal'], (m) => {
                             m.Modal.toast('已经是最新版本');
                         })
@@ -320,7 +325,7 @@ namespace BW {
 
                     if (page && page.dom) {
                         let refers = sysPcHistory.getRefer(url, -1),
-                                liHtml = '<li><span class="iconfont icon-house"></span></li>',
+                            liHtml = '<li><span class="iconfont icon-house"></span></li>',
                             menu = sysPcHistory.getMenuOrder();
 
                         refers.unshift(url);
@@ -335,20 +340,20 @@ namespace BW {
                             }
                         }
                         let breadcrumb = d.query('.breadcrumb', page.dom);
-                        if(breadcrumb){
+                        if (breadcrumb) {
                             breadcrumb.innerHTML = liHtml;
-                        }else{
+                        } else {
                             let liHtmlDom = d.create('<ol class="breadcrumb">' + liHtml + '</ol>');
 
                             d.on(liHtmlDom, 'click', 'a[data-href]', function () {
-                                self.window.open({url: this.dataset.href});
+                                self.window.open({ url: this.dataset.href });
                             });
                             page.dom.insertBefore(liHtmlDom, page.dom.firstElementChild);
                         }
                     }
 
                 },
-                reOpen: function (o: winOpen){
+                reOpen: function (o: winOpen) {
                     sys.window.open(o);
                 },
                 refreshHome() {
@@ -390,7 +395,7 @@ namespace BW {
                     if (url != null) {
                         toastr.options.closeButton = true;
                         toastr.options.onclick = function () {
-                            self.window.open({url: CONF.siteUrl + url})
+                            self.window.open({ url: CONF.siteUrl + url })
                             $('.messageList').find('li').each(function () {
                                 if (this.dataset.url == url) {
                                     $(this).remove();
@@ -416,17 +421,17 @@ namespace BW {
             };
         }(this));
 
-        static handle (action:string,dict?:string) {
-            if(!('BlueWhaleShell' in window)) {
+        static handle(action: string, dict?: string) {
+            if (!('BlueWhaleShell' in window)) {
                 return null;
             }
-            if(typeof dict === 'undefined'){
+            if (typeof dict === 'undefined') {
                 return BlueWhaleShell.postMessage(action);
-            }else{
-                if(typeof dict !== 'string'){
+            } else {
+                if (typeof dict !== 'string') {
                     dict = JSON.stringify(dict);
                 }
-                return BlueWhaleShell.postMessage(action,dict);
+                return BlueWhaleShell.postMessage(action, dict);
             }
 
         }

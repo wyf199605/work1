@@ -22,21 +22,16 @@ export = class menuMbPage {
         });
 
         d.on(d.query('#list'), 'press', 'li.mui-table-view-cell', function () {
-            let test = true;
-            if (test) {
-                new Collect().addCollect({
-                    dom:this,
-                    favid: this.dataset.favid,
-                    link: this.dataset.href
-                });
-            } else {
-                let type = tools.isEmpty(this.dataset.favid) ? 'add' : 'cancel';
-                MENU_FAVORITE.toggleFavSheet(this, type, {
-                    favid: this.dataset.favid,
-                    link: this.dataset.href
-                });
-            }
-
+            // let type = tools.isEmpty(this.dataset.favid) ? 'add' : 'cancel';
+            // MENU_FAVORITE.toggleFavSheet(this, type, {
+            //     favid: this.dataset.favid,
+            //     link: this.dataset.href
+            // });
+            new Collect().addCollect({
+                dom:this,
+                favid: this.dataset.favid,
+                link: this.dataset.href
+            });
 
         });
         (function () {

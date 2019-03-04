@@ -116,20 +116,15 @@
   }
   .no-data {
     &::after {
-      font-family: "appcommon" !important;
-      font-style: normal;
-      -webkit-font-smoothing: antialiased;
-      content: "\e62b";
+      content: "暂无数据";
       display: block;
-      font-size: 150px;
+      font-size: 15px;
+      position: absolute;
+      top: 45%;
       text-align: center;
-      padding: 20px 0;
-      line-height: 200px;
-      color: $text;
-      height: auto!important;
-      -webkit-transform: scaleY(1)!important;
-      transform: scaleY(1)!important;
-      background-color: transparent!important;
+      color: #666;
+      background-color: transparent !important;
+      -webkit-transform: scaleY(1) !important;
     }
   }
   .mui-bar.mui-bar-nav {
