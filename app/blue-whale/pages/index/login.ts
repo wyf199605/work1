@@ -698,10 +698,14 @@ export class LoginPage{
                             user.platformName = col.VALUE;
                         }
                     });
-                    // debugger;
                     if (sys.os === 'ad' || sys.os === 'ip') {
-                        let accessToken = response.head.accessToken || '';
-                        sys.window.opentab(user.userid, accessToken.toString(), noShow);
+                        let accessToken = response.head.accessToken || '',
+                            jwtToken = response.head.jwtToken || '',
+                            refreshToken = response.head.refreshToken || '';
+                        sys.window.opentab(user.userid, accessToken.toString(), noShow, {
+                            refreshToken,
+                            jwtToken
+                        });
                     } else {
                         BW.sysPcHistory.setLockKey(user.userid);
                         BW.sysPcHistory.setInitType('1');
