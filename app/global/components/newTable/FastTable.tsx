@@ -1440,6 +1440,17 @@ export class FastTable extends Component {
         return this.selectedRows.map(row => row.data);
     }
 
+    get selectedPreRowData(){
+        if(!this.pseudoTable){
+            return null;
+        }
+        let index = this.pseudoTable.selectIndex;
+        if(index in this.rows){
+            return this.rows[index].data;
+        }
+        return null;
+    }
+
     get visibleCol() {
         let visibleCol = [];
         this.columns.forEach((col) => {
