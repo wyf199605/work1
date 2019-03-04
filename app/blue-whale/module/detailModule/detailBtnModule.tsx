@@ -162,6 +162,7 @@ export class DetailBtnModule extends DetailModule{
                             content: '新增',
                             key: 'insert',
                             onClick: () => {
+                                detailEdit.insert();
                             }
                         }))
                     }

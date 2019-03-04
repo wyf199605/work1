@@ -19,16 +19,30 @@ import IComponentPara = G.IComponentPara;
 import {ITab, Tab} from "../../../global/components/ui/tab/tab";
 import {FormCom} from "../../../global/components/form/basic";
 import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
+import AGroupTabItem = BW.AGroupTabItem;
+import IGroupTabItemPara = BW.IGroupTabItemPara;
 
-export interface ITableModulePara extends IComponentPara {
+export interface ITableModulePara extends IGroupTabItemPara {
     bwEl: IBW_Table;
     ajaxData?: obj;
     data?: obj[];
 }
 
-export class NewTableModule {
+export class NewTableModule extends AGroupTabItem{
 
     static EVT_EDIT_SAVE = "__event_edit_save__";
+    wrapperInit(){
+        return null;
+    }
+
+    get btnWrapper(){
+        return this.main.btnWrapper;
+    }
+    getData(){
+        return this.main.ftable.selectedRowsData || null;
+    }
+    onDataChange;
+    onRender;
 
     main: BwMainTableModule = null;
     sub: objOf<BwSubTableModule> = {};
@@ -51,6 +65,7 @@ export class NewTableModule {
     private currentSelectedIndexes: number[] = [];
 
     constructor(para: ITableModulePara) {
+        super(para);
         console.log(para);
         this.bwEl = para.bwEl;
         this.showSubField = para.bwEl.showSubField;
@@ -77,9 +92,10 @@ export class NewTableModule {
             if (tools.isNotEmpty(this.bwEl.subButtons)) {
                 main.subBtns.init(this.main.btnWrapper);
             }
+            this.onRender && this.onRender();
 
             if (this.editType === 'linkage' && this.editable) {
-                this.editInit(main);
+                this.initEdit(main);
                 this.active.onChange = (isMain) => {
                     if(isMain){
                         this.main.modify.end();
@@ -89,12 +105,12 @@ export class NewTableModule {
                     }
                 }
             }else if(this.editType === 'self' && this.main.editParam){
-                this.editInit(main);
+                this.initEdit(main);
             }
             let box = tools.keysVal(this.main, 'subBtns', 'box');
             box && box.responsive();
 
-            // this.editInit(para.bwEl);
+            // this.initEdit(para.bwEl);
 
             if (tools.isNotEmpty(subUi)) {
                 let mftable = main.ftable,
@@ -192,7 +208,7 @@ export class NewTableModule {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     if (!~this.currentSelectedIndexes.indexOf(index)) {
                                         this.sub[index].refresh(ajaxData).then(() => {
-                                            this.sub[index].isPivot && this.editInit(this.sub[index]);
+                                            this.sub[index].isPivot && this.initEdit(this.sub[index]);
                                         }).catch();
                                         this.currentSelectedIndexes.push(index);
                                     }
@@ -262,6 +278,13 @@ export class NewTableModule {
                         self.subRefreshByIndex(rowIndex);
                     }
                 });
+            }else{
+                let self = this;
+                main.ftable.click.add('.section-inner-wrapper.pseudo-table tbody tr[data-index]', function () {
+                    let rowIndex = parseInt(this.dataset.index);
+                    self.currentSelectedIndexes = [];
+                    self.subRefreshByIndex(rowIndex);
+                })
             }
         };
     }
@@ -356,6 +379,7 @@ export class NewTableModule {
         } else {
             this.mobileModal && (this.mobileModal.isShow = false);
         }
+        this.onDataChange && this.onDataChange();
     }
 
     set subModalShow(flag: boolean) {
@@ -363,6 +387,9 @@ export class NewTableModule {
     }
 
     private noLoadSub(mftable, main) {
+        if(tools.isEmpty(this.bwEl.subTableList)){
+            return true;
+        }
         let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
             ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
             qm = ajaxData.queryoptionsparam,
@@ -428,7 +455,7 @@ export class NewTableModule {
         return Promise.all(promise).then((arr) => {
             Object.values(this.sub).forEach((subTable) => {
                 if(subTable.isPivot){
-                    this.editInit(subTable);
+                    this.initEdit(subTable);
                 }
             });
             return arr;
@@ -456,7 +483,7 @@ export class NewTableModule {
             subTable.onFtableReady = () => {};
             subTable.linkedData = rowData;
             if(this.editType === 'self'){
-                this.editInit(subTable);
+                this.initEdit(subTable);
             }else if(this.editType === 'linkage'){
                 subTable.modify.init(this.main.modify.box, !(this.active.isMain || this.editManage.editing));
                 if(this.editManage.editing && !this.main.ftable.editing){
@@ -556,7 +583,7 @@ export class NewTableModule {
         });
     }
 
-    protected editInit(bwTable: BwTableModule){
+    protected initEdit(bwTable: BwTableModule){
         let time = 500;
         if((this.editType === 'self' && tools.isNotEmpty(bwTable.editParam)) ||
             (this.editType === 'linkage' && this.editable)){

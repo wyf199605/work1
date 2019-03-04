@@ -61,7 +61,7 @@ export class BwMainTableModule extends BwTableModule{
     }
     private tableHeightInit(){
         let ui = this.ui,
-            clientHeight = document.body.clientHeight;
+            clientHeight = this.container.clientHeight;
 
         // 移动端计算表格的高度
         if(tools.isMb) {
