@@ -132,6 +132,12 @@ export class Collect extends BaseCollect {
               }
               set_s.appendChild(opt);
             }
+            d.on(set_s, "blur", () => {
+              window.scroll(0, 0);
+            })
+            d.on(set_s, "change", () => {
+              window.scroll(0, 0);
+            })
           })
           let collect_select = d.query(".collect_select")
           let collect_input = d.query(".collect_input")

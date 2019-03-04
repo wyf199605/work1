@@ -17,19 +17,17 @@
       margin-bottom: 0px;
       width: 68%;
     }
-    .add_i {
-      font-size: 30px;
-      vertical-align: sub!important;
-    }
     .add_i:before {
       content: '\e468';
       display: inline-block;
       transform: rotate(45deg);
     }
-    .add_s {
+    .add_s,
+    .add_i {
       font-size: 30px;
       vertical-align: sub!important;
       cursor: pointer;
+      padding-left: 5px;
     }
     .add_s:before {
       content: '\e468';
