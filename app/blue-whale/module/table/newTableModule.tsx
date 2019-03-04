@@ -170,6 +170,7 @@ export class NewTableModule {
                         this.mobileModal && (this.mobileModal.isShow = false);
                         return;
                     }
+                    pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                     firstRow.selected = true;
                     let noLoadSub = this.noLoadSub(mftable, main);
                     if (tools.isEmpty(this.tab)) {
@@ -179,7 +180,7 @@ export class NewTableModule {
                             tabs: tabs,
                             onClick: (index) => {
                                 this.subTabActiveIndex = index;
-                                let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+                                let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
                                     ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
                                     let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
@@ -197,6 +198,7 @@ export class NewTableModule {
                                         this.currentSelectedIndexes.push(index);
                                     }
                                     this.sub[index].linkedData = selectedData;
+                                    this.sub[index].ftable && this.sub[index].ftable.recountWidth();
                                 }
                             }
                         });
@@ -218,7 +220,7 @@ export class NewTableModule {
                     setTimeout(() => {
                         // this.subRefresh(firstRow.data);
                         if (isFirst && !noLoadSub) {
-                            let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {});
+                            let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
                             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
                                 let showSubSeq = selectedData[this.showSubField].split(',');
                                 this.tab.setTabsShow(showSubSeq);
@@ -363,7 +365,7 @@ export class NewTableModule {
     }
 
     private noLoadSub(mftable, main) {
-        let selectedData = this.rowData ? this.rowData : (mftable.selectedRowsData[0] || {}),
+        let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
             ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData)),
             qm = ajaxData.queryoptionsparam,
             section;
@@ -382,7 +384,7 @@ export class NewTableModule {
         let promise = [],
             main = this.main,
             mftable = main.ftable,
-            selectedData = rowData ? rowData : (mftable.selectedRowsData[0] || {});
+            selectedData = rowData ? rowData : (mftable.selectedPreRowData || {});
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
             let seqIndex = parseInt(showSubSeq[0]) - 1;
