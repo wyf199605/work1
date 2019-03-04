@@ -39,7 +39,7 @@ export class NewTableModule extends AGroupTabItem{
         return this.main.btnWrapper;
     }
     getData(){
-        return this.main.ftable.selectedRowsData || null;
+        return this.main.ftable.selectedPreRowData || null;
     }
     onDataChange;
     onRender;
@@ -485,7 +485,7 @@ export class NewTableModule extends AGroupTabItem{
             subTable.onFtableReady = () => {};
             subTable.linkedData = rowData;
             if(this.editType === 'self'){
-                this.editInit(subTable);
+                this.initEdit(subTable);
             }else if(this.editType === 'linkage'){
                 subTable.modify.init(this.main.modify.box, !(this.active.isMain || this.editManage.editing));
                 if(this.editManage.editing && !this.main.ftable.editing){
