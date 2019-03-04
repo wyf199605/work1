@@ -87,10 +87,12 @@ export class GroupTabsPage extends BasicPage {
         amountEl: null as HTMLElement, // 数量的值容器
         aggrEl: null as HTMLElement,
         btnWrapper: null as HTMLElement,
+        _commitBtn : null as HTMLElement,
         footer: null as HTMLElement,
         fieldName: 'amountcount', // 标识值，从壳获取count时候需壳以改字段作为属性键值
         aggrArr: [] as R_Aggr[], // 主表+子表的aggrList合并的字段
-        isOnSet: true,
+        isOnSet: true, // 是否开启编辑模块的onSet
+        isModify : false, // 是否有替换累加字段未提交
         editModule: {
             main: null as EditModule,
             sub: null as EditModule
@@ -104,8 +106,8 @@ export class GroupTabsPage extends BasicPage {
                 subUi = this.subUi[0] as IBW_Detail,
                 subId = subUi ? {itemId: subUi.itemId} : {},
                 mainId = {itemId: mainUi.itemId},
-                corArr = [Object.assign({}, mainId, mainUi.correlation),
-                    subUi && Object.assign({}, subId, subUi.correlation) || []] as IBW_Detail_Cor[],
+                corArr = [...(tools.isNotEmpty(mainUi.correlation) && [Object.assign({}, mainId, mainUi.correlation)] || []),
+                    ...(subUi && tools.isNotEmpty(subUi.correlation) && [Object.assign({}, subId, subUi.correlation)] || [])] as IBW_Detail_Cor[],
                 main = this.main,
                 sub = this.subs[0];
             this.imports.aggrArr = [...(mainUi && mainUi.aggrList && mainUi.aggrList.map(list => Object.assign({}, mainId, list)) || []),
@@ -113,7 +115,7 @@ export class GroupTabsPage extends BasicPage {
 
             this.imports.footer = <div class="inventory-footer">
                 <div className="barcode-count">
-                    <div className="barcode-row count">
+                    <div className={'barcode-row count ' + (corArr[0] ? '' : 'hide')}>
                         {/* corArr虽为数组，这里仅支持一条数据，主表或子表合并起来有且有一条数据 */}
                         {corArr.map(cor => {
                             if (cor.default === '1') {
@@ -127,7 +129,13 @@ export class GroupTabsPage extends BasicPage {
                                                  data-value={cor.default}>
                                                 {cor.default === '3' ? '累加数值：' : '替换数值：'}
                                             </div>}
-                                        {this.imports.countText = <TextInput type='number' placeholder="请输入"/>}
+                                        {this.imports.countText = <TextInput blur={() => {
+                                            if(this.imports.countText.get()){
+                                                this.imports.isModify = true;
+                                            }else {
+                                                this.imports.isModify = false;
+                                            }
+                                        }} type='number' placeholder="请输入"/>}
                                     </div>
                                     <div className="barcode-cell barcode-right">
                                         <div>{cor.caption + '：'}</div>
@@ -137,7 +145,7 @@ export class GroupTabsPage extends BasicPage {
                             }
                         })}
                     </div>
-                    {this.imports.aggrEl = <div className="barcode-row aggr-list">
+                    {this.imports.aggrEl = <div className={'barcode-row aggr-list ' + (this.imports.aggrArr[0] ? '' : 'hide')}>
                         {this.imports.aggrArr.map((list, i) => {
                             return <div data-item={list.itemId}
                                         className={"barcode-cell " + (i % 2 !== 0 ? 'barcode-right' : '')}>
@@ -152,6 +160,12 @@ export class GroupTabsPage extends BasicPage {
 
             if (!subUi) {
                 d.classAdd(this.dom, 'no-sub');
+            }
+            if(!this.imports.aggrArr[0]){
+                d.classAdd(this.dom, 'no-aggr');
+            }
+            if(!corArr[0]){
+                d.classAdd(this.dom, 'no-cor');
             }
 
             if (!this.imports.editModule.main) {
@@ -189,9 +203,7 @@ export class GroupTabsPage extends BasicPage {
                         data,
                         isOffLine: true,
                         onSet: () => {
-                            if (!this.imports.isOnSet) {
-                                return;
-                            }
+                            if (!this.imports.isOnSet) return;
                             this.imports.operateTable(mainUi.uniqueFlag, ui.itemId, field, ui.keyField, edit);
                         }
                     })
@@ -214,9 +226,16 @@ export class GroupTabsPage extends BasicPage {
 
             d.append(this.wrapper, this.imports.footer);
 
+            // 开启手持机扫码
             if (this.ui.supportRfid && Shell.inventory.can2dScan) {
                 this.imports.openRfid();
             }
+
+            // 隐藏提交按钮
+            corArr.forEach(cor => {
+                let value = cor.default;
+                value && this.imports.toggleComBtn(value);
+            });
 
             // 初始化界面查询是否有上次操作未完成的数据
             let result = Shell.inventory.getScanData(mainUi.uniqueFlag);
@@ -234,13 +253,25 @@ export class GroupTabsPage extends BasicPage {
                 }
             });
         },
-
+        toggleComBtn(value : string){
+            if(this.commitBtn){
+                if(['2', '3'].includes(value)){
+                    this.commitBtn.classList.remove('hide');
+                }else {
+                    this.commitBtn.classList.add('hide');
+                }
+            }
+        },
+        get commitBtn(){
+            if(!this._commitBtn){
+                this._commitBtn = d.query('.import-commit');
+            }
+            return this._commitBtn;
+        },
         scanRender: (data) => {
             Array.isArray(data) && data.forEach(obj => {
                 let item = obj.itemid;
-                if (!item) {
-                    return
-                }
+                if (!item) return;
 
                 let {edit} = this.imports.getKeyField(item);
                 this.imports.editSet(edit, obj.array[0]);
@@ -310,9 +341,7 @@ export class GroupTabsPage extends BasicPage {
             if (itemId !== this.ui.itemId) {
                 ui = this.imports.subUiGet() as IBW_Slave_Ui;
                 key = ui.fields.map(e => {
-                    if (e.name === ui.keyField) {
-                        return e
-                    }
+                    if (e.name === ui.keyField) return e
                 })[0];
                 keyField = key.name;
                 value = this.imports.editModule.sub.get(keyField);
@@ -320,9 +349,7 @@ export class GroupTabsPage extends BasicPage {
             } else {
                 ui = this.imports.mainUiGet() as IBW_Slave_Ui;
                 key = ui.fields.map(e => {
-                    if (e.name === ui.keyField) {
-                        return e
-                    }
+                    if (e.name === ui.keyField) return e
                 })[0];
                 keyField = key.name;
                 value = this.imports.editModule.main.get(keyField);
@@ -334,8 +361,10 @@ export class GroupTabsPage extends BasicPage {
          * 请求shell查询count数据
          */
         getCountData: () => {
-            let data = this.imports.getTextPara(),
-                id = data.itemId,
+            let data = this.imports.getTextPara();
+            if(!data) return;
+
+            let  id = data.itemId,
                 {value} = this.imports.getKeyField(id);
 
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
@@ -356,9 +385,8 @@ export class GroupTabsPage extends BasicPage {
                 let id = aggr.itemId,
                     {value} = this.imports.getKeyField(id);
 
-                if (item !== id) {
-                    return;
-                }
+                if (item !== id) return;
+
                 Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression, value, result => {
                     console.log(result.data, 'getAggrData');
                     if (result.success) {
@@ -373,6 +401,7 @@ export class GroupTabsPage extends BasicPage {
             return btns.map(btn => {
                 return {
                     content: btn.caption,
+                    className : btn.openType,
                     onClick: () => {
                         require(['OfflineBtn'], (e) => {
                             let offBtn = new e.OfflineBtn();
@@ -418,16 +447,22 @@ export class GroupTabsPage extends BasicPage {
          * 获取累加替换值
          */
         getNum(): string {
-            return this.countText.get();
+            return this.countText && this.countText.get();
         },
         getOption(): string {
-            return this.countTextEl.dataset.value;
+            return this.countTextEl && this.countTextEl.dataset.value;
         },
         /**
          * 拼接查询count（累加替换）数据时候需要的参数
          */
         getTextPara(): { itemId: string, name: string, expression: string } {
-            let data = this.countTextEl.dataset;
+            let data = this.countTextEl && this.countTextEl.dataset;
+            if(!data) return {
+                itemId: '',
+                name: '',
+                expression: '',
+            };
+
             return {
                 itemId: data.item,
                 name: data.name,
@@ -435,10 +470,10 @@ export class GroupTabsPage extends BasicPage {
             };
         },
         setAmount(value: string) {
-            this.amountEl.innerHTML = value;
+            this.amountEl && (this.amountEl.innerHTML = value);
         },
         setText(value: string) {
-            this.countText.set(value);
+            this.countText && this.countText.set(value);
         },
         setCount: (option: string) => {
             let el = this.imports.countTextEl;
