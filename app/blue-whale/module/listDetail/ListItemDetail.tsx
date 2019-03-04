@@ -9,6 +9,7 @@ import {Button} from "../../../global/components/general/button/Button";
 import {DetailModal} from "./DetailModal";
 import tools = G.tools;
 import d = G.d;
+import sys = BW.sys;
 
 export class ListItemDetail {
     // DOM容器
@@ -415,10 +416,24 @@ export class ListItemDetail {
                 default:
                     // 其他按钮
                     ButtonAction.get().clickHandle(btn, self.defaultData, () => {
-                    });
+                    }, self.pageUrl);
                     break;
             }
         }
+    }
+    protected pageContainer: HTMLElement;
+    protected _pageUrl: string;
+    get pageUrl() {
+        if (!this._pageUrl) {
+            if (sys.isMb) {
+                this._pageUrl = location.href;
+            } else {
+                let pageContainer = d.closest(this.wrapper, '.page-container[data-src]');
+                this.pageContainer = pageContainer;
+                this._pageUrl = pageContainer ? pageContainer.dataset.src : '';
+            }
+        }
+        return this._pageUrl;
     }
 
     private prev: Button = null;

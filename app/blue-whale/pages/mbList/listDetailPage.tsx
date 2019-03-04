@@ -22,11 +22,11 @@ export class ListDetailPage extends BasicPage {
         } else {
             let detailItem = new ListItemDetail(para);
             // 刷新非detail页面，detail页面的刷新在页面内完成
-            if (para.uiType !== 'detail') {
+            // if (para.uiType !== 'detail') {
                 this.on(BwRule.EVT_REFRESH, () => {
                     detailItem.changePage();
                 })
-            }
+            // }
         }
     }
 }
