@@ -102,7 +102,7 @@ export class GroupTabsPage extends BasicPage {
                 return;
             }
             console.log(this.ui, this.subUi);
-            let mainUi = this.ui as IBW_Detail,
+            const mainUi = this.ui as IBW_Detail,
                 subUi = this.subUi[0] as IBW_Detail,
                 subId = subUi ? {itemId: subUi.itemId} : {},
                 mainId = {itemId: mainUi.itemId},
@@ -110,8 +110,7 @@ export class GroupTabsPage extends BasicPage {
                     ...(subUi && tools.isNotEmpty(subUi.correlation) && [Object.assign({}, subId, subUi.correlation)] || [])] as IBW_Detail_Cor[],
                 main = this.main,
                 sub = this.subs[0];
-            this.imports.aggrArr = [...(mainUi && mainUi.aggrList && mainUi.aggrList.map(list => Object.assign({}, mainId, list)) || []),
-                ...(subUi && subUi.aggrList && subUi.aggrList.map(list => Object.assign({}, subId, list)) || [])];
+            this.imports.aggrArr = [];
 
             this.imports.footer = <div class="inventory-footer">
                 <div className="barcode-count">
@@ -241,7 +240,12 @@ export class GroupTabsPage extends BasicPage {
             let result = Shell.inventory.getScanData(mainUi.uniqueFlag);
             if (result.success) {
                 console.log(result.data, 'getScanData');
-                this.imports.scanRender(result.data);
+                Array.isArray(result.data) && result.data.forEach(obj => {
+                    const item = obj.itemid;
+                    if (!item) return;
+                    const {edit} = this.imports.getKeyField(obj.item);
+                    this.imports.editSet(edit, obj.array[0]);
+                })
             }
         },
         openRfid() {
@@ -270,10 +274,10 @@ export class GroupTabsPage extends BasicPage {
         },
         scanRender: (data) => {
             Array.isArray(data) && data.forEach(obj => {
-                let item = obj.itemid;
+                const item = obj.itemid;
                 if (!item) return;
 
-                let {edit} = this.imports.getKeyField(item);
+                const {edit} = this.imports.getKeyField(item);
                 this.imports.editSet(edit, obj.array[0]);
                 this.imports.setText('');
                 this.imports.getCountData();
@@ -308,7 +312,7 @@ export class GroupTabsPage extends BasicPage {
          * @param edit
          */
         caculate(edit: EditModule) {
-            let cols = edit.col,
+            const cols = edit.col,
                 data = edit.get();
             cols.forEach(col => {
                 let expr = col.caculateExpr;
@@ -361,12 +365,11 @@ export class GroupTabsPage extends BasicPage {
          * 请求shell查询count数据
          */
         getCountData: () => {
-            let data = this.imports.getTextPara();
-            if(!data) return;
+            const data = this.imports.getTextPara(),
+                id = data.itemId;
+            if(!id) return;
 
-            let  id = data.itemId,
-                {value} = this.imports.getKeyField(id);
-
+            const {value} = this.imports.getKeyField(id);
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
                 console.log(result.data, 'getCountData');
                 if (result.success) {
@@ -456,11 +459,11 @@ export class GroupTabsPage extends BasicPage {
          * 拼接查询count（累加替换）数据时候需要的参数
          */
         getTextPara(): { itemId: string, name: string, expression: string } {
-            let data = this.countTextEl && this.countTextEl.dataset;
+            const data = this.countTextEl && this.countTextEl.dataset;
             if(!data) return {
-                itemId: '',
-                name: '',
-                expression: '',
+                itemId: null,
+                name: null,
+                expression: null,
             };
 
             return {
@@ -476,7 +479,7 @@ export class GroupTabsPage extends BasicPage {
             this.countText && this.countText.set(value);
         },
         setCount: (option: string) => {
-            let el = this.imports.countTextEl;
+            const el = this.imports.countTextEl;
             if (option === '1') {
                 d.classAdd(this.dom, 'hide-count')
             } else {
@@ -496,7 +499,7 @@ export class GroupTabsPage extends BasicPage {
          * @param keyField 修改的字段
          */
         setAggr: (value: string, itemId: string, keyField: string) => {
-            let el = d.query(`[data-item=${itemId}] [data-name=${keyField}]`, this.imports.aggrEl);
+            const el = d.query(`[data-item=${itemId}] [data-name=${keyField}]`, this.imports.aggrEl);
             if (el) {
                 el.innerHTML = value;
             }

@@ -33,7 +33,7 @@ export class OfflineBtn {
     init(btn: R_Button, groupTabsPage: GroupTabsPage, itemId: string) {
         this.groupTabsPage = groupTabsPage;
         this.btn = btn;
-        let mainUi = this.imports.mainUiGet(),
+        const mainUi = this.imports.mainUiGet(),
             subUi = this.imports.subUiGet();
 
         this.para = {
@@ -48,7 +48,7 @@ export class OfflineBtn {
             })[0],
             itemId
         };
-        let {ui} = this.imports.getKeyField(itemId);  // 当前按钮对应的ui
+        const {ui} = this.imports.getKeyField(itemId);  // 当前按钮对应的ui
         this.para.ui = ui;
         console.log(btn, ui);
 
@@ -83,7 +83,7 @@ export class OfflineBtn {
     }
 
     private commit(){
-        let {keyField, value} = this.imports.getKeyField(this.para.itemId);
+        const {keyField, value} = this.imports.getKeyField(this.para.itemId);
         this.imports.query(value[keyField]);
         this.imports.isModify = false;
     }
@@ -109,11 +109,11 @@ export class OfflineBtn {
     }
 
     private downData() {
-        let loading = new Loading({
+        const loading = new Loading({
             msg: "下载数据中"
         });
 
-        let url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
+        const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
         Shell.imports.downloadbarcode(this.para.uniqueFlag, url, false, (result) => {
             loading.destroy();
             Modal.toast(result.msg)
@@ -121,7 +121,7 @@ export class OfflineBtn {
     }
 
     private uploadCheck(){
-        let option = this.imports.getOption();
+        const option = this.imports.getOption();
         if(['2', '3'].includes(option) && this.imports.isModify){
             Modal.confirm({
                 msg : '有数据未提交，是否提交？',
@@ -135,12 +135,13 @@ export class OfflineBtn {
         }
     }
 
+
     private uploadData() {
-        let loading = new Loading({
+        const loading = new Loading({
             msg: "数据上传中"
         });
 
-        let url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
+        const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
         Shell.imports.uploadcodedata(this.para.uniqueFlag, url, (result) => {
             if (result.success) {
                 Modal.toast('上传成功');
@@ -152,14 +153,15 @@ export class OfflineBtn {
     }
 
     private deleteData() {
-        let body = <div className="delete-modal" />;
-        let mainKey = this.para.mainKey && this.para.mainKey.name,
+        const body = <div className="delete-modal" />,
+            mainKey = this.para.mainKey && this.para.mainKey.name,
             subKey = this.para.subKey && this.para.subKey.name,
             mainValue = this.imports.editModule.main.get(mainKey),
             subValue = this.imports.editModule.sub && this.imports.editModule.sub.get(subKey),
             mainId = this.para.mainId,
-            subId = this.para.subId,
-            checks: CheckBox[] = [],
+            subId = this.para.subId;
+
+        let checks: CheckBox[] = [],
             inputEl: HTMLInputElement,
             data = [{
                 text: '所有',
@@ -203,7 +205,7 @@ export class OfflineBtn {
             d.append(body, el);
         });
 
-        let get = (): { id: string, value: string, keyField: string }[] => {
+        const get = (): { id: string, value: string, keyField: string }[] => {
             let value = null, index = 0, arr = [];
             checks.forEach((check, i) => {
                 if (check.checked) {
@@ -240,11 +242,11 @@ export class OfflineBtn {
             Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, 'delete', result => {
                 console.log(result.data, 'operateTable删除表');
                 if(result.success){
-                    Modal.toast('删除表（' + itemId + ')成功');
-                    let {edit} = this.imports.getKeyField(itemId);
+                    Modal.toast('删除成功');
+                    const {edit} = this.imports.getKeyField(itemId);
                     this.imports.editSet(edit, {});
                 }else {
-                    Modal.toast('删除表（' + itemId + ')失败');
+                    Modal.toast('删除失败');
                 }
             });
         };
@@ -258,7 +260,7 @@ export class OfflineBtn {
 
     private selectBox : SelectInputMb;
     private setting() {
-        let body = <div className="barcode-setting"/>,
+        const body = <div className="barcode-setting"/>,
             operation = this.btn.operation,
             data = operation && operation.content;
             this.selectBox = new SelectInputMb({
@@ -274,7 +276,7 @@ export class OfflineBtn {
         this.selectBox.set(value);
 
         this.modalInit('设置', body, () => {
-            let value = this.selectBox.get();
+            const value = this.selectBox.get();
             if (value !== this.imports.getOption()) {
                 this.imports.setCount(value);
                 this.imports.setText('');
@@ -295,7 +297,7 @@ export class OfflineBtn {
                 {textInput = <TextInput className='set-rfid-code'/>}
             </div>;
         this.modalInit('请输入', body, () => {
-            let val = textInput.get();
+            const val = textInput.get();
             if (tools.isEmpty(val)) return Modal.alert('条码不能为空');
             this.imports.query(val);
         });

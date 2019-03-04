@@ -114,7 +114,7 @@
       .inventory-footer{
         height: 95px;
       }
-      &.no-cor{
+      &.no-cor, &.hide-count{
         padding-bottom: 40px;
         .inventory-footer{
           height: 40px;
