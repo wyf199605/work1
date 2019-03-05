@@ -1,0 +1,87 @@
+.pay-code-modal{
+  .modal-body{
+    background-color: #fff;
+
+    .pay-code-wrapper{
+      padding: 16px 0;
+      .qrcode{
+        width: 200px;
+        margin: 0 auto;
+        padding-top: 10px;
+        padding-bottom: 20px;
+      }
+      .pay-code-msg{
+        text-align: center;
+        margin-bottom: 14px;
+        color: $title;
+        font-size: 16px;
+
+        &.pay-code-time{
+          font-size: 18px;
+        }
+        &.pay-code-fee{
+          font-size: 36px;
+        }
+      }
+
+      .pay-statue{
+        padding: 0 20px;
+        .content{
+          padding: 50px 0;
+
+
+          .close{
+            $diameter: 60px;
+            width: $diameter;
+            height: $diameter;
+            border-radius: 50%;
+            margin: 0 auto;
+            text-align: center;
+            line-height: $diameter;
+
+            .iconfont{
+              font-size: 30px;
+              color: #fff;
+            }
+          }
+
+          .msg{
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: 20px;
+          }
+        }
+
+        &.pay-error{
+          .content{
+            .close{
+              background-color: $error;
+            }
+            .msg{
+              color: $error;
+            }
+          }
+        }
+        &.pay-success{
+          .content{
+            .close{
+              background-color: $info;
+            }
+            .msg{
+              color: $info;
+            }
+          }
+        }
+      }
+      .btn{
+        display: block;
+        height: 40px;
+        background-color: $primary;
+        color: #fff;
+        width: 100%;
+        font-size: 16px;
+      }
+    }
+  }
+}

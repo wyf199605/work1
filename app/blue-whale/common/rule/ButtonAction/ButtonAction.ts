@@ -318,56 +318,85 @@ export class ButtonAction {
     private checkAction(btn: R_Button, dataObj: obj | obj[], addr?: string, ajaxType?: string, ajaxData?: any, url?: string): Promise<any> {
         let self = this;
         return new Promise((resolve, reject) => {
-            if(btn.actionAddr && (btn.actionAddr.type === 'pdf')){
-                require(['PDFPreview'], (o) => {
-                    new o.PDFPreview({
-                        url: tools.url.addObj(BW.CONF.siteUrl + addr, ajaxData || {})
+            let type = btn.actionAddr ? btn.actionAddr.type : '';
+            switch (type){
+                case 'pdf':
+                    // pdf预览
+                    require(['PDFPreview'], (o) => {
+                        new o.PDFPreview({
+                            url: tools.url.addObj(BW.CONF.siteUrl + addr, ajaxData || {})
+                        });
+                        resolve();
                     });
-                    resolve();
-                })
-            }else{
-                BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
-                    data2url: btn.actionAddr.varType !== 3,
-                    type: ajaxType,
-                    // defaultCallback : btn.openType !== 'popup',
-                    data: ajaxData,
-                    needGps: btn.actionAddr.needGps
+                    break;
+                case 'wxpay':
+                    // 微信二维码支付
+                    BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
+                        type: ajaxType,
+                        // defaultCallback : btn.openType !== 'popup',
+                        data: ajaxData,
+                    }).then(({response}) => {
+                        console.log(response);
+                        let data = tools.keysVal(response, 'body', 'bodyList', 0);
+                        if(tools.isNotEmpty(data)){
+                            require(['PayModule'], (payModule) => {
+                                new payModule.PayModule({
+                                    url: data['code_url'],
+                                    orderQueryUrl: data['order_query'],
+                                    fee: data['total_fee'],
 
-                }).then(({response}) => {
-                    let data = tools.keysVal(response, 'body', 'bodyList', 0);
-                    if (data && (data.type || data.type === 0)) {
-                        if (data.type === 0) {
-                            Modal.alert(data.showText);
-                        } else if(data.type === 2) {
-                            this.progressPopup(data.url, data.showText, resolve);
-                        } else {
-                            Modal.confirm({
-                                msg: data.showText,
-                                callback: (confirmed) => {
-                                    if (confirmed) {
-                                        self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then((response) => {
-                                            resolve(response);
-                                        });
-                                    }else{
-                                        reject();
-                                    }
-                                }
+                                });
                             });
+                            resolve();
+                        }else{
+                            Modal.alert('获取二维码失败，请重试');
+                            reject();
                         }
-                    } else {
-                        // 默认提示
-                        if (!('hintAfterAction' in btn) || btn.hintAfterAction) {
-                            if (data && data.showText) {
-                                Modal.alert(data.showText);
-                            } else if (btn.openType !== 'popup') {
-                                Modal.toast(response.msg || `${btn.title}成功`);
-                            }
-                        }
+                    });
+                    break;
+                default:
+                    BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
+                        data2url: btn.actionAddr.varType !== 3,
+                        type: ajaxType,
+                        // defaultCallback : btn.openType !== 'popup',
+                        data: ajaxData,
+                        needGps: btn.actionAddr.needGps
 
-                        resolve(response);
-                        // callback(response);
-                    }
-                });
+                    }).then(({response}) => {
+                        let data = tools.keysVal(response, 'body', 'bodyList', 0);
+                        if (data && (data.type || data.type === 0)) {
+                            if (data.type === 0) {
+                                Modal.alert(data.showText);
+                            } else if(data.type === 2) {
+                                this.progressPopup(data.url, data.showText, resolve);
+                            } else {
+                                Modal.confirm({
+                                    msg: data.showText,
+                                    callback: (confirmed) => {
+                                        if (confirmed) {
+                                            self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then((response) => {
+                                                resolve(response);
+                                            });
+                                        }else{
+                                            reject();
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            // 默认提示
+                            if (!('hintAfterAction' in btn) || btn.hintAfterAction) {
+                                if (data && data.showText) {
+                                    Modal.alert(data.showText);
+                                } else if (btn.openType !== 'popup') {
+                                    Modal.toast(response.msg || `${btn.title}成功`);
+                                }
+                            }
+
+                            resolve(response);
+                            // callback(response);
+                        }
+                    });
             }
 
         })
