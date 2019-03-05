@@ -290,22 +290,22 @@ export class GroupTabsPage extends BasicPage {
          * @param option
          */
         query: (value: string, option?: string) => {
-                let keyField = this.ui.keyField,
-                    field = {[keyField]: this.imports.editModule.main.get(keyField)[keyField]};
-                if (!this.subUi[0]) {
-                    field = {};
-                }
+            let keyField = this.ui.keyField,
+                field = {[keyField]: this.imports.editModule.main.get(keyField)[keyField]};
+            if (!this.subUi[0]) {
+                field = {};
+            }
 
-                Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag,
-                    field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
-                        if (result.success) {
-                            console.log(result.data, 'operateScanTable');
-                            this.imports.scanRender(result.data);
-                        } else {
-                            Modal.toast('查询失败，请确认已下载数据');
-                        }
+            Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag,
+                field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
+                    if (result.success) {
+                        console.log(result.data, 'operateScanTable');
+                        this.imports.scanRender(result.data);
+                    } else {
+                        Modal.toast('查询失败，请确认已下载数据');
                     }
-                );
+                }
+            );
         },
         /**
          * 计算规则，在数据渲染结束之后调用
@@ -330,7 +330,7 @@ export class GroupTabsPage extends BasicPage {
             this.caculate(edit);
             this.isOnSet = true;
         },
-        clear(edit : EditModule){
+        clear(edit: EditModule) {
             this.isOnSet = false;
             edit.clear();
             this.isOnSet = true;

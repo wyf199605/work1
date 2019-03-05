@@ -85,7 +85,7 @@ export class OfflineBtn {
     private commit(){
         const {keyField, value} = this.imports.getKeyField(this.para.itemId);
         this.imports.query(value[keyField]);
-        this.imports.isModify = false
+        this.imports.isModify = false;
     }
 
     private manyScan(){
@@ -124,10 +124,9 @@ export class OfflineBtn {
         const option = this.imports.getOption();
         if(['2', '3'].includes(option) && this.imports.isModify){
             Modal.confirm({
-                msg : '有数据未提交，是否提交？',
+                msg : '有数据未提交，确定继续上传？',
                 callback : flag => {
-                    flag && this.commit();
-                    this.uploadData();
+                    flag && this.uploadData();
                 }
             })
         }else {
@@ -244,6 +243,7 @@ export class OfflineBtn {
                 if(result.success){
                     Modal.toast('删除成功');
                     const {edit} = this.imports.getKeyField(itemId);
+                    // 若为主表，则同时清空子表数据
                     if(itemId === this.para.mainId){
                         this.imports.clear(this.imports.editModule.sub);
                     }
