@@ -302,7 +302,7 @@ export class DetailModule extends AGroupTabItem {
         Array.isArray(this.items) && this.items.forEach((item: DetailItem) => {
             let field: R_Field = item.custom,
                 name = field.name;
-            item.itemData = data[name];
+            item.itemData = data && data[name];
         });
         Promise.all(this._promises).then(() => {
             this.trigger(DetailModule.EVT_RENDERED);
