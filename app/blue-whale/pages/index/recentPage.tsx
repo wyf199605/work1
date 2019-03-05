@@ -52,7 +52,9 @@ export class CollectPage extends BasicPage {
                 className="collect_li"
               >
                 <a>
-                  <span className={`self_icon  ${menu.icon} `}></span>
+                  <div className="wrap_self_icon">
+                    <span className={`self_icon  ${menu.icon} `}></span>
+                  </div>
                   <div className="collect_caption">{menu.caption}</div>
                 </a>
               </li>;

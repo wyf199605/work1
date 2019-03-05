@@ -88,7 +88,8 @@ export class BaseCollect {
       pageparams: '{"index"=' + obj.index + ', "size"=' + obj.size + '}',
       action: 'query'
     };
-    return BwRule.Ajax.fetch(CONF.ajaxUrl.menuFavor, {
+    //CONF.ajaxUrl.menuFavor  "https://bwt.sanfu.com/sf/app_sanfu_retail/v1/favorites?pageparams=%7B%22index%22%3D1%2C%20%22size%22%3D50%7D&action=query"
+    return BwRule.Ajax.fetch( "https://bwt.sanfu.com/sf/app_sanfu_retail/v1/favorites?pageparams=%7B%22index%22%3D1%2C%20%22size%22%3D50%7D&action=query", {
       data: ajaxData
     })
   }

@@ -65,7 +65,7 @@ export class LoginPcPage extends LoginPage {
                 设备注册
                 </a>
             <a href="#" className="scanLogin">
-                <i class="iconfont icon-scan"></i>
+                <i class="iconfont icon-saoma"></i>
                 扫码登陆
                 </a>
         </div>;

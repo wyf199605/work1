@@ -4,22 +4,39 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  .scan_logo {
+    text-align: center;
+    margin-bottom: 45px;
+  }
   .has_logined {
-    width: 303px;
+    width: 328px;
     border-radius: 6px;
     background-color: white;
     text-align: center;
     padding: 60px 18px 8px;
     color: rgb(153, 153, 153);
     box-shadow: -2px 1px 21px 0px rgba(0, 91, 172, 0.11);
-    p {
-      margin: 10px auto;
+    border-top: 4px solid #005BAC;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    .current_user {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 30px;
     }
     .current_name {
       color: #333;
       font-size: 18px;
-      margin-bottom: 30px;
-      margin-top: 35px;
+      margin-bottom: 40px;
+    }
+    .user_icon {
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      margin-bottom: 20px;
+      .iconfont {
+        font-size: 50px!important;
+      }
     }
     button {
       color: white;
@@ -32,13 +49,21 @@
       padding: 5px;
       border-radius: 5px;
     }
+    .has_logined_footer {
+      display: flex;
+      justify-content: space-between;
+      margin: 28px 17px 40px;
+    }
+    #js_login_btn {
+      width: 260px;
+      height: 40px;
+      background-color: #005BAC;
+      border-radius: 4px;
+    }
     #js_cue {
-      margin-top: 40px;
       cursor: pointer;
     }
     #js_other {
-      text-align: right;
-      margin-top: 42px;
       cursor: pointer;
     }
     #js_other:hover,
@@ -50,16 +75,29 @@
     }
   }
   .code_login {
-    width: 346px;
+    width: 328px;
     box-shadow: -2px 1px 21px 0px rgba(0, 91, 172, 0.11);
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
     background-color: white;
-    padding: 80px 0px 59px 0px;
+    padding: 46px 0px 40px 0px;
+    border-top: 4px solid #005BAC;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
     p {
       margin: 24px auto;
+    }
+    .cav_wrapper {
+      position: relative;
+    }
+    .refresh_code {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 999;
     }
     #code_login_cav {
       width: 150px;
@@ -69,10 +107,15 @@
       animation-duration: 1s;
       animation-timing-function: ease-in;
     }
+    .tip {
+      color: #005bac;
+      font-size: 14px;
+      margin: 40px auto;
+    }
     #close {
       cursor: pointer;
-      font-size: 16px;
-      color: #0099FF
+      font-size: 14px;
+      color: #666;
     }
   }
   .login-wrapper {
@@ -197,7 +240,10 @@
           }
           &.scanLogin {
             .iconfont {
-              background-color: lightblue;
+              background-color: #1AA0F9;
+              &::before {
+                margin-top: 2px!important;
+              }
             }
           }
         }

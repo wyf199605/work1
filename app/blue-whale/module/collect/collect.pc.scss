@@ -1,22 +1,50 @@
 .collect_pc_model_bocy {
   .modal_footer {
     padding: 10px 15px;
-    border-top: 1px solid #e5e5e5;
+    button:not(:first-child) {
+      float: right;
+    }
+    .btn {
+      position: relative;
+      border: none;
+    }
+    .btn>span {
+      padding: 8px 20px;
+      border: 0.8px solid #6666664f;
+      border-radius: 4px;
+    }
+    .del_btn>span {
+      border: none!important;
+      padding-left: 0px!important;
+    }
+    .save_btn>span {
+      background-color: #005BAC!important;
+      color: white!important;
+    }
+    .save_btn>span:hover {
+      color: #007AFF!important;
+    }
   }
   .select_comp {
+    height: 33px;
+    width: 290px;
     display: inline-block;
-    border: 1px solid #33333352;
+    border: 1px solid #6666664f;
+    border-radius: 4px;
+    margin-bottom: 30px
   }
   .menu_name {
-    height: 30px;
-    width: 148px;
+    height: 33px;
+    width: 290px;
     padding-left: 6px;
-    border: 1px solid #33333352;
+    border: 1px solid #6666664f;
+    border-radius: 4px;
+    margin: 30px auto;
   }
   label {
     width: 50px;
     text-align: center;
-    margin-left: -30px;
+    margin-left: -10px;
   }
   .collect_body {
     display: flex;
@@ -29,14 +57,5 @@
   }
   .collect_body_menu {
     margin: 25px auto;
-  }
-  .sure_btn,
-  .cancel_btn {
-    float: right;
-  }
-  .sure_btn {
-    margin-right: 10px;
-    background-color: #2697EB;
-    color: white;
   }
 }

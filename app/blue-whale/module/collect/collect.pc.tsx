@@ -85,17 +85,9 @@ export class CollectPC extends BaseCollect {
     if (!isEdit) {
       BtnList = [
         {
-          content: "取消",
-          container: this.footer,
-          className: "cancel_btn",
-          onClick: () => {
-            this.modal.isShow = false;
-          }
-        },
-        {
           content: "确认",
           container: this.footer,
-          className: "sure_btn",
+          className: "save_btn btn",
           onClick: () => {
             let status = d.query(".new_group_btn").classList.contains("disabled");
             let groupName = "";
@@ -112,6 +104,14 @@ export class CollectPC extends BaseCollect {
               this.modal.isShow = false;
             })
 
+          }
+        },
+        {
+          content: "取消",
+          container: this.footer,
+          className: "btn",
+          onClick: () => {
+            this.modal.isShow = false;
           }
         }
       ]
@@ -134,8 +134,9 @@ export class CollectPC extends BaseCollect {
       inputEl.value = this.GroupName
       BtnList = [
         {
-          content: "删除",
+          content: "删除整组",
           container: this.footer,
+          className: "del_btn btn",
           onClick: () => {
             Modal.confirm({
               msg: "确认删除？",
@@ -150,25 +151,27 @@ export class CollectPC extends BaseCollect {
             });
           }
         },
-        {
-          content: "取消",
-          container: this.footer,
-          className: "cancel_btn",
-          onClick: () => {
-            this.modal.isShow = false;
-          }
-        },
+
         {
           content: "保存",
           container: this.footer,
-          className: "sure_btn",
+          className: "save_btn btn",
           onClick: () => {
             this.req_rename(this.GroupName, inputEl.value).then(() => {
               sys.window.refresh(this.pageUrl)
               this.modal.isShow = false;
             })
           }
+        },
+        {
+          content: "取消",
+          container: this.footer,
+          className: "btn",
+          onClick: () => {
+            this.modal.isShow = false;
+          }
         }
+
       ]
       BtnList.forEach(item => {
         new Button(item)
@@ -178,16 +181,16 @@ export class CollectPC extends BaseCollect {
   addCollect() {
     this.groupItem = <div className="colect_body_group">
       <div>
-        <label>名称</label>
+        <label>名称 :</label>
         <input placeholder="菜单名称" type="text" class="menu_name" id="inputDom" value="" disabled />
       </div>
       <div>
-        <label>收藏夹</label>
+        <label>收藏夹 :</label>
         <div class="select_comp" />
       </div>
     </div>
     this.menuItem = <div className="collect_body_menu">
-      <label>名称</label>
+      <label>名称 :</label>
       <input placeholder="菜单名称" type="text" class="menu_name" id="js_new_groupName" />
     </div>
     this.body = <div class="collect_pc_model_bocy">
@@ -209,7 +212,7 @@ export class CollectPC extends BaseCollect {
         title: '收藏',
         isDrag: false
       },
-      width: '360px',
+      width: '400px',
       top: 160,
     });
     let inputEl = d.query("#inputDom") as HTMLInputElement
@@ -234,6 +237,7 @@ export class CollectPC extends BaseCollect {
         data: this.Item,
         readonly: true,
         clickType: 0,
+        dropClassName:"collect_drop",
         onSet: (item) => {
           this.selectVal = item;
         }
