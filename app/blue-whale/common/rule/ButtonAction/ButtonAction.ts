@@ -332,9 +332,11 @@ export class ButtonAction {
                 case 'wxpay':
                     // 微信二维码支付
                     BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
+                        data2url: btn.actionAddr.varType !== 3,
                         type: ajaxType,
                         // defaultCallback : btn.openType !== 'popup',
                         data: ajaxData,
+                        needGps: btn.actionAddr.needGps
                     }).then(({response}) => {
                         console.log(response);
                         let data = tools.keysVal(response, 'body', 'bodyList', 0);
