@@ -438,7 +438,7 @@ export class UploadImages extends FormCom {
 
     private lookImgEve = (() => {
         let look = () => {
-            if (this.disabled) {
+            // if (this.disabled) {
                 let imgs = this.getImgs();
                 let imgData: ImgModalPara = {
                     img: imgs
@@ -450,9 +450,9 @@ export class UploadImages extends FormCom {
                         d.query('.pswp', document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
                     }, 200);
                 }
-            } else {
-                Modal.alert('编辑状态下不可查看，请退出编辑后查看！');
-            }
+            // } else {
+            //     Modal.alert('编辑状态下不可查看，请退出编辑后查看！');
+            // }
         };
         return {
             on: () => d.on(this.wrapper, 'click', 'img', look),
