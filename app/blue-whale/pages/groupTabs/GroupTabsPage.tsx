@@ -330,6 +330,11 @@ export class GroupTabsPage extends BasicPage {
             this.caculate(edit);
             this.isOnSet = true;
         },
+        clear(edit : EditModule){
+            this.isOnSet = false;
+            edit.clear();
+            this.isOnSet = true;
+        },
         /**
          * 获取itemId对应的相关字段，
          * keyField：主键

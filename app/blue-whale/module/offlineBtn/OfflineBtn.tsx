@@ -245,9 +245,9 @@ export class OfflineBtn {
                     Modal.toast('删除成功');
                     const {edit} = this.imports.getKeyField(itemId);
                     if(itemId === this.para.mainId){
-                        this.imports.editModule.sub.clear();
+                        this.imports.clear(this.imports.editModule.sub);
                     }
-                    edit.clear();
+                    this.imports.clear(edit);
                 }else {
                     Modal.toast('删除失败');
                 }
@@ -330,10 +330,10 @@ export class OfflineBtn {
         this.btnGroup && this.btnGroup.destroy();
         this.modal && this.modal.destroy();
         this.selectBox && this.selectBox.destroy();
-        this.selectBox = null;
-        this.btnGroup = null;
-        this.modal = null;
-        this.btn = null;
-        this.para = null;
+        // this.selectBox = null;
+        // this.btnGroup = null;
+        // this.modal = null;
+        // this.btn = null;
+        // this.para = null;
     }
 }
