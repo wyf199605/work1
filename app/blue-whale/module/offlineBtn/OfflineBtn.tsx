@@ -124,10 +124,9 @@ export class OfflineBtn {
         const option = this.imports.getOption();
         if(['2', '3'].includes(option) && this.imports.isModify){
             Modal.confirm({
-                msg : '有数据未提交，是否提交？',
+                msg : '有数据未提交，确定继续上传？',
                 callback : flag => {
-                    flag && this.commit();
-                    this.uploadData();
+                    flag && this.uploadData();
                 }
             })
         }else {
@@ -244,7 +243,11 @@ export class OfflineBtn {
                 if(result.success){
                     Modal.toast('删除成功');
                     const {edit} = this.imports.getKeyField(itemId);
-                    this.imports.editSet(edit, {});
+                    // 若为主表，则同时清空子表数据
+                    if(itemId === this.para.mainId){
+                        this.imports.clear(this.imports.editModule.sub);
+                    }
+                    this.imports.clear(edit);
                 }else {
                     Modal.toast('删除失败');
                 }
@@ -327,10 +330,10 @@ export class OfflineBtn {
         this.btnGroup && this.btnGroup.destroy();
         this.modal && this.modal.destroy();
         this.selectBox && this.selectBox.destroy();
-        this.selectBox = null;
-        this.btnGroup = null;
-        this.modal = null;
-        this.btn = null;
-        this.para = null;
+        // this.selectBox = null;
+        // this.btnGroup = null;
+        // this.modal = null;
+        // this.btn = null;
+        // this.para = null;
     }
 }
