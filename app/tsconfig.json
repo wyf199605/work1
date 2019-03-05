@@ -7,7 +7,7 @@
     "noEmitHelpers": true,
     "paths": {
     },
-    "lib": ["dom", "es2015.promise", "es5"],
+    "lib": ["dom", "es2015.promise", "es5", "es2015.symbol", "es2015.iterable"],
     "jsx": "react",
     "jsxFactory": "h"
   },
