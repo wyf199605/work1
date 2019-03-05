@@ -85,7 +85,7 @@ export class OfflineBtn {
     private commit(){
         const {keyField, value} = this.imports.getKeyField(this.para.itemId);
         this.imports.query(value[keyField]);
-        this.imports.isModify = false;
+        this.imports.isModify = false
     }
 
     private manyScan(){
@@ -244,7 +244,10 @@ export class OfflineBtn {
                 if(result.success){
                     Modal.toast('删除成功');
                     const {edit} = this.imports.getKeyField(itemId);
-                    this.imports.editSet(edit, {});
+                    if(itemId === this.para.mainId){
+                        this.imports.editModule.sub.clear();
+                    }
+                    edit.clear();
                 }else {
                     Modal.toast('删除失败');
                 }
