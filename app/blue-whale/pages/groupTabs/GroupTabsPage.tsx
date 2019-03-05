@@ -110,7 +110,8 @@ export class GroupTabsPage extends BasicPage {
                     ...(subUi && tools.isNotEmpty(subUi.correlation) && [Object.assign({}, subId, subUi.correlation)] || [])] as IBW_Detail_Cor[],
                 main = this.main,
                 sub = this.subs[0];
-            this.imports.aggrArr = [];
+            this.imports.aggrArr = [...(mainUi && mainUi.aggrList && mainUi.aggrList.map(list => Object.assign({}, mainId, list)) || []),
+                ...(subUi && subUi.aggrList && subUi.aggrList.map(list => Object.assign({}, subId, list)) || [])];
 
             this.imports.footer = <div class="inventory-footer">
                 <div className="barcode-count">
@@ -157,9 +158,6 @@ export class GroupTabsPage extends BasicPage {
                 {this.imports.btnWrapper = <div class="inventory-group-btn"/>}
             </div>;
 
-            if (!subUi) {
-                d.classAdd(this.dom, 'no-sub');
-            }
             if(!this.imports.aggrArr[0]){
                 d.classAdd(this.dom, 'no-aggr');
             }

@@ -76,15 +76,19 @@
         }
        .barcode-count{
         .barcode-row{
-          padding: 10px;
           border-bottom: 1px solid #eee;
           height: 45px;
           font-size: 14px;
+          overflow: auto;
           .barcode-cell{
             display: inline-block;
+            height: 44px;
+            padding: 10px 0 10px 10px;
+            width: 50%;
+            float: left;
             &.barcode-right{
-              float: right;
-              margin-right: 20px;
+              text-align: right;
+              width: 40%;
             }
             .text-input{
               width: 80px;
@@ -99,9 +103,6 @@
     }
     &.hide-count{
       padding-bottom: 90px;
-      &.no-sub{
-        padding-bottom: 40px;
-      }
       .inventory-footer{
         height: 90px;
         .count{
@@ -114,7 +115,7 @@
       .inventory-footer{
         height: 95px;
       }
-      &.no-cor, &.hide-count{
+      &.hide-count{
         padding-bottom: 40px;
         .inventory-footer{
           height: 40px;
