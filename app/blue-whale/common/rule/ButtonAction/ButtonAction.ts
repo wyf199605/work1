@@ -341,7 +341,7 @@ export class ButtonAction {
                         if(tools.isNotEmpty(data)){
                             require(['PayModule'], (payModule) => {
                                 new payModule.PayModule({
-                                    url: data['code_url'],
+                                    url: data['code_url'] || 'data not found',
                                     orderQueryUrl: data['order_query'],
                                     fee: data['total_fee'],
 
