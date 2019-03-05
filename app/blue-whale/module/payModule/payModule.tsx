@@ -83,7 +83,7 @@ export class PayModule{
         this.wrapper.innerHTML = '';
         d.append(this.wrapper, <div className="pay-statue pay-success">
             <div className="content">
-                <div className="close">
+                <div className="close-code">
                     <span className="iconfont icon-dagou"/>
                 </div>
                 <div className="msg">收款成功</div>
@@ -100,7 +100,7 @@ export class PayModule{
         this.wrapper.innerHTML = '';
         d.append(this.wrapper, <div className="pay-statue pay-error">
             <div className="content">
-                <div className="close">
+                <div className="close-code">
                     <span className="iconfont icon-close"/>
                 </div>
                 <div className="msg">{msg}</div>
