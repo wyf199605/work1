@@ -437,22 +437,20 @@ export class UploadImages extends FormCom {
     }
 
     private lookImgEve = (() => {
-        let look = () => {
-            // if (this.disabled) {
-                let imgs = this.getImgs();
-                let imgData: ImgModalPara = {
-                    img: imgs
-                };
-                ImgModal.show(imgData);
-                if (tools.isMb) {
-                    document.body.style.overflow = 'hidden';
-                    setTimeout(() => {
-                        d.query('.pswp', document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
-                    }, 200);
-                }
-            // } else {
-            //     Modal.alert('编辑状态下不可查看，请退出编辑后查看！');
-            // }
+        let look = (e) => {
+            let index = e.target.parentNode.dataset['index'];
+            let imgs = this.getImgs();
+            let imgData: ImgModalPara = {
+                img: imgs
+            };
+            ImgModal.show(imgData, index);
+            if (tools.isMb) {
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    d.query('.pswp', document.body).style.top = tools.getScrollTop(d.query('.list-item-detail-wrapper')) + 'px';
+                }, 200);
+            }
+
         };
         return {
             on: () => d.on(this.wrapper, 'click', 'img', look),
