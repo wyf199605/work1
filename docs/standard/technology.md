@@ -2,7 +2,7 @@
  
  ---
 
- ###= 1.Webpack
+ ### 1.Webpack
 
  Webpack 是一个打包模块化 JavaScript 的工具，在 Webpack 里一切文件皆模块，通过 Loader 转换文件，通过 Plugin 注入钩子，最后输出由多个模块组合成的文件。Webpack 专注于构建模块化项目。
 
@@ -26,4 +26,4 @@
  
  swagger的一个最大的优点是能实时同步api于文档，可提供模型备注，调试，方便前后端的调试沟通
 
-![avatar](https://img-blog.csdn.net/20180106211740322?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcnRoMzYyMTQ3Nzcz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+![avatar](https://img-blog.csdn.net/20170913134633389?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdHVwb3NreQ==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
