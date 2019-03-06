@@ -124,7 +124,7 @@ export class OfflineBtn {
         const option = this.imports.getOption();
         if(['2', '3'].includes(option) && this.imports.isModify){
             Modal.confirm({
-                msg : '有数据未提交，确定继续上传？',
+                msg : '存在未提交数据，确定放弃提交直接上传？',
                 callback : flag => {
                     flag && this.uploadData();
                 }

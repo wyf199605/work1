@@ -990,23 +990,54 @@ export class LoginPage {
         if (wrap) {
             wrap.style.display = "none";
         }
-        let dom = d.create(`<div class='code_login'>
-                <div id='code_login_cav'></div>
-                <p>请打开速狮APP扫码登录</p>
-                <div id="close">其他方式</div>
-         </div>`)
+        //<div class="refresh_code">请刷新</div>
+        let dom = d.create(`
+           <div>
+                <div class="scan_logo">
+                    <img data-action="selectServer" src= ${G.requireBaseUrl + '../img/login-logo.png'} alt="fastlion" />
+                </div>
+                <div class='code_login'>
+                    <div class="cav_wrapper">
+                       <div class="refresh_code">
+                          <span>二维码失效</span>
+                          <div id="code_refresh">刷新</div>
+                       </div>
+                       <div id='code_login_cav'></div>
+                    </div>
+                    <p class="tip">请打开速狮APP扫码登录</p>
+                    <div id="close">其他方式</div>
+                </div>
+           </div>
+         `)
         d.append(d.query(".login-page-container"), dom);
         this.req_getLgToken();
+        d.on( d.query("#code_refresh"),"click",()=>{
+            d.query(".refresh_code").style.display="none";
+            d.query("#code_login_cav").innerHTML=null;
+            this.req_getLgToken();
+        })
         return dom;
     }
     renderLogined = () => {
-        let dom = d.create(`<div class="has_logined">
-                <p>当前用户</p>
-                <p class="current_name">wjb</p>
-                <button id="js_login_btn">登录</button>
-                <div id="js_cue">切换用户</div>
-                <div id="js_other">其他方式登录</div>
-            </div>`)
+        let dom = d.create(`
+         <div>
+            <div class="scan_logo">
+               <img data-action="selectServer" src= ${G.requireBaseUrl + '../img/login-logo.png'} alt="fastlion" />
+           </div>
+            <div class="has_logined">
+                    <p class="current_user">当前用户</p>
+                    <span class="user_icon">
+                    <i class="iconfont icon-yonghu"></i>
+                    </span>
+                    <p class="current_name"></p>
+                    <button id="js_login_btn">登录</button>
+                    <div class="has_logined_footer">
+                            <div id="js_cue">切换用户</div>
+                            <div id="js_other">其他方式登录</div>
+                    </div>
+            </div>
+         </div>
+        `)
         d.append(d.query(".login-page-container"), dom);
         d.query(".current_name", dom).innerText = this.props.userId.value.replace(/\s+/g, "")
         let loginBtn = d.query("#js_login_btn");
@@ -1054,6 +1085,7 @@ export class LoginPage {
         let i = 60;
         this.Interval = setInterval(() => {
             this.req_polling(lgToken).then(({ response }) => {
+                //手机确认登录或扫码成功
                 if (response.head) {
                     let user = User.get(),
                         noShow = [];
@@ -1082,13 +1114,17 @@ export class LoginPage {
                         // BW.sysPcHistory.remainLockOnly(() => sys.window.opentab());
                     }
                 }
+                //手机确认过 state=1
                 if (Number(response.state) === 1) {
                     i--;
                     if (i === 1) {
                         cb();
                         clearInterval(this.Interval)
                     }
-                } else if (Number(response.state) !== 0) {
+                } if (Number(response.state) === -2) {
+                    d.query(".refresh_code").style.display="block";
+                    clearInterval(this.Interval)
+                } else {
                     Modal.toast(response.msg)
                     clearInterval(this.Interval)
                 }

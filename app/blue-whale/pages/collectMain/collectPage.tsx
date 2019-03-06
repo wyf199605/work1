@@ -73,10 +73,10 @@ export class CollectPage extends BasicPage {
     return item.map((child) => {
       return <div class="collect_block">
         <div class="collect_nav">
-          <span>{child.tag ? child.tag : '默认分组'}</span>
-          <span class="edit_btn iconfont icon-shenpiguanli"></span>
+          <span class="collect_nav_groupName">{child.tag ? child.tag : '默认分组'}</span>
+          <span class="edit_btn iconfont icon-shenpiguanli">编辑组名</span>
         </div>
-        <ul class="collect_item">
+        <ul className="recent_parent">
           {
             child.favs.map(menu => {
               return <li
@@ -87,13 +87,16 @@ export class CollectPage extends BasicPage {
                 className="collect_li"
               >
                 <a>
-                  <span className={`self_icon  ${menu.icon} `}></span>
+                  <div className="wrap_self_icon">
+                    <span className={`self_icon  ${menu.icon} `}></span>
+                  </div>
                   <div className="collect_caption">{menu.caption}</div>
                 </a>
               </li>;
             })
           }
         </ul>
+        <div className="collect_line_hr"></div>
       </div>
     })
   }

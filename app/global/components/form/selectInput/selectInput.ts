@@ -13,7 +13,7 @@ export interface ISelectInputPara extends ITextInputBasicPara {
     };
     useInputVal?: boolean; // get值时是否用input的值
     clickType?: number; // 点击出现下拉框的位置, 0: 整个输入框, 1:下拉图标, 默认下拉图标
-
+    isAdapt?:boolean;
     multi?:boolean;
     multiSplit?:string;
     dropClassName?: string;
@@ -25,10 +25,9 @@ export class SelectInput extends TextInput {
     onSet: (item: ListItem, index?: number) => {};
 
     private defaultVal: any;
-
     protected para: ISelectInputPara;
     protected dropdown: DropDown;
-
+    private isAdapt:boolean;
 
     private toggle() {
         this.dropdown.toggle(this.wrapper);
@@ -42,7 +41,7 @@ export class SelectInput extends TextInput {
                 this.toggle();
             } : null
         }));
-
+        this.isAdapt=para.isAdapt?para.isAdapt:false;
         this.tabIndex = para.tabIndex;
         this.ajaxFun(para);
         this.para = para;
@@ -60,7 +59,8 @@ export class SelectInput extends TextInput {
             data: para.data,
             ajax: para.ajax,
             multi: para.multi,
-            className: para.dropClassName
+            className: para.dropClassName,
+            isAdapt:this.isAdapt
 
         };
         this.para.multi ? (dropPara['onMultiSelect'] = (selected, index) => {
@@ -132,7 +132,6 @@ export class SelectInput extends TextInput {
     get() {
         return this.value;
     }
-
     set value(data) {
         if(data !== null && typeof data === 'object'){
             let {value, text} = data;

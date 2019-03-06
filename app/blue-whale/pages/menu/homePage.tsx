@@ -16,7 +16,6 @@ export = class homePage extends BasicPage{
     protected homeList: HTMLElement;
     protected favoritesList: HTMLElement;
     protected recentList: HTMLElement;
-
     protected initHomeList(data, isRefresh = false) {
         if (isRefresh) {
             this.homeList.innerHTML = '';
@@ -72,18 +71,8 @@ export = class homePage extends BasicPage{
             });
             this.favoritesList.appendChild(div);
             let editBook = div.querySelector('.editBook');
-            editBook.addEventListener('click', function () {
-                let txt_edit = document.querySelector('.txt_edit') as HTMLInputElement,
-                    pValue = p.innerHTML;
-               // popoverToggle(MENU_FAVORITE.favEditDom);
-                // mui().popover('toggle');
-                //                               txt_edit.focus();
-                if (this.dataset.edit === "") {
-                    txt_edit.value = "默认分组";
-                }
-                else {
-                    txt_edit.value = pValue;
-                }
+            editBook.addEventListener('click', function (event) {
+                let pValue = p.innerHTML;
                 new Collect().editCollectGroup(pValue,this);
                 // let test = true;
                 // if (test) {

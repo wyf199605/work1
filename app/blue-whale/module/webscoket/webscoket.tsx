@@ -3,6 +3,7 @@ import { Modal } from "global/components/feedback/modal/Modal";
 import { User } from "../../../global/entity/User";
 import { Message } from "../../../global/entity/Message";
 import d = G.d;
+import Shell = G.Shell;
 import tools = G.tools;
 import { Notify } from "../../../global/components/feedback/notify/Notify";
 import { Hints } from "../hints/hints";
@@ -179,12 +180,23 @@ export = class webscoket {
     private scanHandle = () => {
         let scanBtn = d.query("#scan_btn");
         d.on(scanBtn, "click", () => {
+            // Modal.alert("开始调用")
             ShellAction.get().device().scan({
                 callback: (e: { detail: { data: string } }) => {
                     this.handleUrl(e.detail.data)
                 }
             });
-
+            // Modal.alert("开始结束")
+            // Modal.alert(111)
+            // Shell.inventory.openScanCode(0, (result) => {
+            //     Modal.alert(result)
+            //     if (result.success) {
+            //         Modal.alert(result.data);
+            //     } else {
+            //         Modal.toast(result.msg);
+            //     }
+            // });
+            // Modal.alert("调用结束")
            // this.handleUrl("l111111");
 
         })

@@ -583,10 +583,10 @@ namespace G {
         };
         //表格上方的发送位置-停止发送
         const location = {
-            startRecord(back: IShellEventHandler) {
+            startRecord(back?: IShellEventHandler) {
                 return ShellBase.handler('startRecord', { "timestep": "5000" },back);
             },
-            stopRecord(back: IShellEventHandler) {
+            stopRecord(back?: IShellEventHandler) {
                 return ShellBase.handler('stopRecord', {},back);
             },
         };
