@@ -42,9 +42,9 @@ export = class webscoket {
             },
             start: function () {
                 this.serverTimeoutObj = setInterval(function () {
-                    if ( self.ws.readyState == 1) {
+                    if (self.ws.readyState == 1) {
                         // console.log("连接状态，发送消息保持连接");
-                        self.ws.send(JSON.stringify({reqType:"ping"}));
+                        self.ws.send(JSON.stringify({ reqType: "ping" }));
                         heartCheck.reset().start();    // 如果获取到消息，说明连接是正常的，重置心跳检测
                     }
                 }, this.timeout)
@@ -61,10 +61,10 @@ export = class webscoket {
             heartCheck.reset().start();
             self.onMessage(r);
         };
-        self.ws.onerror = function(e){
+        self.ws.onerror = function (e) {
             // console.warn("websocket出现异常."+e);
         };
-        self.ws.onclose = function(e){
+        self.ws.onclose = function (e) {
             // console.info("websocket连接关闭.");
         };
         document.addEventListener("netchange", () => {
@@ -93,10 +93,10 @@ export = class webscoket {
         });
     }
 
-    private onMessage(r){
-        let data = JSON.parse(r.data),type = data.respType,self = this;
-        switch(type){
-            case "notify" :
+    private onMessage(r) {
+        let data = JSON.parse(r.data), type = data.respType, self = this;
+        switch (type) {
+            case "notify":
                 let dataMap = data.data.dataMap[0];
                 //let messageAction = new MessageAction();
                 let message = new Message({
@@ -173,32 +173,25 @@ export = class webscoket {
                 this.openLoginModal(data.data);
                 break;
             default:
-                console.info("后台返回未知的消息("+ type +")类型.");
+                console.info("后台返回未知的消息(" + type + ")类型.");
                 break;
         }
     }
     private scanHandle = () => {
         let scanBtn = d.query("#scan_btn");
         d.on(scanBtn, "click", () => {
-            // Modal.alert("开始调用")
-            ShellAction.get().device().scan({
-                callback: (e: { detail: { data: string } }) => {
-                    this.handleUrl(e.detail.data)
-                }
-            });
-            // Modal.alert("开始结束")
-            // Modal.alert(111)
-            // Shell.inventory.openScanCode(0, (result) => {
-            //     Modal.alert(result)
-            //     if (result.success) {
-            //         Modal.alert(result.data);
-            //     } else {
-            //         Modal.toast(result.msg);
+            // ShellAction.get().device().scan({
+            //     callback: (e: { detail: { data: string } }) => {
+            //         this.handleUrl(e.detail.data)
             //     }
             // });
-            // Modal.alert("调用结束")
-           // this.handleUrl("l111111");
-
+            Shell.inventory.openScanCode(0, (result) => {
+                if (result.success) {
+                    this.handleUrl(result.data)
+                } else {
+                    Modal.toast(result.msg);
+                }
+            })
         })
     }
     private handleUrl(code: string) {

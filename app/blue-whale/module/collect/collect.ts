@@ -25,7 +25,7 @@ export interface dataObj {
 export class BaseCollect {
   //新增收藏时候 拉取分组名 插入到select下
   req_groupName() {
-   return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
+    return BwRule.Ajax.fetch(BW.CONF.ajaxUrl.menuFavor, {
       data2url: true,
       data: {
         action: "tags"
@@ -89,7 +89,7 @@ export class BaseCollect {
       action: 'query'
     };
     //CONF.ajaxUrl.menuFavor  "https://bwt.sanfu.com/sf/app_sanfu_retail/v1/favorites?pageparams=%7B%22index%22%3D1%2C%20%22size%22%3D50%7D&action=query"
-    return BwRule.Ajax.fetch( "https://bwt.sanfu.com/sf/app_sanfu_retail/v1/favorites?pageparams=%7B%22index%22%3D1%2C%20%22size%22%3D50%7D&action=query", {
+    return BwRule.Ajax.fetch(CONF.ajaxUrl.menuFavor, {
       data: ajaxData
     })
   }

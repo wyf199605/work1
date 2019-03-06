@@ -22,7 +22,7 @@
     .current_user {
       font-size: 14px;
       color: #333;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
     .current_name {
       color: #333;
@@ -31,11 +31,17 @@
     }
     .user_icon {
       display: inline-block;
-      width: 60px;
-      height: 60px;
+      margin-top: 5px;
       margin-bottom: 20px;
+      background-color: #F3f3f3;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      vertical-align: bottom;
       .iconfont {
-        font-size: 50px!important;
+        font-size: 38px !important;
+        display: inline-block;
+        margin-top: 4px;
       }
     }
     button {
