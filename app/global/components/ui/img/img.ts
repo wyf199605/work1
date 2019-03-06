@@ -130,12 +130,12 @@ export const ImgModal = (() => {
         }
     }
 
-    function show(para: ImgModalPara) {
+    function show(para: ImgModalPara, index = 0) {
         if (para.isThumbnail) {
             //    显示缩略图
             showModalThumbnail(para);
         } else {
-            showPhotoSwipe(para);
+            showPhotoSwipe(para, index);
         }
     }
 
