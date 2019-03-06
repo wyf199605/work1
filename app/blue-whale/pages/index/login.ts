@@ -1011,9 +1011,9 @@ export class LoginPage {
          `)
         d.append(d.query(".login-page-container"), dom);
         this.req_getLgToken();
-        d.on( d.query("#code_refresh"),"click",()=>{
-            d.query(".refresh_code").style.display="none";
-            d.query("#code_login_cav").innerHTML=null;
+        d.on(d.query("#code_refresh"), "click", () => {
+            d.query(".refresh_code").style.display = "none";
+            d.query("#code_login_cav").innerHTML = null;
             this.req_getLgToken();
         })
         return dom;
@@ -1027,7 +1027,7 @@ export class LoginPage {
             <div class="has_logined">
                     <p class="current_user">当前用户</p>
                     <span class="user_icon">
-                    <i class="iconfont icon-yonghu"></i>
+                      <i class="iconfont icon-yonghu1"></i>
                     </span>
                     <p class="current_name"></p>
                     <button id="js_login_btn">登录</button>
@@ -1082,7 +1082,7 @@ export class LoginPage {
     }
 
     req_countdown(lgToken, cb) {
-        let i = 60;
+        let i = 180;
         this.Interval = setInterval(() => {
             this.req_polling(lgToken).then(({ response }) => {
                 //手机确认登录或扫码成功
@@ -1113,21 +1113,28 @@ export class LoginPage {
                         sys.window.opentab(void 0, void 0, noShow);
                         // BW.sysPcHistory.remainLockOnly(() => sys.window.opentab());
                     }
+                    clearInterval(this.Interval)
+                }
+                if (Number(response.state) !== 0) {
+                    if(Number(response.state)===-2){
+                        d.query(".refresh_code").style.display = "block";
+                    }
+                    clearInterval(this.Interval)
                 }
                 //手机确认过 state=1
-                if (Number(response.state) === 1) {
-                    i--;
-                    if (i === 1) {
-                        cb();
-                        clearInterval(this.Interval)
-                    }
-                } if (Number(response.state) === -2) {
-                    d.query(".refresh_code").style.display="block";
-                    clearInterval(this.Interval)
-                } else {
-                    Modal.toast(response.msg)
-                    clearInterval(this.Interval)
-                }
+                // if (Number(response.state) === 1) {
+                //     i--;
+                //     if (i === 1) {
+                //         cb();
+                //         clearInterval(this.Interval)
+                //     }
+                // } if (Number(response.state) === -2) {
+                //     d.query(".refresh_code").style.display="block";
+                //     clearInterval(this.Interval)
+                // } else {
+                //     Modal.toast(response.msg)
+                //     clearInterval(this.Interval)
+                // }
             }).catch(() => {
                 clearInterval(this.Interval)
             })
