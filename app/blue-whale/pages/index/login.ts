@@ -998,7 +998,10 @@ export class LoginPage {
                 </div>
                 <div class='code_login'>
                     <div class="cav_wrapper">
-                       <div class="refresh_code">请刷新</div>
+                       <div class="refresh_code">
+                          <span>二维码失效</span>
+                          <div id="code_refresh">刷新</div>
+                       </div>
                        <div id='code_login_cav'></div>
                     </div>
                     <p class="tip">请打开速狮APP扫码登录</p>
@@ -1008,6 +1011,11 @@ export class LoginPage {
          `)
         d.append(d.query(".login-page-container"), dom);
         this.req_getLgToken();
+        d.on( d.query("#code_refresh"),"click",()=>{
+            d.query(".refresh_code").style.display="none";
+            d.query("#code_login_cav").innerHTML=null;
+            this.req_getLgToken();
+        })
         return dom;
     }
     renderLogined = () => {
@@ -1021,7 +1029,7 @@ export class LoginPage {
                     <span class="user_icon">
                     <i class="iconfont icon-yonghu"></i>
                     </span>
-                    <p class="current_name">wjb</p>
+                    <p class="current_name"></p>
                     <button id="js_login_btn">登录</button>
                     <div class="has_logined_footer">
                             <div id="js_cue">切换用户</div>
@@ -1077,6 +1085,7 @@ export class LoginPage {
         let i = 60;
         this.Interval = setInterval(() => {
             this.req_polling(lgToken).then(({ response }) => {
+                //手机确认登录或扫码成功
                 if (response.head) {
                     let user = User.get(),
                         noShow = [];
@@ -1105,13 +1114,17 @@ export class LoginPage {
                         // BW.sysPcHistory.remainLockOnly(() => sys.window.opentab());
                     }
                 }
+                //手机确认过 state=1
                 if (Number(response.state) === 1) {
                     i--;
                     if (i === 1) {
                         cb();
                         clearInterval(this.Interval)
                     }
-                } else if (Number(response.state) !== 0) {
+                } if (Number(response.state) === -2) {
+                    d.query(".refresh_code").style.display="block";
+                    clearInterval(this.Interval)
+                } else {
                     Modal.toast(response.msg)
                     clearInterval(this.Interval)
                 }

@@ -1,6 +1,7 @@
 .collect_pc_model_bocy {
   .modal_footer {
     padding: 10px 15px;
+    margin-bottom: 15px;
     button:not(:first-child) {
       float: right;
     }
@@ -51,11 +52,5 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-  }
-  .collect_body .colect_body_group>div {
-    margin: 8px auto;
-  }
-  .collect_body_menu {
-    margin: 25px auto;
   }
 }

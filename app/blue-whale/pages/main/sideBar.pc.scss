@@ -318,6 +318,9 @@ li:last-child .item-content .item-inner {
   .collect_item {
     text-align: center;
     cursor: pointer;
+    .iconfont {
+      font-size: 25px!important;
+    }
   }
   p {
     text-align: center;

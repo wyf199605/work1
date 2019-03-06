@@ -238,11 +238,11 @@ export class CollectPC extends BaseCollect {
         readonly: true,
         clickType: 0,
         dropClassName:"collect_drop",
+        isAdapt:true,
         onSet: (item) => {
           this.selectVal = item;
         }
-      });
-
+      })
     })
   }
 }

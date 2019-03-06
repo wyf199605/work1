@@ -6,9 +6,9 @@ import { BaseCollect } from "./collect";
 import tools = G.tools;
 import d = G.d
 interface CollectPara {
-  dom: HTMLElement,
-  favid: number | string,
-  link: string;
+  dom?: HTMLElement,
+  favid?: number | string,
+  link?: string;
 }
 export class Collect extends BaseCollect {
   private ModalContent: Modal;
@@ -159,6 +159,7 @@ export class Collect extends BaseCollect {
   }
   //分组管理（重命名和删除）
   editCollectGroup(GroupName: string, HandleDOM: HTMLElement) {
+    console.log("尽量")
     let dom = G.d.create(`
         <div class="collect_modal-body">
           <div class="mui-input-row">

@@ -94,10 +94,37 @@
     }
     .refresh_code {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+      left: 0px;
+      top: 0px;
+      bottom: 0px;
+      right: 0px;
+      background-color: white;
       z-index: 999;
+      opacity: 0.95;
+      text-align: center;
+      display: none;
+      span {
+        display: block;
+        color: #333;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 35px auto 20px;
+      }
+      div {
+        display: block;
+        font-size: 14px;
+        color: white;
+        width: 100%;
+        background-color: #005BAC;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      div:hover {
+        color: #333;
+      }
     }
     #code_login_cav {
       width: 150px;

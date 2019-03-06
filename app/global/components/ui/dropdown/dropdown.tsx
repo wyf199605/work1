@@ -11,7 +11,7 @@ export interface DropDownPara extends SelectDataPara {
     inline?: boolean; // 是否直接显示在界面上，为真时其父容器是el，否则为body
     multi?: boolean;  // true多选 false单选（默认）, null or undefined 每次点击都会调用onSelect
     className?: string;
-
+    isAdapt?:boolean;//下拉框是否自适应
     // onSelect?(item : ListItem, index:number): void;
     onSelect?(item: ListItem, index: number): void;
 
@@ -37,13 +37,14 @@ export class DropDown {
     private isVisible = false;
     private list: List;
     private data: ListItem[];
-
+    private isAdapt:boolean;
     get isShow(){
         return this.isVisible;
     }
 
     constructor(private para: DropDownPara) {
         this.ulDom = <ul className="dropdown-menu"></ul>;
+        this.isAdapt=para.isAdapt;
         if (para.className) {
             this.ulDom.classList.add(para.className);
         }
@@ -252,9 +253,9 @@ export class DropDown {
         this.ulDom.classList.add('show');
         if(!this.para.inline) {
             if(relEl) {
-                d.setPosition(this.ulDom, relEl, false);
+                d.setPosition(this.ulDom, relEl, this.isAdapt);
             } else {
-                d.setPosition(this.ulDom, this.para.el, false);
+                d.setPosition(this.ulDom, this.para.el, this.isAdapt);
             }
         }
     }
