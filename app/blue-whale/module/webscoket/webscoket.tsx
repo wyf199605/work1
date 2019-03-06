@@ -180,18 +180,19 @@ export = class webscoket {
     private scanHandle = () => {
         let scanBtn = d.query("#scan_btn");
         d.on(scanBtn, "click", () => {
-            // ShellAction.get().device().scan({
-            //     callback: (e: { detail: { data: string } }) => {
-            //         this.handleUrl(e.detail.data)
-            //     }
-            // });
-            Shell.inventory.openScanCode(0, (result) => {
-                if (result.success) {
-                    this.handleUrl(result.data)
-                } else {
-                    Modal.toast(result.msg);
+            ShellAction.get().device().scan({
+                callback: (event) => {
+                    let detail =JSON.parse(event.detail);
+                    this.handleUrl(detail.data)
                 }
-            })
+            });
+            // Shell.inventory.openScanCode(0, (result) => {
+            //     if (result.success) {
+            //         this.handleUrl(result.data)
+            //     } else {
+            //         Modal.toast(result.msg);
+            //     }
+            // })
         })
     }
     private handleUrl(code: string) {
@@ -204,8 +205,6 @@ export = class webscoket {
             if (list && list.indexOf("code") > -1) {
                 this.requestUrl(CONF.siteUrl + response.next.url, code)
             }
-        }).catch(() => {
-            Modal.toast("无对应的路由规则")
         })
     }
     private requestUrl(url: string, code: string | number) {

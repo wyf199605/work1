@@ -142,73 +142,8 @@ let obj =
 // 不好的写法
 doSomething({ key1: value1, key2: value2});
 ```
-
-### 9.注释
-
-以下情况应当使用注释：  
-+ 代码晦涩难懂；
-+ 可能被误认为有错误的代码；
-+ 对对象的方法、属性生成jsDoc文档；
-
-1. 单行注释 `//`
-
-    + 独占一行的注释，用来解释下一行代码；
-    + 在代码尾部注释，用来解释它之前的代码；
-    + 用来注释多行代码；
-
-    ```js
-    if(condition){
-    
-       // 注释...
-       doSomething();
-    }
-       
-    // 不好的写法，注释之前没有空行
-    if(condition){
-        // 注释...
-        doSomething();
-    }
-    // 不好的写法，注释没有缩进
-    if(condition){
-    // 注释...
-        doSomething();
-    }
-     
-    // 好的写法, 注释多行代码
-    // if(condition){
-    //    doSomething();
-    // }
-    ```
-
-2. 多行注释 `/**/`
-
-    多行文字一般用于注释大段文字。
-    
-    ```js
-    if(condition) {
-    
-        /**
-         * 好的多行文字注释写法
-         * 如果代码执行到这里
-         * 则说明条件成立
-         */
-        ok();
-    }
-    
-    /**
-     * 好的多行文字注释写法
-     * 这是一个函数
-     * 这是一个函数
-     */
-     function fun() {
-         
-     }
-     
-    /*不好的写法，单行注释应用//注释 */
-    let a = 1;
-    ```
-    
-### 10.变量声明
+ 
+### 9.变量声明
 
 多个变量一起声明时，只使用一个let，每个变量用逗号和换行隔开。
 
@@ -236,7 +171,7 @@ let a = 10,
 let c = 100;
 ```
 
-### 11.函数声明
+### 10.函数声明
 
 ```js
 // 好的写法
@@ -257,17 +192,65 @@ function doSomething(arg1, arg2)
 var doSomething = new Function("arg1", "arg2", "return arg1 + arg2");
 ```
 
-### 12.命名
+### 11.命名
 
 1. 变量与函数用小写开头驼峰法 : girlName, setName(), getData();
 2. 构造函数大写开头驼峰法：MyObject, SomeObject;
 3. 常量用单词用大写且用下划线隔开：MY_ADDRESS, TOTAL_MONEY;
 
-### 13.等号
+### 12.等号
 
 使用 === 或者 !== 严格等号，避免类型转换带来的潜在问题
 
-### 14.语句
+### 13.语句
 
 1. 每行只能有一行语句，且用分号结尾；
 2. ii.if, for, while等中所有语句都用花括号括起来；
+
+### 14.注释
+
+ 1.在文件开始时写块注释：
+
+```
+    /** 
+    * 作用于哪些页面
+    * 注明代码业务/功能说明
+    */ 
+```
+
+2.单个函数注释
+
+
+ ```
+    /**
+    * 函数功能简述
+    *
+    * 具体描述一些细节
+    *
+    * @param    {string}  address     地址
+    * @param    {array}   com         商品数组
+    * @param    {string}  pay_status  支付方式
+    * @returns  void
+    */
+
+```
+
+3.css注释的写法
+
+```
+    /* Footer */
+
+    内容区
+
+    /* End Footer */
+
+```
+
+
+
+### <a href="#/standard/component.md">15.组件化</a>
+
+
+### <a href="#/standard/technology.md">16.技术栈</a>
+
+
