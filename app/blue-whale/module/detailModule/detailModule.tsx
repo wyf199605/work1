@@ -281,6 +281,40 @@ export class DetailModule extends AGroupTabItem {
         return this.dataManager ? this.dataManager.refresh(this.ajaxData) : Promise.reject('未实例化dataManager控件');
     }
 
+    protected _defData: obj;
+
+    // 获取默认数据
+    get defData(): Promise<obj> {
+        return new Promise((resolve, reject) => {
+            if (tools.isNotEmpty(this._defData)) {
+                resolve(this._defData);
+            } else {
+                let data = BwRule.getDefaultByFields(this.fields),
+                    defAddrs = this.ui.defDataAddrList;
+
+                if (tools.isNotEmpty(defAddrs)) {
+                    Promise.all(defAddrs.map(url => {
+                        return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(url))
+                            .then(({response}) => {
+                                // TODO data可能不存在
+                                let resultData = tools.keysVal(response, 'data', 0) || {};
+                                data = Object.assign(data, resultData);
+                                // cb();
+                            });
+                    })).then(() => {
+                        this._defData = data;
+                        resolve(data);
+                    }).catch(() => {
+                        reject()
+                    })
+                } else {
+                    this._defData = data;
+                    resolve(data);
+                }
+            }
+        })
+    }
+
     protected currentPage = -1; // 当前页
     noData = false; // 有没有数据
 

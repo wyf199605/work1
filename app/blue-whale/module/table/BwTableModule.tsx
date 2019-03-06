@@ -772,19 +772,20 @@ export class BwTableModule extends Component {
             d.on(ftable.wrapper, 'click', `${tdSelector}.cell-img:not(.disabled-cell)`, tools.pattern.throttling((e) => {
                 imgHandler(e, true);
             }, 1000))
-        } else if(hasImg) {
+        } else {
 
-            let imgColumn = this.ftable.columns.filter(col => {
-                let field = col.content as R_Field;
-                let dataType = field.atrrs && field.atrrs.dataType;
-                return BwRule.isImage(dataType);
-            })[0];
+            // let imgColumn = this.ftable.columns.filter(col => {
+            //     let field = col.content as R_Field;
+            //     let dataType = field.atrrs && field.atrrs.dataType;
+            //     return BwRule.isImage(dataType);
+            // })[0];
 
-            imgColumn && ftable.click.add(trSelector, tools.pattern.throttling((e) => {
+            ftable.click.add(trSelector, tools.pattern.throttling((e) => {
                 let td = d.closest(e.target as HTMLElement, 'td'),
-                    index = parseInt(td.parentElement.dataset.index),
-                    cell = imgColumn.bodyCells[index] as FastTableCell;
-                cell && self.imgManager.showImg(cell);
+                    index = parseInt(td.parentElement.dataset.index);
+                //     cell = imgColumn.bodyCells[index] as FastTableCell;
+                // cell && self.imgManager.showImg(cell);
+                this.imgEdit.showImg(index);
             }, 1000));
         }
 
