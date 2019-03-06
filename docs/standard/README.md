@@ -271,3 +271,10 @@ var doSomething = new Function("arg1", "arg2", "return arg1 + arg2");
 
 1. 每行只能有一行语句，且用分号结尾；
 2. ii.if, for, while等中所有语句都用花括号括起来；
+
+### <a href="#/standard/component.md">15.组件化</a>
+
+
+### <a href="#/standard/technology.md">16.技术栈</a>
+
+###<a href="#/standard/annotation.md">17.注释</a>

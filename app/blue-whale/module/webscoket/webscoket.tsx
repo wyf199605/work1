@@ -180,18 +180,18 @@ export = class webscoket {
     private scanHandle = () => {
         let scanBtn = d.query("#scan_btn");
         d.on(scanBtn, "click", () => {
-            // ShellAction.get().device().scan({
-            //     callback: (e: { detail: { data: string } }) => {
-            //         this.handleUrl(e.detail.data)
-            //     }
-            // });
-            Shell.inventory.openScanCode(0, (result) => {
-                if (result.success) {
-                    this.handleUrl(result.data)
-                } else {
-                    Modal.toast(result.msg);
+            ShellAction.get().device().scan({
+                callback: (e: { detail: { data: string } }) => {
+                    this.handleUrl(e.detail.data)
                 }
-            })
+            });
+            // Shell.inventory.openScanCode(0, (result) => {
+            //     if (result.success) {
+            //         this.handleUrl(result.data)
+            //     } else {
+            //         Modal.toast(result.msg);
+            //     }
+            // })
         })
     }
     private handleUrl(code: string) {
