@@ -643,7 +643,7 @@ export class BwTableModule extends Component {
                 [field.name]: rowData[field.name],
                 down: 'allow'
             });
-            sys.window.download(url);
+            sys.window.download(url, rowData[field.name]);
             return;
         }
 
