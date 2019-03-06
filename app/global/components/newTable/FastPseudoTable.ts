@@ -88,6 +88,9 @@ export class FastPseudoTable extends TableBase {
 
     protected preSelCell: TableDataCell = null;
     protected preSelIndex: number = -1;
+    get selectIndex(){
+        return this.preSelIndex;
+    }
     setPresentSelected(index: number){
         let rows = this.body.rows || [];
         if(rows.length === 0){

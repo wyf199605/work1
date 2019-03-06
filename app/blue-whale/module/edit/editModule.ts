@@ -699,6 +699,13 @@ export class EditModule {
         return pageData;
     }
 
+    public clear(){
+        for(let name in this.coms){
+            let com = this.coms[name];
+            com && com.set('');
+        }
+    }
+
     public validate = (() => {
         let v: Validate = null;
 
