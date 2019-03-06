@@ -144,8 +144,10 @@ export class OfflineBtn {
         Shell.imports.uploadcodedata(this.para.uniqueFlag, url, (result) => {
             if (result.success) {
                 Modal.toast('上传成功');
+                this.imports.clear(this.imports.editModule.main);
+                this.imports.clear(this.imports.editModule.sub);
             } else {
-                Modal.toast(result.msg);
+                Modal.toast(result.msg); 
             }
             loading.destroy();
         });

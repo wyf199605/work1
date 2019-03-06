@@ -160,10 +160,11 @@ export class DetailEditModule {
         return tools.isNotEmpty(this.editParam.insert);
     }
 
-    insert() {
+    insert(defData: obj = {}) {
         this.editType = 'insert';
         this.isEdit = true;
         this.createItem('modal');
+        this.editModule && this.editModule.set(defData);
     }
 
     protected fetch(data: obj): Promise<any> {
