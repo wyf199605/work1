@@ -462,7 +462,12 @@ export class TableDataCell extends TableCell {
             // this.input = new
             this._editing = flag;
             if(!this.isVirtual){
-                if(flag && this.input === null) {
+                if(flag) {
+                    if(this.input){
+                        this.input.container = this.wrapper;
+                        return;
+                    }
+
                     // 缓存当前内容
                     let tmpDoc = document.createDocumentFragment();
                     Array.prototype.slice.call(this.wrapper.childNodes, 0).forEach(node => {

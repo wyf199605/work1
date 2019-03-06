@@ -2615,7 +2615,10 @@ export class BwTableModule extends Component {
 
                     // 设置默认值
                     if (com instanceof FormCom) {
+                        let onSet = com.onSet;
+                        com.onSet = null;
                         com.set(value);
+                        com.onSet = onSet;
                     }
                     return com;
                 },
