@@ -15,15 +15,18 @@
     align-items: center;
     .login_tip {
       margin: 10px auto;
+      font-size: 16px;
+      color: #333;
     }
     .login_btn {
-      width: 51%;
-      background-color: rgba(22, 155, 213, 1);
-      padding: 6px;
+      width: 84%;
+      background-color: #005BAC;
+      padding: 13px;
       color: white;
       text-align: center;
       border-radius: 6px;
-      margin-top: 12vh;
+      margin-top: 18vh;
+      font-size: 18px;
     }
     .login_cancel {
       margin: 20px auto;
@@ -32,6 +35,8 @@
       padding-bottom: 10px;
       padding-left: 20px;
       padding-right: 20px;
+      font-size: 15px;
+      color: #666;
     }
     .login_pic {
       margin-top: 28vh;

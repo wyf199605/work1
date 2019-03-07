@@ -246,7 +246,12 @@ var doSomething = new Function("arg1", "arg2", "return arg1 + arg2");
 
 ```
 
-
+### 15.文件命名规范
+  
+   > --项目中支持tsx，尽量使用tsx来定义脚本文件
+   
+   1. 移动端: **xxx.mb.scss**    &nbsp;&nbsp;&nbsp;&nbsp;  **xxx.mb.tsx**
+   2. PC端: **xxx.pc.scss**   &nbsp;&nbsp;&nbsp;&nbsp;      **xxx.pc.tsx**
 
 ### <a href="#/standard/component.md">15.组件化</a>
 
