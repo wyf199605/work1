@@ -27,11 +27,16 @@
     border-bottom: 1px solid #e3e3e3;
   }
   .mui-table-view-cell .mui-badge {
+    //position: absolute;
+    //top: 50%;
+    //right: -50px;
+    //-webkit-transform: translateY(-50%);
+    //transform: translateY(-50%);
     position: absolute;
-    top: 50%;
-    right: -50px;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
+    top: -5px;
+    right: -15px;
+    left: auto;
+    min-width: 18px;
   }
   .mui-grid-view.mui-grid-9 .mui-media  .mui-icon, .mui-grid-view.mui-grid-9 .mui-media  .mui-icon-extra{
     font-size: 1.3em;

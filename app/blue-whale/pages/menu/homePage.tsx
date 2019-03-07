@@ -20,7 +20,22 @@ export = class homePage {
             this.homeList.innerHTML = '';
         }
         data && tools.toArray(data).forEach((item) => {
-            d.append(this.homeList, homePage.createHomeList(item));
+            let li = homePage.createHomeList(item);
+            d.append(this.homeList, li);
+            item.subScriptUrl && BwRule.Ajax.fetch(CONF.siteUrl + item.subScriptUrl)
+                .then(({response}) => {
+                    let num = tools.keysVal(response, 'data', '0', 'N');
+                    if (num) {
+                        num = parseInt(num);
+                        let badge = d.query('.mui-badge.mui-badge-danger', li);
+                        if (num > 0) {
+                            badge.classList.remove('hide');
+                            badge.textContent = num;
+                        } else {
+                            badge.classList.add('hide');
+                        }
+                    }
+                });
         });
         this.homeList.classList.toggle('no-data', this.homeList.innerHTML === '');
     }
@@ -255,7 +270,9 @@ export = class homePage {
     protected static createHomeList(menu: obj): HTMLLIElement{
         return  <li data-href={BW.CONF.siteUrl + menu.menuPath.dataAddr} data-gps={menu.menuPath.needGps} class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
             <a>
-                <span className={'mui-icon' + ' ' + menu.menuIcon}/>
+                <span className={'mui-icon' + ' ' + menu.menuIcon}>
+                    <span className="mui-badge mui-badge-danger hide"/>
+                </span>
                 <div class="mui-media-body">{menu.menuName}</div>
             </a>
         </li>

@@ -4,6 +4,7 @@ import {FastTable} from "./FastTable";
 import {FastTableCell} from "./FastTableCell";
 import {TableDataRow} from "./base/TableRow";
 import tools = G.tools;
+import {TableBase} from "./base/TableBase";
 
 export interface IFastTableRowPara {
     fastTable: FastTable;
@@ -206,8 +207,15 @@ export class FastTableRow {
     get data() {
         let data: obj = {};
         this.rowsEach(row => {
+            let rowData = {};
+            for(let cell of row.cells){
+                rowData[cell.name] = cell.data;
+            }
+
             // debugger;
-            data = Object.assign({}, data, row.data || {});
+            data = Object.assign({
+                [TableBase.GUID_INDEX]: row.data[TableBase.GUID_INDEX]
+            }, data, rowData || {});
         });
         return data;
     }
