@@ -30,7 +30,7 @@
           padding: 50px 0;
 
 
-          .close{
+          .close-code{
             $diameter: 60px;
             width: $diameter;
             height: $diameter;
@@ -55,7 +55,7 @@
 
         &.pay-error{
           .content{
-            .close{
+            .close-code{
               background-color: $error;
             }
             .msg{
@@ -65,7 +65,7 @@
         }
         &.pay-success{
           .content{
-            .close{
+            .close-code{
               background-color: $info;
             }
             .msg{

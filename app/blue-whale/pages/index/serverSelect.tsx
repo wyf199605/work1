@@ -79,7 +79,7 @@ export class ServerSelect extends BasicPage {
             <option value="http://bwt.fastlion.cn:7777/sf/app_fastlion_retail/v1/index">速狮测试环境</option>,
             <option value="http://bwd.fastlion.cn:7776/sf/app_sanfu_retail/v1/index">速狮开发环境</option>,
             <option value="http://t.hengyusy.cn:7777/lion/hydc/null/index?page=login">恒裕测试环境</option>,
-            <option value="http://bwt.fastlion.cn:7777/sf/hydc/v1/index?page=login">恒裕开发环境</option>,
+            <option value="http://bwt.fastlion.cn:7777/hy/hydc/v1/index?page=login">恒裕开发环境</option>,
             <option value="https://www.hengyusy.cn/lion/hydc/v1/index?page=login">恒裕生产环境</option>
         ]
     }

@@ -4,6 +4,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {BwRule} from "../../common/rule/BwRule";
 import Rule = G.Rule;
 import d = G.d;
+import tools = G.tools;
 import {Button} from "../../../global/components/general/button/Button";
 
 declare const QRCode;
@@ -25,6 +26,8 @@ export class PayModule{
         this.modal = new Modal({
             header: '收款',
             isShow: true,
+            width: tools.isMb ? void 0 : '350px',
+            height: tools.isMb ? void 0 : '500px',
             className: 'pay-code-modal',
             onClose: () => {
                 this.destroy();
@@ -80,7 +83,7 @@ export class PayModule{
         this.wrapper.innerHTML = '';
         d.append(this.wrapper, <div className="pay-statue pay-success">
             <div className="content">
-                <div className="close">
+                <div className="close-code">
                     <span className="iconfont icon-dagou"/>
                 </div>
                 <div className="msg">收款成功</div>
@@ -97,7 +100,7 @@ export class PayModule{
         this.wrapper.innerHTML = '';
         d.append(this.wrapper, <div className="pay-statue pay-error">
             <div className="content">
-                <div className="close">
+                <div className="close-code">
                     <span className="iconfont icon-close"/>
                 </div>
                 <div className="msg">{msg}</div>
@@ -144,7 +147,7 @@ export class PayModule{
         this.wrapper = null;
     }
 
-    static orderQueryTime = 7000; // 轮询请求时间间隔
+    static orderQueryTime = 5000; // 轮询请求时间间隔
 }
 function getTime(overtime: number){
     return `${Math.floor(overtime / 60)}分${two(overtime % 60)}秒`;

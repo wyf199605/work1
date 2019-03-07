@@ -14,6 +14,7 @@ import {TextInput} from "../../../global/components/form/text/text";
 import {ContactsModule} from "../flowDesigner/ContactsModule";
 import Component = G.Component;
 import {IDetailBasePara} from "./DetailBase";
+import sys = BW.sys;
 
 export class ListItemDetail extends Component{
     // DOM容器
@@ -561,11 +562,25 @@ export class ListItemDetail extends Component{
                     break;
                 default:
                     // 其他按钮
-                    ButtonAction.get().clickHandle(btn, def_data, () => {
-                    }, self.para.url);
+                    ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                    }, self.pageUrl);
                     break;
             }
         }
+    }
+    protected pageContainer: HTMLElement;
+    protected _pageUrl: string;
+    get pageUrl() {
+        if (!this._pageUrl) {
+            if (sys.isMb) {
+                this._pageUrl = location.href;
+            } else {
+                let pageContainer = d.closest(this.wrapper, '.page-container[data-src]');
+                this.pageContainer = pageContainer;
+                this._pageUrl = pageContainer ? pageContainer.dataset.src : '';
+            }
+        }
+        return this._pageUrl;
     }
 
     private prev: Button = null;
