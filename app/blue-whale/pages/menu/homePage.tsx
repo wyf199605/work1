@@ -24,15 +24,14 @@ export = class homePage {
             d.append(this.homeList, li);
             item.subScriptUrl && BwRule.Ajax.fetch(CONF.siteUrl + item.subScriptUrl)
                 .then(({response}) => {
-                    let num = response.data[0].N;
-                    if (num !== undefined) {
+                    let num = tools.keysVal(response, 'data', '0', 'N');
+                    if (num) {
                         num = parseInt(num);
                         let badge = d.query('.mui-badge.mui-badge-danger', li);
                         if (num > 0) {
                             badge.classList.remove('hide');
                             badge.textContent = num;
-                        }
-                        else {
+                        } else {
                             badge.classList.add('hide');
                         }
                     }
