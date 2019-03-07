@@ -207,7 +207,7 @@ export class UploadImages extends FormCom {
                 let imageObj: IImage = {
                     unique: '',
                     isError: false,
-                    isOnLine: false,
+                    isOnLine: this.autoUpload,
                     localUrl: (window.URL) ? window.URL.createObjectURL(file.blob) : window['webkitURL'].createObjectURL(file.blob)
                 };
                 Modal.toast('上传成功!');
