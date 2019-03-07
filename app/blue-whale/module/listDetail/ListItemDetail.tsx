@@ -14,6 +14,7 @@ import {TextInput} from "../../../global/components/form/text/text";
 import {ContactsModule} from "../flowDesigner/ContactsModule";
 import Component = G.Component;
 import {IDetailBasePara} from "./DetailBase";
+import sys = BW.sys;
 
 export class ListItemDetail extends Component{
     // DOM容器
