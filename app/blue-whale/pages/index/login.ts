@@ -1115,12 +1115,22 @@ export class LoginPage {
                     }
                     clearInterval(this.Interval)
                 }
-                if (Number(response.state) !== 0) {
-                    if(Number(response.state)===-2){
+                let state=Number(response.state);
+                if(state<0){
+                    if(state===-2){
                         d.query(".refresh_code").style.display = "block";
                     }
                     clearInterval(this.Interval)
                 }
+                // if (Number(response.state) !== 0) {
+                //     if (Number(response.state) === -2) {
+                //         d.query(".refresh_code").style.display = "block";
+                //     }
+                //     if (Number(response.state) !== 1) {
+                //         clearInterval(this.Interval)
+                //     }
+
+                // }
                 //手机确认过 state=1
                 // if (Number(response.state) === 1) {
                 //     i--;
