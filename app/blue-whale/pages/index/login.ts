@@ -41,7 +41,6 @@ export class LoginPage {
         let response = props.responseBean;
         this.device = Device.get();
         this.deviceUpdate();
-
         if (response && response.body && response.body.bodyList && response.body.bodyList[0]) {
             let dataList = response.body.bodyList[0].dataList;
             let meta = response.body.bodyList[0].meta;

@@ -1,18 +1,80 @@
-/// <amd-module name="Authorized"/>
 /** 
   * 授权页面  登录模块 
 */
+/// <amd-module name="Authorized"/>
 import BasicPage from "basicPage";
+import { BwRule } from "../../common/rule/BwRule";
+import tools = G.tools;
+import CONF = BW.CONF;
+import { Modal } from "global/components/feedback/modal/Modal";
 interface pagePara {
   dom?: HTMLElement,
   title?: string
 }
+type Name = string | number;
+interface formPara {
+  response_type: Name;
+  client_id: Name;
+  redirect_uri: Name;
+  account?: Name;
+  password?: Name;
+}
 export class Authorized extends BasicPage {
   private container: HTMLElement; //页面挂载的父元素
+  private showPassword: HTMLElement;//查看密码的按钮
+  private account: HTMLInputElement;//账号Input
+  private password: HTMLInputElement;//密码Input
+  private submitBtn: HTMLElement;//提交按钮
+  private state: formPara;//提交给服务端的数据
   constructor(para: pagePara) {
     super(para);
+    let urlObj = tools.url.getObjPara(location.href) as formPara;
+    this.state = {
+      response_type: urlObj.response_type,
+      client_id: urlObj.client_id,
+      redirect_uri: urlObj.redirect_uri
+    }
     this.container = para.dom;
-    d.append(this.container, this.render())
+    G.d.append(this.container, this.render())
+    this.event();
+  }
+  /**
+   * 页面的事件绑定
+   */
+  event() {
+    G.d.on(this.showPassword, 'click', (e) => {
+      e.preventDefault();
+      this.showPassword.classList.contains('active') ? this.showPassword.classList.remove('active') : this.showPassword.classList.add('active');
+      this.password.type = this.password.type == 'password' ? 'text' : 'password';
+    });
+    G.d.on(this.submitBtn, "click", (e) => {
+      e.preventDefault();
+      if (!this.account.value) {
+        Modal.toast("请输入员工号/手机号")
+        return false;
+      }
+      if (!this.password.value) {
+        Modal.toast("请输入密码")
+        return false;
+      }
+      this.state.account = this.account.value;
+      this.state.password = this.password.value;
+      this.req_author();
+    })
+
+  }
+  /**
+   * 提交授权按钮
+   */
+  req_author() {
+    BwRule.Ajax.fetch(CONF.siteUrl + "sf/auth", {
+      type: 'post',
+      data: this.state
+    }).then(({ response }) => {
+
+    }).catch((ev) => {
+
+    });
   }
   /**
     * 页面模板
@@ -24,16 +86,28 @@ export class Authorized extends BasicPage {
           <img src={G.requireBaseUrl + "../img/fastlion_logo.png"} alt="fastlion" />
         </div>
         <div className="form_content">
-          <div>
+          <div className="form_item">
             <label>账号</label>
-            <input type="text" placeholder="请输入员工号/手机号" />
+            {
+              this.account = <input type="text" placeholder="请输入员工号/手机号" />
+            }
           </div>
-          <div>
+          <div className="form_item">
             <label>密码</label>
-            <input type="text" placeholder="请输入密码" />
+            {
+              this.password = <input type="password" placeholder="请输入密码" id="js_password" />
+            }
+            {
+              this.showPassword = <div className="password-show" type="button">
+                <i className="appcommon app-xianxingyanjing" />
+              </div>
+            }
           </div>
+          {
+            this.submitBtn = <button className="authorized_btn">授权</button>
+          }
         </div>
-        <button>授权</button>
+
       </div>
     )
   }

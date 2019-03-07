@@ -403,6 +403,7 @@ gulp.task('js', function() {
     gulpTsPage('mbList/listDetailPage', 'ListDetailPage.js');
 
     gulpTsPage('msgList/MsgListPage', 'MsgListPage.js');
+    gulpTsPage('index/authorized.mb', "Authorized.js");
 });
 
 /**
