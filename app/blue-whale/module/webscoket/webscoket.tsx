@@ -182,7 +182,7 @@ export = class webscoket {
         d.on(scanBtn, "click", () => {
             ShellAction.get().device().scan({
                 callback: (event) => {
-                    let detail =JSON.parse(event.detail);
+                    let detail = JSON.parse(event.detail);
                     this.handleUrl(detail.data)
                 }
             });
@@ -235,13 +235,27 @@ export = class webscoket {
             d.append(document.body, dom);
             let cancelBtn = d.query("#js_cancal_login")
             d.on(cancelBtn, "click", () => {
-                d.query(".login_modal_page").remove();
+                this.req_cancelLogin(lgToken)
             })
             let loginBtn = d.query("#js_scan_login", dom);
             d.on(loginBtn, "click", () => {
                 this.req_sureLogin(lgToken);
             })
         }
+    }
+    private req_cancelLogin(lgtoken: string | number) {
+        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/change", {
+            data: {
+                code: lgtoken,
+                action: "cancel"
+            }
+        }).then(({ response }) => {
+            let state = Number(response.state);
+            if (state === 1) {
+                d.query(".login_modal_page").remove();
+            }
+
+        })
     }
     private req_sureLogin(lgtoken: string | number) {
         //lgtoken=XXXXXX&userid=xxx  & token=XXXXX
@@ -255,7 +269,6 @@ export = class webscoket {
             }
         }).then(({ response }) => {
             d.query(".login_modal_page").remove();
-            console.log(response)
         })
     }
     private messageDom(listData) {

@@ -1119,6 +1119,9 @@ export class LoginPage {
                 if(state<0){
                     if(state===-2){
                         d.query(".refresh_code").style.display = "block";
+                        if(d.query(".has_logined")){
+                            Modal.alert(response.msg||'二维码失效，请重试')
+                        }
                     }
                     clearInterval(this.Interval)
                 }
