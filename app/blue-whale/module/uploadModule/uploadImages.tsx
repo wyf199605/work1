@@ -91,6 +91,7 @@ export class UploadImages extends FormCom {
                         localUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.pageData),
                         isError: false,
                         unique: val || '',
+                        isOnLine: this.autoUpload
                     }];
                 }
                     break;
