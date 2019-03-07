@@ -91,6 +91,7 @@ export class UploadImages extends FormCom {
                         localUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.pageData),
                         isError: false,
                         unique: val || '',
+                        isOnLine: this.autoUpload
                     }];
                 }
                     break;
@@ -206,7 +207,7 @@ export class UploadImages extends FormCom {
                 let imageObj: IImage = {
                     unique: '',
                     isError: false,
-                    isOnLine: false,
+                    isOnLine: this.autoUpload,
                     localUrl: (window.URL) ? window.URL.createObjectURL(file.blob) : window['webkitURL'].createObjectURL(file.blob)
                 };
                 Modal.toast('上传成功!');

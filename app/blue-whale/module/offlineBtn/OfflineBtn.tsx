@@ -145,7 +145,8 @@ export class OfflineBtn {
             if (result.success) {
                 Modal.toast('上传成功');
                 this.imports.clear(this.imports.editModule.main);
-                this.imports.clear(this.imports.editModule.sub);
+                let sub = this.imports.editModule.sub;
+                sub && this.imports.clear(sub);
             } else {
                 Modal.toast(result.msg); 
             }
