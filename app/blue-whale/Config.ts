@@ -50,7 +50,7 @@ namespace BW {
             msgList : 'newPage/MsgListPage',
         },
         ajaxUrl: {
-            userMsg : 'rest/notify/read', // 用户消息读取
+            userMsg : 'rest/message/notify/read', // 用户消息读取
             systemMenu: 'common/othersystem/getallsystem', // 打开系统按钮
             systemMsg: 'common/othersystem/getsystem', // 获取系统信息
             getVersion: 'rest/version/fastlion', // 获取版本号

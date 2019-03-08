@@ -43,4 +43,77 @@
   .mui-title .mui-badge{
     vertical-align: text-top;
   }
+
+  .tab-mb.nav-tabs{
+    display: flex;
+    margin: 0;
+    padding: 0;
+    li[data-index]{
+      margin: auto;
+      background: white;
+      width: 100%;
+      height: 40px;
+      border-right: 1.5px solid #E4E4E4;
+      border-bottom: 1.5px solid #E4E4E4;
+      text-align: center;
+      line-height: 40px;
+      &:last-child{
+        border-right: none;
+      }
+      &.active {
+        a{
+          border-bottom: none;
+        }
+      }
+
+    }
+  }
+  .tab-content{
+    padding: 0;
+  }
+
+  ul.task{
+    position: relative;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+    height: calc(100vh - 85px);
+    overflow: auto;
+    .task-msg{
+      padding: 3px;
+      .task-msg-time{
+        text-align: center;
+        padding: 5px 0 0;
+        font-size: 18px;
+        border-bottom: 1px solid #e4e4e4;
+      }
+      .task-msg-body{
+        background: white;
+        margin: 5px 10px;
+        border-radius: 10px;
+        .task-msg-title{
+          padding: 5px 15px;
+          line-height: 35px;
+          border-bottom: 1px solid #e4e4e4;
+        }
+        .task-msg-content{
+          padding: 5px 15px;
+        }
+        .task-msg-footer{
+          display: flex;
+          padding: 6px;
+          border-top: 1px solid #e4e4e4;
+          &>button{
+            margin: auto;
+            color: #16B6E8;
+            font-size: 18px;
+            border: none;
+          }
+        }
+      }
+
+    }
+  }
+
 }

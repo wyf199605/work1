@@ -9,17 +9,18 @@ namespace G{
     let LOCAL_MSG_ID = 'local_msg_' + user.userid;
     export let localMsg = (function () {
         let _notify = function(){
-            if(G.tools.isPc){
-                let unreadMsgNum = d.query('#unreadMsgNum'),
-                    num = _getUnreadCount();
+            let unreadMsgNum = d.query('#unreadMsgNum'),
+                num = _getUnreadCount();
+            if(unreadMsgNum){
                 if(num > 0){
                     unreadMsgNum.classList.remove('hide');
-                    unreadMsgNum.innerText = num + '';
+                    unreadMsgNum.innerText = G.tools.isPc ? num + '' : '!';
                 }else {
                     unreadMsgNum.classList.add('hide');
                 }
             }
         };
+
         let _get = function () {
             let s = _storage.getItem(LOCAL_MSG_ID);
             return s ? JSON.parse(s) : [];
@@ -74,6 +75,7 @@ namespace G{
             get: _get,
             add: _add,
             read: _read,
+            notify : _notify,
             getUnreadCount: _getUnreadCount
         }
     }());

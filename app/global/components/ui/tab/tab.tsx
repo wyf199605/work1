@@ -116,6 +116,7 @@ export class Tab {
             d.append(this.tabContainer, Tab.createTab({
                 index: this.len,
                 title: p.titleDom ? p.titleDom : p.title,
+                name : p.name
             }, this.para.className));
 
             this.len++;
@@ -225,15 +226,15 @@ export class Tab {
     }
 
     protected static createTabContainer() {
-        return <ul className="nav nav-tabs nav-tabs-line"></ul>;
+        return <ul className={(tools.isMb ? 'tab-mb ' : '') + 'nav nav-tabs nav-tabs-line'}></ul>;
     }
 
     protected static createTab(obj: obj,className?:string) {
         if (typeof obj.title === 'string') {
-            return <li className={className || ''}  data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
+            return <li className={className || ''} data-name={obj.name ? obj.name : ''}  data-index={obj.index} tabIndex={tools.getGuid('')}><a>{obj.title}</a></li>;
         }
         else {
-            let tempLi = <li className={className || ''} data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
+            let tempLi = <li className={className || ''} data-name={obj.name ? obj.name : ''} data-index={obj.index} tabIndex={tools.getGuid('')}></li>;
             d.append(tempLi, obj.title);
             return tempLi;
         }

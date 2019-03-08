@@ -21,6 +21,8 @@ export = class mainMbPage {
             }
         });
 
+        G.localMsg.notify();
+
         let SUB_PAGE = {
             pagesContainer : document.getElementById('pagesContainer'),
             pages,

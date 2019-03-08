@@ -39,7 +39,7 @@ export class MsgListPage extends BasicPage {
      * @param read
      */
     private paging(arr : IDataMapPara[], html : HTMLElement, read : number){
-        let pagDom = <div class="msg-paging"></div>,
+        let pagDom = <div class="msg-paging"/>,
             len = arr.length;
 
         if(len > 5){
@@ -76,7 +76,7 @@ export class MsgListPage extends BasicPage {
     private listCreate(read?: number): HTMLElement {
         this.modal = null;
 
-        let html = <ul class="msg-list"></ul>,
+        let html = <ul class="msg-list"/>,
             data = localMsg.get(),
             arr = [],
             dom = this.getDom(read);
@@ -111,7 +111,7 @@ export class MsgListPage extends BasicPage {
                     <div className="msg-time">时间：{obj.createDate}</div>
                     <div className="msg-sender">发送人：{obj.sender}</div>
                     {del = <div className="msg-del">
-                        <span className="iconfont icon-shanchu"></span>
+                        <span className="iconfont icon-shanchu"/>
                         <span>删除</span>
                     </div>}
                 </div>
@@ -205,13 +205,13 @@ export class MsgListPage extends BasicPage {
     }
 
     protected wrapperInit() {
-        return <div class="msgListPage modal-box container-fluid"></div>
+        return <div class="msgListPage modal-box container-fluid"/>
     }
 
     private _readDom: HTMLElement;
     get readDom() {
         if (!this._readDom) {
-            this._readDom = <div className="read-msg"></div>;
+            this._readDom = <div className="read-msg"/>;
         }
         return this._readDom;
     }
@@ -224,7 +224,7 @@ export class MsgListPage extends BasicPage {
     private _unReadDom: HTMLElement;
     get unReadDom() {
         if (!this._unReadDom) {
-            this._unReadDom = <div class="unread-msg"></div>;
+            this._unReadDom = <div class="unread-msg"/>;
         }
         return this._unReadDom;
     }
@@ -237,7 +237,7 @@ export class MsgListPage extends BasicPage {
     private _allMsgDom: HTMLElement;
     get allMsgDom() {
         if (!this._allMsgDom) {
-            this._allMsgDom = <div class="all-msg"></div>;
+            this._allMsgDom = <div class="all-msg"/>;
         }
         return this._allMsgDom;
     }
