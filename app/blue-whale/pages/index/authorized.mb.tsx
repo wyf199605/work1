@@ -57,8 +57,10 @@ export class Authorized extends BasicPage {
         Modal.toast("请输入密码")
         return false;
       }
-      this.state.account = this.account.value;
-      this.state.password = this.password.value;
+      Object.assign(this.state, {
+        account: this.account.value,
+        password: this.password.value
+      })
       this.req_author();
     })
 
@@ -67,14 +69,24 @@ export class Authorized extends BasicPage {
    * 提交授权按钮
    */
   req_author() {
-    BwRule.Ajax.fetch(CONF.siteUrl + "sf/auth", {
-      type: 'post',
-      data: this.state
+
+    BwRule.Ajax.fetch(CONF.ajaxUrl.passwordEncrypt, {
+      data: { str: this.state.password }
     }).then(({ response }) => {
+      let encodePassword = response.body.bodyList[0];
+      this.state.password = encodePassword;
+      BwRule.Ajax.fetch(CONF.siteUrl + "/auth", {
+        type: 'post',
+        data: this.state
+      }).then(({ response }) => {
 
-    }).catch((ev) => {
+      }).catch((ev) => {
 
-    });
+      });
+    })
+
+
+
   }
   /**
     * 页面模板
