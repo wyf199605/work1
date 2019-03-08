@@ -9,6 +9,8 @@ import tools = G.tools;
 import {ListItemDetail} from "../listDetail/ListItemDetail";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 import {DetailEditModule} from "./detailEditModule";
+import {FlowDesigner} from "../flowDesigner/FlowDesigner";
+import {BwRule} from "../../common/rule/BwRule";
 
 export class DetailBtnModule extends DetailModule{
     constructor(para:IDetailModulePara){
@@ -180,9 +182,57 @@ export class DetailBtnModule extends DetailModule{
             return new Button({
                 content: btn.caption,
                 onClick: () => {
+                    // 流程引擎操作按钮
+                    if (btn.openType.indexOf('flow') > -1) {
+                        let btnUi = btn as R_Button,
+                            {multiselect} = btnUi,
+                            selectedData = [this.detailData];
+                        let select = multiselect === 1 ? selectedData[0] : selectedData,
+                            dataAddr = BW.CONF.siteUrl + btnUi.actionAddr.dataAddr,
+                            varList = btnUi.actionAddr.varList;
+                        if (tools.isNotEmpty(varList)) {
+                            varList.forEach((li, index) => {
+                                let name = li.varName;
+                                for (let key in select) {
+                                    if (key === name) {
+                                        if (index === 0) {
+                                            dataAddr += '?';
+                                        } else {
+                                            dataAddr += '&';
+                                        }
+                                        dataAddr = dataAddr + `${key.toLowerCase()}=${select[key]}`
+                                    }
+                                }
+                            })
+                        }
+                        let field = btn.openType.split('-')[1];
+                        switch (field) {
+                            case 'look': {
+                                BwRule.Ajax.fetch(dataAddr).then(({response}) => {
+                                    new FlowDesigner(response, field);
+                                }).catch(err => {
+                                    console.log(err);
+                                });
+                            }
+                                break;
+                            case 'design': {
+                                BwRule.Ajax.fetch(dataAddr, {
+                                    type: 'GET'
+                                }).then(({response}) => {
+                                    new FlowDesigner(response, field);
+                                }).catch(err => {
+                                    console.log(err);
+                                });
+                            }
+                                break;
+                        }
+                        return ;
+                    }
+
+                    // 普通操作按钮
                     let data = this.getData();
-                    ButtonAction.get().clickHandle(btn, data, () => {
-                    }, this.pageUrl || '');
+                    ButtonAction.get().clickHandle(btn, data, () => {}, this.pageUrl || '');
+
                 }
             })
         };

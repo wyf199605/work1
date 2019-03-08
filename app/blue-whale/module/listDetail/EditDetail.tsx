@@ -26,9 +26,9 @@ export class EditDetail extends DetailBase {
     set isEdit(isEdit: boolean) {
         this._isEdit = isEdit;
         if (this.totalNumber === 0 && this.para.uiType !== 'edit_view') {
-            this.cancelBtn.disabled = false;
+            this.cancelBtn.disabled = true;
             this.updateBtn.disabled = true;
-            this.saveBtn.disabled = false;
+            this.saveBtn.disabled = true;
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = false);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
