@@ -13,11 +13,11 @@ interface pagePara {
 }
 type Name = string | number;
 interface formPara {
-  response_type: Name;
-  client_id: Name;
-  redirect_uri: Name;
-  userid?: Name;
-  password?: Name;
+  response_type: Name;///url上的query
+  client_id: Name;///url上的query
+  redirect_uri: Name;//url上的query
+  userid?: Name;//用户名
+  password?: Name;//密码
 }
 export class Authorized extends BasicPage {
   private container: HTMLElement; //页面挂载的父元素
