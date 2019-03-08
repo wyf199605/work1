@@ -16,19 +16,19 @@ export class EditDetail extends DetailBase {
         if (this.para.uiType === 'edit_view') {
             this.wrapper.classList.add('edit_view');
         }
+        this.initAllButtons();
         this.isEdit = para.isEdit;
     }
 
     protected initDetailButtonsModule() {
-        this.initAllButtons();
     }
 
     set isEdit(isEdit: boolean) {
         this._isEdit = isEdit;
         if (this.totalNumber === 0 && this.para.uiType !== 'edit_view') {
-            this.cancelBtn.disabled = true;
+            this.cancelBtn.disabled = false;
             this.updateBtn.disabled = true;
-            this.saveBtn.disabled = true;
+            this.saveBtn.disabled = false;
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = false);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
