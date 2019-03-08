@@ -60,6 +60,7 @@ export abstract class DetailBase extends Component {
         this.getDetailData().then((data) => {
             this.inputs(para.fm.inputs, this.wrapper);
             this.detailForm.editData = data;
+            this.isEdit = this.para.isEdit;
         });
     }
 
