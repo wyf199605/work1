@@ -37,14 +37,14 @@ export class DropDown {
     private isVisible = false;
     private list: List;
     private data: ListItem[];
-    private isAdapt:boolean;
+    private isAdapt: boolean;
     get isShow(){
         return this.isVisible;
     }
 
     constructor(private para: DropDownPara) {
         this.ulDom = <ul className="dropdown-menu"></ul>;
-        this.isAdapt=para.isAdapt;
+        this.isAdapt = para.isAdapt || false;
         if (para.className) {
             this.ulDom.classList.add(para.className);
         }
