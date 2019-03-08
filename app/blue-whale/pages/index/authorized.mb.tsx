@@ -16,13 +16,13 @@ interface formPara {
   response_type: Name;
   client_id: Name;
   redirect_uri: Name;
-  account?: Name;
+  userid?: Name;
   password?: Name;
 }
 export class Authorized extends BasicPage {
   private container: HTMLElement; //页面挂载的父元素
   private showPassword: HTMLElement;//查看密码的按钮
-  private account: HTMLInputElement;//账号Input
+  private userid: HTMLInputElement;//账号Input
   private password: HTMLInputElement;//密码Input
   private submitBtn: HTMLElement;//提交按钮
   private state: formPara;//提交给服务端的数据
@@ -49,7 +49,7 @@ export class Authorized extends BasicPage {
     });
     G.d.on(this.submitBtn, "click", (e) => {
       e.preventDefault();
-      if (!this.account.value) {
+      if (!this.userid.value) {
         Modal.toast("请输入员工号/手机号")
         return false;
       }
@@ -58,7 +58,7 @@ export class Authorized extends BasicPage {
         return false;
       }
       Object.assign(this.state, {
-        account: this.account.value,
+        userid: this.userid.value,
         password: this.password.value
       })
       this.req_author();
@@ -101,7 +101,7 @@ export class Authorized extends BasicPage {
           <div className="form_item">
             <label>账号</label>
             {
-              this.account = <input type="text" placeholder="请输入员工号/手机号" />
+              this.userid = <input type="text" placeholder="请输入员工号/手机号" />
             }
           </div>
           <div className="form_item">
