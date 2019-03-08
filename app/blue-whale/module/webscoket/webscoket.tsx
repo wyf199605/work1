@@ -172,6 +172,8 @@ export = class webscoket {
             case "qrcodelogin":
                 this.openLoginModal(data.data);
                 break;
+            case "ping":
+                break;
             default:
                 console.info("后台返回未知的消息(" + type + ")类型.");
                 break;
