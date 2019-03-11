@@ -236,16 +236,18 @@ export class GroupTabsPage extends BasicPage {
             });
 
             // 初始化界面查询是否有上次操作未完成的数据
-            let result = Shell.inventory.getScanData(mainUi.uniqueFlag);
-            if (result.success) {
-                console.log(result.data, 'getScanData');
-                Array.isArray(result.data) && result.data.forEach(obj => {
-                    const item = obj.itemid;
-                    if (!item) return;
-                    const {edit} = this.imports.getKeyField(obj.item);
-                    this.imports.editSet(edit, obj.array[0]);
-                })
-            }
+            Shell.inventory.getScanData(mainUi.uniqueFlag, result => {
+                if (result.success) {
+                    console.log(result.data, 'getScanData');
+                    Array.isArray(result.data) && result.data.forEach(obj => {
+                        const item = obj.itemid;
+                        if (!item) return;
+                        const {edit} = this.imports.getKeyField(obj.item);
+                        this.imports.editSet(edit, obj.array[0]);
+                    })
+                }
+            });
+
         },
         openRfid() {
             Shell.inventory.scan2dOn((result) => {
