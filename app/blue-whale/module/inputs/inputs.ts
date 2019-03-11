@@ -155,6 +155,11 @@ export class Inputs {
         typeof open === 'function' && open();
     }
 
+    /**
+     * 数据刷新
+     * @param ftable
+     * @param response
+     */
     private dataCover(ftable : FastBtnTable, response : obj){
         let data = response.data,
             queryModule = this.para.queryModule && this.para.queryModule();
@@ -175,6 +180,10 @@ export class Inputs {
         }
     }
 
+    /**
+     * 提示信息
+     * @param showText
+     */
     private logTip(showText : string){
         if(tools.isEmpty(showText)){
             return;
