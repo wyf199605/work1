@@ -32,6 +32,7 @@ import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
 import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
 import {FastTableColumn} from "../../../global/components/newTable/FastTabelColumn";
+import {NewIDB} from "../../../global/NewIDB";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -2091,10 +2092,36 @@ export class BwTableModule extends Component {
                 );
                 // this.tableImgEdit.indexSet(rowIndex, urls);
                 // debugger;
-                imgs.forEach((img, i) => {
-                    img.src = md5s[i] ? imgUrlCreate(md5s[i]) : imgsUrl[i];
-                    // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
-                })
+
+                Promise.all(imgsUrl.map((url) => {
+                    return new Promise<string>((resolve, reject) => {
+                        let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+                        idb.getCollection(BwRule.IMG_TABLE).then((store) => {
+                            store.find((val) => {
+                                return val['url'] === url;
+                            }).then((response) => {
+                                if(tools.isNotEmpty(response)){
+                                    let data = response[0],
+                                        version = data['version'];
+                                    version && (url = tools.url.addObj(url, {version: version}));
+                                }
+                                idb.destroy();
+                                resolve(url);
+                            });
+                        });
+                    });
+                })).then((urls) => {
+                    imgs.forEach((img, i) => {
+                        img.src = md5s[i] ? imgUrlCreate(md5s[i]) : urls[i];
+                        // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
+                    });
+                }).catch(() => {
+                    imgs.forEach((img, i) => {
+                        img.src = md5s[i] ? imgUrlCreate(md5s[i]) : imgsUrl[i];
+                        // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
+                    });
+                });
+
             }
             currentRowIndex = rowIndex;
             modal && (modal.isShow = true);
@@ -2819,7 +2846,9 @@ export class BwTableModule extends Component {
         };
 
         let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
-            let paramData: obj = {};
+            let paramData: obj = {
+                allData: {}
+            };
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
@@ -2828,6 +2857,7 @@ export class BwTableModule extends Component {
                         !isPivot);
                     if (data) {
                         paramData[key] = data;
+                        paramData.allData[key] = tableData[dataKey]
                     }
                 }
             });
@@ -2900,6 +2930,17 @@ export class BwTableModule extends Component {
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
+                                        let data = saveData['allData']['update'] || [],
+                                            pictureAddrList = this.ui.pictureAddrList;
+
+                                        if(pictureAddrList){
+                                            pictureAddrList.forEach((addr) => {
+                                                this.updateImgVersion(data.map((rowData) => {
+                                                    return tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
+                                                }));
+                                            })
+                                        }
+                                        delete saveData['allData'];
                                         resolve(saveData);
                                     }).catch((msg) => reject(msg));
                                 }, 100);
@@ -2980,6 +3021,41 @@ export class BwTableModule extends Component {
             editBtnStateInit
         }
     })();
+
+    updateImgVersion(urls: string[]){
+        if(tools.isEmpty(urls)){
+            return;
+        }
+
+        let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+        idb.getCollection(BwRule.IMG_TABLE).then(store => {
+            store.find((val) => {
+                return urls.indexOf(val['url']) > -1;
+            }).then((response) => {
+                let data = response || [];
+                for(let url of urls){
+                    if(tools.isEmpty(url)){
+                        continue;
+                    }
+                    if(data.some((item) => item['url'] === url)){
+                        // update
+                        store.update((val) => {
+                            return url === val['url'];
+                        }, () => ({
+                            url: url,
+                            version: new Date().getTime()
+                        }));
+                    }else{
+                        // insert
+                        store.insert({
+                            url: url,
+                            version: new Date().getTime()
+                        });
+                    }
+                }
+            })
+        })
+    }
 
     // 关联数据，每次按钮请求时需附带的参数
     public linkedData = {};

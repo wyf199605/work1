@@ -26,7 +26,7 @@ interface SYS_Window{
     firePreviousPage(event : string , data? : obj, url? : string) : void;
     fire(event :string, data? : obj, url? : string);
 
-    refresh?(url:string);
+    // refresh?(url:string);
     wake?( event:string, data:obj) :void;
     setTitle?(url:string, title:string):void;
     quit?() :void;
@@ -48,6 +48,7 @@ interface SYS_Window{
     clientCode?(callback: Function);
     // speak?(type:number,text?:string,callback?:Function,error?:Function);
     refreshHome?();
+    redirect?(obj:winOpen);
 }
 
 interface SYS_UI{

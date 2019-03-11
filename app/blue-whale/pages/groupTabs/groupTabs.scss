@@ -199,6 +199,7 @@
 
       .panel-item-content{
         max-height: 400px;
+        overflow: auto;
         .detail-wrapper{
           padding-bottom: 0;
         }
