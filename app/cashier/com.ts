@@ -13,10 +13,10 @@ import {cashReceiptPrint} from "./module/print/Print";
  * 全局变量，全局函数方法
  */
 export class Com{
-    static SCAN = '1';
-    static KEYBOARD = '2';
-    static KEYSELECT = '3';
-    static SCANANDKEYBOARD = '4';
+    static SCAN = '1';  // 扫码
+    static KEYBOARD = '2'; // 按键输入
+    static KEYSELECT = '3';  // 键盘选择
+    // static SCANANDKEYBOARD = '4';
     static RFID = '5';
     static isShell = ('AppShell' in window);
 
@@ -25,13 +25,13 @@ export class Com{
     static url = {
         registered : '/pos/posregistered',  // 注册验证
         register : '/pos/posregister',  // 注册
-        index : '/index?output=json', //
+        index : '/index?output=json', // 若返回有login地址，则进入登录页，否知直接进入主页
         config : '/pos/config/cashier', // 获取配置信息
         login: '/pos/poslogin/s0',  // 登录验证
         page : '/pos/page/cashier/{sceneId}',
         printer : '/pos/posprint/s0/s0_p1', // 打印地址
         posClear : '/pos/pclear', // 注销
-        reset : '/pos/posclear',
+        reset : '/pos/posclear',  // 清空全局变量
         macList : '/pos/posconfig/mac_list' // mac_id列表地址
     };
 
@@ -47,7 +47,7 @@ export class Com{
     static loadingEl : HTMLElement;  // 加载效果
     static sceneVersion : ISceneVerPara; // 场景版本数据，离线使用
     static keyFlag : boolean = true;  // 处理按键多次触发,只有当前按键操作并加载完成后才可以执行下一次按键
-    static status : number = 0; //
+    static status : number = 0; // 后台跟前端约定的状态位，从1->0清空,置0   从0->1，置1
     static clearItem = {}; // 需要清空数据的item
     static _config : obj[]; // 全局变量配置信息
 
@@ -108,12 +108,11 @@ export class Com{
      * 关闭最后一个弹框
      */
     static closeLastModalPanel(){
-        let modal = Com.keyModal[Com.keyModal.length - 1];
-        if(!modal){
-            return;
-        }
-        let src = window.location.href;
-        let str : string = src.substr(src.indexOf('#') + 1, src.length);
+        const modal = Com.keyModal[Com.keyModal.length - 1];
+        if(!modal) return;
+
+        const src = window.location.href,
+            str : string = src.substr(src.indexOf('#') + 1, src.length);
 
         SPA.close(str)
     }
@@ -126,7 +125,7 @@ export class Com{
      */
     static finger(msgDom : HTMLElement, url : string, cb : Function){
         if(CA.Config.isProduct){
-            let device = Shell.base.device,
+            const device = Shell.base.device,
                 devData = device && device.data;
             Shell.finger.get({
                 type: 0,
@@ -174,7 +173,7 @@ export class Com{
                 },
                 notVarList : true
             }).then(({response}) => {
-                let type = response.type;
+                const type = response.type;
                 if (type === '1') {
                     cb(response);
                 }else {
@@ -205,7 +204,7 @@ export class Com{
 
                 let timestamp = Date.parse(new Date().toString()) / 1000,
                     time;
-                let index = value.indexOf('_');
+                const index = value.indexOf('_');
                 if (index > -1) {
                     time = value.slice(index + 1, value.length);
                 }
@@ -248,10 +247,8 @@ export class Com{
      */
     static empty(){
         for(let item in Com.clearItem){
-            let itemList = Com.clearItem[item];
-            if(itemList){
-                itemList.emptied();
-            }
+            const itemList = Com.clearItem[item];
+            if(itemList) itemList.emptied();
         }
     }
 
@@ -294,12 +291,9 @@ export class Com{
      */
     static count(dataRules : IDataRulesPara[], panelId : string, content? : string, itemId? : string){
         dataRules && dataRules.forEach((obj : IDataRulesPara) => {
-            if(itemId){
-                // 若有配置itemId，只有itemId等于dataRule中的itemId时候才出发dataRule（p2有多个item情况）
-                if(itemId !== obj.itemId){
-                    return;
-                }
-            }
+            // 若有配置itemId，只有itemId等于dataRule中的itemId时候才触发dataRule（p2有多个item情况）
+            if(itemId && itemId !== obj.itemId) return;
+
             let fieldRule = obj.fieldRule.replace(')', '').split('('),
                 itemList = Com.itemList[panelId],
                 toItemList = Com.itemList[obj.toPanelId],
@@ -331,9 +325,8 @@ export class Com{
                 return;
             }
 
-            if(!itemList || !toItemList){
-                return;
-            }
+            if(!itemList || !toItemList) return;
+
 
 // debugger;
             Object.keys(items).forEach(key => {
@@ -355,9 +348,8 @@ export class Com{
                         pass = false;
                     }
                 });
-                if(!pass){
-                    return;
-                }
+                if(!pass) return;
+
                 // 写死，实售价
                 // if(obj.fieldRule.indexOf('REALPRICE') > -1){
                     // isPrice = true;
@@ -366,9 +358,8 @@ export class Com{
                 if(ruleType === 1){
                     //值计算
                     data.forEach(d => {
-                        if(tools.isEmpty(d)){
-                            return;
-                        }
+                        if(tools.isEmpty(d)) return;
+
                         d = d.replace('--','-').replace('¥', '');  // 减去一个负值会出现 -- 情况
                         if(fieldRule[0] === 'sum'){
                             sum += tools.calc(d);
@@ -435,25 +426,22 @@ export class Com{
      * @param {boolean} isOverLay true时候不清除原提示信息，如f6用券后提示已使用券
      */
     static logTip(str: string, isRed = false, isOverLay = false) {
-        if(tools.isEmpty(str)){
-            return;
-        }
+        if(tools.isEmpty(str)) return;
+
         let modalTip = d.query('.modal-short-tip');
         if (modalTip) {
             if (!isOverLay) {
                 modalTip.innerHTML = '';
             }
             let dom = d.create(`<div class="padding-2-7">${str}</div>`);
-            modalTip.appendChild(dom);
-            return;
+            return modalTip.appendChild(dom);
         }
 
         if(!Com.tipEl){
             Com.tipEl = d.query('.reminder-msg', document);
         }
-        if(!Com.tipEl){
-            return;
-        }
+        if(!Com.tipEl) return;
+
 
         Com.tipEl.innerHTML = str;
         if (isRed) {
@@ -538,9 +526,8 @@ export class Com{
         if(!Com.loadingEl){
             Com.loadingEl = d.query('.log-loading');
         }
-        if(!Com.loadingEl){
-            return
-        }
+        if(!Com.loadingEl) return;
+
         d.classToggle(Com.loadingEl, 'loading', isShow && Com.loadCount !== 0);
     }
 
