@@ -16,7 +16,7 @@ export class Com{
     static SCAN = '1';  // 扫码
     static KEYBOARD = '2'; // 按键输入
     static KEYSELECT = '3';  // 键盘选择
-    // static SCANANDKEYBOARD = '4';
+    static SCANANDKEYBOARD = '4'; // 键盘输入后进行扫描
     static RFID = '5';
     static isShell = ('AppShell' in window);
 

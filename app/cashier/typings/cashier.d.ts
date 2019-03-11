@@ -35,9 +35,9 @@ interface TableListPara{
 
 /**
  * type
- * 0：跳出“确定”按钮窗口，不执行该操作
- * 1：跳出“确定”、“取消”按钮窗口，根据按钮选择操作。
- * 10:跳出指纹验证，不通过则在当前页面提示重新输入指纹
+ * 0：弹出“确定”按钮窗口，不执行该操作
+ * 1：弹出“确定”、“取消”按钮窗口，根据按钮选择操作。
+ * 10:弹出指纹验证，不通过则在当前页面提示重新输入指纹
  * 11:在界面下方提示框显示提示信息并进入下一步
  * 12:在界面下方提示框显示提示信息但仍在当前步骤
  * 13:结账校验通过，bill添加通过字段
@@ -161,8 +161,8 @@ interface IInputPara{
     hintAddr? : R_ReqAddr,
     status? : number, // 前台状态0-->1:前台记录状态1; 前台状态1-->0:执行清空操作
     caption? : string
-    nextFields? : string
-    outputField? : string
+    nextFields? : string  // nextField影响下个界面取参
+    outputField? : string  // outputField在本界面(影响padData和ui)和下个界面生效取参
     fieldRule? : string // 全局变量规则
     panelId? : string   // shortcut中的panelId
 }

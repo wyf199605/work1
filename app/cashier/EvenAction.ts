@@ -113,10 +113,8 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
         nextFieldParam : obj = {},
         param: obj = {};
 
-    if (!inputs) {
-        Com.keyFlag = true;
-        return;
-    }
+    if (!inputs) return Com.keyFlag = true;
+
     let select = keyModal && keyModal.getSelect();
     if (select) {
         type = Com.KEYSELECT;
@@ -125,9 +123,7 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
     // 匹配input值
     inputs.forEach(i => {
         let inputType = i.inputType;
-        if (regInput) {
-            return;
-        }
+        if (regInput) return;
 
         if (inputType === type || tools.isEmpty(type) || (inputType === '4' && (type === '2' || type === '1'))) {
             switch (inputType) {
@@ -144,10 +140,8 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
             }
         }
     });
-    if (!regInput) {
-        Com.keyFlag = true;
-        return;
-    }
+    if (!regInput) return Com.keyFlag = true;
+
 
     // 带上F6窗口数据---写死
     if(Com.countItemList && Com.modalMainItemList){
@@ -166,10 +160,7 @@ export function inputs(type: string, response: ICashierPanel, value: string, nex
     // 全局变量规则执行，判断会员卡是否超时。
     let rule = Com.fieldRule(input.fieldRule, value);
 
-    if (rule.isTimeOut) {
-        Com.logTip(rule.msg);
-        return;
-    }
+    if (rule.isTimeOut) return Com.logTip(rule.msg);
 
     input.dataAddr && (dataAddr = input.dataAddr);
     input.uiAddr && (uiAddr = input.uiAddr);
@@ -310,8 +301,7 @@ function condition(response): Promise<{ isNext: boolean, isRepeat: boolean }> {
         // 无condition，直接进入下一步
         if (tools.isEmpty(type)) {
             isNext = true;
-            resolve({isNext, isRepeat});
-            return;
+            return resolve({isNext, isRepeat});
         }
         Com.keyFlag = true;
         let msgDom = d.create(`<div class="padding-30">${text}</div>`),
@@ -393,9 +383,7 @@ function condition(response): Promise<{ isNext: boolean, isRepeat: boolean }> {
                 Com.isClose = true;
                 initModal(para);
 
-                if(!CA.Config.isProduct){
-                    return;
-                }
+                if(!CA.Config.isProduct) return;
 
                 // 开启指纹
                 let url = Com.url.login + '';
@@ -463,7 +451,7 @@ function condition(response): Promise<{ isNext: boolean, isRepeat: boolean }> {
 
 /**
  * 创建面板
- * @param {IShortcutsPara} shortcut或者input
+ * @param {IShortcutsPara} shortcut shortcut或者input
  * @param {obj} nextField 由上一级传下来的outputField和nextField
  * @param {obj} field 本界面请求参数
  */
@@ -526,7 +514,7 @@ function createPanel(shortcut: IShortcutsPara, field: obj, nextField?: obj) {
 
 
     if(!shortcut.inputId){
-        // F6
+        // F6 后台要求写死，需优化
         if(shortcut.shortId === 's0_sh6'){
             shortcut.dataAddr.varList.push({
                 varName : 'DIS_NAME'
@@ -574,6 +562,7 @@ function check(s: IShortcutsPara | IInputPara, field) {
         dataAddr = s.dataAddr,
         status = s.status;
 
+    // 先验证chk，再验证item
     return new Promise(((resolve) => {
         if (chkAddr) {
             accessDataAddr(chkAddr, field, s).then(() => {
@@ -718,10 +707,10 @@ function keyField(res : obj, itemList : ItemList, cb : Function) {
  * 影响其他面板数据规则
  * @param {IInputPad[]} padData
  * @param {string} fieldName 要修改的字段名
- * @param {obj} param
+ * @param {obj} param padType 12 13时请求需要获取的参数
  * @param {Function} cb 所有padData规则执行结束后的回调（padData存在异步）
- * @param {obj} res
- * @param {string} value
+ * @param {obj} res check返回的数据
+ * @param {string} value 键盘选中对应的fileName的值或input的输入值
  */
 function padData(padData: IInputPad[], fieldName : string, param : obj, cb : Function, res : obj, value : string) {
     let keyModal = Com.keyModal[Com.keyModal.length - 1];
