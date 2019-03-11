@@ -32,6 +32,7 @@ import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
 import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
 import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
 import {FastTableColumn} from "../../../global/components/newTable/FastTabelColumn";
+import {NewIDB} from "../../../global/NewIDB";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -1650,6 +1651,24 @@ export class BwTableModule extends Component {
                     text = <img src={url}/>;
                     classes.push('cell-img');
 
+                    if(dataType === '20'){
+                        let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+                        idb.getCollection(BwRule.IMG_TABLE).then((store) => {
+                            store.find((val) => {
+                                return val['url'] === url;
+                            }).then((response) => {
+                                if(tools.isNotEmpty(response)){
+                                    let data = response[0];
+                                    url = tools.url.addObj(url, data['version']);
+                                }
+                                text = <img src={url}/>;
+                                idb.destroy();
+                                resolve({text, classes, bgColor, color, data});
+                            })
+                        });
+                        return;
+                    }
+
                 } else if (BwRule.isNewImg(dataType)) {
                     if (cellData && typeof cellData === 'string') {
                         let urls = [];
@@ -2900,6 +2919,19 @@ export class BwTableModule extends Component {
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
+                                        let names = [];
+                                        this.cols.forEach((field: R_Field) => {
+                                            let dataType = field.atrrs && field.atrrs.dataType;
+                                            if(dataType === '20'){
+                                                names.push(field.name);
+                                            }
+                                        });
+                                        let data = saveData['update'] || [];
+                                        names.forEach((name) => {
+                                             this.updateImgVersion(data.map((obj) => {
+                                                 return obj[name];
+                                             }));
+                                        });
                                         resolve(saveData);
                                     }).catch((msg) => reject(msg));
                                 }, 100);
@@ -2980,6 +3012,41 @@ export class BwTableModule extends Component {
             editBtnStateInit
         }
     })();
+
+    updateImgVersion(urls: string[]){
+        if(tools.isEmpty(urls)){
+            return;
+        }
+
+        let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+        idb.getCollection(BwRule.IMG_TABLE).then(store => {
+            store.find((val) => {
+                return urls.indexOf(val['url']) > -1;
+            }).then((response) => {
+                let data = response || [];
+                for(let url of urls){
+                    if(tools.isEmpty(url)){
+                        continue;
+                    }
+                    if(~data.indexOf(url)){
+                        // update
+                        store.update((val) => {
+                            return url === val['url'];
+                        }, () => ({
+                            url: url,
+                            version: new Date().getTime()
+                        }));
+                    }else{
+                        // insert
+                        store.insert({
+                            url: url,
+                            version: new Date().getTime()
+                        });
+                    }
+                }
+            })
+        })
+    }
 
     // 关联数据，每次按钮请求时需附带的参数
     public linkedData = {};
