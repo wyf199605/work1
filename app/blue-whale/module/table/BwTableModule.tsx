@@ -1651,24 +1651,6 @@ export class BwTableModule extends Component {
                     text = <img src={url}/>;
                     classes.push('cell-img');
 
-                    if(dataType === '20'){
-                        let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
-                        idb.getCollection(BwRule.IMG_TABLE).then((store) => {
-                            store.find((val) => {
-                                return val['url'] === url;
-                            }).then((response) => {
-                                if(tools.isNotEmpty(response)){
-                                    let data = response[0];
-                                    url = tools.url.addObj(url, data['version']);
-                                }
-                                text = <img src={url}/>;
-                                idb.destroy();
-                                resolve({text, classes, bgColor, color, data});
-                            })
-                        });
-                        return;
-                    }
-
                 } else if (BwRule.isNewImg(dataType)) {
                     if (cellData && typeof cellData === 'string') {
                         let urls = [];
@@ -2110,10 +2092,36 @@ export class BwTableModule extends Component {
                 );
                 // this.tableImgEdit.indexSet(rowIndex, urls);
                 // debugger;
-                imgs.forEach((img, i) => {
-                    img.src = md5s[i] ? imgUrlCreate(md5s[i]) : imgsUrl[i];
-                    // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
-                })
+
+                Promise.all(imgsUrl.map((url) => {
+                    return new Promise<string>((resolve, reject) => {
+                        let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+                        idb.getCollection(BwRule.IMG_TABLE).then((store) => {
+                            store.find((val) => {
+                                return val['url'] === url;
+                            }).then((response) => {
+                                if(tools.isNotEmpty(response)){
+                                    let data = response[0],
+                                        version = data['version'];
+                                    version && (url = tools.url.addObj(url, {version: version}));
+                                }
+                                idb.destroy();
+                                resolve(url);
+                            });
+                        });
+                    });
+                })).then((urls) => {
+                    imgs.forEach((img, i) => {
+                        img.src = md5s[i] ? imgUrlCreate(md5s[i]) : urls[i];
+                        // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
+                    });
+                }).catch(() => {
+                    imgs.forEach((img, i) => {
+                        img.src = md5s[i] ? imgUrlCreate(md5s[i]) : imgsUrl[i];
+                        // img.src = md5s[i] ? imgUrlCreate(md5s[i]) : tools.url.addObj(imgsUrl[i], {'_': Date.now()});
+                    });
+                });
+
             }
             currentRowIndex = rowIndex;
             modal && (modal.isShow = true);
@@ -2838,7 +2846,9 @@ export class BwTableModule extends Component {
         };
 
         let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
-            let paramData: obj = {};
+            let paramData: obj = {
+                allData: {}
+            };
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
@@ -2847,6 +2857,7 @@ export class BwTableModule extends Component {
                         !isPivot);
                     if (data) {
                         paramData[key] = data;
+                        paramData.allData[key] = tableData[dataKey]
                     }
                 }
             });
@@ -2919,19 +2930,17 @@ export class BwTableModule extends Component {
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
-                                        let names = [];
-                                        this.cols.forEach((field: R_Field) => {
-                                            let dataType = field.atrrs && field.atrrs.dataType;
-                                            if(dataType === '20'){
-                                                names.push(field.name);
-                                            }
-                                        });
-                                        let data = saveData['update'] || [];
-                                        names.forEach((name) => {
-                                             this.updateImgVersion(data.map((obj) => {
-                                                 return obj[name];
-                                             }));
-                                        });
+                                        let data = saveData['allData']['update'] || [],
+                                            pictureAddrList = this.ui.pictureAddrList;
+
+                                        if(pictureAddrList){
+                                            pictureAddrList.forEach((addr) => {
+                                                this.updateImgVersion(data.map((rowData) => {
+                                                    return tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
+                                                }));
+                                            })
+                                        }
+                                        delete saveData['allData'];
                                         resolve(saveData);
                                     }).catch((msg) => reject(msg));
                                 }, 100);
@@ -3028,7 +3037,7 @@ export class BwTableModule extends Component {
                     if(tools.isEmpty(url)){
                         continue;
                     }
-                    if(~data.indexOf(url)){
+                    if(data.some((item) => item['url'] === url)){
                         // update
                         store.update((val) => {
                             return url === val['url'];

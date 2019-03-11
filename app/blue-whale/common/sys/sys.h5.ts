@@ -138,7 +138,7 @@ namespace BW {
                 reOpen: function (o: winOpen) {
                     sys.window.open(o);
                 },
-                refreshHome() {
+                refreshHome: function() {
                     sys.window.open({
                         url: BW.CONF.url.main
                     })
