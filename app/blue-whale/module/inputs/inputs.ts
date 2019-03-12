@@ -30,12 +30,12 @@ interface IKeyStepPara{
     locationLine? : string
 }
 /**
- * Inputs在pc端为按键输入，移动端为扫码
+ * Inputs在pc端为按键输入，移动端为扫码,根据后台返回类型区分各种操作
  */
 export class Inputs {
     private p: InputsPara;
     private m: Toast;
-    private isProcess : boolean = false;
+    private isProcess : boolean = false; // 连续扫码，记录当前操作是否结束
     private url: string;  //记录当前请求的url步骤,每次请求从该步骤开始
     private keyStep : KeyStep;
     constructor(private para: InputsPara) {
@@ -151,6 +151,10 @@ export class Inputs {
 
     }
 
+    /**
+     * 再次打开摄像头
+     * @param open
+     */
     private reOpen(open : Function){
         typeof open === 'function' && open();
     }
@@ -164,9 +168,7 @@ export class Inputs {
         let data = response.data,
             queryModule = this.para.queryModule && this.para.queryModule();
 
-        if(tools.isEmpty(data)){
-            return;
-        }
+        if(tools.isEmpty(data)) return;
 
         queryModule && queryModule.hide();
         if(queryModule && !ftable){
@@ -323,6 +325,9 @@ export class Inputs {
     }
 }
 
+/**
+ *
+ */
 export class KeyStep{
     private p : IKeyStepPara;
     constructor(para : IKeyStepPara){
@@ -433,8 +438,6 @@ export class KeyStep{
             }
         }
     }
-
-
 
     scanOpen(){
         return new Promise((resolve) => {

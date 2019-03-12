@@ -10,7 +10,9 @@ import {SelectInput} from "../../../global/components/form/selectInput/selectInp
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {User} from "../../../global/entity/User";
 
-
+/**
+ * 页面数据写死，sql数据通过websocket传给前端，前端索引sql页ID固定添加到sql页面
+ */
 export class SqlMonitor extends BasicPage{
     private container: HTMLElement;
     private btns : obj = {};//存放button节点

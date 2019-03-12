@@ -26,6 +26,9 @@ interface resDataPara {
     MEMO: string;
 }
 
+/**
+ *  这里不支持multiPick
+ */
 export class PickModule extends TextInput {
     private Dom: HTMLElement;
     private body: HTMLElement;
@@ -58,7 +61,7 @@ export class PickModule extends TextInput {
                 // dataGet = this.p.dataGet(),
                 ajaxData,
                 dataAddr;
-            if (this.p.field.multiPick) { // TODO 这里不支持multiPick
+            if (this.p.field.multiPick) {
                 //元素列表
                 dataAddr = self.p.field.multiPick.dataAddr;
                 // ajaxUrl = CONF.siteUrl + Rule.reqAddr(dataAddr, dataGet);

@@ -26,7 +26,8 @@ interface dataMapPara{
     sender : string
 }
 /**
- * hint系统提醒
+ * pc端hint系统提醒,后台通过websocket传hints数据给前端，前端弹窗展示，每次有新的数据过来，就销毁前一个hints，
+ * 重新生成hints，1.打开：打开对应的页面  2.今日不提醒：发送一个请求给后台
  */
 export class Hints{
     private modal : Modal;
