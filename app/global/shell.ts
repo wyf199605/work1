@@ -694,7 +694,7 @@ namespace G {
                     // 异步调用
                     let flag, shellData = Object.assign({ data: dataStr } || {}, { back: eventBack, info: eventInfor });
                     if (tools.os.ios) {
-                        // ios只有异步调用
+                        // ios只有异步调用,所以原先安卓中同步调用的在ios中必须改成异步
                         flag = webkit.messageHandlers.AppShell.postMessage(Object.assign(shellData, { action }));
                     } else {
                         flag = AppShell.asyncFunction(action, dataStr, eventBack, eventInfor);

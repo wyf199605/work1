@@ -304,7 +304,7 @@ export class GroupTabsPage extends BasicPage {
                         console.log(result.data, 'operateScanTable');
                         this.imports.scanRender(result.data);
                     } else {
-                        Modal.toast('查询失败，请确认已下载数据');
+                        Modal.toast(result.msg);
                     }
                 }
             );
