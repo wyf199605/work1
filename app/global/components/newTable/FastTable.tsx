@@ -1508,7 +1508,7 @@ export class FastTable extends Component {
                 if (this.pseudoTable._type === 'number') {
                     // 未使用checkbox
                     if (e.ctrlKey === true) {
-                        singleSelectedPseudoTableCell(rowIndex);
+                        singleSelectedPseudoTableCell(rowIndex, true);
                         shiftComparePosition.rowIndex = rowIndex;
                         shiftComparePosition.columnIndex = 0;
                     } else if (e.shiftKey === true) {
@@ -1638,11 +1638,11 @@ export class FastTable extends Component {
                     cell._selectedInnerSet(true);
             }
         };
-        let singleSelectedPseudoTableCell = (row: number) => {
+        let singleSelectedPseudoTableCell = (row: number, mutiSelect = false) => {
             // let pseudoTableRow = this.pseudoTable.body.rowGet(tools.isEmpty(domIndex) ? row : domIndex);
             // pseudoTableRow.cells[0].selected = true; // 伪列选中
             let sRow = this.rowGet(row);
-            (this.mutiSelect && sRow) ? sRow._selectedInnerRowSet(!sRow.selected) : sRow._selectedInnerRowSet(true);
+            mutiSelect || (this.mutiSelect && sRow) ? sRow._selectedInnerRowSet(!sRow.selected) : sRow._selectedInnerRowSet(true);
 
         };
         let shiftKeySelectedTable = (currentPosition) => {

@@ -2935,16 +2935,16 @@ export class BwTableModule extends Component {
         };
         let rowCanInit = (row, isSub) => {
             let canRowInit = (isMain: boolean, rowData?: obj) => {
-                if (isMain) {
-                    return !(rowData && (rowData['EDITEXPRESS'] === 0));
-                } else {
-                    let ftable = self.ftable,
-                        index = ftable.pseudoTable.presentOffset,
-                        row = ftable.rowGet(index),
-                        mainRowData = row ? row.data : {};
-
-                    return canRowInit(true, mainRowData)
-                }
+                // if (isMain) {
+                return !(rowData && (rowData['EDITEXPRESS'] === 0));
+                // } else {
+                //     let ftable = self.ftable,
+                //         index = ftable.pseudoTable.presentOffset,
+                //         row = ftable.rowGet(index),
+                //         mainRowData = row ? row.data : {};
+                //
+                //     return canRowInit(true, mainRowData)
+                // }
             };
 
             return tools.isEmpty(row) ? false : canRowInit(!isSub, row.data);
