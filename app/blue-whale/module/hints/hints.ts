@@ -26,7 +26,8 @@ interface dataMapPara{
     sender : string
 }
 /**
- * hint系统提醒
+ * pc端hint系统提醒,后台通过websocket传hints数据给前端，前端弹窗展示，每次有新的数据过来，就销毁前一个hints，
+ * 重新生成hints，1.打开：打开对应的页面  2.今日不提醒：发送一个请求给后台
  */
 export class Hints{
     private modal : Modal;
@@ -127,29 +128,34 @@ export class Hints{
      * @param btnCaption
      */
     private showMsg(index:number, msg : string, url : string, btnUrl : string, btnCaption : string){
+        const upBtn = this.upButton.getDom(),
+            nextBtn = this.nextButton.getDom(),
+            openBtn = this.openButton.getDom(),
+            warmBtn =  this.noWarmButton.getDom();
+
         if(index === 0){
-            this.upButton.getDom().classList.add('disabled');
+            upBtn.classList.add('disabled');
         }else{
-            this.upButton.getDom().classList.remove('disabled');
+            upBtn.classList.remove('disabled');
         }
         if(index === this.len - 1){
-            this.nextButton.getDom().classList.add('disabled');
+            nextBtn.classList.add('disabled');
         }else {
-            this.nextButton.getDom().classList.remove('disabled');
+            nextBtn.classList.remove('disabled');
         }
         //按钮可点击
         if(btnUrl){
-            this.noWarmButton.getDom().classList.remove('disabled');
-            this.noWarmButton.getDom().dataset.url = btnUrl;
+            warmBtn.classList.remove('disabled');
+            warmBtn.dataset.url = btnUrl;
         }else {
-            this.noWarmButton.getDom().classList.add('disabled');
+            warmBtn.classList.add('disabled');
         }
         //按钮存在
         if(btnCaption){
-            this.noWarmButton.getDom().innerHTML = btnCaption;
-            this.noWarmButton.getDom().classList.remove('hide');
+            warmBtn.innerHTML = btnCaption;
+            warmBtn.classList.remove('hide');
         }else {
-            this.noWarmButton.getDom().classList.add('hide');
+            warmBtn.classList.add('hide');
         }
 
 
@@ -159,9 +165,9 @@ export class Hints{
         active.innerHTML = msg;
         active.dataset.url = url;
         if(active.dataset.url){
-            this.openButton.getDom().classList.remove('disabled');
+            openBtn.classList.remove('disabled');
         }else {
-            this.openButton.getDom().classList.add('disabled');
+            openBtn.classList.add('disabled');
         }
     }
 

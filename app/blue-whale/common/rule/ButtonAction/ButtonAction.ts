@@ -524,14 +524,15 @@ export class ButtonAction {
             comSelectInput: SelectInput,
             speedInput: SelectInput,
             loading: Loading,
-            sendMsg,
-            sendFinish,
+            sendMsg : Function, // 接收过程信息，如上传过程中进度条信息
+            sendFinish : Function, // 接收结束信息
             width: number,    //模态框宽度
             progress, //进度条
             tipDom,   //盘点机信息提示
             table;    //表格模块
 
         BwRule.atvar = null;
+        // 弹框宽度计算
         if (type === 3 || type === 5) {
             if (len > 6) {
                 width = 100 * 10;
@@ -648,6 +649,7 @@ export class ButtonAction {
                         progress.format(percent);
                         if (percent === '100') {
                             if (action === 'upload') {
+                                // 从shell下载数据，发送给后台
                                 let upLoadData = pos.inventory({
                                     msg: 'getUploadData',
                                 })._data;
@@ -740,6 +742,7 @@ export class ButtonAction {
         tipDom = d.query('.progress-title', modal.bodyWrapper); //盘点机提示
 
 
+        // 生成表格，选择数据，确定后回填
         if (type === 3 || type === 5) {
             list();
         } else if (res.atvarparams) {
@@ -830,6 +833,7 @@ export class ButtonAction {
                 });
                 let coms = BwRule.atvar.coms,
                     keys = Object.keys(coms);
+                // 如果长度只有1，直接show
                 if (keys && keys.length === 1 && coms[keys[0]] instanceof SelectInputMb) {
                     coms[keys[0]].showList();
                 }

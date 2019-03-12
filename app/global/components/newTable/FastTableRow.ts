@@ -217,7 +217,8 @@ export class FastTableRow {
                 [TableBase.GUID_INDEX]: row.data[TableBase.GUID_INDEX]
             }, data, rowData || {});
         });
-        return data;
+
+        return Object.assign({}, this.fastTable.data[this.index] || {}, data);
     }
 
     set color(color: string) {

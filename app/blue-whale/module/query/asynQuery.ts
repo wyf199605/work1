@@ -18,6 +18,10 @@ interface QueryDataPara{
     container : HTMLElement,
     asynData : AsynQueryPara[]
 }
+
+/**
+ * 部分节点请求数据过大，超过30s，待后台查询完毕，通过websocket告诉前端，前端再跳转到对应页面查看历史记录和数据
+ */
 export class AsynQuery {
     private para : QueryDataPara;
     private loading : Loading;

@@ -26,6 +26,9 @@ interface resDataPara {
     MEMO: string;
 }
 
+/**
+ *  这里不支持multiPick
+ */
 export class PickModule extends TextInput {
     private Dom: HTMLElement;
     private body: HTMLElement;
