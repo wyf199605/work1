@@ -67,6 +67,7 @@ module.exports = function(request, rConfig){
         .replace(/paths:\s?({[\w\W]*}),\s?bundles:\s?({[\w\W]*})\s?},\s?urlArg\)/, ($1) => {
             return "paths: " + JSON.stringify(paths, null, 4) + ", bundles: " + JSON.stringify(bundles, null, 4) + " }, urlArg)";
         });
+    mkdirsSync(path);
     fs.writeFileSync(path, pathContent);
 };
 
