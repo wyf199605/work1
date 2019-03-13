@@ -62,6 +62,18 @@ namespace G{
                                     this.innerEl[val] = current;
                                 }
                                 break;
+                            case 'hide':
+                                if (current instanceof Component) {
+                                    val && current.wrapper.classList.add('hide');
+                                } else if (current instanceof HTMLElement) {
+                                    val && current.classList.add('hide');
+                                }
+                                break;
+                            case 'click':
+                                if (current instanceof HTMLElement) {
+                                    typeof val === 'function' && d.on(current,'click', val);
+                                }
+                                break;
                             case 'body':
                                 if (val) {
                                     this['_body'] = current;
