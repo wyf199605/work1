@@ -660,7 +660,7 @@ export class NewLabelPrint {
                         height: item.height * scale,
                         x: item.leftPos * scale,
                         y: item.topPos * scale,
-                        barCodeWidth: (item.codeRate || 1) * scale,
+                        barCodeWidth: (item.codeRate || 0.2) * scale,
                         align: NewLabelPrint.alignTag[item.alignment], // 对齐方式
                         format: NewLabelPrint.codeType[type] // 条形码类型
                     });
