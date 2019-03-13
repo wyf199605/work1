@@ -254,11 +254,11 @@ export class DropDown {
         if(!this.para.inline) {
             if(relEl) {
                 d.setPosition(this.ulDom, relEl, this.isAdapt);
-                // if(Number(this.ulDom.style.top.split(".")[0])<0){
-                //     this.ulDom.style.top="0px"
-                //     this.ulDom.style.height=relEl.getBoundingClientRect().top+"px";
-                //     this.ulDom.style.overflow="scroll";
-                // }
+                if(this.ulDom.style.top&&Number(this.ulDom.style.top.split(".")[0])<0){
+                    this.ulDom.style.top="0px"
+                    this.ulDom.style.height=relEl.getBoundingClientRect().top+"px";
+                    this.ulDom.style.overflow="scroll";
+                }
             } else {
                 d.setPosition(this.ulDom, this.para.el, this.isAdapt);
             }
