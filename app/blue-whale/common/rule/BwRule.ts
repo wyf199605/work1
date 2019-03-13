@@ -5,13 +5,13 @@ import sys = BW.sys;
 import Rule = G.Rule;
 import tools = G.tools;
 import Ajax = G.Ajax;
-import { ImgModal, ImgModalPara } from "../../../global/components/ui/img/img";
-import { ImgModalMobile } from "../ImgModalMobile";
-import { BugReportModal } from "../../module/BugReport/BugReport";
-import { Loading } from "../../../global/components/ui/loading/loading";
-import { TreeNodeBase } from "../../../global/dataStruct/tree/TreeNodeBase";
-import { IFastTableCol } from "../../../global/components/newTable/FastTable";
-import { Method } from "blue-whale/module/flowDesigner/FlowDesigner";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {ImgModalMobile} from "../ImgModalMobile";
+import {BugReportModal} from "../../module/BugReport/BugReport";
+import {Loading} from "../../../global/components/ui/loading/loading";
+import {TreeNodeBase} from "../../../global/dataStruct/tree/TreeNodeBase";
+import {IFastTableCol} from "../../../global/components/newTable/FastTable";
+import {IIDBPara} from "../../../global/NewIDB";
 
 export class BwRule extends Rule {
     /**
@@ -19,6 +19,14 @@ export class BwRule extends Rule {
      * fieldList 中 dataType 数值
      */
 
+    static IMG_TABLE = '__img_table__';
+    static IMG_CACHE_CONF: IIDBPara = {
+        name: '__image_cache_database__',
+        version: 1,
+        tableConf: {
+            [BwRule.IMG_TABLE]: ['url', 'version'],
+        }
+    };
 
     static EVT_REFRESH = 'refreshData';
 

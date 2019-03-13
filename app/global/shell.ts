@@ -420,8 +420,8 @@ namespace G {
             downloadbarcode(uniqueFlag: string, downUrl: string, uploadUrl: string, defaultUpload: boolean, back: IShellEventHandler) {
                 return ShellBase.handler('downloadbarcode', { uniqueFlag: uniqueFlag, downUrl: downUrl, uploadUrl: uploadUrl, defaultUpload: defaultUpload }, back, null, false);
             },
-            getScanData(uniqueFlag: string) {
-                return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag })
+            getScanData(uniqueFlag: string,  back?: IShellEventHandler) {
+                return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag }, back)
             },
             //条码扫码总量统计
             getCountData(uniqueFlag: string, where: obj, back: IShellEventHandler) {
@@ -508,9 +508,9 @@ namespace G {
             getCountData(uniqueFlag: string, itemid: string, fieldname: string, expression: string, where: obj, back: IShellEventHandler) {
                 return ShellBase.handler('getCountData', { uniqueFlag, itemid, fieldname, expression, where }, back);
             },
-            calculateData(uniqueFlag: string, itemid: string, fieldname: string, expression: string, back: IShellEventHandler) {
-                return ShellBase.handler('calculateData', { uniqueFlag, itemid, fieldname, expression }, back);
-            },
+            // calculateData(uniqueFlag: string, itemid: string, fieldname: string, expression: string, back: IShellEventHandler) {
+            //     return ShellBase.handler('calculateData', { uniqueFlag, itemid, fieldname, expression }, back);
+            // },
             /**
              *
              * @param uniqueFlag 唯一值
@@ -694,7 +694,7 @@ namespace G {
                     // 异步调用
                     let flag, shellData = Object.assign({ data: dataStr } || {}, { back: eventBack, info: eventInfor });
                     if (tools.os.ios) {
-                        // ios只有异步调用
+                        // ios只有异步调用,所以原先安卓中同步调用的在ios中必须改成异步
                         flag = webkit.messageHandlers.AppShell.postMessage(Object.assign(shellData, { action }));
                     } else {
                         flag = AppShell.asyncFunction(action, dataStr, eventBack, eventInfor);

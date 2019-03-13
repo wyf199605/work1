@@ -17,7 +17,7 @@ export class EditDetail extends DetailBase {
             this.wrapper.classList.add('edit_view');
         }
         this.initAllButtons();
-        this.isEdit = para.isEdit;
+        // this.isEdit = para.isEdit;
     }
 
     protected initDetailButtonsModule() {

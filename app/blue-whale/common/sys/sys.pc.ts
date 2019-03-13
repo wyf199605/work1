@@ -129,7 +129,7 @@ namespace BW {
         public window = (function (self) {
             return {
                 redirect: function (o: winOpen) {
-                    this.close()
+                    this.close();
                     setTimeout(() => {
                         this.open(o)
                     },100);
