@@ -144,6 +144,7 @@ export class OfflineBtn {
         Shell.imports.uploadcodedata(this.para.uniqueFlag, url, (result) => {
             if (result.success) {
                 Modal.toast('上传成功');
+                // 上传成功后清空主表，子表数据
                 this.imports.clear(this.imports.editModule.main);
                 let sub = this.imports.editModule.sub;
                 sub && this.imports.clear(sub);
@@ -154,6 +155,9 @@ export class OfflineBtn {
         });
     }
 
+    /**
+     * 该部分由前端半写死生成
+     */
     private deleteData() {
         const body = <div className="delete-modal" />,
             mainKey = this.para.mainKey && this.para.mainKey.name,
@@ -207,7 +211,7 @@ export class OfflineBtn {
             d.append(body, el);
         });
 
-        const get = (): { id: string, value: string, keyField: string }[] => {
+        const getSelect = (): { id: string, value: string, keyField: string }[] => {
             let value = null, index = 0, arr = [];
             checks.forEach((check, i) => {
                 if (check.checked) {
@@ -233,7 +237,7 @@ export class OfflineBtn {
             }
             return arr;
         };
-        let del = (itemId: string, keyField: string, value: string = '') => {
+        const del = (itemId: string, keyField: string, value: string = '') => {
             let where = {
                 [keyField]: value
             };
@@ -257,7 +261,7 @@ export class OfflineBtn {
             });
         };
         this.modalInit('请选择删除数据范围', body, () => {
-            get().forEach(obj => {
+            getSelect().forEach(obj => {
                 del(obj.id, obj.keyField, obj.value);
             })
         });
