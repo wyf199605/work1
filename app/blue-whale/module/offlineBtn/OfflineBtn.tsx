@@ -10,6 +10,8 @@ import CONF = BW.CONF;
 import d = G.d;
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import sys = BW.sys;
 
 interface IGeneralPara {
     ui?: IBW_Slave_Ui;  // 当前按钮对应ui
@@ -78,7 +80,8 @@ export class OfflineBtn {
                 this.commit();
                 break;
             default:
-                Modal.alert('未知类型openType');
+                let {edit} = this.imports.getKeyField(itemId);
+                ButtonAction.get().clickHandle(btn, edit.get(), () => {},  '');
         }
     }
 
