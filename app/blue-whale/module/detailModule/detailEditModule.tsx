@@ -39,7 +39,8 @@ export class DetailEditModule {
                 }
             }),
             container: this.detail.container,
-            cols: para.field
+            cols: para.field,
+            defaultData: Object.assign({}, this.detail.ajaxData || {}, this.detail.detailData)
         });
     }
 
@@ -124,9 +125,22 @@ export class DetailEditModule {
                 reject();
                 return
             }
-            this.fetch(this.editModule.get()).then(() => {
-                resolve();
-                this.cancel();
+            let data = this.editModule.get();
+            this.fetch(data).then(() => {
+                let urls = [];
+                this.field.forEach((field) => {
+                    if(field.link && field.atrrs && field.atrrs.dataType === '20'){
+                        let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, data), this.detail.ajaxData || {}, true, true);
+                        urls.push(url);
+                    }
+                });
+                this.detail.updateImgVersion(urls)
+                    .then(() => {})
+                    .catch((e) => console.log(e))
+                    .finally(() => {
+                        resolve();
+                        this.cancel();
+                    })
             }).catch((e) => {
                 reject(e);
             });

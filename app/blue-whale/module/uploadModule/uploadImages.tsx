@@ -9,6 +9,7 @@ import {BwRule} from "../../common/rule/BwRule";
 import {BwUploader, IBwUploaderPara} from "./bwUploader";
 import {ListItemDetailCell} from "../listDetail/ListItemDetailCell";
 import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {NewIDB} from "../../../global/NewIDB";
 
 export interface IImage {
     unique?: string;
@@ -84,20 +85,35 @@ export class UploadImages extends FormCom {
 
     set value(val: string) {
         this._value = val || '';
-        if (tools.isNotEmpty(val)) {
-            switch (this.imgType) {
-                case '20': {
-                    this.imgs = [{
-                        localUrl: BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.pageData),
-                        isError: false,
-                        unique: val || '',
-                        isOnLine: this.autoUpload
-                    }];
-                }
-                    break;
-                case  '26':
-                case  '27':
-                case  '28': {
+        switch (this.imgType) {
+            case '20': {
+                let url = BW.CONF.siteUrl + BwRule.reqAddr(this.para.field.link, this.pageData);
+                let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+                idb.getCollection(BwRule.IMG_TABLE).then((store) => {
+                    store.find((val) => {
+                        return val['url'] === url;
+                    }).then((response) => {
+                        if(tools.isNotEmpty(response)){
+                            let data = response[0],
+                                version = data['version'];
+                            version && (url = tools.url.addObj(url, {version: version}));
+                        }
+                        idb.destroy();
+                        console.log(url);
+                        this.imgs = [{
+                            localUrl: url,
+                            isError: false,
+                            unique: val || '',
+                            isOnLine: false
+                        }];
+                    });
+                });
+            }
+                break;
+            case  '26':
+            case  '27':
+            case  '28': {
+                if (tools.isNotEmpty(val)) {
                     // 第一次设置值
                     let addrArr = val.split(','),
                         arr = [];
@@ -123,11 +139,12 @@ export class UploadImages extends FormCom {
                         });
                     }
                     this.imgs = arr;
+
+                } else {
+                    this.imgs = [];
                 }
-                    break;
             }
-        } else {
-            this.imgs = [];
+                break;
         }
     }
 
@@ -173,7 +190,7 @@ export class UploadImages extends FormCom {
         this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
         this.pageData = para.pageData || {};
         this.imgType = para.field.dataType || para.field.atrrs.dataType;
-        this.value = para.unique;
+        para.unique && (this.value = para.unique);
         this.createUploader();
         this.uploader.disabled = this.disabled;
         this.initEvent.on();
