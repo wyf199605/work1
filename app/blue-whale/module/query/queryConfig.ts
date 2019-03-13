@@ -6,6 +6,8 @@ import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {DropDown} from "../../../global/components/ui/dropdown/dropdown";
 import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
+import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
+
 import {BwRule} from "../../common/rule/BwRule";
 
 export class QueryConfig {
@@ -40,8 +42,8 @@ export class QueryConfig {
     private groupByFields : DropDown;
     private fieldCol : DropDown;
 
-    private sectionField : SelectInput;
-    private sectionNorm : SelectInput;
+    private sectionField : SelectInputMb;
+    private sectionNorm : SelectInputMb;
 
     private caption : ListItem[] = [];
     private numbers  : number[] = [];
@@ -172,7 +174,7 @@ export class QueryConfig {
         });
 
         //分段字段
-        self.sectionField = new SelectInput({
+        self.sectionField = new SelectInputMb({
             container : sectionField,
             data : self.caption,
             readonly : true,
@@ -187,7 +189,7 @@ export class QueryConfig {
         });
 
         //分段标准
-        self.sectionNorm = new SelectInput({
+        self.sectionNorm = new SelectInputMb({
             container : sectionNorm,
             readonly : true,
             clickType : 0,
