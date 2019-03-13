@@ -2,7 +2,7 @@
   height: 100%;
   overflow: auto;
 
-  .disabled{
+  .disabled, [disabled]{
     opacity: .8;
   }
   &.editing{
