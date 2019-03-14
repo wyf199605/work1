@@ -395,13 +395,16 @@ export class DetailModule extends AGroupTabItem {
             return this._detailEdit;
         }
 
-        let tableAddr = this.ui.tableAddr;
-        if (tools.isEmpty(tableAddr && tableAddr.param)) {
+        let tableAddr = this.ui.tableAddr,
+            param = tableAddr.param.filter((param) => {
+                return param.itemId === this.ui.itemId;
+            });
+        if (tools.isEmpty(param)) {
             return null;
         }
         this._detailEdit = new DetailEditModule({
             url: tableAddr.dataAddr,
-            editParam: tableAddr.param[0],
+            editParam: param[0],
             detail: this,
             field: this.fields
         });

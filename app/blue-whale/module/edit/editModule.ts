@@ -525,11 +525,12 @@ export class EditModule {
         let assignSend = (field: R_Field, val, data: obj, onExtra: Function) => {
             if (tools.isEmpty(val) || tools.isEmpty(field.assignAddr)) {
                 if (field.assignSelectFields) {
-                    let assignData = {};
+                    let assignData1 = {};
                     field.assignSelectFields.forEach((name) => {
-                        assignData[name] = null;
+                        assignData1[name] = null;
                     });
-                    onExtra && onExtra(assignData, field.assignSelectFields, false, false, true);
+                    Object.assign(assignData, assignData1);
+                    onExtra && onExtra(assignData1, field.assignSelectFields, false, false, true);
                 }
                 return;
             }
@@ -564,15 +565,16 @@ export class EditModule {
                         resolve(resData ? resData[0] : {});
                     }
                 }).then((data) => {
-                    let assignData = assignDataGet(val, data);
+                    let assignData1 = assignDataGet(val, data);
 
-                    for (let key in assignData) {
-                        assignData[key] = Array.isArray(assignData[key]) ? assignData[key].join(';') : ''
+                    for (let key in assignData1) {
+                        assignData1[key] = Array.isArray(assignData1[key]) ? assignData1[key].join(';') : ''
                     }
 
-                    assign2extra(field, assignData);
+                    assign2extra(field, assignData1);
                     // debugger;
-                    onExtra && onExtra(assignData, field.assignSelectFields, true, false, true);
+                    Object.assign(assignData, assignData1);
+                    onExtra && onExtra(assignData1, field.assignSelectFields, true, false, true);
                 })
 
             })
