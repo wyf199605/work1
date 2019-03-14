@@ -275,14 +275,14 @@ export class GroupTabsPage extends BasicPage {
         },
         scanRender: (data) => {
             Array.isArray(data) && data.forEach(obj => {
-                const item = obj.itemid;
-                if (!item) return;
+                const itemId = obj.itemid;
+                if (!itemId) return;
 
-                const {edit} = this.imports.getKeyField(item);
+                const {edit} = this.imports.getKeyField(itemId);
                 this.imports.editSet(edit, obj.array[0]);
                 this.imports.setText('');
                 this.imports.getCountData();
-                this.imports.getAggrData(item);
+                this.imports.getAggrData(itemId);
             });
         }
         ,
@@ -388,16 +388,18 @@ export class GroupTabsPage extends BasicPage {
         },
         /**
          * 从壳获取新的aggr值
-         * @param item
+         * @param itemId
          */
-        getAggrData: (item: string) => {
+        getAggrData: (itemId: string) => {
             this.imports.aggrArr.forEach(aggr => {
                 let id = aggr.itemId,
-                    {value} = this.imports.getKeyField(id);
+                    mainId = this.imports.mainUiGet().itemId,
+                    {value} = this.imports.getKeyField(mainId);
 
-                if (item !== id) return;
+                if (itemId !== id) return;
 
-                Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression, value, result => {
+                Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression,
+                    id === mainId ? {} : value, result => {
                     console.log(result.data, 'getAggrData');
                     if (result.success) {
                         this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
