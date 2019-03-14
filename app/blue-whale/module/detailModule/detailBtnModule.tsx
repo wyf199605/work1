@@ -29,7 +29,12 @@ export class DetailBtnModule extends DetailModule{
         //         this.btnManager.box.delItem('next');
         //         this.btnManager.box.delItem('prev');
         //     }
-        // })
+        // });
+
+        this.on(DetailModule.EVT_RENDERED, () => {
+            this.paging.initState();
+            this.btnManager.initStatus();
+        });
     }
 
     protected paging = (() => {
@@ -58,10 +63,6 @@ export class DetailBtnModule extends DetailModule{
                     });
                     box.addItem(nextBtn,1);
                 }
-                this.off(DetailModule.EVT_RENDERED, handler);
-                this.on(DetailModule.EVT_RENDERED, handler = () => {
-                    this.paging.initState();
-                });
             },
             initState: () => {
                 let dataManager = this.dataManager;
@@ -178,9 +179,23 @@ export class DetailBtnModule extends DetailModule{
     protected btnManager = (() => {
         let box: InputBox;
 
+        let initStatus = () => {
+            let data = this.detailData;
+            box && box.children.forEach((btn: Button) => {
+                let btnUi = btn.custom as R_Button;
+                if(tools.isEmpty(btnUi.judgefield)){
+                    return;
+                }
+                let judges = btnUi.judgefield.split(','),
+                    flag = judges.every((judge) => tools.isNotEmpty(data[judge]) ? data[judge] === 1 : true);
+                btn.isDisabled = !flag;
+            })
+        };
+
         let initButton = (btn: R_Button): Button =>{
             return new Button({
                 content: btn.caption,
+                custom: btn,
                 onClick: () => {
                     // 流程引擎操作按钮
                     if (btn.openType.indexOf('flow') > -1) {
@@ -248,13 +263,15 @@ export class DetailBtnModule extends DetailModule{
                 btns.forEach((btn) => {
                     box.addItem(initButton(btn));
                 });
+                initStatus();
             },
             addBtn(btn: R_Button, position?){
                 box && box.addItem(initButton(btn), position);
             },
             get box(){
                 return box;
-            }
+            },
+            initStatus
         }
     })();
 }

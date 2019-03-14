@@ -139,7 +139,7 @@ export class GroupTabsPage extends BasicPage {
                                     </div>
                                     <div className="barcode-cell barcode-right">
                                         <div>{cor.caption + '：'}</div>
-                                        {this.imports.amountEl = <div/>}
+                                        {this.imports.amountEl = <div data-name />}
                                     </div>
                                 </div>
                             }
@@ -275,14 +275,14 @@ export class GroupTabsPage extends BasicPage {
         },
         scanRender: (data) => {
             Array.isArray(data) && data.forEach(obj => {
-                const item = obj.itemid;
-                if (!item) return;
+                const itemId = obj.itemid;
+                if (!itemId) return;
 
-                const {edit} = this.imports.getKeyField(item);
+                const {edit} = this.imports.getKeyField(itemId);
                 this.imports.editSet(edit, obj.array[0]);
                 this.imports.setText('');
-                this.imports.getCountData();
-                this.imports.getAggrData(item);
+                this.imports.setCountData();
+                this.imports.setAggrData(itemId);
             });
         }
         ,
@@ -332,9 +332,15 @@ export class GroupTabsPage extends BasicPage {
             this.caculate(edit);
             this.isOnSet = true;
         },
-        clear(edit: EditModule) {
+        clear(itemId : string) {
             this.isOnSet = false;
+            const {edit} = this.getKeyField(itemId);
             edit.clear();
+            this.setText('');
+            this.setAmount('');
+            this.aggrArr.forEach(aggr => {
+                this.setAggr('', aggr.itemId, aggr.fieldName);
+            });
             this.isOnSet = true;
         },
         /**
@@ -371,14 +377,14 @@ export class GroupTabsPage extends BasicPage {
         /**
          * 请求shell查询count数据
          */
-        getCountData: () => {
+        setCountData: () => {
             const data = this.imports.getTextPara(),
                 id = data.itemId;
             if (!id) return;
 
             const {value} = this.imports.getKeyField(id);
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
-                console.log(result.data, 'getCountData');
+                console.log(result.data, 'setCountData');
                 if (result.success) {
                     this.imports.setAmount(result.data[this.imports.fieldName]);
                 } else {
@@ -388,17 +394,19 @@ export class GroupTabsPage extends BasicPage {
         },
         /**
          * 从壳获取新的aggr值
-         * @param item
+         * @param itemId
          */
-        getAggrData: (item: string) => {
+        setAggrData: (itemId: string) => {
             this.imports.aggrArr.forEach(aggr => {
                 let id = aggr.itemId,
-                    {value} = this.imports.getKeyField(id);
+                    mainId = this.imports.mainUiGet().itemId,
+                    {value} = this.imports.getKeyField(mainId);
 
-                if (item !== id) return;
+                if (itemId !== id) return;
 
-                Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression, value, result => {
-                    console.log(result.data, 'getAggrData');
+                Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression,
+                    id === mainId ? {} : value, result => {
+                    console.log(result.data, 'setAggrData');
                     if (result.success) {
                         this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
                     } else {
@@ -507,10 +515,9 @@ export class GroupTabsPage extends BasicPage {
          */
         setAggr: (value: string, itemId: string, keyField: string) => {
             const el = d.query(`[data-item=${itemId}] [data-name=${keyField}]`, this.imports.aggrEl);
-            if (el) {
-                el.innerHTML = value;
-            }
-        },
+            if (el) el.innerHTML = value;
+
+        }
     };
 
     /**

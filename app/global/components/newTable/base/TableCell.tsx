@@ -322,6 +322,19 @@ export class TableDataCell extends TableCell {
         }
     }
 
+    // 在编辑状态下设置数据时，会生成input
+    setData(data: Primitive){
+        if(this.table.editing){
+            if(!this.editing){
+                this.editing = true;
+            }
+            this.input && this.input instanceof FormCom && this.input.set(data);
+            this.editing = false;
+        }else{
+            this.data = data;
+        }
+    }
+
     // 在编辑状态下无法修改 不能编辑 且 isNotPassiveModify为true 的cell的数据
     isNotPassiveModify: boolean = false;
 

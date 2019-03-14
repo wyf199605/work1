@@ -105,6 +105,7 @@ export class BwTableModule extends Component {
             para.ajaxData = para.ajaxData || {};
             para.ajaxData['uiurl'] = this.pageUrl.substring(find(this.pageUrl, '/', 5), this.pageUrl.length);
         }
+        this.linkedData = para.ajaxData || {};
 
         function find(str, cha, num) {
             let x = str.indexOf(cha);

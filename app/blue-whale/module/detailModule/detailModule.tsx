@@ -15,6 +15,7 @@ import {DetailEditModule} from "./detailEditModule";
 import AGroupTabItem = BW.AGroupTabItem;
 import IGroupTabItemPara = BW.IGroupTabItemPara;
 import {FormCom} from "../../../global/components/form/basic";
+import {NewIDB} from "../../../global/NewIDB";
 
 export interface IDetailModulePara extends IGroupTabItemPara {
     ui: IBW_Detail; // 根据ui生成detail页
@@ -394,13 +395,16 @@ export class DetailModule extends AGroupTabItem {
             return this._detailEdit;
         }
 
-        let tableAddr = this.ui.tableAddr;
-        if (tools.isEmpty(tableAddr && tableAddr.param)) {
+        let tableAddr = this.ui.tableAddr,
+            param = tableAddr.param ? tableAddr.param.filter((param) => {
+                return param.itemId === this.ui.itemId;
+            }) : null;
+        if (tools.isEmpty(param)) {
             return null;
         }
         this._detailEdit = new DetailEditModule({
             url: tableAddr.dataAddr,
-            editParam: tableAddr.param[0],
+            editParam: param[0],
             detail: this,
             field: this.fields
         });
@@ -423,6 +427,46 @@ export class DetailModule extends AGroupTabItem {
         return this._pageUrl;
     }
 
+    updateImgVersion(urls: string[]){
+        if(tools.isEmpty(urls)){
+            return Promise.reject();
+        }
+        return new Promise((resolve, reject) => {
+            let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+            idb.getCollection(BwRule.IMG_TABLE).then(store => {
+                store.find((val) => {
+                    return urls.indexOf(val['url']) > -1;
+                }).then((response) => {
+                    let data = response || [];
+                    for(let url of urls){
+                        if(tools.isEmpty(url)){
+                            continue;
+                        }
+                        if(data.some((item) => item['url'] === url)){
+                            // update
+                            store.update((val) => {
+                                return url === val['url'];
+                            }, () => ({
+                                url: url,
+                                version: new Date().getTime()
+                            }));
+                        }else{
+                            // insert
+                            store.insert({
+                                url: url,
+                                version: new Date().getTime()
+                            });
+                        }
+                    }
+                    resolve();
+                }).catch((e) => {
+                    reject(e);
+                })
+            })
+        })
+
+    }
+
     // 格式化数据
     format(field: R_Field, cellData: any, rowData: obj): Promise<IDetailFormatData> {
         // console.log(rowData);
@@ -440,11 +484,25 @@ export class DetailModule extends AGroupTabItem {
                     // 缩略图
                     let ajaxData = this.dataManager ? this.dataManager.ajaxData : {};
                     let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), ajaxData, true, true);
-                    url = tools.url.addObj(url, {version: new Date().getTime()});
+                    // url = tools.url.addObj(url, {version: new Date().getTime()});
 
-                    text = <img src={url}/>;
-                    classes.push('cell-img');
-
+                    let idb = new NewIDB(BwRule.IMG_CACHE_CONF);
+                    idb.getCollection(BwRule.IMG_TABLE).then((store) => {
+                        store.find((val) => {
+                            return val['url'] === url;
+                        }).then((response) => {
+                            if(tools.isNotEmpty(response)){
+                                let data = response[0],
+                                    version = data['version'];
+                                version && (url = tools.url.addObj(url, {version: version}));
+                            }
+                            idb.destroy();
+                            text = <img src={url}/>;
+                            classes.push('cell-img');
+                            resolve({text, classes, bgColor, color, data});
+                        });
+                    });
+                    return ;
                 } else if (BwRule.isNewImg(dataType)) {
                     classes.push('cell-img');
                     if (cellData && typeof cellData === 'string') {

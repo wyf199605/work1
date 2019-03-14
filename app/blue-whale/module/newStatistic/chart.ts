@@ -5,6 +5,7 @@ import tools = G.tools;
 import {FormCom} from "../../../global/components/form/basic";
 import {SelectBox} from "../../../global/components/form/selectBox/selectBox";
 import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
+import { SelectInputMb } from "../../../global/components/form/selectInput/selectInput.mb";
 import {Echart} from "../../../global/utils/echart";
 import {Button} from "../../../global/components/general/button/Button";
 import d = G.d;
@@ -272,7 +273,7 @@ export = class NewChartBasic{
                 });
                 break;
             case 'row':
-                this.coms['row'] = new SelectInput({
+                let obj={
                     container : el,
                     data : this.chartRow,
                     onSet : function(item,index){
@@ -280,7 +281,12 @@ export = class NewChartBasic{
                     className : 'selectInput',
                     clickType : 0,
                     readonly : true
-                });
+                }
+                if(tools.isPc){
+                    this.coms['row'] = new SelectInput(obj);
+                }else{
+                    this.coms['row'] = new SelectInputMb(obj);
+                }
                 break;
             case 'col':
                 this.coms['col'] = new SelectBox({
@@ -340,7 +346,7 @@ export = class NewChartBasic{
         d.queryAll('[data-name]',this.body).forEach(el => {
             this.initHtmlTpl(el.dataset.name,el);
         });
-        let row = <SelectInput>this.coms['row'];
+        let row = <SelectInput|SelectInputMb>this.coms['row'];
         this.chartRow[0]&&row.set(this.chartRow[0].value);
     }
     /**
