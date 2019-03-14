@@ -148,9 +148,9 @@ export class OfflineBtn {
             if (result.success) {
                 Modal.toast('上传成功');
                 // 上传成功后清空主表，子表数据
-                this.imports.clear(this.imports.editModule.main);
+                this.imports.clear(this.para.mainId);
                 let sub = this.imports.editModule.sub;
-                sub && this.imports.clear(sub);
+                sub && this.imports.clear(this.para.subId);
             } else {
                 Modal.toast(result.msg); 
             }
@@ -252,12 +252,11 @@ export class OfflineBtn {
                 console.log(result.data, 'operateTable删除表');
                 if(result.success){
                     Modal.toast('删除成功');
-                    const {edit} = this.imports.getKeyField(itemId);
                     // 若为主表，则同时清空子表数据
                     if(itemId === this.para.mainId){
-                        this.imports.clear(this.imports.editModule.sub);
+                        this.imports.clear(this.para.subId);
                     }
-                    this.imports.clear(edit);
+                    this.imports.clear(itemId);
                 }else {
                     Modal.toast('删除失败');
                 }

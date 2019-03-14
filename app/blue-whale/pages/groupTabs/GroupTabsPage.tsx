@@ -332,9 +332,15 @@ export class GroupTabsPage extends BasicPage {
             this.caculate(edit);
             this.isOnSet = true;
         },
-        clear(edit: EditModule) {
+        clear(itemId : string) {
             this.isOnSet = false;
+            const {edit} = this.getKeyField(itemId);
             edit.clear();
+            this.setText('');
+            this.setAmount('');
+            this.aggrArr.forEach(aggr => {
+                this.setAggr('', aggr.itemId, aggr.fieldName);
+            });
             this.isOnSet = true;
         },
         /**
@@ -509,9 +515,8 @@ export class GroupTabsPage extends BasicPage {
          */
         setAggr: (value: string, itemId: string, keyField: string) => {
             const el = d.query(`[data-item=${itemId}] [data-name=${keyField}]`, this.imports.aggrEl);
-            if (el) {
-                el.innerHTML = value;
-            }
+            if (el) el.innerHTML = value;
+
         }
     };
 
