@@ -112,6 +112,7 @@ export class OfflineBtn {
     }
 
     private downData() {
+        this.imports.clearCell();
         const loading = new Loading({
             msg: "下载数据中"
         });

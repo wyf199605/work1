@@ -86,6 +86,7 @@ export class GroupTabsPage extends BasicPage {
         countTextEl: null as HTMLElement,
         amountEl: null as HTMLElement, // 数量的值容器
         aggrEl: null as HTMLElement,
+        cells : null as HTMLElement[], // aggr，cor的所有el
         btnWrapper: null as HTMLElement,
         _commitBtn: null as HTMLElement,
         footer: null as HTMLElement,
@@ -139,7 +140,7 @@ export class GroupTabsPage extends BasicPage {
                                     </div>
                                     <div className="barcode-cell barcode-right">
                                         <div>{cor.caption + '：'}</div>
-                                        {this.imports.amountEl = <div/>}
+                                        {this.imports.amountEl = <div data-name />}
                                     </div>
                                 </div>
                             }
@@ -281,8 +282,8 @@ export class GroupTabsPage extends BasicPage {
                 const {edit} = this.imports.getKeyField(itemId);
                 this.imports.editSet(edit, obj.array[0]);
                 this.imports.setText('');
-                this.imports.getCountData();
-                this.imports.getAggrData(itemId);
+                this.imports.setCountData();
+                this.imports.setAggrData(itemId);
             });
         }
         ,
@@ -335,6 +336,7 @@ export class GroupTabsPage extends BasicPage {
         clear(edit: EditModule) {
             this.isOnSet = false;
             edit.clear();
+            this.clearCell();
             this.isOnSet = true;
         },
         /**
@@ -371,14 +373,14 @@ export class GroupTabsPage extends BasicPage {
         /**
          * 请求shell查询count数据
          */
-        getCountData: () => {
+        setCountData: () => {
             const data = this.imports.getTextPara(),
                 id = data.itemId;
             if (!id) return;
 
             const {value} = this.imports.getKeyField(id);
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
-                console.log(result.data, 'getCountData');
+                console.log(result.data, 'setCountData');
                 if (result.success) {
                     this.imports.setAmount(result.data[this.imports.fieldName]);
                 } else {
@@ -390,7 +392,7 @@ export class GroupTabsPage extends BasicPage {
          * 从壳获取新的aggr值
          * @param itemId
          */
-        getAggrData: (itemId: string) => {
+        setAggrData: (itemId: string) => {
             this.imports.aggrArr.forEach(aggr => {
                 let id = aggr.itemId,
                     mainId = this.imports.mainUiGet().itemId,
@@ -400,7 +402,7 @@ export class GroupTabsPage extends BasicPage {
 
                 Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression,
                     id === mainId ? {} : value, result => {
-                    console.log(result.data, 'getAggrData');
+                    console.log(result.data, 'setAggrData');
                     if (result.success) {
                         this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
                     } else {
@@ -513,6 +515,10 @@ export class GroupTabsPage extends BasicPage {
                 el.innerHTML = value;
             }
         },
+        clearCell(){
+            if(!this.cells) this.cells = d.queryAll('.barcode-cell [data-name]');
+            Array.isArray(this.cells) && this.cells.forEach(cell => cell.innerHTML = '');
+        }
     };
 
     /**
