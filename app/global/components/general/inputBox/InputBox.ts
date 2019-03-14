@@ -68,7 +68,7 @@ export class InputBox extends Component {
         this._children = tools.isEmpty(children)? []: children;
     }
     get children() {
-        return this._children;
+        return this._children || [];
     }
 
     /*
