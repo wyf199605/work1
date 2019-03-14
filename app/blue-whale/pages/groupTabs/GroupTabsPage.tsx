@@ -86,7 +86,6 @@ export class GroupTabsPage extends BasicPage {
         countTextEl: null as HTMLElement,
         amountEl: null as HTMLElement, // 数量的值容器
         aggrEl: null as HTMLElement,
-        cells : null as HTMLElement[], // aggr，cor的所有el
         btnWrapper: null as HTMLElement,
         _commitBtn: null as HTMLElement,
         footer: null as HTMLElement,
@@ -336,7 +335,6 @@ export class GroupTabsPage extends BasicPage {
         clear(edit: EditModule) {
             this.isOnSet = false;
             edit.clear();
-            this.clearCell();
             this.isOnSet = true;
         },
         /**
@@ -514,10 +512,6 @@ export class GroupTabsPage extends BasicPage {
             if (el) {
                 el.innerHTML = value;
             }
-        },
-        clearCell(){
-            if(!this.cells) this.cells = d.queryAll('.barcode-cell [data-name]');
-            Array.isArray(this.cells) && this.cells.forEach(cell => cell.innerHTML = '');
         }
     };
 
