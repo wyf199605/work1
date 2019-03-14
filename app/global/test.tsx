@@ -15,7 +15,7 @@ import {CustomBoxLayout} from "./components/view/customLayout/customBoxLayout";
     height: 250,
     resize: true, // 是否可改变宽高
     fullScreen: false, // 是否可以放大
-    content: <h1>测试块11111111</h1>,
+    content: <h1>测试块11</h1>,
     drag:true,
 }, {
     width: 200,
@@ -29,7 +29,7 @@ import {CustomBoxLayout} from "./components/view/customLayout/customBoxLayout";
     height: 100,
     resize: true, // 是否可改变宽高
     fullScreen: false, // 是否可以放大
-    content: <h1>测试块333333333</h1>,
+    content: <h1>测试块33333</h1>,
     drag:true,
 }, {
     width: 300,

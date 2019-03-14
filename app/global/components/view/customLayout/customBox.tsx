@@ -61,6 +61,7 @@ export class CustomBox extends Component{
         this.resize = para.resize;
         this.content = para.content;
         this.fullScreen = para.fullScreen;
+
         this.drag = para.drag;
         this._parent = para.parent;
 
@@ -176,8 +177,8 @@ export class CustomBox extends Component{
                     let resX;
                     let resY;
 
-                    let wrapperIndexOnBoxes;
-                    d.on(copyDom,'mousemove', moveHandler = (e) => {
+                    let wrapperIndexOnBoxes; // 当前移动的DOM在数组中的索引
+                    d.on(document ,'mousemove', moveHandler = (e) => {
                         newX = e.clientX;
                         newY = e.clientY;
                         resX = disX + newX - oldX;
@@ -187,7 +188,12 @@ export class CustomBox extends Component{
                         copyDom.style.top = resY + 'px';
                         e.preventDefault();
                     });
-                    d.on(copyDom,'mouseup',upHandler=() => {
+                    d.on(document,'mouseup',upHandler=() => {
+
+                        d.off(document, 'mousemove', moveHandler);
+                        // 判断是否创建了copyDom
+                        if ( !copyDom ) return;
+
                         // 计算位置!!!
 
                         // 获取所有的框集合
@@ -222,43 +228,44 @@ export class CustomBox extends Component{
                             let moveRight = copyDom.getBoundingClientRect().right;
                             let moveBottom = copyDom.getBoundingClientRect().bottom;
 
-                            // 碰撞检测
-                            if ( (moveRight > myObj['left'] && moveLeft < myObj['right']) && (moveBottom > myObj['top'] && moveTop < myObj['bottom'])  ) {
-                                // 判断是否是往后移
-                                if( wrapperIndexOnBoxes > i ) {
-                                    continue
-                                }
-                                // 判断是否有多个重叠，取重叠的最大值
-
-                                // 计算当前重重的面积
-                                let x = 0;
-                                let y = 0;
-
-                                // 计算X轴
-                                if ( moveLeft <= myObj['left'] ) {
-                                    x = moveRight - myObj['left']
-                                } else {
-                                    x = myObj['right'] - moveLeft;
-                                }
-                                // 计算Y轴
-                                if ( moveTop <= myObj['top'] ) {
-                                    y = moveBottom - myObj['top']
-                                } else {
-                                    y = myObj['bottom'] - moveTop;
-                                }
-
-                                let s = x * y; // 重叠的面积
-                                myObj['area'] = s;
+                            // 首先判断鼠标有没在目标位置中
+                            // 如果有直接结束，否则判断是否有重叠面积
+                            if (  (newX > myObj['left'] && newX < myObj['right'])  && ( newY > myObj['top'] && newY < myObj['bottom'] )  ) {
                                 myObj['index'] = i;
-                                if ( resultBoom ) {
+                                resultBoom = myObj;
+                                break;
+                            } else {
+                                // 碰撞检测
+                                if ( (moveRight > myObj['left'] && moveLeft < myObj['right']) && (moveBottom > myObj['top'] && moveTop < myObj['bottom'])  ) {
+                                    // 判断是否有多个重叠，取重叠的最大值
+                                    // 计算当前重重的面积
+                                    let x = 0;
+                                    let y = 0;
 
-                                    // 比较重叠面积的大小
-                                    if( s > resultBoom.area ) {
+                                    // 计算X轴
+                                    if ( moveLeft <= myObj['left'] ) {
+                                        x = moveRight - myObj['left']
+                                    } else {
+                                        x = myObj['right'] - moveLeft;
+                                    }
+                                    // 计算Y轴
+                                    if ( moveTop <= myObj['top'] ) {
+                                        y = moveBottom - myObj['top']
+                                    } else {
+                                        y = myObj['bottom'] - moveTop;
+                                    }
+
+                                    let s = x * y; // 重叠的面积
+                                    myObj['area'] = s;
+                                    myObj['index'] = i;
+                                    if ( resultBoom ) {
+                                        // 比较重叠面积的大小
+                                        if( s > resultBoom.area ) {
+                                            resultBoom = myObj
+                                        }
+                                    } else {
                                         resultBoom = myObj
                                     }
-                                } else {
-
-                                    resultBoom = myObj
                                 }
                             }
                         }
@@ -270,16 +277,13 @@ export class CustomBox extends Component{
                         // 插入移动前的位置
                         if ( resultBoom ) {
                             let dom = d.queryAll('.custom-box', this._parent.wrapper);
-                            // dom.splice( wrapperIndexOnBoxes, 1 );
                             this._parent.wrapper.removeChild(this.wrapper);
-                            d.before(  dom[ resultBoom['index'] ], this.wrapper );
-
-                            // dom.splice(resultBoom['index'], 0, this.wrapper);
-
-
-                            // for ( let i = 0; i < dom.length; i++ ) {
-                            //     dom[i].style.order = i.toString();
-                            // }
+                            // 判断是否是往后移
+                            if( wrapperIndexOnBoxes < resultBoom['index'] ) {
+                                d.after(  dom[ resultBoom['index'] ], this.wrapper );
+                            } else  {
+                                d.before(  dom[ resultBoom['index'] ], this.wrapper );
+                            }
                         }
                     })
                 })
