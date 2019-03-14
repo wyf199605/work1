@@ -404,6 +404,7 @@ gulp.task('js', function() {
 
     gulpTsPage('msgList/MsgListPage', 'MsgListPage.js');
     gulpTsPage('index/authorized.mb', "Authorized.js");
+    gulpTsPage('myself/checkNetwork.mb', "checkNetwork.js");
 });
 
 /**

@@ -2,15 +2,15 @@ import sys = BW.sys;
 import tools = G.tools;
 import CONF = BW.CONF;
 import d = G.d;
-import {BwRule} from "../../common/rule/BwRule";
-import {Modal} from 'global/components/feedback/modal/Modal';
-import {User} from "../../../global/entity/User";
-import {ShellAction} from "../../../global/action/ShellAction";
+import { BwRule } from "../../common/rule/BwRule";
+import { Modal } from 'global/components/feedback/modal/Modal';
+import { User } from "../../../global/entity/User";
+import { ShellAction } from "../../../global/action/ShellAction";
 import Ajax = G.Ajax;
-import {RfidSettingModal} from "../rfid/RfidSetting/RfidSetting";
+import { RfidSettingModal } from "../rfid/RfidSetting/RfidSetting";
 import Shell = G.Shell;
 import sysPcHistory = BW.sysPcHistory;
-import {Loading} from "../../../global/components/ui/loading/loading";
+import { Loading } from "../../../global/components/ui/loading/loading";
 
 export = class myselfMbPage {
     constructor() {
@@ -19,7 +19,7 @@ export = class myselfMbPage {
         let items = [];
         let loading = new Loading({});
         loading.show();
-        G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({response}) => {
+        G.Ajax.fetch(CONF.ajaxUrl.personalmenu).then(({ response }) => {
             response = JSON.parse(response);
             let menus = response.body && response.body.elements;
             // console.log('in mb');
@@ -45,7 +45,7 @@ export = class myselfMbPage {
         });
     }
 
-    protected init(items: obj[]){
+    protected init(items: obj[]) {
         let self = this;
         let user = User.get();
         d.setHTML(d.query('#userid'), user.are_id + ' ' + user.department);
@@ -61,7 +61,7 @@ export = class myselfMbPage {
         items.forEach((item) => {
             let li = <li className="mui-table-view-cell">
                 <a href="#" className="mui-navigate-right">
-                    <i className={item.icon}/>
+                    <i className={item.icon} />
                     {item.content}
                 </a>
             </li>;
@@ -96,7 +96,7 @@ export = class myselfMbPage {
             </li>;
             d.append(list, li);
         }
-        if(sys.window.toClient){
+        if (sys.window.toClient) {
             let li = <li className="mui-table-view-cell">
                 <a href="#" className="mui-navigate-right">更改客户代码</a>
             </li>;
@@ -108,7 +108,7 @@ export = class myselfMbPage {
         }
 
         d.on(d.query('.selfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
-            let dataset = d.closest(e.target as HTMLElement,'.mui-table-view-cell[data-page-name]').dataset.pageName;
+            let dataset = d.closest(e.target as HTMLElement, '.mui-table-view-cell[data-page-name]').dataset.pageName;
             let pageUrl = BW.CONF.url[dataset];
             if (pageUrl) {
                 if (dataset === 'myself') {
@@ -117,19 +117,19 @@ export = class myselfMbPage {
                             userid: user.userid
                         })
                     });
-                }else if (dataset === 'bugReport') {
+                } else if (dataset === 'bugReport') {
                     sys.window.open({
                         url: CONF.url.bugList
                     });
-                }else if (dataset === 'myApplication') {
+                } else if (dataset === 'myApplication') {
                     sys.window.open({
                         url: CONF.url.myApplication
                     });
-                }else if (dataset === 'myApproval') {
+                } else if (dataset === 'myApproval') {
                     sys.window.open({
                         url: CONF.url.myApproval
                     });
-                }else {
+                } else {
                     sys.window.open({
                         url: pageUrl
                     });
@@ -166,17 +166,19 @@ export = class myselfMbPage {
             //     }
             // });
             BwRule.Ajax.fetch(CONF.ajaxUrl.logout)
-                .then(({}) => {
+                .then(({ }) => {
                     Modal.toast('退出成功');
                     sys.window.logout();
                 });
         });
 
         d.on(d.query('#testNetwork'), 'click', () => {
-            modal.isShow = true;
+            // modal.isShow = true;
+            let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=checkNetwork" });
+            sys.window.open({ url })
         });
         let modal = this.initModal();
-        let urls = Array.from({length: 5}, () => 1000).map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, {size: num}));
+        let urls = Array.from({ length: 5 }, () => 1000).map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, { size: num }));
         let testStart = true;
 
         d.on(d.query('body'), 'click', '.mui-rotate-box', function () {
@@ -234,7 +236,7 @@ export = class myselfMbPage {
         sys.window.close = double_back;
     }
 
-    private rfidSettingInit(list:HTMLElement){
+    private rfidSettingInit(list: HTMLElement) {
 
         if (Shell.inventory.canRfid == true) {
             let li = <li className="mui-table-view-cell" id="rfidSettingIn">
@@ -282,7 +284,7 @@ export = class myselfMbPage {
             }
             let startTime = new Date().getTime();
             Ajax.fetch(urls[num])
-                .then(({response}) => {
+                .then(({ response }) => {
                     let time = new Date().getTime() - startTime;
                     num++;
                     let size = tools.str.utf8Len(response);
