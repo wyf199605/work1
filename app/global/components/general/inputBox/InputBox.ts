@@ -2,10 +2,10 @@
 import d = G.d;
 import tools = G.tools;
 import IComponentPara = G.IComponentPara; import Component = G.Component;
-import {Button} from "../button/Button";
-import {DropDown} from "../../ui/dropdown/dropdown";
+import { Button } from "../button/Button";
+import { DropDown } from "../../ui/dropdown/dropdown";
 
-interface IInputBoxPara extends IComponentPara{
+interface IInputBoxPara extends IComponentPara {
     //width?: string | number;//  ，则不支持响应式
     isVertical?: boolean;
     size?: string;
@@ -58,14 +58,14 @@ export class InputBox extends Component {
 
     }
 
-    private isVertical:boolean;
+    private isVertical: boolean;
 
     /**
      * 子组件集合
      */
     private _children: Array<Button>;
-    set children(children:Array<Button>) {
-        this._children = tools.isEmpty(children)? []: children;
+    set children(children: Array<Button>) {
+        this._children = tools.isEmpty(children) ? [] : children;
     }
     get children() {
         return this._children;
@@ -74,12 +74,12 @@ export class InputBox extends Component {
     /*
     * 按钮组合形状，可选值为circle或者不设置
     * */
-    private _shape?:string;
-    set shape(shape:string) {
-        if(tools.isEmpty(shape)) {
+    private _shape?: string;
+    set shape(shape: string) {
+        if (tools.isEmpty(shape)) {
             return;
         }
-        if(shape === 'circle') {
+        if (shape === 'circle') {
             this.wrapper.classList.add('input-box-circle');
         } else {
             this.wrapper.classList.remove('input-box-circle');
@@ -111,7 +111,7 @@ export class InputBox extends Component {
                 break;
         }
         this._size = size;
-    } 
+    }
 
     get size() {
         return this._size;
@@ -187,7 +187,7 @@ export class InputBox extends Component {
     * */
     private _moreBtn?: Button;
     set moreBtn(moreBtn: Button) {
-        if(this._isResponsive) {
+        if (this._isResponsive) {
             this._moreBtn = moreBtn;
         }
     }
@@ -206,25 +206,25 @@ export class InputBox extends Component {
         return this._isResponsive;
     }
 
-    responsive(){
-        if(!this.isResponsive){
-            return ;
+    responsive() {
+        if (!this.isResponsive) {
+            return;
         }
         let childrenWidth = 56, isFirst = true;
         let wrapperWidth = this.wrapper.offsetWidth;
-        for(let c of this.children){
+        for (let c of this.children) {
             d.append(this.wrapper, c.wrapper);
         }
-        for(let i = 0; i < this.children.length; i++){
+        for (let i = 0; i < this.children.length; i++) {
             let c = this.children[i];
             childrenWidth += c.wrapper.offsetWidth;
-            if((this.limitCount !== -1 && i >= this.limitCount) || childrenWidth > wrapperWidth){
-                if(isFirst){
+            if ((this.limitCount !== -1 && i >= this.limitCount+1) || childrenWidth > wrapperWidth) {
+                if (isFirst) {
                     isFirst = false;
                     this._lastNotMoreIndex = i;
                 }
-                    // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
-                    //仅从dom结构上改变了组件，并未改变组件的container属性
+                // this.wrapper.style.width = parseInt(this.wrapper.style.width) - parseInt(getComputedStyle(com.wrapper)['width']) + 5 + 'px';
+                //仅从dom结构上改变了组件，并未改变组件的container属性
                 tools.isEmpty(this._moreBtn) && (this._moreBtn = new Button({
                     content: '更多',
                     size: this._size,
@@ -240,18 +240,18 @@ export class InputBox extends Component {
                         className: "input-box-morebtn"
                     });
                 }
-            }else{
+            } else {
                 d.append(this.wrapper, c.wrapper);
                 this._lastNotMoreIndex = Math.min(this._lastNotMoreIndex, i);
             }
         }
 
-        if(this._moreBtn){
+        if (this._moreBtn) {
             this._moreBtn && d.append(this.wrapper, this._moreBtn.wrapper);
-            if(this._lastNotMoreIndex === 0){
+            if (this._lastNotMoreIndex === 0) {
                 this._moreBtn && this._moreBtn.destroy();
                 this._moreBtn = null;
-            }else {
+            } else {
                 this.children.slice(this._lastNotMoreIndex).forEach((btn) => {
                     if (this.moreBtn.dropDown) {
                         this.moreBtn.dropDown.getUlDom().appendChild(btn.wrapper);
@@ -338,7 +338,7 @@ export class InputBox extends Component {
         if (!com) {
             return;
         }
-        if(typeof position === 'number'){
+        if (typeof position === 'number') {
             position = Math.max(0, position);
             position = position >= this.children.length ? void 0 : position;
         }
@@ -348,16 +348,16 @@ export class InputBox extends Component {
         if (this._moreBtn && this._moreBtn.dropDown) {
             this.wrapper.insertBefore(com.wrapper, this.wrapper.lastChild);
         } else {
-            if(typeof position === 'number'){
+            if (typeof position === 'number') {
                 d.before(this.wrapper.children[position], com.wrapper);
-            }else{
+            } else {
                 this.wrapper.appendChild(com.wrapper);
             }
         }
         //添加至组件集合children
-        if(typeof position === 'number'){
+        if (typeof position === 'number') {
             this.children.splice(position, 0, com);
-        }else {
+        } else {
             this.children.push(com);
         }
 
@@ -372,6 +372,24 @@ export class InputBox extends Component {
             }
             this.responsive();
         }
+        this.sort();
+    }
+    // 对每个addItem到box中的按钮进行排序  每个Button 的默认按钮为level=10
+    sort() {
+        this.children && this.children.length > 1 && this.children.sort((obj1: any, obj2: any) => {
+            var val1 = obj1.button.level;
+            var val2 = obj2.button.level;
+            // console.log(val1, val2)
+            if (val1 < val2) {
+                return -1;
+            } else if (val1 > val2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        })
+        //console.log(this.children)
+        this.responsive();
     }
 
     /*
@@ -433,17 +451,17 @@ export class InputBox extends Component {
     * */
     // private resizeHandler() {
     //     /**/let timer = null;
-        /*d.on(window, 'resize', () => {
-            if (timer === null) {
-                timer = setTimeout(() => {
-                    this.responsive();
-                    timer = null;
-                }, 1000);
-            }
-        });*/
+    /*d.on(window, 'resize', () => {
+        if (timer === null) {
+            timer = setTimeout(() => {
+                this.responsive();
+                timer = null;
+            }, 1000);
+        }
+    });*/
     // }
 
-    set isShow(flag: boolean){
+    set isShow(flag: boolean) {
         d.hide(this.wrapper, !flag);
     }
 

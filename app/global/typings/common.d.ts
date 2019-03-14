@@ -192,6 +192,7 @@ interface R_Button extends Btn {
     caption?:string;
     title?:string;
     judgefield?: string; // 列字段名（可多个，逗号隔开），全为1可点击，有0不可点击，表格中无该字段数据则略过
+    level_no?:number;
 }
 interface R_Input {
     maxLength?: number, //最大长度

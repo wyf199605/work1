@@ -1,0 +1,48 @@
+$bgColor:#005bac;
+@mixin postion($top:0px, $bottom:0px, $left:0px, $right:0px) {
+  position: absolute;
+  top: $top;
+  bottom: $bottom;
+  left: $left;
+  right: $right;
+}
+
+.check_netWork {
+  @include postion(0px, 0px, 0px, 0px);
+  font-size: 18px;
+  .check_wrap {
+    background-color: $bgColor;
+    color: white;
+  }
+  .check_Header {
+    position: relative;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 18px;
+    margin: 0px;
+    span:first-child {
+      float: left;
+      width: 45px;
+      .iconfont {
+        font-size: 22px;
+      }
+    }
+    span:last-child {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  .check_Tab {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    p {
+      color: white!important;
+    }
+  }
+}

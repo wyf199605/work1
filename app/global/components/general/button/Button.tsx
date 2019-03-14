@@ -2,9 +2,9 @@
 import d = G.d;
 import tools = G.tools;
 import IComponentPara = G.IComponentPara; import Component = G.Component;
-import {DropDown} from "../../ui/dropdown/dropdown";
+import { DropDown } from "../../ui/dropdown/dropdown";
 
-export interface IButton extends IComponentPara{
+export interface IButton extends IComponentPara {
     content?: string;
     icon?: string;
     iconPre?: string;
@@ -19,13 +19,14 @@ export interface IButton extends IComponentPara{
     key?: string;
     className?: string;
     tip?: string;
+    level?: number
 }
 /**
  * 按钮组件对象
  */
-export class Button extends Component implements IButton{
+export class Button extends Component implements IButton {
 
-    private init(button: IButton){
+    private init(button: IButton) {
 
         // if(button.className){
         //     this.wrapper.classList.add(button.className);
@@ -47,19 +48,19 @@ export class Button extends Component implements IButton{
         this.tip = button.tip;
     }
 
-    public iconPre:string;
+    public iconPre: string;
 
     protected wrapperInit(): HTMLElement {
-        return <button type="button" className="btn"/>;
+        return <button type="button" className="btn" />;
     }
 
     public key: string;
 
     protected _tip: string;
-    get tip(){
+    get tip() {
         return this._tip;
     }
-    set tip(tip: string){
+    set tip(tip: string) {
         tip = tip || '';
         this._tip = tip;
         this.wrapper.title = tip;
@@ -70,9 +71,9 @@ export class Button extends Component implements IButton{
      * 类型：string
      * 默认值：空
      */
-    private _icon?:string;
-    set icon(icon:string){
-        if(tools.isEmpty(icon) || (tools.isNotEmpty(icon) && this._icon === icon)){
+    private _icon?: string;
+    set icon(icon: string) {
+        if (tools.isEmpty(icon) || (tools.isNotEmpty(icon) && this._icon === icon)) {
             return;
         }
 
@@ -83,7 +84,7 @@ export class Button extends Component implements IButton{
         let iconStr = this.iconPre === 'iconfont' ? `icon-${icon}` : icon,
             className = `${this.iconPre} button-icon ${iconStr}`;
 
-        if(icon === 'spinner'&& this._isLoading) {
+        if (icon === 'spinner' && this._isLoading) {
             className = 'spinner';
         }
 
@@ -92,14 +93,14 @@ export class Button extends Component implements IButton{
 
         this._icon = icon;
     }
-    get icon(){
+    get icon() {
         return this._icon;
     }
 
     //
-    private _iconEl? : HTMLElement;
-    get iconEl(){
-        if(!this._iconEl){
+    private _iconEl?: HTMLElement;
+    get iconEl() {
+        if (!this._iconEl) {
             this._iconEl = d.query('i', this.wrapper);
         }
         return this._iconEl;
@@ -109,16 +110,16 @@ export class Button extends Component implements IButton{
      * 按钮颜色
      * primary|info|success|warning|error
      */
-    private _color:string;
-    set color(color:string){
-        if(tools.isEmpty(color)){
+    private _color: string;
+    set color(color: string) {
+        if (tools.isEmpty(color)) {
             return;
         }
         this.wrapper.classList.remove("button-" + this._color);
         this.wrapper.classList.add("button-" + color);
         this._color = color;
     }
-    get color(){
+    get color() {
         return this._color;
     }
 
@@ -127,16 +128,16 @@ export class Button extends Component implements IButton{
      * 类型：string
      * 默认值：default|ghost|text|dashed
      */
-    private _type?:string;
-    set type(type:string){
+    private _type?: string;
+    set type(type: string) {
         //若已经初始化过按钮类型，则删除之前添加的样式
-        if(this._type) {
+        if (this._type) {
             this.wrapper.classList.remove(`button-type-${this._type}`);
         }
-        this._type = tools.isEmpty(type)?'default':type;
-        this.wrapper.classList.add("button-type-"+this._type);
+        this._type = tools.isEmpty(type) ? 'default' : type;
+        this.wrapper.classList.add("button-type-" + this._type);
     }
-    get type(){
+    get type() {
         return this._type;
     }
 
@@ -145,13 +146,13 @@ export class Button extends Component implements IButton{
      * 类型：string
      * 默认值：操作,如果icon不为空则默认值为''
      */
-    private _content:string;
-    set content(content:string){
-        content = tools.isEmpty(content)? (tools.isEmpty(this._icon) ? '操作' : ''): content;
-        if(!tools.isEmpty(content)) {
-            let contentWrapper = d.query('span',this.wrapper);
+    private _content: string;
+    set content(content: string) {
+        content = tools.isEmpty(content) ? (tools.isEmpty(this._icon) ? '操作' : '') : content;
+        if (!tools.isEmpty(content)) {
+            let contentWrapper = d.query('span', this.wrapper);
             //不存在则创建容器存放之(放在容器的第一个节点处)
-            if(!contentWrapper) {
+            if (!contentWrapper) {
                 contentWrapper = <span>{content}</span>;
                 this.wrapper.appendChild(contentWrapper);
             }
@@ -162,20 +163,20 @@ export class Button extends Component implements IButton{
             this._content = content;
         }
     }
-    get content(){
+    get content() {
         return this._content;
     }
 
     /**
      * 下拉列表
      * */
-    private _dropDown?:DropDown;
-    set dropDown(dropDown:DropDown) {
-        if(!tools.isEmpty(dropDown)) {
+    private _dropDown?: DropDown;
+    set dropDown(dropDown: DropDown) {
+        if (!tools.isEmpty(dropDown)) {
             let pos = <span className="iconfont icon-expanse iconPos"></span>;
             this.wrapper.classList.add('dropdown-toggle');
             this.wrapper.appendChild(pos);
-            this.onClick = ()=>{
+            this.onClick = () => {
                 this._dropDown.toggle();
             };
         }
@@ -200,18 +201,18 @@ export class Button extends Component implements IButton{
      * 默认值middle  |small|large
      */
     private _size?: string;
-    set size(size:string){
+    set size(size: string) {
         size = tools.isEmpty(size) ? 'middle' : size;
         //若已经初始化过按钮尺寸，则删除之前添加的样式
-        if(this._size) {
+        if (this._size) {
             this.wrapper.classList.remove(`button-${this._size}`);
         }
-        if(size) {
+        if (size) {
             this.wrapper.classList.add(`button-${size}`);
             this._size = size;
         }
     }
-    get size(){
+    get size() {
         return this._size;
     }
 
@@ -220,15 +221,15 @@ export class Button extends Component implements IButton{
      * 类型：Boolean
      * 默认值：false
      */
-    private _isDisabled?:boolean;
-    set isDisabled(isDisabled:boolean){
-        if(isDisabled)
+    private _isDisabled?: boolean;
+    set isDisabled(isDisabled: boolean) {
+        if (isDisabled)
             this.wrapper.classList.add('disabled');
         else
             this.wrapper.classList.remove('disabled');
-        this._isDisabled = tools.isEmpty(isDisabled)?false:isDisabled;
+        this._isDisabled = tools.isEmpty(isDisabled) ? false : isDisabled;
     }
-    get isDisabled(){
+    get isDisabled() {
         return this._isDisabled;
     }
 
@@ -237,12 +238,12 @@ export class Button extends Component implements IButton{
      * 类型：Boolean
      * 默认值：false
      */
-    private _isLoading:boolean;
-    set isLoading(isLoading:boolean){
+    private _isLoading: boolean;
+    set isLoading(isLoading: boolean) {
         this._isLoading = tools.isEmpty(isLoading) ? false : isLoading;
-        if(this._isLoading) {
+        if (this._isLoading) {
             this.icon = 'spinner';
-        }else{
+        } else {
             //移除原有icon
             this.iconEl && d.remove(this._iconEl);
             this._icon = null;
@@ -250,7 +251,7 @@ export class Button extends Component implements IButton{
         }
         this._isLoading = isLoading;
     }
-    get isLoading(){
+    get isLoading() {
         return this._isLoading;
     }
 
@@ -259,12 +260,12 @@ export class Button extends Component implements IButton{
      * 类型：Boolean
      * 默认值：true
      */
-    private _isShow:boolean;
-    set isShow(isShow:boolean){
-        this._isShow = tools.isEmpty(isShow)?true:isShow;
+    private _isShow: boolean;
+    set isShow(isShow: boolean) {
+        this._isShow = tools.isEmpty(isShow) ? true : isShow;
         d.classToggle(this.wrapper, 'hide', !this._isShow);
     }
-    get isShow(){
+    get isShow() {
         return this._isShow;
     }
 
@@ -273,34 +274,39 @@ export class Button extends Component implements IButton{
      * 类型：EventListener
      * 默认值：无
      */
-    private _onClick:EventListener;
-    set onClick(callback:EventListener) {
-        if(!tools.isEmpty(callback)) {
+    private _onClick: EventListener;
+    set onClick(callback: EventListener) {
+        if (!tools.isEmpty(callback)) {
             d.off(this.wrapper, 'click', this._onClick);
-            this._onClick = function(e: MouseEvent) {
+            this._onClick = function (e: MouseEvent) {
                 e && e.stopPropagation();
                 callback.call(this, e)
             };
             d.on(this.wrapper, 'click', this._onClick);
         }
     }
-    get onClick(){
+    get onClick() {
         return this._onClick;
     }
 
-    getDom() : HTMLElement{
+    getDom(): HTMLElement {
         return this.wrapper;
     }
     constructor(private button?: IButton) {
         super(button);
-        if(tools.isEmpty(button)){
+        if (!button.level) {
+            if (button.level !== 0) {
+                button.level = 10
+            }
+        }
+        if (tools.isEmpty(button)) {
             button = {};
         }
 
         this.init(button);
     }
 
-    destroy(){
+    destroy() {
         this._dropDown && this._dropDown.destroy();
         super.destroy();
     }
