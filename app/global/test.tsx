@@ -8,16 +8,35 @@ import {SvgDraw} from "./utils/svgDraw";
 import {SelectBox} from "./components/form/selectBox/selectBox";
 import {RadioBoxGroup} from "./components/form/selectBoxGroup/selectBoxGroup";
 import {RadioBox} from "./components/form/radiobox/radioBox";
+import {CustomBoxLayout} from "./components/view/customLayout/customBoxLayout";
 
-function fn(string, substitute) {
-    if(substitute === 'ES6') {
-        substitute = 'ES2015'
-    }
-    return substitute + string[1];
-}
-
-const version = 'ES6';
-const result = fn`${version} was a major update`;
-
-console.log(result);
+<CustomBoxLayout items={[{
+    width: 250,
+    height: 250,
+    resize: true, // 是否可改变宽高
+    fullScreen: false, // 是否可以放大
+    content: <h1>测试块11111111</h1>,
+    drag:true,
+}, {
+    width: 200,
+    height: 200,
+    resize: false, // 是否可改变宽高
+    fullScreen: false, // 是否可以放大
+    content: <h1>测试块2222222</h1>,
+    drag:true,
+}, {
+    width: 100,
+    height: 100,
+    resize: true, // 是否可改变宽高
+    fullScreen: false, // 是否可以放大
+    content: <h1>测试块333333333</h1>,
+    drag:true,
+}, {
+    width: 300,
+    height: 300,
+    resize: false, // 是否可改变宽高
+    fullScreen: false, // 是否可以放大
+    content: <h1>测试块4444444</h1>,
+    drag:true,
+}]}/>
 

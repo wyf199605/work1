@@ -75,18 +75,13 @@ export class Authorized extends BasicPage {
     }).then(({ response }) => {
       let encodePassword = response.body.bodyList[0];
       this.state.password = encodePassword;
-      BwRule.Ajax.fetch(CONF.siteUrl + "/auth", {
-        type: 'post',
-        data: this.state
-      }).then(({ response }) => {
-
-      }).catch((ev) => {
-
-      });
+      BwRule.Ajax.axios(CONF.siteUrl + "/auth", 'post', this.state).then((e) => {
+        let res=JSON.parse(e);
+        res.code === 0 && window.location.replace(res.url);
+      }).catch((e) => {
+        Modal.alert(e.error || "授权失败，请重试")
+      })
     })
-
-
-
   }
   /**
     * 页面模板
