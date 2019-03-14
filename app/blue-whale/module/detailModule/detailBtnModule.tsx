@@ -183,7 +183,7 @@ export class DetailBtnModule extends DetailModule{
             let data = this.detailData;
             box && box.children.forEach((btn: Button) => {
                 let btnUi = btn.custom as R_Button;
-                if(tools.isEmpty(btnUi.judgefield)){
+                if(tools.isEmpty(btnUi && btnUi.judgefield)){
                     return;
                 }
                 let judges = btnUi.judgefield.split(','),
