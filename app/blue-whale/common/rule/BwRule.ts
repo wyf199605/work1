@@ -1,5 +1,5 @@
 /// <amd-module name="BwRule"/>
-import {Modal} from "../../../global/components/feedback/modal/Modal";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
 import CONF = BW.CONF;
 import sys = BW.sys;
 import Rule = G.Rule;
@@ -39,15 +39,15 @@ export class BwRule extends Rule {
     static QUERY_OP: ListItem[] = [
         // {}, // {value: 0,text: 'and'}
         // {}, //{value: 1,text: 'or' }
-        {value: 2, text: '等于'},
-        {value: 3, text: '大于'},
-        {value: 4, text: '大于等于'},
-        {value: 5, text: '小于'},
-        {value: 6, text: '小于等于'},
-        {value: 7, text: '介于'}, // between
-        {value: 8, text: '包含于'}, // in
-        {value: 9, text: '包含'}, // like
-        {value: 10, text: '为空'} // isnull
+        { value: 2, text: '等于' },
+        { value: 3, text: '大于' },
+        { value: 4, text: '大于等于' },
+        { value: 5, text: '小于' },
+        { value: 6, text: '小于等于' },
+        { value: 7, text: '介于' }, // between
+        { value: 8, text: '包含于' }, // in
+        { value: 9, text: '包含' }, // like
+        { value: 10, text: '为空' } // isnull
     ];
 
     static SQL_SF = null;
@@ -143,7 +143,7 @@ export class BwRule extends Rule {
                         latitude: gps.latitude,
                         longitude: gps.longitude
                     };
-                    setting.headers = Object.assign(setting.headers || {}, {position: JSON.stringify(gpsObj)});
+                    setting.headers = Object.assign(setting.headers || {}, { position: JSON.stringify(gpsObj) });
 
                     // 设置loading加载框
                     let loading: Loading;
@@ -155,15 +155,15 @@ export class BwRule extends Rule {
 
                     super.fetch(url, setting).then((result) => {
                         // debugger;
-                        let {response, xhr} = result;
-                        response.errorCode=response.errorCode?Number(response.errorCode):null;
+                        let { response, xhr } = result;
+                        response.errorCode = response.errorCode ? Number(response.errorCode) : null;
                         if (tools.isEmpty(response)) {
                             alert('后台数据为空');
                             reject(Ajax.errRes(xhr, 'emptyData', ''));
                             return;
                         }
                         if (typeof response === 'object') {
-                        
+
                             let isLogout = response.errorCode === 50001;
                             if (isLogout) {
                                 Modal.confirm({
@@ -269,6 +269,41 @@ export class BwRule extends Rule {
         static fetch(url: string, setting: IRAjaxSetting = {}) {
             return new BwRule.Ajax().fetch(url, setting);
         }
+        static axios(url: string, type: string, data: FormData) {
+            return new Promise((resolve, reject) => {
+                let method = type.toUpperCase();
+                //创建xhr对象 
+                let xhr = new XMLHttpRequest();
+                if (method === "POST") {
+                    xhr.open(method, url, true);
+                    //发送数据
+                    try {
+                        let FormData = []
+                        FormData.push(data);
+                        xhr.send(JSON.stringify(FormData))
+                    } catch (e) {
+                        console.error('发送失败', e)
+                    }
+                }
+                //传输成功完成
+                xhr.onload = function (event) {
+                    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                        resolve(xhr.response)
+                    } else {
+                        reject(xhr.response)
+                    }
+                }
+                //网络等错误
+                xhr.onerror = function (event) {
+                    reject(xhr.response)
+                }
+                //超时
+                xhr.ontimeout = function (event) {
+                    reject(xhr.response)
+                }
+
+            })
+        }
     };
 
     /**
@@ -277,13 +312,13 @@ export class BwRule extends Rule {
      * @param {Array} fields 原始cols数据
      * @return {Array}
      */
-    static createCrossTableCols(metaData: string[], fields: R_Field[]): IFastTableCol[][]{
+    static createCrossTableCols(metaData: string[], fields: R_Field[]): IFastTableCol[][] {
 
         let tree: TreeNodeBase = new TreeNodeBase({
-                content: {
-                    name: '__nothing'
-                }
-            }),
+            content: {
+                name: '__nothing'
+            }
+        }),
             count = 0,
             metaArr: Array<string[]> = metaData.map((name) => {
                 let arr = name.split('.');
@@ -297,20 +332,20 @@ export class BwRule extends Rule {
                 let children = parent.find((child) => {
                     return child.content.name === name;
                 });
-                if(children && tools.isNotEmpty(children[0])){
+                if (children && tools.isNotEmpty(children[0])) {
                     parent = children[0];
-                    parent.content.colspan ++;
-                }else{
+                    parent.content.colspan++;
+                } else {
                     let content: obj = {
                         name: name,
                         colspan: 1,
                         rowspan: 1,
                         title: fieldName
                     };
-                    if(index === arr.length - 1){
+                    if (index === arr.length - 1) {
                         content.rowspan = count - index;
-                        for(let field of fields){
-                            if(field.name === fieldName){
+                        for (let field of fields) {
+                            if (field.name === fieldName) {
                                 content.field = field;
                                 break;
                             }
@@ -323,17 +358,17 @@ export class BwRule extends Rule {
             })
 
         });
-        let fieldArr: IFastTableCol[][] = Array.from({length: count}, () => []);
+        let fieldArr: IFastTableCol[][] = Array.from({ length: count }, () => []);
         tree.each((tnode, deep) => {
             let content = tnode.content;
-            if(Array.isArray(fieldArr[deep - 1]) && content !== '__nothing'){
+            if (Array.isArray(fieldArr[deep - 1]) && content !== '__nothing') {
                 let field: IFastTableCol = {
                     name: content.name,
                     colspan: content.colspan,
                     rowspan: content.rowspan,
                     title: content.title,
                 };
-                if('field' in content){
+                if ('field' in content) {
                     let col: R_Field = content.field;
                     field = Object.assign({}, field, {
                         title: col.caption,
@@ -483,7 +518,7 @@ export class BwRule extends Rule {
                 sys.window.download(url);
             } else {
                 BwRule.Ajax.fetch(url)
-                    .then(({response}) => {
+                    .then(({ response }) => {
                         rData = response.data[0];
                         //地址加上域名
                         if (rData.IMGADDR) {
@@ -510,15 +545,15 @@ export class BwRule extends Rule {
                         // para.callback(action, rData, _linkAct);
                         let filename = rData.FILENAME || '附件';
                         switch (action) {
-                            case _linkAct.OPEN_WIN :
-                                sys.window.open({url: rData.url}, para.openUrl);
+                            case _linkAct.OPEN_WIN:
+                                sys.window.open({ url: rData.url }, para.openUrl);
                                 break;
-                            case _linkAct.SHOW_IMGS :
+                            case _linkAct.SHOW_IMGS:
                                 let img = [],
                                     len = rData.PAGENUM,
                                     imgAddr = rData.IMGADDR;
                                 for (let i = 1, d, item; i <= len; i++) {
-                                    d = {page: i};
+                                    d = { page: i };
                                     item = BwRule.parseURL(imgAddr, d);
                                     img.push(item)
                                 }
@@ -537,14 +572,14 @@ export class BwRule extends Rule {
                                     ImgModal.show(imgData);
                                 }
                                 break;
-                            case _linkAct.SHOW_IMG :
+                            case _linkAct.SHOW_IMG:
                                 if (sys.os === 'ad' || sys.os === 'ip') {
                                     sys.window.openImg(rData.DOWNADDR);
                                 } else {
                                     sys.window.download(rData.DOWNADDR, filename);
                                 }
                                 break;
-                            case _linkAct.DOWNLOAD :
+                            case _linkAct.DOWNLOAD:
                                 sys.window.download(rData.DOWNADDR, filename);
                                 break;
                             default:
@@ -553,7 +588,7 @@ export class BwRule extends Rule {
             }
         } else {
             // action = _linkAct.OPEN_WIN;
-            sys.window.open({url, gps: para.needGps}, para.openUrl);
+            sys.window.open({ url, gps: para.needGps }, para.openUrl);
             // para.callback(action, rData, _linkAct);
         }
     };
@@ -606,7 +641,7 @@ export class BwRule extends Rule {
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + data.url, {
                     type: 'POST',
                     data: JSON.stringify(postData),
-                }).then(({response}) => {
+                }).then(({ response }) => {
                     if (tools.keysVal(response, 'body', 'bodyList', 0)) {
                         this.checkValue(response, postData, confirm)
                     } else {
@@ -632,7 +667,7 @@ export class BwRule extends Rule {
         }
     }
 
-    static getFileInfo(name: string, data: string){
+    static getFileInfo(name: string, data: string) {
         return G.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.fileInfo, {
             "field_name": name,
             [name.toLowerCase()]: data
@@ -642,7 +677,7 @@ export class BwRule extends Rule {
     static getLookUpOpts(field: R_Field, data?: obj): Promise<ListItem[]> {
         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.dataAddr, data), {
             needGps: field.dataAddr.needGps
-        }).then(({response}) => {
+        }).then(({ response }) => {
             return response.data.map(data => {
                 return {
                     text: data[field.name],
@@ -867,7 +902,7 @@ export class BwRule extends Rule {
         },
         3: function (reqAddr: R_ReqAddr, data?: obj | obj[]) {
             return {
-                addr: tools.url.addObj(reqAddr.dataAddr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())}),
+                addr: tools.url.addObj(reqAddr.dataAddr, { 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) }),
                 data: {}
             }
         }
@@ -883,25 +918,25 @@ export class BwRule extends Rule {
         });
     }
 
-    static reqAddrMenu(menu: IBW_Menu){
+    static reqAddrMenu(menu: IBW_Menu) {
         let addr = menu.menuPath;
         if (addr) {
-            if(addr.type === 'front_custom'){
-                if(addr.dataAddr === 'ChangeProject'){
+            if (addr.type === 'front_custom') {
+                if (addr.dataAddr === 'ChangeProject') {
                     let currentProject = JSON.parse(localStorage.getItem('userInfo')).platformName || '';
-                    if(tools.isNotEmpty(currentProject)){
+                    if (tools.isNotEmpty(currentProject)) {
                         require(['ChangeProject'], (c) => {
                             new c.ChangeProject({
                                 current: currentProject
                             });
                         });
-                    }else {
+                    } else {
                         Modal.toast('当前用户无所属项目！');
                     }
                 }
-            }else {
+            } else {
                 let url = CONF.siteUrl + BwRule.reqAddr(addr);
-                sys.window.open({url, title: menu.menuName})
+                sys.window.open({ url, title: menu.menuName })
             }
         }
     }
