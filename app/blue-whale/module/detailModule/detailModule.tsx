@@ -396,9 +396,9 @@ export class DetailModule extends AGroupTabItem {
         }
 
         let tableAddr = this.ui.tableAddr,
-            param = tableAddr.param.filter((param) => {
+            param = tableAddr.param ? tableAddr.param.filter((param) => {
                 return param.itemId === this.ui.itemId;
-            });
+            }) : null;
         if (tools.isEmpty(param)) {
             return null;
         }
