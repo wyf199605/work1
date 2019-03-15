@@ -40,7 +40,7 @@ export class DetailBtnModule extends DetailModule {
         let handler;
         this.on(DetailModule.EVT_RENDERED, handler = () => {
             let btn = this.btnManager.box.getItem('edit');
-            this.autoEdit && btn.wrapper && btn.wrapper.click();
+            btn && this.autoEdit && btn.wrapper && btn.wrapper.click();
             this.off(DetailModule.EVT_RENDERED, handler)
         });
     }
@@ -70,7 +70,7 @@ export class DetailBtnModule extends DetailModule {
                             this.dataManager && !this.dataManager.toNext()
                         }, 500)
                     });
-                     box.addItem(nextBtn, 1);
+                    box.addItem(nextBtn, 1);
                 }
             },
             initState: (box: InputBox = inputBox) => {
@@ -97,11 +97,11 @@ export class DetailBtnModule extends DetailModule {
                         this.btnManager.box.delItem('next');
                     }
                     if (dataManager.isToPrev) {
-                       box.addItem(prevBtn);
+                        box.addItem(prevBtn);
                     } else {
                         this.btnManager.box.delItem('prev');
                     }
-                    
+
                     // nextBtn && (nextBtn.isDisabled = !dataManager.isToNext);
                     // prevBtn && (prevBtn.isDisabled = !dataManager.isToPrev);
                 }
