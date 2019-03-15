@@ -223,11 +223,11 @@ export class Pagination extends Component {
             isRefresh: ifRefresh
         }).then((isEnd = false) => {
             if (tools.isEmpty(this.paging) && isEnd) {
+                this.totalHeight = this.wrapper.offsetHeight;
                 this.isEnd = isEnd;
             }
         }).finally(() => {
             this.spinner && this.spinner.hide();
-            this.totalHeight = this.wrapper.offsetHeight;
             this.loading = false;
         })
     }
