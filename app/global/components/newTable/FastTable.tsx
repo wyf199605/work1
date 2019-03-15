@@ -2868,6 +2868,7 @@ export class FastTable extends Component {
         this.editing = true;
 
         this.tablesEach((table, index) => {
+            table.off(TableBase.EVT_EDITED);
             table.on(TableBase.EVT_EDITED, (ev) => {
                 if (ev.row === 0 && this.editor.autoInsert) {
                     let num = this.rowAdd(void 0, 0);
@@ -2882,6 +2883,7 @@ export class FastTable extends Component {
                     }
                 }
             });
+            table.off(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index]);
             table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell: TableDataCell) => {
                 let index = cell.row.index;
                 if(!this.rows[index]){

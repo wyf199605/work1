@@ -2867,9 +2867,8 @@ export class BwTableModule extends Component {
         };
 
         let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
-            let paramData: obj = {
-                allData: {}
-            };
+            let paramData: obj = {};
+
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
@@ -2878,6 +2877,9 @@ export class BwTableModule extends Component {
                         !isPivot);
                     if (data) {
                         paramData[key] = data;
+                        if(!paramData.allData){
+                            paramData.allData = {};
+                        }
                         paramData.allData[key] = tableData[dataKey]
                     }
                 }
@@ -2951,17 +2953,19 @@ export class BwTableModule extends Component {
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
-                                        let data = saveData['allData']['update'] || [],
-                                            pictureAddrList = this.ui.pictureAddrList;
+                                        if(tools.isNotEmpty(saveData)){
+                                            let data = saveData['allData']['update'] || [],
+                                                pictureAddrList = this.ui.pictureAddrList;
 
-                                        if (pictureAddrList) {
-                                            pictureAddrList.forEach((addr) => {
-                                                this.updateImgVersion(data.map((rowData) => {
-                                                    return tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
-                                                }));
-                                            })
+                                            if (pictureAddrList) {
+                                                pictureAddrList.forEach((addr) => {
+                                                    this.updateImgVersion(data.map((rowData) => {
+                                                        return tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
+                                                    }));
+                                                })
+                                            }
+                                            delete saveData['allData'];
                                         }
-                                        delete saveData['allData'];
                                         resolve(saveData);
                                     }).catch((msg) => reject(msg));
                                 }, 100);

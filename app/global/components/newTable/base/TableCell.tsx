@@ -341,8 +341,8 @@ export class TableDataCell extends TableCell {
             }
             this.table.tableData.update({[this.name]: data}, this.row.index);
         }
-        this.editing && (this.cancelEdit());
         this.render();
+        this.editing && (this.cancelEdit());
         this.renderPromise.finally(() => {
             let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
             tools.isNotEmpty(events) && events.forEach((fun) => {
@@ -372,56 +372,54 @@ export class TableDataCell extends TableCell {
             }
         }
         // this.wrapper && (this.wrapper.innerHTML = '');
-        this.renderPromise.finally(() => {
-            this.table.addStack(this.renderPromise = new Promise((resolve) => {
-                if(data instanceof Node) {
-                    this.wrapper && d.append(this.wrapper, data);
-                    resolve();
-                }else{
-                    this.format(data).then((formated) => {
-                        if(formated) {
-                            let {classes, text, color, bgColor, data} = formated;
-                            if(text instanceof Node){
-                                this.wrapper && d.append(this.wrapper, text);
-                            }else {
-                                text = tools.isEmpty(text) ? '' : text;
-                                this._text = text + '';
-                                if(this.wrapper){
-                                    d.append(this.wrapper, document.createTextNode(this._text));
-                                }
-                            }
-                            this.width = getTextWidth(this.text);
-                            this.initMoreBtn();
-                            this.classes = classes;
-                            this.color = color;
-                            this.background = bgColor;
-                            if(data){
-                                this.table.tableData.update({[this.name]: data}, this.row.index);
+        this.table.addStack(this.renderPromise = new Promise((resolve) => {
+            if(data instanceof Node) {
+                this.wrapper && d.append(this.wrapper, data);
+                resolve();
+            }else{
+                this.format(data).then((formated) => {
+                    if(formated) {
+                        let {classes, text, color, bgColor, data} = formated;
+                        if(text instanceof Node){
+                            this.wrapper && d.append(this.wrapper, text);
+                        }else {
+                            text = tools.isEmpty(text) ? '' : text;
+                            this._text = text + '';
+                            if(this.wrapper){
+                                d.append(this.wrapper, document.createTextNode(this._text));
                             }
                         }
-                    }).finally(() => {
-                        resolve();
-                    });
-                }
-            }).then(() => {
-                !this.table.isWrapLine && this.initMoreBtn();
-
-                if(this.table.editing){
-                    let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
-                        rowData = null;
-                    for(let data of this.table.tableData.edit.getOriginalData()){
-                        if(data[TableBase.GUID_INDEX] === guidIndex){
-                            rowData = data;
-                            break;
+                        this.width = getTextWidth(this.text);
+                        this.initMoreBtn();
+                        this.classes = classes;
+                        this.color = color;
+                        this.background = bgColor;
+                        if(data){
+                            this.table.tableData.update({[this.name]: data}, this.row.index);
                         }
                     }
-                    // console.log(rowsData);
-                    let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
-                    // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
-                    this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
+                }).finally(() => {
+                    resolve();
+                });
+            }
+        }).then(() => {
+            !this.table.isWrapLine && this.initMoreBtn();
+
+            if(this.table.editing){
+                let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
+                    rowData = null;
+                for(let data of this.table.tableData.edit.getOriginalData()){
+                    if(data[TableBase.GUID_INDEX] === guidIndex){
+                        rowData = data;
+                        break;
+                    }
                 }
-            }))
-        })
+                // console.log(rowsData);
+                let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
+                // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
+                this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
+            }
+        }))
 
     }
 
@@ -563,10 +561,7 @@ export class TableDataCell extends TableCell {
 
     triggerEditCancel(){
         this.renderPromise.finally(() => {
-            let events = this.table.eventHandlers[TableBase.EVT_CELL_EDIT_CANCEL];
-            tools.isNotEmpty(events) && events.forEach((fun) => {
-                typeof fun === 'function' && fun(this);
-            });
+            this.table.trigger(TableBase.EVT_CELL_EDIT_CANCEL, this);
         });
     }
 }
