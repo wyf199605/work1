@@ -46,11 +46,12 @@ export class DetailBtnModule extends DetailModule {
     }
 
     protected paging = (() => {
-        let nextBtn,
-            prevBtn,
-            handler;
+        let inputBox: InputBox,
+            nextBtn,
+            prevBtn;
         return {
             init: (box: InputBox) => {
+                inputBox = box;
                 if (!prevBtn) {
                     prevBtn = new Button({
                         content: '上一页',
@@ -71,18 +72,17 @@ export class DetailBtnModule extends DetailModule {
                     });
                     // box.addItem(nextBtn, 1);
                 }
-                this.off(DetailModule.EVT_RENDERED, handler);
-                this.on(DetailModule.EVT_RENDERED, handler = () => {
-                    this.paging.initState(box);
-                });
             },
-            initState: (box: InputBox) => {
+            initState: (box: InputBox = inputBox) => {
+                if(!inputBox){
+                    return;
+                }
                 // console.log(box)
                 let dataManager = this.dataManager;
                 if (dataManager) {
                     let preIndex = null,
                         nextIndex = null;
-                    for (var i = 0; i < box.children.length; i++) {
+                    for (let i = 0; i < box.children.length; i++) {
                         let item = box.children[i];
                         if (item.content === "上一页") {
                             preIndex = i;
@@ -214,10 +214,23 @@ export class DetailBtnModule extends DetailModule {
     protected btnManager = (() => {
         let box: InputBox;
 
-        let initButton = (btn: R_Button): Button => {
-          //  console.log(btn)
+        let initStatus = () => {
+            let data = this.detailData;
+            box && box.children.forEach((btn: Button) => {
+                let btnUi = btn.custom as R_Button;
+                if(tools.isEmpty(btnUi && btnUi.judgefield)){
+                    return;
+                }
+                let judges = btnUi.judgefield.split(','),
+                    flag = judges.every((judge) => tools.isNotEmpty(data[judge]) ? data[judge] === 1 : true);
+                btn.isDisabled = !flag;
+            })
+        };
+
+        let initButton = (btn: R_Button): Button =>{
             return new Button({
                 content: btn.caption,
+                custom: btn,
                 level: btn.level_no,
                 onClick: () => {
                     // 流程引擎操作按钮
@@ -247,7 +260,7 @@ export class DetailBtnModule extends DetailModule {
                         }).catch(err => {
                             console.log(err);
                         });
-                    } else (btn.openType.indexOf('flow') > -1) {
+                    } else if(btn.openType.indexOf('flow') > -1) {
 
                         let btnUi = btn as R_Button,
                             { multiselect } = btnUi,
@@ -271,7 +284,6 @@ export class DetailBtnModule extends DetailModule {
                             })
                         }
                         let field = btn.openType.split('-')[1];
-                        console.log(field)
                         switch (field) {
                             case 'look': {
                                 BwRule.Ajax.fetch(dataAddr).then(({ response }) => {
