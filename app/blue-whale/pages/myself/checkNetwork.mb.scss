@@ -1,0 +1,124 @@
+$bgColor:#005bac;
+@mixin postion($top:0px, $bottom:0px, $left:0px, $right:0px) {
+  position: absolute;
+  top: $top;
+  bottom: $bottom;
+  left: $left;
+  right: $right;
+}
+
+.check_netWork {
+  @include postion(0px, 0px, 0px, 0px);
+  font-size: 18px;
+  .unselectable {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  /* css formats for the gauge */
+  .gauge .domain {
+    stroke-width: 2px;
+    stroke: #fff;
+  }
+  .gauge .tick line {
+    stroke: #fff;
+    stroke-width: 2px;
+  }
+  .gauge line {
+    stroke: #fff;
+  }
+  .gauge .arc,
+  .gauge .cursor {
+    opacity: 0;
+  }
+  .gauge .major {
+    fill: #fff;
+    font-size: 20px;
+    font-family: 'Play', verdana, sans-serif;
+    font-weight: normal;
+  }
+  .gauge .indicator {
+    stroke: #EE3311;
+    fill: #000;
+    stroke-width: 4px;
+  }
+  /* css formats for the segment display */
+  .segdisplay .on {
+    fill: #00FFFF;
+  }
+  .segdisplay .off {
+    fill: #00FFFF;
+    opacity: 0.15;
+  }
+  .check_wrap {
+    background-color: $bgColor;
+    color: white;
+  }
+  .check_Header {
+    position: relative;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 18px;
+    margin: 0px;
+    span:first-child {
+      float: left;
+      width: 45px;
+      .iconfont {
+        font-size: 22px;
+      }
+    }
+    span:last-child {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  .check_Tab {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    p {
+      color: white!important;
+      font-size: 16px!important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      &::after {
+        content: "";
+        display: inline-block;
+        width: 30px;
+        margin-top: 8px;
+        border-bottom: 2px solid white;
+        visibility: hidden;
+      }
+    }
+    .active {
+      &::after {
+        visibility: visible;
+      }
+    }
+  }
+  .check_pane {
+    height: 327px;
+    width: 100%;
+  }
+  .check_btn {
+    font-size: 16px;
+    border: none;
+    border-radius: 28px;
+    width: 86%;
+    height: 50px;
+    color: white;
+    margin-top: 50px;
+    margin-left: 7%;
+    margin-right: 7%;
+    background-color: #005bac;
+  }
+}
