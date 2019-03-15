@@ -2204,7 +2204,6 @@ export class BwTableModule extends Component {
             //btnsUi = [{ "caption": "测试设计", "title": "测试设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 10 }, { "caption": "流程设计", "title": "流程设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 0 }];
 
             Array.isArray(btnsUi) && btnsUi.forEach((btnUi) => {
-                console.log(btnUi)
                 let btn = new Button({
                     icon: btnUi.icon,
                     content: btnUi.title,

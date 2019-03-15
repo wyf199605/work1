@@ -10,10 +10,8 @@ export class ListDetailPage extends BasicPage {
             dom: para.dom,
             url: this.url
         }));
-        if (para.uiType !== 'detail') {
-            this.on(BwRule.EVT_REFRESH, () => {
-                detailModule.refresh();
-            })
-        }
+        this.on(BwRule.EVT_REFRESH, () => {
+            detailModule.refresh();
+        });
     }
 }
