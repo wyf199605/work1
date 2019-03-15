@@ -218,7 +218,7 @@ export class InputBox extends Component {
         for (let i = 0; i < this.children.length; i++) {
             let c = this.children[i];
             childrenWidth += c.wrapper.offsetWidth;
-            if ((this.limitCount !== -1 && i >= this.limitCount+1) || childrenWidth > wrapperWidth) {
+            if ((this.limitCount !== -1 && i >= this.limitCount + 1) || childrenWidth > wrapperWidth) {
                 if (isFirst) {
                     isFirst = false;
                     this._lastNotMoreIndex = i;
@@ -379,7 +379,6 @@ export class InputBox extends Component {
         this.children && this.children.length > 1 && this.children.sort((obj1: any, obj2: any) => {
             var val1 = obj1.button.level;
             var val2 = obj2.button.level;
-            // console.log(val1, val2)
             if (val1 < val2) {
                 return -1;
             } else if (val1 > val2) {
@@ -388,7 +387,6 @@ export class InputBox extends Component {
                 return 0;
             }
         })
-        //console.log(this.children)
         this.responsive();
     }
 
@@ -428,6 +426,7 @@ export class InputBox extends Component {
             if (curCom) {
                 this.children[item].remove();
                 this.children.splice(item, 1);
+                this.sort();
             }
             return curCom;
         }
@@ -438,6 +437,7 @@ export class InputBox extends Component {
                 if (d) {
                     this.children.splice(index, 1);
                     d.remove();
+                    this.sort();
                 }
                 return curCom;
             }
