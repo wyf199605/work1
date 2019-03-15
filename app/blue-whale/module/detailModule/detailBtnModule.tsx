@@ -60,7 +60,7 @@ export class DetailBtnModule extends DetailModule {
                             this.dataManager && !this.dataManager.toPrev()
                         }, 500)
                     });
-                    // box.addItem(prevBtn, 0);
+                    box.addItem(prevBtn, 0);
                 }
                 if (!nextBtn) {
                     nextBtn = new Button({
@@ -70,40 +70,40 @@ export class DetailBtnModule extends DetailModule {
                             this.dataManager && !this.dataManager.toNext()
                         }, 500)
                     });
-                    // box.addItem(nextBtn, 1);
+                     box.addItem(nextBtn, 1);
                 }
             },
             initState: (box: InputBox = inputBox) => {
-                if(!inputBox){
+                if (!inputBox) {
                     return;
                 }
-                // console.log(box)
                 let dataManager = this.dataManager;
                 if (dataManager) {
-                    let preIndex = null,
-                        nextIndex = null;
-                    for (let i = 0; i < box.children.length; i++) {
-                        let item = box.children[i];
-                        if (item.content === "上一页") {
-                            preIndex = i;
+                    // let preIndex = null,
+                    //     nextIndex = null;
+                    // for (let i = 0; i < box.children.length; i++) {
+                    //     let item = box.children[i];
+                    //     if (item.content === "上一页") {
+                    //         preIndex = i;
 
-                        }
-                        if (item.content === "下一页") {
-                            nextIndex = i;
-                        }
-                    }
+                    //     }
+                    //     if (item.content === "下一页") {
+                    //         nextIndex = i;
+                    //     }
+                    // }
                     if (dataManager.isToNext) {
-                        !nextIndex && box.addItem(nextBtn);
+                        box.addItem(nextBtn);
                     } else {
-                        box.delItem(nextIndex);
+                        this.btnManager.box.delItem('next');
                     }
                     if (dataManager.isToPrev) {
-                        !preIndex && box.addItem(prevBtn);
+                       box.addItem(prevBtn);
                     } else {
-                        box.delItem(preIndex);
+                        this.btnManager.box.delItem('prev');
                     }
-                    // nextBtn && box.delItem(index);// (nextBtn.isDisabled = !dataManager.isToNext);
-                    // prevBtn && box.delItem("上一页");// (prevBtn.isDisabled = !dataManager.isToPrev);
+                    
+                    // nextBtn && (nextBtn.isDisabled = !dataManager.isToNext);
+                    // prevBtn && (prevBtn.isDisabled = !dataManager.isToPrev);
                 }
             }
         }
@@ -218,7 +218,7 @@ export class DetailBtnModule extends DetailModule {
             let data = this.detailData;
             box && box.children.forEach((btn: Button) => {
                 let btnUi = btn.custom as R_Button;
-                if(tools.isEmpty(btnUi && btnUi.judgefield)){
+                if (tools.isEmpty(btnUi && btnUi.judgefield)) {
                     return;
                 }
                 let judges = btnUi.judgefield.split(','),
@@ -227,12 +227,13 @@ export class DetailBtnModule extends DetailModule {
             })
         };
 
-        let initButton = (btn: R_Button): Button =>{
+        let initButton = (btn: R_Button): Button => {
             return new Button({
                 content: btn.caption,
                 custom: btn,
                 level: btn.level_no,
                 onClick: () => {
+
                     // 流程引擎操作按钮
                     if (btn.subType.indexOf("flow_add_sign") > -1) {
                         BwRule.Ajax.fetch(BW.CONF.ajaxUrl.useAddressList_user, {
@@ -260,7 +261,8 @@ export class DetailBtnModule extends DetailModule {
                         }).catch(err => {
                             console.log(err);
                         });
-                    } else if(btn.openType.indexOf('flow') > -1) {
+                        return false;
+                    } else if (btn.openType.indexOf('flow') > -1) {
 
                         let btnUi = btn as R_Button,
                             { multiselect } = btnUi,
@@ -303,13 +305,9 @@ export class DetailBtnModule extends DetailModule {
                                 });
                             }
                                 break;
-                            case 'add_sign':
-                                alert(1111)
-                                break;
                         }
                         return;
                     }
-
                     // 普通操作按钮
                     let data = this.getData();
                     ButtonAction.get().clickHandle(btn, data, () => { }, this.pageUrl || '');

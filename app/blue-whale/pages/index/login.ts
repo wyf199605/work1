@@ -151,7 +151,7 @@ export class LoginPage {
             container: document.body,
             header: ' ',
             body,
-            position: tools.isMb ? 'full' : '',
+            isMb:true,
             width: '730px',
             isShow: true,
             isOnceDestroy: true,

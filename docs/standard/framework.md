@@ -185,3 +185,137 @@ likeButton.onStateChange = (oldEl, newEl) => {
 
 
 
+
+# 全局状态管理
+
+## 改变数据--dispatch函数
+一个可以被不同模块/组件任意修改共享的数据状态就是魔鬼，一旦数据可以任意修改，出现问题的时候 debug 起来就非常困难，这就是老生常谈的尽量避免全局变量。
+
+模块（组件）之间可以共享数据，也可以改数据。但是我们约定，这个数据并不能直接改，你只能执行某些我允许的某些修改，而且你修改的必须显示的调用dispatch函数。
+
+```
+//全局数据
+const appState = {
+  title: {
+    text: 'React.js 小书',
+    color: 'red',
+  },
+  content: {
+    text: 'React.js 小书内容',
+    color: 'blue'
+  }
+}
+
+//dispatc函数
+function dispatch (action) {
+  switch (action.type) {
+    case 'UPDATE_TITLE_TEXT':
+      appState.title.text = action.text
+      break
+    case 'UPDATE_TITLE_COLOR':
+      appState.title.color = action.color
+      break
+    default:
+      break
+  }
+}
+
+//调用方式
+dispatch({ type: 'UPDATE_TITLE_TEXT', text: '《React.js 小书》' }) // 修改标题文本
+dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' }) // 修改标题颜色
+
+```
+
+![avator](http://huzidaha.github.io/static/assets/img/posts/7536BBF9-6563-4FD5-8359-28D3A5254EE7.png)
+
+## 创建store && 监听数据
+
+>  监听数据:全局修改数据也要去刷新组件
+
+```
+function createStore (state, stateChanger) {
+  const listeners = []
+  const subscribe = (listener) => listeners.push(listener)
+  const getState = () => state
+  const dispatch = (action) => {
+    stateChanger(state, action)
+    listeners.forEach((listener) => listener())
+  }
+  return { getState, dispatch, subscribe }
+}
+
+let appState = {
+  title: {
+    text: 'React.js 小书',
+    color: 'red',
+  },
+  content: {
+    text: 'React.js 小书内容',
+    color: 'blue'
+  }
+}
+
+function stateChanger (state, action) {
+  switch (action.type) {
+    case 'UPDATE_TITLE_TEXT':
+      state.title.text = action.text
+      break
+    case 'UPDATE_TITLE_COLOR':
+      state.title.color = action.color
+      break
+    default:
+      break
+  }
+}
+
+const store = createStore(appState, stateChanger)
+
+store.dispatch({ type: 'UPDATE_TITLE_TEXT', text: '《React.js 小书》' }) //修改数据 
+store.dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' }) // 修改数据
+
+```
+
+# 前端路由
+
+## 切换页面
+  
+  前端路由通过 # 号，捕获到具体的hash值进行刷新页面
+
+  ```
+    //路由切换
+    window.addEventListener('hashchange',function(){
+        //do something 
+        this.hashChange()
+    })
+
+  ```
+
+## 注册路由
+
+```
+  //注册函数
+  map:function(path,callback){
+   path = path.replace(/\s*/g,"");//过滤空格
+   //在有回调，且回调是一个正确的函数的情况下进行存储 以 /name 为key的对象 {callback:xx}
+   if(callback && Object.prototype.toString.call(callback) === '[object Function]' ){
+       this.routers[path] ={
+            callback:callback,//回调
+            fn:null //存储异步文件状态，用来记录异步的js文件是否下载，下文有提及
+        } 
+    }else{
+    //打印出错的堆栈信息
+        console.trace('注册'+path+'地址需要提供正确的的注册回调')
+    }
+  }
+ 
+   //调用方式
+   map('/detail',function(transition){
+  ...
+  })
+
+```
+
+## 页面传参
+
+页面与页面之前可能需要参数传递
+
