@@ -380,3 +380,12 @@ let __makeTemplateObject = (window && window['__makeTemplateObject']) || functio
     }
     return cooked;
 };
+
+// Mixins
+function applyMixins(derivedCtor: any, baseCtors: any[]) {
+    baseCtors.forEach(baseCtor => {
+        Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+            derivedCtor.prototype[name] = baseCtor.prototype[name];
+        })
+    });
+}
