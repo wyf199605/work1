@@ -97,10 +97,11 @@ export class Pagination extends Component {
     protected initSpinner() {
         this.spinner && this.spinner.hide();
         this.spinner = new Spinner({
-            el: this.wrapper.lastChild as HTMLElement,
-            type: 0,
+            el: this.textEl as HTMLElement,
+            type: Spinner.SHOW_TYPE.append,
             className: 'pagination-spinner'
         });
+        this.spinner.show();
         this._isEnd = false;
         this.textEl && this.textEl.classList.add('hide');
     }
@@ -117,6 +118,9 @@ export class Pagination extends Component {
             isPulldownRefresh: boolean;
 
         let scrollHandle = function () {
+            if(self.loading){
+                return;
+            }
             let scroll = this.scrollTop;
             if (isPulldownRefresh) {
                 if (scroll <= 0) {
@@ -204,27 +208,27 @@ export class Pagination extends Component {
         }
     }
 
+    protected loading = false;
     private changedPage(ifRefresh = false) {
+        console.log(ifRefresh);
+        this.loading = true;
         this.paging && this.paging.initItem(this._current);
+        if (tools.isMb) {
+            this.initSpinner();
+            this.paginationScrollSpinner && this.paginationScrollSpinner.cancel();
+        }
         return this.onChange({
             current: this._current,
             pageSize: this.pageSize,
             isRefresh: ifRefresh
         }).then((isEnd = false) => {
-            if (tools.isEmpty(this.paging)) {
-                if (ifRefresh) {
-                    this.initSpinner();
-                    this.paginationScrollSpinner && this.paginationScrollSpinner.cancel();
-                }
-                if (isEnd) {
-                    this.isEnd = isEnd;
-                }
-                this.spinner && this.spinner.hide();
-                this.totalHeight = this.wrapper.offsetHeight;
-            } else {
+            if (tools.isEmpty(this.paging) && isEnd) {
+                this.isEnd = isEnd;
             }
-
         }).finally(() => {
+            this.spinner && this.spinner.hide();
+            this.totalHeight = this.wrapper.offsetHeight;
+            this.loading = false;
         })
     }
 

@@ -35,6 +35,7 @@ export class DetailModule extends AGroupTabItem {
     protected fields: R_Field[]; // ui 中的fields字段数据，用于构建detailItem
     items: DetailItem[]; // 存放实例化的detailItem
     editType: 'current' | 'modal'; // 存放实例化的detailItem
+    autoEdit: boolean;
 
     onRender: Function;
     onDataChange: Function;
@@ -56,6 +57,7 @@ export class DetailModule extends AGroupTabItem {
         BwRule.beforeHandle.detail(this.ui); // 处理ui的fields字段
         this.fields = this.ui.fields;
         this.editType = (this.ui.operationType && this.ui.operationType.editType) || 'current';
+        this.autoEdit = (this.ui.operationType && this.ui.operationType.autoEdit) || false;
 
         let content = d.query('.detail-content', this.wrapper);
         this.items = this.initItems(content);
@@ -72,7 +74,6 @@ export class DetailModule extends AGroupTabItem {
             }, 100);
 
         this.clickEvent.on();
-
     }
 
     editInit(inputInit: (field: R_Field, item: DetailItem) => FormCom){

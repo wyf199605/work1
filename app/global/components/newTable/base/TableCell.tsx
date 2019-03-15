@@ -368,13 +368,6 @@ export class TableDataCell extends TableCell {
     protected renderPromise: Promise<any> = Promise.resolve();
     render(cellData?){
         // debugger
-        if(this.rendering){
-            return;
-        }
-        this.rendering = true;
-        setTimeout(() => {
-            this.rendering = false;
-        }, 200);
         let data = tools.isEmpty(cellData) ? this.data : cellData;
 
         // 移除 除了moreBtn以外的所有dom
@@ -392,54 +385,57 @@ export class TableDataCell extends TableCell {
             }
         }
         // this.wrapper && (this.wrapper.innerHTML = '');
-        this.table.addStack(this.renderPromise = new Promise((resolve) => {
-            if(data instanceof Node) {
-                this.wrapper && d.append(this.wrapper, data);
-                resolve();
-            }else{
-                this.format(data).then((formated) => {
-                    if(formated) {
-                        let {classes, text, color, bgColor, data} = formated;
-                        if(text instanceof Node){
-                            this.wrapper && d.append(this.wrapper, text);
-                        }else {
-                            text = tools.isEmpty(text) ? '' : text;
-                            this._text = text + '';
-                            if(this.wrapper){
-                                d.append(this.wrapper, document.createTextNode(this._text));
+        this.renderPromise.finally(() => {
+            this.table.addStack(this.renderPromise = new Promise((resolve) => {
+                if(data instanceof Node) {
+                    this.wrapper && d.append(this.wrapper, data);
+                    resolve();
+                }else{
+                    this.format(data).then((formated) => {
+                        if(formated) {
+                            let {classes, text, color, bgColor, data} = formated;
+                            if(text instanceof Node){
+                                this.wrapper && d.append(this.wrapper, text);
+                            }else {
+                                text = tools.isEmpty(text) ? '' : text;
+                                this._text = text + '';
+                                if(this.wrapper){
+                                    d.append(this.wrapper, document.createTextNode(this._text));
+                                }
+                            }
+                            this.width = getTextWidth(this.text);
+                            this.initMoreBtn();
+                            this.classes = classes;
+                            this.color = color;
+                            this.background = bgColor;
+                            if(data){
+                                this.table.tableData.update({[this.name]: data}, this.row.index);
                             }
                         }
-                        this.width = getTextWidth(this.text);
-                        this.initMoreBtn();
-                        this.classes = classes;
-                        this.color = color;
-                        this.background = bgColor;
-                        if(data){
-                            this.table.tableData.update({[this.name]: data}, this.row.index);
+                    }).finally(() => {
+                        resolve();
+                    });
+                }
+            }).then(() => {
+                !this.table.isWrapLine && this.initMoreBtn();
+
+                if(this.table.editing){
+                    let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
+                        rowData = null;
+                    for(let data of this.table.tableData.edit.getOriginalData()){
+                        if(data[TableBase.GUID_INDEX] === guidIndex){
+                            rowData = data;
+                            break;
                         }
                     }
-                    resolve();
-                });
-            }
-        }).then(() => {
-            this.rendering = false;
-            !this.table.isWrapLine && this.initMoreBtn();
-
-            if(this.table.editing){
-                let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
-                    rowData = null;
-                for(let data of this.table.tableData.edit.getOriginalData()){
-                    if(data[TableBase.GUID_INDEX] === guidIndex){
-                        rowData = data;
-                        break;
-                    }
+                    // console.log(rowsData);
+                    let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
+                    // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
+                    this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
                 }
-                // console.log(rowsData);
-                let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
-                // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
-                this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
-            }
-        }))
+            }))
+        })
+
     }
 
     tagName() {

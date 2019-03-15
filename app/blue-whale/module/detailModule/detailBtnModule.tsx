@@ -34,6 +34,9 @@ export class DetailBtnModule extends DetailModule{
         this.on(DetailModule.EVT_RENDERED, () => {
             this.paging.initState();
             this.btnManager.initStatus();
+
+            let btn = this.btnManager.box.getItem('edit');
+            this.autoEdit && btn.wrapper && btn.wrapper.click();
         });
     }
 
