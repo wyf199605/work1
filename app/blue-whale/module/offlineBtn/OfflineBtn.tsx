@@ -113,7 +113,8 @@ export class OfflineBtn {
 
     private downData() {
         const loading = new Loading({
-            msg: "下载数据中"
+            msg: "下载数据中",
+            duration : 99999
         });
 
         const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
@@ -140,7 +141,8 @@ export class OfflineBtn {
 
     private uploadData() {
         const loading = new Loading({
-            msg: "数据上传中"
+            msg: "数据上传中",
+            duration : 99999
         });
 
         const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
