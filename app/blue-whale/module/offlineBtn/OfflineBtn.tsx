@@ -113,8 +113,9 @@ export class OfflineBtn {
 
     private downData() {
         const loading = new Loading({
-            msg: "下载数据中"
-        });
+            msg: "下载数据中",
+            duration : 99999
+        }); 
 
         const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
         Shell.imports.downloadbarcode(this.para.uniqueFlag, url, false, (result) => {
