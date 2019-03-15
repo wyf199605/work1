@@ -274,7 +274,23 @@ export class BwTableModule extends Component {
         }
         return res;
     }
-
+    //查看地图
+    private viewMap(){
+      alert("查看地图")
+    }
+    //提交
+    private sumitMap(){
+        let body=<div>测试</div>
+        let modal = new Modal({
+            container: document.body,
+            header: ' ',
+            body,
+            width: '730px',
+            isShow: true,
+            isOnceDestroy: true,
+            className: 'sms-login'
+        });
+    }
     private ftableInit(ajaxData?: obj) {
         let ui = this.ui;
         this.ftable = new FastBtnTable(
@@ -2199,7 +2215,11 @@ export class BwTableModule extends Component {
                         if (btn.data.openType.indexOf('rfid') > -1) {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
-                        } else if (btn.data.openType === 'stopLocation') {
+                        }else if(btn.data.openType === "buildMap"){
+                           this.viewMap();
+                        }else if(btn.data.openType === "submit"){
+                            this.sumitMap();
+                        }else if (btn.data.openType === 'stopLocation') {
                             let stopBtn = d.query(".stop_location", wrapper)
                             let startBtn = d.query(".start_location", wrapper);
                             let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
