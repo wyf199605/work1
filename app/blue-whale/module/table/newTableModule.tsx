@@ -594,7 +594,9 @@ export class NewTableModule extends AGroupTabItem{
                     key: 'edit',
                     content: '编辑',
                     onClick: tools.pattern.throttling(() => {
-                        this.editManage.start(bwTable);
+                        bwTable.isModalEdit
+                            ? this.modalEditManager.init(bwTable)
+                            : this.editManage.start(bwTable);
                     }, time),
                     icon: 'app-bianji',
                     iconPre: 'appcommon'
@@ -602,7 +604,9 @@ export class NewTableModule extends AGroupTabItem{
                     key: 'insert',
                     content: '新增',
                     onClick: tools.pattern.throttling(() => {
-                        this.editManage.insert(bwTable);
+                        bwTable.isModalEdit
+                            ? this.modalEditManager.insert(bwTable)
+                            : this.editManage.insert(bwTable);
                     }, time),
                     icon: 'app-xinzeng',
                     iconPre: 'appcommon'
@@ -651,6 +655,101 @@ export class NewTableModule extends AGroupTabItem{
         }
 
     }
+
+    modalEditManager = (() => {
+
+        let editDataGet = (obj: obj, bwTable: BwTableModule, key: string) => {
+            let editParam = bwTable.editParam;
+            let data = BwRule.varList(editParam[key], obj, true);
+            return {
+                param: [
+                    {
+                        itemId: bwTable.ui.itemId,
+                        [key]: [
+                            data
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let saveData = (bwTable: BwTableModule, saveData: obj, callback: Function) => {
+            if(tools.isEmpty(saveData.param)){
+                Modal.toast('没有数据改变');
+                return ;
+            }
+
+            let url;
+            if(bwTable.ui.tableAddr){
+                url = bwTable.ui.tableAddr.dataAddr
+            }
+            if(this.bwEl.tableAddr){
+                url = this.bwEl.tableAddr.dataAddr;
+            }
+            if(url){
+                let loading = new Loading({
+                    msg: '保存中',
+                    disableEl: this.main.wrapper
+                });
+                BwRule.Ajax.fetch(CONF.siteUrl + url, {
+                    type: 'POST',
+                    data: saveData,
+                }).then(({response}) => {
+
+                    BwRule.checkValue(response, saveData, () => {
+                        this.currentSelectedIndexes = [];
+                        // 主表子表刷新
+                        this.refresh();
+                        Modal.toast(response.msg);
+                        // loading && loading.destroy();
+                        // loading = null;
+                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                        callback && callback();
+                    });
+                }).finally(() => {
+                    loading && loading.destroy();
+                    loading = null;
+                });
+            }else{
+                Modal.alert('保存失败');
+            }
+        };
+
+        return {
+            init: (bwTable: BwTableModule) => {
+                let selectedData = bwTable ? bwTable.ftable.selectedRowsData : null;
+                if(tools.isEmpty(selectedData && selectedData[0])){
+                    Modal.alert('请选中要编辑的数据');
+                    return ;
+                }
+                let data = selectedData[0],
+                    editModule = bwTable.initModalEdit(data);
+                editModule.clear();
+                editModule.set(data);
+                editModule.modalShow = true;
+                editModule.onFinish = (data) => {
+                    let params = editDataGet(data, bwTable, 'update');
+                    saveData(bwTable, params, () => {
+                        editModule.modalShow = false;
+                    })
+                }
+            },
+            insert: (bwTable: BwTableModule) => {
+                let editModule = bwTable.initModalEdit();
+                editModule.clear();
+                editModule.modalShow = true;
+                bwTable.rowDefData.then(data => {
+                    editModule.set(data);
+                });
+                editModule.onFinish = (data) => {
+                    let params = editDataGet(data, bwTable, 'insert');
+                    saveData(bwTable, params, () => {
+                        editModule.modalShow = false;
+                    });
+                }
+            }
+        }
+    })();
 
     editManage = (() => {
         let editing = false;

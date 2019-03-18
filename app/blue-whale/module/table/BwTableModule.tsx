@@ -33,6 +33,7 @@ import { BwLayoutImg } from "../uploadModule/bwLayoutImg";
 import { TableDataRow } from "../../../global/components/newTable/base/TableRow";
 import { FastTableColumn } from "../../../global/components/newTable/FastTabelColumn";
 import { NewIDB } from "../../../global/NewIDB";
+import {BwTableEditModule} from "./BwTableEditModule";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -68,6 +69,7 @@ export class BwTableModule extends Component {
     protected ajax = new BwRule.Ajax();
 
     public ftable: FastBtnTable;
+    public isModalEdit: boolean = true;
 
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
@@ -2492,7 +2494,7 @@ export class BwTableModule extends Component {
                 };
             return {
                 on: () => {
-                    d.on(this.wrapper, 'dblclick', selector, handler);
+                    !this.isModalEdit && d.on(this.wrapper, 'dblclick', selector, handler);
                 },
                 off: () => {
                     d.off(this.wrapper, 'dblclick', selector, handler);
@@ -3080,6 +3082,20 @@ export class BwTableModule extends Component {
                 }
             })
         })
+    }
+
+    protected modalEdit: BwTableEditModule;
+    initModalEdit(data?: obj): BwTableEditModule{
+        if(this.modalEdit){
+            return this.modalEdit;
+        }
+
+        return this.modalEdit = new BwTableEditModule({
+            container: this.container,
+            fields: this.cols,
+            defaultData: data,
+            title: this.ui.caption
+        });
     }
 
     // 关联数据，每次按钮请求时需附带的参数

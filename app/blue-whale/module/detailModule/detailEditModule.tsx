@@ -244,6 +244,8 @@ export class DetailEditModule {
         let modal = this.modal = new Modal({
             header: '编辑',
             isMb: tools.isMb,
+            height: tools.isMb ? void 0 : '80%',
+            width: tools.isMb ? void 0 : '80%',
             className: 'detail-edit-modal',
             isShow: true,
             body: <div className="detail-content"/>,
