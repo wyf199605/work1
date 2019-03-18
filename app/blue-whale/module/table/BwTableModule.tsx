@@ -3028,8 +3028,8 @@ export class BwTableModule extends Component {
                 del: editVarHas(this.editParam, ['delete']),
                 save: isStart,
                 cancel: isStart,
-                "modal-edit": isStart ? false : editVarHas(this.editParam, ['update']),
-                "modal-insert": isStart ? false : editVarHas(this.editParam, ['insert'])
+                // "modal-edit": isStart ? false : editVarHas(this.editParam, ['update']),
+                // "modal-insert": isStart ? false : editVarHas(this.editParam, ['insert'])
             };
 
             if (box) {

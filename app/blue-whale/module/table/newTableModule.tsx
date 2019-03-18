@@ -590,22 +590,22 @@ export class NewTableModule extends AGroupTabItem{
         if((this.editType === 'self' && tools.isNotEmpty(bwTable.editParam)) ||
             (this.editType === 'linkage' && this.editable)){
             let editBtnData = [
-                {
-                    key: 'modal-edit',
-                    content: '编辑',
-                    onClick: tools.pattern.throttling(() => {
-                        this.modalEditManager.init(bwTable);
-                    }, time),
-                    icon: 'danchuceng'
-                },
-                {
-                    key: 'modal-insert',
-                    content: '新增',
-                    onClick: tools.pattern.throttling(() => {
-                        this.modalEditManager.insert(bwTable);
-                    }, time),
-                    icon: 'danchuceng'
-                },
+                // {
+                //     key: 'modal-edit',
+                //     content: '编辑',
+                //     onClick: tools.pattern.throttling(() => {
+                //         this.modalEditManager.init(bwTable);
+                //     }, time),
+                //     icon: 'danchuceng'
+                // },
+                // {
+                //     key: 'modal-insert',
+                //     content: '新增',
+                //     onClick: tools.pattern.throttling(() => {
+                //         this.modalEditManager.insert(bwTable);
+                //     }, time),
+                //     icon: 'danchuceng'
+                // },
                 {
                     key: 'edit',
                     content: '编辑',
