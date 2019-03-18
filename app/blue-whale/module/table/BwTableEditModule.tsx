@@ -5,15 +5,18 @@ import {DetailItem} from "../detailModule/detailItem";
 import {EditModule} from "../edit/editModule";
 import d = G.d;
 import tools = G.tools;
+import {BwTableModule} from "./BwTableModule";
 
 interface IBwTableEditPara{
     fields: R_Field[];
     container: HTMLElement;
     defaultData?: obj;
     title?: string;
+    bwTable: BwTableModule;
 }
 
 export class BwTableEditModule {
+    protected bwTable: BwTableModule;
     protected modal: Modal;
     protected fields: R_Field[];
     protected container: HTMLElement;
@@ -24,6 +27,7 @@ export class BwTableEditModule {
     constructor(para: IBwTableEditPara){
         this.wrapper = <div className="detail-content"/>;
         this.container = para.container;
+        this.bwTable = para.bwTable;
         this.fields = para.fields;
         this.editModule = new EditModule({
             auto: true,
@@ -99,7 +103,24 @@ export class BwTableEditModule {
     }
 
     set(data: obj){
-        this.editModule.set(data);
+        let lookUpData = this.bwTable.lookUpData;
+        this.fields.forEach((field) => {
+            let name = field.name,
+                com = this.editModule.getDom(name);
+
+            if(com){
+                if(field.elementType === 'lookup' && field.lookUpKeyField in data){
+                    let options = lookUpData[name] || [];
+                    for (let opt of options) {
+                        if (opt.value == data[field.lookUpKeyField]) {
+                            com.set(opt || '');
+                        }
+                    }
+                }else if(name in data){
+                    com.set(data[name] || '');
+                }
+            }
+        });
     }
 
     clear(){

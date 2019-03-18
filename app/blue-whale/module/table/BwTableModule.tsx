@@ -3098,7 +3098,8 @@ export class BwTableModule extends Component {
             container: this.container,
             fields: this.cols,
             defaultData: data,
-            title: this.ui.caption
+            title: this.ui.caption,
+            bwTable: this,
         });
     }
 
