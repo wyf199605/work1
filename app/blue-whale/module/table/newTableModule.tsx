@@ -591,12 +591,26 @@ export class NewTableModule extends AGroupTabItem{
             (this.editType === 'linkage' && this.editable)){
             let editBtnData = [
                 {
+                    key: 'modal-edit',
+                    content: '编辑',
+                    onClick: tools.pattern.throttling(() => {
+                        this.modalEditManager.init(bwTable);
+                    }, time),
+                    icon: 'danchuceng'
+                },
+                {
+                    key: 'modal-insert',
+                    content: '新增',
+                    onClick: tools.pattern.throttling(() => {
+                        this.modalEditManager.insert(bwTable);
+                    }, time),
+                    icon: 'danchuceng'
+                },
+                {
                     key: 'edit',
                     content: '编辑',
                     onClick: tools.pattern.throttling(() => {
-                        bwTable.isModalEdit
-                            ? this.modalEditManager.init(bwTable)
-                            : this.editManage.start(bwTable);
+                        this.editManage.start(bwTable);
                     }, time),
                     icon: 'app-bianji',
                     iconPre: 'appcommon'
@@ -604,9 +618,7 @@ export class NewTableModule extends AGroupTabItem{
                     key: 'insert',
                     content: '新增',
                     onClick: tools.pattern.throttling(() => {
-                        bwTable.isModalEdit
-                            ? this.modalEditManager.insert(bwTable)
-                            : this.editManage.insert(bwTable);
+                        this.editManage.insert(bwTable);
                     }, time),
                     icon: 'app-xinzeng',
                     iconPre: 'appcommon'
@@ -725,6 +737,7 @@ export class NewTableModule extends AGroupTabItem{
                 let data = selectedData[0],
                     editModule = bwTable.initModalEdit(data);
                 editModule.clear();
+                editModule.initStatus(false);
                 editModule.set(data);
                 editModule.modalShow = true;
                 editModule.onFinish = (data) => {
@@ -737,6 +750,7 @@ export class NewTableModule extends AGroupTabItem{
             insert: (bwTable: BwTableModule) => {
                 let editModule = bwTable.initModalEdit();
                 editModule.clear();
+                editModule.initStatus(true);
                 editModule.modalShow = true;
                 bwTable.rowDefData.then(data => {
                     editModule.set(data);

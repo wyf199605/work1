@@ -40,16 +40,8 @@ export class BwTableEditModule {
             cols: this.fields,
             defaultData: para.defaultData || {}
         });
-        this.fields.forEach(field => {
-            let isEdit = !field.noEdit,
-                com = this.editModule.getDom(field.name);
-            if(!isEdit && com){
-                com.disabled = true;
-                tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
-                    Modal.toast(field.caption + '不可编辑');
-                });
-            }
-        });
+
+        this.initStatus();
 
         this.modal = new Modal({
             header: para.title || '编辑',
@@ -86,6 +78,20 @@ export class BwTableEditModule {
                 ]
             }
         })
+    }
+
+    initStatus(isInsert = false){
+        this.fields.forEach(field => {
+            let isEdit = isInsert ? !field.noModify : !field.noEdit,
+                com = this.editModule.getDom(field.name);
+            com.disabled = false;
+            if(!isEdit && com){
+                com.disabled = true;
+                tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
+                    Modal.toast(field.caption + '不可编辑');
+                });
+            }
+        });
     }
 
     set modalShow(flag: boolean){
