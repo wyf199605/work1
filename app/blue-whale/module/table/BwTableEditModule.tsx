@@ -52,10 +52,11 @@ export class BwTableEditModule {
             isMb: tools.isMb,
             className: 'detail-edit-modal',
             isShow: true,
+            zIndex: 999,
             height: tools.isMb ? void 0 : '80%',
             width: tools.isMb ? void 0 : '80%',
             body: this.wrapper,
-            // container: this.container,
+            container: this.container,
             closeMsg: '确定取消编辑吗?',
             onClose: () => {
 
