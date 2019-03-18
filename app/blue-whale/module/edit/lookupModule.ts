@@ -8,7 +8,7 @@ import {BwRule} from "../../common/rule/BwRule";
 
 interface ILookupModulePara extends IFormComPara{
     field:R_Field;
-    rowData?: obj
+    rowDataGet?: () => obj
     onExtra?: Function;
 }
 export class LookupModule extends FormCom{
@@ -43,8 +43,8 @@ export class LookupModule extends FormCom{
     }
 
     private ajax(callback:Function){
-        let {field, rowData} = this.para;
-        BwRule.getLookUpOpts(field, rowData).then(options => {
+        let {field, rowDataGet} = this.para;
+        BwRule.getLookUpOpts(field, rowDataGet ? rowDataGet() : {}).then(options => {
             this.options = options;
             callback(options ? options.map((o) => Object.assign({}, o)) : []);
         });

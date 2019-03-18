@@ -299,7 +299,9 @@ export class EditModule {
                     container: p.dom,
                     field: p.field,
                     custom: p.field,
-                    rowData: p.data,
+                    rowDataGet: () => {
+                        return p.data ? p.data : this.get()
+                    },
                     onExtra: (item) => {
                         if (item) {
                             setTimeout(() => {
