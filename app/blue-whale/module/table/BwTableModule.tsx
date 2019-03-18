@@ -79,6 +79,8 @@ export class BwTableModule extends Component {
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
+        this.isModalEdit = ui.operationType && ui.operationType.editType
+            ? ui.operationType.editType === 'modal' : false;
         this.isPivot = ui.relateType === 'P';
         if (this.tableModule && !this.tableModule.editable && !this.isPivot) {
             this.editParam = null;
