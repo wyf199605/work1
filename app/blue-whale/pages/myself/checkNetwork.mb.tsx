@@ -59,28 +59,28 @@ export class checkNetwork extends BasicPage {
   netTest() {
     let url = tools.url.addObj(CONF.ajaxUrl.speedTest, { size: 1000 })
     let results = [];
-    let total = 5;
     this.option.series[0].data[0].value = 0;
     this.myChart.setOption(this.option, true);
-    for (var i = 0; i < 5; i++) {
-      setTimeout(() => {
-        this.req_net(url).then(num => {
-          results.push(num)
-          let sum = results.reduce(function (pre, cur) { return pre + cur }) / i
-          this.option.series[0].data[0].value = sum ? sum.toString().split(".")[0] : 0;
-          this.myChart.setOption(this.option, true);
-          total = total - 1;
-          if (total === 0 && (this.submitBtn.innerText !== '运行' && this.submitBtn.innerText !== '运行中...')) {
-            this.submitBtn.innerText = "开始测试"
-            this.submitBtn.removeAttribute("disabled");
-          }
-        }).catch(() => {
-          if (this.submitBtn.innerText !== '运行' && this.submitBtn.innerText !== '运行中...') {
-            this.submitBtn.innerText = "开始测试"
-            this.submitBtn.removeAttribute("disabled");
-          }
-        })
-      }, i * 500);
+    for (var j = 0; j < 5; j++) {
+      ((i) => {
+        setTimeout(() => {
+          this.req_net(url).then(num => {
+            results.push(num)
+            let sum = results.reduce(function (pre, cur) { return pre + cur }) / (i + 1)
+            this.option.series[0].data[0].value = sum ? sum.toString().split(".")[0] : 0;
+            this.myChart.setOption(this.option, true);
+            if (i === 4 && (this.submitBtn.innerText !== '运行' && this.submitBtn.innerText !== '运行中...')) {
+              this.submitBtn.innerText = "开始测试"
+              this.submitBtn.removeAttribute("disabled");
+            }
+          }).catch(() => {
+            if (this.submitBtn.innerText !== '运行' && this.submitBtn.innerText !== '运行中...') {
+              this.submitBtn.innerText = "开始测试"
+              this.submitBtn.removeAttribute("disabled");
+            }
+          })
+        }, i * 500);
+      })(j)
     }
   }
   req_net(url) {
