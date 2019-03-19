@@ -183,7 +183,7 @@ export class Modal extends Component {
         if (typeof zIndex === 'number') {
             this._zIndex = zIndex;
             this.wrapper && (this.wrapper.style.zIndex = zIndex + '');
-            this.modalScreen && (this.modalScreen.style.zIndex = zIndex - 1 + '');
+            this.modalScreen && (this.modalScreen.style.zIndex = zIndex + '');
         }
     }
 
@@ -698,7 +698,8 @@ export class Modal extends Component {
         //初始化遮罩层
         if (!this.modalScreen && this._isBackground) {
             this.modalScreen = <div className="modal-screen lock-screen"></div>;
-            this._container.appendChild(this.modalScreen);
+            // this._container.appendChild(this.modalScreen);
+            d.before(this.wrapper, this.modalScreen);
         } else {
             d.remove(this.modalScreen);
             this.modalScreen = null;
