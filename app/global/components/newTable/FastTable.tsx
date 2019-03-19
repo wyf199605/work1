@@ -155,7 +155,7 @@ export class FastTable extends Component {
         let row = this.selectedRows[0],
             type: 'show' | 'edit' | 'insert' = 'show';
         if(!row){
-            Modal.alert('请选中一行表格数据');
+            Modal.alert('请选中要进行操作的数据');
             return ;
         }
 

@@ -109,7 +109,7 @@ export class BwTableEditModule {
     }
 
     set(data: obj){
-        this.bwTable.lookup.finally(() => {
+        this.bwTable && this.bwTable.lookup.finally(() => {
             let lookUpData = this.bwTable.lookUpData;
             this.fields.forEach((field) => {
                 let name = field.name,
