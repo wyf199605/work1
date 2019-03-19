@@ -52,11 +52,9 @@ export class BwTableEditModule {
             isMb: tools.isMb,
             className: 'detail-edit-modal',
             isShow: true,
-            zIndex: 999,
             height: tools.isMb ? void 0 : '80%',
             width: tools.isMb ? void 0 : '80%',
             body: this.wrapper,
-            container: this.container,
             closeMsg: '确定取消编辑吗?',
             onClose: () => {
 
@@ -85,18 +83,25 @@ export class BwTableEditModule {
         })
     }
 
-    initStatus(isInsert = false){
+    initStatus(isInsert = false, isModify = true){
         this.fields.forEach(field => {
             let isEdit = isInsert ? !field.noModify : !field.noEdit,
                 com = this.editModule.getDom(field.name);
-            com.disabled = false;
-            if(!isEdit && com){
+            if(isModify){
+                com.disabled = false;
+                if(!isEdit && com){
+                    com.disabled = true;
+                    tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
+                        Modal.toast(field.caption + '不可编辑');
+                    });
+                }
+            }else{
                 com.disabled = true;
-                tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
-                    Modal.toast(field.caption + '不可编辑');
-                });
             }
+
         });
+        if(this.modal)
+            isModify ? (this.modal.closeMsg = '确定取消编辑吗?') : (this.modal.closeMsg = '');
     }
 
     set modalShow(flag: boolean){
@@ -104,23 +109,25 @@ export class BwTableEditModule {
     }
 
     set(data: obj){
-        let lookUpData = this.bwTable.lookUpData;
-        this.fields.forEach((field) => {
-            let name = field.name,
-                com = this.editModule.getDom(name);
+        this.bwTable.lookup.finally(() => {
+            let lookUpData = this.bwTable.lookUpData;
+            this.fields.forEach((field) => {
+                let name = field.name,
+                    com = this.editModule.getDom(name);
 
-            if(com){
-                if(field.elementType === 'lookup' && field.lookUpKeyField in data){
-                    let options = lookUpData[name] || [];
-                    for (let opt of options) {
-                        if (opt.value == data[field.lookUpKeyField]) {
-                            com.set(opt || '');
+                if(com){
+                    if(field.elementType === 'lookup' && field.lookUpKeyField in data){
+                        let options = lookUpData[name] || [];
+                        for (let opt of options) {
+                            if (opt.value == data[field.lookUpKeyField]) {
+                                com.set(opt || '');
+                            }
                         }
+                    }else if(name in data){
+                        com.set(data[name] || '');
                     }
-                }else if(name in data){
-                    com.set(data[name] || '');
                 }
-            }
+            });
         });
     }
 

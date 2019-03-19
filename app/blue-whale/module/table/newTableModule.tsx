@@ -607,6 +607,15 @@ export class NewTableModule extends AGroupTabItem{
                 //     icon: 'danchuceng'
                 // },
                 {
+                    key: 'modal-action',
+                    content: '窗口操作',
+                    onClick: tools.pattern.throttling(() => {
+                        let ftable = bwTable.ftable;
+                        ftable && ftable.dataControl();
+                    }, time),
+                    icon: 'danchuceng'
+                },
+                {
                     key: 'edit',
                     content: '编辑',
                     onClick: tools.pattern.throttling(() => {
@@ -728,7 +737,7 @@ export class NewTableModule extends AGroupTabItem{
         };
 
         return {
-            init: (bwTable: BwTableModule) => {
+            edit: (bwTable: BwTableModule) => {
                 let selectedData = bwTable ? bwTable.ftable.selectedRowsData : null;
                 if(tools.isEmpty(selectedData && selectedData[0])){
                     Modal.alert('请选中要编辑的数据');

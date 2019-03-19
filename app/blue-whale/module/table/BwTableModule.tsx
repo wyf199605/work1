@@ -253,7 +253,24 @@ export class BwTableModule extends Component {
                 onClick: () => {
                     this.ftable.colsSort.open();
                 }
-            } : null]
+            } : null],
+            dataAction: (data, type, callback) => {
+                let editModule = this.initModalEdit(),
+                    isEdit = type !== 'show',
+                    isInsert = type === 'insert';
+                editModule.clear();
+                editModule.initStatus(isInsert, isEdit);
+                editModule.set(data);
+                editModule.modalShow = true;
+
+                editModule.onFinish = (data) => {
+                    editModule.modalShow = false;
+                    if(isEdit){
+                        callback && callback(data);
+                        Modal.toast('请点击保存以保存数据');
+                    }
+                }
+            }
         }
     }
 
@@ -636,7 +653,7 @@ export class BwTableModule extends Component {
         return this._lookUpData || {};
     }
 
-    private get lookup(): Promise<void> {
+    get lookup(): Promise<void> {
         if (tools.isEmpty(this._lookUpData)) {
             let allPromise = this.cols.filter(col => col.elementType === 'lookup')
                 .map(col => BwRule.getLookUpOpts(col).then((items) => {
