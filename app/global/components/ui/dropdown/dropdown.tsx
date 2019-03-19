@@ -346,18 +346,13 @@ export class DropDown {
         if (Array.isArray(this.data)) {
             for (let i = 0, d: ListItem = null; d = this.data[i]; i++) {
                 if (d.value === value) {
-                    if(this.selectIndex !== i){
-                        this.selectIndex = i;
-                        this.onSelect();
-                    }
-
+                    this.selectIndex = i;
+                    this.onSelect();
                     return true;
                 }
             }
-            this.selectIndex = -1;
             return false;
         } else {
-            this.selectIndex = -1;
             return false;
         }
     }
