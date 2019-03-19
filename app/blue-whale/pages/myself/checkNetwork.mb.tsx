@@ -9,17 +9,19 @@ import { Modal } from "global/components/feedback/modal/Modal";
 declare const echarts;
 interface pagePara {
   dom?: HTMLElement,
-  title?: string
+  title?: string,
+  modal: Modal
 }
-export class checkNetwork extends BasicPage {
+export class checkNetwork {
   private testBtn: HTMLElement;
   private pingBtn: HTMLElement;
   private submitBtn: HTMLElement;
   private myChart: any;
   private option: any;
+  private modal: Modal;
   constructor(para: pagePara) {
-    super(para)
-    this.render(para.dom);
+    this.modal = para.modal;
+    this.render(para.modal.wrapper);
     this.event();
     this.renderCircle()
   }
@@ -42,7 +44,8 @@ export class checkNetwork extends BasicPage {
       this.renderFullCircle();
     })
     G.d.on(G.d.query("#check_back"), "click", () => {
-      BW.sys.window.back('');
+      d.query(".check_netWork").remove();
+       this.modal.isShow=false;
     })
     G.d.on(this.submitBtn, "click", () => {
       this.submitBtn.setAttribute("disabled", "true");

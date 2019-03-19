@@ -173,10 +173,10 @@ export = class myselfMbPage {
         });
 
         d.on(d.query('#testNetwork'), 'click', () => {
-            //  modal.isShow = true;
-            let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=checkNetwork" });
-            sys.window.open({ url })
-            //  new checkNetwork({dom:window.parent.document.querySelector(".mainPage")})
+            modal.isShow = true;
+            // let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=checkNetwork" });
+            // sys.window.open({ url })
+            new checkNetwork({modal:modal})
 
         });
         let modal = this.initModal();
@@ -270,7 +270,7 @@ export = class myselfMbPage {
         return new Modal({
             className: 'test-module-wrapper',
             header: '网络测速',
-            body: body,
+            body: null,
             position: sys.isMb ? 'full' : '',
             isShow: false
         });
