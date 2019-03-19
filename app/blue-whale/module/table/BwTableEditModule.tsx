@@ -31,6 +31,42 @@ export class BwTableEditModule {
         this.container = para.container;
         this.bwTable = para.bwTable;
         this.fields = para.fields;
+
+        this.modal = new Modal({
+            header: para.title || '编辑',
+            isMb: tools.isMb,
+            className: 'detail-edit-modal',
+            isShow: true,
+            height: tools.isMb ? void 0 : '80%',
+            width: tools.isMb ? void 0 : '80%',
+            body: this.wrapper,
+            closeMsg: '确定取消编辑吗?',
+            onClose: () => {
+
+            },
+            footer: {
+                leftPanel: [
+                    {
+                        content: '取消',
+                        className: 'modal-btn edit-cancel',
+                        onClick: () => {
+                            this.modal.modalHidden();
+                        }
+                    }
+                ],
+                rightPanel: [
+                    {
+                        content: '确定',
+                        className: 'modal-btn eidt-confirm',
+                        type: 'primary',
+                        onClick: () => {
+                            this.onFinish && this.onFinish(this.get());
+                        }
+                    }
+                ]
+            }
+        });
+
         this.editModule = new EditModule({
             auto: true,
             type: 'table',
@@ -90,41 +126,6 @@ export class BwTableEditModule {
         });
 
         this.initStatus();
-
-        this.modal = new Modal({
-            header: para.title || '编辑',
-            isMb: tools.isMb,
-            className: 'detail-edit-modal',
-            isShow: true,
-            height: tools.isMb ? void 0 : '80%',
-            width: tools.isMb ? void 0 : '80%',
-            body: this.wrapper,
-            closeMsg: '确定取消编辑吗?',
-            onClose: () => {
-
-            },
-            footer: {
-                leftPanel: [
-                    {
-                        content: '取消',
-                        className: 'modal-btn edit-cancel',
-                        onClick: () => {
-                            this.modal.modalHidden();
-                        }
-                    }
-                ],
-                rightPanel: [
-                    {
-                        content: '确定',
-                        className: 'modal-btn eidt-confirm',
-                        type: 'primary',
-                        onClick: () => {
-                            this.onFinish && this.onFinish(this.get());
-                        }
-                    }
-                ]
-            }
-        })
     }
 
     initStatus(isInsert = false, isModify = true){
