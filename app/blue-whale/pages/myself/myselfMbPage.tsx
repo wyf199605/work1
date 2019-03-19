@@ -11,7 +11,7 @@ import { RfidSettingModal } from "../rfid/RfidSetting/RfidSetting";
 import Shell = G.Shell;
 import sysPcHistory = BW.sysPcHistory;
 import { Loading } from "../../../global/components/ui/loading/loading";
-
+import { checkNetwork } from './checkNetwork.mb'
 export = class myselfMbPage {
     constructor() {
         // mui.init();
@@ -173,9 +173,11 @@ export = class myselfMbPage {
         });
 
         d.on(d.query('#testNetwork'), 'click', () => {
-            // modal.isShow = true;
+            //  modal.isShow = true;
             let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=checkNetwork" });
             sys.window.open({ url })
+            //  new checkNetwork({dom:window.parent.document.querySelector(".mainPage")})
+
         });
         let modal = this.initModal();
         let urls = Array.from({ length: 5 }, () => 1000).map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, { size: num }));
