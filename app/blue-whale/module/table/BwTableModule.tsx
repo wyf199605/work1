@@ -2940,7 +2940,11 @@ export class BwTableModule extends Component {
         let insert = () => {
             (this.ftable.editing ? Promise.resolve() : start())
                 .then(() => {
-                    this.ftable.rowAdd();
+                    let ftable = this.ftable;
+                    ftable.rowAdd();
+                    ftable.clearSelectedRows();
+                    let firstRow = ftable.rows[0];
+                    firstRow && (firstRow.selected = true);
                 })
         };
 
