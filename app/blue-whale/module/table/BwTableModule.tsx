@@ -33,7 +33,8 @@ import { BwLayoutImg } from "../uploadModule/bwLayoutImg";
 import { TableDataRow } from "../../../global/components/newTable/base/TableRow";
 import { FastTableColumn } from "../../../global/components/newTable/FastTabelColumn";
 import { NewIDB } from "../../../global/NewIDB";
-
+import { Datetime } from "../../../global/components/form/datetime/datetime";
+import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
     tableModule?: NewTableModule;
@@ -275,21 +276,81 @@ export class BwTableModule extends Component {
         return res;
     }
     //查看地图
-    private viewMap(){
-      alert("查看地图")
+    private viewMap() {
+        G.Shell.location.drawMap()
     }
     //提交
-    private sumitMap(){
-        let body=<div>测试</div>
-        let modal = new Modal({
-            container: document.body,
-            header: ' ',
-            body,
-            width: '730px',
-            isShow: true,
-            isOnceDestroy: true,
-            className: 'sms-login'
-        });
+    private sumitMap() {
+        let cancel = <button>取消</button>
+        let sure = <button>确定</button>
+        let start = null;
+        let end = null;
+        let body = <div className="select_time_wrap">
+            <div className="select_time">
+                <header>选择日期</header>
+                <div id="time_wrap">
+                    <div className="time_item">
+                        {/* <input type="text" placeholder="请选择时间" disabled /> */}
+                        {
+                            start = <DatetimeMb className="datetime" c-var="time" format="yyyy-MM-dd HH:mm" placeholder="请选择时间" />
+                        }
+                        {/* <i className="iconfont icon-arrow-right"></i> */}
+                    </div>
+                    <div className="time_item">
+                        {/* <input type="text" placeholder="请选择时间" disabled /> */}
+                        {
+                            end = <DatetimeMb className="datetime" c-var="time" format="yyyy-MM-dd HH:mm" placeholder="请选择时间" />
+                        }
+                        {/* <i className="iconfont icon-arrow-right"></i> */}
+                    </div>
+                </div>
+                <footer>
+                    {cancel}
+                    {sure}
+                </footer>
+            </div>
+        </div>
+        d.append(document.body, body)
+        d.on(cancel, "click", () => {
+            body.remove();
+        })
+        d.on(sure, "click", () => {
+            if (!start.value) {
+                Modal.toast("请选择开始时间")
+                return false;
+            }
+            if (!end.value) {
+                Modal.toast("请选择结束时间")
+                return false;
+            }
+            if (!/(20\d{2}([\.\-/|年月\s]{1,3}\d{1,2}){2}日?(\s?\d{2}:\d{2}(:\d{2})?)?)|(\d{1,2}\s?(分钟|小时|天)前)/.test(start.value)) {
+                Modal.toast("请选择正确的开始时间格式")
+                return false;
+            }
+            if (!/(20\d{2}([\.\-/|年月\s]{1,3}\d{1,2}){2}日?(\s?\d{2}:\d{2}(:\d{2})?)?)|(\d{1,2}\s?(分钟|小时|天)前)/.test(end.value)) {
+                Modal.toast("请选择正确的结束时间格式")
+                return false;
+            }
+            if (new Date(end.value).getTime() <= new Date(start.value).getTime()) {
+                Modal.toast("开始时间必须小于结束时间")
+                return false;
+            }
+            body.remove();
+            let user_id = JSON.parse(localStorage.getItem("userInfo")).userid||"";
+            let url = tools.url.addObj(CONF.ajaxUrl.location, { "start_time": start.value, "end_time": end.value, user_id })
+            console.log(url)
+            this.req_postTime(url);
+        })
+        // let modal = new Modal({
+        //     container: document.body,
+
+        // });
+    }
+
+    req_postTime(url) {
+        BwRule.Ajax.fetch(url).then(({ response }) => {
+            console.log(response)
+        })
     }
     private ftableInit(ajaxData?: obj) {
         let ui = this.ui;
@@ -2204,6 +2265,7 @@ export class BwTableModule extends Component {
             //btnsUi = [{ "caption": "测试设计", "title": "测试设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 10 }, { "caption": "流程设计", "title": "流程设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 0 }];
 
             Array.isArray(btnsUi) && btnsUi.forEach((btnUi) => {
+                console.log(btnUi)
                 let btn = new Button({
                     icon: btnUi.icon,
                     content: btnUi.title,
@@ -2215,11 +2277,11 @@ export class BwTableModule extends Component {
                         if (btn.data.openType.indexOf('rfid') > -1) {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
-                        }else if(btn.data.openType === "buildMap"){
-                           this.viewMap();
-                        }else if(btn.data.openType === "submit"){
+                        } else if (btn.data.openType === "buildMap") {
+                            this.viewMap();
+                        } else if (btn.data.openType === "submit") {
                             this.sumitMap();
-                        }else if (btn.data.openType === 'stopLocation') {
+                        } else if (btn.data.openType === 'stopLocation') {
                             let stopBtn = d.query(".stop_location", wrapper)
                             let startBtn = d.query(".start_location", wrapper);
                             let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")

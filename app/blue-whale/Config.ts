@@ -119,6 +119,8 @@ namespace BW {
             scanSecondCode:"/app_sanfu_retail/null/codelogin/code",//pc非初次登录 
             scanMbSure:"/app_sanfu_retail/null/codelogin/change",//手机扫码后点击确认登录 
 
+            pingUrl:'moblie/ping',
+            location:'buildmap'
         },
 
         init(siteUrl: string, appid: string, version: string, webscoket) {

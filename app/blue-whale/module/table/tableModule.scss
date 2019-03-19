@@ -1,45 +1,131 @@
-.statistic-modal{
-  .modal-body{
+.select_time_wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0px;
+  right: 0px;
+  background-color: rgba(189, 189, 189, 0.7);
+  z-index: 999;
+  color: black;
+  .select_time {
+    color: black;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 285px;
+    background-color: white;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    text-align: center;
+    animation-duration: 0.3s;
+    animation-fill-mode: both;
+    animation-name: fadeIn;
+    animation-timing-function: cubic-bezier(0, 0.45, 0.18, 1.04);
+    .time_item {
+      position: relative;
+    }
+    .time_item {
+      margin-top: 30px;
+    }
+    .iconfont {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .datetime {
+      border: none;
+      width: 85%;
+      margin: 12px auto;
+      font-size: 16px;
+      input {
+        border-bottom: 1px solid #ccc;
+        border-radius: 0px;
+      }
+      .iconfont {
+        margin-top: 5px!important;
+        font-size: 19px;
+      }
+    }
+    .datetime:last-child {
+      margin-top: 0px;
+      margin-bottom: 25px;
+    }
+    header {
+      color: black;
+      text-align: center;
+      margin: 15px auto;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    footer {
+      margin-bottom: 30px;
+      margin-top: 15px;
+      text-align: center;
+      button {
+        border-radius: 20px;
+        padding: 9px 26px;
+      }
+      button:first-child {
+        color: black;
+        margin-right: 30px;
+      }
+      button:last-child {
+        background-color: #005BAC;
+        color: white;
+      }
+    }
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.statistic-modal {
+  .modal-body {
     max-height: none!important;
   }
 }
-.pick-table-modal{
-  .modal-body{
+
+.pick-table-modal {
+  .modal-body {
     max-height: none!important;
-    .pick-table-wrapper{
+    .pick-table-wrapper {
       height: 100%;
-      .tables{
+      .tables {
         height: 98%;
         height: calc(100% - 10px);
       }
     }
   }
-
 }
 
 .fl-pc .table-module-has-sub {
-  .tab-content{
+  .tab-content {
     margin-top: 0;
   }
   .sub-table-tab-wrapper {
     overflow: hidden;
     height: calc(45% - 10px);
     position: relative;
-
-    .sub-tab-navbar{
+    .sub-tab-navbar {
       padding-right: 90px;
       min-height: 30px;
       height: 30px;
-      &>li>a{
+      &>li>a {
         padding: 4px 15px;
       }
     }
-    .sub-icon-navbar{
+    .sub-icon-navbar {
       position: absolute;
       right: 0;
       top: 0;
       width: 90px;
-
       .sub-icon {
         float: right;
         line-height: 30px;
@@ -54,7 +140,7 @@
       height: calc(100% - 30px);
       .tab-pane {
         height: 100%;
-        .fast-table-container.table-width-full.paging-content{
+        .fast-table-container.table-width-full.paging-content {
           padding-bottom: 0;
         }
       }
@@ -85,7 +171,7 @@
 }
 
 .fl-pc {
-  .table-module-wrapper{
+  .table-module-wrapper {
     overflow: hidden;
   }
   .edit-btns {
@@ -122,30 +208,25 @@
     background-color: $blue;
     color: #fff;
   }
-
   &.editing {
     position: relative;
-
     &.uploaderCom div:last-child {
       width: 100% !important;
       height: 100% !important;
     }
-    & > * {
+    &>* {
       position: absolute;
       top: 0;
       left: 0;
       white-space: normal;
       width: 100%;
-
       input {
         font-size: 12px;
       }
     }
-
     .bootstrap-tagsinput {
       background-color: #fff;
     }
-
     .note-editor {
       min-width: 300px;
       z-index: 1;
@@ -156,7 +237,7 @@
 .table-module-wrapper {
   height: 100%;
   background-color: #fafafa;
-  & > .showDetail {
+  &>.showDetail {
     position: fixed;
     max-width: 300px;
     max-height: 200px;
@@ -172,9 +253,9 @@
     border: 1px solid #ccc;
     border-radius: 4px;
   }
-  .table-body-wrapper{
-    td{
-      .accessory-wrapper{
+  .table-body-wrapper {
+    td {
+      .accessory-wrapper {
         overflow: visible;
       }
     }
@@ -183,7 +264,6 @@
 
 .table-img-wrapper {
   .table-img-wrapper-btns {
-
     .table-img-uploader {
       display: inline-block;
       width: 75px;
@@ -194,22 +274,18 @@
       font-size: 14px;
       color: rgba(0, 0, 0, 0.65);
       top: 4px;
-
       input {
         font-size: 14px;
         text-align: center;
       }
-
       &:hover {
         background-color: white;
         border-color: #108ee9;
-
         input::-webkit-input-placeholder {
           color: #108ee9;
         }
       }
     }
-
     button {
       margin-left: 5px;
     }
@@ -260,18 +336,19 @@
   .modal-mbPage.sub-table {
     .mbPage-header {
       height: 30px;
-      .mbPage-title{
+      .mbPage-title {
         line-height: 30px;
       }
-      .mbPage-left, .mbPage-right, .mbPage-title {
+      .mbPage-left,
+      .mbPage-right,
+      .mbPage-title {
         top: 0 !important;
       }
     }
-    .mbPage-body{
+    .mbPage-body {
       padding-top: 30px;
     }
   }
-
   .table-module-wrapper {
     background-color: #fafafa;
     padding-bottom: 41px;
@@ -292,10 +369,10 @@
       justify-content: space-between;
       color: #555;
       font-weight: bold;
-      & > span {
+      &>span {
         padding: 0 3px;
         align-self: center;
-        & > span {
+        &>span {
           color: #333;
         }
       }
@@ -315,8 +392,7 @@
       border-top: 1px solid #e1e1e1;
       //z-index: 10000;
       transition: none;
-
-      & > div {
+      &>div {
         height: 39px;
         button {
           &::after {
@@ -334,12 +410,10 @@
           }
         }
       }
-
       .input-box {
         background: #fff;
       }
     }
-
   }
 }
 
@@ -413,7 +487,8 @@
 }
 
 .fl-mobile {
-  .flowListPC, .sub-table-page-modal{
+  .flowListPC,
+  .sub-table-page-modal {
     .nav-tabs {
       display: flex;
       justify-content: flex-start;
@@ -427,7 +502,7 @@
       overflow-y: hidden;
       min-width: 100%;
       border-bottom: 1px solid #ccc;
-      & > li {
+      &>li {
         height: 40px;
         text-align: center;
         width: auto;
@@ -436,12 +511,12 @@
         outline: none;
         flex-shrink: 0;
         flex-grow: 0;
-        & > a {
+        &>a {
           color: #8e8e93;
           border-radius: 0;
           border: none;
         }
-        &.active > a {
+        &.active>a {
           display: inline-block;
           height: 100%;
           border-bottom: 2px solid #005bac;
@@ -460,8 +535,8 @@
   }
 }
 
-.aggr-wrapper + .fast-table-container{
-  .tables{
+.aggr-wrapper+.fast-table-container {
+  .tables {
     height: calc(100% - 105px);
   }
 }
@@ -485,4 +560,3 @@
 //  }
 //
 //}
-

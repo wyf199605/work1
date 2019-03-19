@@ -173,7 +173,7 @@ export = class myselfMbPage {
         });
 
         d.on(d.query('#testNetwork'), 'click', () => {
-            // modal.isShow = true;
+            //  modal.isShow = true;
             let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=checkNetwork" });
             sys.window.open({ url })
         });

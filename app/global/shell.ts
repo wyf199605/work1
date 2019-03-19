@@ -420,7 +420,7 @@ namespace G {
             downloadbarcode(uniqueFlag: string, downUrl: string, uploadUrl: string, defaultUpload: boolean, back: IShellEventHandler) {
                 return ShellBase.handler('downloadbarcode', { uniqueFlag: uniqueFlag, downUrl: downUrl, uploadUrl: uploadUrl, defaultUpload: defaultUpload }, back, null, false);
             },
-            getScanData(uniqueFlag: string,  back?: IShellEventHandler) {
+            getScanData(uniqueFlag: string, back?: IShellEventHandler) {
                 return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag }, back)
             },
             //条码扫码总量统计
@@ -497,12 +497,12 @@ namespace G {
          */
         const imports = {
             //条码扫码下载
-            downloadbarcode(uniqueFlag:string, downUrl:string, defaultUpload:boolean, back:IShellEventHandler){
-                return ShellBase.handler('downloadbarcode',{uniqueFlag,downUrl,defaultUpload},back,null,false);
+            downloadbarcode(uniqueFlag: string, downUrl: string, defaultUpload: boolean, back: IShellEventHandler) {
+                return ShellBase.handler('downloadbarcode', { uniqueFlag, downUrl, defaultUpload }, back, null, false);
             },
             //上传条码数据
-            uploadcodedata(uniqueFlag:string,uploadUrl:string, back:IShellEventHandler){
-                return ShellBase.handler('uploadcodedata',{uniqueFlag, uploadUrl},back,null,false);
+            uploadcodedata(uniqueFlag: string, uploadUrl: string, back: IShellEventHandler) {
+                return ShellBase.handler('uploadcodedata', { uniqueFlag, uploadUrl }, back, null, false);
             },
             //条码扫码总量统计
             getCountData(uniqueFlag: string, itemid: string, fieldname: string, expression: string, where: obj, back: IShellEventHandler) {
@@ -520,11 +520,11 @@ namespace G {
              * @param type “delete”，“updata”，“query”分别 表示删改查
              * @param back
              */
-            operateTable(uniqueFlag:string, itemid:string, params:obj, where:obj, type: string,back:IShellEventHandler){
-                return ShellBase.handler('operateTable',{uniqueFlag, itemid, params, where,type},back)
+            operateTable(uniqueFlag: string, itemid: string, params: obj, where: obj, type: string, back: IShellEventHandler) {
+                return ShellBase.handler('operateTable', { uniqueFlag, itemid, params, where, type }, back)
             },
-            operateScanTable(sancode:string, option: string, uniqueFlag:string, keyfield:obj, numName: string, num: string, back:IShellEventHandler){
-                return ShellBase.handler('operateScanTable',{sancode, keyfield, uniqueFlag, option, numName, num},back)
+            operateScanTable(sancode: string, option: string, uniqueFlag: string, keyfield: obj, numName: string, num: string, back: IShellEventHandler) {
+                return ShellBase.handler('operateScanTable', { sancode, keyfield, uniqueFlag, option, numName, num }, back)
             },
 
         };
@@ -583,15 +583,30 @@ namespace G {
         };
         //表格上方的发送位置-停止发送
         const location = {
+            //开始定位
             startRecord(back?: IShellEventHandler) {
-                return ShellBase.handler('startRecord', { "timestep": "5000" },back);
+                return ShellBase.handler('startRecord', { "timestep": "5000" }, back);
             },
+            //结束定位
             stopRecord(back?: IShellEventHandler) {
-                return ShellBase.handler('stopRecord', {},back);
+                return ShellBase.handler('stopRecord', {}, back);
             },
+            // 绘制地图
+            drawMap(back?: IShellEventHandler) {
+                return ShellBase.handler('drawMap', {}, back);
+            },
+            //提交
+            localSubmit(data: obj, back?: IShellEventHandler) {
+                return ShellBase.handler("localSubmit", { data }, back)
+            }
         };
+        const network = {
+            startPing(data: obj, back?: IShellEventHandler, info?: IShellEventHandler) {
+                return ShellBase.handler('startPing', { data }, back, info);
+            }
+        }
         return {
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem,clearCache
+            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem, clearCache, network
         }
     })(window, document);
 
@@ -639,8 +654,8 @@ namespace G {
             events.forEach(event => d.off(window, event));
             delete events[action];
         }
-        function windowsHandler<IShellHandler>(action:string, data, back?, infor?, isAutoOff = true) {
-            if(typeof AppShell === 'object' || (tools.os.ios && 'webkit' in window && typeof webkit.messageHandlers.AppShell === 'object')) {
+        function windowsHandler<IShellHandler>(action: string, data, back?, infor?, isAutoOff = true) {
+            if (typeof AppShell === 'object' || (tools.os.ios && 'webkit' in window && typeof webkit.messageHandlers.AppShell === 'object')) {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
 
                 if (tools.isEmpty(back) && tools.isEmpty(infor)) {
