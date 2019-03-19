@@ -121,6 +121,7 @@ export class BwTableEditModule {
                         for (let opt of options) {
                             if (opt.value == data[field.lookUpKeyField]) {
                                 com.set(opt || '');
+                                break;
                             }
                         }
                     }else if(name in data){

@@ -354,8 +354,10 @@ export class DropDown {
                     return true;
                 }
             }
+            this.selectIndex = -1;
             return false;
         } else {
+            this.selectIndex = -1;
             return false;
         }
     }
