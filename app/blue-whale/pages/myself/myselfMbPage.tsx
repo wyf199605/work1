@@ -144,98 +144,38 @@ export = class myselfMbPage {
         d.on(d.query('#check'), 'click', function () {
             sys.window.update();
         });
+        /**清理缓存 */
         d.on(d.query('#clear'), 'click', function () {
             sys.window.clear();
             Modal.toast('清理成功');
         });
-
+        /**扫一扫 */
         d.on(d.query('#scan'), 'click', function () {
             (ShellAction.get()).device().scan({
                 callback: (e) => {
-
                     alert(e.detail);
                 }
             });
         });
-
+        /**退出登录 */
         d.on(d.query('[data-action="logout"]'), 'click', function () {
-            // Rule.ajax(CONF.ajaxUrl.logout, {
-            //     success : function () {
-            //         Modal.toast('退出成功');
-            //         sys.window.logout(CONF.siteAppVerUrl + "/index?uuid="+Device.get().uuid);
-            //     }
-            // });
             BwRule.Ajax.fetch(CONF.ajaxUrl.logout)
                 .then(({ }) => {
                     Modal.toast('退出成功');
                     sys.window.logout();
                 });
         });
-
+        /**网络测试 */
         d.on(d.query('#testNetwork'), 'click', () => {
             modal.isShow = true;
-            // let url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=checkNetwork" });
-            // sys.window.open({ url })
-            new checkNetwork({modal:modal})
-
+            new checkNetwork({ modal: modal })
         });
-        let modal = this.initModal();
-        let urls = Array.from({ length: 5 }, () => 1000).map(num => tools.url.addObj(CONF.ajaxUrl.speedTest, { size: num }));
-        let testStart = true;
-
-        d.on(d.query('body'), 'click', '.mui-rotate-box', function () {
-            if (testStart) {
-                let progressBar = d.query('.mui-progress-bar', this.parentElement);
-                let progressWidth = d.query('.mui-progress', this.parentElement).offsetWidth;
-                progressBar.style.width = 0 + 'px';
-                testStart = false;
-                this.className += ' animate_start';
-                let interval = null;
-                let timeout = null;
-                let width = 0;
-                let scroll = 0;
-                let addWidth = (): void => {
-                    progressBar.style.transition = 0 + 's';
-                    progressBar.style.webkitTransition = 0 + 's';
-                    interval = setInterval(() => {
-                        width++;
-                        this.querySelector('.box-content').innerHTML = '测速中...';
-                        progressBar.style.width = width + 'px';
-                        if (width / progressWidth >= scroll) {
-                            clearInterval(interval);
-                        }
-                    }, 100);
-                };
-                addWidth();
-                self.speedTest(urls, (results: number[]) => {
-                    clearInterval(interval);
-                    clearInterval(timeout);
-                    scroll = (results.length + 1) / urls.length;
-                    progressBar.style.transition = .8 + 's';
-                    progressBar.style.webkitTransition = .8 + 's';
-                    width = progressWidth * (results.length / urls.length);
-                    progressBar.style.width = width + 'px';
-                    timeout = setTimeout(() => {
-                        addWidth();
-                    }, 800);
-                    if (results.length === urls.length) {
-                        clearInterval(interval);
-                        clearInterval(timeout);
-                        let sum: number = 0;
-                        results.forEach((val) => {
-                            sum += val;
-                        });
-                        setTimeout(() => {
-                            this.className = this.classList[0];
-                            this.querySelector('.box-content').innerHTML =
-                                (sum / results.length).toFixed(2) + 'KB/s';
-                            testStart = true;
-                        }, 1000);
-                    }
-                });
-            }
+        let modal = new Modal({
+            className: 'test-module-wrapper',
+            body: null,
+            position: sys.isMb ? 'full' : '',
+            isShow: false
         });
-        sys.window.close = double_back;
     }
 
     private rfidSettingInit(list: HTMLElement) {
@@ -254,48 +194,6 @@ export = class myselfMbPage {
         }
     }
 
-
-    private initModal() {
-        let body = <div className="mui-content">
-            <div className="mui-rotate-box">
-                <div className="box-content">点击测速</div>
-                <div className="circle-box1"></div>
-                <div className="circle-box2"></div>
-            </div>
-            <div className="mui-progress">
-                <div className="mui-progress-bar"></div>
-            </div>
-        </div>;
-
-        return new Modal({
-            className: 'test-module-wrapper',
-            header: '网络测速',
-            body: null,
-            position: sys.isMb ? 'full' : '',
-            isShow: false
-        });
-    }
-
-    private speedTest(urls: string[], callback: Function) {
-        test(urls);
-        let results: number[] = [];
-
-        function test(urls: string[], num = 0) {
-            if (urls.length === num) {
-                return;
-            }
-            let startTime = new Date().getTime();
-            Ajax.fetch(urls[num])
-                .then(({ response }) => {
-                    let time = new Date().getTime() - startTime;
-                    num++;
-                    let size = tools.str.utf8Len(response);
-                    results.push((size / 1024) / (time / 1000));
-                    callback && callback(results);
-                    test(urls, num);
-                })
-        }
-    }
 
     private setFontSize(list: HTMLElement) {
         let li = <li className="mui-table-view-cell" id="setFontSize">

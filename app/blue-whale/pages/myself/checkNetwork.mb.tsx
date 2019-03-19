@@ -1,6 +1,5 @@
 /// <amd-dependency path="echarts" name="echarts"/>
 ///<amd-module name="checkNetwork"/>
-import BasicPage from "basicPage";
 import tools = G.tools;
 import CONF = BW.CONF;
 import d = G.d;
@@ -8,13 +7,9 @@ import { BwRule } from "../../common/rule/BwRule";
 import { Modal } from "global/components/feedback/modal/Modal";
 declare const echarts;
 interface pagePara {
-  dom?: HTMLElement,
-  title?: string,
   modal: Modal
 }
 export class checkNetwork {
-  private testBtn: HTMLElement;
-  private pingBtn: HTMLElement;
   private submitBtn: HTMLElement;
   private myChart: any;
   private option: any;
@@ -27,39 +22,41 @@ export class checkNetwork {
   }
   /** 事件绑定 */
   event() {
-    G.d.on(this.testBtn, "click", (e) => {
+    //tab切换
+    let tab = d.query("#js_tab");
+    G.d.on(tab, "click", (e) => {
       let dom = e.target as HTMLElement;
-      let parent = dom.parentNode.lastChild as HTMLElement;
-      parent.classList.remove("active");
+      for (var i = 0; i < tab.childNodes.length; i++) {
+        let item = tab.childNodes[i] as HTMLElement;
+        item.classList.remove("active")
+      }
       dom.classList.add("active");
       this.submitBtn.removeAttribute("disabled");
-      this.renderCircle()
+      if (dom.innerText == '网络测速') {
+        this.renderCircle()
+      } else {
+        this.renderFullCircle();
+      }
     })
-    G.d.on(this.pingBtn, "click", (e) => {
-      let dom = e.target as HTMLElement;
-      let parent = dom.parentNode.firstChild as HTMLElement;
-      parent.classList.remove("active");
-      dom.classList.add("active");
-      this.submitBtn.removeAttribute("disabled");
-      this.renderFullCircle();
-    })
+    //关闭
     G.d.on(G.d.query("#check_back"), "click", () => {
       d.query(".check_netWork").remove();
-       this.modal.isShow=false;
+      this.modal.isShow = false;
     })
+    //点击测试或运行按钮
     G.d.on(this.submitBtn, "click", () => {
       this.submitBtn.setAttribute("disabled", "true");
       if (this.submitBtn.innerText === "开始测试") {
         this.submitBtn.innerText = "测试中..."
-        this.netTest();
+        this.networkTest();
       } else {
         this.submitBtn.innerText = "运行中..."
         this.pingTest();
       }
     })
   }
-  //网络测试
-  netTest() {
+  /**网络测试 */
+  networkTest() {
     let url = tools.url.addObj(CONF.ajaxUrl.speedTest, { size: 1000 })
     let results = [];
     this.option.series[0].data[0].value = 0;
@@ -86,18 +83,7 @@ export class checkNetwork {
       })(j)
     }
   }
-  req_net(url) {
-    let startTime = new Date().getTime();
-    return new Promise((resolve, reject) => {
-      G.Ajax.fetch(url).then(({ response }) => {
-        let size = tools.str.utf8Len(response);
-        let time = new Date().getTime() - startTime;
-        resolve((size / 1024) / (time / 1000))
-      }).catch(err => {
-        reject();
-      })
-    })
-  }
+  /**ping调用壳的startPing指令 */
   pingTest() {
     let total = 0
     this.req_getIp().then(data => {
@@ -129,6 +115,7 @@ export class checkNetwork {
       this.submitBtn.removeAttribute("disabled");
     })
   }
+  /** 从后端获取ip列表给壳 */
   req_getIp() {
     return new Promise((resolve, reject) => {
       BwRule.Ajax.fetch(CONF.ajaxUrl.pingUrl).then(({ response }) => {
@@ -138,6 +125,20 @@ export class checkNetwork {
       })
     })
   }
+  /**请求网络速度 */
+  req_net(url) {
+    let startTime = new Date().getTime();
+    return new Promise((resolve, reject) => {
+      G.Ajax.fetch(url).then(({ response }) => {
+        let size = tools.str.utf8Len(response);
+        let time = new Date().getTime() - startTime;
+        resolve((size / 1024) / (time / 1000))
+      }).catch(err => {
+        reject();
+      })
+    })
+  }
+  /**网络测试的仪表盘配置 */
   renderCircle() {
     let parent = G.d.query(".check_pane");
     parent.innerHTML = "";
@@ -148,13 +149,13 @@ export class checkNetwork {
     // 指定图表的配置项和数据
     this.option = {
       series: [{
-        type: 'gauge',
-        min: 0,                     // 最小值
-        max: 10240,                   // 最大值
+        type: 'gauge',             //类型
+        min: 0,                     // 最小值 0k
+        max: 10240,                   // 最大值  10M
         axisLine: {            // 坐标轴线
           show: true,        // 默认显示，属性show控制显示与否
           lineStyle: {       // 属性lineStyle控制线条样式
-            color: [[0.2, 'lightgreen'], [0.4, 'orange'], [0.8, 'skyblue'], [1, '#ff4500']],
+            color: [[0.2, 'lightgreen'], [0.4, 'orange'], [0.8, 'skyblue'], [1, '#ff4500']],  //每段的颜色
             width: 10
           }
         },
@@ -195,6 +196,7 @@ export class checkNetwork {
     this.myChart.setOption(this.option);
     G.d.query(".check_btn").innerText = "开始测试"
   }
+  /** 渲染环形ping进度条 */
   renderFullCircle() {
     let parent = G.d.query(".check_pane");
     parent.innerHTML = "";
@@ -203,6 +205,7 @@ export class checkNetwork {
     this.myChart = null;
     this.myChart = echarts.init(document.getElementById('speedometer'));
     this.option = {
+      //百分比字体样式设置
       title: {
         show: true,
         text: '0%',
@@ -214,6 +217,7 @@ export class checkNetwork {
           fontWeight: 'normal'
         }
       },
+      //面板提示 show=false
       tooltip: {
         trigger: 'item',
         formatter: "{d}%",
@@ -224,6 +228,7 @@ export class checkNetwork {
         x: 'left',
         show: false
       },
+      //进度条颜色
       color: ['#FD5457', '#BEE0FF'],
       series: {
         name: '',
@@ -253,10 +258,9 @@ export class checkNetwork {
     };
     // 使用刚指定的配置项和数据显示图表。
     this.myChart.setOption(this.option);
-    // let txt = <div className="center_txt">50%</div>
-    // G.d.append(document.querySelector(".check_pane"), txt);
     G.d.query(".check_btn").innerText = "运行"
   }
+  /**页面渲染 */
   render(wrapper: HTMLElement) {
     let wraper = <div className="check_netWork">
       <div className="check_wrap">
@@ -266,13 +270,9 @@ export class checkNetwork {
           </span>
           <span>网络监控</span>
         </div>
-        <div className="check_Tab">
-          {
-            this.testBtn = <p className="active">  网络测速 </p>
-          }
-          {
-            this.pingBtn = <p>网络检查 </p>
-          }
+        <div className="check_Tab" id="js_tab">
+          <p className="active">  网络测速 </p>
+          <p>网络检查 </p>
         </div>
         <div className="check_pane"></div>
       </div>
