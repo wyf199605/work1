@@ -256,7 +256,7 @@ export class OfflineBtn {
                     Modal.toast('删除成功');
                     // 若为主表，则同时清空子表数据
                     if(itemId === this.para.mainId){
-                        this.imports.clear(this.para.subId);
+                        this.para.subId && this.imports.clear(this.para.subId);
                     }
                     this.imports.clear(itemId);
                 }else {
