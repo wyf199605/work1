@@ -6,6 +6,8 @@ import {EditModule} from "../edit/editModule";
 import d = G.d;
 import tools = G.tools;
 import {BwTableModule} from "./BwTableModule";
+import {BwRule} from "../../common/rule/BwRule";
+import CONF = BW.CONF;
 
 interface IBwTableEditPara{
     fields: R_Field[];
@@ -32,12 +34,54 @@ export class BwTableEditModule {
         this.editModule = new EditModule({
             auto: true,
             type: 'table',
-            fields: para.fields.map((field) => {
-                let el = BwTableEditModule.initItem(field);
+            fields: para.fields.map((f) => {
+                let el = BwTableEditModule.initItem(f);
                 el && d.append(this.wrapper, el);
                 return {
                     dom: el ? d.query('.detail-item-content', el) : null,
-                    field: field
+                    field: f,
+                    onExtra: (data, relateCols, isEmptyClear = false) => {
+                        let editModule = this.editModule,
+                            com = editModule.getDom(f.name);
+                        for(let key of relateCols){
+                            let hCom = editModule.getDom(key);
+                            if(hCom && hCom !== com){
+                                let hField = hCom.custom as R_Field;
+                                hCom.set(data[key] || '');
+
+                                if (hField.assignSelectFields && hField.assignAddr) {
+                                    BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.get()), {
+                                        cache: true,
+                                    }).then(({response}) => {
+                                        let res = response.data;
+                                        if (res && res[0]) {
+                                            hField.assignSelectFields.forEach((name) => {
+                                                let assignCom = editModule.getDom(name);
+                                                assignCom && assignCom.set(res[0][name]);
+                                            });
+                                            let data = this.get();
+                                            this.fields.forEach((field) => {
+                                                if(field.elementType === 'lookup'){
+                                                    let lCom = editModule.getDom(field.name);
+                                                    if(!data[field.lookUpKeyField]){
+                                                        lCom.set('');
+                                                    }else{
+                                                        let options = this.bwTable.lookUpData[field.name] || [];
+                                                        for (let opt of options) {
+                                                            if (opt.value == data[field.lookUpKeyField]) {
+                                                                lCom.set(opt.value);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            })
+                                        }
+
+                                    })
+                                }
+                            }
+                        }
+                    }
                 }
             }),
             container: this.container,

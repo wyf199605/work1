@@ -70,9 +70,10 @@ export class LookupModule extends FormCom{
                     if(option.value === value){
                         isSetSelect && this.selectInput.set(option);
                         typeof this.onSet === 'function' && this.onSet(option);
-                        break;
+                        return;
                     }
                 }
+                this.clear(isSetSelect);
             });
         } else{
             for(let i = 0; i < this.options.length; i ++) {
@@ -80,12 +81,22 @@ export class LookupModule extends FormCom{
                 if(option.value === value){
                     isSetSelect && this.selectInput.set(option);
                     typeof this.onSet === 'function' && this.onSet(option);
-                    break;
+                    return;
                 }
             }
+            this.clear(isSetSelect);
             // this.selectInput.set(value);
             // typeof this.onSet === 'function' && this.onSet(value);
         }
+    }
+
+    clear(isSetSelect = true){
+        let option = {
+            value: '',
+            text: ''
+        };
+        isSetSelect && this.selectInput.set(option);
+        typeof this.onSet === 'function' && this.onSet(option);
     }
 
 
