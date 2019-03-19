@@ -47,9 +47,7 @@ export class AssignTextModule extends TextInput{
 
     }
     destroy(){
-        if(this.assignBasic && this.assignBasic.iframe){
-            d.remove(this.assignBasic.iframe.get());
-            this.assignBasic.destroy();
-        }
+        this.assignBasic && this.assignBasic.destroy();
+        super.destroy();
     }
 }

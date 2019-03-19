@@ -1111,13 +1111,13 @@ export const d = {
     /**
      * 在某个元素之前插入一个元素
      */
-    before(ref: Node, el: Node | Primitive) {
-        if(ref instanceof Node) {
-            if (tools.isPrimitive(el)) {
-                el = document.createTextNode(el + '');
+    before(refChild: Node, newChild: Node | Primitive) {
+        if(refChild instanceof Node) {
+            if (tools.isPrimitive(newChild)) {
+                newChild = document.createTextNode(newChild + '');
             }
-            if(el instanceof Node) {
-                ref.parentNode && ref.parentNode.insertBefore(el, ref);
+            if(newChild instanceof Node) {
+                refChild.parentNode && refChild.parentNode.insertBefore(newChild, refChild);
             }
         }
     },

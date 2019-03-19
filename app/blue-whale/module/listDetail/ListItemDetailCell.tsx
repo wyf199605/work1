@@ -308,8 +308,9 @@ export class ListItemDetailCell extends Component {
                 if (tools.isNotEmpty(this.para.link)) {
                     this.innerEl.content.innerHTML = `<a href="#"" class="link" title="${data}">${data}</a>`;
                 } else {
-                    this.innerEl.content.innerText = data as string || '';
-                    this.innerEl.content.title = data as string || '';
+                    let text = tools.isEmpty(data) ? '' : data as string;
+                    this.innerEl.content.innerText = text;
+                    this.innerEl.content.title = text;
                 }
             }
                 break;

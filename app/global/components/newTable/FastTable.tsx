@@ -54,6 +54,7 @@ export interface IFastTablePara extends IComponentPara {
     dragCol?: boolean; // 列拖动
     isWrapLine?: boolean; // 是否换行，默认false
     isLockRight?: boolean; // 是否右侧锁列，默认否
+    dataAction?: (data: obj, type: 'show' | 'edit' | 'insert', callback?: (data: obj) => void) => void;
 }
 
 export interface IFastTableCol extends ITableCol {
@@ -130,6 +131,7 @@ export class FastTable extends Component {
 
     constructor(para: IFastTablePara) {
         super(para);
+        this.dataAction = para.dataAction;
         this.maxHeight = para.maxHeight;
         this.rowFormat = para.rowFormat;
         this._isLockRight = para.isLockRight || false;
@@ -146,6 +148,31 @@ export class FastTable extends Component {
             });
         }
 
+    }
+
+    public dataAction: (data: obj, type: 'show' | 'edit' | 'insert', callback?: (data: obj) => void) => void;
+    dataControl(){
+        let row = this.selectedRows[0],
+            type: 'show' | 'edit' | 'insert' = 'show';
+        if(!row){
+            Modal.alert('请选中要进行操作的数据');
+            return ;
+        }
+
+        if(!this.editing){
+            this.dataAction(row.data, type);
+            return ;
+        }
+
+        let index = row.data[TableBase.GUID_INDEX],
+            insertIndexes = this.edit.addIndex.get();
+
+        type = ~insertIndexes.indexOf(index) ? 'insert' : 'edit';
+        this.dataAction(row.data, type, (data) => {
+            row.cells.forEach(cell => {
+                cell.data = data[cell.name]
+            });
+        });
     }
 
     get errorMsg(){
@@ -2868,6 +2895,7 @@ export class FastTable extends Component {
         this.editing = true;
 
         this.tablesEach((table, index) => {
+            table.off(TableBase.EVT_EDITED);
             table.on(TableBase.EVT_EDITED, (ev) => {
                 if (ev.row === 0 && this.editor.autoInsert) {
                     let num = this.rowAdd(void 0, 0);
@@ -2882,6 +2910,7 @@ export class FastTable extends Component {
                     }
                 }
             });
+            table.off(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index]);
             table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell: TableDataCell) => {
                 let index = cell.row.index;
                 if(!this.rows[index]){

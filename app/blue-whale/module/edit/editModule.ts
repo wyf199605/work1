@@ -299,7 +299,9 @@ export class EditModule {
                     container: p.dom,
                     field: p.field,
                     custom: p.field,
-                    rowData: p.data,
+                    rowDataGet: () => {
+                        return p.data ? p.data : this.get()
+                    },
                     onExtra: (item) => {
                         if (item) {
                             setTimeout(() => {
@@ -314,6 +316,7 @@ export class EditModule {
                 })
             } else {
                 let ajaxFun = (url: string, value: string, cb: Function) => {
+                    url = CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, p.data ? p.data : this.get());
                     BwRule.Ajax.fetch(url, {
                         needGps: p.field.dataAddr.needGps
                     }).then(({response}) => {

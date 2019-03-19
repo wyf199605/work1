@@ -16,7 +16,7 @@ export class AssignModuleBasic extends FormCom{
     public iframe;
 
     public initPicker(pickDom: HTMLElement, href:string, data:obj , onSelect: Function){
-        let isAppend = true;
+
         if(pickDom){
             let captionName = pickDom.parentElement.dataset.name;
             if(sys.isMb){
@@ -28,11 +28,7 @@ export class AssignModuleBasic extends FormCom{
                 localStorage.setItem('fromPickCaption', captionName);
                 localStorage.setItem('fromPickData', JSON.stringify(tools.str.toEmpty(data)));
                 if(sys.os === 'pc'){
-                    if(isAppend){
-                        this.initIframe(href);
-                        isAppend = false;
-
-                    }
+                    this.initIframe(href);
                     this.contactModal.isShow = true;
                 }else {
                     this.iframe.show();
@@ -50,6 +46,9 @@ export class AssignModuleBasic extends FormCom{
 
     protected initIframe(href:string){
         /*初始化收件人模态框*/
+        if(this.contactModal){
+            return ;
+        }
         if(!href){
             return;
         }
@@ -58,8 +57,8 @@ export class AssignModuleBasic extends FormCom{
 
         this.contactModal = new Modal({
             body : iframe,
-            isOnceDestroy : true,
-            className: 'contact-modal',
+            // isOnceDestroy : true,
+            className: 'contact-modal'
         });
 
         // iframe.onload = () => {
@@ -119,5 +118,14 @@ export class AssignModuleBasic extends FormCom{
 
     protected wrapperInit(): HTMLElement {
         return undefined;
+    }
+
+    destroy(){
+        if(this.iframe){
+            d.remove(this.iframe.get());
+        }
+        this.contactModal && this.contactModal.destroy();
+        this.contactModal = null;
+        super.destroy();
     }
 }

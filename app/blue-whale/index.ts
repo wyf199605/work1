@@ -1,4 +1,5 @@
 /// <reference path="Config.ts"/>
+/// <reference path="common/subItem.tsx"/>
 /// <reference path="common/sys/sys.ad.ts"/>
 /// <reference path="common/sys/sys.h5.ts"/>
 /// <reference path="common/sys/sys.ip.ts"/>

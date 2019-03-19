@@ -134,9 +134,9 @@ export class DetailItem extends Component{
                     this.render();
                 }
 
-                if(tools.isMb && !isEdit && com){
+                if(!isEdit && com){
                     com.disabled = true;
-                    com.wrapper && com.wrapper.addEventListener('click', () => {
+                    tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
                         Modal.toast(field.caption + '不可编辑');
                     });
                 }

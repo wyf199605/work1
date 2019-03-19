@@ -271,7 +271,7 @@ export class ListItemDetail extends Component{
     render(data: obj) {
         let cells = this.cells;
         for (let key in cells) {
-            cells[key].render(data[key] || '');
+            cells[key].render(tools.isEmpty(data[key]) ? '' : data[key]);
         }
     }
 

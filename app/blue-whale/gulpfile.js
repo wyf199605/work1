@@ -94,7 +94,7 @@ gulp.task('js', function() {
     compiler.ts(['*', 'common/**/*'], 'bw.js', path.global);
 
 
-    compiler.ts(['BwTableModule', 'BwMainTable', 'BwSubTableModule', 'newTableModule', 'InventoryBtn'].map(s => 'module/table/' + s), 'table.js', path.module);
+    compiler.ts(['BwTableModule', 'BwTableEditModule', 'BwMainTable', 'BwSubTableModule', 'newTableModule', 'InventoryBtn'].map(s => 'module/table/' + s), 'table.js', path.module);
 
     // pc 表格
     compiler.ts([

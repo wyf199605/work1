@@ -175,6 +175,9 @@ export class SelectInputMb extends TextInput{
             text = data.text;
             value = data.value
         }
+        if(tools.isEmpty(data)){
+            this._index = -1;
+        }
 
         for (let d:ListItem = null, i = 0; d = this.data[i]; i++){
             if (d.value === value){

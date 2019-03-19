@@ -590,6 +590,31 @@ export class NewTableModule extends AGroupTabItem{
         if((this.editType === 'self' && tools.isNotEmpty(bwTable.editParam)) ||
             (this.editType === 'linkage' && this.editable)){
             let editBtnData = [
+                // {
+                //     key: 'modal-edit',
+                //     content: '编辑',
+                //     onClick: tools.pattern.throttling(() => {
+                //         this.modalEditManager.init(bwTable);
+                //     }, time),
+                //     icon: 'danchuceng'
+                // },
+                // {
+                //     key: 'modal-insert',
+                //     content: '新增',
+                //     onClick: tools.pattern.throttling(() => {
+                //         this.modalEditManager.insert(bwTable);
+                //     }, time),
+                //     icon: 'danchuceng'
+                // },
+                {
+                    key: 'modal-action',
+                    content: '窗口操作',
+                    onClick: tools.pattern.throttling(() => {
+                        let ftable = bwTable.ftable;
+                        ftable && ftable.dataControl();
+                    }, time),
+                    icon: 'danchuceng'
+                },
                 {
                     key: 'edit',
                     content: '编辑',
@@ -651,6 +676,103 @@ export class NewTableModule extends AGroupTabItem{
         }
 
     }
+
+    modalEditManager = (() => {
+
+        let editDataGet = (obj: obj, bwTable: BwTableModule, key: string) => {
+            let editParam = bwTable.editParam;
+            let data = BwRule.varList(editParam[key], obj, true);
+            return {
+                param: [
+                    {
+                        itemId: bwTable.ui.itemId,
+                        [key]: [
+                            data
+                        ]
+                    }
+                ]
+            }
+        };
+
+        let saveData = (bwTable: BwTableModule, saveData: obj, callback: Function) => {
+            if(tools.isEmpty(saveData.param)){
+                Modal.toast('没有数据改变');
+                return ;
+            }
+
+            let url;
+            if(bwTable.ui.tableAddr){
+                url = bwTable.ui.tableAddr.dataAddr
+            }
+            if(this.bwEl.tableAddr){
+                url = this.bwEl.tableAddr.dataAddr;
+            }
+            if(url){
+                let loading = new Loading({
+                    msg: '保存中',
+                    disableEl: this.main.wrapper
+                });
+                BwRule.Ajax.fetch(CONF.siteUrl + url, {
+                    type: 'POST',
+                    data: saveData,
+                }).then(({response}) => {
+
+                    BwRule.checkValue(response, saveData, () => {
+                        this.currentSelectedIndexes = [];
+                        // 主表子表刷新
+                        this.refresh();
+                        Modal.toast(response.msg);
+                        // loading && loading.destroy();
+                        // loading = null;
+                        tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                        callback && callback();
+                    });
+                }).finally(() => {
+                    loading && loading.destroy();
+                    loading = null;
+                });
+            }else{
+                Modal.alert('保存失败');
+            }
+        };
+
+        return {
+            edit: (bwTable: BwTableModule) => {
+                let selectedData = bwTable ? bwTable.ftable.selectedRowsData : null;
+                if(tools.isEmpty(selectedData && selectedData[0])){
+                    Modal.alert('请选中要编辑的数据');
+                    return ;
+                }
+                let data = selectedData[0],
+                    editModule = bwTable.initModalEdit(data);
+                editModule.clear();
+                editModule.initStatus(false);
+                editModule.set(data);
+                editModule.modalShow = true;
+                editModule.onFinish = (data) => {
+                    let params = editDataGet(data, bwTable, 'update');
+                    saveData(bwTable, params, () => {
+                        editModule.modalShow = false;
+                    })
+                }
+            },
+            insert: (bwTable: BwTableModule) => {
+                let editModule = bwTable.initModalEdit();
+                editModule.clear();
+                editModule.initStatus(true);
+                editModule.modalShow = true;
+                bwTable.rowDefData.then(data => {
+                    editModule.set(data);
+                });
+                editModule.onFinish = (data) => {
+                    let params = editDataGet(data, bwTable, 'insert');
+                    saveData(bwTable, params, () => {
+                        editModule.modalShow = false;
+                    });
+                }
+            }
+        }
+    })();
 
     editManage = (() => {
         let editing = false;

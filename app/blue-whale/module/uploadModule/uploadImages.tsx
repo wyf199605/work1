@@ -157,7 +157,7 @@ export class UploadImages extends FormCom {
         return this._pageData;
     }
 
-    private _imgs: IImage[];
+    private _imgs: IImage[] = [];
     set imgs(imgs: IImage[]) {
         this._imgs = imgs || [];
         this.render(this._imgs);

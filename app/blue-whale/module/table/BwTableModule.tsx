@@ -35,6 +35,8 @@ import { FastTableColumn } from "../../../global/components/newTable/FastTabelCo
 import { NewIDB } from "../../../global/NewIDB";
 import { Datetime } from "../../../global/components/form/datetime/datetime";
 import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
+import {BwTableEditModule} from "./BwTableEditModule";
+
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
     tableModule?: NewTableModule;
@@ -69,6 +71,7 @@ export class BwTableModule extends Component {
     protected ajax = new BwRule.Ajax();
 
     public ftable: FastBtnTable;
+    public isModalEdit: boolean = true;
 
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
@@ -78,6 +81,8 @@ export class BwTableModule extends Component {
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
+        this.isModalEdit = ui.operationType && ui.operationType.editType
+            ? ui.operationType.editType === 'modal' : false;
         this.isPivot = ui.relateType === 'P';
         if (this.tableModule && !this.tableModule.editable && !this.isPivot) {
             this.editParam = null;
@@ -250,7 +255,24 @@ export class BwTableModule extends Component {
                 onClick: () => {
                     this.ftable.colsSort.open();
                 }
-            } : null]
+            } : null],
+            dataAction: (data, type, callback) => {
+                let editModule = this.initModalEdit(),
+                    isEdit = type !== 'show',
+                    isInsert = type === 'insert';
+                editModule.clear();
+                editModule.initStatus(isInsert, isEdit);
+                editModule.set(data);
+                editModule.modalShow = true;
+
+                editModule.onFinish = (data) => {
+                    editModule.modalShow = false;
+                    if(isEdit){
+                        callback && callback(data);
+                        Modal.toast('请点击保存以保存数据');
+                    }
+                }
+            }
         }
     }
 
@@ -693,7 +715,7 @@ export class BwTableModule extends Component {
         return this._lookUpData || {};
     }
 
-    private get lookup(): Promise<void> {
+    get lookup(): Promise<void> {
         if (tools.isEmpty(this._lookUpData)) {
             let allPromise = this.cols.filter(col => col.elementType === 'lookup')
                 .map(col => BwRule.getLookUpOpts(col).then((items) => {
@@ -2554,7 +2576,7 @@ export class BwTableModule extends Component {
                 };
             return {
                 on: () => {
-                    d.on(this.wrapper, 'dblclick', selector, handler);
+                    !this.isModalEdit && d.on(this.wrapper, 'dblclick', selector, handler);
                 },
                 off: () => {
                     d.off(this.wrapper, 'dblclick', selector, handler);
@@ -2929,9 +2951,8 @@ export class BwTableModule extends Component {
         };
 
         let editParamDataGet = (tableData, varList: IBW_TableAddrParam, isPivot = false) => {
-            let paramData: obj = {
-                allData: {}
-            };
+            let paramData: obj = {};
+
             varList && ['update', 'delete', 'insert'].forEach(key => {
                 let dataKey = varList[`${key}Type`];
                 if (varList[key] && tableData[dataKey][0]) {
@@ -2940,6 +2961,9 @@ export class BwTableModule extends Component {
                         !isPivot);
                     if (data) {
                         paramData[key] = data;
+                        if(!paramData.allData){
+                            paramData.allData = {};
+                        }
                         paramData.allData[key] = tableData[dataKey]
                     }
                 }
@@ -2979,7 +3003,11 @@ export class BwTableModule extends Component {
         let insert = () => {
             (this.ftable.editing ? Promise.resolve() : start())
                 .then(() => {
-                    this.ftable.rowAdd();
+                    let ftable = this.ftable;
+                    ftable.rowAdd();
+                    ftable.clearSelectedRows();
+                    let firstRow = ftable.rows[0];
+                    firstRow && (firstRow.selected = true);
                 })
         };
 
@@ -3013,17 +3041,19 @@ export class BwTableModule extends Component {
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
-                                        let data = saveData['allData']['update'] || [],
-                                            pictureAddrList = this.ui.pictureAddrList;
+                                        if(tools.isNotEmpty(saveData)){
+                                            let data = saveData['allData']['update'] || [],
+                                                pictureAddrList = this.ui.pictureAddrList;
 
-                                        if (pictureAddrList) {
-                                            pictureAddrList.forEach((addr) => {
-                                                this.updateImgVersion(data.map((rowData) => {
-                                                    return tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
-                                                }));
-                                            })
+                                            if (pictureAddrList) {
+                                                pictureAddrList.forEach((addr) => {
+                                                    this.updateImgVersion(data.map((rowData) => {
+                                                        return tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(addr, rowData), this.ajaxData, true, true)
+                                                    }));
+                                                })
+                                            }
+                                            delete saveData['allData'];
                                         }
-                                        delete saveData['allData'];
                                         resolve(saveData);
                                     }).catch((msg) => reject(msg));
                                 }, 100);
@@ -3081,7 +3111,9 @@ export class BwTableModule extends Component {
                 insert: editVarHas(this.editParam, ['insert']),
                 del: editVarHas(this.editParam, ['delete']),
                 save: isStart,
-                cancel: isStart
+                cancel: isStart,
+                // "modal-edit": isStart ? false : editVarHas(this.editParam, ['update']),
+                // "modal-insert": isStart ? false : editVarHas(this.editParam, ['insert'])
             };
 
             if (box) {
@@ -3138,6 +3170,21 @@ export class BwTableModule extends Component {
                 }
             })
         })
+    }
+
+    protected modalEdit: BwTableEditModule;
+    initModalEdit(data?: obj): BwTableEditModule{
+        if(this.modalEdit){
+            return this.modalEdit;
+        }
+
+        return this.modalEdit = new BwTableEditModule({
+            container: this.container,
+            fields: this.cols,
+            defaultData: data,
+            title: this.ui.caption,
+            bwTable: this,
+        });
     }
 
     // 关联数据，每次按钮请求时需附带的参数

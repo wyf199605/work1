@@ -8,7 +8,7 @@ import {BwRule} from "../../common/rule/BwRule";
 
 interface ILookupModulePara extends IFormComPara{
     field:R_Field;
-    rowData?: obj
+    rowDataGet?: () => obj
     onExtra?: Function;
 }
 export class LookupModule extends FormCom{
@@ -43,8 +43,8 @@ export class LookupModule extends FormCom{
     }
 
     private ajax(callback:Function){
-        let {field, rowData} = this.para;
-        BwRule.getLookUpOpts(field, rowData).then(options => {
+        let {field, rowDataGet} = this.para;
+        BwRule.getLookUpOpts(field, rowDataGet ? rowDataGet() : {}).then(options => {
             this.options = options;
             callback(options ? options.map((o) => Object.assign({}, o)) : []);
         });
@@ -70,9 +70,10 @@ export class LookupModule extends FormCom{
                     if(option.value === value){
                         isSetSelect && this.selectInput.set(option);
                         typeof this.onSet === 'function' && this.onSet(option);
-                        break;
+                        return;
                     }
                 }
+                this.clear(isSetSelect);
             });
         } else{
             for(let i = 0; i < this.options.length; i ++) {
@@ -80,12 +81,22 @@ export class LookupModule extends FormCom{
                 if(option.value === value){
                     isSetSelect && this.selectInput.set(option);
                     typeof this.onSet === 'function' && this.onSet(option);
-                    break;
+                    return;
                 }
             }
+            this.clear(isSetSelect);
             // this.selectInput.set(value);
             // typeof this.onSet === 'function' && this.onSet(value);
         }
+    }
+
+    clear(isSetSelect = true){
+        let option = {
+            value: '',
+            text: ''
+        };
+        isSetSelect && this.selectInput.set(option);
+        typeof this.onSet === 'function' && this.onSet(option);
     }
 
 
