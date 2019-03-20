@@ -309,9 +309,7 @@ export class UploadImages extends FormCom {
                         // 最大张数限制，不配置或者配置0则默认10张
                         const maxValue = this.para.field.atrrs.maxValue || 10;
                         const maxLen = maxValue != '0' ? maxValue : 10;
-                        if(imgs.length > maxLen){
-                            return Modal.alert(`图片最大数量不超过${maxLen}张`); 
-                        }
+                        if(imgs.length > maxLen) return Modal.alert(`图片最大数量不超过${maxLen}张`);
                         this.imgs = imgs;
                     }).catch((e) => {
                         console.log(e);
