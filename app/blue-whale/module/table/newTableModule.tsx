@@ -610,8 +610,7 @@ export class NewTableModule extends AGroupTabItem{
                     key: 'modal-action',
                     content: '窗口操作',
                     onClick: tools.pattern.throttling(() => {
-                        let ftable = bwTable.ftable;
-                        ftable && ftable.dataControl();
+                        this.editManage.windowControl(bwTable);
                     }, time),
                     icon: 'danchuceng'
                 },
@@ -929,6 +928,23 @@ export class NewTableModule extends AGroupTabItem{
             }
         };
 
+        let windowControl = (bwTable: BwTableModule) => {
+            switch (this.editType){
+                case 'self':{
+                    let ftable = bwTable.ftable;
+                    ftable && ftable.dataControl();
+                    break;
+                }
+                case 'linkage':{
+                    let main = this.main,
+                        sub = this.sub[this.subTabActiveIndex],
+                        table = this.active.isMain ? main : sub;
+                    let ftable = table.ftable;
+                    ftable && ftable.dataControl();
+                }
+            }
+        };
+
         return {
             get editing(){
                 return editing
@@ -938,6 +954,7 @@ export class NewTableModule extends AGroupTabItem{
             end,
             insert,
             del,
+            windowControl
         }
     })();
 
