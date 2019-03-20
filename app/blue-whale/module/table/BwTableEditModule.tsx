@@ -133,6 +133,7 @@ export class BwTableEditModule {
             let isEdit = isInsert ? !field.noModify : !field.noEdit,
                 com = this.editModule.getDom(field.name),
                 parent = d.closest(com.wrapper, '.detail-item');
+            parent && parent.classList.remove('disabled');
             if(isModify){
                 com.disabled = false;
                 if(!isEdit && com){
@@ -140,11 +141,11 @@ export class BwTableEditModule {
                     tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
                         Modal.toast(field.caption + '不可编辑');
                     });
+                    parent && parent.classList.add('disabled');
                 }
             }else{
                 com.disabled = true;
             }
-            parent && parent.classList.toggle('disabled', com.disabled);
 
         });
         if(this.modal)
