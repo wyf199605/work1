@@ -144,6 +144,7 @@ export class BwUploader extends FormCom {
                         }), BwUploader.hintMsg);
                     }
                 },
+
                 {
                     content: '相册',
                     onClick: () => {
@@ -153,7 +154,7 @@ export class BwUploader extends FormCom {
                     }
                 }
             ].concat(buttons),
-            zIndex: 1001,
+            zIndex: 1002,
         })
     }
 
