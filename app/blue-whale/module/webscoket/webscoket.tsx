@@ -185,7 +185,10 @@ export = class webscoket {
             ShellAction.get().device().scan({
                 callback: (event) => {
                     let detail = JSON.parse(event.detail);
-                    this.handleUrl(detail.data)
+                    this.handleUrl(detail.data);
+
+
+
                 }
             });
             // Shell.inventory.openScanCode(0, (result) => {
@@ -203,9 +206,21 @@ export = class webscoket {
                 code: code
             }
         }).then(({ response }) => {
-            let list = response.next.vars
-            if (list && list.indexOf("code") > -1) {
-                this.requestUrl(CONF.siteUrl + response.next.url, code)
+            let list = response.next.vars;
+
+            // 判断是扫码登陆还是扫码跳转
+            // type = 0 登录
+            // type = 1 跳转
+            if ( response.next.type == 1 ) {
+                if ( list && response.next.url ) {
+                    sys.window.open({
+                        url : CONF.siteUrl + response.next.url + '?' + list[0] + '=' + code
+                    })
+                }
+            } else  {
+                if (list && list.indexOf("code") > -1) {
+                    this.requestUrl(CONF.siteUrl + response.next.url, code);
+                }
             }
         })
     }
