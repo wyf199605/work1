@@ -131,7 +131,8 @@ export class BwTableEditModule {
     initStatus(isInsert = false, isModify = true){
         this.fields.forEach(field => {
             let isEdit = isInsert ? !field.noModify : !field.noEdit,
-                com = this.editModule.getDom(field.name);
+                com = this.editModule.getDom(field.name),
+                parent = d.closest(com.wrapper, '.detail-item');
             if(isModify){
                 com.disabled = false;
                 if(!isEdit && com){
@@ -143,6 +144,7 @@ export class BwTableEditModule {
             }else{
                 com.disabled = true;
             }
+            parent && parent.classList.toggle('disabled', com.disabled);
 
         });
         if(this.modal)

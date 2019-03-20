@@ -134,8 +134,10 @@ export class DetailItem extends Component{
                     this.render();
                 }
 
+                this.disabled = false;
                 if(!isEdit && com){
                     com.disabled = true;
+                    this.disabled = true;
                     tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
                         Modal.toast(field.caption + '不可编辑');
                     });
@@ -147,6 +149,7 @@ export class DetailItem extends Component{
                     com.destroy();
                     com = null;
                 }
+                this.disabled = false;
             }
         }
     })();
