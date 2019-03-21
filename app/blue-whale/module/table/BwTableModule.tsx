@@ -35,7 +35,7 @@ import { FastTableColumn } from "../../../global/components/newTable/FastTabelCo
 import { NewIDB } from "../../../global/NewIDB";
 import { Datetime } from "../../../global/components/form/datetime/datetime";
 import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
-import {BwTableEditModule} from "./BwTableEditModule";
+import { BwTableEditModule } from "./BwTableEditModule";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -51,7 +51,8 @@ interface IEditImgModuleUploadHandler {
 }
 
 export class BwTableModule extends Component {
-
+    private mapState: boolean;
+    private submitState: boolean;
     static EVT_READY = '__TABLE_READY__';  // 创建fastTable完成后的事件
 
     protected wrapperInit(para: IBwTableModulePara): HTMLElement {
@@ -267,7 +268,7 @@ export class BwTableModule extends Component {
 
                 editModule.onFinish = (data) => {
                     editModule.modalShow = false;
-                    if(isEdit){
+                    if (isEdit) {
                         callback && callback(data);
                         Modal.toast('请点击保存以保存数据');
                     }
@@ -358,10 +359,14 @@ export class BwTableModule extends Component {
                 return false;
             }
             body.remove();
-            let user_id = JSON.parse(localStorage.getItem("userInfo")).userid||"";
-            let url = tools.url.addObj(CONF.ajaxUrl.location, { "start_time": start.value, "end_time": end.value, user_id })
-            console.log(url)
-            this.req_postTime(url);
+            let user_id = JSON.parse(localStorage.getItem("userInfo")).userid || "";
+            let params = { "start_time": start.value, "end_time": end.value, user_id }
+            BwRule.Ajax.fetch(CONF.ajaxUrl.location, {
+                type: "POST",
+                data: params
+            }).then(({ response }) => {
+                G.Shell.location.localSubmit(response)
+            })
         })
         // let modal = new Modal({
         //     container: document.body,
@@ -369,11 +374,7 @@ export class BwTableModule extends Component {
         // });
     }
 
-    req_postTime(url) {
-        BwRule.Ajax.fetch(url).then(({ response }) => {
-            console.log(response)
-        })
-    }
+
     private ftableInit(ajaxData?: obj) {
         let ui = this.ui;
         this.ftable = new FastBtnTable(
@@ -2300,8 +2301,12 @@ export class BwTableModule extends Component {
                             // RFID 操作按钮
                             InventoryBtn(btn, this);
                         } else if (btn.data.openType === "buildMap") {
+                            this.mapState = false;
+                            this.submitState = false;
                             this.viewMap();
                         } else if (btn.data.openType === "submit") {
+                            this.mapState = false;
+                            this.submitState = false;
                             this.sumitMap();
                         } else if (btn.data.openType === 'stopLocation') {
                             let stopBtn = d.query(".stop_location", wrapper)
@@ -2961,7 +2966,7 @@ export class BwTableModule extends Component {
                         !isPivot);
                     if (data) {
                         paramData[key] = data;
-                        if(!paramData.allData){
+                        if (!paramData.allData) {
                             paramData.allData = {};
                         }
                         paramData.allData[key] = tableData[dataKey]
@@ -3041,7 +3046,7 @@ export class BwTableModule extends Component {
                                 setTimeout(() => {
                                     let saveData = editDataGet();
                                     this.saveVerify.then(() => {
-                                        if(tools.isNotEmpty(saveData)){
+                                        if (tools.isNotEmpty(saveData)) {
                                             let data = saveData['allData']['update'] || [],
                                                 pictureAddrList = this.ui.pictureAddrList;
 
@@ -3173,8 +3178,8 @@ export class BwTableModule extends Component {
     }
 
     protected modalEdit: BwTableEditModule;
-    initModalEdit(data?: obj): BwTableEditModule{
-        if(this.modalEdit){
+    initModalEdit(data?: obj): BwTableEditModule {
+        if (this.modalEdit) {
             return this.modalEdit;
         }
 
