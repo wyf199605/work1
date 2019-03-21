@@ -1,13 +1,15 @@
+/// <amd-module name="drillMbPage">
+
 import d = G.d;
-import {BwSubTableModule} from "../../module/table/BwSubTableModule";
 import {IPanelItemPara, Panel} from "../../../global/components/view/panel/Panel";
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import {BwTableElement} from "../table/newTablePage";
 
 export = class drillMbPage {
     constructor(para){
         let len = para.mtPara.length,
             panelItems: IPanelItemPara[] = [],
-            tables: BwSubTableModule[] = Array.from({length: len}),
+            tables: BwTableElement[] = Array.from({length: len}),
             indexes: number[] = [];
         para.mtPara.forEach((tableConf, index) => {
             panelItems.push({
@@ -24,7 +26,7 @@ export = class drillMbPage {
                             spinner.show();
 
                             let table = tables[index];
-                            table.ftable.statistic('chart').then(() => {
+                            table.tableModule.main.ftable.statistic('chart').then(() => {
                                 spinner.hide();
                             });
                         }
@@ -46,9 +48,9 @@ export = class drillMbPage {
             onChange(ev){
                 if(indexes.indexOf(ev.index) === -1){
                     indexes.push(ev.index);
-                    tables[ev.index] = new BwSubTableModule({
+                    tables[ev.index] = new BwTableElement({
                         container: ev.item.contentEl,
-                        ui: para.mtPara[ev.index],
+                        tableEl: para.mtPara[ev.index],
                     });
                 }
             }
