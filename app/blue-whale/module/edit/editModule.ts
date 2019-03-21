@@ -630,7 +630,7 @@ export class EditModule {
      * 设置值
      * @param data
      */
-    public set(data: obj) {
+    public set(data: obj, changeSet = false) {
         let coms = this.coms;
         for (let name in data) {
             if (!coms[name]) {
@@ -645,7 +645,14 @@ export class EditModule {
                 (coms[name] as Accessory | UploadImages).pageData = data;
             }
             //给控件赋值
-            coms[name].set(tools.str.toEmpty(data[name]));
+            if(changeSet){
+                coms[name].set(tools.str.toEmpty(data[name]));
+            }else{
+                let onSet = coms[name].onSet;
+                coms[name].onSet = null;
+                coms[name].set(tools.str.toEmpty(data[name]));
+                coms[name].onSet = onSet;
+            }
         }
     }
 
