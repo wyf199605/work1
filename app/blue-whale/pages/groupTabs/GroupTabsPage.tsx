@@ -16,6 +16,7 @@ import {IButton} from "../../../global/components/general/button/Button";
 import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
 import Shell = G.Shell;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {Loading} from "../../../global/components/ui/loading/loading";
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -442,6 +443,15 @@ export class GroupTabsPage extends BasicPage {
 
             console.log(edit.get(name));
 
+            let loading : Loading,
+                dataType = field.atrrs.dataType;
+            if(dataType === '28'){
+                loading = new Loading({
+                    msg : '图片保存中',
+                    duration : 99999,
+                    disableEl : document.body
+                })
+            }
             Shell.imports.operateTable(uniqueFlag, itemId, {
                 [name]: edit.get(name)[name]
             }, {
@@ -453,6 +463,7 @@ export class GroupTabsPage extends BasicPage {
                 } else {
                     Modal.toast(result.msg);
                 }
+                loading && loading.destroy();
             });
         },
         mainUiGet: (): IBW_Slave_Ui => {

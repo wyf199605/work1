@@ -597,7 +597,7 @@ namespace G {
             },
             //提交
             localSubmit(data: obj, back?: IShellEventHandler) {
-                return ShellBase.handler("localSubmit", { data }, back)
+                return ShellBase.handler("localSubmit", data, back)
             }
         };
         const network = {
