@@ -260,4 +260,6 @@ var doSomething = new Function("arg1", "arg2", "return arg1 + arg2");
 
 ### <a href="#/standard/framework.md">17.框架</a>
 
+### <a href="#/standard/handover.md">18.项目交接</a>
+
 

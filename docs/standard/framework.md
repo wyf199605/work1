@@ -37,17 +37,30 @@
  ```
   <template lang="html">
       // 组件中的html结构
+      <div v-bind:class="{ active: isActive }"></div>
   </template>
 
   <script>
       //逻辑
       export default {
-          
+          data(){
+             return {
+                isActive:false
+             }
+          },
+          mehtods:{
+            change(){
+               this.isActive=!this.isActive
+            }
+          }
       }
   </script>
 
   <style lang="css" scoped>
       // 样式
+      .active{
+        ...
+      }
   </style>
 
  ```
@@ -60,12 +73,20 @@
   class AppComponent extends  React.Component {   
       //逻辑
       constructor(props){
-          super(props)       
+          super(props)      
+          this.state={
+             isActive:false
+          } 
       }
-
+      change=()=>{
+         this.setState({
+           isActive:!this.state.isActive
+         })
+      }
       render(){      
           return  <div> 
             //页面视图层
+               <div className={ this.state.isActive?'active':null}></div>
           </div>
       }
   }
@@ -186,9 +207,16 @@ likeButton.onStateChange = (oldEl, newEl) => {
 
 
 
+## 3.通信
+单向数据流 从父节点传递到子节点。如果顶层的某个数据改变了，重渲染对应的子节点
+* 父 → 子  prop
+* 子 → 父  事件
+* 兄弟组件  发布订阅  状态提升
+* 无关组件 全局状态
+
 # 全局状态管理
 
-## 改变数据--dispatch函数
+## 1.改变数据--dispatch函数
 一个可以被不同模块/组件任意修改共享的数据状态就是魔鬼，一旦数据可以任意修改，出现问题的时候 debug 起来就非常困难，这就是老生常谈的尽量避免全局变量。
 
 模块（组件）之间可以共享数据，也可以改数据。但是我们约定，这个数据并不能直接改，你只能执行某些我允许的某些修改，而且你修改的必须显示的调用dispatch函数。
@@ -228,7 +256,7 @@ dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' }) // 修改标题颜色
 
 ![avator](http://huzidaha.github.io/static/assets/img/posts/7536BBF9-6563-4FD5-8359-28D3A5254EE7.png)
 
-## 创建store && 监听数据
+## 2.创建store && 监听数据
 
 >  监听数据:全局修改数据也要去刷新组件
 
@@ -277,7 +305,7 @@ store.dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' }) // 修改数据
 
 # 前端路由
 
-## 切换页面
+## 1.切换页面
   
   前端路由通过 # 号，捕获到具体的hash值进行刷新页面
 
@@ -290,7 +318,7 @@ store.dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' }) // 修改数据
 
   ```
 
-## 注册路由
+## 2.注册路由
 
 ```
   //注册函数
@@ -315,7 +343,7 @@ store.dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' }) // 修改数据
 
 ```
 
-## 页面传参
+## 3.页面传参
 
 页面与页面之前可能需要参数传递
 
