@@ -51,9 +51,10 @@
       color: $text;
 
       &.disabled{
-        opacity: .5;
+        opacity: .9;
         pointer-events: auto !important;
-        background: #c8c7cc!important;
+        background: #e3e3e3 !important;
+        color: #3a3a3a;
       }
 
       &.cell-link{
