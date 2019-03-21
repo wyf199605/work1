@@ -148,6 +148,9 @@ export class DetailEditModule {
     }
 
     cancel() {
+        this.detail && this.detail.items && this.detail.items.forEach((item) => {
+            item.disabled = false;
+        });
         this.isEdit = false;
         this.editModule.destroy();
         this.modal && this.modal.destroy();
