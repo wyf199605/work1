@@ -16,7 +16,6 @@ import {RingProgress} from "../../../../global/components/ui/progress/ringProgre
 import Shell = G.Shell;
 import {Spinner} from "../../../../global/components/ui/spinner/spinner";
 import {TextInput} from "../../../../global/components/form/text/text";
-import {DetailBtnModule} from "../../../module/detailModule/detailBtnModule";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -30,7 +29,7 @@ export class ButtonAction {
      * button点击后业务操作规则
      */
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
-    }, url?: string, itemId?: string, atvData?: obj, btnModule? : DetailBtnModule) {
+    }, url?: string, itemId?: string, atvData?: obj) {
         let self = this;
         if (btn.subType === 'excel') {
             callback(null);
@@ -115,12 +114,12 @@ export class ButtonAction {
                     msg: `确定要${word}吗?`,
                     callback: (index) => {
                         if (index === true) {
-                            self.btnAction(btn, data, callback, url, null, btnModule);
+                            self.btnAction(btn, data, callback, url, null);
                         }
                     }
                 });
             } else {
-                self.btnAction(btn, data, callback, url, atvData, btnModule);
+                self.btnAction(btn, data, callback, url, atvData);
             }
         }
     }
@@ -186,7 +185,7 @@ export class ButtonAction {
      * 处理按钮规则buttonType=0:get,1:post,2put,3delete
      */
     private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
-    }, url?: string, avtData?: obj, btnModule? : DetailBtnModule) {
+    }, url?: string, avtData?: obj) {
         let actionAddr = btn.actionAddr,
             {addr, data} = actionAddr && BwRule.reqAddrFull(actionAddr, dataObj) || {addr : null, data : null},
             self = this,
