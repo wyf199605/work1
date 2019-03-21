@@ -189,10 +189,10 @@
   }
   .detail-wrapper, .detail-edit-modal{
     padding-bottom: 50px;
-    .disabled, [disabled]{
-      color: #474747;
-      opacity: 1;
-    }
+    //.disabled, [disabled]{
+    //  color: #474747;
+    //  opacity: 1;
+    //}
     .detail-btn-group{
       position: fixed;
       bottom: 0;
