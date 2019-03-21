@@ -447,7 +447,9 @@ export class GroupTabsPage extends BasicPage {
                 dataType = field.atrrs.dataType;
             if(dataType === '28'){
                 loading = new Loading({
-                    msg : '图片保存中'
+                    msg : '图片保存中',
+                    duration : 99999,
+                    disableEl : document.body
                 })
             }
             Shell.imports.operateTable(uniqueFlag, itemId, {

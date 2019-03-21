@@ -53,7 +53,7 @@
       &.disabled{
         opacity: .5;
         pointer-events: auto !important;
-        background: rgba(0, 0, 0, .1) !important;
+        background: #c8c7cc!important;
       }
 
       &.cell-link{
@@ -189,10 +189,10 @@
   }
   .detail-wrapper, .detail-edit-modal{
     padding-bottom: 50px;
-    //.disabled, [disabled]{
-    //  color: #474747;
-    //  opacity: 1;
-    //}
+    .disabled, [disabled]{
+      opacity: 1;
+      color: #3a3a3a;
+    }
     .detail-btn-group{
       position: fixed;
       bottom: 0;
