@@ -367,15 +367,15 @@ export class NewTableModule extends AGroupTabItem{
         this.subIndex = index;
         if (row && row.selected) {
             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(row.data[this.showSubField])) {
+                pseudoTable && pseudoTable.setPresentSelected(index);
                 let showSubSeq = row.data[this.showSubField].split(',');
                 this.tab.setTabsShow(showSubSeq);
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
                 this.tab.active(parseInt(showSubSeq[0]) - 1);
-                pseudoTable && pseudoTable.setPresentSelected(index);
                 this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
             } else {
-                !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
                 pseudoTable && pseudoTable.setPresentSelected(index);
+                !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
                 this.currentSelectedIndexes.push(0);
             }
         } else {
