@@ -9,7 +9,7 @@ namespace G{
     let LOCAL_MSG_ID = 'local_msg_' + user.userid;
     export let localMsg = (function () {
         let _notify = function(){
-            let unreadMsgNum = d.query('#unreadMsgNum'),
+            let unreadMsgNum = tools.isMb ? d.query('#unreadMsgNum', window.parent.document.body) : d.query('#unreadMsgNum'),
                 num = _getUnreadCount();
             if(unreadMsgNum){
                 if(num > 0){
