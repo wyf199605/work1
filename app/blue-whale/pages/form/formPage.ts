@@ -15,12 +15,13 @@ export = class FormPage extends BasicPage {
     private editModule : EditModule;
     private validate : Validate;
     protected fields: R_Field[];
+    protected isInsert: boolean;
     // private loading =  document.querySelector('.loading');
 
     constructor(form: HTMLElement, private para: EditPagePara) {
         super(para);
         console.log(para);
-        let isInsert = para.uiType === 'insert' || para.uiType === 'associate';
+        let isInsert = this.isInsert = para.uiType === 'insert' || para.uiType === 'associate';
         let emPara: EditModulePara = {fields : []};
         let nameFields : {[name : string] : R_Field} = {};
         this.fields = para.fm.fields;
@@ -334,6 +335,38 @@ export = class FormPage extends BasicPage {
         return BwRule.getOldField(varList);
     }
 
+    protected _defData: obj = {};
+    get defData(): Promise<obj> {
+        return new Promise((resolve, reject) => {
+            if (tools.isNotEmpty(this._defData)) {
+                resolve(this._defData);
+            } else {
+                let data = BwRule.getDefaultByFields(this.fields),
+                    defAddrs = this.para.fm.defDataAddrList;
+
+                if (tools.isNotEmpty(defAddrs)) {
+                    Promise.all(defAddrs.map(url => {
+                        return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(url))
+                            .then(({ response }) => {
+                                // TODO data可能不存在
+                                let resultData = tools.keysVal(response, 'data', 0) || {};
+                                data = Object.assign(data, resultData);
+                                // cb();
+                            });
+                    })).then(() => {
+                        this._defData = data;
+                        resolve(data);
+                    }).catch(() => {
+                        reject()
+                    })
+                } else {
+                    this._defData = data;
+                    resolve(data);
+                }
+            }
+        })
+    }
+
     /**
      * 初始化数据
      */
@@ -365,11 +398,11 @@ export = class FormPage extends BasicPage {
         }
 
         // url请求默认值
-        if(form.dataAddr){
-            let loading = new Loading({
-                msg: '默认数据加载中...'
-            });
-            loading.show();
+        let loading = new Loading({
+            msg: '默认数据加载中...'
+        });
+        loading.show();
+        if(!this.isInsert && form.dataAddr){
             Promise.all([
                 BwRule.Ajax.fetch(BW.CONF.siteUrl + BwRule.reqAddr(form.dataAddr)),
                 this.lookup
@@ -423,13 +456,28 @@ export = class FormPage extends BasicPage {
             //         }
             //     }
             // });
+        } else if(this.isInsert && tools.isNotEmpty(form.defDataAddrList)) {
+            this.defData.then(data => {
+                if (tools.isEmpty(data)) {
+                    return;
+                }
+                data = addOldField(data);
+                //    ajaxLoadedData = response.data[0];
+                this.setData(data);
+            }).finally(() => {
+                loading && loading.hide();
+                loading = null;
+            })
         }else{
             // 字段默认值
             let defaultVal = BwRule.getDefaultByFields(form.fields);
             this.lookup.then(() =>{
                 defaultVal = addOldField(defaultVal);
                 this.setData(defaultVal);
-            })
+            });
+
+            loading && loading.hide();
+            loading = null;
         }
     }
 

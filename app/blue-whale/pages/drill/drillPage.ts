@@ -1,8 +1,10 @@
+/// <amd-module name="drillPage">
+
 import BasicPage from "basicPage";
-import {BwSubTableModule} from "../../module/table/BwSubTableModule";
+import {BwTableElement} from "../table/newTablePage";
 declare const initDataTable : any;
 export = class drillPage extends BasicPage{
-    private tableModules: BwSubTableModule[]  = [];
+    private tableModules: BwTableElement[]  = [];
     constructor(private para){
         super(para);
         let subTables = para.subTables,
@@ -19,9 +21,9 @@ export = class drillPage extends BasicPage{
             //     scrollEl:this.dom.parentElement,
             //     fixTop: 40
             // }, tableConf);
-            this.tableModules[index] = new BwSubTableModule({
+            this.tableModules[index] = new BwTableElement({
                 container: para.tableDom[index],
-                ui: tableConf
+                tableEl: tableConf
             });
 
             e.target.dataset.load = '1';
