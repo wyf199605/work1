@@ -85,7 +85,11 @@ export class checkNetwork {
   }
   /**ping调用壳的startPing指令 */
   pingTest() {
-    let total = 0
+    let total = 0;
+    this.option.title.text = total + "%";
+    this.option.series.data[0].value = total;
+    this.option.series.data[1].value = 100 - total;
+    this.myChart.setOption(this.option, true);
     this.req_getIp().then(data => {
       G.Shell.network.startPing(data, (res) => {
         total = res.data * 100

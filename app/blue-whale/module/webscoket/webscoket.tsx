@@ -181,24 +181,33 @@ export = class webscoket {
     }
     private scanHandle = () => {
         let scanBtn = d.query("#scan_btn");
+        let flag=false;
         d.on(scanBtn, "click", () => {
+            if(flag){
+                return false;
+            }
+            flag=true;
+            setTimeout(() => {
+                flag=false;
+            }, 1500);
             ShellAction.get().device().scan({
                 callback: (event) => {
                     let detail = JSON.parse(event.detail);
                     this.handleUrl(detail.data);
-
-
-
                 }
             });
-            // Shell.inventory.openScanCode(0, (result) => {
-            //     if (result.success) {
-            //         this.handleUrl(result.data)
-            //     } else {
-            //         Modal.toast(result.msg);
-            //     }
-            // })
         })
+    }
+    // 节流
+    protected throttle(delay, action) {
+        let last = 0;
+        return function () {
+            var curr = +new Date();
+            if (curr - last > delay) {
+                action.apply(this, arguments);
+                last = curr;
+            }
+        }
     }
     private handleUrl(code: string) {
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/commonsvc/scan", {
@@ -211,13 +220,13 @@ export = class webscoket {
             // 判断是扫码登陆还是扫码跳转
             // type = 0 登录
             // type = 1 跳转
-            if ( response.next.type == 1 ) {
-                if ( list && response.next.url ) {
+            if (response.next.type == 1) {
+                if (list && response.next.url) {
                     sys.window.open({
-                        url : CONF.siteUrl + response.next.url + '?' + list[0] + '=' + code
+                        url: CONF.siteUrl + response.next.url + '?' + list[0] + '=' + code
                     })
                 }
-            } else  {
+            } else {
                 if (list && list.indexOf("code") > -1) {
                     this.requestUrl(CONF.siteUrl + response.next.url, code);
                 }
