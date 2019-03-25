@@ -45,16 +45,14 @@ export class BwTableEditModule {
 
             },
             footer: {
-                leftPanel: [
+                rightPanel: [
                     {
                         content: '取消',
                         className: 'modal-btn edit-cancel',
                         onClick: () => {
                             this.modal.modalHidden();
                         }
-                    }
-                ],
-                rightPanel: [
+                    },
                     {
                         content: '确定',
                         className: 'modal-btn eidt-confirm',

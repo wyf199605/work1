@@ -539,7 +539,7 @@ export class PrivilegePersonal extends PrivilegeDP {
                             container: tipDom,
                             type: 'primary',
                             onClick: (e) => {
-                                let url = tools.isNotEmpty(this.controllUrl) ? this.controllUrl : this.url;
+                                let url = CONF.ajaxUrl.rmprivsInsert;
                                 this.ajaxLoad(url, [{
                                     node_id: this.infoPlatSelected.join(',')
                                 }], false).then((res) => {
