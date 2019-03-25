@@ -1,16 +1,16 @@
 /// <amd-module name="OfflineBtn"/>
-import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {Loading} from "../../../global/components/ui/loading/loading";
-import {TextInput} from "../../../global/components/form/text/text";
+import { BtnGroup } from "../../../global/components/ui/buttonGroup/btnGroup";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { Loading } from "../../../global/components/ui/loading/loading";
+import { TextInput } from "../../../global/components/form/text/text";
 import Shell = G.Shell;
 import tools = G.tools;
-import {GroupTabsPage} from "../../pages/groupTabs/GroupTabsPage";
+import { GroupTabsPage } from "../../pages/groupTabs/GroupTabsPage";
 import CONF = BW.CONF;
 import d = G.d;
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
+import { SelectInputMb } from "../../../global/components/form/selectInput/selectInput.mb";
+import { ButtonAction } from "../../common/rule/ButtonAction/ButtonAction";
 import sys = BW.sys;
 
 interface IGeneralPara {
@@ -41,7 +41,7 @@ export class OfflineBtn {
         this.para = {
             mainId: mainUi.itemId,
             subId: subUi && subUi.itemId,
-            uniqueFlag : mainUi.uniqueFlag,
+            uniqueFlag: mainUi.uniqueFlag,
             mainKey: mainUi.fields.map(e => {
                 if (e.name === mainUi.keyField) return e
             })[0],
@@ -50,10 +50,8 @@ export class OfflineBtn {
             })[0],
             itemId
         };
-        const {ui} = this.imports.getKeyField(itemId);  // 当前按钮对应的ui
+        const { ui } = this.imports.getKeyField(itemId);  // 当前按钮对应的ui
         this.para.ui = ui;
-        console.log(btn, ui);
-
         switch (btn.openType) {
             case 'import-manual-input':
                 this.barCode();
@@ -80,19 +78,19 @@ export class OfflineBtn {
                 this.commit();
                 break;
             default:
-                let {edit} = this.imports.getKeyField(itemId);
-                ButtonAction.get().clickHandle(btn, edit.get(), () => {},  '');
+                let { edit } = this.imports.getKeyField(itemId);
+                ButtonAction.get().clickHandle(btn, edit.get(), () => { }, '');
         }
     }
 
-    private commit(){
-        const {keyField, value} = this.imports.getKeyField(this.para.itemId);
+    private commit() {
+        const { keyField, value } = this.imports.getKeyField(this.para.itemId);
         this.imports.query(value[keyField]);
         this.imports.isModify = false;
     }
 
-    private manyScan(){
-        Shell.inventory.openScanCode(1, () => {},(result) => {
+    private manyScan() {
+        Shell.inventory.openScanCode(1, () => { }, (result) => {
             if (result.success) {
                 this.imports.query(result.data);
             } else {
@@ -114,8 +112,8 @@ export class OfflineBtn {
     private downData() {
         const loading = new Loading({
             msg: "下载数据中",
-            duration : 99999,
-            disableEl : document.body
+            duration: 99999,
+            disableEl: document.body
         });
 
         const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
@@ -125,16 +123,16 @@ export class OfflineBtn {
         })
     }
 
-    private uploadCheck(){
+    private uploadCheck() {
         const option = this.imports.getOption();
-        if(['2', '3'].includes(option) && this.imports.isModify){
+        if (['2', '3'].includes(option) && this.imports.isModify) {
             Modal.confirm({
-                msg : '存在未提交数据，确定放弃提交直接上传？',
-                callback : flag => {
+                msg: '存在未提交数据，确定放弃提交直接上传？',
+                callback: flag => {
                     flag && this.uploadData();
                 }
             })
-        }else {
+        } else {
             this.uploadData();
         }
     }
@@ -143,8 +141,8 @@ export class OfflineBtn {
     private uploadData() {
         const loading = new Loading({
             msg: "数据上传中",
-            duration : 99999,
-            disableEl : document.body
+            duration: 99999,
+            disableEl: document.body
         });
 
         const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
@@ -156,7 +154,7 @@ export class OfflineBtn {
                 let sub = this.imports.editModule.sub;
                 sub && this.imports.clear(this.para.subId);
             } else {
-                Modal.toast(result.msg); 
+                Modal.toast(result.msg);
             }
             loading.destroy();
         });
@@ -177,11 +175,16 @@ export class OfflineBtn {
         let checks: CheckBox[] = [],
             inputEl: HTMLInputElement,
             data = [{
-                text: '所有',
+                text: '清空操作数据',
                 value: Object.assign({}, mainValue, subValue || {}),
                 name: mainKey + ',' + subKey,
                 item: ''
-            },{
+            }, {
+                text: '删除下载数据',
+                value: mainValue,
+                name: mainKey,
+                item: mainId
+            }, {
                 text: this.para.mainKey.caption + '：',
                 value: mainValue,
                 name: mainKey,
@@ -202,14 +205,14 @@ export class OfflineBtn {
                 input: HTMLInputElement,
                 el = <div className="delete-cell">
                     <div className="delete-text">{m.text}</div>
-                    {i !== 0 ? (input = <input value={m.value[m.name] || ''} data-name={m.name} data-item={m.item} className="delete-input" type="text"/>) : ``}
+                    {i !== 0 ? (input = <input value={m.value[m.name] || ''} data-name={m.name} data-item={m.item} className="delete-input" type="text" />) : ``}
                     {checkBox = <CheckBox value={m.value} onClick={() => {
                         checks.forEach(check => {
                             check.checked = false;
                         });
                         checkBox.checked = true;
                         inputEl = input;
-                    }} className="delete-check"/>}
+                    }} className="delete-check" />}
                 </div>;
             if (i === 0) {
                 checkBox.checked = true;
@@ -218,8 +221,9 @@ export class OfflineBtn {
             d.append(body, el);
         });
 
-        const getSelect = (): { id: string, value: string, keyField: string }[] => {
+        const getSelect = (): { id: string, value: string, keyField: string,type?:any }[] => {
             let value = null, index = 0, arr = [];
+            console.log(checks)
             checks.forEach((check, i) => {
                 if (check.checked) {
                     value = check.value;
@@ -227,24 +231,29 @@ export class OfflineBtn {
                 }
             });
             if (index === 0) {
-                arr.push({id: mainId});
+                arr.push({ id: mainId });
                 if (this.para.subId) {
-                    arr.push({id: subId});
+                    arr.push({ id: subId });
+                }
+            } else if (index === 1) {
+                arr.push({ id: mainId, type: 'deleteAll' });
+                if (this.para.subId) {
+                    arr.push({ id: subId });
                 }
             } else {
                 let value = inputEl.value,
                     id = inputEl.dataset.item,
                     name = inputEl.dataset.name,
-                    {edit} = this.imports.getKeyField(id);
+                    { edit } = this.imports.getKeyField(id);
 
                 if (tools.isEmpty(value)) {
                     value = edit.get(name)[name];
                 }
-                arr.push({id, value, keyField: name})
+                arr.push({ id, value, keyField: name })
             }
             return arr;
         };
-        const del = (itemId: string, keyField: string, value: string = '') => {
+        const del = (itemId: string, keyField: string, value: string = '', type: string = 'delete') => {
             let where = {
                 [keyField]: value
             };
@@ -252,37 +261,37 @@ export class OfflineBtn {
                 where = {};
             }
 
-            Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, 'delete', result => {
+            Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, type, result => {
                 console.log(result.data, 'operateTable删除表');
-                if(result.success){
+                if (result.success) {
                     Modal.toast('删除成功');
                     // 若为主表，则同时清空子表数据
-                    if(itemId === this.para.mainId){
+                    if (itemId === this.para.mainId) {
                         this.para.subId && this.imports.clear(this.para.subId);
                     }
                     this.imports.clear(itemId);
-                }else {
+                } else {
                     Modal.toast('删除失败');
                 }
             });
         };
         this.modalInit('请选择删除数据范围', body, () => {
             getSelect().forEach(obj => {
-                del(obj.id, obj.keyField, obj.value);
+                del(obj.id, obj.keyField, obj.value, obj.type);
             })
         });
 
     }
 
-    private selectBox : SelectInputMb;
+    private selectBox: SelectInputMb;
     private setting() {
-        const body = <div className="barcode-setting"/>,
+        const body = <div className="barcode-setting" />,
             operation = this.btn.operation,
             data = operation && operation.content;
-            this.selectBox = new SelectInputMb({
-                container: body,
-                data,
-            });
+        this.selectBox = new SelectInputMb({
+            container: body,
+            data,
+        });
         let value = operation && operation.default || "1", index = 1;
         data.forEach((obj, i) => {
             if (obj.value === value) {
@@ -306,11 +315,11 @@ export class OfflineBtn {
     }
 
     private barCode() {
-        let {key} = this.imports.getKeyField(this.para.itemId),
+        let { key } = this.imports.getKeyField(this.para.itemId),
             textInput: TextInput,
             body = <div data-code="barcodeModal">
                 <label>{key.caption + ":"}</label>
-                {textInput = <TextInput className='set-rfid-code'/>}
+                {textInput = <TextInput className='set-rfid-code' />}
             </div>;
         this.modalInit('请输入', body, () => {
             const val = textInput.get();
