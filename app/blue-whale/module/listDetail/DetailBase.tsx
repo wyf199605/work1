@@ -163,8 +163,8 @@ export abstract class DetailBase extends Component {
                     this.currentPage = 1;
                 }
             }
-            this.checkPageButtonDisabled();
         }
+        this.checkPageButtonDisabled();
         this.scrollToTop();
         return this.getDetailData().then(data => {
             this.detailForm.editData = data;
@@ -181,6 +181,10 @@ export abstract class DetailBase extends Component {
      * @Description: 判断上一页下一页按钮是否可用
      */
     protected checkPageButtonDisabled = () => {
+        if(!this.prev || !this.next){
+            return;
+        }
+
         if (this.totalNumber === 1 || this.totalNumber === 0) {
             this.prev.disabled = true;
             this.next.disabled = true;
