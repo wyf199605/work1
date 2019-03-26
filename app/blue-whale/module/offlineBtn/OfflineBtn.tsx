@@ -221,7 +221,7 @@ export class OfflineBtn {
             d.append(body, el);
         });
 
-        const getSelect = (): { id: string, value: string, keyField: string,type?:any }[] => {
+        const getSelect = (): { id: string, value: string, keyField: string, type?: any }[] => {
             let value = null, index = 0, arr = [];
             console.log(checks)
             checks.forEach((check, i) => {
@@ -277,7 +277,11 @@ export class OfflineBtn {
         };
         this.modalInit('请选择删除数据范围', body, () => {
             getSelect().forEach(obj => {
-                del(obj.id, obj.keyField, obj.value, obj.type);
+                if (obj.type) {
+                    del(obj.id, obj.keyField, obj.value, obj.type);
+                } else {
+                    del(obj.id, obj.keyField, obj.value);
+                }
             })
         });
 
