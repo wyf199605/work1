@@ -58,6 +58,7 @@ export abstract class DetailBase extends Component {
         this.initDetailFormModule();
         this.initDetailButtonsModule();
         this.getDetailData().then((data) => {
+            this.checkPageButtonDisabled();
             this.inputs(para.fm.inputs, this.wrapper);
             this.detailForm.editData = data;
             this.isEdit = this.para.isEdit;
