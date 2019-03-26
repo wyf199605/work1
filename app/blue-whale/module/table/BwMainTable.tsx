@@ -66,7 +66,7 @@ export class BwMainTableModule extends BwTableModule{
         // 移动端计算表格的高度
         if(tools.isMb) {
             if(tools.isNotEmpty(ui.subButtons) || tools.isNotEmpty(this.editParam)) {
-                clientHeight -= 37;
+                clientHeight -= 40;
             }
             if(ui.rfidCols && ui.rfidCols.amountFlag){
                 clientHeight -= 42;

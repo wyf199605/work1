@@ -342,7 +342,7 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
 }
 
 .flowListPC {
-  height: calc(100% - 23px);
+  height: 100%;
 
   .tab-content {
     height: calc(100% - 42px);
