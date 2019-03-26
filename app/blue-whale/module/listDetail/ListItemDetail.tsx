@@ -254,9 +254,9 @@ export class ListItemDetail extends Component{
                     this.currentPage = 1;
                 }
             }
-            this.checkPageButtonDisabled();
             this.scrollToTop();
             this.initDetailData().then(data => {
+                this.checkPageButtonDisabled();
                 this.render(data);
             });
         } else {
