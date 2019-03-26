@@ -164,9 +164,9 @@ export abstract class DetailBase extends Component {
                 }
             }
         }
-        this.checkPageButtonDisabled();
         this.scrollToTop();
         return this.getDetailData().then(data => {
+            this.checkPageButtonDisabled();
             this.detailForm.editData = data;
             this.isEdit = this.para.isEdit;
         });
