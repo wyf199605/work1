@@ -490,6 +490,8 @@ export = class FormPage extends BasicPage {
                 com = this.editModule.getDom(name);
 
             if(com){
+                let onSet = com.onSet;
+                com.onSet = null;
                 if(field.elementType === 'lookup' && field.lookUpKeyField in data){
                     let options = this.lookUpData[name] || [];
                     for (let opt of options) {
@@ -500,6 +502,7 @@ export = class FormPage extends BasicPage {
                 }else if(name in data){
                     com.set(data[name] || '');
                 }
+                com.onSet = onSet;
             }
         });
     }
