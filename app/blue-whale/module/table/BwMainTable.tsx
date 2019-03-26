@@ -61,7 +61,7 @@ export class BwMainTableModule extends BwTableModule{
     }
     private tableHeightInit(){
         let ui = this.ui,
-            clientHeight = this.container.clientHeight;
+            clientHeight = this.wrapper.clientHeight;
 
         // 移动端计算表格的高度
         if(tools.isMb) {
@@ -75,7 +75,7 @@ export class BwMainTableModule extends BwTableModule{
             if(ui.reportTitle){
                 clientHeight -= 42;
             }
-            clientHeight -= 45;
+            // clientHeight -= 45;
 
             // iphone x 兼容
             if(tools.cssSupports('height', 'env(safe-area-inset-bottom)')){
