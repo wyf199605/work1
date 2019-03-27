@@ -175,15 +175,15 @@ export class OfflineBtn {
         let checks: CheckBox[] = [],
             inputEl: HTMLInputElement,
             data = [{
-                text: '清空操作数据',
-                value: Object.assign({}, mainValue, subValue || {}),
-                name: mainKey + ',' + subKey,
-                item: ''
-            }, {
                 text: '删除下载数据',
                 value: mainValue,
                 name: mainKey,
                 item: mainId
+            }, {
+                text: '清空操作数据',
+                value: Object.assign({}, mainValue, subValue || {}),
+                name: mainKey + ',' + subKey,
+                item: ''
             }, {
                 text: this.para.mainKey.caption + '：',
                 value: mainValue,
@@ -205,7 +205,7 @@ export class OfflineBtn {
                 input: HTMLInputElement,
                 el = <div className="delete-cell">
                     <div className="delete-text">{m.text}</div>
-                    {i !== 0 ? (input = <input value={m.value[m.name] || ''} data-name={m.name} data-item={m.item} className="delete-input" type="text" />) : ``}
+                    {i !== 0 && i !== 1 ? (input = <input value={m.value[m.name] || ''} data-name={m.name} data-item={m.item} className="delete-input" type="text" />) : ``}
                     {checkBox = <CheckBox value={m.value} onClick={() => {
                         checks.forEach(check => {
                             check.checked = false;
@@ -221,7 +221,7 @@ export class OfflineBtn {
             d.append(body, el);
         });
 
-        const getSelect = (): { id: string, value: string, keyField: string,type?:any }[] => {
+        const getSelect = (): { id: string, value: string, keyField: string, type?: any }[] => {
             let value = null, index = 0, arr = [];
             console.log(checks)
             checks.forEach((check, i) => {
@@ -230,12 +230,12 @@ export class OfflineBtn {
                     index = i
                 }
             });
-            if (index === 0) {
+            if (index === 1) {
                 arr.push({ id: mainId });
                 if (this.para.subId) {
                     arr.push({ id: subId });
                 }
-            } else if (index === 1) {
+            } else if (index === 0) {
                 arr.push({ id: mainId, type: 'deleteAll' });
                 if (this.para.subId) {
                     arr.push({ id: subId });
@@ -277,7 +277,11 @@ export class OfflineBtn {
         };
         this.modalInit('请选择删除数据范围', body, () => {
             getSelect().forEach(obj => {
-                del(obj.id, obj.keyField, obj.value, obj.type);
+                if (obj.type) {
+                    del(obj.id, obj.keyField, obj.value, obj.type);
+                } else {
+                    del(obj.id, obj.keyField, obj.value);
+                }
             })
         });
 

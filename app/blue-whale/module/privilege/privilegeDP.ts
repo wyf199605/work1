@@ -112,7 +112,6 @@ export class PrivilegeDP {
         }
         this.privGroupSearchDom = d.create(`<div class="priv-group-search"></div>`);
         let privGroupContent = d.create(`<div class="priv-group-content"></div>`);
-
         container.appendChild(this.privGroupSearchDom);
         container.appendChild(privGroupContent);
 

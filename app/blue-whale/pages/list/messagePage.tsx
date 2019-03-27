@@ -40,7 +40,7 @@ export = class messagePage {
                 index === 1 ? this.showSysList(localMsg.get(), false, listDOM) : null
             }
         });
-
+        console.log(this.tab)
         this.initSysMsg(listDOM);
         this.initTaskMsg(taskDom);
     }
@@ -84,7 +84,10 @@ export = class messagePage {
             </li>;
             d.append(fragment, li);
         });
-
+        if(list.length<=0){
+            fragment.appendChild(<li class="nodata"><span class="iconfont icon-gongyongwushuju"/></li>);
+            d.query(".task").style.backgroundColor="white";
+        }
         return fragment;
     }
 
