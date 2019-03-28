@@ -5,142 +5,137 @@
 //  overflow: auto !important;
 //
 //}
-
-.fl-mobile{
-  &.inventory{
-    .detail-btn-group{
+.fl-mobile {
+  &.inventory {
+    .detail-btn-group {
       display: none;
     }
-    .panel-wrapper{
-      &:after{
+    .panel-wrapper {
+      &:after {
         background: white;
       }
-      .panel-item-wrapper.selected{
-        &:after{
+      .panel-item-wrapper.selected {
+        &:after {
           display: none;
         }
       }
     }
     padding-bottom: 140px;
-    &.no-sub{
+    &.no-sub {
       padding-bottom: 90px;
     }
-    .inventory-footer{
-        position: fixed;
+    .inventory-footer {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      height: 140px;
+      background-color: #fff;
+      border-top: 1px solid #ddd;
+      .inventory-group-btn {
+        position: absolute;
         bottom: 0;
         right: 0;
         left: 0;
         width: 100%;
-        height: 140px;
+        height: 50px;
         background-color: #fff;
         border-top: 1px solid #ddd;
-        .inventory-group-btn{
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          left: 0;
-          width: 100%;
-          height: 50px;
-          background-color: #fff;
-          border-top: 1px solid #ddd;
-          .btn-group-container{
-            .btn{
-              height: 50px;
-            }
-          }
-          .input-box{
-            height: 100%;
-            display: flex;
-            display: -webkit-flex;
-            align-items: center;
-            justify-content: center;
-
-            .btn{
-              font-size: 14px;
-              height: 40px;
-              //margin-left: 15px;
-              border-color: #005bac;
-              color: #005bac;
-              padding: 0 14px;
-              max-width: 25%;
-            }
-          }
-          .detail-count{
-            .detail-row{
-              display: inline-block;
-            }
-          }
-          .input-box{
-            align-items: inherit;
+        .btn-group-container {
+          .btn {
+            height: 50px;
           }
         }
-       .barcode-count{
-        .barcode-row{
+        .input-box {
+          height: 100%;
+          display: flex;
+          display: -webkit-flex;
+          align-items: center;
+          justify-content: center;
+          .btn {
+            font-size: 14px;
+            height: 40px;
+            //margin-left: 15px;
+            border-color: #005bac;
+            color: #005bac;
+            padding: 0 14px;
+            max-width: 25%;
+          }
+        }
+        .detail-count {
+          .detail-row {
+            display: inline-block;
+          }
+        }
+        .input-box {
+          align-items: inherit;
+        }
+      }
+      .barcode-count {
+        .barcode-row {
           border-bottom: 1px solid #eee;
           height: 45px;
           font-size: 14px;
           overflow: auto;
-          .barcode-cell{
+          .barcode-cell {
             display: inline-block;
             height: 44px;
             padding: 10px 0 10px 10px;
             width: 50%;
             float: left;
-            &.barcode-right{
+            &.barcode-right {
               text-align: right;
               width: 40%;
             }
-            .text-input{
+            .text-input {
               width: 80px;
               height: 25px;
             }
-            &>div{
+            &>div {
               display: inline-block;
             }
           }
         }
       }
     }
-    &.hide-count{
+    &.hide-count {
       padding-bottom: 90px;
-      .inventory-footer{
+      .inventory-footer {
         height: 90px;
-        .count{
+        .count {
           display: none;
         }
       }
     }
-    &.no-aggr, &.no-cor{
+    &.no-aggr,
+    &.no-cor {
       padding-bottom: 95px;
-      .inventory-footer{
+      .inventory-footer {
         height: 95px;
       }
-      &.hide-count{
+      &.hide-count {
         padding-bottom: 40px;
-        .inventory-footer{
+        .inventory-footer {
           height: 40px;
         }
       }
     }
   }
-
-  .group-tab-page{
+  .group-tab-page {
     ul.nav.nav-tabs.nav-tabs-line {
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      overflow-x: auto;
       height: 44px;
-      width: 100%;
       background-color: #ffffff;
       z-index: 1;
-      overflow-y: hidden;
       min-width: 100%;
       border-bottom: 1px solid #ccc;
       margin: 0;
       padding: 0;
       //position: fixed;
-      & > li {
+      &>li {
         height: 44px;
         text-align: center;
         width: auto;
@@ -149,12 +144,12 @@
         outline: none;
         flex-shrink: 0;
         flex-grow: 0;
-        & > a {
+        &>a {
           color: #3a3a3a;
           border-radius: 0;
           border: none;
         }
-        &.active > a {
+        &.active>a {
           display: inline-block;
           height: 100%;
           border-bottom: 2px solid #005bac;
@@ -167,52 +162,47 @@
         }
       }
     }
-    .tab-content{
+    .tab-content {
       width: 100%;
       height: calc(100% - 44px);
       padding: 0;
-      .tab-pane{
+      .tab-pane {
         height: 100%;
         overflow-y: auto;
       }
     }
   }
-
-  .panel-wrapper{
-    &::after{
+  .panel-wrapper {
+    &::after {
       display: none;
     }
-    .panel-item-wrapper{
-      &::after{
+    .panel-item-wrapper {
+      &::after {
         display: none;
       }
-
-      .panel-item-title{
+      .panel-item-title {
         border-bottom: 1px solid #c8c7cc;
         font-weight: normal;
       }
-
-      .panel-item-content{
-        max-height: 400px;
-        overflow: auto;
-        .detail-wrapper{
+      .panel-item-content {
+        // max-height: 400px;
+        // overflow: hidden;
+        .detail-wrapper {
           padding-bottom: 0;
         }
-        .table-module-wrapper{
+        .table-module-wrapper {
           height: 350px;
           padding-bottom: 0;
         }
       }
-
-      &.selected{
-        .panel-item-title{
+      &.selected {
+        .panel-item-title {
           color: #555;
           box-shadow: none;
           z-index: 5;
           background-color: inherit;
         }
       }
-
     }
   }
 }

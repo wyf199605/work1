@@ -41,7 +41,7 @@ export class GroupTabsPage extends BasicPage {
 
     constructor(para: IGroupTabsPagePara) {
         super(para);
-        // console.log(para);
+         console.log(para);
         window['d'] = this;
         this.ui = para.ui.body.elements[0];
         let btns = para.ui.body.subButtons;
@@ -52,12 +52,14 @@ export class GroupTabsPage extends BasicPage {
         this.ui.uiType = this.ui.uiType || para.ui.uiType;
         this.subUi = this.ui.subTableList || [];
         delete this.ui.subTableList;
-
         this.wrapper = tools.isPc ? this.dom : d.query('body > .mui-content');
+        if(!tools.isPc){
+            d.query('body > .mui-content').style.overflow="scroll";
+        }
         this.wrapper.classList.add('group-tab-page');
         // 当前子表数组为空，则为表格/单页，否则为主从
         this.styleType = (this.ui.exhibitionType && this.ui.exhibitionType.showType) || 'tab';
-
+        
         if (['panel-one', 'panel-none'].includes(this.styleType)) {
             this.styleType = 'panel-on';
             this.isInventory = true;
