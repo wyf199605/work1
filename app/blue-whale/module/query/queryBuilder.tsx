@@ -863,7 +863,7 @@ export class AtVarBuilder{
                         return { text : keys.map((k) => d[k]).join(','), value : tools.str.toEmpty(d[keys[0]])}
                     });
                 let multi = conf.atrrs && conf.atrrs.multiValueFlag;
-                return {data, useInputVal: true, multi : multi === 1, isScan : hasScan};
+                return {data, useInputVal: false, multi : multi === 1, isScan : hasScan};
 
             case 'number':
                 return {max : atrrs.maxValue , min : atrrs.minValue, isScan : hasScan }

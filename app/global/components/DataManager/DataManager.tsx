@@ -28,6 +28,7 @@ export interface IDataManagerAjaxStatus {
     sort: [[string, SortType]] // true升序, false降序
     custom: obj;
     timeout?:number;
+    noPaging?: boolean;
 }
 export interface IDataManagerPageConf{
     size: number;
