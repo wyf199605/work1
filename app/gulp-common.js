@@ -8,6 +8,7 @@ const gulp = require('gulp'), //gulp
     minifycss = require('gulp-clean-css'), //压缩css文件
     css = require('gulp-scss'), //打包css文件
     sass = require('gulp-sass'),
+    autoprefixer = require('gulp-autoprefixer'),
     through = require('through2'),
     fs = require('fs'),
     Path = require('path'),
@@ -56,6 +57,13 @@ module.exports = class Compiler {
             if (fun) {
                 funs = funs.pipe(fun());
             }
+            funs.pipe(autoprefixer({
+                browsers: ['last 2 versions', 'Android >= 4.0'],
+                cascade: true, //是否美化属性值 默认：true 像这样：
+                //-webkit-transform: rotate(45deg);
+                //        transform: rotate(45deg);
+                remove:true //是否去掉不必要的前缀 默认：true
+            }));
 
             if (rname) {
                 funs.pipe(rename(rname))
