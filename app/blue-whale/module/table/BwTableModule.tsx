@@ -385,7 +385,7 @@ export class BwTableModule extends Component {
                     ajaxData,
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
                     auto: !this.hasQuery,    // 有查询器时不自动查询
-                    timeout: this.ui.timeOut,
+                    timeout: (this.ui.timeOut || 0) * 1000,
                     fun: ({ pageSize, current, sort, custom, timeout }) => {
                         let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
                         pageSize = pageSize === -1 ? 3000 : pageSize;

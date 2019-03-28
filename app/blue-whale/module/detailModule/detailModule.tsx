@@ -100,7 +100,7 @@ export class DetailModule extends AGroupTabItem {
             ajax: {
                 auto: false,
                 resetCurrent: false, // 是否重新设置当前页
-                timeout:this.ui.timeOut,
+                timeout: (this.ui.timeOut || 0) * 1000,
                 fun: ({pageSize, current, sort, custom,timeout}) => {
                     return new Promise((resolve, reject) => {
                         let ui = this.ui,
