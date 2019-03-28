@@ -386,9 +386,8 @@ export class BwTableModule extends Component {
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
                     auto: !this.hasQuery,    // 有查询器时不自动查询
                     timeout: (this.ui.timeOut || 0) * 1000,
-                    fun: ({ pageSize, current, sort, custom, timeout, noPaging}) => {
-                        let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr),
-                            ajaxData;
+                    fun: ({ pageSize, current, sort, custom, timeout}) => {
+                        let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
                         pageSize = pageSize === -1 ? 3000 : pageSize;
 
                         let pagesortparams = Array.isArray(sort) ?
@@ -396,24 +395,15 @@ export class BwTableModule extends Component {
                                 sort.map(s => `${s[0]},${s[1].toLocaleLowerCase()}`)
                             ) : '';
 
-                        if(noPaging){
-                            ajaxData =  Object.assign({
-                                nopage: true,
-                                pagesortparams
-                            }, custom)
-                        }else{
-                            ajaxData =  Object.assign({
-                                pageparams: `{"index"=${current + 1},"size"=${pageSize},"total"=1}`,
-                                pagesortparams
-                            }, custom)
-                        }
-
                         return Promise.all([
                             // 获取表格数据
                             this.ajax.fetch(url, {
                                 needGps: ui.dataAddr.needGps,
                                 timeout: timeout,
-                                data: ajaxData
+                                data: Object.assign({
+                                    pageparams: `{"index"=${current + 1},"size"=${pageSize},"total"=1}`,
+                                    pagesortparams
+                                }, custom)
                             }),
                             // 获取lookup数据
                             this.lookup
@@ -652,6 +642,10 @@ export class BwTableModule extends Component {
         return this.pivotRefresh(ajaxData).then((response) => {
             if (tools.isEmpty(response)) {
                 return;
+            }
+            if(tools.isEmpty(response.data)){
+                this.ftableInit(ajaxData);
+                return
             }
             response.data = this.addOldData(response.data);
             this.ftable = new FastBtnTable(
