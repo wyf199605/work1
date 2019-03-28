@@ -104,7 +104,7 @@ export class DetailEditModule {
         let data = this.detail.detailData,
             items = this.createItem(type);
 
-        this.editModule.set(data);
+        this.setData(data);
         items.forEach((item) => {
             let field = item.custom;
             if (field.elementType === 'lookup') {
@@ -117,6 +117,21 @@ export class DetailEditModule {
                 }
             }
         });
+    }
+
+    protected setData(data: obj){
+        if(tools.isEmpty(this.editModule)){
+            return;
+        }
+        for(let name in data){
+            let com = this.editModule.getDom(name);
+            if(com){
+                let onSet = com.onSet;
+                com.onSet = null;
+                com.set(data[name]);
+                com.onSet = onSet;
+            }
+        }
     }
 
     save() {
@@ -181,7 +196,7 @@ export class DetailEditModule {
         this.editType = 'insert';
         this.isEdit = true;
         this.createItem('modal');
-        this.editModule && this.editModule.set(defData);
+        this.setData(defData);
     }
 
     protected fetch(data: obj): Promise<any> {
