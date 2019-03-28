@@ -1,22 +1,22 @@
 /// <amd-module name="GroupTabsPage"/>
 
 import BasicPage from "../basicPage";
-import {BwRule} from "../../common/rule/BwRule";
-import {DetailBtnModule} from "../../module/detailModule/detailBtnModule";
-import {NewTableModule} from "../../module/table/newTableModule";
-import {Panel} from "../../../global/components/view/panel/Panel";
-import {Tab} from "../../../global/components/ui/tab/tab";
+import { BwRule } from "../../common/rule/BwRule";
+import { DetailBtnModule } from "../../module/detailModule/detailBtnModule";
+import { NewTableModule } from "../../module/table/newTableModule";
+import { Panel } from "../../../global/components/view/panel/Panel";
+import { Tab } from "../../../global/components/ui/tab/tab";
 import d = G.d;
 import tools = G.tools;
 import AGroupTabItem = BW.AGroupTabItem;
-import {TextInput} from "../../../global/components/form/text/text";
-import {EditModule} from "../../module/edit/editModule";
-import {DetailItem} from "../../module/detailModule/detailItem";
-import {IButton} from "../../../global/components/general/button/Button";
-import {BtnGroup} from "../../../global/components/ui/buttonGroup/btnGroup";
+import { TextInput } from "../../../global/components/form/text/text";
+import { EditModule } from "../../module/edit/editModule";
+import { DetailItem } from "../../module/detailModule/detailItem";
+import { IButton } from "../../../global/components/general/button/Button";
+import { BtnGroup } from "../../../global/components/ui/buttonGroup/btnGroup";
 import Shell = G.Shell;
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {Loading} from "../../../global/components/ui/loading/loading";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { Loading } from "../../../global/components/ui/loading/loading";
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -41,7 +41,7 @@ export class GroupTabsPage extends BasicPage {
 
     constructor(para: IGroupTabsPagePara) {
         super(para);
-        console.log(para);
+        // console.log(para);
         window['d'] = this;
         this.ui = para.ui.body.elements[0];
         let btns = para.ui.body.subButtons;
@@ -102,17 +102,17 @@ export class GroupTabsPage extends BasicPage {
             if (!this.isInventory) {
                 return;
             }
-            console.log(this.ui, this.subUi);
+            // console.log(this.ui, this.subUi);
             const mainUi = this.ui as IBW_Detail,
                 subUi = this.subUi[0] as IBW_Detail,
-                subId = subUi ? {itemId: subUi.itemId} : {},
-                mainId = {itemId: mainUi.itemId},
+                subId = subUi ? { itemId: subUi.itemId } : {},
+                mainId = { itemId: mainUi.itemId },
                 corArr = [...(tools.isNotEmpty(mainUi.correlation) && [Object.assign({}, mainId, mainUi.correlation)] || []),
-                    ...(tools.isNotEmpty(subUi && subUi.correlation) && [Object.assign({}, subId, subUi.correlation)] || [])] as IBW_Detail_Cor[],
+                ...(tools.isNotEmpty(subUi && subUi.correlation) && [Object.assign({}, subId, subUi.correlation)] || [])] as IBW_Detail_Cor[],
                 main = this.main,
                 sub = this.subs[0];
             this.imports.aggrArr = [...(mainUi && mainUi.aggrList && mainUi.aggrList.map(list => Object.assign({}, mainId, list)) || []),
-                ...(subUi && subUi.aggrList && subUi.aggrList.map(list => Object.assign({}, subId, list)) || [])];
+            ...(subUi && subUi.aggrList && subUi.aggrList.map(list => Object.assign({}, subId, list)) || [])];
 
             this.imports.footer = <div class="inventory-footer">
                 <div className="barcode-count">
@@ -127,7 +127,7 @@ export class GroupTabsPage extends BasicPage {
                                     <div className="barcode-cell">
                                         {this.imports.countTextEl =
                                             <div data-item={cor.itemId} data-name={cor.numberName}
-                                                 data-value={cor.default}>
+                                                data-value={cor.default}>
                                                 {cor.default === '3' ? '累加数值：' : '替换数值：'}
                                             </div>}
                                         {this.imports.countText = <TextInput blur={() => {
@@ -136,7 +136,7 @@ export class GroupTabsPage extends BasicPage {
                                             } else {
                                                 this.imports.isModify = false;
                                             }
-                                        }} type='number' placeholder="请输入"/>}
+                                        }} type='number' placeholder="请输入" />}
                                     </div>
                                     <div className="barcode-cell barcode-right">
                                         <div>{cor.caption + '：'}</div>
@@ -150,14 +150,14 @@ export class GroupTabsPage extends BasicPage {
                         <div className={'barcode-row aggr-list ' + (this.imports.aggrArr[0] ? '' : 'hide')}>
                             {this.imports.aggrArr.map((list, i) => {
                                 return <div data-item={list.itemId}
-                                            className={"barcode-cell " + (i % 2 !== 0 ? 'barcode-right' : '')}>
+                                    className={"barcode-cell " + (i % 2 !== 0 ? 'barcode-right' : '')}>
                                     <div>{list.caption + '：'}</div>
-                                    <div data-name={list.fieldName}/>
+                                    <div data-name={list.fieldName} />
                                 </div>
                             })}
                         </div>}
                 </div>
-                {this.imports.btnWrapper = <div class="inventory-group-btn"/>}
+                {this.imports.btnWrapper = <div class="inventory-group-btn" />}
             </div>;
 
             if (!this.imports.aggrArr[0]) {
@@ -220,7 +220,7 @@ export class GroupTabsPage extends BasicPage {
             new BtnGroup({
                 container: this.imports.btnWrapper,
                 buttons: [...this.imports.btnParaGet(this.subBtn.main, this.imports.editModule.main, mainUi.itemId),
-                    ...(subUi && this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId) || [])]
+                ...(subUi && this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId) || [])]
             });
 
             d.append(this.wrapper, this.imports.footer);
@@ -235,7 +235,7 @@ export class GroupTabsPage extends BasicPage {
                 let value = cor.default;
                 value && this.imports.toggleComBtn(value);
             });
-
+            //this.imports.editSet(null, { "SHELF_NO": "30003", "MEMO": "货架三", "SHELFACREAGE": "37平方米" });
             // 初始化界面查询是否有上次操作未完成的数据
             Shell.inventory.getScanData(mainUi.uniqueFlag, result => {
                 if (result.success) {
@@ -243,7 +243,7 @@ export class GroupTabsPage extends BasicPage {
                     Array.isArray(result.data) && result.data.forEach(obj => {
                         const item = obj.itemid;
                         if (!item) return;
-                        const {edit} = this.imports.getKeyField(obj.item);
+                        const { edit } = this.imports.getKeyField(obj.itemid);
                         this.imports.editSet(edit, obj.array[0]);
                     })
                 }
@@ -279,7 +279,7 @@ export class GroupTabsPage extends BasicPage {
                 const itemId = obj.itemid;
                 if (!itemId) return;
 
-                const {edit} = this.imports.getKeyField(itemId);
+                const { edit } = this.imports.getKeyField(itemId);
                 this.imports.editSet(edit, obj.array[0]);
                 this.imports.setText('');
                 this.imports.setCountData();
@@ -294,7 +294,7 @@ export class GroupTabsPage extends BasicPage {
          */
         query: (value: string, option?: string) => {
             let keyField = this.ui.keyField,
-                field = {[keyField]: this.imports.editModule.main.get(keyField)[keyField]};
+                field = { [keyField]: this.imports.editModule.main.get(keyField)[keyField] };
             if (!this.subUi[0]) {
                 field = {};
             }
@@ -319,7 +319,7 @@ export class GroupTabsPage extends BasicPage {
                 data = edit.get();
             cols.forEach(col => {
                 let expr = col.caculateExpr;
-                expr && edit.set({[col.name]: eval(tools.str.parseTpl(expr, data, true, 1, /\%\S+?%/g))})
+                expr && edit.set({ [col.name]: eval(tools.str.parseTpl(expr, data, true, 1, /\%\S+?%/g)) })
             })
         },
         /**
@@ -329,13 +329,14 @@ export class GroupTabsPage extends BasicPage {
          */
         editSet(edit: EditModule, value: obj) {
             this.isOnSet = false;
+            console.log(JSON.stringify(value))
             edit.set(value);
             this.caculate(edit);
             this.isOnSet = true;
         },
-        clear(itemId : string) {
+        clear(itemId: string) {
             this.isOnSet = false;
-            const {edit} = this.getKeyField(itemId);
+            const { edit } = this.getKeyField(itemId);
             edit.clear();
             this.setText('');
             this.setAmount('');
@@ -373,7 +374,7 @@ export class GroupTabsPage extends BasicPage {
                 value = this.imports.editModule.main.get(keyField);
                 edit = this.imports.editModule.main;
             }
-            return {keyField, value, ui, edit, key}
+            return { keyField, value, ui, edit, key }
         },
         /**
          * 请求shell查询count数据
@@ -383,7 +384,7 @@ export class GroupTabsPage extends BasicPage {
                 id = data.itemId;
             if (!id) return;
 
-            const {value} = this.imports.getKeyField(id);
+            const { value } = this.imports.getKeyField(id);
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
                 console.log(result.data, 'setCountData');
                 if (result.success) {
@@ -401,19 +402,19 @@ export class GroupTabsPage extends BasicPage {
             this.imports.aggrArr.forEach(aggr => {
                 let id = aggr.itemId,
                     mainId = this.imports.mainUiGet().itemId,
-                    {value} = this.imports.getKeyField(mainId);
+                    { value } = this.imports.getKeyField(mainId);
 
                 if (itemId !== id) return;
 
                 Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression,
                     id === mainId ? {} : value, result => {
-                    console.log(result.data, 'setAggrData');
-                    if (result.success) {
-                        this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
-                    } else {
-                        Modal.toast(result.msg);
-                    }
-                });
+                        console.log(result.data, 'setAggrData');
+                        if (result.success) {
+                            this.imports.setAggr(result.data[this.imports.fieldName], id, aggr.fieldName);
+                        } else {
+                            Modal.toast(result.msg);
+                        }
+                    });
             })
         },
         btnParaGet: (btns: R_Button[], data: obj, itemId: string): IButton[] => {
@@ -443,28 +444,28 @@ export class GroupTabsPage extends BasicPage {
 
             console.log(edit.get(name));
 
-            let loading : Loading,
+            let loading: Loading,
                 dataType = field.atrrs.dataType;
-            if(dataType === '28'){
+            if (dataType === '28') {
                 loading = new Loading({
-                    msg : '图片保存中',
-                    duration : 99999,
-                    disableEl : document.body
+                    msg: '图片保存中',
+                    duration: 99999,
+                    disableEl: document.body
                 })
             }
             Shell.imports.operateTable(uniqueFlag, itemId, {
                 [name]: edit.get(name)[name]
             }, {
-                [keyField]: edit.get(keyField)[keyField]
-            }, 'updata', result => {
-                console.log(result);
-                if (result.success) {
-                    this.imports.editSet(edit, result.data);
-                } else {
-                    Modal.toast(result.msg);
-                }
-                loading && loading.destroy();
-            });
+                    [keyField]: edit.get(keyField)[keyField]
+                }, 'updata', result => {
+                    console.log(result);
+                    if (result.success) {
+                        this.imports.editSet(edit, result.data);
+                    } else {
+                        Modal.toast(result.msg);
+                    }
+                    loading && loading.destroy();
+                });
         },
         mainUiGet: (): IBW_Slave_Ui => {
             return this.ui;
@@ -545,7 +546,7 @@ export class GroupTabsPage extends BasicPage {
                 }
             }),
             isOpenFirst: true,
-            onChange: ({index, isSelected, item}) => {
+            onChange: ({ index, isSelected, item }) => {
                 if (isSelected) {
                     let panel = this.tab as Panel;
                     if (this.styleType === 'panel-off') {
@@ -594,9 +595,9 @@ export class GroupTabsPage extends BasicPage {
         main: R_Button[],
         sub: R_Button[]
     } = {
-        main: [],
-        sub: []
-    };
+            main: [],
+            sub: []
+        };
 
     protected createTabItem(index: number, wrapper: HTMLElement) {
         if (index === 0) {
@@ -669,7 +670,7 @@ export class GroupTabsPage extends BasicPage {
                     output: 'json'
                 });
                 url = tools.url.addObj(url, G.Rule.parseVarList(sub.uiAddr.parseVarList, {}));
-                BwRule.Ajax.fetch(url).then(({response}: { response: IBW_UI<IBW_Slave_Ui> }) => {
+                BwRule.Ajax.fetch(url).then(({ response }: { response: IBW_UI<IBW_Slave_Ui> }) => {
                     let ui = response.body.elements[0];
                     ui.uiType = ui.uiType || response.uiType;
                     resolve(ui);

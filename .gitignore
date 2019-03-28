@@ -9,3 +9,4 @@ app/package-lock.json
 .gitignore
 dist.min.zip
 dist.zip
+dist.min.rar
