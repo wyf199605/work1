@@ -148,7 +148,7 @@ export class OfflineBtn {
         const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
         Shell.imports.uploadcodedata(this.para.uniqueFlag, url, (result) => {
             if (result.success) {
-                Modal.toast('上传成功');
+                Modal.toast(result.msg||'上传成功');
                 // 上传成功后清空主表，子表数据
                 this.imports.clear(this.para.mainId);
                 let sub = this.imports.editModule.sub;
