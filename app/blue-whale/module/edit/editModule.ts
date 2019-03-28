@@ -472,7 +472,7 @@ export class EditModule {
             if (!p) {
                 return;
             }
-            let {field, data, onExtra} = p;
+            let {field, data, onExtra, isNewData} = p;
             if (field && (p.field.comType === 'tagsinput')) {
                 return;
             }
@@ -485,6 +485,7 @@ export class EditModule {
                 //     }
                 data = data || {};
                 if (data[field.name] != val) {
+                    isNewData && (assignData = {});
                     assignData = Object.assign({}, data, assignData, {[field.name]: val});
                     assignSend(field, val, assignData, onExtra);
                 }

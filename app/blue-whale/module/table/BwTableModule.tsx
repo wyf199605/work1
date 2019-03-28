@@ -2733,6 +2733,7 @@ export class BwTableModule extends Component {
                     let com = BwRule.isImage(field.atrrs && field.atrrs.dataType) ? null : editModule.init(col.name, {
                         dom: cell.wrapper,
                         data: row.data,
+                        isNewData: true,
                         field,
                         onExtra: (data, relateCols, isEmptyClear = false, isValid = true, isReplace = false) => {
                             if (tools.isEmpty(data) && isEmptyClear) {

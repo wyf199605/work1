@@ -4,6 +4,7 @@ interface ComInitP {
     data?: obj;
     onSet?: (val: any) => void;
     isOffLine?: boolean;
+    isNewData?: boolean;
     onExtra?(data: obj, relateCols: string[], isEmptyClear?, isValid?, isReplace?): void
 }
 
