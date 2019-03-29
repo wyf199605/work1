@@ -143,7 +143,7 @@ export = class ChartBasic {
                         }
                         else if (!isDrill && sys.isMb) {
                             require(['Modal', 'Button'], function (M, B) {
-                                let chartBody = d.create('<div class="Echart_body" style="width: 100vw; height: calc(100vh - 44px); overflow-x: hidden;"></div>');
+                                let chartBody = d.create('<div class="Echart_body" style="width: 100vw; height: calc(100% - 44px); overflow-x: hidden;"></div>');
                                 let m = new M.Modal({
                                     position: 'full',
                                     body: chartBody,
@@ -151,7 +151,7 @@ export = class ChartBasic {
                                 });
                                 m.body.parentElement.parentElement.classList.add('myChart');
                                 m.body.parentElement.style.maxHeight = 'none';
-                                m.body.parentElement.setAttribute('style', 'height:calc(100vh - 44px);');
+                                m.body.parentElement.setAttribute('style', 'height:calc(100% - 44px);');
                                 let chartType = <SelectBox>self.coms['type'],
                                     jsonData = self.getChartInput();
                                 self.generateGraph(m.body, chartType.get()[0], jsonData);

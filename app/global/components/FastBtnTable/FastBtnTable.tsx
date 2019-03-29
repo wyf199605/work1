@@ -609,26 +609,44 @@ export class FastBtnTable extends FastTable{
      */
     protected export(action : string){
         require(['tableExport'], (tableExport) => {
-            let names = [];
-            this.columns.forEach((col) => {
-                 if(col.isFixed){
-                     col.isFixed = false;
-                     names.push(col.name);
-                 }
-            });
-            let tbody = d.query('tbody', this.mainTable.body.tableEl).cloneNode(true) as HTMLElement,
-                thead = d.query('thead', this.mainTable.head.tableEl).cloneNode(true) as HTMLElement;
-            let table: HTMLTableElement = <table border="1" id="tableExport"/>;
-            table.innerHTML = thead.outerHTML + tbody.outerHTML;
+            let leftRows = this.leftTable.head.rows || [],
+                mainRows = this.mainTable.head.rows || [],
+                rowCells = Array.from({length: Math.max(leftRows.length, mainRows.length)}, (v, index) => {
+                    let leftRow = leftRows[index],
+                        mainRow = mainRows[index];
+                    return [...(leftRow ? leftRow.cells : []), ...(mainRow ? mainRow.cells : [])]
+                }),
+                id = tools.getGuid();
+            let table: HTMLTableElement = <table border="1" id={id}>
+                <thead>
+                {rowCells.map((cells) => {
+                    return <tr>
+                        {cells.map(cell => {
+                            if(cell.isVirtual || !cell.show){
+                                return null;
+                            }
+                            return cell.wrapper.cloneNode(true);
+                        })}
+                    </tr>
+                })}
+                </thead>
+                <tbody>
+                {this.rows.map((row) => {
+                    return <tr>
+                        {row && row.cells.map((cell) => {
+                            if(cell.isVirtual || !cell.show){
+                                return null;
+                            }
+                            return cell.wrapper.cloneNode(true);
+                        })}
+                    </tr>
+                })}
+                </tbody>
+            </table>;
             d.append(document.body, table);
-            tableExport('tableExport', this.exportTitle, action);
+            tableExport(id, this.exportTitle, action);
             d.remove(table, true);
             table = null;
-            this.columns.forEach((col) => {
-                if(names.indexOf(col.name) > -1){
-                    col.isFixed = true;
-                }
-            });
         })
     }
 

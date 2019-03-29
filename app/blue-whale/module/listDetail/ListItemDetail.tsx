@@ -262,6 +262,7 @@ export class ListItemDetail extends Component{
         } else {
             this.scrollToTop();
             this.initDetailData().then(data => {
+                this.checkPageButtonDisabled();
                 this.render(data);
             });
         }
