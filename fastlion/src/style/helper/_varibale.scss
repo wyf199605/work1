@@ -1,0 +1,14 @@
+
+// Color
+$primary-color          : #2d8cf0; //::
+$info-color             : #0071c0; //::
+$success-color          : #09bb07; //::
+$warning-color          : #FEBF06; //::
+$error-color            : #FF5946; //::
+$link-color             : #2D8cF0;
+$link-hover-color       : lighten($link-color, 20%);
+$link-active-color      : darken($link-color, 5%);
+$selected-color         : shade($primary-color, 90%);
+$tooltip-color          : #fff;
+$subsidiary-color       : #80848f;
+$rate-star-color        : #f5a623;
