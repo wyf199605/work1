@@ -63,6 +63,55 @@ export class LoginPage {
         // let fqa = new FqaModal({
         //     container: document.body
         // });
+        this.setLoginType();
+    }
+
+    protected setLoginType(){
+        G.Ajax.fetch(tools.url.addObj(CONF.url.login, {
+            output: 'json'
+        })).then(({ response }) => {
+            response = JSON.parse(response);
+            let data = tools.keysVal(response, 'body', 'bodyList', 0);
+            let {
+                SMSBtn,
+                scanButton,
+                wxButton,
+                fingerMbBtn,
+                fingerPcBtn,
+                regButton
+            } = this.props;
+
+            if(data){
+                if(data.loginMessage == 1){
+                    if(SMSBtn instanceof Button){
+                        SMSBtn.destroy();
+                    }else{
+                        d.remove(SMSBtn);
+                    }
+                }
+
+                if(data.loginScan == 1){
+                    d.remove(scanButton);
+                }
+
+                if(data.loginWechat == 1){
+                    d.remove(wxButton);
+                }
+
+                if(data.loginFingerprint == 1){
+                    d.remove(fingerPcBtn);
+                    d.remove(fingerMbBtn);
+                }
+
+                if(data.singIn == 1){
+                    if(regButton instanceof Button){
+                        regButton.destroy();
+                    }else{
+                        d.remove(regButton);
+                    }
+                }
+            }
+        });
     }
 
     protected getVersion() {

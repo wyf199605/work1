@@ -371,53 +371,67 @@ export = class MainPage {
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({ response }) => {
                 let data = tools.keysVal(response, 'body', 'bodyList');
                 if (tools.isNotEmpty(data)) {
-                    let popover = new Popover({
-                        target: li,
-                        // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
-                        isWatch: true,
-                        items: data.map((item) => {
-                            return {
-                                title: item.systemName,
-                                onClick: () => {
-                                    getSystemMsg(item.systemId).then((response) => {
-                                        console.log(response);
-                                        let loading: Loading,
-                                            path = tools.keysVal(response, 'LOGIN_VAR', 'SYSTEM_PATH') || '',
-                                            params = tools.keysVal(response, 'LOGIN_VAR', 'PARAMS') || '';
-
-                                        let flag = Shell.openSystem(path, params, (result) => {
-                                            loading && loading.hide();
-                                            loading = null;
-                                            if (!result.success) {
-                                                Modal.alert(result.msg || '打开失败');
-                                            }
-                                        });
-
-                                        if (flag) {
-                                            loading = new Loading({
-                                                msg: '打开中...',
-                                                duration: 10
-                                            });
-                                            loading.show();
-                                        } else {
-                                            Modal.alert('打开失败');
-                                        }
-                                    })
+                    if(data.length === 1){
+                        let item = data[0],
+                            el = d.create(`<li class="dropdown pull-right">
+                                    <span class="${'iconfont icon-' + item.systemIcon}"></span>
+                                    ${item.systemName}
+                                </li>`);
+                        d.on(el, 'click', () => {
+                            handlerClick(item);
+                        });
+                        d.replace(el, li);
+                    }else{
+                        let popover = new Popover({
+                            target: li,
+                            // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
+                            isWatch: true,
+                            items: data.map((item) => {
+                                return {
+                                    title: item.systemName,
+                                    icon: 'iconfont icon-' + item.systemIcon,
+                                    onClick: () => {
+                                        handlerClick(item);
+                                    }
                                 }
+                            }),
+                            isBackground: false,
+                            onClick: function () {
+                                popover.show = false;
                             }
-                        }),
-                        isBackground: false,
-                        onClick: function (index, content) {
-                            popover.show = false;
-                        }
-                    });
+                        });
+                    }
                 } else {
-                    d.on(li, 'click', () => {
-                        Modal.toast('无相关系统信息');
-                    })
+                    d.remove(li);
                 }
-
             });
+
+        };
+        let handlerClick = (item) => {
+            getSystemMsg(item.systemId).then((response) => {
+                console.log(response);
+                let loading: Loading,
+                    path = tools.keysVal(response, 'LOGIN_VAR', 'SYSTEM_PATH') || '',
+                    params = tools.keysVal(response, 'LOGIN_VAR', 'PARAMS') || '';
+
+                let flag = Shell.openSystem(path, params, (result) => {
+                    loading && loading.hide();
+                    loading = null;
+                    if (!result.success) {
+                        Modal.alert(result.msg || '打开失败');
+                    }
+                });
+
+                if (flag) {
+                    loading = new Loading({
+                        msg: '打开中...',
+                        duration: 10
+                    });
+                    loading.show();
+                } else {
+                    Modal.alert('打开失败');
+                }
+            })
         };
 
         let getSystemMsg = (systemId: string): Promise<any> => {

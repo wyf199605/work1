@@ -8,6 +8,7 @@ type State = {
     a: number,
     b: number
 };
+
 export class Welcome extends Component<Props, State> {
     readonly state: State = {
         a: 1,
