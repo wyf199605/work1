@@ -10,7 +10,7 @@ export class LoginPcPage extends LoginPage {
     constructor(para) {
         // 初始化头部logo和注册按钮
         let logoWrapper = <div className="logo">
-            <img data-action="selectServer" src={G.requireBaseUrl + '../img/login-logo.png'} alt="fastlion" />
+            <img data-action="selectServer" src={G.requireBaseUrl + '../img/logo/fastlion.png'} alt="fastlion" />
         </div>;
 
         // 初始化表单内容（输入框、按钮等）

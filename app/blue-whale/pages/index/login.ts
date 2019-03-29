@@ -82,6 +82,17 @@ export class LoginPage {
             } = this.props;
 
             if(data){
+                if(data.iconName){
+                    let logoWrapper = tools.isMb ? d.query('.login-logo') :d.query('.logo');
+                    logoWrapper.innerHTML = '';
+                    d.append(logoWrapper, d.create(`
+                    <img src="${G.requireBaseUrl + "../img/logo/" + data.iconName + ".png"}" alt="${data.iconName}"/>
+                     `));
+                    data.caption && d.append(logoWrapper, d.create(`
+                    <p class="text">${data.caption}</p>
+                    `));
+                }
+
                 if(data.loginMessage == 1){
                     if(SMSBtn instanceof Button){
                         SMSBtn.destroy();
@@ -877,7 +888,7 @@ export class LoginPage {
         }
         let usertap = 0, maxtap = 5;
         let type = tools.isMb ? 'touchstart' : 'click';
-        (tools.isMb ? d.query('.login-logo') : d.query('[data-action="selectServer"]')).addEventListener(type, () => {
+        (tools.isMb ? d.query('.login-logo') : d.query('.logo')).addEventListener(type, () => {
             usertap += 1;
             if (usertap === maxtap) {
                 sys.window.load(CONF.url.selectServer);
