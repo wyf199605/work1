@@ -1787,6 +1787,7 @@ export class FastTable extends Component {
     render(indexes: number[], position?: number): void
     render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
     render(x, y?, w?, z = true) {
+        // debugger;
         if(this.rendering){
             return;
         }

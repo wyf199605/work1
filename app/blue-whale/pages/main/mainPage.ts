@@ -43,8 +43,55 @@ export = class MainPage {
 
     constructor() {
     }
+    //下载
+    static downloadFile = (fileName, content) => {
+        let aLink = document.createElement('a');
+        let blob = MainPage.base64ToBlob(content); //new Blob([content]);
 
-    public static init(props: IProps) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("click", true, true);//initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
+        aLink.download = fileName;
+        aLink.href = URL.createObjectURL(blob);
+
+        // aLink.dispatchEvent(evt);
+        //aLink.click()
+        aLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));//兼容火狐
+    }
+    //base64转blob
+    static base64ToBlob = (code) => {
+        let parts = code.split(';base64,');
+        let contentType = parts[0].split(':')[1];
+        let raw = window.atob(parts[1]);
+        let rawLength = raw.length;
+
+        let uInt8Array = new Uint8Array(rawLength);
+
+        for (let i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+        return new Blob([uInt8Array], { type: contentType });
+    }
+    public static init = (props: IProps) => {
+        document.oncontextmenu = (event: obj) => {
+            if (event.target.nodeName == 'IMG') {
+                event.preventDefault();
+                let modal = Modal.confirm({
+                    msg: "是否保存图片?",
+                    callback: (status) => {
+                        if (status) {
+                            let str1 = "abcdefghijklmnopqrstuvwxyz";
+                            let array = str1.split("");
+                            let str = "";
+                            for (var i = 0; i < 5; i++) {
+                                let n = Math.round(Math.random() * (array.length - 1));//此处注意越界问题
+                                str += array[n]
+                            }
+                            MainPage.downloadFile(str + ".png", event.target.currentSrc);
+                        }
+                    }
+                })
+            }
+        };
         MainPage.pageContainer = props.pageContainer;
         MainPage.navBar = props.navBar;
         MainPage.tabContainer = <HTMLUListElement>props.navBar.querySelector('ul.page-tabs-content');
