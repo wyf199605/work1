@@ -1,0 +1,150 @@
+$theme:#2D8cF0;
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    overflow: hidden;
+}
+
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    border: 1px solid #CCC !important;
+}
+
+.cf::after,
+.clearfix::after,
+.cf-all::after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: right;
+    visibility: hidden
+}
+
+.cf-all::after {
+    clear: both !important;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.rlt {
+    position: relative;
+}
+
+.abs {
+    position: absolute;
+}
+
+.dn {
+    display: none;
+}
+
+.db {
+    display: block;
+}
+
+.dib {
+    display: inline-block;
+}
+
+.tc {
+    text-align: center;
+}
+
+.tl {
+    text-align: left;
+}
+
+.tr {
+    text-align: right;
+}
+
+.ell,
+.toe {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.vm{
+    vertical-align: middle;
+}
+
+.ell2,
+.toe2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.fc-def {
+    color: #2f353b
+}
+
+.fc-black {
+    color: black
+}
+
+.fc-red {
+    color: red
+}
+
+.fc-white {
+    color: white
+}
+
+.fc-blue {
+    color: $theme
+}
+
+.fc3 {
+    color: #333;
+}
+
+.fc6 {
+    color: #666;
+}
+
+.fc9 {
+    color: #999;
+}
+
+.text-link,
+.primary-link,
+.text-primary {
+    color: $primary-color;
+}
+
+.success-link, 
+.text-success {
+    color: $success-color;
+}
+
+.info-link, 
+.text-info {
+    color: $info-color;
+}
+
+.warning-link, 
+.text-warning {
+    color: $warning-color;
+}
+
+.error-link, 
+.text-error {
+    color: $error-color;
+}
+
+.text-link,
+.primary-link,
+.success-link,
+.info-link,
+.warning-link,
+.error-link {
+    cursor: pointer;
+}
