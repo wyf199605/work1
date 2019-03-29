@@ -93,7 +93,7 @@ export class LoginPage {
                     `));
                 }
 
-                if(data.loginMessage){
+                if(data.loginMessage == 1){
                     if(SMSBtn instanceof Button){
                         SMSBtn.destroy();
                     }else{
@@ -101,20 +101,20 @@ export class LoginPage {
                     }
                 }
 
-                if(data.loginScan){
+                if(data.loginScan == 1){
                     d.remove(scanButton);
                 }
 
-                if(data.loginWechat){
+                if(data.loginWechat == 1){
                     d.remove(wxButton);
                 }
 
-                if(data.loginFingerprint){
+                if(data.loginFingerprint == 1){
                     d.remove(fingerPcBtn);
                     d.remove(fingerMbBtn);
                 }
 
-                if(data.singIn){
+                if(data.singIn == 1){
                     if(regButton instanceof Button){
                         regButton.destroy();
                     }else{
