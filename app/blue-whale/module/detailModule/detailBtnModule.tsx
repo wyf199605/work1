@@ -92,14 +92,14 @@ export class DetailBtnModule extends DetailModule {
                     //     }
                     // }
                     if (dataManager.isToNext) {
-                        box.addItem(nextBtn);
+                        !box.getItem('next') && box.addItem(nextBtn);
                     } else {
-                        this.btnManager.box.delItem('next');
+                        box.delItem('next');
                     }
                     if (dataManager.isToPrev) {
-                        box.addItem(prevBtn);
+                        !box.getItem('prev') && box.addItem(prevBtn);
                     } else {
-                        this.btnManager.box.delItem('prev');
+                        box.delItem('prev');
                     }
 
                     // nextBtn && (nextBtn.isDisabled = !dataManager.isToNext);
