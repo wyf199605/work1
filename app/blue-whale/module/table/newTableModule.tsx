@@ -88,6 +88,8 @@ export class NewTableModule extends AGroupTabItem{
             tableModule: this,
         });
 
+        let operationType = this.bwEl.operationType;
+        this.autoEdit = operationType && operationType.autoEdit;
 
         main.onFtableReady = () => {
             if (tools.isNotEmpty(this.bwEl.subButtons)) {
@@ -290,13 +292,14 @@ export class NewTableModule extends AGroupTabItem{
                 })
             }
 
-            let operationType = this.bwEl.operationType,
-                editBtn = this.main && this.main.modify.box.getItem('edit');
-            operationType
-            && operationType.autoEdit
-            && editBtn
-            && editBtn.wrapper
-            && editBtn.wrapper.click();
+            let editBtn = this.main && this.main.modify.box.getItem('edit');
+
+            this.autoEdit && setTimeout(() => {
+                editBtn &&
+                editBtn.wrapper &&
+                editBtn.wrapper.click();
+            }, 600);
+            this.autoEdit = false;
         };
     }
 
@@ -573,6 +576,7 @@ export class NewTableModule extends AGroupTabItem{
         sub && sub.ftable && sub.ftable.recountWidth();
     }
 
+    autoEdit = false;
     refresh(data?: obj) {
         let box = tools.keysVal(this.main, 'subBtns', 'box');
         box && box.responsive();
