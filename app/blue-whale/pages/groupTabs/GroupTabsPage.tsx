@@ -300,8 +300,8 @@ export class GroupTabsPage extends BasicPage {
             if (!this.subUi[0]) {
                 field = {};
             }
-
-            Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag,
+            
+            Shell.imports.operateScanTable(value+'', option || this.imports.getOption(), this.ui.uniqueFlag,
                 field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                     if (result.success) {
                         // console.log(result.data, 'operateScanTable');

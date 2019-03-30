@@ -153,7 +153,7 @@ export class OfflineBtn {
                 // this.imports.clear(this.para.mainId);
                 // let sub = this.imports.editModule.sub;
                 // sub && this.imports.clear(this.para.subId);
-                this.del(this.para.mainId,this.para.mainKey.name, null, 'deleteAll', false);
+                this.del(this.para.mainId,this.para.mainKey.name, null, 'delete', false);
             } else {
                 Modal.toast(result.msg);
             }
