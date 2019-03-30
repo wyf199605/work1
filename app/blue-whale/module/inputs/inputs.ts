@@ -11,6 +11,7 @@ import { Button } from "../../../global/components/general/button/Button";
 import { ShellAction } from "../../../global/action/ShellAction";
 import Shell = G.Shell;
 import { ListItemDetail } from "../listDetail/ListItemDetail";
+import { systemMenu } from "blue-whale/pages/main/mainPage";
 
 interface InputsPara {
     inputs: R_Input[]
@@ -145,6 +146,9 @@ export class Inputs {
             case 4:
                 // 提示信息,自动下一步
                 this.ajax(CONF.siteUrl + this.url, open);
+                break;
+            case 5:
+                BW.sys.window.open({url : CONF.siteUrl + url});
                 break;
             default:
                 this.isProcess = false;

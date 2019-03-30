@@ -153,8 +153,7 @@ export class OfflineBtn {
                 // this.imports.clear(this.para.mainId);
                 // let sub = this.imports.editModule.sub;
                 // sub && this.imports.clear(this.para.subId);
-                this.del(this.para.mainId,this.para.mainKey.name, null, null, false);
-                this.para.subId && this.del(this.para.subId,this.para.subKey.name, null, null, false);
+                this.del(this.para.mainId,this.para.mainKey.name, null, 'deleteAll', false);
             } else {
                 Modal.toast(result.msg);
             }
@@ -296,7 +295,6 @@ export class OfflineBtn {
         if (!keyField) {
             where = {};
         }
-
         Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, type, result => {
             console.log(result.data, 'operateTable删除表');
             if (result.success) {

@@ -25,6 +25,7 @@ export interface IDetailItemPara extends IComponentPara{
 
 export class DetailItem extends Component{
     wrapperInit(para: IDetailItemPara){
+        console.log(para)
         let field = para.field,
             name = field.name,
             title = field.caption,
