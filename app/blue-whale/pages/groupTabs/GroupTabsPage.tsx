@@ -296,7 +296,7 @@ export class GroupTabsPage extends BasicPage {
          */
         query: (value: string, option?: string) => {
             let keyField = this.ui.keyField,
-                field = { [keyField]: this.imports.editModule.main.get(keyField)[keyField] };
+                field = { [keyField]: this.imports.editModule.main.get(keyField)[keyField] + '' };
             if (!this.subUi[0]) {
                 field = {};
             }
@@ -304,7 +304,7 @@ export class GroupTabsPage extends BasicPage {
             Shell.imports.operateScanTable(value, option || this.imports.getOption(), this.ui.uniqueFlag,
                 field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                     if (result.success) {
-                        console.log(result.data, 'operateScanTable');
+                        // console.log(result.data, 'operateScanTable');
                         this.imports.scanRender(result.data);
                     } else {
                         Modal.toast(result.msg);

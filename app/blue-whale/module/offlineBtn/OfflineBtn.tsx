@@ -92,7 +92,7 @@ export class OfflineBtn {
     private manyScan() {
         Shell.inventory.openScanCode(1, () => { }, (result) => {
             if (result.success) {
-                this.imports.query(result.data);
+                this.imports.query(result.data + '');
             } else {
                 Modal.toast(result.msg);
             }
@@ -102,7 +102,7 @@ export class OfflineBtn {
     private scan() {
         Shell.inventory.openScanCode(0, (result) => {
             if (result.success) {
-                this.imports.query(result.data);
+                this.imports.query(result.data + '');
             } else {
                 Modal.toast(result.msg);
             }
@@ -148,7 +148,7 @@ export class OfflineBtn {
         const url = CONF.siteUrl + this.btn.actionAddr.dataAddr;
         Shell.imports.uploadcodedata(this.para.uniqueFlag, url, (result) => {
             if (result.success) {
-                Modal.toast(result.msg||'上传成功');
+                Modal.toast(result.msg || '上传成功');
                 // 上传成功后清空主表，子表数据
                 this.imports.clear(this.para.mainId);
                 let sub = this.imports.editModule.sub;
@@ -255,7 +255,7 @@ export class OfflineBtn {
         };
         const del = (itemId: string, keyField: string, value: string = '', type: string = 'delete') => {
             let where = {
-                [keyField]: value
+                [keyField]: value + ''
             };
             if (!keyField) {
                 where = {};
