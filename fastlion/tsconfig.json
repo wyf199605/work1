@@ -7,7 +7,7 @@
     "sourceMap": true,
     "outDir": "ts-build",
     "jsx": "preserve",
-    "strict": true
+    "strict": false
   },
   "exclude": [
     "node_modules"

@@ -6,8 +6,8 @@ declare var module:any;
 const App = () => {
   return (
     <div>
-      <p>Hello World!!</p>
-      <Welcome name="!!!"/>
+      <p>Hello World!2222!</p>
+      <Welcome/>
     </div>
   )
 }

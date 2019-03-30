@@ -3,66 +3,71 @@ const path = require('path');
 const merge = require('webpack-merge');
 const common = require("./webpack.common.js");
 const cleanWebpackPlugin = require('clean-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const UglifyJsPlugin=require('uglifyjs-webpack-plugin');
+const MiniCssExtractPlugin=require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const env = {
-    NODE_ENV: '"production"'
-}
 module.exports = merge(common, {
+    mode: "production",
     module: {
-        rules: [{
-            // 用正则去匹配要用该 loader 转换的 CSS 文件
-            test: /\.scss$/,
-            use: ExtractTextPlugin.extract({
-                publicPath: "../",
-                fallback: 'style-loader',
-                use: ['css-loader', 'sass-loader']
-            })
-        }]
+        rules: [ {
+            test: /\.(css|sass|scss)$/,
+            use: [
+                {
+                    loader:MiniCssExtractPlugin.loader,
+                    options:{
+                        publicPath: '../'
+                    }
+                },
+                {
+                    loader: 'css-loader',
+                    options: {
+                        importLoaders: 2,
+                        sourceMap: false
+                    }
+                },
+                {
+                    loader: 'postcss-loader',
+                    options: {
+                        plugins: () => [
+                            require('autoprefixer')
+                        ],
+                        sourceMap: false
+                    }
+                },
+                {
+                    loader: 'sass-loader',
+                    options: {
+                        sourceMap: false
+                    }
+                }
+            ]
+    },]
     },
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env': env
-        }),
         new cleanWebpackPlugin(),
-        new ExtractTextPlugin({
-            filename: "css/[name].[contenthash].css",
-            allChunks: true
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
+        new MiniCssExtractPlugin({
+            filename: "css/[name].css",
+        })
+    ],
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    compress: false
+                }
+            })
+        ],
+        runtimeChunk: {
+            name: "manifest"
+        },
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendor",
+                    chunks: "all"
+                }
             }
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor',
-            minChunks: function (module, count) {
-                return (
-                    module.resource &&
-                    /\.js$/.test(module.resource) &&
-                    module.resource.indexOf(
-                        path.join(__dirname, '../node_modules')
-                    ) === 0
-                )
-            }
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'manifest',
-            chunks: ['vendor']
-        }),
-        // new BundleAnalyzerPlugin(
-        //     {
-        //         analyzerMode: 'server',
-        //         analyzerHost: '127.0.0.1',
-        //         analyzerPort: 8888,
-        //         reportFilename: 'report.html',
-        //         defaultSizes: 'parsed',
-        //         openAnalyzer: true,
-        //         generateStatsFile: false,
-        //         statsFilename: 'stats.json',
-        //         statsOptions: null,
-        //         logLevel: 'info'
-        //     }
-        // ),
-    ]
+        }
+    },
 })

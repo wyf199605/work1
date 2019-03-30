@@ -3,10 +3,8 @@ const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlug
 const merge = require('webpack-merge');
 const common = require("./webpack.common");
 common.entry.unshift('webpack-hot-middleware/client');
-const env = {
-    NODE_ENV: '"develop"'
-}
 module.exports = merge(common, {
+    mode: "development",
     devtool: 'source-map',
     module: {
         rules: [{
@@ -16,9 +14,6 @@ module.exports = merge(common, {
         }]
     },
     plugins: [
-        new webpack.DefinePlugin({
-            'process.env': env
-        }),
         new HotModuleReplacementPlugin()
     ]
 })
