@@ -532,7 +532,7 @@ export class ButtonAction {
 
         BwRule.atvar = null;
         // 弹框宽度计算
-        if (type === 3 || type === 5) {
+        if (type === 3 || type === 5||type===13) {
             if (len > 6) {
                 width = 100 * 10;
             }
@@ -560,13 +560,13 @@ export class ButtonAction {
                             offShellMonitor();
                         }
                     });
-                    if (type === 3) {
+                    if (type === 3||type===13) {
                         BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
                     }
                 }
             };
 
-        if (type === 3 || type === 5) {
+        if (type === 3 || type === 5||type===13) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
         } else if (type === 4) {
             para['className'] = 'action-type-4';
@@ -742,7 +742,7 @@ export class ButtonAction {
 
 
         // 生成表格，选择数据，确定后回填
-        if (type === 3 || type === 5) {
+        if (type === 3 || type === 5||type===13) {
             list();
         } else if (res.atvarparams) {
             //type4 or handle or
@@ -861,7 +861,7 @@ export class ButtonAction {
                 });
                 table.refresh();
                 //编辑并保存之后调用回调
-                if (type === 3) {
+                if (type === 3||type===13) {
                     d.on(window, e.NewTableModule.EVT_EDIT_SAVE, () => {
                         onOk();
                     });
