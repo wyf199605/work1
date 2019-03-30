@@ -1,12 +1,12 @@
 /// <amd-module name="EditDetail"/>
 
-import {DetailBase, IDetailBasePara} from "./DetailBase";
-import {Button} from "../../../global/components/general/button/Button";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {ListItemDetail} from "./ListItemDetail";
-import {DetailModal} from "./DetailModal";
-import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import { DetailBase, IDetailBasePara } from "./DetailBase";
+import { Button } from "../../../global/components/general/button/Button";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { ListItemDetail } from "./ListItemDetail";
+import { DetailModal } from "./DetailModal";
+import { ActionSheet, IActionSheetButton } from "../../../global/components/ui/actionSheet/actionSheet";
+import { ButtonAction } from "../../common/rule/ButtonAction/ButtonAction";
 import tools = G.tools;
 
 export class EditDetail extends DetailBase {
@@ -41,10 +41,17 @@ export class EditDetail extends DetailBase {
                 })
             }
         } else {
-            if (tools.isPc) {
-                this.actionButtons.forEach(btn => {
-                    btn.disabled = isEdit;
-                })
+            // if (tools.isPc) {
+            //     this.actionButtons.forEach(btn => {
+            //         btn.disabled = isEdit;
+            //     })
+            // }
+            //编辑状态下也可以点击新增
+            console.log(111)
+            if (!tools.isPc) {
+               setTimeout(() => {
+                this.moreBtn.disabled=false;
+               }, 1000);
             }
             this.cancelBtn.disabled = !isEdit;
             this.updateBtn.disabled = isEdit;
@@ -102,6 +109,7 @@ export class EditDetail extends DetailBase {
 
         // 创建PC按钮
         function createPcButtons(buttons: R_Button[], wrapper: HTMLElement) {
+            console.log(buttons)
             buttons.forEach((btn) => {
                 self.actionButtons.push(new Button({
                     content: btn.caption,
@@ -171,7 +179,7 @@ export class EditDetail extends DetailBase {
                 }
             });
             if (tools.isNotEmpty(buttons)) {
-                let btnWrapper = <div className="list-item-detail-buttons"/>;
+                let btnWrapper = <div className="list-item-detail-buttons" />;
                 this.wrapper.appendChild(btnWrapper);
                 if (tools.isMb) {
                     createMoreBtn(buttons, btnWrapper);
@@ -181,8 +189,8 @@ export class EditDetail extends DetailBase {
                     }
                 } else {
                     // PC 按钮
-                    let pcBtnWrapper = <div className="item-buttons"/>,
-                        pageBtnWrapper = <div className="page-buttons"/>;
+                    let pcBtnWrapper = <div className="item-buttons" />,
+                        pageBtnWrapper = <div className="page-buttons" />;
                     if (tools.isNotEmpty(buttons)) {
                         btnWrapper.appendChild(pcBtnWrapper);
                         createEditBtn(pcBtnWrapper);
@@ -295,7 +303,7 @@ export class EditDetail extends DetailBase {
     }
 
     private initPageButtons(wrapper?: HTMLElement) {
-        let btnWrapper = wrapper ? wrapper : <div className="page-buttons"/>;
+        let btnWrapper = wrapper ? wrapper : <div className="page-buttons" />;
         this.wrapper.appendChild(btnWrapper);
         this.prev = new Button({
             content: '上一页',

@@ -150,9 +150,11 @@ export class OfflineBtn {
             if (result.success) {
                 Modal.toast(result.msg || '上传成功');
                 // 上传成功后清空主表，子表数据
-                this.imports.clear(this.para.mainId);
-                let sub = this.imports.editModule.sub;
-                sub && this.imports.clear(this.para.subId);
+                // this.imports.clear(this.para.mainId);
+                // let sub = this.imports.editModule.sub;
+                // sub && this.imports.clear(this.para.subId);
+                this.del(this.para.mainId,this.para.mainKey.name);
+                this.para.subId && this.del(this.para.subId,this.para.subKey.name);
             } else {
                 Modal.toast(result.msg);
             }
@@ -253,38 +255,61 @@ export class OfflineBtn {
             }
             return arr;
         };
-        const del = (itemId: string, keyField: string, value: string = '', type: string = 'delete') => {
-            let where = {
-                [keyField]: value + ''
-            };
-            if (!keyField) {
-                where = {};
-            }
+        // const del = (itemId: string, keyField: string, value: string = '', type: string = 'delete') => {
+        //     let where = {
+        //         [keyField]: value + ''
+        //     };
+        //     if (!keyField) {
+        //         where = {};
+        //     }
 
-            Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, type, result => {
-                console.log(result.data, 'operateTable删除表');
-                if (result.success) {
-                    Modal.toast('删除成功');
-                    // 若为主表，则同时清空子表数据
-                    if (itemId === this.para.mainId) {
-                        this.para.subId && this.imports.clear(this.para.subId);
-                    }
-                    this.imports.clear(itemId);
-                } else {
-                    Modal.toast('删除失败');
-                }
-            });
-        };
+        //     Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, type, result => {
+        //         console.log(result.data, 'operateTable删除表');
+        //         if (result.success) {
+        //             Modal.toast('删除成功');
+        //             // 若为主表，则同时清空子表数据
+        //             if (itemId === this.para.mainId) {
+        //                 this.para.subId && this.imports.clear(this.para.subId);
+        //             }
+        //             this.imports.clear(itemId);
+        //         } else {
+        //             Modal.toast('删除失败');
+        //         }
+        //     });
+        // };
         this.modalInit('请选择删除数据范围', body, () => {
             getSelect().forEach(obj => {
                 if (obj.type) {
-                    del(obj.id, obj.keyField, obj.value, obj.type);
+                    this.del(obj.id, obj.keyField, obj.value, obj.type);
                 } else {
-                    del(obj.id, obj.keyField, obj.value);
+                    this.del(obj.id, obj.keyField, obj.value);
                 }
             })
         });
 
+    }
+
+    private del(itemId: string, keyField: string, value: string = '', type: string = 'delete') {
+        let where = {
+            [keyField]: value + ''
+        };
+        if (!keyField) {
+            where = {};
+        }
+
+        Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, type, result => {
+            console.log(result.data, 'operateTable删除表');
+            if (result.success) {
+                Modal.toast('删除成功');
+                // 若为主表，则同时清空子表数据
+                if (itemId === this.para.mainId) {
+                    this.para.subId && this.imports.clear(this.para.subId);
+                }
+                this.imports.clear(itemId);
+            } else {
+                Modal.toast('删除失败');
+            }
+        });
     }
 
     private selectBox: SelectInputMb;

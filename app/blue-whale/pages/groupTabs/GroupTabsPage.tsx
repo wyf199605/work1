@@ -41,7 +41,7 @@ export class GroupTabsPage extends BasicPage {
 
     constructor(para: IGroupTabsPagePara) {
         super(para);
-         console.log(para);
+        console.log(para);
         window['d'] = this;
         this.ui = para.ui.body.elements[0];
         let btns = para.ui.body.subButtons;
@@ -53,13 +53,13 @@ export class GroupTabsPage extends BasicPage {
         this.subUi = this.ui.subTableList || [];
         delete this.ui.subTableList;
         this.wrapper = tools.isPc ? this.dom : d.query('body > .mui-content');
-        if(!tools.isPc){
-            d.query('body > .mui-content').style.overflow="scroll";
+        if (!tools.isPc) {
+            d.query('body > .mui-content').style.overflow = "scroll";
         }
         this.wrapper.classList.add('group-tab-page');
         // 当前子表数组为空，则为表格/单页，否则为主从
         this.styleType = (this.ui.exhibitionType && this.ui.exhibitionType.showType) || 'tab';
-        
+
         if (['panel-one', 'panel-none'].includes(this.styleType)) {
             this.styleType = 'panel-on';
             this.isInventory = true;
@@ -358,7 +358,6 @@ export class GroupTabsPage extends BasicPage {
          */
         getKeyField: (itemId: string): { keyField: string, value: obj, ui: IBW_Slave_Ui, edit: EditModule, key: R_Field } => {
             let keyField, ui, edit, value, key;
-
             if (itemId !== this.ui.itemId) {
                 ui = this.imports.subUiGet() as IBW_Slave_Ui;
                 key = ui.fields.map(e => {
@@ -385,8 +384,12 @@ export class GroupTabsPage extends BasicPage {
             const data = this.imports.getTextPara(),
                 id = data.itemId;
             if (!id) return;
-
             const { value } = this.imports.getKeyField(id);
+
+            for (var i in value) {
+                value[i] = value[i] + '';
+            }
+            // alert(JSON.stringify(value))
             Shell.imports.getCountData(this.ui.uniqueFlag, data.itemId, this.imports.fieldName, data.expression, value, result => {
                 console.log(result.data, 'setCountData');
                 if (result.success) {
@@ -405,9 +408,7 @@ export class GroupTabsPage extends BasicPage {
                 let id = aggr.itemId,
                     mainId = this.imports.mainUiGet().itemId,
                     { value } = this.imports.getKeyField(mainId);
-
                 if (itemId !== id) return;
-
                 Shell.imports.getCountData(this.ui.uniqueFlag, id, this.imports.fieldName, aggr.expression,
                     id === mainId ? {} : value, result => {
                         console.log(result.data, 'setAggrData');
@@ -456,9 +457,9 @@ export class GroupTabsPage extends BasicPage {
                 })
             }
             Shell.imports.operateTable(uniqueFlag, itemId, {
-                [name]: edit.get(name)[name]
+                [name]: edit.get(name)[name] + ""
             }, {
-                    [keyField]: edit.get(keyField)[keyField]
+                    [keyField]: edit.get(keyField)[keyField]+''
                 }, 'updata', result => {
                     console.log(result);
                     if (result.success) {
