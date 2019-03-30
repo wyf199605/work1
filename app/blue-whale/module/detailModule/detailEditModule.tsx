@@ -165,11 +165,13 @@ export class DetailEditModule {
     cancel() {
         this.detail && this.detail.items && this.detail.items.forEach((item) => {
             item.disabled = false;
+            item.wrapper.classList.remove('editing');
         });
         this.isEdit = false;
         this.editModule.destroy();
         this.modal && this.modal.destroy();
         this.modal = null;
+
     }
 
     get isDelete() {

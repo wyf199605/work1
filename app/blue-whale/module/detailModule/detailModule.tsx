@@ -178,11 +178,12 @@ export class DetailModule extends AGroupTabItem {
 
     // 下钻事件管理
     protected linkManager = (() => {
-        let handler;
+        let handler,
+            selector = '.cell-link:not(.editing) .detail-item-content';
         return {
             on: () => {
-                d.off(this.wrapper, 'click', '.cell-link .detail-item-content', handler);
-                d.on(this.wrapper, 'click', '.cell-link .detail-item-content', handler = (e) => {
+                d.off(this.wrapper, 'click', selector, handler);
+                d.on(this.wrapper, 'click', selector, handler = (e) => {
                     let itemEl = d.closest(e.target as HTMLElement, '.detail-item');
                     if (itemEl) {
                         let name = itemEl.dataset.name,
@@ -194,18 +195,19 @@ export class DetailModule extends AGroupTabItem {
                 })
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.cell-link .detail-item-content', handler);
+                d.off(this.wrapper, 'click', selector, handler);
             }
         }
     })();
 
     // 查看图片事件管理
     protected imgManager = (() => {
-        let handler;
+        let handler,
+            selector = '.cell-img:not(.editing) img';
         return {
             on: () => {
-                d.off(this.wrapper, 'click', '.cell-img img', handler);
-                d.on(this.wrapper, 'click', '.cell-img img', handler = (e) => {
+                d.off(this.wrapper, 'click', selector, handler);
+                d.on(this.wrapper, 'click', selector, handler = (e) => {
                     let img = e.target as HTMLImageElement,
                         url = img.src;
                     let imgData: ImgModalPara = {
@@ -215,7 +217,7 @@ export class DetailModule extends AGroupTabItem {
                 })
             },
             off: () => {
-                d.off(this.wrapper, 'click', '.cell-img img', handler);
+                d.off(this.wrapper, 'click', selector, handler);
             }
         }
     })();
