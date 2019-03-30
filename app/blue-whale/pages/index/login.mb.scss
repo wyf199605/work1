@@ -1,93 +1,4 @@
-/*.mui-input-group:first-child {
-  margin-top: 20px;
-}
-.mui-input-group label {
-  width: 22%;
-}
-.mui-input-row label ~ input,
-.mui-input-row label ~ select,
-.mui-input-row label ~ textarea {
-  width: 78%;
-}
-.mui-checkbox input[type=checkbox],
-.mui-radio input[type=radio] {
-  top: 6px;
-}
-.mui-content-padded {
-  margin-top: 25px;
-}
-.link-area {
-  display: block;
-  margin-top: 50px;
-  text-align: center;
-}
-.link-area a{
-  display: inline-block;
-  width: 32%;
-}
-.link-area a.hide{
-  display: none;
-}
-.link-area a span{
-  display: inline-block;
-  font-size: 12px;
-  margin-top: 5px;
-}
-.link-area a span:last-child{
-  color: #aaa;
-}
 
-.link-area a .iconfont{
-  font-size: 45px;
-  line-height: 20px;
-}
-.spliter {
-  color: #bbb;
-  padding: 0 8px;
-}
-.big{
-  .link-area a br~span{
-    font-size: 16px;
-  }
-  .mui-input-group label {
-    font-size: 16px;
-  }
-  .mui-input-row label ~ input,
-  .mui-input-row label ~ select,
-  .mui-input-row label ~ textarea {
-    font-size: 16px;
-  }
-  .mui-checkbox input[type=checkbox],
-  .mui-radio input[type=radio] {
-    font-size: 16px;
-  }
-  .mui-table-view-cell{
-    font-size: 16px;
-  }
-}
-.super-fontsize{
-  .link-area a br~span{
-    font-size: 20px;
-  }
-  .mui-input-group label {
-    font-size: 20px;
-  }
-  .mui-input-row label ~ input,
-  .mui-input-row label ~ select,
-  .mui-input-row label ~ textarea {
-    font-size: 20px;
-  }
-  .mui-checkbox input[type=checkbox],
-  .mui-radio input[type=radio] {
-    font-size: 20px;
-  }
-  .mui-table-view-cell{
-    font-size: 20px;
-  }
-}*/
-//.mui-btn-outlined.mui-btn-blue, .mui-btn-outlined.mui-btn-primary{
-//  background: #4CB6FF;
-//}
 .login-header{
   background-color: transparent;
   box-shadow: none;
@@ -148,6 +59,12 @@
       display: block;
       width: 100px;
       margin: 0 auto;
+    }
+    .text{
+      font-size: 25px;
+      margin-top: 10px;
+      text-align: center;
+      color: $title;
     }
 
   }

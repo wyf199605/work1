@@ -292,7 +292,8 @@ export class NewTableModule extends AGroupTabItem{
                 })
             }
 
-            let editBtn = this.main && this.main.modify.box.getItem('edit');
+            let editBox = this.main && this.main.modify.box,
+                editBtn = editBox && editBox.getItem('edit');
 
             this.autoEdit && setTimeout(() => {
                 editBtn &&

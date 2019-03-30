@@ -10,7 +10,7 @@ export class LoginMbPage extends LoginPage {
     constructor(para) {
         // 初始化头部logo和注册按钮
         let logoWrapper = <div className="login-logo">
-            <img src={G.requireBaseUrl + "../img/fastlion_logo.png"} alt="fastlion"/>
+            <img src={G.requireBaseUrl + "../img/logo/fastlion.png"} alt="fastlion"/>
         </div>;
         let header = <header className="login-header mui-bar mui-bar-nav ios-top"/>;
         let registerBtn = new Button({

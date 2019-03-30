@@ -374,8 +374,10 @@ export = class MainPage {
                     if(data.length === 1){
                         let item = data[0],
                             el = d.create(`<li class="dropdown pull-right">
-                                    <span class="${'iconfont icon-' + item.systemIcon}"></span>
-                                    ${item.systemName}
+                                    <a href="#">                                   
+                                        <span class="${'iconfont icon-' + item.systemIcon}"></span>
+                                        ${item.systemName}
+                                    </a>
                                 </li>`);
                         d.on(el, 'click', () => {
                             handlerClick(item);

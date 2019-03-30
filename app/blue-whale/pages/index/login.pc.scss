@@ -161,6 +161,16 @@
     font-stretch: normal;
     .logo {
       text-align: center;
+      .text{
+        font-size: 30px;
+        margin-top: 10px;
+        color: $title;
+        text-align: center;
+      }
+      img{
+        max-height: 100px;
+      }
+
     }
     .login-form {
       width: 100%;

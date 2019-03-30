@@ -55,6 +55,15 @@
       height: auto;
       .disabled, [disabled] {
         opacity: 0.8 !important;
+        &.detail-link{
+          input{
+            cursor: pointer!important;
+            color: $blue;
+          }
+          opacity: 1 !important;
+          cursor: pointer!important;
+          color: $blue;
+        }
       }
       .bw-upload-wrapper {
         width: 100%;

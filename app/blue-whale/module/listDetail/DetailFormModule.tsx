@@ -63,17 +63,33 @@ export class DetailFormModule extends Component {
         emPara.fields.forEach((f) => {
             let field = f.field,
                 name = field.name,
+                link = field.link,
                 isNotEdit = field.noEdit;
             if (isNotEdit && !field.noShow) {
                 let com = this.editModule.getDom(name);
                 com && (com.disabled = true);
-                if (tools.isMb) {
-                    let wrapper = com.wrapper || com.container;
+                let wrapper = com.wrapper || com.container;
+                if(link){
+                    wrapper.classList.add('detail-link');
+                    wrapper && wrapper.addEventListener('click', () => {
+                        let data = this.editData;
+                        BwRule.link({
+                            link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, data)),
+                            varList: link.varList,
+                            dataType: field.atrrs.dataType,
+                            data: data,
+                            needGps: link.needGps === 1,
+                            type: link.type
+                        });
+                    });
+                } else if (tools.isMb) {
                     wrapper && wrapper.addEventListener('click', () => {
                         Modal.toast(field.caption + '不可以修改～');
                     });
                 }
             }
+
+
         });
     }
 
