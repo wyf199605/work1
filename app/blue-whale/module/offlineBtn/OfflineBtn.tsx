@@ -153,8 +153,8 @@ export class OfflineBtn {
                 // this.imports.clear(this.para.mainId);
                 // let sub = this.imports.editModule.sub;
                 // sub && this.imports.clear(this.para.subId);
-                this.del(this.para.mainId,this.para.mainKey.name);
-                this.para.subId && this.del(this.para.subId,this.para.subKey.name);
+                this.del(this.para.mainId,this.para.mainKey.name, null, null, false);
+                this.para.subId && this.del(this.para.subId,this.para.subKey.name, null, null, false);
             } else {
                 Modal.toast(result.msg);
             }
@@ -289,7 +289,7 @@ export class OfflineBtn {
 
     }
 
-    private del(itemId: string, keyField: string, value: string = '', type: string = 'delete') {
+    private del(itemId: string, keyField: string, value: string = '', type: string = 'delete', isTip = true) {
         let where = {
             [keyField]: value + ''
         };
@@ -300,14 +300,14 @@ export class OfflineBtn {
         Shell.imports.operateTable(this.para.uniqueFlag, itemId, {}, where, type, result => {
             console.log(result.data, 'operateTable删除表');
             if (result.success) {
-                Modal.toast('删除成功');
+                isTip && Modal.toast('删除成功');
                 // 若为主表，则同时清空子表数据
                 if (itemId === this.para.mainId) {
                     this.para.subId && this.imports.clear(this.para.subId);
                 }
                 this.imports.clear(itemId);
             } else {
-                Modal.toast('删除失败');
+                isTip && Modal.toast('删除失败');
             }
         });
     }
@@ -348,7 +348,7 @@ export class OfflineBtn {
             textInput: TextInput,
             body = <div data-code="barcodeModal">
                 <label>{key.caption + ":"}</label>
-                {textInput = <TextInput className='set-rfid-code' />}
+                {textInput = <TextInput className='set-rfid-code' type="number" />}
             </div>;
         this.modalInit('请输入', body, () => {
             const val = textInput.get();

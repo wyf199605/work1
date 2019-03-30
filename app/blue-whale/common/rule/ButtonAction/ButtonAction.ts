@@ -857,6 +857,7 @@ export class ButtonAction {
                 table = new e.NewTableModule({
                     bwEl: Object.assign(tableData, {subButtons: []}),
                     container: modal.body as HTMLElement,
+            
                 });
                 table.refresh();
                 //编辑并保存之后调用回调
@@ -864,6 +865,9 @@ export class ButtonAction {
                     d.on(window, e.NewTableModule.EVT_EDIT_SAVE, () => {
                         onOk();
                     });
+                }
+                if(type === 13){
+                    table.modify.start();
                 }
             });
         }

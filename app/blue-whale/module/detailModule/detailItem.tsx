@@ -123,7 +123,10 @@ export class DetailItem extends Component{
 
                 this.contentEl && (this.contentEl.innerHTML = '');
                 com = inputInit(this.custom, this);
-                this.wrapper.classList.add('editing');
+                if(this.wrapper){
+                    this.wrapper.classList.add('editing');
+                }
+                
 
                 if(com instanceof FormCom){
                     let onSet = com.onSet;
