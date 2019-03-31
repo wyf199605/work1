@@ -867,7 +867,7 @@ export class ButtonAction {
                     });
                 }
                 if(type === 13){
-                    table.editManage.start();
+                    table.editManage.start(table.main)
                 }
             });
         }

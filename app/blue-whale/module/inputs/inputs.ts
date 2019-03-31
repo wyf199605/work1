@@ -147,6 +147,7 @@ export class Inputs {
                 break;
             case 5:
                BW.sys.window.open({ url: CONF.siteUrl + this.url });
+               this.url='';
                 break;
             default:
                 this.isProcess = false;

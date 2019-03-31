@@ -303,7 +303,7 @@ export class NewTableModule extends AGroupTabItem{
             this.autoEdit = false;
         };
     }
-
+   
     protected subIconWrapper: HTMLElement = null;
     protected initSubIcon(){
         let navbar = d.query('ul.nav-tabs', this.subWrapper),
@@ -861,7 +861,6 @@ export class NewTableModule extends AGroupTabItem{
                 }
             }
         };
-
         return {
             get editing(){
                 return editing
