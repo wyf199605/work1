@@ -37,7 +37,8 @@ namespace G{
                 canvg: ['../plugin/svg2Canvas/canvg.min'],
                 rgbcolor: ['../plugin/svg2Canvas/rgbcolor.min'],
                 'stackblur-canvas': ['../plugin/svg2Canvas/stackblur.min'],
-                hammer:['../plugin/hammer']
+                hammer:['../plugin/hammer'],
+                laydate:['../plugin/layDate/laydate']
                 // picker: ['../web/plugin/mui/js/mui.picker.min']
             }, config.paths),
 

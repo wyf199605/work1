@@ -9,7 +9,7 @@ export class RegisterPcPage extends RegPage {
 
         // 初始化头部logo
         let logoWrapper = <div className="logo">
-            <img data-action="selectServer" src={G.requireBaseUrl + '../img/login-logo.png'} alt="fastlion"/>
+            <img data-action="selectServer" src={G.requireBaseUrl + '../img/logo/fastlion_logo.png'} alt="fastlion"/>
         </div>;
 
         let body = <div className="register-content mui-content">
