@@ -2,10 +2,16 @@ const webpack = require('webpack');
 const path = require('path');
 const WebpackNotifierPlugin = require('webpack-notifier');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = {
-    entry: [
-        path.resolve(__dirname, '../src/index.tsx')
-    ],
+    // entry: [
+    //     path.resolve(__dirname, '../src/main.pc.tsx'),
+    //     path.resolve(__dirname, '../src/main.mb.tsx')
+    // ],
+    entry: {
+        pc: path.resolve(__dirname, '../src/main.pc.tsx'),
+        mb: path.resolve(__dirname, '../src/main.mb.tsx')
+    },
     output: {
         filename: '[name].[hash:7].js',
         path: path.resolve(__dirname, '../dist'),
@@ -18,10 +24,10 @@ module.exports = {
         rules: [{
             // 用正则去匹配要用该 loader 转换的 tsx 文件
             test: /\.tsx$/,
-            exclude: /node_modules/, 
+            exclude: /node_modules/,
             use: [
-                {loader:'babel-loader'},
-                {loader:"ts-loader"}
+                { loader: 'babel-loader' },
+                { loader: "ts-loader" }
             ]
         }, {
             test: /\.(png|svg|jpg|gif)$/,
@@ -37,9 +43,20 @@ module.exports = {
     plugins: [
         new WebpackNotifierPlugin(),
         new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: 'index.html',
+            chunks: ['pc', 'vendor', 'manifest'],
+            filename: 'index.pc.html',
+            template: path.resolve(__dirname, '../index.pc.html'),
             inject: true
-        })
+        }),
+        new HtmlWebpackPlugin({
+            chunks: ['mb', 'vendor', 'manifest'],
+            filename: 'index.mb.html',
+            template: path.resolve(__dirname, '../index.mb.html'),
+            inject: true
+        }),
+        new CopyWebpackPlugin([{
+            from: path.resolve(__dirname, "../index.html"),
+            to: path.resolve(__dirname, "../dist")
+        }])
     ]
 }
