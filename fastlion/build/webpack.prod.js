@@ -7,45 +7,36 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = merge(common, {
     mode: "production",
-    devtool: 'cheap-source-map',
     module: {
         rules: [{
             test: /\.(css|sass|scss)$/,
             use: [{
-                    loader: MiniCssExtractPlugin.loader,
-                    options: {
-                        publicPath: '../'
-                    }
-                },
-                {
-                    loader: 'css-loader',
-                    options: {
-                        importLoaders: 2,
-                        sourceMap: false
-                    }
-                },
-                {
-                    loader: 'postcss-loader',
-                    options: {
-                        plugins: () => [
-                            require('autoprefixer')
-                        ],
-                        sourceMap: false
-                    }
-                },
-                {
-                    loader: 'sass-loader',
-                    options: {
-                        sourceMap: false
-                    }
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                    publicPath: '../'
                 }
+            },
+            {
+                loader: 'css-loader'
+            },
+            {
+                loader: 'postcss-loader',
+                options: {
+                    plugins: () => [
+                        require('autoprefixer')
+                    ]
+                }
+            },
+            {
+                loader: 'sass-loader'
+            }
             ]
-        }, ]
+        },]
     },
     plugins: [
         new cleanWebpackPlugin(),
         new MiniCssExtractPlugin({
-            filename: "css/[name].css",
+            filename: "css/[name]_[hash:7].css",
         })
     ],
     optimization: {
