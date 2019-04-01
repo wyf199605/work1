@@ -1697,10 +1697,25 @@ export class FastTable extends Component {
             }
         };
         let selector = '.section-inner-wrapper:not(.pseudo-table) tbody td:not(.disabled-cell)',
-            eventName = tools.isMb ? 'click' : 'mousedown';
+            eventName = tools.isMb ? 'click' : 'mousedown',
+            dblclickHandle;
         return {
-            selectedOn: () => d.on(this.wrapper, eventName, 'tbody td:not(.disabled-cell)', selectedEvent),
-            selectedOff: () => d.off(this.wrapper, eventName, 'tbody td:not(.disabled-cell)', selectedEvent),
+            selectedOn: () => {
+                d.on(this.wrapper, eventName, 'tbody td:not(.disabled-cell)', selectedEvent);
+                if(tools.isMb && this.pseudoTable){
+                    d.on(this.wrapper, 'press', '.pseudo-table tbody td', dblclickHandle = (ev) => {
+                        this.clearSelectedRows();
+                        let td = d.closest((ev.target as HTMLElement), 'td');
+                        td && td.click();
+                    });
+                }
+            },
+            selectedOff: () => {
+                d.off(this.wrapper, eventName, 'tbody td:not(.disabled-cell)', selectedEvent);
+                if(tools.isMb && this.pseudoTable){
+                    d.off(this.pseudoTable.wrapper, 'press', '.pseudo-table tbody td', dblclickHandle);
+                }
+            },
             dragOn: () => d.on(this.wrapper, 'mousedown', selector, dragSelectedEvent),
             dragOff: () => d.off(this.wrapper, 'mousedown', selector, dragSelectedEvent)
         }
