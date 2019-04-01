@@ -1713,7 +1713,7 @@ export class FastTable extends Component {
             selectedOff: () => {
                 d.off(this.wrapper, eventName, 'tbody td:not(.disabled-cell)', selectedEvent);
                 if(tools.isMb && this.pseudoTable){
-                    d.off(this.pseudoTable.wrapper, 'press', '.pseudo-table tbody td', dblclickHandle);
+                    d.off(this.wrapper, 'press', '.pseudo-table tbody td', dblclickHandle);
                 }
             },
             dragOn: () => d.on(this.wrapper, 'mousedown', selector, dragSelectedEvent),
