@@ -7,8 +7,9 @@ module.exports = {
         path.resolve(__dirname, '../src/index.tsx')
     ],
     output: {
-        filename: '[name].[hash].js',
-        path: path.resolve(__dirname, '../dist')
+        filename: '[name].[hash:7].js',
+        path: path.resolve(__dirname, '../dist'),
+        chunkFilename: '[name].[hash:7].js', // chunk文件名字
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.jsx']
@@ -17,10 +18,11 @@ module.exports = {
         rules: [{
             // 用正则去匹配要用该 loader 转换的 tsx 文件
             test: /\.tsx$/,
+            exclude: /node_modules/, 
             use: [
                 {loader:'babel-loader'},
                 {loader:"ts-loader"}
-            ],
+            ]
         }, {
             test: /\.(png|svg|jpg|gif)$/,
             use: [{

@@ -1,8 +1,12 @@
 const webpack = require('webpack');
-const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 const merge = require('webpack-merge');
 const common = require("./webpack.common");
-common.entry.unshift('webpack-hot-middleware/client');
+const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+const config = require("./config")
+common.entry.unshift('webpack-hot-middleware/client?noInfo=true&reload=true');
+common.entry.unshift("babel-polyfill")
+common.entry.unshift("react-hot-loader/patch");
+
 module.exports = merge(common, {
     mode: "development",
     devtool: 'source-map',
@@ -14,6 +18,7 @@ module.exports = merge(common, {
         }]
     },
     plugins: [
-        new HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new OpenBrowserPlugin({ url: 'http://localhost:' + config.server.port })
     ]
 })

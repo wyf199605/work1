@@ -1,5 +1,10 @@
+@import './helper/index.scss'; 
+@import './common/index.scss'; 
+*{
+    margin:0px;
+    padding: 0px;
+}
 body{
-    color:blue;
-    background-image: url("../assert/fott.png");
-    transform: translate(50%)
+    color:$rate-star-color;
+    @include coverScreen;
 }
