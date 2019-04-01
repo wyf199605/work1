@@ -384,7 +384,7 @@ export class ButtonAction {
                             Modal.alert('获取二维码失败，请重试');
                             reject();
                         }
-                    });
+                    }).catch(() => reject());
                     break;
                 default:
                     BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
