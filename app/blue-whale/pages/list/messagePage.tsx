@@ -129,7 +129,17 @@ export = class messagePage {
                         },
                         type: 'post'
                     }).then(({ response }) => {
-                        tapThis.dataset.url && sys.window.open({ url: CONF.siteUrl + tapThis.dataset.url });
+                        // debugger;
+                        event.preventDefault();
+                        // console.log(tapThis.dataset.url)
+                        // debugger;
+                        if (tapThis.dataset.url==='undefined') {
+                            return false;
+                        }else{
+                            sys.window.open({ url: CONF.siteUrl + tapThis.dataset.url });
+                        }
+                       
+
                     });
                     break;
             }
