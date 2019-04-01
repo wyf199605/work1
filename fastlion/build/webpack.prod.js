@@ -2,18 +2,18 @@ const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require("./webpack.common.js");
 const cleanWebpackPlugin = require('clean-webpack-plugin');
-const UglifyJsPlugin=require('uglifyjs-webpack-plugin');
-const MiniCssExtractPlugin=require('mini-css-extract-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = merge(common, {
     mode: "production",
+    devtool: 'cheap-source-map',
     module: {
-        rules: [ {
+        rules: [{
             test: /\.(css|sass|scss)$/,
-            use: [
-                {
-                    loader:MiniCssExtractPlugin.loader,
-                    options:{
+            use: [{
+                    loader: MiniCssExtractPlugin.loader,
+                    options: {
                         publicPath: '../'
                     }
                 },
@@ -40,7 +40,7 @@ module.exports = merge(common, {
                     }
                 }
             ]
-    },]
+        }, ]
     },
     plugins: [
         new cleanWebpackPlugin(),
