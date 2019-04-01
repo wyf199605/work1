@@ -859,15 +859,16 @@ export class ButtonAction {
                     container: modal.body as HTMLElement,
             
                 });
-                table.refresh();
+                table.refresh().finally(() => {
+                    if(type === 13){
+                        table.editManage.start(table.main)
+                    }
+                });
                 //编辑并保存之后调用回调
                 if (type === 3||type===13) {
                     d.on(window, e.NewTableModule.EVT_EDIT_SAVE, () => {
                         onOk();
                     });
-                }
-                if(type === 13){
-                    table.editManage.start(table.main)
                 }
             });
         }
