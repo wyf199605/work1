@@ -194,7 +194,7 @@ export class EditModule {
                 // uniques:tools.isNotEmpty(p.data) ?  p.data[p.field.name] : '',
                 onComplete: (response) => {
                     let data = response.data,
-                        type = p.field.dataType || p.field.atrrs.dataType;
+                        type = p.field.dataType || (p.field.atrrs && p.field.atrrs.dataType);
                     // fileId 值加入额外数据中
                     if (type === '43') {
                         for (let field in data) {
@@ -337,7 +337,7 @@ export class EditModule {
                     });
                 };
 
-                let valueList = p.field.atrrs.valueLists ? p.field.atrrs.valueLists.split(/,|;/) : null,
+                let valueList = p.field.atrrs && p.field.atrrs.valueLists ? p.field.atrrs.valueLists.split(/,|;/) : null,
                     comData = Array.isArray(valueList) ? valueList : null,
                     ajax = p.field.dataAddr ? {
                         fun: ajaxFun,
@@ -433,14 +433,15 @@ export class EditModule {
     private initFactory(type: string, initP?: ComInitP): FormCom {
         this.para.type === 'table' && (type = EditModule.tableComTypeGet(type));
 
-        let field = initP ? initP.field : null;
+        let field = initP ? initP.field : null,
+            atrrs = field.atrrs || null;
 
         if (field) {
             if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
                 type = 'pickInput';
-            } else if (field.elementType === 'value' || field.elementType === 'lookup' || field.atrrs.valueLists) {
+            } else if (field.elementType === 'value' || field.elementType === 'lookup' || atrrs && atrrs.valueLists) {
                 type = 'selectInput';
-            } else if (BwRule.isImage(field.dataType) || BwRule.isImage(field.atrrs.dataType)) {
+            } else if (BwRule.isImage(field.dataType) || BwRule.isImage(atrrs && atrrs.dataType)) {
                 type = 'image';
             }
         }
@@ -685,7 +686,7 @@ export class EditModule {
                     data = Number(data);
                 }
 
-                dataObj[name] = BwRule.maxValue(data, field.dataType, field.atrrs.maxValue);
+                dataObj[name] = BwRule.maxValue(data, field.dataType, field.atrrs && field.atrrs.maxValue);
             }
 
             return extra ? tools.obj.merge(extra, dataObj) : dataObj;
@@ -758,14 +759,16 @@ export class EditModule {
             }
 
             ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'validChars'].forEach(ruleName => {
-                let ruleVal = field.atrrs[ruleName];
-                if (!tools.isEmpty(ruleVal)) {
-                    rules.push({
-                        rule: ruleName,
-                        value: ruleVal,
-                        title: field.caption,
-                        errMsg: field.atrrs.inputHint || ''
-                    });
+                if(field.atrrs){
+                    let ruleVal = field.atrrs[ruleName];
+                    if (!tools.isEmpty(ruleVal)) {
+                        rules.push({
+                            rule: ruleName,
+                            value: ruleVal,
+                            title: field.caption,
+                            errMsg: (field.atrrs && field.atrrs.inputHint) || ''
+                        });
+                    }
                 }
             });
             v.add(field.name, rules);

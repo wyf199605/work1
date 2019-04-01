@@ -144,7 +144,7 @@ export class BwTableModule extends Component {
     protected getBaseFtablePara(): IFastBtnTablePara {
         // 基本配置
         return {
-            isWrapLine: tools.isMb && (this.ui.cols ? this.ui.cols.some((col) => col.atrrs.displayWidth > 0) : false),
+            isWrapLine: tools.isMb && (this.ui.cols ? this.ui.cols.some((col) => col.atrrs && (col.atrrs.displayWidth > 0)) : false),
             tabIndex: true,
             cols: null,
             container: this.wrapper,
