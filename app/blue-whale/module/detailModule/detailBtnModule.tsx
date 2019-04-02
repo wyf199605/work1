@@ -77,34 +77,31 @@ export class DetailBtnModule extends DetailModule {
                 if (!inputBox) {
                     return;
                 }
-                let dataManager = this.dataManager;
-                if (dataManager) {
-                    // let preIndex = null,
-                    //     nextIndex = null;
-                    // for (let i = 0; i < box.children.length; i++) {
-                    //     let item = box.children[i];
-                    //     if (item.content === "上一页") {
-                    //         preIndex = i;
+                // let preIndex = null,
+                //     nextIndex = null;
+                // for (let i = 0; i < box.children.length; i++) {
+                //     let item = box.children[i];
+                //     if (item.content === "上一页") {
+                //         preIndex = i;
 
-                    //     }
-                    //     if (item.content === "下一页") {
-                    //         nextIndex = i;
-                    //     }
-                    // }
-                    if (dataManager.isToNext) {
-                        !box.getItem('next') && box.addItem(nextBtn);
-                    } else {
-                        box.delItem('next');
+                //     }
+                //     if (item.content === "下一页") {
+                //         nextIndex = i;
+                //     }
+                // }
+                if(this.total <= 1){
+                    box.delItem('next');
+                    box.delItem('prev');
+                }else{
+                    !box.getItem('prev') && box.addItem(prevBtn, 0);
+                    !box.getItem('next') && box.addItem(nextBtn, 1);
+                    let dataManager = this.dataManager;
+                    if (dataManager) {
+                        nextBtn && (nextBtn.isDisabled = !dataManager.isToNext);
+                        prevBtn && (prevBtn.isDisabled = !dataManager.isToPrev);
                     }
-                    if (dataManager.isToPrev) {
-                        !box.getItem('prev') && box.addItem(prevBtn);
-                    } else {
-                        box.delItem('prev');
-                    }
-
-                    // nextBtn && (nextBtn.isDisabled = !dataManager.isToNext);
-                    // prevBtn && (prevBtn.isDisabled = !dataManager.isToPrev);
                 }
+
             }
         }
     })();

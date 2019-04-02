@@ -154,8 +154,8 @@ export class DetailEditModule {
                     .catch((e) => console.log(e))
                     .finally(() => {
                         resolve();
-                        this.cancel();
-                    })
+                    });
+                this.cancel();
             }).catch((e) => {
                 reject(e);
             });
@@ -165,7 +165,7 @@ export class DetailEditModule {
     cancel() {
         this.detail && this.detail.items && this.detail.items.forEach((item) => {
             item.disabled = false;
-            item.wrapper.classList.remove('editing');
+            item.wrapper && item.wrapper.classList.remove('editing');
         });
         this.isEdit = false;
         this.editModule.destroy();

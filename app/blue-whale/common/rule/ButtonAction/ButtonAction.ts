@@ -864,23 +864,24 @@ export class ButtonAction {
                 isInModal: true,
             });
 
-            require(['newTableModule'], (e) => {
+            require(['NewTablePage'], (e) => {
                 // debugger;
-                table = new e.NewTableModule({
-                    bwEl: Object.assign(tableData, { subButtons: [] }),
+                table = new e.BwTableElement({
+                    tableEl: Object.assign(tableData, {subButtons: []}),
                     container: modal.body as HTMLElement,
 
                 });
-                table.refresh().finally(() => {
-                    if (type === 13) {
-                        table.editManage.start(table.main)
-                    }
-                });
+                // table.refresh().finally(() => {
+                //     if(type === 13){
+                //         table.editManage.start(table.main)
+                //     }
+                // });
                 //编辑并保存之后调用回调
-                if (type === 3 || type === 13) {
-                    d.on(window, e.NewTableModule.EVT_EDIT_SAVE, () => {
-                        onOk();
-                    });
+                if (type === 3||type===13) {
+                    // d.on(window, e.NewTableModule.EVT_EDIT_SAVE, () => {
+                    //     debugger
+                    //     onOk();
+                    // });
                 }
             });
         }
