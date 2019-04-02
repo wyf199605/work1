@@ -46,6 +46,11 @@ namespace G{
 
         private static parseNumberReg = /(\.)(\d*[1-9]+)?(0+)$/;
 
+        /**
+         * 数字千分位格式化
+         * @param num 输入的数值
+         * @param minFraction  使用0补全小数点后几位
+         */
         private static easyLocalString(num: number | string, minFraction = 0) {
 
             num = num.toString();
@@ -75,7 +80,7 @@ namespace G{
 
             return dotNum.join('.');
         }
-
+        
         static parseNumber(number, displayFormat) {
             let formatArr, hasDot;
             if (!tools.isEmpty(displayFormat) && typeof number === 'number') {
@@ -101,6 +106,7 @@ namespace G{
                             //去0
                             return p1 + p2;
                         }
+                        // return p1 === '.' && tools.isEmpty(p2) ? '' : p1 + p2 ;
                     });
                 }
 
