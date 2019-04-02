@@ -6,6 +6,18 @@ const config=require("./config")
 // 实例化一个 Expressjs app
 const app = express();
 
+var hotMiddlewareScript='webpack-hot-middleware/client?noInfo=true&reload=true';
+Object.keys(webpackconfig.entry).forEach(function(name) {
+  // 每个页面生成一个entry
+  // 这里修改entry实现HotUpdate
+  webpackconfig.entry[name] = [
+    // '"react-hot-loader/patch"',
+    // 'babel-polyfill',
+    hotMiddlewareScript,
+    webpackconfig.entry[name]
+  ];
+});
+
 // 用读取到的 Webpack 配置实例化一个 Compiler
 const compiler = webpack(webpackconfig);
 

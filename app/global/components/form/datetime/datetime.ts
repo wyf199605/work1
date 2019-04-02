@@ -20,24 +20,24 @@ export interface IDatetimePara extends ITextInputPara {
 
 export type dateType = 'date'| 'time'| 'datetime';
 
-declare const flatpickr: Function;
-
 export class Datetime extends TextInput {
     com: any;
     protected para: IDatetimePara;
+    protected laydate: any;
 
     constructor(p: IDatetimePara) {
-        // let icons = p.isClean ? ['iconfont icon-calendar', p.cleanIcon] : ['iconfont icon-calendar'];
+        let icons = p.isClean ? ['iconfont icon-calendar', p.cleanIcon] : ['iconfont icon-calendar'];
         let timePara: IDatetimePara = <ITextInputPara> tools.obj.merge(p, {
-            // icons: icons,
-            // iconHandle: (index) => {
-            //     // if (index === 0) {
-            //     //     this.com && this.com.toggle();
-            //     // } else if (index === 1) {
-            //     //     this.input.value = '';
-            //     // }
-            //     this.com.config.show = true;
-            // },
+            icons: icons,
+            iconHandle: (index) => {
+                // if (index === 0) {
+                //     this.com && this.com.toggle();
+                // } else if (index === 1) {
+                //     this.input.value = '';
+                // }
+                this.initDatetime();
+
+            },
             placeholder: p.placeholder || '请选择有效时间'
         });
 
@@ -48,24 +48,36 @@ export class Datetime extends TextInput {
         // require(['flatpickr'], () => {
         //     this.initDatetime();
         // });
-        require(['laydate'], (laydate) => {
-            let conf = Datetime.format2Conf(this.para.format);
-            this.com = laydate.render({
-                elem: this.input,
-                show: true,
-                // trigger: 'click',
-                format: Datetime.format2Conf(this.para.format).format,
-                type: conf.type
-            });
-            // this.set(this._value);
+        this.conf = Datetime.format2Conf(p.format);
+        // this.initDatetime(false);
+        require(['laydate'], (l: any) => {
+            this.laydate = l;
         });
+    }
+
+    protected conf;
+    initDatetime(){
+        let laydate = this.laydate,
+            conf = this.conf;
+        if(!laydate){
+            return ;
+        }
+        this.com = laydate.render({
+            elem: this.input,
+            show: true,
+            trigger: 'none',
+            format: Datetime.format2Conf(this.para.format).format,
+            type: conf.type,
+            theme: 'grid'
+        });
+        // this.set(this._value);
     }
 
     public format(str: string) {
         if (!this.com) {
             return
         }
-        let conf = Datetime.format2Conf(str);
+        let conf = this.conf = Datetime.format2Conf(str);
         for(let key in conf){
             this.com.config[key] = conf[key];
         }
@@ -144,11 +156,12 @@ export class Datetime extends TextInput {
     public set(str: string) {
 
         // this.com && this.com.setDate(str || '');
-        let date = str ? new Date(str) : new Date();
-        str = Rule.dateFormat(date, this.para.format);
-        this.com && (this.com.config.value = str);
-        this._value = str || '';
-        super.set(str);
+        let date = str && new Date(str);
+        let dateStr = date ? Rule.dateFormat(date, this.para.format) : '';
+        console.log(dateStr);
+        this._value = dateStr;
+        this.com && (this.com.config.value = dateStr);
+        super.set(dateStr);
         // typeof this.onSet === 'function' && this.onSet(str);
     }
 
