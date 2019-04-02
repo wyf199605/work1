@@ -18,8 +18,9 @@ global.cookie = {};
 module.exports = class Compiler {
     /**
      *
-     * @param tsConfig - ts配置
-     * @param globalPath - 全局目录
+     * @param tsConfig - tsconfig.json配置路径
+     * @param globalPath - 全局global文件夹的目录
+     * @param requireConfig - gulp.conf的路径
      * @param commonTsSrc - 需要一起编译的公共ts文件src
      */
     constructor(tsConfig, globalPath, requireConfig, commonTsSrc) {
@@ -168,8 +169,8 @@ module.exports = class Compiler {
     /**
      * 编译TS文件
      * @param src
-     * @param rname
-     * @param target
+     * @param rname - 打包输出文件名
+     * @param target 
      * @param [watchSrc]
      */
     ts(src, rname, target, watchSrc = src) {

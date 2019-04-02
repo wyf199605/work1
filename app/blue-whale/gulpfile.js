@@ -24,6 +24,13 @@ gulp.task("server", function() {
     // });
 });
 
+//定义默认任务
+gulp.task('BW_Watch', ['js', 'css', 'watch'], function() {
+    // for(var i=0,len = pathSrc.length; i <= len - 1; i++){
+    //     gulp.watch(pathSrc[i], [str[i]]);
+    // }
+});
+
 gulp.task('watch', function() {
     livereload.listen();
     gulp.watch(['../../dist/**']).on('change', livereload.changed);
@@ -410,12 +417,7 @@ gulp.task('js', function() {
 /**
  * ------------ Js ---------------
  */
-//定义默认任务
-gulp.task('BW_Watch', ['js', 'css', 'watch'], function() {
-    // for(var i=0,len = pathSrc.length; i <= len - 1; i++){
-    //     gulp.watch(pathSrc[i], [str[i]]);
-    // }
-});
+
 //编译所有任务
 gulp.task('BW_Start', ['js', 'css'], function() {
     gulp.start(compiler.allTask);

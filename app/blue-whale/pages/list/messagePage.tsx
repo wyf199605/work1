@@ -22,7 +22,7 @@ export = class messagePage {
     constructor(private para) {
         this.p = para;
         let container = d.query('.mui-scroll'),
-            listDOM = <ul className="mui-table-view full-height has-header" />,
+            listDOM = <ul className="mui-table-view" />,
             taskDom = <ul className="task" />;
         this.tab = new Tab({
             panelParent: container,
