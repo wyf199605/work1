@@ -183,7 +183,7 @@ export class DetailBtnModule extends DetailModule {
                                         if (flag) {
                                             detailEdit.del().then(() => {
                                                 Modal.alert('删除成功');
-                                                if(this.dataManager.current === this.total - 1){
+                                                if(this.total !== 1 && this.dataManager.current === this.total - 1){
                                                     this.dataManager.toPrev();
                                                 }else{
                                                     this.refresh();
