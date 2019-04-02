@@ -10,6 +10,7 @@ import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { ShellAction } from "../../../global/action/ShellAction";
 import BasicPage from "../../pages/basicPage";
 import { Collect } from "../../module/collect/collect.mb";
+import {User} from "../../../global/entity/User";
 export = class homePage extends BasicPage{
 
     protected slideTab: SlideTab;
@@ -247,6 +248,9 @@ export = class homePage extends BasicPage{
 
         sys.window.close = double_back;
         sys.window.wake("refreshHomeData", null);
+
+        let platformName = User.get().platformName;
+        d.query('#title', window.document.body).innerText = platformName || '速狮后台';
 
     }
     // initScan() {
