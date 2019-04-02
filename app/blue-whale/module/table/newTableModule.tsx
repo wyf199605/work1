@@ -30,6 +30,8 @@ export interface ITableModulePara extends IGroupTabItemPara {
 
 export class NewTableModule extends AGroupTabItem{
 
+    static EVT_DATA_GET = "__event_data_get__";
+
     static EVT_EDIT_SAVE = "__event_edit_save__";
     wrapperInit(){
         return null;
@@ -292,15 +294,19 @@ export class NewTableModule extends AGroupTabItem{
                 })
             }
 
-            let editBox = this.main && this.main.modify.box,
-                editBtn = editBox && editBox.getItem('edit');
+            let handler;
+            this.on(NewTableModule.EVT_DATA_GET, handler = () => {
+                let editBox = this.main && this.main.modify.box,
+                    editBtn = editBox && editBox.getItem('edit');
 
-            this.autoEdit && setTimeout(() => {
-                editBtn &&
-                editBtn.wrapper &&
-                editBtn.wrapper.click();
-            }, 600);
-            this.autoEdit = false;
+                this.autoEdit && setTimeout(() => {
+                    editBtn &&
+                    editBtn.wrapper &&
+                    editBtn.wrapper.click();
+                }, 600);
+                this.autoEdit = false;
+                this.off(NewTableModule.EVT_DATA_GET, handler);
+            });
         };
     }
    
@@ -881,19 +887,29 @@ export class NewTableModule extends AGroupTabItem{
             };
 
         let on = () => {
-            this.sub && d.on(this.subWrapper, 'click', handler1 = () => {
+            /*this.sub && d.on(this.subWrapper, 'click', handler1 = () => {
                 isMainActive = false;
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
             d.on(this.main.wrapper, 'click', handler2 = () => {
                 isMainActive = true;
                 tools.isFunction(onChange) && onChange(isMainActive);
-            });
+            });*/
+            this.sub && this.subWrapper.addEventListener('click', handler1 = () => {
+                isMainActive = false;
+                tools.isFunction(onChange) && onChange(isMainActive);
+            }, true);
+            this.main.wrapper.addEventListener('click', handler2 = () => {
+                isMainActive = true;
+                tools.isFunction(onChange) && onChange(isMainActive);
+            }, true)
         };
 
         let off = () => {
-            this.sub && d.off(this.subWrapper, 'click', handler1);
-            d.off(this.main.wrapper, 'click', handler2);
+            // this.sub && d.off(this.subWrapper, 'click', handler1);
+            // d.off(this.main.wrapper, 'click', handler2);
+            this.sub && this.subWrapper.removeEventListener('click', handler1, true);
+            this.main.wrapper.removeEventListener('click', handler2, true);
         };
 
         return {

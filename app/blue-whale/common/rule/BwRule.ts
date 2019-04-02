@@ -122,6 +122,8 @@ export class BwRule extends Rule {
 
             setting.dataType = setting.dataType || 'json';
 
+            let guid = tools.getGuid();
+            console.time(guid);
             return new Promise((resolve, reject) => {
                 // debugger;
                 if (setting.needGps) {
@@ -239,6 +241,8 @@ export class BwRule extends Rule {
                     }).finally(() => {
                         loading && loading.hide();
                         loading = null;
+                        console.timeEnd(guid);
+
                     });
 
                 })

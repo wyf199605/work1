@@ -108,6 +108,10 @@ export class DataManager {
             promise = new Promise((resolve, reject) => {
                 fun({current, pageSize, isRefresh, sort, custom,timeout})
                     .then(({data, total}) => {
+                        if(once){
+                            this.allData = data;
+                            data = this.allData.slice(0, this.pageSize);
+                        }
                         if (isSetData) {
                             this.data = data;
                         } else {
@@ -126,7 +130,8 @@ export class DataManager {
                     })
             })
         }else {
-            promise = Promise.resolve(this.data.length)
+            let length = once ? this.allData.length : this.data.length;
+            promise = Promise.resolve(length);
         }
         return promise;
     }
@@ -174,6 +179,9 @@ export class DataManager {
                             let dataArr = this.data;
                             // 是否创建分页
                             if (this.isMb || this._serverMode) { // 移动端或者服务端模式, 都是全部渲染
+                                if(!this._serverMode && current !== 0){
+                                    this.dataAdd(this.allData.slice(current * pageSize, (current + 1) * pageSize));
+                                }
                                 this.pagination.total = total;
                                 this.render(0, (current + 1) * pageSize, isRefresh);
                             } else {
@@ -248,6 +256,7 @@ export class DataManager {
     get data() {
         return [...this._data];
     }
+    protected allData: any[] = [];
 
     destroy(){
         this._data = [];

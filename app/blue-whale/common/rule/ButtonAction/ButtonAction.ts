@@ -830,7 +830,7 @@ export class ButtonAction {
                     <div data-type="input"></div></div>`),
                     setting: res.setting
                 });
-                let dom = d.query(".self_dis").parentNode;
+                let dom = d.query(".self_dis").parentNode as HTMLElement;
                 let inputList = Array.prototype.slice.call(dom.querySelectorAll('input'),0);
                 let areaList = Array.prototype.slice.call(dom.querySelectorAll('textarea'),0);
                 let all=inputList.concat(areaList);
@@ -867,10 +867,16 @@ export class ButtonAction {
             require(['NewTablePage'], (e) => {
                 // debugger;
                 table = new e.BwTableElement({
-                    tableEl: Object.assign(tableData, {subButtons: []}),
-                    container: modal.body as HTMLElement,
-
+                    tableEl: Object.assign(tableData, {
+                        subButtons: [],
+                        operationType: {
+                            autoEdit: type === 13,
+                            editType: 'current'
+                        }
+                    }),
+                    container: modal.body as HTMLElement
                 });
+
                 // table.refresh().finally(() => {
                 //     if(type === 13){
                 //         table.editManage.start(table.main)
