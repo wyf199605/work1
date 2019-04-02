@@ -1,0 +1,7 @@
+$ue-width: 750;
+
+/* ue图的宽度 */
+
+@function px2rem($px) {
+  @return #{$px/$ue-width*100}rem;
+}

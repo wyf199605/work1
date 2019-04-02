@@ -18,6 +18,6 @@ export class Welcome extends Component<Props, IState> {
     }
     render() {
         console.log(this.state)
-        return <span className='welcome' onClick={this.change}>{this.props.foo}{this.state.count}</span>;
+        return <span className='welcome' onClick={this.change}>{this.props.foo}{this.state.count}111</span>;
     }
 }
