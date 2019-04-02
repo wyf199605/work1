@@ -93,8 +93,8 @@ export class DetailBtnModule extends DetailModule {
                     box.delItem('next');
                     box.delItem('prev');
                 }else{
+                    !box.getItem('next') && box.addItem(nextBtn, 0);
                     !box.getItem('prev') && box.addItem(prevBtn, 0);
-                    !box.getItem('next') && box.addItem(nextBtn, 1);
                     let dataManager = this.dataManager;
                     if (dataManager) {
                         nextBtn && (nextBtn.isDisabled = !dataManager.isToNext);
@@ -182,7 +182,11 @@ export class DetailBtnModule extends DetailModule {
                                         if (flag) {
                                             detailEdit.del().then(() => {
                                                 Modal.alert('删除成功');
-                                                this.refresh();
+                                                if(this.dataManager.current === this.total - 1){
+                                                    this.dataManager.toPrev();
+                                                }else{
+                                                    this.refresh();
+                                                }
                                             }).catch(() => {
                                                 Modal.alert('删除失败');
                                             })

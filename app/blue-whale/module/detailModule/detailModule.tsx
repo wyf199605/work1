@@ -105,7 +105,7 @@ export class DetailModule extends AGroupTabItem {
                     return new Promise((resolve, reject) => {
                         let ui = this.ui,
                             url = tools.isNotEmpty(ui.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(ui.dataAddr) : '';
-                        current++;
+                        current ++;
                         if (tools.isNotEmpty(url)) {
                             Promise.all([
                                 BwRule.Ajax.fetch(url, {
