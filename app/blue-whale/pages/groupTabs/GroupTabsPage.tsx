@@ -81,6 +81,10 @@ export class GroupTabsPage extends BasicPage {
         } else {
             this.createTabItem(0, this.wrapper);
         }
+
+        this.on(BwRule.EVT_REFRESH, () => {
+            this.refresh();
+        });
     }
 
     protected isInventory = false;
@@ -717,6 +721,12 @@ export class GroupTabsPage extends BasicPage {
         return item;
     }
 
+
+    refresh(){
+        this.main && this.main.refresh().then(() => {
+            this.subRefresh();
+        });
+    }
     /**
      * @author WUML
      * @date 2019/2/18
