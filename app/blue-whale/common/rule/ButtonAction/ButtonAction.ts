@@ -874,9 +874,9 @@ export class ButtonAction {
                             editType: 'current'
                         }
                     }),
-                    container: modal.body as HTMLElement,
-
+                    container: modal.body as HTMLElement
                 });
+
                 // table.refresh().finally(() => {
                 //     if(type === 13){
                 //         table.editManage.start(table.main)

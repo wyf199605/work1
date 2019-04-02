@@ -412,6 +412,7 @@ export class BwTableModule extends Component {
                             // 选项查询处理(wbf)
                             this.sectionField(response);
                             data = this.addOldData(data);
+                            this.tableModule.trigger(NewTableModule.EVT_DATA_GET);
                             return {
                                 data,
                                 total: head ? head.totalNum : (data.length || 0),
