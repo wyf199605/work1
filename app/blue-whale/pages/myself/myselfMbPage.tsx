@@ -96,16 +96,16 @@ export = class myselfMbPage {
             </li>;
             d.append(list, li);
         }
-        if (sys.window.toClient) {
-            let li = <li className="mui-table-view-cell">
-                <a href="#" className="mui-navigate-right">更改客户代码</a>
-            </li>;
-            d.append(list, li);
-            d.on(li, 'click', (e) => {
-                e.preventDefault();
-                sys.window.toClient();
-            })
-        }
+        // if (sys.window.toClient) {
+        //     let li = <li className="mui-table-view-cell">
+        //         <a href="#" className="mui-navigate-right">更改客户代码</a>
+        //     </li>;
+        //     d.append(list, li);
+        //     d.on(li, 'click', (e) => {
+        //         e.preventDefault();
+        //         sys.window.toClient();
+        //     })
+        // }
 
         d.on(d.query('.selfMenuPage'), 'click', '.mui-table-view>.mui-table-view-cell[data-page-name]', function (e) {
             let dataset = d.closest(e.target as HTMLElement, '.mui-table-view-cell[data-page-name]').dataset.pageName;

@@ -1,21 +1,21 @@
 /// <amd-module name="ButtonAction"/>
 import tools = G.tools;
-import {InputBox} from "../../../../global/components/general/inputBox/InputBox";
-import {Button} from "../../../../global/components/general/button/Button";
-import {IModal, Modal} from "../../../../global/components/feedback/modal/Modal";
-import {SelectBox} from "../../../../global/components/form/selectBox/selectBox";
+import { InputBox } from "../../../../global/components/general/inputBox/InputBox";
+import { Button } from "../../../../global/components/general/button/Button";
+import { IModal, Modal } from "../../../../global/components/feedback/modal/Modal";
+import { SelectBox } from "../../../../global/components/form/selectBox/selectBox";
 import CONF = BW.CONF;
 import d = G.d;
-import {ShellErpManagePc} from "../../../../global/shell/pcImpl/ShellErpManage";
-import {SelectInput} from "../../../../global/components/form/selectInput/selectInput";
-import {Loading} from "../../../../global/components/ui/loading/loading";
-import {BwRule} from "../BwRule";
-import {SelectInputMb} from "../../../../global/components/form/selectInput/selectInput.mb";
-import {User} from "../../../../global/entity/User";
-import {RingProgress} from "../../../../global/components/ui/progress/ringProgress";
+import { ShellErpManagePc } from "../../../../global/shell/pcImpl/ShellErpManage";
+import { SelectInput } from "../../../../global/components/form/selectInput/selectInput";
+import { Loading } from "../../../../global/components/ui/loading/loading";
+import { BwRule } from "../BwRule";
+import { SelectInputMb } from "../../../../global/components/form/selectInput/selectInput.mb";
+import { User } from "../../../../global/entity/User";
+import { RingProgress } from "../../../../global/components/ui/progress/ringProgress";
 import Shell = G.Shell;
-import {Spinner} from "../../../../global/components/ui/spinner/spinner";
-import {TextInput} from "../../../../global/components/form/text/text";
+import { Spinner } from "../../../../global/components/ui/spinner/spinner";
+import { TextInput } from "../../../../global/components/form/text/text";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -136,15 +136,15 @@ export class ButtonAction {
      */
     btnRefresh(refresh: number, url?: string) {
         switch (refresh) {
-            case 1 :
+            case 1:
                 BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
                 break;
-            case 2 :
+            case 2:
                 setTimeout(function () {
                     BW.sys.window.close('', null, url);
                 }, 1000);
                 break;
-            case 3 :
+            case 3:
                 setTimeout(function () {
                     // if (tools.isMb && tools.isEmpty(tools.url.getPara('instance')) && tools.url.getPara('page') === 'flowReport') {
                     //     BW.sys.window.reOpen({
@@ -156,7 +156,7 @@ export class ButtonAction {
                     BW.sys.window.close(BwRule.EVT_REFRESH, null, url);
                 }, 1000);
                 break;
-            case 4 :
+            case 4:
                 BW.sys.window.firePreviousPage(BwRule.EVT_REFRESH, null, url);
                 break;
             default:
@@ -187,7 +187,7 @@ export class ButtonAction {
     private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
     }, url?: string, avtData?: obj) {
         let actionAddr = btn.actionAddr,
-            {addr, data} = actionAddr && BwRule.reqAddrFull(actionAddr, dataObj) || {addr : null, data : null},
+            { addr, data } = actionAddr && BwRule.reqAddrFull(actionAddr, dataObj) || { addr: null, data: null },
             self = this,
             ajaxType = ['GET', 'POST', 'PUT', 'DELETE'][btn.buttonType];
 
@@ -195,7 +195,7 @@ export class ButtonAction {
             addr && (addr = tools.url.replaceTmpUrl(addr, Array.isArray(dataObj) ? dataObj[0] : dataObj));
         }
         if (avtData) {
-            addr && (addr = tools.url.addObj(addr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())}));
+            addr && (addr = tools.url.addObj(addr, { 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) }));
         }
         let varType = actionAddr && actionAddr.varType, res: any = data;
 
@@ -213,7 +213,7 @@ export class ButtonAction {
             }
         }
         switch (btn.openType) {
-            case 'none' :
+            case 'none':
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
@@ -229,7 +229,7 @@ export class ButtonAction {
                     return;
                 }
 
-                addr = tools.url.addObj(addr, {output: 'json'});
+                addr = tools.url.addObj(addr, { output: 'json' });
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     //创建条码扫码页面
                     self.btnPopup(response, () => {
@@ -244,13 +244,13 @@ export class ButtonAction {
                     return;
                 }
                 if (tools.isPc) {
-                    addr = tools.url.addObj(addr, {output: 'json'});
+                    addr = tools.url.addObj(addr, { output: 'json' });
                     self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                         if (response.uiType === 'import') {
                             require(['RfidInventory'], (e) => {
                                 new e.RfidInventory({
-                                    data : response,
-                                    onClose : () => self.btnRefresh(btn.refresh, url)
+                                    data: response,
+                                    onClose: () => self.btnRefresh(btn.refresh, url)
                                 })
                             });
 
@@ -268,10 +268,10 @@ export class ButtonAction {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
-                addr = tools.url.addObj(addr, {output: 'json'});
+                addr = tools.url.addObj(addr, { output: 'json' });
                 let can2dScan = G.Shell.inventory.can2dScan;
 
-                if(can2dScan || tools.isMb){
+                if (can2dScan || tools.isMb) {
                     self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                         //创建条码扫码页面
                         if (response.uiType === 'inventory' && tools.isMb) {
@@ -280,7 +280,7 @@ export class ButtonAction {
                         }
                         callback(response);
                     }, () => callback(null))
-                }else {
+                } else {
                     callback(null);
                     Modal.alert('目前不支持PC端功能');
                 }
@@ -289,7 +289,7 @@ export class ButtonAction {
             default:
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
                 if (varType === 3 && res) {
-                    openUrl = tools.url.addObj(openUrl, {bodyParams: res}, false)
+                    openUrl = tools.url.addObj(openUrl, { bodyParams: res }, false)
                 }
                 callback(null);
                 BW.sys.window.open({
@@ -349,7 +349,7 @@ export class ButtonAction {
         let self = this;
         return new Promise((resolve, reject) => {
             let type = btn.actionAddr ? btn.actionAddr.type : '';
-            switch (type){
+            switch (type) {
                 case 'pdf':
                     // pdf预览
                     require(['PDFPreview'], (o) => {
@@ -367,10 +367,10 @@ export class ButtonAction {
                         // defaultCallback : btn.openType !== 'popup',
                         data: ajaxData,
                         needGps: btn.actionAddr.needGps
-                    }).then(({response}) => {
+                    }).then(({ response }) => {
                         console.log(response);
                         let data = tools.keysVal(response, 'body', 'bodyList', 0);
-                        if(tools.isNotEmpty(data)){
+                        if (tools.isNotEmpty(data)) {
                             require(['PayModule'], (payModule) => {
                                 new payModule.PayModule({
                                     url: data['code_url'],
@@ -380,7 +380,7 @@ export class ButtonAction {
                                 });
                             });
                             resolve();
-                        }else{
+                        } else {
                             Modal.alert('获取二维码失败，请重试');
                             reject();
                         }
@@ -394,13 +394,13 @@ export class ButtonAction {
                         data: ajaxData,
                         needGps: btn.actionAddr.needGps
 
-                    }).then(({response}) => {
+                    }).then(({ response }) => {
                         let data = tools.keysVal(response, 'body', 'bodyList', 0);
                         if (data && (data.type || data.type === 0)) {
                             if (data.type === 0) {
                                 Modal.alert(data.showText);
                                 reject();
-                            } else if(data.type === 2) {
+                            } else if (data.type === 2) {
                                 this.progressPopup(data.url, data.showText, resolve);
                             } else {
                                 Modal.confirm({
@@ -410,7 +410,7 @@ export class ButtonAction {
                                             self.checkAction(btn, dataObj, data.url, ajaxType, ajaxData, url).then((response) => {
                                                 resolve(response);
                                             });
-                                        }else{
+                                        } else {
                                             reject();
                                         }
                                     }
@@ -466,7 +466,7 @@ export class ButtonAction {
 
             let getProgress = () => {
                 let percent = 0;
-                return BwRule.Ajax.fetch(BW.CONF.siteUrl + url).then(({response}) => {
+                return BwRule.Ajax.fetch(BW.CONF.siteUrl + url).then(({ response }) => {
                     let {
                         allAccount: all,
                         curAccount: current,
@@ -523,8 +523,8 @@ export class ButtonAction {
             comSelectInput: SelectInput,
             speedInput: SelectInput,
             loading: Loading,
-            sendMsg : Function, // 接收过程信息，如上传过程中进度条信息
-            sendFinish : Function, // 接收结束信息
+            sendMsg: Function, // 接收过程信息，如上传过程中进度条信息
+            sendFinish: Function, // 接收结束信息
             width: number,    //模态框宽度
             progress, //进度条
             tipDom,   //盘点机信息提示
@@ -532,7 +532,7 @@ export class ButtonAction {
 
         BwRule.atvar = null;
         // 弹框宽度计算
-        if (type === 3 || type === 5||type===13) {
+        if (type === 3 || type === 5 || type === 13) {
             if (len > 6) {
                 width = 100 * 10;
             }
@@ -560,13 +560,13 @@ export class ButtonAction {
                             offShellMonitor();
                         }
                     });
-                    if (type === 3||type===13) {
+                    if (type === 3 || type === 13) {
                         BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
                     }
                 }
             };
 
-        if (type === 3 || type === 5||type===13) {
+        if (type === 3 || type === 5 || type === 13) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
         } else if (type === 4) {
             para['className'] = 'action-type-4';
@@ -692,7 +692,7 @@ export class ButtonAction {
                         };
                         //上传操作
                         if (action === 'upload') {
-                            url = tools.url.addObj(res.uploadAddr.dataAddr, {'atvarparams': JSON.stringify(BwRule.atvar.dataGet())});
+                            url = tools.url.addObj(res.uploadAddr.dataAddr, { 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) });
                             msg = 'callUpload';
                             if ("AppShell" in window) {
                                 pos.casio.upload(shellData.port, shellData.speed, (e) => {
@@ -742,7 +742,7 @@ export class ButtonAction {
 
 
         // 生成表格，选择数据，确定后回填
-        if (type === 3 || type === 5||type===13) {
+        if (type === 3 || type === 5 || type === 13) {
             list();
         } else if (res.atvarparams) {
             //type4 or handle or
@@ -826,10 +826,22 @@ export class ButtonAction {
                 BwRule.atvar = new q.AtVarBuilder({
                     queryConfigs: res.atvarparams,
                     resultDom: avatarLoad,
-                    tpl: () => d.create(`<div class="atvarDom atvar-auto ${disabled}"><div style="display: inline-block;" data-type="title"></div>
+                    tpl: () => d.create(`<div  class="self_dis atvarDom atvar-auto ${disabled}"><div style="display: inline-block;" data-type="title"></div>
                     <div data-type="input"></div></div>`),
                     setting: res.setting
                 });
+                let dom = d.query(".self_dis").parentNode;
+                let inputList = Array.prototype.slice.call(dom.querySelectorAll('input'),0);
+                let areaList = Array.prototype.slice.call(dom.querySelectorAll('textarea'),0);
+                let all=inputList.concat(areaList);
+    
+                for(var i=0;i<all.length;i++){
+                    let item=all[i] as any;
+                    if(item.hasAttribute('readonly')){
+                       item.style.cssText ="color:#8080808a;cursor:not-allowed";
+                    }
+                }
+                
                 let coms = BwRule.atvar.coms,
                     keys = Object.keys(coms);
                 // 如果长度只有1，直接show
@@ -857,7 +869,7 @@ export class ButtonAction {
                 table = new e.BwTableElement({
                     tableEl: Object.assign(tableData, {subButtons: []}),
                     container: modal.body as HTMLElement,
-            
+
                 });
                 // table.refresh().finally(() => {
                 //     if(type === 13){
@@ -900,7 +912,7 @@ export class ButtonAction {
             BwRule.Ajax.fetch(CONF.siteUrl + url, {
                 type: 'POST',
                 data: ajaxData
-            }).then(({response}) => {
+            }).then(({ response }) => {
                 if (msg === 'callDownload') {
                     shellData['data'] = response.body.bodyList[0].inventData;
 
@@ -934,7 +946,7 @@ export class ButtonAction {
                                     BwRule.Ajax.fetch(CONF.siteUrl + resData.url, {
                                         type: 'post',
                                         data: ajaxData,
-                                    }).then(({response}) => {
+                                    }).then(({ response }) => {
                                         successCb(response)
 
                                     });

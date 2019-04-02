@@ -210,7 +210,7 @@ export class RfidInventory {
             this.atVarBuilder = new q.AtVarBuilder({
                 queryConfigs: atvarparams,
                 resultDom: this.atvarEl,
-                tpl: () =><div class="atvarDom atvar-auto">
+                tpl: () =><div class="atvarDom  atvar-auto">
                     <div style="display: inline-block;" data-type="title"/>
                     <div data-type="input"/>
                 </div>,
