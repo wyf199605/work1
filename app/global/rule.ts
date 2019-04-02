@@ -275,7 +275,7 @@ namespace G{
         }
 
         static reqAddrFull(reqAddr: R_ReqAddr, data?: obj | obj[]): { addr: string, data: obj } {
-            if (!this.reqAddrCommit[reqAddr.commitType]) {
+            if (!reqAddr.commitType||!this.reqAddrCommit[reqAddr.commitType]) {
                 reqAddr.commitType = 1;
             }
             
