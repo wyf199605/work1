@@ -838,7 +838,7 @@ export class ButtonAction {
                 for(var i=0;i<all.length;i++){
                     let item=all[i] as any;
                     if(item.hasAttribute('readonly')){
-                       item.style.cssText ="color:#8080808a;cursor:not-allowed";
+                       item.style.cssText ="color:#9e9e9e;cursor:not-allowed";
                     }
                 }
                 
