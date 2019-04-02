@@ -40,7 +40,7 @@ export = class messagePage {
                 index === 1 ? this.showSysList(localMsg.get(), false, listDOM) : null
             }
         });
-        console.log(this.tab)
+        // console.log(this.tab)
         this.initSysMsg(listDOM);
         this.initTaskMsg(taskDom);
     }
@@ -50,7 +50,6 @@ export = class messagePage {
             dataType: 'json',
             type: 'get'
         }).then(({ response }) => {
-            console.log(response);
             d.append(taskDom, this.showTaskList(response.data));
         });
 
@@ -92,6 +91,7 @@ export = class messagePage {
     }
 
     initSysMsg(listDOM: HTMLElement) {
+        console.log("---")
         let lis = d.queryAll('li[data-name]', this.tab.getTab());
         lis.forEach(li => {
             d.append(li, <span className="mui-badge mui-badge-primary hide" data-field={li.dataset.name} />);

@@ -1,91 +1,96 @@
 //excel
-.upload-modal{
-  .modal-body{
+.upload-modal {
+  .modal-body {
     width: 200px;
   }
-  [id^="rt_rt"]{
+  [id^="rt_rt"] {
     width: 100%!important;
     height: 100%!important;
   }
 }
+
 //上传下载
-.avatar-load{
-  &>.select-box{
+.avatar-load {
+  &>.select-box {
     display: inline-block;
     margin: 3px 6px;
   }
 }
-.avatar-progress{
 
-}
+.avatar-progress {}
 
-.action-type-5{
-  .btnsLeft{
+.action-type-5 {
+  .btnsLeft {
     display: none;
   }
   width: 600px;
-  .modal-body{
+  .modal-body {
     max-height: 75vh!important;
   }
 }
-.mb-action-type-5{
+
+.mb-action-type-5 {
   top: 40px!important;
-  .modal-body{
+  .modal-body {
     max-width: 85vw;
     max-height: 70vh;
   }
 }
-.action-type-4{
+
+.action-type-4 {
   top: 80px!important;
   min-width: 200px;
-  .modal-body-mobile{
+  .modal-body-mobile {
     max-height: 300px!important;
   }
 }
-.avatar-progress{
+
+.avatar-progress {
   padding: 0 0 0 8px;
   width: 250px;
 }
-.avatar-load{
+
+.avatar-load {
   width: 250px;
-  .conf-left{
+  .conf-left {
     width: 57%;
     display: inline-block;
-    >.select-box{
+    >.select-box {
       padding: 4px;
     }
   }
-  .conf-right{
+  .conf-right {
     width: 43%;
     display: inline-block;
-    .text-input{
+    .text-input {
       width: 100px;
       display: inline-block;
     }
   }
 }
-.atvarDom.atvar-auto{
+
+.atvarDom.atvar-auto {
   padding-left: 7px;
-  [data-type="input"]{
+  [data-type="input"] {
     display: inline-block;
   }
   display: flex;
-  [data-type='title']{
+  [data-type='title'] {
     margin: auto;
     line-height: 16px;
     white-space: nowrap;
   }
-  [data-type="input"]{
+  [data-type="input"] {
     margin: auto;
   }
-
-  .height-auto{
+  .height-auto {
     padding: 9px 1px 0 0;
   }
 }
-.fl-mobile{
+
+.fl-mobile {
   .atvarDom.atvar-auto {
-    .height-auto{
+    .height-auto {
       padding: 9px 26px 0 0;
     }
   }
