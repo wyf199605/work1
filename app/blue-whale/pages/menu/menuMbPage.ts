@@ -17,6 +17,9 @@ function setBadge(badge, num) {
 }
 export = class menuMbPage {
     constructor(public para) {
+        console.log(para)
+        let parent=d.query('#list').parentNode.parentNode as any;
+        parent.style.overflow='scroll';
         d.on(d.query('#list'), 'click', 'li.mui-table-view-cell[data-href]', function () {
             sys.window.open({ url: CONF.siteUrl + this.dataset.href, gps: !!parseInt(this.dataset.gps) });
         });
