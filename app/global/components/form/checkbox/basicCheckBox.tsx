@@ -51,14 +51,14 @@ let checkBoxEvent = (() => {
         plus() {
             count++;
             if (count === 1) {
-                document.body.addEventListener('click', checkEvent, true);
+                document.body.addEventListener('click', checkEvent);
                 // d.on(document.body, 'click', '.new-select-box',checkEvent);
             }
         },
         minus() {
             count--;
             if (count === 0) {
-                document.body.removeEventListener('click', checkEvent, true);
+                document.body.removeEventListener('click', checkEvent);
                 // d.off(document.body, 'click', '.new-select-box',checkEvent);
             }
         },
