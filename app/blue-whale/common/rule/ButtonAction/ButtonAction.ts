@@ -552,7 +552,7 @@ export class ButtonAction {
                 isOnceDestroy: true,
                 width: width + 'px',
                 isAdaptiveCenter: true,
-                isMb: false,
+                isMb: tools.isMb && type === 13,
                 top: tools.isMb ? 80 : null,
                 onClose: () => {
                     modal.destroy(() => {

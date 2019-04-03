@@ -4,6 +4,7 @@ const common = require("./webpack.common.js");
 const cleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = merge(common, {
     mode: "production",
@@ -45,7 +46,8 @@ module.exports = merge(common, {
                 uglifyOptions: {
                     compress: false
                 }
-            })
+            }),
+            new OptimizeCssAssetsPlugin()
         ],
         runtimeChunk: {
             name: "manifest"
@@ -55,7 +57,8 @@ module.exports = merge(common, {
                 commons: {
                     test: /[\\/]node_modules[\\/]/,
                     name: "vendor",
-                    chunks: "all"
+                    chunks: "all",
+                    minChunks: 1
                 }
             }
         }
