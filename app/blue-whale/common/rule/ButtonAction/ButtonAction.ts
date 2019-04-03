@@ -857,6 +857,9 @@ export class ButtonAction {
 
         function list() {
             modal.body = d.create(`<div style="height: 70vh;"></div>`);
+            if(type === 13 && tools.isMb){
+                (<HTMLElement>modal.body).style.height = '100%';
+            }
             res.cols.forEach(c => {
                 c['title'] = c.caption;
             });
