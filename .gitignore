@@ -5,6 +5,7 @@ test/
 app/package-lock.json
 .gulp-scss-cache/
 /dist/
+/fastlion/dist/
 /dist.min/
 .gitignore
 dist.min.zip
