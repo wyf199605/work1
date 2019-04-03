@@ -568,6 +568,9 @@ export class ButtonAction {
 
         if (type === 3 || type === 5 || type === 13) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
+            if(type === 13 && tools.isMb){
+                para['className'] = '';
+            }
         } else if (type === 4) {
             para['className'] = 'action-type-4';
         }
