@@ -1056,10 +1056,12 @@ export class BwTableModule extends Component {
     refresh(data?: obj) {
         if (this.isPivot) {
             this.ftable && this.ftable.destroy();
+            this.modalEditCancel();
             return this.pivotInit(data);
         } else {
             return this.ftable.tableData.refresh(data).then(() => {
                 this.aggregate.get(data);
+                this.modalEditCancel();
                 setTimeout(() => {
                     this.subBtns.initState();
                     this.ftable && this.ftable.clearSelectedRows();
@@ -3193,6 +3195,11 @@ export class BwTableModule extends Component {
             title: this.ui.caption,
             bwTable: this,
         });
+    }
+
+    modalEditCancel(){
+        this.modalEdit && this.modalEdit.destroy();
+        this.modalEdit = null;
     }
 
     // 关联数据，每次按钮请求时需附带的参数

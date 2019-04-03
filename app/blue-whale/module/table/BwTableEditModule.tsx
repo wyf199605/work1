@@ -205,7 +205,15 @@ export class BwTableEditModule {
     }
 
     destroy(){
-
+        this.editModule && this.editModule.destroy();
+        this.modal && this.modal.destroy();
+        this.editModule = null;
+        this.modal = null;
+        this.bwTable = null;
+        this.fields = null;
+        this.container = null;
+        this.wrapper = null;
+        this.onFinish = null;
     }
 
 }
