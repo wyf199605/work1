@@ -4,18 +4,14 @@ const WebpackNotifierPlugin = require('webpack-notifier');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = {
-    // entry: [
-    //     path.resolve(__dirname, '../src/main.pc.tsx'),
-    //     path.resolve(__dirname, '../src/main.mb.tsx')
-    // ],
     entry: {
         pc: path.resolve(__dirname, '../src/main.pc.tsx'),
         mb: path.resolve(__dirname, '../src/main.mb.tsx')
     },
     output: {
-        filename: '[name].[hash:7].js',
+        filename: 'js/[name].[hash:7].js',
         path: path.resolve(__dirname, '../dist'),
-        chunkFilename: '[name].[hash:7].js', // chunk文件名字
+        chunkFilename: 'js/[name].[hash:7].js', // chunk文件名字
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.jsx']
