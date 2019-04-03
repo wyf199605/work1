@@ -108,7 +108,6 @@ export class NewLabelPrint {
         this.getData = para.getData;
         this.getSelectedData = para.getSelectedData;
         this.container = para.container;
-        this.scale = getDpi() / 10;
 
         // 根据printList生成打印标签类型
         let printList: { text: string, value: any }[] = [];
@@ -163,6 +162,7 @@ export class NewLabelPrint {
                         //         Modal.alert('打印失败');
                         //     });
                         // }
+                        this.scale = getDpi() / 10 * 3;
                         promise = this.preview(true).catch((e) => {
                             console.log(e);
                             Modal.alert('打印失败');
@@ -170,6 +170,7 @@ export class NewLabelPrint {
                         break;
                     case 'preview':
                     default:
+                        this.scale = getDpi() / 10;
                         promise = this.preview().catch((e) => {
                             console.log(e);
                             Modal.alert('预览失败');
@@ -736,22 +737,28 @@ export class NewLabelPrint {
 
 }
 
-function getDpi(): number{
-    let arrDPI = [];
-    if (window.screen.deviceXDPI) {
-        arrDPI[0] = window.screen.deviceXDPI;
-        arrDPI[1] = window.screen.deviceYDPI;
-    }
-    else {
-        let tmpNode = document.createElement("div");
-        tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
-        document.body.appendChild(tmpNode);
-        arrDPI[0] = tmpNode.offsetWidth;
-        arrDPI[1] = tmpNode.offsetHeight;
-        tmpNode.parentNode.removeChild(tmpNode);
-    }
-    let dpi = arrDPI[0],
-        scale = 72 / 28.346;
+const getDpi = (() => {
+    let deviceDpi: number = null;
+    return function(): number{
+        if(deviceDpi){
+            return deviceDpi;
+        }
+        let arrDPI = [];
+        if (window.screen.deviceXDPI) {
+            arrDPI[0] = window.screen.deviceXDPI;
+            arrDPI[1] = window.screen.deviceYDPI;
+        }
+        else {
+            let tmpNode = document.createElement("div");
+            tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+            document.body.appendChild(tmpNode);
+            arrDPI[0] = tmpNode.offsetWidth;
+            arrDPI[1] = tmpNode.offsetHeight;
+            tmpNode.parentNode.removeChild(tmpNode);
+        }
+        let dpi = arrDPI[0],
+            scale = 72 / 28.346;
 
-    return dpi / scale;
-}
+        return deviceDpi = dpi / scale;
+    }
+})();
