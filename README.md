@@ -54,7 +54,7 @@
             e. 三福开发环境,conf.properties中sys.envName=sanfuDev加载此配置
             f. 三福准生产环境,conf.properties中sys.envName=sanfuPe加载此配置
 
-##启动项目： 
+## 启动项目： 
     1. 启动tomcat
     2. 切到路径 global,启动项目 gulp G_Start
     3. 切到路径 blue-whale,启动项目 gulp BW_Start
