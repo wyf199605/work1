@@ -22,7 +22,9 @@ export = class FormPage extends BasicPage {
         super(para);
         //     console.log(para);
         //    console.log( d.query("#formContent"))
-        d.query("#formContent").style.overflow = 'scroll';
+        if(tools.isMb){
+            d.query("#formContent").style.overflow = 'scroll';
+        }
         let isInsert = this.isInsert = para.uiType === 'insert' || para.uiType === 'associate';
         let emPara: EditModulePara = { fields: [] };
         let nameFields: { [name: string]: R_Field } = {};

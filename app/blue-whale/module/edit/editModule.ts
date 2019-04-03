@@ -278,8 +278,8 @@ export class EditModule {
             });
             let dom = G.d.query('.rich-text-base');
             //兼容移动端软键盘置顶表单后收复键盘无法回弹
-            G.d.on(dom,'blur',()=>{
-               document.body.scrollTop=0;
+            G.d.on(dom, 'blur', () => {
+                document.body.scrollTop = 0;
             })
             return rich;
 
@@ -438,10 +438,19 @@ export class EditModule {
      * @return {FormCom}
      */
     private initFactory(type: string, initP?: ComInitP): FormCom {
+        // if(!initP){
+        //   return 
+        // }
+        // debugger;
         this.para.type === 'table' && (type = EditModule.tableComTypeGet(type));
-
-        let field = initP ? initP.field : null,
-            atrrs = field.atrrs || null;
+        // console.log(initP)
+        // debugger;
+        let field = initP ? initP.field : null;
+        let atrrs = null;
+        if (field) {
+            atrrs = field.atrrs
+        }
+        // atrrs = field.atrrs || null;
 
         if (field) {
             if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
