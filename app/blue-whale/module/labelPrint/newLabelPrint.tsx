@@ -162,7 +162,7 @@ export class NewLabelPrint {
                         //         Modal.alert('打印失败');
                         //     });
                         // }
-                        this.scale = getDpi() / 10 * 5;
+                        this.scale = getDpi() / 10 * 3;
                         promise = this.preview(true).catch((e) => {
                             console.log(e);
                             Modal.alert('打印失败');
@@ -327,7 +327,7 @@ export class NewLabelPrint {
             let canvas = <canvas/>,
                 copies = this.printModal.getData('copies');
 
-            svgEl.innerHTML = new Array(4).join(svgEl.innerHTML);
+            svgEl.innerHTML = new Array(11).join(svgEl.innerHTML);
             d.append(document.body, canvas);
 
             canvg(canvas, svgEl.outerHTML, {

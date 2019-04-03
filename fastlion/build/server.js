@@ -37,5 +37,5 @@ app.listen(config.server.port, (err) => {
     console.error(err);
     return;
   }
-  console.info('成功监听在 3000');
+  console.info('成功监听在' + config.server.port);
 });
