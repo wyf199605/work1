@@ -10,3 +10,4 @@ app/package-lock.json
 dist.min.zip
 dist.zip
 dist.min.rar
+.vscode/
