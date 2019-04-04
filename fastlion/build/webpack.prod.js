@@ -1,13 +1,14 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require("./webpack.common.js");
+const config=require("./config");
 const cleanWebpackPlugin = require('clean-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 module.exports = merge(common, {
     mode: "production",
+    stats:config.stats,
     module: {
         rules: [{
             test: /\.(css|sass|scss)$/,
