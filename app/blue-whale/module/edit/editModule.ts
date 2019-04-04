@@ -3,30 +3,30 @@ import tools = G.tools;
 import CONF = BW.CONF;
 import sys = BW.sys;
 import AssignModule from "assignModule/assignModule";
-import {AssignTextModule} from "./assignModule/assignTextModule";
-import {PickModule} from "./pickModule";
-import {FormCom} from "../../../global/components/form/basic";
-import {TextInput} from "../../../global/components/form/text/text";
-import {SelectInput} from "../../../global/components/form/selectInput/selectInput";
-import {Virtual} from "../../../global/components/form/virtual";
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {Datetime} from "../../../global/components/form/datetime/datetime";
-import {RichText} from "../../../global/components/form/richText/richText";
-import {RichTextMb} from "../../../global/components/form/richText/richTextMb";
-import {SelectInputMb} from "../../../global/components/form/selectInput/selectInput.mb";
-import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
-import {Toggle} from "../../../global/components/form/toggle/toggle";
-import {LookupModule} from "./lookupModule";
-import {Validate, ValidateResult, ValidateRule} from "../../../global/utils/validate";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {BwRule} from "../../common/rule/BwRule";
-import {RichTextModal} from "../../../global/components/form/richTextModal/richTextModal";
-import {BwUploader} from "../uploadModule/bwUploader";
-import {UploadImages} from "../uploadModule/uploadImages";
-import {Accessory} from "../uploadModule/accessory";
-import {TextAreaInput} from "../../../global/components/form/text/TextInput";
-import {PickTable} from "./pickTable";
-import {Loading} from "../../../global/components/ui/loading/loading";
+import { AssignTextModule } from "./assignModule/assignTextModule";
+import { PickModule } from "./pickModule";
+import { FormCom } from "../../../global/components/form/basic";
+import { TextInput } from "../../../global/components/form/text/text";
+import { SelectInput } from "../../../global/components/form/selectInput/selectInput";
+import { Virtual } from "../../../global/components/form/virtual";
+import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
+import { Datetime } from "../../../global/components/form/datetime/datetime";
+import { RichText } from "../../../global/components/form/richText/richText";
+import { RichTextMb } from "../../../global/components/form/richText/richTextMb";
+import { SelectInputMb } from "../../../global/components/form/selectInput/selectInput.mb";
+import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
+import { Toggle } from "../../../global/components/form/toggle/toggle";
+import { LookupModule } from "./lookupModule";
+import { Validate, ValidateResult, ValidateRule } from "../../../global/utils/validate";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { BwRule } from "../../common/rule/BwRule";
+import { RichTextModal } from "../../../global/components/form/richTextModal/richTextModal";
+import { BwUploader } from "../uploadModule/bwUploader";
+import { UploadImages } from "../uploadModule/uploadImages";
+import { Accessory } from "../uploadModule/accessory";
+import { TextAreaInput } from "../../../global/components/form/text/TextInput";
+import { PickTable } from "./pickTable";
+import { Loading } from "../../../global/components/ui/loading/loading";
 
 interface ComInitFun {
     (para: ComInitP): FormCom
@@ -198,14 +198,14 @@ export class EditModule {
                     // fileId 值加入额外数据中
                     if (type === '43') {
                         for (let field in data) {
-                            let {key, value} = data[field];
+                            let { key, value } = data[field];
                             upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
                         }
                         p.onExtra && p.onExtra(upperKeyData, Object.keys(upperKeyData));
                         this.comsExtraData[p.field.name] = {};
                         for (let name in upperKeyData) {
                             if (this.coms[name]) {
-                                this.set({[name]: upperKeyData[name]});
+                                this.set({ [name]: upperKeyData[name] });
                             } else {
                                 this.comsExtraData[p.field.name][name] = data[name];
                             }
@@ -216,7 +216,7 @@ export class EditModule {
                     if (tools.isNotEmpty(upperKeyData)) {
                         for (let name in upperKeyData) {
                             if (this.coms[name]) {
-                                this.set({[name]: ''});
+                                this.set({ [name]: '' });
                             } else {
                                 this.comsExtraData[p.field.name][name] = '';
                             }
@@ -250,7 +250,7 @@ export class EditModule {
                             upperKeyData[p.field.name] = tools.str.toEmpty(data[field]);
                             com.set(data[field]);
                         } else {
-                            let {key, value} = data[field];
+                            let { key, value } = data[field];
                             upperKeyData[key.toLocaleUpperCase()] = tools.str.toEmpty(value);
                         }
                     }
@@ -259,7 +259,7 @@ export class EditModule {
                     this.comsExtraData[p.field.name] = {};
                     for (let name in upperKeyData) {
                         if (this.coms[name]) {
-                            this.set({[name]: upperKeyData[name]});
+                            this.set({ [name]: upperKeyData[name] });
                         } else {
                             this.comsExtraData[p.field.name][name] = data[name];
                         }
@@ -272,10 +272,17 @@ export class EditModule {
 
         richText: (p) => {
             let Rich = sys.isMb ? RichTextMb : RichText;
-            return new Rich({
+            let rich = new Rich({
                 container: p.dom,
                 custom: p.field,
             });
+            let dom = G.d.query('.rich-text-base');
+            //兼容移动端软键盘置顶表单后收复键盘无法回弹
+            G.d.on(dom, 'blur', () => {
+                document.body.scrollTop = 0;
+            })
+            return rich;
+
         },
 
         richTextInput: (p) => {
@@ -319,7 +326,7 @@ export class EditModule {
                     url = CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr, p.data ? p.data : this.get());
                     BwRule.Ajax.fetch(url, {
                         needGps: p.field.dataAddr.needGps
-                    }).then(({response}) => {
+                    }).then(({ response }) => {
                         let fields = [];
                         if (response.data[0]) {
                             fields = Object.keys(response.data[0]);
@@ -368,8 +375,8 @@ export class EditModule {
                     container: p.dom,
                     custom: p.field,
                     data: [
-                        {value: '1', text: '是'},
-                        {value: '0', text: '否'}
+                        { value: '1', text: '是' },
+                        { value: '0', text: '否' }
                     ]
                 });
             } else {
@@ -431,10 +438,19 @@ export class EditModule {
      * @return {FormCom}
      */
     private initFactory(type: string, initP?: ComInitP): FormCom {
+        // if(!initP){
+        //   return 
+        // }
+        // debugger;
         this.para.type === 'table' && (type = EditModule.tableComTypeGet(type));
-
-        let field = initP ? initP.field : null,
-            atrrs = field.atrrs || null;
+        // console.log(initP)
+        // debugger;
+        let field = initP ? initP.field : null;
+        let atrrs = null;
+        if (field) {
+            atrrs = field.atrrs
+        }
+        // atrrs = field.atrrs || null;
 
         if (field) {
             if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
@@ -473,7 +489,7 @@ export class EditModule {
             if (!p) {
                 return;
             }
-            let {field, data, onExtra, isNewData} = p;
+            let { field, data, onExtra, isNewData } = p;
             if (field && (p.field.comType === 'tagsinput')) {
                 return;
             }
@@ -487,7 +503,7 @@ export class EditModule {
                 data = data || {};
                 if (data[field.name] != val) {
                     isNewData && (assignData = {});
-                    assignData = Object.assign({}, data, assignData, {[field.name]: val});
+                    assignData = Object.assign({}, data, assignData, { [field.name]: val });
                     assignSend(field, val, assignData, onExtra);
                 }
 
@@ -508,7 +524,7 @@ export class EditModule {
                 }
 
                 if (this.coms[key]) {
-                    this.set({[key]: data});
+                    this.set({ [key]: data });
                 } else {
                     //assign 值加入额外数据中
                     if (!this.comsExtraData[fieldName]) {
@@ -541,7 +557,7 @@ export class EditModule {
             }
             this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.assignAddr, data), {
                 cache: true,
-            }).then(({response}) => {
+            }).then(({ response }) => {
                 let resData = tools.keysVal(response, 'data');
 
                 new Promise<obj>((resolve) => {
@@ -596,7 +612,7 @@ export class EditModule {
             }
         };
 
-        return {init, assign2extra, assignSend, checkAssign};
+        return { init, assign2extra, assignSend, checkAssign };
 
     })();
 
@@ -615,7 +631,7 @@ export class EditModule {
 
                 if (this.coms[key]) {
                     if (key !== field.name) {
-                        this.set({[key]: data});
+                        this.set({ [key]: data });
                     }
                 } else {
                     //assign 值加入额外数据中
@@ -647,9 +663,9 @@ export class EditModule {
                 (coms[name] as Accessory | UploadImages).pageData = data;
             }
             //给控件赋值
-            if(changeSet){
+            if (changeSet) {
                 coms[name].set(tools.str.toEmpty(data[name]));
-            }else{
+            } else {
                 let onSet = coms[name].onSet;
                 coms[name].onSet = null;
                 coms[name].set(tools.str.toEmpty(data[name]));
@@ -671,7 +687,7 @@ export class EditModule {
 
         let allDateGet = (name: string) => {
             let extra = extras[name],
-                dataObj = {[name]: coms[name].get()};
+                dataObj = { [name]: coms[name].get() };
 
             // 字符串转数字
             for (let name in dataObj) {
@@ -713,8 +729,8 @@ export class EditModule {
         return pageData;
     }
 
-    public clear(){
-        for(let name in this.coms){
+    public clear() {
+        for (let name in this.coms) {
             let com = this.coms[name];
             com && com.set('');
         }
@@ -759,7 +775,7 @@ export class EditModule {
             }
 
             ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'validChars'].forEach(ruleName => {
-                if(field.atrrs){
+                if (field.atrrs) {
                     let ruleVal = field.atrrs[ruleName];
                     if (!tools.isEmpty(ruleVal)) {
                         rules.push({
@@ -781,7 +797,7 @@ export class EditModule {
             if (f) {
                 ruleAdd(f.field);
                 data = tools.isUndefined(data) ? (com ? this.get(f.field.name)[f.field.name] : null) : data;
-                return v.start({[name]: data});
+                return v.start({ [name]: data });
             }
         };
 
@@ -801,7 +817,7 @@ export class EditModule {
         };
 
 
-        return {start};
+        return { start };
     })();
 
     static checkValue(field: R_Field, rowData: obj, clear: Function, name = field.name): Promise<CheckValueResult> {
@@ -823,16 +839,16 @@ export class EditModule {
             //     return;
             // }
 
-            let {addr, data} = BwRule.reqAddrFull(chkAddr, rowData);
+            let { addr, data } = BwRule.reqAddrFull(chkAddr, rowData);
 
             // checkValue验证
             BwRule.Ajax.fetch(CONF.siteUrl + addr, {
                 silent: true,
                 type: 'POST',
                 data: [data],
-            }).then(({response}) => {
+            }).then(({ response }) => {
                 let data = tools.keysVal(response, 'body', 'bodyList', 0),
-                    {type, showText} = data || {type: '', showText: ''};
+                    { type, showText } = data || { type: '', showText: '' };
 
                 if (type === 1) {
                     // Modal.alert(showText);
@@ -852,7 +868,7 @@ export class EditModule {
                     });
                 } else {
                     resolve({
-                        errors: [{name, msg: showText}],
+                        errors: [{ name, msg: showText }],
                     });
                 }
 
