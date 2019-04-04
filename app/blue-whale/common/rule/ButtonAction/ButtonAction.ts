@@ -16,6 +16,7 @@ import { RingProgress } from "../../../../global/components/ui/progress/ringProg
 import Shell = G.Shell;
 import { Spinner } from "../../../../global/components/ui/spinner/spinner";
 import { TextInput } from "../../../../global/components/form/text/text";
+import {BwTableElement} from "../../../pages/table/newTablePage";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -604,7 +605,7 @@ export class ButtonAction {
                                     return;
                                 }
                             } else if (type === 5) {
-                                data[0] = table.main.ftable.selectedRowsData;
+                                data[0] = table.tableModule.main.ftable.selectedRowsData;
                             }
                             data[1] = res;
                             modal.destroy();
