@@ -376,7 +376,9 @@ export class ButtonAction {
                                     url: data['code_url'],
                                     orderQueryUrl: data['order_query'],
                                     fee: data['total_fee'],
-
+                                    onSuccess: () => {
+                                        this.btnRefresh(btn.refresh, url);
+                                    }
                                 });
                             });
                             resolve();

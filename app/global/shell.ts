@@ -213,8 +213,8 @@ namespace G {
             get() {
                 return ShellBase.handler('printersGet', {});
             },
-            labelPrint(quantity: number, driveCode: number, image: string, back: IShellEventHandler) {
-                return ShellBase.handler('labelPrint', { quantity, driveCode, image }, back);
+            labelPrint(quantity: number, driveCode: number, image: string, back: IShellEventHandler, props: obj = {}) {
+                return ShellBase.handler('labelPrint', { quantity, driveCode, image, ...props }, back);
             }
         };
 

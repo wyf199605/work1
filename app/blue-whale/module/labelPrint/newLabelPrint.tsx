@@ -352,8 +352,12 @@ export class NewLabelPrint {
                         BlueWhaleShell.postMessage('callPrint', '{"quantity":1,"driveCode":"3","image":"' + url + '"}');
                     } else if ('AppShell' in window) {
                         let code = this.printModal.getData('printer');
+                        let settingData: obj = this.printModal.data;
                         Shell.printer.labelPrint(copies, code, url, () => {
                             Modal.toast('打印成功');
+                        }, {
+                            width: parseFloat(settingData.width),
+                            height: parseFloat(settingData.height),
                         })
                     } else {
                         Modal.alert('无法连接到打印机');

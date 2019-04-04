@@ -17,10 +17,14 @@ import { BtnGroup } from "../../../global/components/ui/buttonGroup/btnGroup";
 import Shell = G.Shell;
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { Loading } from "../../../global/components/ui/loading/loading";
+import sys = BW.sys;
+import {BwTableModule} from "../../module/table/BwTableModule";
+import CONF = BW.CONF;
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
 }
+const queryModuleName = sys.isMb ? 'QueryModuleMb' : 'QueryModulePc';
 
 /**
  * @author WUML
@@ -85,6 +89,49 @@ export class GroupTabsPage extends BasicPage {
         this.on(BwRule.EVT_REFRESH, () => {
             this.refresh();
         });
+
+        let bwTableEl = this.ui as IBW_Table,
+            hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
+
+        if(hasQuery) {
+            require([queryModuleName], (Query) => {
+                let queryModule = new Query({
+                    qm: bwTableEl.querier,
+                    refresher: (ajaxData) => {
+                        // debugger;
+                        return this.refresh(ajaxData)
+                    },
+                    cols: bwTableEl.cols,
+                    url: CONF.siteUrl + BwRule.reqAddr(bwTableEl.dataAddr),
+                    container: this.dom,
+                    tableGet: () => this.main
+                });
+                if(tools.isMb) {
+                    //打开查询面板
+                    d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
+                        queryModule.show();
+                    });
+                } else {
+                    let main = (this.main as NewTableModule).main;
+                    let addBtn = () => {
+                        main.ftable.btnAdd('query', {
+                            content: '查询器',
+                            type: 'default',
+                            icon: 'shaixuan',
+                            onClick: () => {queryModule.show()}
+                        }, 0);
+                    };
+                    if(main.ftable){
+                        addBtn()
+                    }else{
+                        main.on(BwTableModule.EVT_READY, () => {
+                            addBtn()
+                        });
+                    }
+                }
+            })
+        }
+
     }
 
     protected isInventory = false;
@@ -722,10 +769,10 @@ export class GroupTabsPage extends BasicPage {
     }
 
 
-    refresh(){
-        this.main && this.main.refresh().then(() => {
+    refresh(ajaxData?){
+        return this.main ? this.main.refresh(ajaxData).then(() => {
             this.subRefresh();
-        });
+        }) : Promise.reject();
     }
     /**
      * @author WUML

@@ -113,6 +113,7 @@ interface IBW_Detail {
     updatefileData?: R_ReqAddr;
     groupInfo?: IGroupInfo[];
     signField?: string;
+    querier?: IBw_Query;           // 查询器
     inputs?: R_Input[];
     scannableTime?: number;
     subTableList?: IBW_Slave[];
