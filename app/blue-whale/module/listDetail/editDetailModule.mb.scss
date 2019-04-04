@@ -2,8 +2,8 @@
   width: 100%;
   height: 100%;
   position: relative;
-  &.edit_view{
-    .edit-detail-content{
+  &.edit_view {
+    .edit-detail-content {
       top: 0;
       height: calc(100% - 70px);
     }
@@ -75,11 +75,13 @@
     .form-wrapper {
       background-color: #ffffff;
       padding-left: 16px;
-      .disabled, [disabled] {
+      .disabled,
+      [disabled] {
         opacity: 0.8 !important;
       }
       &.ios-form {
-        .disabled, [disabled] {
+        .disabled,
+        [disabled] {
           opacity: 0.9 !important;
           color: #333333;
         }
@@ -131,7 +133,7 @@
           }
         }
         &.disabled {
-          .detail-cell-title[data-input-type="input"] ~ .text-input > input {
+          .detail-cell-title[data-input-type="input"]~.text-input>input {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -140,12 +142,12 @@
         .text-input {
           color: #666666;
           flex: 1 1 auto;
-          & > .btn-group .icon {
+          &>.btn-group .icon {
             display: flex;
             display: -webkit-flex;
             align-items: center;
           }
-          & > input {
+          &>input {
             height: 100%;
             margin-bottom: 0;
             text-align: right;
@@ -159,7 +161,7 @@
           max-width: 180px;
           font-size: 14px;
         }
-        .detail-cell-title[data-input-type="datetime"] ~ .text-input > input {
+        .detail-cell-title[data-input-type="datetime"]~.text-input>input {
           pointer-events: none;
         }
       }

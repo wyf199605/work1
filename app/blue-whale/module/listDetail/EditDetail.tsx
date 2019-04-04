@@ -13,6 +13,7 @@ export class EditDetail extends DetailBase {
 
     constructor(para: IDetailBasePara) {
         super(para);
+        console.log(para)
         if (this.para.uiType === 'edit_view') {
             this.wrapper.classList.add('edit_view');
         }
@@ -25,10 +26,11 @@ export class EditDetail extends DetailBase {
 
     set isEdit(isEdit: boolean) {
         this._isEdit = isEdit;
+        //if (this.totalNumber === 0 && this.para.uiType !== 'edit_view') {
         if (this.totalNumber === 0 && this.para.uiType !== 'edit_view') {
-            this.cancelBtn.disabled = true;
-            this.updateBtn.disabled = true;
-            this.saveBtn.disabled = true;
+            // this.cancelBtn.disabled = true;
+            // this.updateBtn.disabled = true;
+            // this.saveBtn.disabled = true;
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = false);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
@@ -41,22 +43,15 @@ export class EditDetail extends DetailBase {
                 })
             }
         } else {
-            // if (tools.isPc) {
-            //     this.actionButtons.forEach(btn => {
-            //         btn.disabled = isEdit;
-            //     })
-            // }
-            //编辑状态下也可以点击新增
-            console.log(111)
-            if (!tools.isPc) {
-               setTimeout(() => {
-                this.moreBtn.disabled=false;
-               }, 1000);
+            if (tools.isPc) {
+                // this.actionButtons.forEach(btn => {
+                //     btn.disabled = isEdit;
+                // })
             }
             this.cancelBtn.disabled = !isEdit;
             this.updateBtn.disabled = isEdit;
             this.saveBtn.disabled = !isEdit;
-            tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = isEdit);
+            tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = !isEdit);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
                     this.detailForm.editModule.getDom(f.name).disabled = !isEdit;
@@ -78,10 +73,10 @@ export class EditDetail extends DetailBase {
     private actionButtons: Button[] = []; // PC端专用
 
     private initAllButtons() {
+        // console.log(this.totalNumber)
         let subButtons: R_Button[] = this.para.fm.subButtons,
             buttons: R_Button[] = [],
             self = this;
-
         // 更多按钮
         function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement) {
             self.moreBtn = new Button({
@@ -134,6 +129,7 @@ export class EditDetail extends DetailBase {
                     self.isEdit = true;
                 }
             });
+            self.updateBtn.wrapper.classList.add('hide');
             self.saveBtn = new Button({
                 content: '保存',
                 className: 'edit-btn',
@@ -152,9 +148,14 @@ export class EditDetail extends DetailBase {
                                 keyStepData[self.currentPage - 1] = data;
                                 self.keyStepData = keyStepData;
                             }
-                            self.isEdit = false;
+                            self.defaultData = self.detailForm.editModule.get();
+                            // self.isEdit = false;
+
+
+                            self.isEdit = true;
                         }, self.para.url || '');
                     }
+
                 }
             });
             self.cancelBtn = new Button({
@@ -164,7 +165,7 @@ export class EditDetail extends DetailBase {
                 onClick: () => {
                     self.getDetailData().then((data) => {
                         self.detailForm.editData = data;
-                        self.isEdit = false;
+                        // self.isEdit = false;
                     });
                 }
             })
@@ -182,6 +183,48 @@ export class EditDetail extends DetailBase {
                 let btnWrapper = <div className="list-item-detail-buttons" />;
                 this.wrapper.appendChild(btnWrapper);
                 if (tools.isMb) {
+                    let prev: R_Button = {
+                        "selectionFlag": 0,
+                        "caption": "上一页",
+                        "title": "上一页",
+                        "actionAddr": {
+                            "type": "",
+                            "needGps": 0,
+                            "dataAddr": "",
+                            "varType": 3,
+                            "addrType": false,
+                            "commitType": 1
+                        },
+                        "buttonType": 2,
+                        "subType": "web_prev",
+                        "openType": "none",
+                        "hintBeforeAction": false,
+                        "refresh": 1,
+                        "multiselect": 0,
+                        "level_no": 10
+                    }
+                    let next: R_Button = {
+                        "selectionFlag": 0,
+                        "caption": "下一页",
+                        "title": "下一页",
+                        "actionAddr": {
+                            "type": "",
+                            "needGps": 0,
+                            "dataAddr": "",
+                            "varType": 3,
+                            "addrType": false,
+                            "commitType": 1
+                        },
+                        "buttonType": 2,
+                        "subType": "web_next",
+                        "openType": "none",
+                        "hintBeforeAction": false,
+                        "refresh": 1,
+                        "multiselect": 0,
+                        "level_no": 10
+                    }
+                    buttons.push(prev)
+                    buttons.push(next)
                     createMoreBtn(buttons, btnWrapper);
                     createEditBtn(btnWrapper);
                     if (~DetailBase.detailTypes.indexOf(this.para.uiType)) {
@@ -211,7 +254,17 @@ export class EditDetail extends DetailBase {
             if (tools.isNotEmpty(varList)) {
                 def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
             }
+            if (self.checkIsSave()) {
+                Modal.toast('还有数据未保存，请先保存')
+                return false;
+            }
             switch (btn.subType) {
+                case 'web_prev':
+                    self.prevHandle();
+                    break;
+                case 'web_next':
+                    self.nextHandle();
+                    break
                 case 'insert_save':
                     btn.refresh = 0;
                     new DetailModal(Object.assign({}, self.para, {
@@ -301,56 +354,66 @@ export class EditDetail extends DetailBase {
             typeof callback === 'function' && callback(response);
         }, this.para.url);
     }
-
-    private initPageButtons(wrapper?: HTMLElement) {
-        let btnWrapper = wrapper ? wrapper : <div className="page-buttons" />;
-        this.wrapper.appendChild(btnWrapper);
-        this.prev = new Button({
-            content: '上一页',
-            className: 'list-detail-btn',
-            container: btnWrapper,
-            onClick: () => {
-                if (this.currentPage !== 1) {
-                    if (this.isEdit && this.checkIsSave()) {
-                        Modal.confirm({
-                            msg: '还有数据未保存，确定跳转上一页吗?',
-                            callback: (flag) => {
-                                if (flag) {
-                                    let current = this.currentPage - 1;
-                                    this.refresh(current);
-                                }
-                            }
-                        })
-                    } else {
-                        let current = this.currentPage - 1;
-                        this.refresh(current);
+    private prevHandle = () => {
+        if (this.currentPage !== 1) {
+            if (this.isEdit && this.checkIsSave()) {
+                Modal.confirm({
+                    msg: '还有数据未保存，确定跳转上一页吗?',
+                    callback: (flag) => {
+                        if (flag) {
+                            let current = this.currentPage - 1;
+                            this.refresh(current);
+                        }
                     }
-                }
+                })
+            } else {
+                let current = this.currentPage - 1;
+                this.refresh(current);
             }
-        });
-        this.next = new Button({
-            content: '下一页',
-            container: btnWrapper,
-            onClick: () => {
-                if (this.currentPage !== this.totalNumber) {
-                    if (this.isEdit && this.checkIsSave()) {
-                        Modal.confirm({
-                            msg: '还有数据未保存，确定跳转下一页吗?',
-                            callback: (flag) => {
-                                if (flag) {
-                                    let current = this.currentPage + 1;
-                                    this.refresh(current);
-                                }
-                            }
-                        })
-                    } else {
-                        let current = this.currentPage + 1;
-                        this.refresh(current);
+        }
+    }
+    private nextHandle = () => {
+        if (this.currentPage !== this.totalNumber) {
+            if (this.isEdit && this.checkIsSave()) {
+                Modal.confirm({
+                    msg: '还有数据未保存，确定跳转下一页吗?',
+                    callback: (flag) => {
+                        if (flag) {
+                            let current = this.currentPage + 1;
+                            this.refresh(current);
+                        }
                     }
+                })
+            } else {
+                let current = this.currentPage + 1;
+                this.refresh(current);
+            }
+        }
+    }
+    private initPageButtons(wrapper?: HTMLElement) {
+        // console.log(this.totalNumber)
+        if (tools.isPc) {
+            let btnWrapper = wrapper ? wrapper : <div className="page-buttons" />;
+            this.wrapper.appendChild(btnWrapper);
+            this.prev = new Button({
+                content: '上一页',
+                className: 'list-detail-btn',
+                container: btnWrapper,
+                onClick: () => {
+                    this.prevHandle();
                 }
-            },
-            className: 'list-detail-btn'
-        });
+            });
+            this.next = new Button({
+                content: '下一页',
+                container: btnWrapper,
+                onClick: () => {
+                    this.nextHandle();
+                },
+                className: 'list-detail-btn'
+            });
+        } else {
+            G.d.query('.edit-detail-content').style.top = '0px'
+        }
         this.checkPageButtonDisabled();
     }
 
