@@ -13,7 +13,6 @@ export class EditDetail extends DetailBase {
 
     constructor(para: IDetailBasePara) {
         super(para);
-        console.log(para)
         if (this.para.uiType === 'edit_view') {
             this.wrapper.classList.add('edit_view');
         }
@@ -73,7 +72,6 @@ export class EditDetail extends DetailBase {
     private actionButtons: Button[] = []; // PC端专用
 
     private initAllButtons() {
-        // console.log(this.totalNumber)
         let subButtons: R_Button[] = this.para.fm.subButtons,
             buttons: R_Button[] = [],
             self = this;
@@ -104,7 +102,6 @@ export class EditDetail extends DetailBase {
 
         // 创建PC按钮
         function createPcButtons(buttons: R_Button[], wrapper: HTMLElement) {
-            console.log(buttons)
             buttons.forEach((btn) => {
                 self.actionButtons.push(new Button({
                     content: btn.caption,
@@ -149,9 +146,6 @@ export class EditDetail extends DetailBase {
                                 self.keyStepData = keyStepData;
                             }
                             self.defaultData = self.detailForm.editModule.get();
-                            // self.isEdit = false;
-
-
                             self.isEdit = true;
                         }, self.para.url || '');
                     }
@@ -254,7 +248,7 @@ export class EditDetail extends DetailBase {
             if (tools.isNotEmpty(varList)) {
                 def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
             }
-            if (self.checkIsSave()) {
+            if (btn.subType!=='insert_save'&&self.checkIsSave()) {
                 Modal.toast('还有数据未保存，请先保存')
                 return false;
             }
@@ -288,6 +282,9 @@ export class EditDetail extends DetailBase {
                                         self.totalNumber += 1;
                                     }
                                     self.refresh();
+                                    self.actionButtons.forEach(item=>{
+                                        item.disabled=false;
+                                    })
                                     resolve();
                                 });
                             })
@@ -391,7 +388,6 @@ export class EditDetail extends DetailBase {
         }
     }
     private initPageButtons(wrapper?: HTMLElement) {
-        // console.log(this.totalNumber)
         if (tools.isPc) {
             let btnWrapper = wrapper ? wrapper : <div className="page-buttons" />;
             this.wrapper.appendChild(btnWrapper);
