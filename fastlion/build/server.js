@@ -7,11 +7,12 @@ const config = require("./config")
 const app = express();
 
 var hotMiddlewareScript = 'webpack-hot-middleware/client?noInfo=true&reload=true';
+var reactHot='react-hot-loader/patch'
 Object.keys(webpackconfig.entry).forEach(function (name) {
   // 每个页面生成一个entry
   // 这里修改entry实现HotUpdate
   webpackconfig.entry[name] = [
-    // '"react-hot-loader/patch"',
+    reactHot,
     // 'babel-polyfill',
     hotMiddlewareScript,
     webpackconfig.entry[name]
