@@ -12,6 +12,7 @@ import Shell = G.Shell;
 import sysPcHistory = BW.sysPcHistory;
 import { Loading } from "../../../global/components/ui/loading/loading";
 import { checkNetwork } from './checkNetwork.mb'
+import { QueryBuilder } from "blue-whale/module/query/queryBuilder";
 export = class myselfMbPage {
     constructor() {
         // mui.init();
@@ -171,11 +172,13 @@ export = class myselfMbPage {
             new checkNetwork({ modal: modal })
         });
         let modal = new Modal({
-            className: 'test-module-wrapper',
-            body: null,
+            header: '网络监控',
+            className:'modal_class',
+            body: d.create('<div id="check_net_id"></div>'),
             position: sys.isMb ? 'full' : '',
             isShow: false
         });
+        d.query('#check_net_id').style.height="100%";
     }
 
     private rfidSettingInit(list: HTMLElement) {

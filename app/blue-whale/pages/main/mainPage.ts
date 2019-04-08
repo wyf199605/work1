@@ -86,10 +86,17 @@ export = class MainPage {
                                 let n = Math.round(Math.random() * (array.length - 1));//此处注意越界问题
                                 str += array[n]
                             }
-                            MainPage.downloadFile(str + ".png", event.target.currentSrc);
+                            if(/^http(s)?/.test(event.target.currentSrc)){
+                                sys.window.download(event.target.currentSrc, str + '.png');
+                            } else {
+                                MainPage.downloadFile(str + ".png", event.target.currentSrc);
+                            }
                         }
                     }
                 })
+                let dom = d.query(`.${modal.className}`);
+                let str = dom.style.cssText;
+                dom.style.cssText = str + 'z-index:99999!important;'
             }
         };
         MainPage.pageContainer = props.pageContainer;
@@ -371,7 +378,7 @@ export = class MainPage {
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({ response }) => {
                 let data = tools.keysVal(response, 'body', 'bodyList');
                 if (tools.isNotEmpty(data)) {
-                    if(data.length === 1){
+                    if (data.length === 1) {
                         let item = data[0],
                             el = d.create(`<li class="dropdown pull-right">
                                     <a href="#">                                   
@@ -383,7 +390,7 @@ export = class MainPage {
                             handlerClick(item);
                         });
                         d.replace(el, li);
-                    }else{
+                    } else {
                         let popover = new Popover({
                             target: li,
                             // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
