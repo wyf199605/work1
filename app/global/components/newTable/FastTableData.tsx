@@ -122,9 +122,7 @@ export class FastTableData extends DataManager{
     }
 
     rowDataGet(index: number) {
-        let data: obj = {};
-        this.ftable.tablesEach(table => Object.assign(data, table.tableData.get(index)));
-        return data;
+        return this.ftable.rows[index].data;
     }
 
     dataSplit(dataArr: obj[]): [obj[], obj[]]

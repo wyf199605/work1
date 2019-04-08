@@ -363,7 +363,7 @@ export = class contactsPage {
                                 }else {
                                     let name = '';
                                     if(key === treeField[level]){
-                                        for(let m = level > 2 ? level - 2 : 0; m < level; m++ ){
+                                        for(let m = 0; m < level; m++ ){
                                             name += obj[treeField[m]];
                                         }
                                         if(name === id){
