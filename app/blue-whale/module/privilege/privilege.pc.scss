@@ -740,6 +740,52 @@
   }
 }
 
+// 修改表格不能滚动问题
+.priviledePage {
+    .priv-group-content  {
+        .table-module-wrapper {
+            overflow-y: auto !important;
+        }
+        
+    }
+    // .table-out-bottom {
+    //     position: fixed;
+    //     width: 160px;
+    //     bottom: 20px;
+    // }
+}
+.fl-pc {
+    .priv-group {
+        .g-table-module-wrapper  {
+            overflow: scroll !important;
+            .mini {
+                position: fixed;
+                bottom: -40px;
+                width: 160px;
+                background-color: #fff;
+            }
+        }
+    }
+}
+// .fl-pc {
+//     .g-table-module-wrapper  {
+//         overflow: scroll !important;
+//         .mini {
+//             position: fixed;
+//             bottom: -40px;
+//             width: 160px;
+//             background-color: #fff;
+//         }
+//     }
+    // table.mobileTable tbody tr td {
+    //     // padding: none;
+    //     height: 30px;
+    //     line-height: 30px;
+    //     padding-top: 0;
+    //     padding-block-start: 0;
+    // }
+// }
+
 /*.privilegePage {
 
   //内盒子边框阴影效果

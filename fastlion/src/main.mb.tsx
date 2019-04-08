@@ -1,18 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Welcome} from './component/Welcome/Welcome';
+import { AppContainer } from 'react-hot-loader';
+import "./utils/response.js";
+import { Welcome } from './component/Welcome/Welcome';
 import "./style/index.scss";
-declare var module:any;
-const App = () => {
-  return (
-    <div>
-      <p>移动端</p>
-      <Welcome foo="wjb"/>
-    </div>
-  )
-}
+declare var module: any;
 
-ReactDOM.render( <App />, document.getElementById('app'))
+ReactDOM.render(
+  <Welcome foo='hello' />,
+  document.getElementById('app'))
 
 if (module.hot) {
   module.hot.accept();
