@@ -335,14 +335,24 @@ export = class contactsPage {
                         console.timeEnd('data')
                     }else if(para.recursion === 0){
                         //去重
-                        let filterData = [], arr = {};
-                        data.forEach(d => {
+                        let filterData = [], arr = {},
+                            parentValue = parent && parent.dataset.id,
+                            parentIndexes = Array.from({length: Math.max(level, 0)}, (v, i) => i);
+                        for(let d of data){
+                            if(tools.isNotEmpty(parentIndexes)){
+                                if(parentIndexes.map(name => {
+                                    let filedName = treeField[name];
+                                    return filedName ? d[filedName] : '';
+                                }).join('') !== parentValue){
+                                    continue;
+                                }
+                            }
                             let name = d[nameField];
                             if(!arr[name]){
                                 arr[name] = true;
                                 filterData.push(d);
                             }
-                        });
+                        }
 
                         filterData.forEach((obj) => {
                             for(let key in obj){
@@ -381,12 +391,15 @@ export = class contactsPage {
                                 valueJson: JSON.stringify(m)
                             };
                         }else if(para.recursion === 0){
-                            let field = treeField[level],
-                                parentField = treeField[level - 1],
-                                id = m[field];
-                            if(parentField){
-                                id = m[parentField] + m[field];
+                            let /*field = treeField[level],
+                                parentField = treeField[level - 1],*/
+                                id = '';
+                            for(let i = 0; i < level; i++){
+                                id += m[treeField[i]];
                             }
+                            // if(parentField){
+                            //     id = m[parentField] + m[field];
+                            // }
                             parseData = {
                                 name: m[highlightName],
                                 level: level,
