@@ -394,7 +394,7 @@ export = class contactsPage {
                             let /*field = treeField[level],
                                 parentField = treeField[level - 1],*/
                                 id = '';
-                            for(let i = 0; i < level; i++){
+                            for(let i = 0; i < level + 1; i++){
                                 id += m[treeField[i]];
                             }
                             // if(parentField){
