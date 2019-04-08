@@ -172,9 +172,12 @@
 
 .fl-pc {
   .table-module-wrapper {
-    overflow: hidden; 
-    overflow-y: auto;
+    overflow: hidden ; 
+    // overflow-x: scroll;
+    // overflow-y: visible;
+    // overflow-y: auto;
   }
+  
   .edit-btns {
     button {
       border: none;
