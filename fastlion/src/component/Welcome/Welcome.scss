@@ -1,18 +1,8 @@
 @import "../../style/helper/index.scss";
 .welcome {
-  color: black;
+  width: px2rem(375);
+  display: inline-block;
+  background-color: red;
   cursor: pointer;
-}
-
-@media screen and (min-width: 780px) {
-  body {
-    font-size: 16px
-  }
-}
-
-@media screen and (max-width: 780px) {
-  body {
-    font-size: 16px;
-    width: px2rem(750)!important;
-  }
+  @include font-size(42px)
 }

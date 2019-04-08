@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "module": "es6",
-    "target": "es6",
+    "module": "esnext",
+    "target": "esnext",
     "allowSyntheticDefaultImports": true,
     "baseUrl": "src",
-    "sourceMap": true,
-    "outDir": "ts-build",
+    "sourceMap": false,
     "jsx": "preserve",
-    "strict": false
+    "strict": false,
+    "lib": ["dom", "es2015.promise", "es5", "es2015.symbol", "esnext","es2015.iterable", "es2015.generator"]
   },
   "exclude": [
     "node_modules"
