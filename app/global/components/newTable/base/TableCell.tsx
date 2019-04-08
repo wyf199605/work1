@@ -78,28 +78,22 @@ export abstract class TableCell {
     }
 
     // 渲染到页面的格式
-    protected format(data: any): Promise<{
+    protected format(data: any): {
         text: string | Node,
         color?: string;
         bgColor?: string;
         classes?: string[],
         data?: any
-    }> {
+    }{
         let format = this.table.cellFormat,
             formated = format && format(data, this);
         // formated = format && format(this.column, (this.row as TableDataRow).data || {[this.name]: data});
         // if(this instanceof TableFooterCell){
         //     console.log(this.column)
         // }
-        // formated = formated || {text: data};
-        // formated.text = tools.str.removeHtmlTags(tools.str.toEmpty(formated.text));
-        return new Promise((resolve, reject) => {
-            formated ? formated.then((result) => {
-                result = result || {text: data};
-                result.text = tools.str.removeHtmlTags(tools.str.toEmpty(result.text));
-                resolve(result);
-            }) : resolve({text: data});
-        });
+        formated = formated || {text: data};
+        formated.text = tools.str.removeHtmlTags(tools.str.toEmpty(formated.text));
+        return formated;
     }
 
     // 是否显示在页面上
@@ -343,83 +337,72 @@ export class TableDataCell extends TableCell {
         }
         this.render();
         this.editing && (this.cancelEdit());
-        this.renderPromise.finally(() => {
-            let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
-            tools.isNotEmpty(events) && events.forEach((fun) => {
-                typeof fun === 'function' && fun(this.table.editing);
-            });
+        let events = this.table.eventHandlers[TableBase.EVT_CHANGED];
+        tools.isNotEmpty(events) && events.forEach((fun) => {
+            typeof fun === 'function' && fun(this.table.editing);
         });
     }
 
-    protected rendering = false;
-    protected renderPromise: Promise<any> = Promise.resolve();
+    formatCell({classes, text, color, bgColor, data}){
+        this.moreButton && this.moreButton.destroy();
+        this.wrapper && (this.wrapper.innerHTML = '');
+        if(text instanceof Node){
+            this.wrapper && d.append(this.wrapper, text);
+        }else {
+            text = tools.isEmpty(text) ? '' : text;
+            this._text = text + '';
+            if(this.wrapper){
+                d.append(this.wrapper, document.createTextNode(this._text));
+            }
+        }
+        this.width = getTextWidth(this.text);
+        this.initMoreBtn();
+        this.classes = classes;
+        this.color = color;
+        this.background = bgColor;
+        if(data){
+            this.table.tableData.update({[this.name]: data}, this.row.index);
+        }
+        if(this.table.editing){
+            let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
+                rowData = null;
+            for(let data of this.table.tableData.edit.getOriginalData()){
+                if(data[TableBase.GUID_INDEX] === guidIndex){
+                    rowData = data;
+                    break;
+                }
+            }
+            // console.log(rowsData);
+            let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
+            // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
+            this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
+        }
+    }
+
     render(cellData?){
         // debugger
         let data = tools.isEmpty(cellData) ? this.data : cellData;
 
         // 移除 除了moreBtn以外的所有dom
-        if(this.wrapper){
-            if(this.moreButton){
-                let childNodes = (this.wrapper as Node).childNodes;
-                for(let i = 0; i < childNodes.length; i ++){
-                    let child = childNodes[i];
-                    if(this.moreButton.wrapper !== child) {
-                        this.wrapper.removeChild(child);
-                    }
-                }
-            }else{
-                this.wrapper.innerHTML = '';
-            }
-        }
-        // this.wrapper && (this.wrapper.innerHTML = '');
-        this.table.addStack(this.renderPromise = new Promise((resolve) => {
-            if(data instanceof Node) {
-                this.wrapper && d.append(this.wrapper, data);
-                resolve();
-            }else{
-                this.format(data).then((formated) => {
-                    if(formated) {
-                        let {classes, text, color, bgColor, data} = formated;
-                        if(text instanceof Node){
-                            this.wrapper && d.append(this.wrapper, text);
-                        }else {
-                            text = tools.isEmpty(text) ? '' : text;
-                            this._text = text + '';
-                            if(this.wrapper){
-                                d.append(this.wrapper, document.createTextNode(this._text));
-                            }
-                        }
-                        this.width = getTextWidth(this.text);
-                        this.initMoreBtn();
-                        this.classes = classes;
-                        this.color = color;
-                        this.background = bgColor;
-                        if(data){
-                            this.table.tableData.update({[this.name]: data}, this.row.index);
-                        }
-                    }
-                }).finally(() => {
-                    resolve();
+
+        if(data instanceof Node) {
+            this.moreButton && this.moreButton.destroy();
+            this.wrapper && (this.wrapper.innerHTML = '');
+            this.wrapper && d.append(this.wrapper, data);
+        }else{
+            let formated = this.format(data);
+            if(formated) {
+                let {classes, text, color, bgColor, data} = formated;
+                this.formatCell({
+                    classes,
+                    text,
+                    color,
+                    bgColor,
+                    data
                 });
             }
-        }).then(() => {
-            !this.table.isWrapLine && this.initMoreBtn();
+        }
 
-            if(this.table.editing){
-                let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
-                    rowData = null;
-                for(let data of this.table.tableData.edit.getOriginalData()){
-                    if(data[TableBase.GUID_INDEX] === guidIndex){
-                        rowData = data;
-                        break;
-                    }
-                }
-                // console.log(rowsData);
-                let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
-                // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
-                this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
-            }
-        }))
 
     }
 
@@ -560,9 +543,7 @@ export class TableDataCell extends TableCell {
     }
 
     triggerEditCancel(){
-        this.renderPromise.finally(() => {
-            this.table.trigger(TableBase.EVT_CELL_EDIT_CANCEL, this);
-        });
+        this.table.trigger(TableBase.EVT_CELL_EDIT_CANCEL, this);
     }
 }
 
@@ -703,25 +684,22 @@ export class TableFooterCell extends TableCell{
         if(tools.isNotEmpty(data)){
             if(this._options.indexOf(data) === -1){
                 this._options.push(data);
-                this.format(data).then((result) => {
-                    let text = result.text as string;
-                    if(Array.isArray(this.optionGroup[text])){
-                        this.optionGroup[text].push(data);
-                        for(let i = 0; i < this.selectEl.length; i ++){
-                            let option = this.selectEl.options[i];
-                            let tem = option.text;
-                            if(tem == text){
-                                d.data(option, this.optionGroup[text]);
-                                break;
-                            }
+                let text = this.format(data).text as string;
+                if(Array.isArray(this.optionGroup[text])){
+                    this.optionGroup[text].push(data);
+                    for(let i = 0; i < this.selectEl.length; i ++){
+                        let option = this.selectEl.options[i];
+                        let tem = option.text;
+                        if(tem == text){
+                            d.data(option, this.optionGroup[text]);
+                            break;
                         }
-                    }else{
-                        let option = <option>{text}</option>;
-                        this.optionGroup[text] = [data];
-                        this.selectEl.add(option, null);
                     }
-                });
-
+                }else{
+                    let option = <option>{text}</option>;
+                    this.optionGroup[text] = [data];
+                    this.selectEl.add(option, null);
+                }
             }
         }
     }
@@ -740,9 +718,7 @@ export class TableFooterCell extends TableCell{
             optionEl = this.selectEl.options[oldIndex + 1];
         if(oldIndex > -1){
             optionEl.value = newData;
-            this.format(newData).then(({text}) => {
-                optionEl.innerText = text as string;
-            });
+            optionEl.innerText = this.format(newData).text as string;
         }
     }
 

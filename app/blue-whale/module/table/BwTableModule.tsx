@@ -171,16 +171,12 @@ export class BwTableModule extends Component {
                 },
             cellFormat: (cellData, cell: FastTableCell) => {
                 let col = cell.column,
-                    promise: Promise<any>,
-                    rowData = this.ftable.tableData.rowDataGet(cell.row.index); // 行数据
+                    rowData = this.ftable.data[cell.row.index]; // 行数据
                 if (col) {
-                    promise = this.cellFormat(col.content, cellData, rowData);
+                    return this.cellFormat(cell, cellData, rowData);
                 } else {
-                    promise = new Promise((resolve) => {
-                        resolve({ text: cellData });
-                    })
+                    return { text: cellData }
                 }
-                return promise;
             },
             rowFormat: (rowData: obj) => {
                 let color = '',
@@ -1739,9 +1735,9 @@ export class BwTableModule extends Component {
      * @param cellData - 单元格数据
      * @param rowData - 行数据
      */
-    private cellFormat(field: R_Field, cellData: any, rowData: obj) {
-        return new Promise((resolve, reject) => {
+    private cellFormat(cell: FastTableCell, cellData: any, rowData: obj) {
             let text: string | Node = cellData, // 文字 或 Node
+                field = cell.column.content as R_Field,
                 data = null,
                 color: string,                  // 文字颜色
                 bgColor: string,                // 背景颜色
@@ -1796,21 +1792,19 @@ export class BwTableModule extends Component {
                     classes.push('cell-img');
 
                 } else if (BwRule.isNewFile(dataType)) {
-                    classes.push('cell-link');
-                    color = 'blue';
                     if (cellData) {
                         BwRule.getFileInfo(field.name, cellData).then(({ response }) => {
                             response = JSON.parse(response);
                             if (response && response.dataArr && response.dataArr[0]) {
-                                let data = response.dataArr[0],
-                                    filename = data.filename;
-                                text = filename;
+                                let data = response.dataArr[0];
+                                text = data.filename;
                             }
-                            resolve({ text, classes, bgColor, color, data });
-                        }).catch(() => {
-                            resolve({ text, classes, bgColor, color, data });
+                            classes.push('cell-link');
+                            color = 'blue';
+                            cell.formatCell({ text, classes, bgColor, color, data });
+                        }).catch((e) => {
+                            console.log(e);
                         });
-                        return;
                     }
                 } else if (dataType === '50') {
                     // 打钩打叉
@@ -1881,9 +1875,7 @@ export class BwTableModule extends Component {
                     }
                 }
             }
-
-            resolve({ text, classes, bgColor, color, data });
-        })
+            return { text, classes, bgColor, color, data };
     }
 
     // 多图查看与编辑

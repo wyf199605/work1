@@ -122,7 +122,7 @@ export class FastTableData extends DataManager{
     }
 
     rowDataGet(index: number) {
-        return this.ftable.rows[index].data;
+        return this.data[index];
     }
 
     dataSplit(dataArr: obj[]): [obj[], obj[]]

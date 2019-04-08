@@ -42,13 +42,13 @@ interface ITableBaseAnnexedPara {    // 创建附表的参数
 
 // cell格式
 export interface ITableCellFormatter {
-    (data: any, cell: TableCell): Promise<{
+    (data: any, cell: TableCell): {
         text: string | Node,
         color?: string;
         bgColor?: string;
         classes?: string[],
         data?: any
-    }>
+    }
 }
 
 
@@ -783,20 +783,11 @@ export class TableBase extends Component {
 
     // private _allData: obj[];
     // private current: [number, number];
-    _promiseList: Promise<any>[] = [];
-    addStack(promise: Promise<any>){
-        this._promiseList.push(promise);
-    }
-    renderPromise(){
-        return Promise.all(this._promiseList);
-    }
 
-    render(indexes: number[], position?: number): Promise<any>
-    render(start: number, length: number, position?: number, isUpdateFoot?: boolean): Promise<any>
-    render(x, y, w?, z = true): Promise<any> {
-        this._promiseList = [];
+    render(indexes: number[], position?: number): void
+    render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
+    render(x, y, w?, z = true): void {
         this.body.render(x, y, w, z);
-        return this.renderPromise();
     }
 
     public sortByIndex(sortRule: ISortRule) {

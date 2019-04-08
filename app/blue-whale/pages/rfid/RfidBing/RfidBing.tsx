@@ -215,11 +215,9 @@ export class EpcList extends Component {
                 let fragDoc = document.createDocumentFragment();
                 d.append(fragDoc, data);
                 d.append(fragDoc, <div className="delete">x</div>);
-                return new Promise((resolve) => {
-                    resolve({
-                        text: fragDoc
-                    });
-                });
+                return {
+                    text: fragDoc
+                }
             }
         });
 

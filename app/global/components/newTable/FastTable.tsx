@@ -1797,21 +1797,14 @@ export class FastTable extends Component {
         // }
     }
 
-    protected rendering = false;
-    // 渲染
     render(indexes: number[], position?: number): void
     render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
     render(x, y?, w?, z = true) {
         // debugger;
-        if(this.rendering){
-            return;
-        }
-        this.rendering = true;
 
-        let promiseList: Promise<any>[] = [];
         this.wrapper.style.display = 'none';
         this.tablesEach(table => {
-            promiseList.push(table.render(x, y, w, z));
+            table.render(x, y, w, z);
         });
         // debugger;
         let indexes = this.mainTable.body.rows.map(row => row ? row.index : null);
@@ -1906,12 +1899,7 @@ export class FastTable extends Component {
         Array.isArray(handlers) && handlers.forEach(handler => {
             handler();
         });
-        Promise.all(promiseList).then(() => {}).catch((e) => {
-            console.log(e);
-        }).finally(() => {
-            this.recountWidth();
-            this.rendering = false;
-        });
+        this.recountWidth();
     }
 
     loadedError = () => {
@@ -2883,12 +2871,7 @@ export class FastTable extends Component {
                 this.rows.forEach((row) => {
                     row.isAdd = false;
                 });
-
-                Promise.all(this.tableBases.map((table) => table.renderPromise())).then(() => {
-                    console.log(this.data);
-                    this.render(0, void 0);
-                });
-
+                this.render(0, void 0);
             }
         }
     }
