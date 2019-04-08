@@ -20,7 +20,7 @@ import {TableColumn} from "../../../global/components/newTable/base/TableColumn"
 export = class TableModulePc extends TableModule {
 
     protected initWrapper(tableDom: HTMLTableElement) {
-        let wrapper = d.create(`<div class="table-module-wrapper"></div>`),
+        let wrapper = d.create(`<div class="table-module-wrapper g-table-module-wrapper"></div>`),
             topBtns = d.create('<div class="topBtns">' +
                 '<div class="btn-group btnsRight"></div>' +
                 '<div style="clear:both"></div></div>');

@@ -2,6 +2,7 @@
   "devDependencies": {
     "browser-sync": "^2.18.12",
     "del": "^3.0.0",
+    "gulp": "^3.9.1",
     "gulp-amd-optimize": "^0.4.3",
     "gulp-autoprefixer": "^6.0.0",
     "gulp-clean-css": "^3.9.0",
