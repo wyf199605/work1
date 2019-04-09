@@ -363,7 +363,9 @@
     }
   }
   .priv-group {
-    height: 79vh;
+    height: 70vh;
+    position: relative;
+    top: -9vh;   
     width: 160px;
     display: inline-block;
     .priv-group-content {
@@ -742,9 +744,14 @@
 
 // 修改表格不能滚动问题
 .priviledePage {
+    //  .priv-group {
+    //     height: 70vh !important;
+    //     position: relative;
+    //     top: -9vh;
+    // }
     .priv-group-content  {
         .table-module-wrapper {
-            overflow-y: auto !important;
+            // overflow-y: visible !important;
         }
         
     }
@@ -757,10 +764,10 @@
 .fl-pc {
     .priv-group {
         .g-table-module-wrapper  {
-            overflow: scroll !important;
+            overflow: visible ;
             .mini {
                 position: fixed;
-                bottom: -40px;
+                bottom: 0;
                 width: 160px;
                 background-color: #fff;
             }
