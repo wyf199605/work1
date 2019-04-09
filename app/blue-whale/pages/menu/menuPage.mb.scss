@@ -26,6 +26,7 @@
     }
   }
   .mui-scroll {
-      height: 101% !important;
+      height: calc(100% + 20px) !important;
+      
   }
 }
