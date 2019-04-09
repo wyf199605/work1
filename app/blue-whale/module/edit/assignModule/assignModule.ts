@@ -37,7 +37,7 @@ export default class AssignModule extends AssignModuleBasic{
                     data.push(obj);
                 }
             });
-            this.para.onGetData(data, detail ? detail.otherField : '');
+            this.para.onGetData && this.para.onGetData(data, detail ? detail.otherField : '');
         };
 
         this.initDeleteEvent();

@@ -220,7 +220,7 @@ export class FastTable extends Component {
         if (this.isFullWidth) {
             this.wrapper.classList.add('table-width-full');
         }
-        this.mutiSelect = tools.isNotEmpty(para.pseudo) ? !!para.pseudo.multi : false;
+        this.mutiSelect = tools.isNotEmpty(para.pseudo) ? !!para.pseudo.multi : tools.isMb;
 
         this.noData.toggle(true);
         this.tableData = new FastTableData({
