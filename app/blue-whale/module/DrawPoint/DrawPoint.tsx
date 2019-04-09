@@ -521,7 +521,7 @@ export class DrawPoint extends Component {
 
         });
         if (!tools.isMb) {
-            this.editEvent.on();
+            // this.editEvent.on();
             this.keyDownEvent.on();
             this.keyUpEvent.on();
         }

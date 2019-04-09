@@ -76,7 +76,7 @@ export class PlanModule extends Component{
                     }
 
                 }
-                }></div>
+                }/>
             </div>
             d.append(this.container,div)
         }
