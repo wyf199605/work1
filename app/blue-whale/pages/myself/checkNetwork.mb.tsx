@@ -99,7 +99,7 @@ export class checkNetwork {
     this.myChart.setOption(this.option, true);
     this.req_getIp().then(data => {
       G.Shell.network.startPing(data, (res) => {
-        total = res.data * 100
+        total = Math.ceil(res.data * 100);
         if (total <= 100) {
           this.option.title.text = total + "%";
           this.option.series.data[0].value = total;
@@ -111,7 +111,7 @@ export class checkNetwork {
           this.submitBtn.removeAttribute("disabled");
         }
       }, (res) => {
-        total = res.data * 100
+        total = Math.ceil(res.data * 100);
         if (total <= 100) {
           this.option.title.text = total + "%";
           this.option.series.data[0].value = total;
