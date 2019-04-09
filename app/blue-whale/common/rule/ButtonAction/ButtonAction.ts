@@ -571,7 +571,7 @@ export class ButtonAction {
 
         if (type === 3 || type === 5 || type === 13) {
             para['className'] = tools.isMb ? 'mb-action-type-5' : 'action-type-5';
-            if(type === 13 && tools.isMb){
+            if (type === 13 && tools.isMb) {
                 para['className'] = '';
             }
         } else if (type === 4) {
@@ -837,17 +837,22 @@ export class ButtonAction {
                     setting: res.setting
                 });
                 let dom = d.query(".self_dis").parentNode as HTMLElement;
-                let inputList = Array.prototype.slice.call(dom.querySelectorAll('input'),0);
-                let areaList = Array.prototype.slice.call(dom.querySelectorAll('textarea'),0);
-                let all=inputList.concat(areaList);
-    
-                for(var i=0;i<all.length;i++){
-                    let item=all[i] as any;
-                    if(item.hasAttribute('readonly')){
-                       item.style.cssText ="color:#9e9e9e;cursor:not-allowed";
+                let inputList = Array.prototype.slice.call(dom.querySelectorAll('input'), 0);
+                let areaList = Array.prototype.slice.call(dom.querySelectorAll('textarea'), 0);
+                let all = inputList.concat(areaList);
+
+                let status = false;
+                for (var i = 0; i < all.length; i++) {
+                    let item = all[i] as any;
+                    if (item.hasAttribute('readonly')) {
+                        item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
+                    }
+                    if (!status && !item.hasAttribute('readonly')) {
+                        item.focus();
+                        status = true;
                     }
                 }
-                
+
                 let coms = BwRule.atvar.coms,
                     keys = Object.keys(coms);
                 // 如果长度只有1，直接show
@@ -860,7 +865,7 @@ export class ButtonAction {
 
         function list() {
             modal.body = d.create(`<div style="height: 70vh;"></div>`);
-            if(type === 13 && tools.isMb){
+            if (type === 13 && tools.isMb) {
                 (<HTMLElement>modal.body).style.height = '100%';
             }
             res.cols.forEach(c => {
@@ -892,7 +897,7 @@ export class ButtonAction {
                 //     }
                 // });
                 //编辑并保存之后调用回调
-                if (type === 3||type===13) {
+                if (type === 3 || type === 13) {
                     // d.on(window, e.NewTableModule.EVT_EDIT_SAVE, () => {
                     //     debugger
                     //     onOk();

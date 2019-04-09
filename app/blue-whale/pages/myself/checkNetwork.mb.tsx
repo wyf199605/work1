@@ -16,7 +16,14 @@ export class checkNetwork {
   private modal: Modal;
   constructor(para: pagePara) {
     this.modal = para.modal;
-    this.render(para.modal.wrapper);
+    let net = d.query(".check_netWork")
+    if (net) {
+      net.remove();
+    }
+    // d.query(".modal-header", para.modal.headWrapper).style.cssText = "background-color:#005BAC!important";
+    // d.query(".modal-title", para.modal.headWrapper).style.cssText = 'color:white!important';
+    // d.query(".close", para.modal.headWrapper).style.cssText = 'color:white!important';
+    this.render(para.modal.body);
     this.event();
     this.renderCircle()
   }
@@ -39,10 +46,10 @@ export class checkNetwork {
       }
     })
     //关闭
-    G.d.on(G.d.query("#check_back"), "click", () => {
-      d.query(".check_netWork").remove();
-      this.modal.isShow = false;
-    })
+    // G.d.on(G.d.query("#check_back"), "click", () => {
+
+    //   this.modal.isShow = false;
+    // })
     //点击测试或运行按钮
     G.d.on(this.submitBtn, "click", () => {
       this.submitBtn.setAttribute("disabled", "true");
@@ -145,7 +152,9 @@ export class checkNetwork {
   /**网络测试的仪表盘配置 */
   renderCircle() {
     let parent = G.d.query(".check_pane");
-    parent.innerHTML = "";
+    if(parent){
+      parent.innerHTML = "";
+    }
     let dom = <div id="speedometer"></div>
     G.d.append(parent, dom)
     this.myChart = null;
@@ -203,7 +212,9 @@ export class checkNetwork {
   /** 渲染环形ping进度条 */
   renderFullCircle() {
     let parent = G.d.query(".check_pane");
-    parent.innerHTML = "";
+    if (parent) {
+      parent.innerHTML = "";
+    }
     let dom = <div id="speedometer"></div>
     G.d.append(parent, dom)
     this.myChart = null;
@@ -265,15 +276,16 @@ export class checkNetwork {
     G.d.query(".check_btn").innerText = "运行"
   }
   /**页面渲染 */
-  render(wrapper: HTMLElement) {
-    let wraper = <div className="check_netWork">
+  render(wrapper: HTMLElement | Node) {
+    //   <div className="check_Header">
+    //   <span id="check_back">
+    //     <i class="iconfont icon-arrow-left"></i>
+    //   </span>
+    //   <span>网络监控</span>
+    // </div>
+    let dom = <div className="check_netWork">
       <div className="check_wrap">
-        <div className="check_Header">
-          <span id="check_back">
-            <i class="iconfont icon-arrow-left"></i>
-          </span>
-          <span>网络监控</span>
-        </div>
+
         <div className="check_Tab" id="js_tab">
           <p className="active">  网络测速 </p>
           <p>网络检查 </p>
@@ -284,7 +296,7 @@ export class checkNetwork {
         this.submitBtn = <button className="check_btn">开始测试</button>
       }
     </div>
-    wrapper.append(wraper);
+    wrapper.appendChild(dom);
   }
 }
 
