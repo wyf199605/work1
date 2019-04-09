@@ -438,15 +438,9 @@ export class EditModule {
      * @return {FormCom}
      */
     private initFactory(type: string, initP?: ComInitP): FormCom {
-        // if(!initP){
-        //   return
-        // }
-        // debugger;
         this.para.type === 'table' && (type = EditModule.tableComTypeGet(type));
-
-        let field = initP ? initP.field : null,
-            atrrs = field.atrrs || null;
-
+        let field = initP ? initP.field : null;
+        let atrrs = field ? field.atrrs : null;
         if (field) {
             if (field.multiPick && field.name === 'ELEMENTNAMELIST' || field.elementType === 'pick') {
                 type = 'pickInput';
@@ -770,7 +764,7 @@ export class EditModule {
             }
 
             ['maxLength', 'maxValue', 'minLength', 'minValue', 'requieredFlag', 'regExp', 'validChars'].forEach(ruleName => {
-                if(field.atrrs){
+                if (field.atrrs) {
                     let ruleVal = field.atrrs[ruleName];
                     if (!tools.isEmpty(ruleVal)) {
                         rules.push({

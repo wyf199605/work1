@@ -3,15 +3,16 @@ import sys = BW.sys;
 import d = G.d;
 import tools = G.tools;
 import Gesture = require("../module/gesture/gesture");
-import {ButtonAction} from "../common/rule/ButtonAction/ButtonAction";
-import {Modal} from "../../global/components/feedback/modal/Modal";
-import {Graffiti} from "../module/share/Share";
+import { ButtonAction } from "../common/rule/ButtonAction/ButtonAction";
+import { Modal } from "../../global/components/feedback/modal/Modal";
+import { Graffiti } from "../module/share/Share";
 
 export default class BasicPage {
     protected dom: HTMLElement;
     protected isMb: boolean;
     protected url: string;
     protected param: obj = {};
+    protected websocket: any;
 
     constructor(para?: BasicPagePara) {
         // this.isMb = sys.os !== 'pc';
@@ -115,8 +116,8 @@ export default class BasicPage {
         if (!G.tools.isMb) {
             return;
         }
-        require(['webscoket'], function (webscoket) {
-            new webscoket({
+        require(['webscoket'], (webscoket) => {
+            this.websocket = new webscoket({
                 mgrPath: BW.CONF.siteUrl,
                 wsUrl: BW.CONF.webscoketUrl
             });
@@ -162,7 +163,7 @@ export default class BasicPage {
                             hasGesture = true;
                         } else if (gesture[ges] === 'cycle' || gesture[ges] === 'cross') {
                             hasGesture = true;
-                            tools.event.fire(BasicPage.FlowReortRouch, gesture[ges],this.dom);
+                            tools.event.fire(BasicPage.FlowReortRouch, gesture[ges], this.dom);
                         } else {
                             let subButtomsPara = para.subButtons || {};
                             for (let i = 0, l = subButtomsPara.length; i < l; i++) {

@@ -10,8 +10,8 @@ import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { ShellAction } from "../../../global/action/ShellAction";
 import BasicPage from "../../pages/basicPage";
 import { Collect } from "../../module/collect/collect.mb";
-import {User} from "../../../global/entity/User";
-export = class homePage extends BasicPage{
+import { User } from "../../../global/entity/User";
+export = class homePage extends BasicPage {
 
     protected slideTab: SlideTab;
     protected homeList: HTMLElement;
@@ -25,7 +25,7 @@ export = class homePage extends BasicPage{
             let li = homePage.createHomeList(item);
             d.append(this.homeList, li);
             item.subScriptUrl && BwRule.Ajax.fetch(CONF.siteUrl + item.subScriptUrl)
-                .then(({response}) => {
+                .then(({ response }) => {
                     let num = tools.keysVal(response, 'data', '0', 'N');
                     if (num) {
                         num = parseInt(num);
@@ -89,7 +89,7 @@ export = class homePage extends BasicPage{
             let editBook = div.querySelector('.editBook');
             editBook.addEventListener('click', function (event) {
                 let pValue = p.innerHTML;
-                new Collect().editCollectGroup(pValue,this);
+                new Collect().editCollectGroup(pValue, this);
                 // let test = true;
                 // if (test) {
                 //     new Collect().editCollectGroup(pValue,this);
@@ -114,6 +114,7 @@ export = class homePage extends BasicPage{
         // this.initScan();
         let content = <div className="slide-panel-wrapper" />;
         d.append(para.container, content);
+
         let isAndroid4 = false;
         if (/(Android)/i.test(navigator.userAgent)) {
             let andrVersionArr = navigator.userAgent.match(/Android\s*(\d+)/);
@@ -252,6 +253,24 @@ export = class homePage extends BasicPage{
         let platformName = User.get().platformName;
         d.query('#title', window.document.body).innerText = platformName || '速狮后台';
 
+
+        let scanBtn = d.query("#scan_btn");
+        let flag = false;
+        d.on(scanBtn, "click", () => {
+            if (flag) {
+                return false;
+            }
+            flag = true;
+            setTimeout(() => {
+                flag = false;
+            }, 1500);
+            ShellAction.get().device().scan({
+                callback: (event) => {
+                    let detail = JSON.parse(event.detail);
+                    this.websocket.handleUrl(detail.data);
+                }
+            });
+        })
     }
     // initScan() {
     //     let scanBtn = d.query("#scan_btn");
@@ -350,7 +369,7 @@ export = class homePage extends BasicPage{
         return <li data-href={BW.CONF.siteUrl + menu.menuPath.dataAddr} data-gps={menu.menuPath.needGps} class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3">
             <a>
                 <span className={'mui-icon' + ' ' + menu.menuIcon}>
-                    <span className="mui-badge mui-badge-danger hide"/>
+                    <span className="mui-badge mui-badge-danger hide" />
                 </span>
                 <div class="mui-media-body">{menu.menuName}</div>
             </a>
