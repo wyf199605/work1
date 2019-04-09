@@ -87,6 +87,7 @@ export class NewStatisticBase {
             sort: true,
             pseudo: {
                 type: "number",
+                multi: tools.isMb
             },
             isResizeCol: true,
             clickSelect: true,
@@ -94,21 +95,20 @@ export class NewStatisticBase {
             cellFormat: (cellData, cell: FastTableCell) => {
                 let col = cell.column,
                     content = col.content;
-                return new Promise((resolve) => {
-                    let text = cellData,
-                        classes = [];
-                    if(content && content.content){
-                        let field = content.content as R_Field;
-                        text = BwRule.formatTableText(cellData, field);
-                        let dataType = field.dataAddr || (field.atrrs && field.atrrs.dataType);
-                        if (BwRule.isNumber(dataType)) {
-                            classes.push('text-right');
-                        }
-                        resolve({text, classes});
-                    }else{
-                        resolve({text, classes});
+
+                let text = cellData,
+                    classes = [];
+                if(content && content.content){
+                    let field = content.content as R_Field;
+                    text = BwRule.formatTableText(cellData, field);
+                    let dataType = field.dataAddr || (field.atrrs && field.atrrs.dataType);
+                    if (BwRule.isNumber(dataType)) {
+                        classes.push('text-right');
                     }
-                })
+                    return ({text, classes});
+                }else{
+                    return ({text, classes});
+                }
             }
         };
         !tools.isMb && (para['btn'] = {

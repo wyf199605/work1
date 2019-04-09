@@ -9,6 +9,7 @@ import UploadModule from "../uploadModule/uploadModule";
 import CONF = BW.CONF;
 import {BwRule} from "../../common/rule/BwRule";
 import sys = BW.sys;
+import {BwUploader} from "../uploadModule/bwUploader";
 
 type addType = 'img' | 'video';
 
@@ -126,12 +127,12 @@ export class BugReport extends Component {
                         videoName = '';
                     this.formEle['upload'] = addImg;
                     elWrap.appendChild(addImg);
-                    let uploader = new UploadModule({
+                    let uploader = new BwUploader({
                         uploadUrl: CONF.ajaxUrl.fileUpload,
                         nameField: 'FILE_ID',
                         // 上传成功
-                        onComplete: (res, file) => {
-                            let fileId = res.data.blobField.value;
+                        onSuccess: (res, file: CustomFile) => {
+                            let fileId = file.name;
                             if (type === 'img') {
                                 let name = file.name;
                                 let pics = this.bugReportItem.picture;
@@ -146,40 +147,41 @@ export class BugReport extends Component {
                                 this.bugReportItem.video[0]['fileId'] = fileId;
                             }
                         },
-                        onError: (file) => {
-                            if (type === 'img') {
-                                let name = file.name;
-                                let pics = this.bugReportItem.picture;
-                                for (let i = 0, len = pics.length; i < len; i++) {
-                                    let pic = pics[i];
-                                    if (pic.fileName === name && tools.isEmpty(pic.fileId)) {
-                                        let imgWrapper = d.query(`.upload-img[data-index="${i}"]`, this.wrapper);
-                                        this.addErrorMark(imgWrapper);
-                                        pics.splice(i, 1);
-                                        break;
-                                    }
-                                }
-                            } else {
-                                this.bugReportItem.video = [];
-                                let img = d.query('.upload-img[data-type=video]', this.wrapper);
-                                this.addErrorMark(img, false);
-                                videoName = '';
-                            }
-                        },
                         container: d.query('.upload', addImg),
                         text: '+'
+                    });
+                    uploader.on(BwUploader.EVT_UPLOAD_ERROR, (file: CustomFile) => {
+                        if (type === 'img') {
+                            let name = file.name;
+                            let pics = this.bugReportItem.picture;
+                            for (let i = 0, len = pics.length; i < len; i++) {
+                                let pic = pics[i];
+                                if (pic.fileName === name && tools.isEmpty(pic.fileId)) {
+                                    let imgWrapper = d.query(`.upload-img[data-index="${i}"]`, this.wrapper);
+                                    this.addErrorMark(imgWrapper);
+                                    pics.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        } else {
+                            this.bugReportItem.video = [];
+                            let img = d.query('.upload-img[data-type=video]', this.wrapper);
+                            this.addErrorMark(img, false);
+                            videoName = '';
+                        }
                     });
                     // 上传失败
                     // uploader.com.on('uploadError', (file) => {
                     //
                     // });
                     // 所有文件上传完成时调用
-                    uploader.com.on('uploadFinished', () => {
+                    uploader.on(BwUploader.EVT_UPLOAD_SUCCESS, () => {
                         this.isUpload = true;
                     });
                     // 文件加入上传队列
-                    uploader.com.on('fileQueued', (file) => {
-                        if (file.type.split('/')[0] === 'image') {
+                    uploader.on(BwUploader.EVT_FILE_JOIN_QUEUE, (files: CustomFile[]) => {
+                        let file = files[0];
+                        if (file && file.type.split('/')[0] === 'image') {
                             if (this.bugReportItem.picture.length <= 4) {
                                 let pics = this.bugReportItem.picture;
                                 let name = file.name;
@@ -196,11 +198,11 @@ export class BugReport extends Component {
                                     fileName: name
                                 };
                                 this.bugReportItem.picture.push(obj);
-                                let url = window.URL.createObjectURL(file.source.source);
+                                let url = window.URL.createObjectURL(file.blob);
                                 d.before(addImg, this.addImg(url, 'img'));
                                 d.query('.form-img', this.wrapper).scrollLeft = d.query('.form-img', this.wrapper).scrollLeft + 100;
                                 type = 'img';
-                                uploader.com.upload();
+                                uploader.upload();
                             } else {
                                 Modal.alert('最多可添加5张图片和1个视频');
                                 return false;
@@ -221,10 +223,10 @@ export class BugReport extends Component {
                             };
                             this.bugReportItem.video.push(obj);
                             videoName = file.name;
-                            let url = window.URL.createObjectURL(file.source.source);
+                            let url = window.URL.createObjectURL(file.blob);
                             d.before(addImg, this.addImg(url, 'video'));
                             type = 'video';
-                            uploader.com.upload();
+                            uploader.upload();
                         }
                     });
                     break;
@@ -405,7 +407,7 @@ export class BugReport extends Component {
             this._bugReportItem = {
                 info: {
                     title: '',
-                    uuid: deviceInfo.uuid,
+                    uuid: deviceInfo && deviceInfo.uuid,
                     message: '',
                     url: '',
                     param: '',
