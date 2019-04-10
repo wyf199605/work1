@@ -604,9 +604,14 @@ namespace G {
             startPing(data: obj, back?: IShellEventHandler, info?: IShellEventHandler) {
                 return ShellBase.handler('startPing', { data }, back, info);
             }
+        };
+        const other={
+            sendMsgCount(data:obj){
+                return ShellBase.handler('receiveMessage', {MsgCount:1});
+            }
         }
         return {
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem, clearCache, network
+            other,base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem, clearCache, network
         }
     })(window, document);
 

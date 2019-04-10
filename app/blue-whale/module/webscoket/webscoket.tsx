@@ -55,6 +55,9 @@ export = class webscoket {
         self.ws.onopen = () => {
             heartCheck.reset().start();
             console.info("websocket 连接打开.");
+            if (tools.isMb) {
+                G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
+            }
         };
         self.ws.onmessage = (r) => {
             heartCheck.reset().start();
@@ -138,6 +141,7 @@ export = class webscoket {
                         unreadMsgNum.classList.remove('hide');
                         unreadMsgNum.innerText = num + '';
                     }
+                    G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
                 }
                 let os = BW.sys.os;
                 if (os === 'ip' || os === 'ad') {
