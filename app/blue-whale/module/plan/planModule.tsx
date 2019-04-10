@@ -219,7 +219,7 @@ export class PlanModule extends Component{
                                 let link = col.link;
                                 if(tools.isNotEmpty(link)) {
                                     BwRule.link({
-                                        link: link.dataAddr,
+                                        link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, data)),
                                         varList: link.varList,
                                         dataType: col.atrrs.dataType,
                                         data,
