@@ -130,6 +130,7 @@ export class BugReport extends Component {
                     let uploader = new BwUploader({
                         uploadUrl: CONF.ajaxUrl.fileUpload,
                         nameField: 'BUG_PICTURE',
+                        autoUpload: false,
                         // 上传成功
                         onSuccess: (res, file: CustomFile) => {
                             let fileId = res.data.unique;
