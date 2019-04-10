@@ -1,17 +1,27 @@
-.inputs-atv{
-  .atvarDom{
+.inputs-atv {
+  .atvarDom {
     padding-left: 7px;
-    [data-type="input"]{
+    [data-type="input"] {
       display: inline-block;
       width: 120px;
     }
   }
 }
-.max-index{
+
+.undisalbe {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 999;
+}
+
+.max-index {
   z-index: 99999;
 }
 
-.keystep{
+.keystep {
   position: fixed;
   bottom: 65px;
   //right: 20px;
@@ -26,14 +36,14 @@
   background: #108ee9!important;
   color: white!important;
   z-index: 501;
-  transition: color,background 0.3s ease 0s !important;
-  &:hover{
+  transition: color, background 0.3s ease 0s !important;
+  &:hover {
     color: white;
   }
-  .iconfont{
+  .iconfont {
     font-size: 25px!important;
   }
-  span{
+  span {
     margin-right: 0;
     font-size: 19px;
     margin-left: 8%;

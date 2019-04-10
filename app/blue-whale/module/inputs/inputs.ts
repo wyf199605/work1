@@ -146,8 +146,8 @@ export class Inputs {
                 this.ajax(CONF.siteUrl + this.url, open);
                 break;
             case 5:
-               BW.sys.window.open({ url: CONF.siteUrl + this.url });
-               this.url='';
+                BW.sys.window.open({ url: CONF.siteUrl + this.url });
+                this.url = '';
                 break;
             default:
                 this.isProcess = false;
@@ -254,10 +254,29 @@ export class Inputs {
             atv = new q.AtVarBuilder({
                 queryConfigs: atvarparams,
                 resultDom: modal.body,
-                tpl: () => d.create(`<div class="atvarDom atvar-auto"><div style="display: inline-block;" data-type="title"></div>
+                tpl: () => d.create(`<div class="self_dis2 atvarDom atvar-auto"><div style="display: inline-block;" data-type="title"></div>
                 <div data-type="input"></div></div>`),
                 setting: null
             });
+            let dom = d.query(".self_dis2").parentNode as HTMLElement;
+            let inputList = Array.prototype.slice.call(dom.querySelectorAll('input'), 0);
+            let areaList = Array.prototype.slice.call(dom.querySelectorAll('textarea'), 0);
+            let all = inputList.concat(areaList);
+            let status = false;
+            for (var i = 0; i < all.length; i++) {
+                let item = all[i] as any;
+                if (item.hasAttribute('readonly')) {
+                    item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
+                    item.parentNode.style.position="relative";
+                    let htl = d.create('<div class="undisalbe"></div>')
+                    item.parentNode.appendChild(htl)
+                }
+                if (!status && !item.hasAttribute('readonly')) {
+                    item.focus();
+                    status = true;
+                }
+            }
+
             let coms = atv.coms,
                 keys = Object.keys(coms);
             if (keys && keys.length === 1 && coms[keys[0]] instanceof SelectInputMb) {

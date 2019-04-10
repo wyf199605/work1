@@ -191,22 +191,19 @@ export abstract class DetailBase extends Component {
             this.next.disabled = true;
             this.next.wrapper.style.display='none';
             return;
+        }else{
+            this.prev.wrapper.style.display='inline-block';
+            this.next.wrapper.style.display='inline-block';
         }
         if (this.currentPage === 1) {
             this.prev.disabled = true;
-            this.prev.wrapper.style.display='none';
             this.next.disabled = false;
-            this.next.wrapper.style.display='inline-block';
         } else if (this.currentPage === this.totalNumber) {
             this.next.disabled = true;
-            this.next.wrapper.style.display='none';
             this.prev.disabled = false;
-            this.prev.wrapper.style.display='inline-block';
         } else {
             this.prev.disabled = false;
-            this.prev.wrapper.style.display='inline-block';
             this.next.disabled = false;
-            this.next.wrapper.style.visibility='inline-block';
         }
     };
 

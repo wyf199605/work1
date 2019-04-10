@@ -832,7 +832,7 @@ export class ButtonAction {
                 BwRule.atvar = new q.AtVarBuilder({
                     queryConfigs: res.atvarparams,
                     resultDom: avatarLoad,
-                    tpl: () => d.create(`<div  class="self_dis atvarDom atvar-auto ${disabled}"><div style="display: inline-block;" data-type="title"></div>
+                    tpl: () => d.create(`<div class="self_dis atvarDom atvar-auto ${disabled}"><div style="display: inline-block;" data-type="title"></div>
                     <div data-type="input"></div></div>`),
                     setting: res.setting
                 });
@@ -840,12 +840,15 @@ export class ButtonAction {
                 let inputList = Array.prototype.slice.call(dom.querySelectorAll('input'), 0);
                 let areaList = Array.prototype.slice.call(dom.querySelectorAll('textarea'), 0);
                 let all = inputList.concat(areaList);
-
                 let status = false;
+
                 for (var i = 0; i < all.length; i++) {
                     let item = all[i] as any;
                     if (item.hasAttribute('readonly')) {
                         item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
+                        item.parentNode.style.position="relative";
+                        let htl = d.create('<div class="undisalbe"></div>')
+                        item.parentNode.appendChild(htl)
                     }
                     if (!status && !item.hasAttribute('readonly')) {
                         item.focus();

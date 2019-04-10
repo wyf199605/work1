@@ -9,6 +9,15 @@
   }
 }
 
+.undisalbe {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 999;
+}
+
 //上传下载
 .avatar-load {
   &>.select-box {
