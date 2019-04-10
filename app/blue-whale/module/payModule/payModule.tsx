@@ -14,14 +14,17 @@ export interface IPayModulePara{
     fee?: string; // 金额
     orderQueryUrl?: string; // 请求订单是否成功的地址;
     timeout?: number; // 二维码超时时长
+    onSuccess?: Function;
 }
 
 export class PayModule{
     protected fee: string;
     protected modal: Modal;
     protected wrapper: HTMLElement;
+    protected onSuccess?: Function;
     constructor(protected para: IPayModulePara){
         this.fee = '￥' + Rule.parseNumber(parseFloat(para.fee), '###,###.##');
+        this.onSuccess = para.onSuccess;
 
         this.modal = new Modal({
             header: '收款',
@@ -89,8 +92,8 @@ export class PayModule{
                 <div className="msg">收款成功</div>
                 <p className="pay-code-msg pay-code-fee">{this.fee}</p>
             </div>
-        </div>)
-
+        </div>);
+        this.onSuccess && this.onSuccess();
     }
 
     protected setError(msg: string = '收款失败'){
