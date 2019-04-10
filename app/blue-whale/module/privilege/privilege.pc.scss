@@ -363,9 +363,9 @@
     }
   }
   .priv-group {
-    height: 70vh;
+    height: 65vh;
     position: relative;
-    top: -9vh;   
+    top: -14vh;   
     width: 160px;
     display: inline-block;
     .priv-group-content {
@@ -764,7 +764,7 @@
 .fl-pc {
     .priv-group {
         .g-table-module-wrapper  {
-            overflow: visible ;
+            overflow: scroll ;
             .mini {
                 position: fixed;
                 bottom: 0;
@@ -773,6 +773,7 @@
             }
         }
     }
+    
 }
 // .fl-pc {
 //     .g-table-module-wrapper  {
