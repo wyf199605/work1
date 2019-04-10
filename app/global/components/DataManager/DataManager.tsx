@@ -110,7 +110,8 @@ export class DataManager {
                     .then(({data, total}) => {
                         if(once){
                             this.allData = data;
-                            data = this.allData.slice(0, this.pageSize > 0 ? this.pageSize : data.length);
+                            if(tools.isMb)
+                                data = this.allData.slice(0, this.pageSize > 0 ? this.pageSize : data.length);
                         }
                         if (isSetData) {
                             this.data = data;

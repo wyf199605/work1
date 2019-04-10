@@ -609,9 +609,14 @@ export class FastBtnTable extends FastTable{
      */
     protected export(action : string){
         require(['tableExport'], (tableExport) => {
-            let leftRows = this.leftTable.head.rows || [],
-                mainRows = this.mainTable.head.rows || [],
-                rowCells = Array.from({length: Math.max(leftRows.length, mainRows.length)}, (v, index) => {
+            let leftRows = this.leftTable.head.rows|| [],
+                mainRows = this.mainTable.head.rows|| [],
+                rows = this.selectedRows;
+            if(tools.isEmpty(rows)){
+                rows = this.rows;
+            }
+
+            let rowCells = Array.from({length: Math.max(leftRows.length, mainRows.length)}, (v, index) => {
                     let leftRow = leftRows[index],
                         mainRow = mainRows[index];
                     return [...(leftRow ? leftRow.cells : []), ...(mainRow ? mainRow.cells : [])]
@@ -631,7 +636,7 @@ export class FastBtnTable extends FastTable{
                 })}
                 </thead>
                 <tbody>
-                {this.rows.map((row) => {
+                {rows.map((row) => {
                     return <tr>
                         {row && row.cells.map((cell) => {
                             if(cell.isVirtual || !cell.show){
