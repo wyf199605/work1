@@ -60,19 +60,14 @@ export class PrivilegeConfigure extends BasicPage {
 
 
         d.on(defaultLi, 'click', () => {
-            $('.pagingWrapper.mini').removeClass('hide');
+            
             personalLi.classList.remove('li-select');
             defaultLi.classList.add('li-select');
             personalContentDom.style.display = 'none';
             defaultContentDom.style.display = 'block';
         });
         d.on(personalLi, 'click', () => {
-            console.log('---======');
-            const timer = setTimeout(() => {
-                $('.pagingWrapper.mini').addClass('hide');
-                console.log($('.pagingWrapper.mini'))
-                clearTimeout(timer);
-            }, 100);
+            
             if (!this.privilegePersonal) {
                 this.privilegePersonal = tools.isNotEmpty(this.ajaxUrl) ? new PrivilegePersonal(personalContentDom, this.url,this.controllUrl) : new PrivilegePersonal(personalContentDom);
             }
