@@ -743,28 +743,28 @@
 }
 
 // 修改表格不能滚动问题
-.priviledePage {
-    //  .priv-group {
-    //     height: 70vh !important;
-    //     position: relative;
-    //     top: -9vh;
-    // }
-    .priv-group-content  {
-        .table-module-wrapper {
-            // overflow-y: visible !important;
-        }
+// .priviledePage {
+//     //  .priv-group {
+//     //     height: 70vh !important;
+//     //     position: relative;
+//     //     top: -9vh;
+//     // }
+//     .priv-group-content  {
+//         .table-module-wrapper {
+//             // overflow-y: visible !important;
+//         }
         
-    }
-    // .table-out-bottom {
-    //     position: fixed;
-    //     width: 160px;
-    //     bottom: 20px;
-    // }
-}
+//     }
+//     // .table-out-bottom {
+//     //     position: fixed;
+//     //     width: 160px;
+//     //     bottom: 20px;
+//     // }
+// }
 .fl-pc {
     .priv-group {
         .g-table-module-wrapper  {
-            overflow: scroll ;
+            overflow: visible ;
             .mini {
                 position: fixed;
                 bottom: 0;

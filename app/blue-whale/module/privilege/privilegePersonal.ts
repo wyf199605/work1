@@ -58,7 +58,7 @@ export class PrivilegePersonal extends PrivilegeDP {
             privGroupEl = d.create('<div class="priv-group"></div>'),
             confWrapper = d.create(`<div class="priv-wrapper"></div>`),
             div = d.create(`<div class="control-area"></div>`),
-            tip = d.create(`<div class="priv-tip">请先选中一个节点</div>`);
+            tip = d.create(`<div class="priv-tip hide">请先选中一个节点</div>`);
         this.dom.appendChild(infoPlatEl);
         this.dom.appendChild(div);
         div.appendChild(tip);
@@ -81,6 +81,8 @@ export class PrivilegePersonal extends PrivilegeDP {
         this.generateFunctionSearch();
         //构建属性、层级切换菜单模块
         this.generatePLSwitchMenu();
+
+
 
         
     }
@@ -533,6 +535,7 @@ export class PrivilegePersonal extends PrivilegeDP {
                 if (treeSelect && treeSelect[0]) {
                     if (r.body.bodyList[0]) {
                         control(tipDom);
+                        $('.pagingWrapper.mini').removeClass('hide');
                     } else {
                         $('.pagingWrapper.mini').addClass('hide');
                         tipDom.classList.remove('hide');
