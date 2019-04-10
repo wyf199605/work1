@@ -2095,7 +2095,7 @@ export class FastTable extends Component {
     }
 
     hoverMoreEvent = (() => {
-        let selected = '.section-inner-wrapper:not(.pseudo-table) td',
+        let selected = '.section-inner-wrapper:not(.pseudo-table) tbody td',
             overHandler = null,
             outHandler = null,
             moreWrapper,

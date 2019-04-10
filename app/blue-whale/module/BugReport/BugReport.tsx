@@ -129,10 +129,10 @@ export class BugReport extends Component {
                     elWrap.appendChild(addImg);
                     let uploader = new BwUploader({
                         uploadUrl: CONF.ajaxUrl.fileUpload,
-                        nameField: 'FILE_ID',
+                        nameField: 'BUG_PICTURE',
                         // 上传成功
                         onSuccess: (res, file: CustomFile) => {
-                            let fileId = file.name;
+                            let fileId = res.data.unique;
                             if (type === 'img') {
                                 let name = file.name;
                                 let pics = this.bugReportItem.picture;
