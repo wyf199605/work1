@@ -55,7 +55,6 @@ export = class webscoket {
         self.ws.onopen = () => {
             heartCheck.reset().start();
             console.info("websocket 连接打开.");
-           // this.scanHandle();
         };
         self.ws.onmessage = (r) => {
             heartCheck.reset().start();
@@ -210,26 +209,6 @@ export = class webscoket {
                 console.info("后台返回未知的消息(" + type + ")类型.");
                 break;
         }
-    }
-    private scanHandle = () => {
-        let scanBtn = d.query("#scan_btn");
-        let flag = false;
-        d.off(scanBtn,'click')
-        d.on(scanBtn, "click", () => {
-            if (flag) {
-                return false;
-            }
-            flag = true;
-            setTimeout(() => {
-                flag = false;
-            }, 1500);
-            ShellAction.get().device().scan({
-                callback: (event) => {
-                    let detail = JSON.parse(event.detail);
-                    this.handleUrl(detail.data);
-                }
-            });
-        })
     }
     // 节流
     protected throttle(delay, action) {

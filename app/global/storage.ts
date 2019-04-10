@@ -1,21 +1,21 @@
-namespace G{
+namespace G {
     let _storage = window.localStorage;
     let user = JSON.parse(_storage.getItem("userInfo"));
-    if(tools.isEmpty(user))
+    if (tools.isEmpty(user))
         user = {};
-    if(typeof user === 'string')
+    if (typeof user === 'string')
         user = JSON.parse(<string>user);
 
     let LOCAL_MSG_ID = 'local_msg_' + user.userid;
     export let localMsg = (function () {
-        let _notify = function(){
+        let _notify = function () {
             let unreadMsgNum = tools.isMb ? d.query('#unreadMsgNum', window.parent.document.body) : d.query('#unreadMsgNum'),
                 num = _getUnreadCount();
-            if(unreadMsgNum){
-                if(num > 0){
+            if (unreadMsgNum) {
+                if (num > 0) {
                     unreadMsgNum.classList.remove('hide');
                     unreadMsgNum.innerText = G.tools.isPc ? num + '' : '!';
-                }else {
+                } else {
                     unreadMsgNum.classList.add('hide');
                 }
             }
@@ -23,7 +23,14 @@ namespace G{
 
         let _get = function () {
             let s = _storage.getItem(LOCAL_MSG_ID);
-            return s ? JSON.parse(s) : [];
+            let arr = s ? JSON.parse(s) : [];
+            let obj = {};
+            let newArr = [];
+            newArr = arr.reduce(function (item, next) {
+                obj[next.notifyId] ? '' : obj[next.notifyId] = true && item.push(next);
+                return item;
+            }, []);
+            return newArr
         };
         let _save = function (array) {
             if (!Array.isArray(array)) {
@@ -75,7 +82,7 @@ namespace G{
             get: _get,
             add: _add,
             read: _read,
-            notify : _notify,
+            notify: _notify,
             getUnreadCount: _getUnreadCount
         }
     }());
