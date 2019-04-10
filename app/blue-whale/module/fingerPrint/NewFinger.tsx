@@ -121,11 +121,11 @@ export class NewFinger {
                         this.fingerFinish(data).then((print) => {
                             if(data.verify === '1'){
                                 let printData = Object.assign({}, data, {print});
-                                this.autoCache && this.addFinger(printData).catch((e) => {
+                                this.autoCache ? this.addFinger(printData).catch((e) => {
                                     console.log(e);
                                 }).finally(() => {
                                     this.initFingerOpen();
-                                });
+                                }) : this.initFingerOpen();
                             }else{
                                 this.initFingerOpen();
                             }

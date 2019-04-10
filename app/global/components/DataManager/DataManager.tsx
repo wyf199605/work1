@@ -110,7 +110,7 @@ export class DataManager {
                     .then(({data, total}) => {
                         if(once){
                             this.allData = data;
-                            data = this.allData.slice(0, this.pageSize);
+                            data = this.allData.slice(0, this.pageSize > 0 ? this.pageSize : data.length);
                         }
                         if (isSetData) {
                             this.data = data;
@@ -120,7 +120,8 @@ export class DataManager {
                         this._total = total;
                         resolve(total);
                     })
-                    .catch(() => {
+                    .catch((e) => {
+                        console.log(e);
                         reject();
                     })
                     .finally(() => {

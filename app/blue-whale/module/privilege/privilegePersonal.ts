@@ -81,6 +81,8 @@ export class PrivilegePersonal extends PrivilegeDP {
         this.generateFunctionSearch();
         //构建属性、层级切换菜单模块
         this.generatePLSwitchMenu();
+
+        
     }
 
     /**
@@ -532,6 +534,7 @@ export class PrivilegePersonal extends PrivilegeDP {
                     if (r.body.bodyList[0]) {
                         control(tipDom);
                     } else {
+                        $('.pagingWrapper.mini').addClass('hide');
                         tipDom.classList.remove('hide');
                         tipDom.innerHTML = '该节点不可受控！';
                         new Button({
@@ -558,9 +561,11 @@ export class PrivilegePersonal extends PrivilegeDP {
         if(!treeSelect){
             tipDom.innerHTML = '请先选中一个节点';
             tipDom.classList.remove('hide');
+            $('.pagingWrapper.mini').addClass('hide');
         }
 
         function control(tipDom) {
+            $('.pagingWrapper.mini').removeClass('hide');
             tipDom.classList.add('hide');
             self.initMultiPage();
             if (self.switchType === 'FIELD') {
