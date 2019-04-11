@@ -582,7 +582,7 @@ namespace G {
             return ShellBase.handler('clear', {}, back)
         };
         //表格上方的发送位置-停止发送
-        const location = { 
+        const location = {
             //开始定位
             startRecord(back?: IShellEventHandler) {
                 console.log(back);
@@ -593,7 +593,7 @@ namespace G {
                 return ShellBase.handler('stopRecord', {}, back);
             },
             // 绘制地图
-            drawMap(data,back?: IShellEventHandler) {
+            drawMap(data, back?: IShellEventHandler) {
                 return ShellBase.handler('drawMap', data, back);
             },
             //提交
@@ -606,13 +606,13 @@ namespace G {
                 return ShellBase.handler('startPing', { data }, back, info);
             }
         };
-        const other={
-            sendMsgCount(data:obj){
-                return ShellBase.handler('receiveMessage', {MsgCount:1});
+        const other = {
+            sendMsgCount(data: obj) {
+                return ShellBase.handler('receiveMessage', data);
             }
         }
         return {
-            other,base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem, clearCache, network
+            other, base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem, clearCache, network
         }
     })(window, document);
 
