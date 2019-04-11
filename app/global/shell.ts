@@ -582,9 +582,10 @@ namespace G {
             return ShellBase.handler('clear', {}, back)
         };
         //表格上方的发送位置-停止发送
-        const location = {
+        const location = { 
             //开始定位
             startRecord(back?: IShellEventHandler) {
+                console.log(back);
                 return ShellBase.handler('startRecord', { "timestep": "5000" }, back);
             },
             //结束定位
@@ -592,8 +593,8 @@ namespace G {
                 return ShellBase.handler('stopRecord', {}, back);
             },
             // 绘制地图
-            drawMap(back?: IShellEventHandler) {
-                return ShellBase.handler('drawMap', {}, back);
+            drawMap(data,back?: IShellEventHandler) {
+                return ShellBase.handler('drawMap', data, back);
             },
             //提交
             localSubmit(data: obj, back?: IShellEventHandler) {
