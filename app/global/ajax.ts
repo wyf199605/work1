@@ -87,6 +87,9 @@ namespace G{
             // url是否加入禁用缓存参数
             let uncacheUrl = s.cache === false ? {'_': new Date().getTime()} : null;
 
+            xhr.onreadystatechange = () => {};
+            xhr.abort();
+
             // 打开xhr
             xhr.open(s.type, tools.url.addObj(s.url, uncacheUrl));
 
@@ -148,9 +151,11 @@ namespace G{
                 }
 
             };
-            // xhr.onabort = function() {
-            //     error(Ajax.errRes(xhr, 'abort', ''));
-            // };
+            xhr.onabort = function() {
+                console.log('abort');
+                clearTimeout(abortTimeoutId);
+                // error(Ajax.errRes(xhr, 'abort', ''));
+            };
 
             // xhr.onerror = function() {
             //     error(Ajax.errRes(xhr, 'error', ''));
