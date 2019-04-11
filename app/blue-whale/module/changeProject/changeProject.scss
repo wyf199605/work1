@@ -70,11 +70,26 @@
 
     .head-wrapper {
         .modal-header {
-            height: 45px;
+            height: 60px;
+            padding-top: 20px;
+            // height: 60px;
+            // padding-top: 15px;
 
             .close {
-                margin-top: 0;
-                line-height: 45px;
+                // margin-top: 0;
+                // line-height: 45px;
+                display: none;
+                top: 25px;
+                border: 1px solid;
+                border-radius: 100%;
+                padding: 0;
+                border: 1px solid;
+                height: 25px;
+                line-height: 25px;
+                padding-left: 3px;
+                padding-right: 3px;
+                font-size: 25px;
+                left: 15px;
             }
 
             .modal-title {
