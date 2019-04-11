@@ -17,6 +17,7 @@ import Shell = G.Shell;
 import { Spinner } from "../../../../global/components/ui/spinner/spinner";
 import { TextInput } from "../../../../global/components/form/text/text";
 import {BwTableElement} from "../../../pages/table/newTablePage";
+import sys = BW.sys;
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -286,18 +287,25 @@ export class ButtonAction {
                     Modal.alert('目前不支持PC端功能');
                 }
                 break;
+            case 'download':
             case 'newwin':
-            default:
+            default:{
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
                 if (varType === 3 && res) {
                     openUrl = tools.url.addObj(openUrl, { bodyParams: res }, false)
                 }
+                if(btn.openType === 'download'){
+                    sys.window.download(openUrl);
+                }else{
+                    BW.sys.window.open({
+                        url: openUrl,
+                        gps: !!btn.actionAddr.needGps,
+                    }, url);
+                }
+
                 callback(null);
-                BW.sys.window.open({
-                    url: openUrl,
-                    gps: !!btn.actionAddr.needGps,
-                }, url);
                 self.btnRefresh(btn.refresh, url);
+            }
         }
     }
 
