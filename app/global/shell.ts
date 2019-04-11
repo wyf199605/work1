@@ -584,9 +584,9 @@ namespace G {
         //表格上方的发送位置-停止发送
         const location = { 
             //开始定位
-            startRecord(back?: IShellEventHandler) {
-                console.log(back);
-                return ShellBase.handler('startRecord', { "timestep": "5000" }, back);
+            startRecord(info = {timeStep: 5000}, back?: IShellEventHandler) {
+                console.log(info);
+                return ShellBase.handler('startRecord', info , back);
             },
             //结束定位
             stopRecord(back?: IShellEventHandler) {
