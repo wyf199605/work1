@@ -76,28 +76,76 @@ export class EditDetail extends DetailBase {
             buttons: R_Button[] = [],
             self = this;
         // 更多按钮
-        function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement) {
+        function createMoreBtn(buttonss: R_Button[], wrapper: HTMLElement) {
             self.moreBtn = new Button({
                 content: '更多',
                 className: 'more',
                 container: wrapper,
                 onClick: () => {
                     // 点击更多
+                    // self.actionSheet.isShow = true;
+                    console.log(self.totalNumber)
+                    let actionBtns: IActionSheetButton[] = [];
+                    buttonss.forEach((b) => {
+                        if (self.totalNumber == 0 || self.totalNumber == 1) {
+                            if (b.caption !== '上一页' && b.caption !== '下一页') {
+                                actionBtns.push({
+                                    content: b.caption,
+                                    onClick: () => {
+                                        subBtnEvent(b);
+                                    }
+                                });
+                            }
+                        } else if (self.currentPage == 1) {
+                            if (b.caption !== '上一页') {
+                                actionBtns.push({
+                                    content: b.caption,
+                                    onClick: () => {
+                                        subBtnEvent(b);
+                                    }
+                                });
+                            }
+
+                        } else if (self.currentPage == self.totalNumber) {
+                            if (b.caption !== '下一页') {
+                                actionBtns.push({
+                                    content: b.caption,
+                                    onClick: () => {
+                                        subBtnEvent(b);
+                                    }
+                                });
+                            }
+                        } else {
+                            actionBtns.push({
+                                content: b.caption,
+                                onClick: () => {
+                                    subBtnEvent(b);
+                                }
+                            });
+                        }
+                    })
+
+                    if (self.actionSheet) {
+                        self.actionSheet.destroy();
+                    }
+                    self.actionSheet = new ActionSheet({
+                        buttons: actionBtns
+                    });
                     self.actionSheet.isShow = true;
                 }
             });
-            let actionBtns: IActionSheetButton[] = [];
-            buttons.forEach((b) => {
-                actionBtns.push({
-                    content: b.caption,
-                    onClick: () => {
-                        subBtnEvent(b);
-                    }
-                });
-            });
-            self.actionSheet = new ActionSheet({
-                buttons: actionBtns
-            });
+            // let actionBtns: IActionSheetButton[] = [];
+            // buttonss.forEach((b) => {
+            //     actionBtns.push({
+            //         content: b.caption,
+            //         onClick: () => {
+            //             subBtnEvent(b);
+            //         }
+            //     });
+            // });
+            // self.actionSheet = new ActionSheet({
+            //     buttons: actionBtns
+            // });
         }
 
         // 创建PC按钮
@@ -248,7 +296,7 @@ export class EditDetail extends DetailBase {
             if (tools.isNotEmpty(varList)) {
                 def_data = ListItemDetail.getOldFieldData(btn, def_data || {})
             }
-            if (btn.subType!=='insert_save'&&self.checkIsSave()) {
+            if (btn.subType !== 'insert_save' && self.checkIsSave()) {
                 Modal.toast('还有数据未保存，请先保存')
                 return false;
             }
@@ -282,8 +330,8 @@ export class EditDetail extends DetailBase {
                                         self.totalNumber += 1;
                                     }
                                     self.refresh();
-                                    self.actionButtons.forEach(item=>{
-                                        item.disabled=false;
+                                    self.actionButtons.forEach(item => {
+                                        item.disabled = false;
                                     })
                                     resolve();
                                 });

@@ -133,12 +133,12 @@ export = class messagePage {
                         event.preventDefault();
                         // console.log(tapThis.dataset.url)
                         // debugger;
-                        if (tapThis.dataset.url==='undefined') {
+                        if (tapThis.dataset.url === 'undefined') {
                             return false;
-                        }else{
+                        } else {
                             sys.window.open({ url: CONF.siteUrl + tapThis.dataset.url });
                         }
-                       
+
 
                     });
                     break;
