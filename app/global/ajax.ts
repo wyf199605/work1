@@ -152,7 +152,6 @@ namespace G{
 
             };
             xhr.onabort = function() {
-                console.log('abort');
                 clearTimeout(abortTimeoutId);
                 // error(Ajax.errRes(xhr, 'abort', ''));
             };
