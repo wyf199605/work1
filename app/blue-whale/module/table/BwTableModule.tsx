@@ -295,8 +295,9 @@ export class BwTableModule extends Component {
         return res;
     }
     //查看地图
-    private viewMap() {
-        G.Shell.location.drawMap()
+    private viewMap(data) {
+        console.log('viewMap.....')
+        G.Shell.location.drawMap(data)
     }
     //提交
     private sumitMap() {
@@ -2299,41 +2300,54 @@ export class BwTableModule extends Component {
                         } else if (btn.data.openType === "buildMap") {
                             this.mapState = false;
                             this.submitState = false;
-                            this.viewMap();
+                            this.viewMap(btn.data);
                         } else if (btn.data.openType === "submit") {
+                            console.log('00--=====00--');
                             this.mapState = false;
                             this.submitState = false;
                             this.sumitMap();
                         } else if (btn.data.openType === 'stopLocation') {
                             let stopBtn = d.query(".stop_location", wrapper)
                             let startBtn = d.query(".start_location", wrapper);
-                            let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
-                            if (!btnStatus) {
-                                Modal.toast("请先选择开始记录")
-                            } else {
+                            let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled");
+
+                            if(btnStatus) {
                                 let keStatus = G.Shell.location.stopRecord(() => {
                                 })
                                 if (keStatus) {
-                                    Modal.toast("已结束发送位置")
+                                    // Modal.toast("已结束发送位置")
                                     stopBtn.classList.add("disabled")
                                     startBtn.classList.remove("disabled")
-                                } else {
-                                    Modal.toast("结束发送位置失败")
                                 }
                             }
+                            // if (!btnStatus) {
+                            //     // Modal.toast("请先选择开始记录")
+                            // } else {
+                            //     let keStatus = G.Shell.location.stopRecord(() => {
+                            //     })
+                            //     if (keStatus) {
+                            //         // Modal.toast("已结束发送位置")
+                            //         stopBtn.classList.add("disabled")
+                            //         startBtn.classList.remove("disabled")
+                            //     } else {
+                            //         // Modal.toast("结束发送位置失败")
+                            //     }
+                            // }
                         } else if (btn.data.openType === 'startLocation') {
-                            let stopBtn = d.query(".stop_location", wrapper)
+                            let stopBtn = d.query(".stop_location", wrapper) 
                             let startBtn = d.query(".start_location", wrapper);
                             let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
                             let keStatus = G.Shell.location.startRecord(() => {
                             })
+                            console.log(keStatus);
                             if (keStatus) {
-                                Modal.toast("已开始发送位置")
+                                // Modal.toast("已开始发送位置")
                                 stopBtn.classList.remove("disabled")
                                 startBtn.classList.add("disabled")
-                            } else {
-                                Modal.toast("发送位置失败")
-                            }
+                            } 
+                            // else {
+                            //     // Modal.toast("发送位置失败")
+                            // }
 
                         } else if (btn.data.openType === 'passwd') {
                             let selectData = ftable.selectedRowsData[0];

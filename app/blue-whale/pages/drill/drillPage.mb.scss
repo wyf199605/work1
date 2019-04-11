@@ -2,6 +2,9 @@
   .table-module-wrapper{
     overflow: visible!important;
   }
+  .table-body-wrapper {
+    max-height: none !important;
+  }
   .mui-bar-nav {
     -webkit-box-shadow: 0 1px 3px #ccc;
     box-shadow: 0 1px 3px #ccc;

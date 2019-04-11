@@ -587,6 +587,7 @@ export class ButtonAction {
                     content: obj.caption,
                     type: 'primary',
                     onClick: () => {
+                        
                         let data = [];
                         if (!res.downloadAddr) {
                             if (res.atvarparams) {
