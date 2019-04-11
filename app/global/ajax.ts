@@ -151,9 +151,10 @@ namespace G{
                 }
 
             };
-            // xhr.onabort = function() {
-            //     error(Ajax.errRes(xhr, 'abort', ''));
-            // };
+            xhr.onabort = function() {
+                clearTimeout(abortTimeoutId);
+                // error(Ajax.errRes(xhr, 'abort', ''));
+            };
 
             // xhr.onerror = function() {
             //     error(Ajax.errRes(xhr, 'error', ''));
