@@ -21,6 +21,8 @@ export = class webscoket {
     constructor(private props) {
         let network, user = User.get(), self = this;
         let single = tools.isMb ? '/single/' : '/pc/';
+
+
         if (!user.userid) {
             user.userid = 'null';
         }
@@ -55,6 +57,7 @@ export = class webscoket {
         self.ws.onopen = () => {
             heartCheck.reset().start();
             console.info("websocket 连接打开.");
+
             if (tools.isMb) {
                 G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
             }
@@ -180,6 +183,7 @@ export = class webscoket {
                     'notifyIds': data.data.notifyIds
                 };
                 self.ws.send(JSON.stringify(jsonMsg));
+                tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
                 break;
             case "sql":
                 let content = d.query('#sqlMonitorContent', document.body);
@@ -208,6 +212,29 @@ export = class webscoket {
                 this.openLoginModal(data.data);
                 break;
             case "ping":
+                // let num = Math.random();
+                // let a = [{
+                //     "notifyId": num,
+                //     "notifyType": 2,
+                //     "sender": "CMS3",
+                //     "isread": 1,
+                //     "objectName": "LinkMsg",
+                //     "content": {
+                //         "content": "随便" + num,
+                //         "link": "/app_sanfu_retail/v1/ui/view/n1092_data-3?mailid=345X0000155"
+                //     },
+                //     "createDate": "2019-04-10 19:40:21"
+                // }]
+                // G.localMsg.add(a);
+                // console.log(a)
+                // new Message({
+                //     sender: tools.str.toEmpty(a[0].sender),
+                //     content: tools.str.toEmpty(a[0].content.content),
+                //     link: tools.isEmpty(a[0].content.link) ? "" : self.props.mgrPath + a[0].content.link,
+                //     time: new Date().toLocaleTimeString(),
+                //     num: 2
+                // });
+               
                 break;
             default:
                 console.info("后台返回未知的消息(" + type + ")类型.");
