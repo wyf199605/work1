@@ -48,8 +48,7 @@ export = class FormPage extends BasicPage {
                         if (hCom && hCom !== com) {
                             let hField = hCom.custom as R_Field;
                             hCom.set(data[key] || '');
-
-                            if (hField.assignSelectFields && hField.assignAddr) {
+                            if (hField&&hField.assignSelectFields && hField.assignAddr) {
                                 BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.dataGet()), {
                                     cache: true,
                                 }).then(({ response }) => {
@@ -401,7 +400,6 @@ export = class FormPage extends BasicPage {
 
             return data;
         };
-        console.log(this.param);
         if (tools.isNotEmpty(this.param)) {
             let param = {};
             for (let key in this.param) {
