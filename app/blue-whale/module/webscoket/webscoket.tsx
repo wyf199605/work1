@@ -144,6 +144,7 @@ export = class webscoket {
                         unreadMsgNum.classList.remove('hide');
                         unreadMsgNum.innerText = num + '';
                     }
+                    tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
                     G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
                 }
                 let os = BW.sys.os;
@@ -183,7 +184,7 @@ export = class webscoket {
                     'notifyIds': data.data.notifyIds
                 };
                 self.ws.send(JSON.stringify(jsonMsg));
-                tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
+              
                 break;
             case "sql":
                 let content = d.query('#sqlMonitorContent', document.body);
@@ -213,6 +214,7 @@ export = class webscoket {
                 break;
             case "ping":
                 // let num = Math.random();
+               
                 // let a = [{
                 //     "notifyId": num,
                 //     "notifyType": 2,
@@ -226,7 +228,7 @@ export = class webscoket {
                 //     "createDate": "2019-04-10 19:40:21"
                 // }]
                 // G.localMsg.add(a);
-                // console.log(a)
+                // tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
                 // new Message({
                 //     sender: tools.str.toEmpty(a[0].sender),
                 //     content: tools.str.toEmpty(a[0].content.content),

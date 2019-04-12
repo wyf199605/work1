@@ -42,11 +42,11 @@ export = class messagePage {
                 index === 1 ? this.showSysList(localMsg.get(), false, listDOM) : null
             }
         });
-    
+
 
         this.initSysMsg(listDOM);
         this.initTaskMsg(taskDom);
-     
+
 
         d.on(window, BwRule.FRESH_SYS_MSG, () => {
             this.showSysList(localMsg.get(), false, listDOM)
@@ -124,7 +124,10 @@ export = class messagePage {
     //     this.showSysList(list, isAppend, this.SysDom)
     // }
     private showSysList(list: obj[], isAppend: boolean, listDOM: HTMLElement) {
-        console.log(11111)
+        if (G.tools.isMb) {
+            G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
+        }
+        alert('渲染')
         let self = this;
         d.on(listDOM, 'click', '[data-action]', function () {
             switch (this.dataset.action) {
