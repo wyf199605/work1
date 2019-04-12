@@ -19,11 +19,13 @@ interface TaskMsgPara {
 export = class messagePage {
     private p: obj;
     private tab: Tab;
+    private SysDom: HTMLElement;
     constructor(private para) {
         this.p = para;
         let container = d.query('.mui-scroll'),
             listDOM = <ul className="mui-table-view" />,
             taskDom = <ul className="task" />;
+        this.SysDom = listDOM;
         this.tab = new Tab({
             panelParent: container,
             tabParent: container,
@@ -40,9 +42,15 @@ export = class messagePage {
                 index === 1 ? this.showSysList(localMsg.get(), false, listDOM) : null
             }
         });
-        // console.log(this.tab)
+
+
         this.initSysMsg(listDOM);
         this.initTaskMsg(taskDom);
+
+
+        d.on(window, BwRule.FRESH_SYS_MSG, () => {
+            this.showSysList(localMsg.get(), false, listDOM)
+        })
     }
 
     initTaskMsg(taskDom: HTMLElement) {
@@ -91,7 +99,6 @@ export = class messagePage {
     }
 
     initSysMsg(listDOM: HTMLElement) {
-        console.log("---")
         let lis = d.queryAll('li[data-name]', this.tab.getTab());
         lis.forEach(li => {
             d.append(li, <span className="mui-badge mui-badge-primary hide" data-field={li.dataset.name} />);
@@ -113,8 +120,14 @@ export = class messagePage {
             this.setSysBadge();
         }
     }
-
+    // static uploadMsg(list: obj[], isAppend: boolean, listDOM: HTMLElement) {
+    //     this.showSysList(list, isAppend, this.SysDom)
+    // }
     private showSysList(list: obj[], isAppend: boolean, listDOM: HTMLElement) {
+        if (G.tools.isMb) {
+            G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
+        }
+        // alert('渲染')
         let self = this;
         d.on(listDOM, 'click', '[data-action]', function () {
             switch (this.dataset.action) {

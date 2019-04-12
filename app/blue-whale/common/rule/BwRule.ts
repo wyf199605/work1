@@ -29,6 +29,7 @@ export class BwRule extends Rule {
     };
 
     static EVT_REFRESH = 'refreshData';
+    static FRESH_SYS_MSG='freshSysMsg';
 
     static EVT_ASYN_QUERY = '__TABLE_ASYN_QUERY__';
 
