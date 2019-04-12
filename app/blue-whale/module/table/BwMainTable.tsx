@@ -79,7 +79,7 @@ export class BwMainTableModule extends BwTableModule{
 
             // iphone x 兼容
             if(tools.cssSupports('height', 'env(safe-area-inset-bottom)')){
-                this.ftable.wrapper.style.height  = `calc(${clientHeight}px - env(safe-area-inset-bottom) - env(safe-area-inset-bottom))`;
+                this.ftable.wrapper.style.height  = `calc(${clientHeight + 30}px - env(safe-area-inset-bottom)`;
             }else{
                 this.ftable.wrapper.style.height = clientHeight + 'px';
             }
