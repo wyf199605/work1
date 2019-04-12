@@ -230,6 +230,7 @@ export = class messagePage {
         } else {
             badge.classList.add('hide');
         }
+        G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
     }
 
 }
