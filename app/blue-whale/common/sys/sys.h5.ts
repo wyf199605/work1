@@ -126,7 +126,7 @@ namespace BW {
                             return {
                                 blob: file,
                                 name: file.name,
-                                lastModifiedDate: file.lastModifiedDate,
+                                lastModifiedDate: file.lastModified,
                                 type: file.type,
                                 size: file.size
                             }
