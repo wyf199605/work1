@@ -127,7 +127,7 @@ export = class messagePage {
         if (G.tools.isMb) {
             G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
         }
-        alert('渲染')
+        // alert('渲染')
         let self = this;
         d.on(listDOM, 'click', '[data-action]', function () {
             switch (this.dataset.action) {
