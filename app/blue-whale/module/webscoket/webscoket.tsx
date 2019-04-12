@@ -59,7 +59,7 @@ export = class webscoket {
             console.info("websocket 连接打开.");
 
             if (tools.isMb) {
-                G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
+                G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
             }
         };
         self.ws.onmessage = (r) => {
@@ -145,7 +145,7 @@ export = class webscoket {
                         unreadMsgNum.innerText = num + '';
                     }
                     tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
-                    G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
+                    G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
                 }
                 let os = BW.sys.os;
                 if (os === 'ip' || os === 'ad') {
@@ -213,29 +213,28 @@ export = class webscoket {
                 this.openLoginModal(data.data);
                 break;
             case "ping":
-                // let num = Math.random();
-               
-                // let a = [{
-                //     "notifyId": num,
-                //     "notifyType": 2,
-                //     "sender": "CMS3",
-                //     "isread": 1,
-                //     "objectName": "LinkMsg",
-                //     "content": {
-                //         "content": "随便" + num,
-                //         "link": "/app_sanfu_retail/v1/ui/view/n1092_data-3?mailid=345X0000155"
-                //     },
-                //     "createDate": "2019-04-10 19:40:21"
-                // }]
-                // G.localMsg.add(a);
-                // tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
-                // new Message({
-                //     sender: tools.str.toEmpty(a[0].sender),
-                //     content: tools.str.toEmpty(a[0].content.content),
-                //     link: tools.isEmpty(a[0].content.link) ? "" : self.props.mgrPath + a[0].content.link,
-                //     time: new Date().toLocaleTimeString(),
-                //     num: 2
-                // });
+                let num = Math.random();
+                let a = [{
+                    "notifyId": num,
+                    "notifyType": 2,
+                    "sender": "CMS3",
+                    "isread": 0,
+                    "objectName": "LinkMsg",
+                    "content": {
+                        "content": "随便" + num,
+                        "link":''
+                    },
+                    "createDate": "2019-04-10 19:40:21"
+                }]
+                G.localMsg.add(a);
+                tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
+                new Message({
+                    sender: tools.str.toEmpty(a[0].sender),
+                    content: tools.str.toEmpty(a[0].content.content),
+                    link: tools.isEmpty(a[0].content.link) ? "" : self.props.mgrPath + a[0].content.link,
+                    time: new Date().toLocaleTimeString(),
+                    num: 2
+                });
                
                 break;
             default:

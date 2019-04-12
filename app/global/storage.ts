@@ -55,6 +55,7 @@ namespace G {
                     break;
                 }
             }
+            G.Shell.other.sendMsgCount({ MsgCount: _getUnreadCount() })
             _save(t);
         };
         let _remove = function (notifyId) {

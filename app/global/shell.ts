@@ -585,7 +585,6 @@ namespace G {
         const location = {
             //开始定位
             startRecord(info = {timeStep: 5000}, back?: IShellEventHandler) {
-                console.log(info);
                 return ShellBase.handler('startRecord', info , back);
             },
             //结束定位
@@ -607,8 +606,8 @@ namespace G {
             }
         };
         const other = {
-            sendMsgCount(data: obj) {
-                return ShellBase.handler('receiveMessage', data);
+            sendMsgCount(data: obj,back?: IShellEventHandler) {
+                return ShellBase.handler('receiveMessage', data,back);
             }
         }
         return {

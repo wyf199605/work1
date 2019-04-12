@@ -113,10 +113,12 @@ export = class messagePage {
     }
 
     private read(msgDOM) {
+        console.log(msgDOM)
+        
         let unreadDot = d.query('.mui-badge.unread', msgDOM);
         if (unreadDot !== null) {
             d.remove(unreadDot);
-            localMsg.read(parseInt(msgDOM.dataset.notifyId));
+            localMsg.read(Number(msgDOM.dataset.notifyId));
             this.setSysBadge();
         }
     }
@@ -125,7 +127,7 @@ export = class messagePage {
     // }
     private showSysList(list: obj[], isAppend: boolean, listDOM: HTMLElement) {
         if (G.tools.isMb) {
-            G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() })
+            G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
         }
         // alert('渲染')
         let self = this;
@@ -134,6 +136,9 @@ export = class messagePage {
                 case 'read':
                     let tapThis = this;
                     self.read(tapThis);
+                    if(tapThis.dataset.url === 'undefined'||tapThis.dataset.url==''){
+                        break;
+                    }
                     BwRule.Ajax.fetch(CONF.ajaxUrl.userMsg, {
                         data: {
                             reqType: 'notifyread',

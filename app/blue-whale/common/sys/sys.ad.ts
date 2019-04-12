@@ -171,7 +171,7 @@ namespace BW {
 
                     let timer = setTimeout(() => {
                         d.off(window, 'putGps', handler);
-                        callback({success: false, msg: '获取gps超时, 请重试...'});
+                        // callback({success: false, msg: '获取gps超时, 请重试...'});
                     }, 5000);
 
 
