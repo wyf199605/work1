@@ -128,7 +128,7 @@ namespace BW {
             this.appid = appid;
             this.version = version;
             this.webscoketUrl = webscoket;
-            this.siteAppVerUrl = `${siteUrl}/${appid}/${version}`;
+            this.siteAppVerUrl = `${this.siteUrl}/${appid}/${version}`;
 
             for (let key in this.url) {
                 let url = this.url[key];
