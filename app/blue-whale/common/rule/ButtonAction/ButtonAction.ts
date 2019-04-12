@@ -31,6 +31,7 @@ export class ButtonAction {
      */
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
     }, url?: string, itemId?: string, atvData?: obj) {
+        console.log('clickHandle');
         let self = this;
         if (btn.subType === 'excel') {
             callback(null);
@@ -187,6 +188,7 @@ export class ButtonAction {
      */
     private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
     }, url?: string, avtData?: obj) {
+        console.log('btnAction');
         let actionAddr = btn.actionAddr,
             { addr, data } = actionAddr && BwRule.reqAddrFull(actionAddr, dataObj) || { addr: null, data: null },
             self = this,
@@ -221,10 +223,12 @@ export class ButtonAction {
                 }
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
+                    
                     self.btnRefresh(btn.refresh, url);
                 }, () => callback(null));
                 break;
             case 'popup':
+                
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
@@ -350,6 +354,7 @@ export class ButtonAction {
         let self = this;
         return new Promise((resolve, reject) => {
             let type = btn.actionAddr ? btn.actionAddr.type : '';
+            console.log('checkAction');
             switch (type) {
                 case 'pdf':
                     // pdf预览
@@ -406,6 +411,7 @@ export class ButtonAction {
                             } else if (data.type === 2) {
                                 this.progressPopup(data.url, data.showText, resolve);
                             } else {
+                                console.log('again chackAction')
                                 Modal.confirm({
                                     msg: data.showText,
                                     callback: (confirmed) => {
@@ -580,6 +586,7 @@ export class ButtonAction {
 
         //type3模态框无footer
         if (type !== 3) {
+            console.log(111111111111111111111)
             let inputBox = new InputBox(),
                 subButtons = res.subButtons;
             subButtons && subButtons.forEach(obj => {
@@ -587,7 +594,6 @@ export class ButtonAction {
                     content: obj.caption,
                     type: 'primary',
                     onClick: () => {
-                        
                         let data = [];
                         if (!res.downloadAddr) {
                             if (res.atvarparams) {
@@ -612,6 +618,9 @@ export class ButtonAction {
                             modal.destroy();
                         }
 
+                        if(obj.openType === 'buildmap') {
+                            return  G.Shell.location.localSubmit(response)
+                        }
                         this.clickHandle(obj, data, (r) => {
                             onOk();
                         }, url, null, BwRule.atvar && BwRule.atvar.dataGet());
@@ -685,6 +694,7 @@ export class ButtonAction {
                     content: '确定',
                     type: 'primary',
                     onClick: (e) => {
+                        
                         if (!('BlueWhaleShell' in window || 'AppShell' in window)) {
                             Modal.alert('当前操作仅支持在蓝鲸PC客户端使用');
                             return null;

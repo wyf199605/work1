@@ -2285,13 +2285,13 @@ export class BwTableModule extends Component {
             });
             //btnsUi = [{ "caption": "测试设计", "title": "测试设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 10 }, { "caption": "流程设计", "title": "流程设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 0 }];
            console.log(btnsUi)
-            Array.isArray(btnsUi) && btnsUi.forEach((btnUi) => {
+            Array.isArray(btnsUi) && btnsUi.forEach((btnUiItem) => {
                 let btn = new Button({
-                    icon: btnUi.icon,
-                    content: btnUi.title,
-                    level: btnUi.level_no,
-                    isDisabled: !(btnUi.multiselect === 0 || btnUi.multiselect === 2 && btnUi.selectionFlag),
-                    data: btnUi,
+                    icon: btnUiItem.icon,
+                    content: btnUiItem.title,
+                    level: btnUiItem.level_no,
+                    isDisabled: !(btnUiItem.multiselect === 0 || btnUiItem.multiselect === 2 && btnUiItem.selectionFlag),
+                    data: btnUiItem,
                     onClick: () => {
 
                         if (btn.data.openType.indexOf('rfid') > -1) {
@@ -2334,10 +2334,17 @@ export class BwTableModule extends Component {
                             //     }
                             // }
                         } else if (btn.data.openType === 'startLocation') {
+                            
+                            const startLocationJson = {
+                                dataAddr : btnUiItem.actionAddr  ? btnUiItem.actionAddr.dataAddr : '',
+                                needGps: btnUiItem.actionAddr  ?  btnUiItem.actionAddr.needGps : '',
+                                timeStep: 5000,
+                            };
+                           
                             let stopBtn = d.query(".stop_location", wrapper) 
                             let startBtn = d.query(".start_location", wrapper);
                             let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
-                            let keStatus = G.Shell.location.startRecord(() => {
+                            let keStatus = G.Shell.location.startRecord(startLocationJson,() => {
                             })
                             console.log(keStatus);
                             if (keStatus) {
@@ -2452,7 +2459,7 @@ export class BwTableModule extends Component {
                             //     Modal.alert('请选最多一条数据');
                             //     return;
                             // }
-
+                            console.log('popup000000--=========');
                             box.children.forEach((button) => {
                                 button && (button.isDisabled = true);
                             });
@@ -2509,6 +2516,7 @@ export class BwTableModule extends Component {
                                     if (tools.isNotEmpty(locData)) {
                                         clearInterval(interval);
                                         ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                            console.log('0----------------');
                                             box.children.forEach((button) => {
                                                 button && (button.isDisabled = false);
                                             });
@@ -2521,6 +2529,7 @@ export class BwTableModule extends Component {
                                 window.localStorage.removeItem('nextKeyField');
                                 window.localStorage.removeItem('currentKeyField');
                                 ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                    console.log('1111111');
                                     box.children.forEach((button) => {
                                         button && (button.isDisabled = false);
                                     });
