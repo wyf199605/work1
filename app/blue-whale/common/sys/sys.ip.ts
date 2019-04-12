@@ -97,7 +97,8 @@ namespace BW {
                     let dict = {
                         data: JSON.stringify(ja),
                         userid,
-                        accessToken
+                        accessToken,
+                        siteUrl: BW.CONF.siteAppVerUrl
                     };
                     for(let key in data){
                         dict[key] = data[key];
@@ -135,17 +136,17 @@ namespace BW {
                     //     let json = JSON.parse(e.detail);
                     //     callback(json);
                     // });
+                    let event = tools.getGuid();
+                    self.handle('getGps', {type: 1, event: event});
 
-                    self.handle('getGps', {type: 1, event: "putGps"});
-
-                    let timer = setTimeout(() => {
-                        d.off(window, 'putGps', handler);
-                        callback({success: false, msg: '定位服务未开启,请进入系统设置>隐私>定位服务中打开开关,并允许App使用定位服务'});
-                    }, 1000);
+                    // let timer = setTimeout(() => {
+                    //     d.off(window, 'putGps', handler);
+                    //     callback({success: false, msg: '定位服务未开启,请进入系统设置>隐私>定位服务中打开开关,并允许App使用定位服务'});
+                    // }, 1000);
 
                     let handler = function (e: CustomEvent) {
-                        d.off(window, 'putGps', handler);
-                        clearTimeout(timer);
+                        d.off(window, event, handler);
+                        // clearTimeout(timer);
                         try {
                             let data = JSON.parse(e.detail);
 
@@ -161,7 +162,7 @@ namespace BW {
                         }
 
                     };
-                    d.on(window, 'putGps', handler);
+                    d.on(window, event, handler);
                 },
                 openGps: function () {
                     self.handle('openGps');

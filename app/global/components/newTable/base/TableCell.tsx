@@ -616,40 +616,37 @@ export class TableFooterCell extends TableCell{
         if(this.colCount) {
             this.optionGroup = {};
             let optionGroup = this.optionGroup;
-            let promises = [];
             this.options.forEach((data) => {
-                promises.push(this.format(data));
-                // let text = this.format(data).text;
-                // if (Array.isArray(optionGroup[text])) {
-                //     optionGroup[text].push(data);
-                // } else {
-                //     optionGroup[text] = [data];
-                // }
+                let text = this.format(data).text as string;
+                if (Array.isArray(optionGroup[text])) {
+                    optionGroup[text].push(data);
+                } else {
+                    optionGroup[text] = [data];
+                }
             });
-            Promise.all(promises).then((data) => {
-                data.forEach(({text}) => {
-                    if (Array.isArray(optionGroup[text])) {
-                        optionGroup[text].push(data);
-                    } else {
-                        optionGroup[text] = [data];
-                    }
-                });
-                let arr = Array.from({length: this.selectEl.length - 1}, (v, k) => k + 1);
+            // optionData.forEach((data) => {
+            //     let text = data.text;
+            //     if (Array.isArray(optionGroup[text])) {
+            //         optionGroup[text].push(data);
+            //     } else {
+            //         optionGroup[text] = [data];
+            //     }
+            // });
+            let arr = Array.from({length: this.selectEl.length - 1}, (v, k) => k + 1);
 
-                d.diff(Object.keys(optionGroup), arr, {
-                    create: (n) => {
-                        let option = <option>{n}</option>;
-                        d.data(option, optionGroup[n]);
-                        this.selectEl.add(option);
-                    },
-                    replace: (n, o) => {
-                        let option = this.selectEl.options[o];
-                        d.data(option, optionGroup[n]);
-                    },
-                    destroy: (o) => {
-                        this.selectEl.remove(o);
-                    }
-                });
+            d.diff(Object.keys(optionGroup), arr, {
+                create: (n) => {
+                    let option = <option>{n}</option>;
+                    d.data(option, optionGroup[n]);
+                    this.selectEl.add(option);
+                },
+                replace: (n, o) => {
+                    let option = this.selectEl.options[o];
+                    d.data(option, optionGroup[n]);
+                },
+                destroy: (o) => {
+                    this.selectEl.remove(o);
+                }
             });
         }
 
