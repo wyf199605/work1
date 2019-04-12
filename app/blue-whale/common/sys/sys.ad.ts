@@ -158,22 +158,23 @@ namespace BW {
                     toast('复制成功');
                 },
                 getGps: function (callback: Function) {
+                    let event = tools.getGuid();
                     let handler = function (e: CustomEvent) {
-                        d.off(window, 'putGps', handler);
-                        clearTimeout(timer);
+                        d.off(window, event, handler);
+                        // clearTimeout(timer);
 
                         // alert(e.detail);
                         let json = JSON.parse(e.detail);
                         // json.success = !!json.gps;
                         callback(json);
                     };
-                    d.on(window, 'putGps', handler);
-                    self.handle('getGps', '{type:1,event:"putGps"}');
+                    d.on(window, event, handler);
+                    self.handle('getGps', '{type:1,event:"' + event + '"}');
 
-                    let timer = setTimeout(() => {
-                        d.off(window, 'putGps', handler);
-                        callback({success: false, msg: '获取gps超时, 请重试...'});
-                    }, 5000);
+                    // let timer = setTimeout(() => {
+                    //     d.off(window, 'putGps', handler);
+                    //     callback({success: false, msg: '获取gps超时, 请重试...'});
+                    // }, 5000);
 
 
                 },
