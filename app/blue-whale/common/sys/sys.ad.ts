@@ -136,7 +136,8 @@ namespace BW {
                     let dict = {
                         data: JSON.stringify(ja),
                         userid,
-                        accessToken
+                        accessToken,
+                        siteUrl: BW.CONF.siteUrl
                     };
                     for(let key in data){
                         dict[key] = data[key];

@@ -1068,6 +1068,9 @@ export class FastTable extends Component {
             });
             self.render(0, void 0, void 0, false);
             // self.body.render(0, Object.keys(self.tableData.get()).length, void 0, false);
+            if(tools.isMb){
+                document.body.scrollTop = 0;
+            }
         }
 
         return {
