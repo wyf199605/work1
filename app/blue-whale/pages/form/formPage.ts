@@ -14,6 +14,7 @@ import { TableDataCell } from "../../../global/components/newTable/base/TableCel
 export = class FormPage extends BasicPage {
     private editModule: EditModule;
     private validate: Validate;
+    private emPara: EditModulePara;
     protected fields: R_Field[];
     protected isInsert: boolean;
     // private loading =  document.querySelector('.loading');
@@ -133,21 +134,8 @@ export = class FormPage extends BasicPage {
         // }
         let editModule = this.editModule = new EditModule(emPara);
 
-        emPara.fields.forEach((f) => {
-            let field = f.field,
-                name = field.name,
-                isNotEdit = isInsert ? field.noModify : field.noEdit;
-            if (isNotEdit && !field.noShow) {
-                let com = this.editModule.getDom(name);
-                com && (com.disabled = true);
-                if (tools.isMb) {
-                    let wrapper = com.wrapper || com.container;
-                    wrapper && wrapper.addEventListener('click', () => {
-                        Modal.toast(field.caption + '不可以修改～');
-                    });
-                }
-            }
-        });
+        this.emPara = emPara;
+        this.editorInit();
 
         // 编辑标识
         this.initData();
@@ -162,8 +150,28 @@ export = class FormPage extends BasicPage {
                 window['com'] = com;
             }
         }, 500);
-        window['e'] = this;
         // this.initValidate();
+    }
+
+    protected editorInit(notEdit = false){
+        this.emPara.fields.forEach((f) => {
+            let field = f.field,
+                name = field.name,
+                isNotEdit = (this.isInsert ? field.noModify : field.noEdit) || notEdit;
+
+            let com = this.editModule.getDom(name),
+                wrapper = com.container;
+            wrapper && wrapper.classList.toggle('disabled', !!isNotEdit);
+            if (wrapper && isNotEdit && !field.noShow) {
+                com && (com.disabled = true);
+                if (tools.isMb) {
+                    wrapper.removeEventListener('click', d.data(wrapper));
+                    wrapper && wrapper.addEventListener('click', d.data(wrapper, () => {
+                        Modal.toast(field.caption + '不可以修改～');
+                    }));
+                }
+            }
+        });
     }
 
     private _lookUpData: objOf<ListItem[]> = {};
@@ -516,5 +524,8 @@ export = class FormPage extends BasicPage {
                 com.onSet = onSet;
             }
         });
+
+        let editExpress = data['EDITEXPRESS'];
+        this.editorInit(editExpress === 0);
     }
 }
