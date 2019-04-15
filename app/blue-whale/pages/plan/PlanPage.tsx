@@ -62,6 +62,12 @@ export class PlanPage extends BasicPage {
                     }
 
                 }}/>;
+            }else{
+                setTimeout(() => {
+                    planModule && planModule.refresh().catch((e)=>{
+                        console.log(e);
+                    });
+                }, 500)
             }
 
             planModule = new PlanModule({
@@ -69,11 +75,6 @@ export class PlanPage extends BasicPage {
                 container: this.wrapper
             });
 
-            if(!qData){
-                planModule && planModule.refresh().catch((e)=>{
-                    console.log(e);
-                });
-            }
             query && query.autoTag();
         });
         // BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
