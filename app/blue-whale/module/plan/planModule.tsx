@@ -296,7 +296,7 @@ export class PlanModule extends Component{
 
     }
 
-    protected setBackground(obj: obj): Promise<any>{
+    protected setBackground(obj: obj = {}): Promise<any>{
         return new Promise((resolve, reject) => {
             let backGround = this.ui.backGround;
             if(backGround){
@@ -332,7 +332,7 @@ export class PlanModule extends Component{
     get ajaxData(){
         return this._ajaxData;
     }
-    refresh(ajaxData?: obj): Promise<any>{
+    refresh(ajaxData: obj = {}): Promise<any>{
         this.detailModal && (this.detailModal.isShow = false);
         return new Promise((resolve, reject) => {
             this._ajaxData = ajaxData;
@@ -343,7 +343,14 @@ export class PlanModule extends Component{
             });
             loading.show();
             this.setBackground(ajaxData).then(() => {
-                let data = Object.assign({nopage: true,atvarparams:JSON.stringify(ajaxData.atvarparams) || ''}, PlanModule.initQueryParams(ajaxData.queryparams1));
+                let data;
+                if(tools.isEmpty(ajaxData)){
+                    data = {
+                        nopage: true
+                    }
+                }else{
+                    data = Object.assign({nopage: true,atvarparams:JSON.stringify(ajaxData.atvarparams) || ''}, PlanModule.initQueryParams(ajaxData.queryparams1));
+                }
                 this.ajax.fetch(tools.url.addObj(url, data), {
                     needGps: ui.dataAddr.needGps,
                     timeout: 30000,
