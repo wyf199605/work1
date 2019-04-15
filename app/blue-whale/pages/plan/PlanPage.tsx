@@ -26,46 +26,55 @@ export class PlanPage extends BasicPage {
         console.log(para);
         //下半部
         this.getUi(para.ui).then(res => {
-            let qData = res.query;
+            let qData = res.query,
+                query;
+
             d.append(para.dom, this.wrapper = <div class="plan-wrapper"/>);
-            let query = <HorizontalQueryModule
-                container={this.wrapper}
-                qm={{
-                autTag: qData['autTag'],
-                hasOption: qData['hasOption'],
-                queryType: qData['queryType'],
-                atvarparams:qData['atvarparams'],
-                queryparams1: qData['queryparams1'],
-                scannableTime: 0,
-                uiPath: qData['uiPath'],
-                setting: null
-            }} search={(data) => {
-                console.log(data)
-                let isEmpty = true;
-                for(let key in data){
-                    if(!isEmpty){
-                        break;
+
+            if(qData){
+                query = <HorizontalQueryModule
+                    container={this.wrapper}
+                    qm={{
+                        autTag: qData['autTag'],
+                        hasOption: qData['hasOption'],
+                        queryType: qData['queryType'],
+                        atvarparams:qData['atvarparams'],
+                        queryparams1: qData['queryparams1'],
+                        scannableTime: 0,
+                        uiPath: qData['uiPath'],
+                        setting: null
+                    }} search={(data) => {
+                    let isEmpty = true;
+                    for(let key in data){
+                        if(!isEmpty){
+                            break;
+                        }
+                        isEmpty = isEmpty && tools.isEmpty(data[key]);
                     }
-                    isEmpty = isEmpty && tools.isEmpty(data[key]);
-                }
-                if(isEmpty){
-                    Modal.alert('没有图层');
-                    return Promise.reject();
-                }else {
-                    planModule && planModule.refresh(data).catch(()=>{
+                    if(isEmpty){
+                        Modal.alert('没有图层');
+                        return Promise.reject();
+                    }else {
+                        planModule && planModule.refresh(data).catch((e)=>{
+                            console.log(e);
+                        });
+                        return Promise.resolve();
+                    }
 
-                    });
-                    return Promise.resolve();
-                }
-
-            }}/>;
-
+                }}/>;
+            }
 
             planModule = new PlanModule({
                 ui: res.ui,
                 container: this.wrapper
             });
-            query.autoTag();
+
+            if(!qData){
+                planModule && planModule.refresh().catch((e)=>{
+                    console.log(e);
+                });
+            }
+            query && query.autoTag();
         });
         // BwRule.Ajax.fetch(BW.CONF.siteUrl + tools.url.addObj(qData['uiPath'].dataAddr, {output: 'json'}), {}).then(({response}) => {
         //     let ui = response.body.elements[0];
