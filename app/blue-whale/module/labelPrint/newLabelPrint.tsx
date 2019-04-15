@@ -748,9 +748,9 @@ const getDpi = (() => {
             return deviceDpi;
         }
         let arrDPI = [];
-        if (window.screen.deviceXDPI) {
-            arrDPI[0] = window.screen.deviceXDPI;
-            arrDPI[1] = window.screen.deviceYDPI;
+        if (window.screen['deviceXDPI']) {
+            arrDPI[0] = window.screen['deviceXDPI'];
+            arrDPI[1] = window.screen['deviceXDPI'];
         }
         else {
             let tmpNode = document.createElement("div");

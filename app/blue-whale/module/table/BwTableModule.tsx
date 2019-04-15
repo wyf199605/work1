@@ -1950,12 +1950,14 @@ export class BwTableModule extends Component {
                 if (tableModule) {
                     (this.ftable.editing ? Promise.resolve() : tableModule.editManage.start(this))
                         .then(() => {
-                            let row = this.ftable.rowGet(rowIndex);
-                            if (row) {
-                                row.data = Object.assign(row.data, {
-                                    [fieldName]: md5Data.join(',')
-                                })
-                            }
+                            setTimeout(() => {
+                                let row = this.ftable.rowGet(rowIndex);
+                                if (row) {
+                                    row.data = Object.assign(row.data, {
+                                        [fieldName]: md5Data.join(',')
+                                    })
+                                }
+                            }, 500);
                         });
                 }
             };
