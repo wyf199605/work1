@@ -27,11 +27,12 @@ export class PlanPage extends BasicPage {
         //下半部
         this.getUi(para.ui).then(res => {
             let qData = res.query,
+                hasQuery = qData && ([3, 13].includes(qData.queryType)),
                 query;
 
             d.append(para.dom, this.wrapper = <div class="plan-wrapper"/>);
 
-            if(qData){
+            if(hasQuery){
                 query = <HorizontalQueryModule
                     container={this.wrapper}
                     qm={{
