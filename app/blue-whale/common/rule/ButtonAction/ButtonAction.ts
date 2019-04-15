@@ -627,7 +627,14 @@ export class ButtonAction {
                         }
 
                         if(obj.openType === 'buildmap') {
-                            return  G.Shell.location.localSubmit(response)
+                            console.log(obj);
+                            // BwRule.reqAddr(obj.actionAddr)
+                             const url = CONF.siteUrl + BwRule.reqAddr(obj.actionAddr)
+                            return BwRule.Ajax.fetch(url ).then(({ response }) => {
+                                console.log('localSubmit');
+                                G.Shell.location.localSubmit(response);
+                            });
+                            //  G.Shell.location.localSubmit(response)
                         }
                         this.clickHandle(obj, data, (r) => {
                             onOk();

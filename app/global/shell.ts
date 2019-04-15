@@ -597,6 +597,8 @@ namespace G {
             },
             //提交
             localSubmit(data: obj, back?: IShellEventHandler) {
+                console.log('-----------------------')
+                console.log(data);
                 return ShellBase.handler("localSubmit", data, back)
             }
         };
