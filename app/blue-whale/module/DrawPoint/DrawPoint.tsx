@@ -64,6 +64,7 @@ export class DrawPoint extends Component {
 
     constructor(protected para: IDrapPoint) {
         super(para);
+        this.container.tabIndex = -1;
         if (!tools.isMb) {
             //PC的有键盘菜单初始化
             d.on(this.wrapper, 'contextmenu', (e) => {
@@ -114,6 +115,18 @@ export class DrawPoint extends Component {
 
         events && events.forEach((f) => {
             f && f();
+        });
+        this.focus();
+    }
+
+    focusHandler;
+    focus(){
+        if(tools.isMb){
+            return;
+        }
+        d.off(this.container, 'mousemove', this.focusHandler);
+        d.on(this.container, 'mousemove', this.focusHandler = () => {
+            this.container.focus();
         });
     }
 
@@ -263,12 +276,12 @@ export class DrawPoint extends Component {
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
         if (tools.isMb) {
-            this.zoom.translate([-280, 0]);
-            this.zoom.scale(0.7);
-            let slate = [-280, 0],
-                slate1 = [-150, -50]
-            this.g.attr("transform", "scale(0.7)" + "translate(" + slate + ")");
+            let slate = [0, 0],
+                scale = Math.max(0.1, document.documentElement.offsetWidth / 1600);
+            this.g.attr("transform", "scale(" + scale + ")" + "translate(" + slate + ")");
             this.svg.attr('width', 1600).attr('height', 1900)
+            this.zoom.translate(slate);
+            this.zoom.scale(scale);
             this.svg.call(this.zoom);
             //this.svg.attr("transform","translate(" + slate1+ ")")
         }
@@ -356,12 +369,12 @@ export class DrawPoint extends Component {
             this.g.selectAll('circle').remove();
         }
         if (!tools.isMb) {
-            this.zoom.scale(1);
+            let scale = Math.max(0.1, this.container.offsetWidth / parseFloat(this.g.select('image').attr('width')))
+            this.zoom.scale(scale);
             this.zoom.translate([0, 0]);
+            this.g.attr('transform', "scale(" + scale + ")");
         }
-        if (!tools.isMb) {
-            this.g.attr('transform', "scale(" + 1 + ")");
-        }
+
         this.renderData = data;
         this.index = data.length || 0;//初始化index
 
@@ -615,21 +628,34 @@ export class DrawPoint extends Component {
         group.attr('id', function (d) {
             urlData = d;
         })
-        group.append("text").attr('class', 'iconfont icon-dianpubiaoji')
-            .attr('font-family', 'iconfont')
-            .attr('x', () => {
-                return x;
-            }).attr('y', () => {
-            return y;
-        }).attr('width', 35).attr('height', 35)
-            .attr('fill', '#666666')
-            .text("\ue6e1")
-            .on('mouseover', function (d) {
-                D3.select(this).transition().attr('y', y + 4).ease("bounce").attr('cursor', 'pointer');
-            }).on('mouseout', function (d) {
-            D3.select(this).transition().attr('y', y).ease("bounce").attr('cursor', 'default');
-        }).on('click', tools.pattern.throttling((d) => {
+        // group.append("text").attr('class', 'iconfont icon-dianpubiaoji')
+        //     .attr('font-family', 'iconfont')
+        //     .attr('x', () => {
+        //         return x;
+        //     }).attr('y', () => {
+        //     return y;
+        // }).attr('width', 35).attr('height', 35)
+        //     .attr('fill', '#666666')
+        //     .text("\ue6e1")
+        //     .on('mouseover', function (d) {
+        //         D3.select(this).transition().attr('y', y + 4).ease("bounce").attr('cursor', 'pointer');
+        //     }).on('mouseout', function (d) {
+        //     D3.select(this).transition().attr('y', y).ease("bounce").attr('cursor', 'default');
+        // }).on('click', tools.pattern.throttling((d) => {
+        //
+        //     this.onAreaClick({
+        //         type: 'link',
+        //         data: urlData
+        //
+        //     }).then((data) => {
+        //         alert(data)
+        //     })
+        // }, 1000))
 
+        group.attr('cursor', 'pointer').on('click', tools.pattern.throttling((d) => {
+            if(D3.event.shiftKey){
+                return;
+            }
             this.onAreaClick({
                 type: 'link',
                 data: urlData
@@ -1041,7 +1067,7 @@ export class DrawPoint extends Component {
         let self = this;
         return {
             on: () => {
-                D3.select(window)
+                D3.select(this.container)
                     .on("keyup", () => {
                         switch (D3.event.keyCode) {
                             case 16: {
@@ -1064,7 +1090,7 @@ export class DrawPoint extends Component {
         let self = this;
         return {
             on: () => {
-                D3.select(window)
+                D3.select(this.container)
                     .on("keydown", () => {
 
                         switch (D3.event.keyCode) {
@@ -1120,7 +1146,7 @@ export class DrawPoint extends Component {
                     })
             },
             off: () => {
-                D3.select(window)
+                D3.select(this.container)
                     .on("keydown", null)
             }
         }
@@ -1154,7 +1180,7 @@ export class DrawPoint extends Component {
         this.zoom = D3.behavior.zoom()
             .x(X)
             .y(Y)
-            .scaleExtent([0.7, 10])
+            .scaleExtent([0.1, 10])
             .on('zoomstart', function () {
                 _this.svg.on("dblclick.zoom", null);
             })

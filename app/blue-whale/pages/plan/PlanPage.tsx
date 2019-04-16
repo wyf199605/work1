@@ -90,6 +90,10 @@ export class PlanPage extends BasicPage {
         this.on(BwRule.EVT_REFRESH, () => {
             planModule && planModule.refresh(planModule.ajaxData);
         });
+
+        this.on(BW.EVT_SHOW_PAGE, () => {
+            planModule && planModule.focus();
+        })
     }
 
 

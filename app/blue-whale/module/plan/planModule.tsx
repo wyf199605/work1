@@ -328,6 +328,10 @@ export class PlanModule extends Component{
 
     }
 
+    focus(){
+        this.draw.focus();
+    }
+
     protected _ajaxData;
     get ajaxData(){
         return this._ajaxData;
