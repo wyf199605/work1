@@ -154,7 +154,7 @@ export class DrawPoint extends Component {
                 this.redraw();
             })
         }
-       //防止PC端 hover文字时闪动问题
+        //防止PC端 hover文字时闪动问题
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
         //使用这个方法可以再次提高安卓手机端的缩放速度，中心缩放方法需要深究
         // if (tools.isMb) {
@@ -255,7 +255,7 @@ export class DrawPoint extends Component {
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
-   //设置背景图的方法
+    //设置背景图的方法
     set imgUrl(url) {
         this.g.select('image').attr('xlink:href',
             () => {
@@ -263,22 +263,23 @@ export class DrawPoint extends Component {
             }
         ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
         if (tools.isMb) {
-            this.svg.call(this.zoom);
-            this.zoom.translate([-280,0]);
+            this.zoom.translate([-280, 0]);
             this.zoom.scale(0.7);
             let slate = [-280, 0],
                 slate1 = [-150, -50]
-             this.g.attr("transform",   "scale(0.7)" + "translate(" + slate + ")");
-             this.svg.attr('width',1600).attr('height',1900)
-             //this.svg.attr("transform","translate(" + slate1+ ")")
+            this.g.attr("transform", "scale(0.7)" + "translate(" + slate + ")");
+            this.svg.attr('width', 1600).attr('height', 1900)
+            this.svg.call(this.zoom);
+            //this.svg.attr("transform","translate(" + slate1+ ")")
         }
     }
 
 
-    public touchlook(){
-         this.svg.attr('style', ' pointer-events: auto;');
+    public touchlook() {
+        this.svg.attr('style', ' pointer-events: auto;');
     }
-    public touchNoLook(){
+
+    public touchNoLook() {
         this.svg.attr('style', ' pointer-events: none;');
     }
 
@@ -475,11 +476,9 @@ export class DrawPoint extends Component {
                                 font = 3;
                             } else if (val < 3000) {
                                 font = 4;
-                            }
-                            else if (val > 10000) {
+                            } else if (val > 10000) {
                                 font = 16;
-                            }
-                            else {
+                            } else {
                                 font = Math.floor(val / (Math.pow(10, size.length - 1)))
                             }
 
@@ -607,6 +606,7 @@ export class DrawPoint extends Component {
         }
 
     }
+
 // 加载图标方法
     private InitIcon(group, points) {
         let x = this.setIconPos(points)[0],
@@ -672,11 +672,9 @@ export class DrawPoint extends Component {
                                 font = 3;
                             } else if (val < 3000) {
                                 font = 4;
-                            }
-                            else if (val > 10000) {
+                            } else if (val > 10000) {
                                 font = 16;
-                            }
-                            else {
+                            } else {
                                 font = Math.floor(val / (Math.pow(10, size.length - 1)))
                             }
                             return font + "px"
@@ -932,6 +930,7 @@ export class DrawPoint extends Component {
     }
 
     protected selectedG;
+
 //初始化拖拽方法
     private InitDrag() {
         let _this = this;
@@ -990,11 +989,9 @@ export class DrawPoint extends Component {
                             font = 3;
                         } else if (val < 3000) {
                             font = 4;
-                        }
-                        else if (val > 10000) {
+                        } else if (val > 10000) {
                             font = 16;
-                        }
-                        else {
+                        } else {
                             font = Math.floor(val / (Math.pow(10, size.length - 1)))
                         }
                         return font + "px"
@@ -1133,11 +1130,13 @@ export class DrawPoint extends Component {
     reback() {
         this.keyDownEvent.on()
     }
-   //绑定上缩放功能
+
+    //绑定上缩放功能
     public OnZoom() {
         this.svg.call(this.zoom);
     }
-   //初始化线的比列
+
+    //初始化线的比列
     private rLate = 1;
     private lineLate = 3;
 
@@ -1152,32 +1151,31 @@ export class DrawPoint extends Component {
                 .range([0, para.height]);
 
 
-            this.zoom = D3.behavior.zoom()
-                .x(X)
-                .y(Y)
-                .scaleExtent([1, 10])
-                .on('zoomstart', function () {
-                    _this.svg.on("dblclick.zoom", null);
-                })
-                .on('zoom', function (d) {
-                    if (D3.event.scale > 5 && D3.event.scale < 8) {
+        this.zoom = D3.behavior.zoom()
+            .x(X)
+            .y(Y)
+            .scaleExtent([1, 10])
+            .on('zoomstart', function () {
+                _this.svg.on("dblclick.zoom", null);
+            })
+            .on('zoom', function (d) {
+                if (D3.event.scale > 5 && D3.event.scale < 8) {
 
-                        //D3.selectAll('circle').attr('r', 1.2);
-                        //D3.selectAll('path').attr('stroke-width',_this.LV(6))
-                    } else if (D3.event.scale > 8) {
-                        //D3.selectAll('circle').attr('r', 0.5);
+                    //D3.selectAll('circle').attr('r', 1.2);
+                    //D3.selectAll('path').attr('stroke-width',_this.LV(6))
+                } else if (D3.event.scale > 8) {
+                    //D3.selectAll('circle').attr('r', 0.5);
 
-                        //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
-                    } else {
-                        _this.rLate = _this.lineLate = D3.event.scale;
-                    }
-                    let s = D3.select('svg').select('.g-wrapper');
-                    _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
+                    //_this.g.selectAll('path').attr('stroke-width',_this.LV(_this.lineLate));
+                } else {
+                    _this.rLate = _this.lineLate = D3.event.scale;
+                }
+                let s = D3.select('svg').select('.g-wrapper');
+                _this.g.attr('transform', "translate(" + D3.event.translate + ")" + "scale(" + D3.event.scale + ")");
 
-                }).on("zoomend", function (d) {
+            }).on("zoomend", function (d) {
 
-                })
-
+            })
 
 
     }
