@@ -1154,7 +1154,7 @@ export class DrawPoint extends Component {
         this.zoom = D3.behavior.zoom()
             .x(X)
             .y(Y)
-            .scaleExtent([1, 10])
+            .scaleExtent([0.7, 10])
             .on('zoomstart', function () {
                 _this.svg.on("dblclick.zoom", null);
             })
