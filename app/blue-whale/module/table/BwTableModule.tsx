@@ -2337,7 +2337,8 @@ export class BwTableModule extends Component {
                             // }
                         } else if (btn.data.openType === 'startLocation') {
                             console.log(ftable, '==============');
-                            const  dataAddr = CONF.siteUrl + BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
+                            // const  dataAddr = CONF.siteUrl + BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
+                            const  dataAddr =  BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
                             const startLocationJson = {
                                 dataAddr : btnUiItem.actionAddr  ? dataAddr : '',
                                 needGps: btnUiItem.actionAddr  ?  btnUiItem.actionAddr.needGps : '',
