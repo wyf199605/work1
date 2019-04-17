@@ -588,8 +588,8 @@ namespace G {
                 return ShellBase.handler('startRecord', info , back);
             },
             //结束定位
-            stopRecord(back?: IShellEventHandler) {
-                return ShellBase.handler('stopRecord', {}, back);
+            stopRecord(info, back?: IShellEventHandler) {
+                return ShellBase.handler('stopRecord', info, back);
             },
             // 绘制地图
             drawMap(data, back?: IShellEventHandler) {

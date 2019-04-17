@@ -626,7 +626,8 @@ export class ButtonAction {
                             modal.destroy();
                         }
                         console.log('-------------------------');
-                        // console.log(table.tableModule.main.ftable)
+                        // console.log(BwRule.atvar);
+                        // console.log(tools.url.addObj(obj.actionAddr.dataAddr,{ 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) } ))
                         if(obj.openType === 'buildmap') {
                             
                             // BwRule.reqAddr(obj.actionAddr)
@@ -643,11 +644,16 @@ export class ButtonAction {
                             //     G.Shell.location.localSubmit(localSubmitObj);
                             // });
                             //  G.Shell.location.localSubmit(response)
+                            const dataAddr = tools.url.addObj(obj.actionAddr.dataAddr,{ 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) });
+                            console.log(dataAddr);
                             const localSubmitObj = {
-                                        startTime: res.atvarparams[0].atrrs.defaultValue,
-                                        endTime: res.atvarparams[0].atrrs.defaultValue,
-                                        dataAddr: obj.actionAddr.dataAddr,
-                                    }
+                                        // startTime: res.atvarparams[0].atrrs.defaultValue,
+                                        // endTime: res.atvarparams[0].atrrs.defaultValue,
+                                        // dataAddr: obj.actionAddr.dataAddr,
+                                        // atvarparams: JSON.stringify(BwRule.atvar.dataGet()) 
+                                        dataAddr
+                                    };
+
                             return G.Shell.location.localSubmit(localSubmitObj);
                         }
                         this.clickHandle(obj, data, (r) => {
