@@ -2304,24 +2304,28 @@ export class BwTableModule extends Component {
                             this.submitState = false;
                             this.viewMap(btn.data);
                         } else if (btn.data.openType === "submit") {
-                            console.log('00--=====00--');
                             this.mapState = false;
                             this.submitState = false;
                             this.sumitMap();
                         } else if (btn.data.openType === 'stopLocation') {
+                            console.log('stopLocation');
                             let stopBtn = d.query(".stop_location", wrapper)
                             let startBtn = d.query(".start_location", wrapper);
                             let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled");
 
-                            if(btnStatus) {
-                                let keStatus = G.Shell.location.stopRecord(() => {
+                            // if(btnStatus) {
+                                const  dataAddr =  BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
+                                const stopLocationJson = {
+                                    dataAddr : btnUiItem.actionAddr  ? dataAddr : ''
+                                };
+                                let keStatus = G.Shell.location.stopRecord(stopLocationJson, () => {
                                 })
                                 if (keStatus) {
                                     // Modal.toast("已结束发送位置")
                                     stopBtn.classList.add("disabled")
                                     startBtn.classList.remove("disabled")
                                 }
-                            }
+                            // }
                             // if (!btnStatus) {
                             //     // Modal.toast("请先选择开始记录")
                             // } else {
