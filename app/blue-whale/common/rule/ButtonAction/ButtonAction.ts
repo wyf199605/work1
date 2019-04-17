@@ -625,9 +625,30 @@ export class ButtonAction {
                             data[1] = res;
                             modal.destroy();
                         }
-
+                        console.log('-------------------------');
+                        // console.log(table.tableModule.main.ftable)
                         if(obj.openType === 'buildmap') {
-                            return  G.Shell.location.localSubmit(response)
+                            
+                            // BwRule.reqAddr(obj.actionAddr)
+                            //  let url = CONF.siteUrl + BwRule.reqAddr(obj.actionAddr);
+                            //     url = `${url}&startTime${res.atvarparams[0].atrrs.defaultValue}
+                            //         &endTime${res.atvarparams[0].atrrs.defaultValue}`;
+                            // return BwRule.Ajax.fetch(url ).then(({ response }) => {
+                            //     console.log('localSubmit');
+                            //     const localSubmitObj = {
+                            //         startTime: res.atvarparams[0].atrrs.defaultValue,
+                            //         endTime: res.atvarparams[0].atrrs.defaultValue,
+                            //         dataAddr: obj.actionAddr,
+                            //     }
+                            //     G.Shell.location.localSubmit(localSubmitObj);
+                            // });
+                            //  G.Shell.location.localSubmit(response)
+                            const localSubmitObj = {
+                                        startTime: res.atvarparams[0].atrrs.defaultValue,
+                                        endTime: res.atvarparams[0].atrrs.defaultValue,
+                                        dataAddr: obj.actionAddr.dataAddr,
+                                    }
+                            return G.Shell.location.localSubmit(localSubmitObj);
                         }
                         this.clickHandle(obj, data, (r) => {
                             onOk();

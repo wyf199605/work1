@@ -1950,12 +1950,14 @@ export class BwTableModule extends Component {
                 if (tableModule) {
                     (this.ftable.editing ? Promise.resolve() : tableModule.editManage.start(this))
                         .then(() => {
-                            let row = this.ftable.rowGet(rowIndex);
-                            if (row) {
-                                row.data = Object.assign(row.data, {
-                                    [fieldName]: md5Data.join(',')
-                                })
-                            }
+                            setTimeout(() => {
+                                let row = this.ftable.rowGet(rowIndex);
+                                if (row) {
+                                    row.data = Object.assign(row.data, {
+                                        [fieldName]: md5Data.join(',')
+                                    })
+                                }
+                            }, 500);
                         });
                 }
             };
@@ -2334,9 +2336,11 @@ export class BwTableModule extends Component {
                             //     }
                             // }
                         } else if (btn.data.openType === 'startLocation') {
-                            
+                            console.log(ftable, '==============');
+                            // const  dataAddr = CONF.siteUrl + BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
+                            const  dataAddr =  BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
                             const startLocationJson = {
-                                dataAddr : btnUiItem.actionAddr  ? btnUiItem.actionAddr.dataAddr : '',
+                                dataAddr : btnUiItem.actionAddr  ? dataAddr : '',
                                 needGps: btnUiItem.actionAddr  ?  btnUiItem.actionAddr.needGps : '',
                                 timeStep: 5000,
                             };
@@ -2530,7 +2534,7 @@ export class BwTableModule extends Component {
                                 window.localStorage.removeItem('currentKeyField');
                                 ButtonAction.get().clickHandle(btnUi, select, (res) => {
                                     console.log('1111111');
-                                    box.children.forEach((button) => {
+                                   box.children.forEach((button) => {
                                         button && (button.isDisabled = false);
                                     });
                                     spinner && spinner.hide();

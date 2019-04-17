@@ -216,8 +216,12 @@ export class DetailBtnModule extends DetailModule {
                 }
                 let editBtn = editBox.getItem('edit'),
                     delBtn = editBox.getItem('del');
-                editBtn && (editBtn.isDisabled = this.total === 0);
-                delBtn && (delBtn.isDisabled = this.total === 0);
+
+                let editExpress = this.detailData['EDITEXPRESS'],
+                    isNotEdit = this.total === 0 || editExpress === 0;
+
+                editBtn && (editBtn.isDisabled = isNotEdit);
+                delBtn && (delBtn.isDisabled = isNotEdit);
             }
         }
     })();
