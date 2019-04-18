@@ -42,7 +42,8 @@ export class MobileScan {
             });
         }
 
-        d.on(btn.wrapper, 'touchstart', (e: TouchEvent) => {
+        d.on(btn.wrapper, 'click',  (e: TouchEvent)=> {
+            // e.preventDefault();
             if (type === 0 && can2dScan) {
                 return false;
             } else {
@@ -104,7 +105,7 @@ export class MobileScan {
         })
         // 拖动
         d.on(btn.wrapper, 'touchstart', function (e: TouchEvent) {
-            e.preventDefault();
+         
             let ev = e.touches[0],
                 wrapper = btn.wrapper,
                 distanceX = ev.clientX - wrapper.offsetLeft,
@@ -124,6 +125,9 @@ export class MobileScan {
 
             d.on(document, 'touchmove', moveHandler);
             d.on(document, 'touchend', endHandler);
+        })
+        d.on(btn.wrapper,"touchmove",function(e:TouchEvent){
+            e.preventDefault();
         })
     }
 
