@@ -452,11 +452,13 @@ export class LoginPage {
                 loginBtn.isDisabled = true;
                 loginBtn.content = '前往中...';
                 // 前端验证通过后向后台发送数据
+                let deviceInfo=JSON.parse(localStorage.getItem("deviceInfo"))
                 BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
                     data: {
                         mobile: telVal,
                         check_code: codeVal,
-                        userid: userVal
+                        userid: userVal,
+                        uuid:deviceInfo.uuid
                     },
                     type: 'get'
                 }).then(({ response }) => {
