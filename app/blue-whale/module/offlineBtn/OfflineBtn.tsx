@@ -72,6 +72,7 @@ export class OfflineBtn {
             case 'import-scanning-single':
                 this.scan();
                 break;
+            case 'import-scanning-many-moving':
             case 'import-scanning-many':
                 this.manyScan();
                 break;

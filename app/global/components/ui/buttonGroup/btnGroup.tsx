@@ -34,6 +34,14 @@ export class BtnGroup extends Component {
                 // 是否拖動按鈕
                 if( G.tools.isMb && btnItem.className.includes('import-scanning-single-moving')) {
                     console.log(btn.className)
+                    btnItem.className = btnItem.className + ' keystep btnBottom';
+                    setTimeout(() => {
+                        const wrapper = btnItem.wrapper;
+                        btnItem.fixedAndMoving(wrapper);
+                    }, 500);
+                }
+                else if( G.tools.isMb && btnItem.className.includes('import-scanning-many-moving')) {
+                    console.log(btn.className)
                     btnItem.className = btnItem.className + ' keystep';
                     setTimeout(() => {
                         const wrapper = btnItem.wrapper;
