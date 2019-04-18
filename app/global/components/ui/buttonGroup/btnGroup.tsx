@@ -26,9 +26,20 @@ export class BtnGroup extends Component {
         let len = this._buttons.length;
         this._buttons.forEach((btn, i) => {
             if (maxBtn > i) {
-                new Button(Object.assign(btn, {
+                
+                let btnItem = new Button(Object.assign(btn, {
                     container: this.wrapper,
-                }))
+                }));
+                // if(btnItem.)
+                // 是否拖動按鈕
+                if( G.tools.isMb && btnItem.className.includes('import-scanning-single-moving')) {
+                    console.log(btn.className)
+                    btnItem.className = btnItem.className + ' keystep';
+                    setTimeout(() => {
+                        const wrapper = btnItem.wrapper;
+                        btnItem.fixedAndMoving(wrapper);
+                    }, 500);
+                }
             }
         });
         if (len > maxBtn) {
@@ -65,4 +76,5 @@ export class BtnGroup extends Component {
     wrapperInit(para: IBtnGroupPara) {
         return <div className="btn-group-container" />
     }
+    
 }

@@ -106,7 +106,7 @@ export class MobileScan{
                 distanceY = ev.clientY - wrapper.offsetTop;
 
             let moveHandler = function (e : TouchEvent) {
-                e.preventDefault();
+                // e.preventDefault();
                 let ev = e.touches[0];
                 wrapper.style.left = ev.clientX - distanceX + 'px';
                 wrapper.style.top = ev.clientY - distanceY + 'px';

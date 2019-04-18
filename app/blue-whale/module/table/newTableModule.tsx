@@ -68,7 +68,7 @@ export class NewTableModule extends AGroupTabItem{
 
     constructor(para: ITableModulePara) {
         super(para);
-        console.log(para);
+        // console.log(para);
         this.bwEl = para.bwEl;
         this.showSubField = para.bwEl.showSubField;
         this._defaultData = para.data || null;

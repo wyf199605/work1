@@ -38,6 +38,7 @@ export class Inputs {
     private url: string;  //记录当前请求的url步骤,每次请求从该步骤开始
     private keyStep: KeyStep;
     constructor(private para: InputsPara) {
+        console.log('------------', para);
         this.p = para;
         para.container.tabIndex = parseInt(G.tools.getGuid());
         this.eventInit(para);
@@ -289,10 +290,11 @@ export class Inputs {
     }
 
     /**
-     * 初始化按键事件
+     * 初始化按键事件 
      * @param para
      */
     private eventInit(para: InputsPara) {
+        console.log('keyStep', para)
         if (G.tools.isMb) {
             this.keyStep = new KeyStep({
                 inputs: para.inputs,
@@ -358,7 +360,7 @@ export class Inputs {
 /**
  *
  */
-export class KeyStep {
+export class KeyStep { 
     private p: IKeyStepPara;
     constructor(para: IKeyStepPara) {
         this.p = para;

@@ -100,6 +100,7 @@ export class MbListModule extends Component {
                     container: globalButtonWrapper
                 });
                 globalButtons.forEach((btn) => {
+                    console.log('mbListModule...........');
                     buttons.push(new Button({
                         content: btn.caption,
                         container: box.wrapper,
@@ -171,6 +172,7 @@ export class MbListModule extends Component {
      * @Description: 外部使用，添加查询按钮
      */
     queryBtnAdd(btn: IButton) {
+        console.log('mbListModule..................')
         let btnWrapper = d.query('.global-button-wrapper', this.wrapper);
         if (tools.isNotEmpty(btnWrapper)) {
             new Button(Object.assign({}, btn, {

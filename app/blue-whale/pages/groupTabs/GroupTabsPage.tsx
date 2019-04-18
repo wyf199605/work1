@@ -45,7 +45,7 @@ export class GroupTabsPage extends BasicPage {
 
     constructor(para: IGroupTabsPagePara) {
         super(para);
-        console.log(para);
+        // console.log(para);
         window['d'] = this;
         this.ui = para.ui.body.elements[0];
         let btns = para.ui.body.subButtons;
@@ -269,12 +269,26 @@ export class GroupTabsPage extends BasicPage {
                     return init(this.imports.editModule.sub, field, item, subUi, sub.getData())
                 })
             }
+            // console.log(this.subBtn);
+            // let subBtnMain = []
+            // this.subBtn.main.forEach( item => {
+            //     if(item.openType === 'import-scanning-single-moving') {
 
+            //     } else {
+            //         subBtnMain.push(item);
+            //     }
+            // })
+            console.log('new BtnGroup')
             new BtnGroup({
                 container: this.imports.btnWrapper,
                 buttons: [...this.imports.btnParaGet(this.subBtn.main, this.imports.editModule.main, mainUi.itemId),
                 ...(subUi && this.imports.btnParaGet(this.subBtn.sub, this.imports.editModule.sub, subUi.itemId) || [])]
             });
+            // setTimeout(() => {
+            //     const wrapper = document.getElementsByClassName('keystep')[0];
+            //     this.fixedAndMoving(wrapper);
+            // }, 500);
+        
 
             d.append(this.wrapper, this.imports.footer);
 
@@ -303,6 +317,7 @@ export class GroupTabsPage extends BasicPage {
             });
 
         },
+        
         openRfid() {
             Shell.inventory.scan2dOn((result) => {
                 if (result.success) {
