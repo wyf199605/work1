@@ -100,6 +100,7 @@ export class MobileScan{
 
         // 拖动
         d.on(btn.wrapper, 'touchstart', function (e : TouchEvent) {
+            e.preventDefault();
             let ev = e.touches[0],
                 wrapper = btn.wrapper,
                 distanceX = ev.clientX - wrapper.offsetLeft,
