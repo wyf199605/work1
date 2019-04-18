@@ -621,6 +621,10 @@ export class ButtonAction {
                                 }
                             } else if (type === 5) {
                                 data[0] = table.tableModule.main.ftable.selectedRowsData;
+                                if(tools.isEmpty(data[0])){
+                                    Modal.alert('请选择数据后再进行操作');
+                                    return
+                                }
                             }
                             data[1] = res;
                             modal.destroy();

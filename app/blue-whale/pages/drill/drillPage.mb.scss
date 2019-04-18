@@ -69,4 +69,13 @@
   .fast-table-container{
     height: 100%!important;
   }
+  .panel-item-content {
+    .table-module-wrapper {
+      height: 300px;
+
+      .fast-table-container .new-table-wrapper .table-body-wrapper{
+        height: calc(100% - 81px);
+      }
+    }
+  }
 }

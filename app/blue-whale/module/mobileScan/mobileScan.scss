@@ -1,4 +1,4 @@
-.mobile-scan{
+.mobile-scan {
   position: fixed;
   bottom: 65px;
   //right: 20px;
@@ -7,20 +7,21 @@
   margin-left: auto;
   left: 0;
   right: 0;
+  z-index: 1000000!important;
   height: 46px!important;
   line-height: 46px!important;
   border-radius: 46px!important;
   background: #108ee9!important;
   color: white!important;
   z-index: 501;
-  transition: color,background 0.3s ease 0s !important;
-  &:hover{
+  transition: color, background 0.3s ease 0s !important;
+  &:hover {
     color: white;
   }
-  .iconfont{
+  .iconfont {
     font-size: 25px!important;
   }
-  span{
+  span {
     margin-right: 0;
     font-size: 19px;
     margin-left: 8%;
