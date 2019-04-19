@@ -24,9 +24,10 @@ export class BwTableEditModule {
     protected container: HTMLElement;
     protected wrapper: HTMLElement;
     protected editModule: EditModule;
-    onFinish: (data: obj) => void;
+    onFinish: (data: obj) => void; 
 
     constructor(para: IBwTableEditPara){
+        console.log('..............bwTable',para)
         this.wrapper = <div className="detail-content"/>;
         this.container = para.container;
         this.bwTable = para.bwTable;
