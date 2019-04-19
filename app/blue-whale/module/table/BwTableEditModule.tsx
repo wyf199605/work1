@@ -35,6 +35,7 @@ export class BwTableEditModule {
         this.modal = new Modal({
             header: para.title || '编辑',
             isMb: tools.isMb,
+            container: this.container,
             className: 'detail-edit-modal',
             isShow: true,
             height: tools.isMb ? void 0 : '80%',
