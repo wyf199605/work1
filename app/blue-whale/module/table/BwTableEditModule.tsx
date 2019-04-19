@@ -80,7 +80,14 @@ export class BwTableEditModule {
                             com = editModule.getDom(f.name);
                         for(let key of relateCols){
                             let hCom = editModule.getDom(key);
-                            if(hCom && hCom !== com){
+                            if(hCom){
+                                if(hCom === com){
+                                    let onSet = com.onSet;
+                                    com.onSet = null;
+                                    com.set(data[key] || '');
+                                    com.onSet = onSet;
+                                    continue;
+                                }
                                 let hField = hCom.custom as R_Field;
                                 hCom.set(data[key] || '');
 
