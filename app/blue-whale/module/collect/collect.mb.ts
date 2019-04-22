@@ -255,6 +255,7 @@ export class Collect extends BaseCollect {
       }
     ];
     arr.forEach(item => {
+        console.log('collect', item);
       new Button(item)
     })
   }

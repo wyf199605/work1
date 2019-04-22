@@ -25,9 +25,27 @@ export interface IButton extends IComponentPara {
  * 按钮组件对象
  */
 export class Button extends Component implements IButton {
+    constructor(private button?: IButton) {
+        super(button);
+        // console.log(button);
+        // if (button.className === 'import-scanning-single-moving') {
+        //     return ;
+            
+        // }
+        if (!button.level) {
+            if (button.level !== 0) {
+                button.level = 10
+            }
+        }
+        if (tools.isEmpty(button)) {
+            button = {};
+        }
 
+        this.init(button);
+        // this.fixedAndMoving();
+    }
     private init(button: IButton) {
-
+        // console.log('button init');
         // if(button.className){
         //     this.wrapper.classList.add(button.className);
         // }
@@ -292,22 +310,51 @@ export class Button extends Component implements IButton {
     getDom(): HTMLElement {
         return this.wrapper;
     }
-    constructor(private button?: IButton) {
-        super(button);
-        if (!button.level) {
-            if (button.level !== 0) {
-                button.level = 10
-            }
-        }
-        if (tools.isEmpty(button)) {
-            button = {};
-        }
+    
+    /**
+     *  按鈕拖動方法
+     * @param wrapper {HTMLElement} 
+     */
+    fixedAndMoving(wrapper) {
+        // 拖动
+        // console.log('test', btn.wrapper);
+        // console.log('keystep');
+        // const wrapper = document.getElementsByClassName('keystep')[0];
+        // if(!wrapper) return
+       
+        d.on(wrapper, 'touchstart', function (e: TouchEvent) {
+            
+            let ev = e.touches[0];
+            // let    wrapper = wrapper;
+            let    evX = ev.clientX;
+            let   evY = ev.clientY;
+            let    top = wrapper.offsetTop;
+            let    left = wrapper.offsetLeft;
 
-        this.init(button);
-    }
+            let moveHandler = function (i: TouchEvent) {
+                let iv = i.touches[0],
+                    ivX = iv.clientX,
+                    ivY = iv.clientY,
+                    distanceX = evX - ivX,
+                    distanceY = evY - ivY;
+                wrapper.style.left = left - distanceX - 30 + 'px';
+                wrapper.style.top = top - distanceY + 'px';
+            };
+
+            let endHandler = function () {
+                d.off(document, 'touchmove', moveHandler);
+                d.off(document, 'touchend', endHandler);
+            };
+
+            d.on(document, 'touchmove', moveHandler);
+            d.on(document, 'touchend', endHandler);
+        })
+    };
+    
 
     destroy() {
         this._dropDown && this._dropDown.destroy();
         super.destroy();
     }
+    
 }

@@ -68,9 +68,11 @@ export class OfflineBtn {
             case 'import-delete':
                 this.deleteData();
                 break;
+            case 'import-scanning-single-moving':
             case 'import-scanning-single':
                 this.scan();
                 break;
+            case 'import-scanning-many-moving':
             case 'import-scanning-many':
                 this.manyScan();
                 break;

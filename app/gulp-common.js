@@ -13,6 +13,8 @@ const gulp = require('gulp'), //gulp
     fs = require('fs'),
     Path = require('path'),
     createRequire = require('./gulp-require.config'); //创建require.congif.js文件
+const babel = require('gulp-babel');
+
 
 global.cookie = {};
 module.exports = class Compiler {
@@ -53,6 +55,9 @@ module.exports = class Compiler {
         this.allTask.push(name);
         let task = gulp.task(name, function() {
             gulp.src(src)
+                .pipe(babel({
+                    presets: ['@babel/env']
+                }))
                 .pipe(self.createConfig(rname, target));
             let funs = gulp.src(src);
             if (fun) {

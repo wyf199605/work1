@@ -2311,7 +2311,7 @@ export class BwTableModule extends Component {
                             console.log('stopLocation');
                             let stopBtn = d.query(".stop_location", wrapper)
                             let startBtn = d.query(".start_location", wrapper);
-                            let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled");
+                            // let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled");
 
                             // if(btnStatus) {
                                 const  dataAddr =  BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
@@ -2320,11 +2320,11 @@ export class BwTableModule extends Component {
                                 };
                                 let keStatus = G.Shell.location.stopRecord(stopLocationJson, () => {
                                 })
-                                if (keStatus) {
-                                    // Modal.toast("已结束发送位置")
-                                    stopBtn.classList.add("disabled")
-                                    startBtn.classList.remove("disabled")
-                                }
+                                // if (keStatus) {
+                                //     // Modal.toast("已结束发送位置")
+                                //     stopBtn.classList.add("disabled")
+                                //     startBtn.classList.remove("disabled")
+                                // }
                             // }
                             // if (!btnStatus) {
                             //     // Modal.toast("请先选择开始记录")
@@ -2351,15 +2351,15 @@ export class BwTableModule extends Component {
                            
                             let stopBtn = d.query(".stop_location", wrapper) 
                             let startBtn = d.query(".start_location", wrapper);
-                            let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
+                            // let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
                             let keStatus = G.Shell.location.startRecord(startLocationJson,() => {
                             })
                             console.log(keStatus);
-                            if (keStatus) {
-                                // Modal.toast("已开始发送位置")
-                                stopBtn.classList.remove("disabled")
-                                startBtn.classList.add("disabled")
-                            } 
+                            // if (keStatus) {
+                            //     // Modal.toast("已开始发送位置")
+                            //     stopBtn.classList.remove("disabled")
+                            //     startBtn.classList.add("disabled")
+                            // } 
                             // else {
                             //     // Modal.toast("发送位置失败")
                             // }

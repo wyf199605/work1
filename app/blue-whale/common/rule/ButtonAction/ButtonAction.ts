@@ -32,7 +32,6 @@ export class ButtonAction {
      */
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
     }, url?: string, itemId?: string, atvData?: obj) {
-        console.log('clickHandle');
         let self = this;
         if (btn.subType === 'excel') {
             callback(null);
@@ -189,7 +188,6 @@ export class ButtonAction {
      */
     private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
     }, url?: string, avtData?: obj) {
-        console.log('btnAction');
         let actionAddr = btn.actionAddr,
             { addr, data } = actionAddr && BwRule.reqAddrFull(actionAddr, dataObj) || { addr: null, data: null },
             self = this,
@@ -224,12 +222,10 @@ export class ButtonAction {
                 }
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
-                    
                     self.btnRefresh(btn.refresh, url);
                 }, () => callback(null));
                 break;
             case 'popup':
-                
                 if (!ajaxType) {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
@@ -237,6 +233,10 @@ export class ButtonAction {
 
                 addr = tools.url.addObj(addr, { output: 'json' });
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                    console.log('res',response);
+                    if(response.uiType === "assselect") {
+                        Reflect.set(response.body.elements[0], 'actionType', 13);
+                    }
                     //创建条码扫码页面
                     self.btnPopup(response, () => {
                         self.btnRefresh(btn.refresh, url);
@@ -362,7 +362,6 @@ export class ButtonAction {
         let self = this;
         return new Promise((resolve, reject) => {
             let type = btn.actionAddr ? btn.actionAddr.type : '';
-            console.log('checkAction');
             switch (type) {
                 case 'pdf':
                     // pdf预览
@@ -419,7 +418,6 @@ export class ButtonAction {
                             } else if (data.type === 2) {
                                 this.progressPopup(data.url, data.showText, resolve);
                             } else {
-                                console.log('again chackAction')
                                 Modal.confirm({
                                     msg: data.showText,
                                     callback: (confirmed) => {
@@ -594,7 +592,6 @@ export class ButtonAction {
 
         //type3模态框无footer
         if (type !== 3) {
-            console.log(111111111111111111111)
             let inputBox = new InputBox(),
                 subButtons = res.subButtons;
             subButtons && subButtons.forEach(obj => {
@@ -633,7 +630,7 @@ export class ButtonAction {
                         // console.log(BwRule.atvar);
                         // console.log(tools.url.addObj(obj.actionAddr.dataAddr,{ 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) } ))
                         if(obj.openType === 'buildmap') {
-                            
+
                             // BwRule.reqAddr(obj.actionAddr)
                             //  let url = CONF.siteUrl + BwRule.reqAddr(obj.actionAddr);
                             //     url = `${url}&startTime${res.atvarparams[0].atrrs.defaultValue}
@@ -654,7 +651,7 @@ export class ButtonAction {
                                         // startTime: res.atvarparams[0].atrrs.defaultValue,
                                         // endTime: res.atvarparams[0].atrrs.defaultValue,
                                         // dataAddr: obj.actionAddr.dataAddr,
-                                        // atvarparams: JSON.stringify(BwRule.atvar.dataGet()) 
+                                        // atvarparams: JSON.stringify(BwRule.atvar.dataGet())
                                         dataAddr
                                     };
 
@@ -733,7 +730,6 @@ export class ButtonAction {
                     content: '确定',
                     type: 'primary',
                     onClick: (e) => {
-                        
                         if (!('BlueWhaleShell' in window || 'AppShell' in window)) {
                             Modal.alert('当前操作仅支持在蓝鲸PC客户端使用');
                             return null;
@@ -799,6 +795,7 @@ export class ButtonAction {
 
         // 生成表格，选择数据，确定后回填
         if (type === 3 || type === 5 || type === 13) {
+            console.log('list.......')
             list();
         } else if (res.atvarparams) {
             //type4 or handle or
@@ -933,9 +930,10 @@ export class ButtonAction {
 
             require(['NewTablePage'], (e) => {
                 // debugger;
+                console.log('......', tableData);
                 table = new e.BwTableElement({
                     tableEl: Object.assign(tableData, {
-                        subButtons: [],
+                        // subButtons: [],
                         operationType: {
                             autoEdit: type === 13,
                             editType: 'current'

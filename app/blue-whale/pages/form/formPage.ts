@@ -257,6 +257,7 @@ export = class FormPage extends BasicPage {
                     self.save(btn, pageData);
                     break;
                 case 'action':
+                    console.log('..................action');
                     // if(!self.validateFormData(pageData)){
                     //     return false;
                     // }

@@ -24,9 +24,10 @@ export class BwTableEditModule {
     protected container: HTMLElement;
     protected wrapper: HTMLElement;
     protected editModule: EditModule;
-    onFinish: (data: obj) => void;
+    onFinish: (data: obj) => void; 
 
     constructor(para: IBwTableEditPara){
+        console.log('..............bwTable',para)
         this.wrapper = <div className="detail-content"/>;
         this.container = para.container;
         this.bwTable = para.bwTable;
@@ -35,6 +36,7 @@ export class BwTableEditModule {
         this.modal = new Modal({
             header: para.title || '编辑',
             isMb: tools.isMb,
+            container: this.container,
             className: 'detail-edit-modal',
             isShow: true,
             height: tools.isMb ? void 0 : '80%',
@@ -79,7 +81,14 @@ export class BwTableEditModule {
                             com = editModule.getDom(f.name);
                         for(let key of relateCols){
                             let hCom = editModule.getDom(key);
-                            if(hCom && hCom !== com){
+                            if(hCom){
+                                if(hCom === com){
+                                    let onSet = com.onSet;
+                                    com.onSet = null;
+                                    com.set(data[key] || '');
+                                    com.onSet = onSet;
+                                    continue;
+                                }
                                 let hField = hCom.custom as R_Field;
                                 hCom.set(data[key] || '');
 

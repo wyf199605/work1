@@ -124,22 +124,29 @@ export default class SideBarMrg {
             <div class="icon iconfont icon-zuijin"></div>
             <p>最近<p>
         </div>
+        
      </div>
     `;
     d.append(d.query("#customNavMenu"), d.create(collectDom));
     d.on(d.query("#js_collect_btn"), "click", () => {
       this.href(0);
-    })
+    });
     d.on(d.query("#js_react_btn"), "click", () => {
       this.href(1);
-    })
+    });
+    d.on(d.query("#js_chart_btn"), "click", () => {
+        this.href(2);
+      });
   }
 
   private href = (type: number) => {
     let url = "";
     if (type === 1) {
       url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=recent" });
-    } else {
+    } else if(type === 2) {
+        url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=chart" });
+    } 
+    else {
       url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=collect" });
     }
 
