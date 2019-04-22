@@ -233,6 +233,10 @@ export class ButtonAction {
 
                 addr = tools.url.addObj(addr, { output: 'json' });
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
+                    console.log('res',response);
+                    if(response.uiType === "assselect") {
+                        Reflect.set(response.body.elements[0], 'actionType', 13);
+                    }
                     //创建条码扫码页面
                     self.btnPopup(response, () => {
                         self.btnRefresh(btn.refresh, url);
@@ -791,6 +795,7 @@ export class ButtonAction {
 
         // 生成表格，选择数据，确定后回填
         if (type === 3 || type === 5 || type === 13) {
+            console.log('list.......')
             list();
         } else if (res.atvarparams) {
             //type4 or handle or
@@ -925,9 +930,10 @@ export class ButtonAction {
 
             require(['NewTablePage'], (e) => {
                 // debugger;
+                console.log('......', tableData);
                 table = new e.BwTableElement({
                     tableEl: Object.assign(tableData, {
-                        subButtons: [],
+                        // subButtons: [],
                         operationType: {
                             autoEdit: type === 13,
                             editType: 'current'
