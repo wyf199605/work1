@@ -243,7 +243,7 @@ namespace BW {
 
                             if (detail.success && detail.msg) {
                                 let data = detail.msg;
-                                let file = tools.base64ToFile(data.dataurl, data.filename);
+                                let file = tools.base64ToFile(data.dataurl, data.filename, data.isBlob);
                                 callback && callback([file]);
                             } else {
                                 error && error(detail.msg || '');

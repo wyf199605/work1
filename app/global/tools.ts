@@ -684,10 +684,21 @@ namespace G {
          * 触发自定义事件
          * @param dataurl base64字符串
          * @param filename 文件名称
+         * @param [isBlob] 是否是二进制字符串
          * @param [lastModify] 最后编辑时间
          */
-        base64ToFile(dataurl: string, filename: string, lastModify?: number): CustomFile{
+        base64ToFile(dataurl: string, filename: string, isBlob = false, lastModify?: number): CustomFile{
             let arr = dataurl.split(',');
+            if(isBlob){
+                let blob = new Blob([dataurl]);
+                return {
+                    blob,
+                    type: blob.type,
+                    name: filename,
+                    lastModifiedDate: new Date(lastModify) || new Date().getTime(),
+                    size: blob.size
+                };
+            }
             if(arr.length === 2){
                 let mime = arr[0].match(/:(.*?);/)[1],
                     bstr = atob(arr[1]),
