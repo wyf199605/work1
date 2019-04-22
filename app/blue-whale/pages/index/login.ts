@@ -437,6 +437,19 @@ export class LoginPage {
         // 短信验证码登录
         d.on(form, 'submit', (ev) => {
             ev.preventDefault();
+            // let a=[{
+            //     MODEL : "搜索",
+            //     VENDOR : "xxx",
+            //     REGISTER_TIME :"xxx",
+            //     UUID : "xxxy"
+            // },{
+            //     MODEL : "搜索2",
+            //     VENDOR : "xxx2",
+            //     REGISTER_TIME :"xxx2",
+            //     UUID : "xxxy"
+            // }]
+            // new UnBinding(a);
+            // return false;
             let telVal = tel.value,
                 codeVal = code.value,
                 userVal = user.value;

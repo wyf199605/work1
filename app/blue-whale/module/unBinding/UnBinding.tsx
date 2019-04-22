@@ -29,9 +29,20 @@ export class UnBinding {
         this.modal.isShow = true;
 
         //遍历li
-        data.forEach(d => {
-            ul.appendChild(this.deviceTpl(d));
-        });
+        if(data.length>0){
+            let first=<div class="dev_title"><p>当前设备</p></div>
+            ul.appendChild(first)
+            first.appendChild(this.deviceTpl(data[0]));
+        }
+
+        if(data.length>1){
+            let second=<div class="dev_title"><p>其他设备</p></div>
+            ul.appendChild(second)
+            let list=data.slice(1)
+            list.forEach(d => {
+                ul.appendChild(this.deviceTpl(d));
+            });
+        }
         let self = this;
             //unbind
         d.on(ul, 'click', '.unbind', function () {
