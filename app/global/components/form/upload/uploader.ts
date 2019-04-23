@@ -95,7 +95,7 @@ export class Uploader extends FormCom {
                     let task = $.Deferred();
                         let start = new Date().getTime();
                         //拿到上传文件的唯一名称，用于断点续传
-                        uniqueFileName = md5('' + file.name + file.type + file.lastModifiedDate + file.size);
+                        uniqueFileName = md5('' + file.name + file.type + file.lastModified + file.size);
 
                         (new WebUploader.Uploader()).md5File(file).progress(function (percentage) {
                             // console.log(percentage);
