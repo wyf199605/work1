@@ -6,6 +6,18 @@
     padding-left: 0;
     list-style: none;
     background-color: #fff;
+    .dev_title {
+      p {
+        background-color: #EFEFF4;
+        font-size: 16px;
+        padding: 0px;
+        height: 45px;
+        line-height: 45px;
+        margin: 0px;
+        color: black;
+        padding-left: 15px;
+      }
+    }
     .device-cell {
       padding: 10px 0;
       position: relative;
@@ -26,7 +38,7 @@
       width: 15%;
       float: left;
       height: 65px;
-      .icon-device-pc{
+      .icon-device-pc {
         margin: 4px 10px;
         display: block;
         font-size: 40px;
@@ -46,17 +58,14 @@
         font-size: 17px;
         font-weight: bold;
       }
-      .device-time, .device-vendor {
+      .device-time,
+      .device-vendor {
         padding-left: 10px;
         font-size: 13px;
         color: #787779;
       }
-      .device-vendor {
-
-      }
-      .device-time {
-
-      }
+      .device-vendor {}
+      .device-time {}
     }
     .btn-group {
       width: 20%;
