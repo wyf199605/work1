@@ -538,6 +538,22 @@ namespace G {
             photoAlbum(callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
                 this.getImg(1, callback, error);
             },
+            fileGet(callback: (file: CustomFile[]) => void){
+                let input = <HTMLInputElement>d.create('<input type="file" class="hide"/>');
+                d.on(input, 'change', () => {
+                    callback && callback(Array.prototype.slice.call(input.files).map((file: File): CustomFile => {
+                        return {
+                            blob: file,
+                            name: file.name,
+                            lastModifiedDate: file.lastModified,
+                            type: file.type,
+                            size: file.size
+                        }
+                    }));
+                    input = null;
+                });
+                input.click();
+            },
             getImg(type: number, callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
                 ShellBase.handler('getImg', {
                     type: type
