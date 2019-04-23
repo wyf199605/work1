@@ -152,6 +152,15 @@ export class BwUploader extends FormCom {
                             this.addFile(files);
                         }), BwUploader.hintMsg);
                     }
+                },
+
+                {
+                    content: '文件',
+                    onClick: () => {
+                        Shell.image.fileGet(((files) => {
+                            this.addFile(files);
+                        }));
+                    }
                 }
             ].concat(buttons),
             zIndex: 1002,
