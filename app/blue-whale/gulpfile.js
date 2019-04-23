@@ -146,6 +146,7 @@ gulp.task('js', function() {
         'query/horizontalFormFactory',
         'query/customModule'
     ], 'query.pc.js');
+    
 
     // mb编辑模块
     gulpTsModule([
@@ -337,6 +338,8 @@ gulp.task('js', function() {
     ], "collect.js")
     gulpTsModule(["collect/collect.pc"], "CollectPC.js")
         /*page*/
+
+    gulpTsModule(["chartPageComponents/stacked-histogram-component/stacked-histogram.component"], "StackedHistogramComponnet.js");
 
     gulpTsPage('index/password', 'personPassword.js');
     gulpTsPage('form/formPage', 'form-page.js');
