@@ -196,8 +196,8 @@ export class TextInput extends FormCom {
     set inputType(str: string) {
         let types = ['text', 'button', 'checkbox', 'password', 'radio', 'image', 'reset', 'file', 'submit', 'textarea', 'number'],
             type = types.indexOf(str) > -1 ? str : types[0];
-
-        this.input.type = this._inputType = type;
+        console.log('input type-------',this.para);
+        this.input.type = this._inputType = this.para.custom && (this.para.custom.dataType === '11' || this.para.custom.dataType === '10') ? 'number' : type ;
     }
 
     get inputType() {
@@ -257,10 +257,11 @@ export class TextInput extends FormCom {
     protected wrapperInit(para: ITextInputPara = {}): HTMLElement {
         let icons = para.icons,
             isNotEmptyIcons = tools.isNotEmptyArray(icons);
+        let inputType = typeof para.type === 'undefined' ? 'text' : para.type;
 
         return <div className="text-input">
             {this.input =
-                <input type={typeof para.type === 'undefined' ? 'text' : para.type}
+                <input type={inputType} 
                        placeholder={para.placeholder || ''}
                        readOnly={!!para.readonly}
                        disabled={!!para.disabled}

@@ -25,10 +25,10 @@ export class NewTablePage extends BasicPage{
     constructor(para: ITablePagePara) {
         super(para);
         d.classAdd(this.dom.parentElement, 'table-page');
-
+        
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
-
+        console.log('new table page', para, bwTableEl);
         let bwTable = new BwTableElement({
             container: tools.isPc ? this.dom : d.query('body > .mui-content'),
             tableEl: bwTableEl,
@@ -50,7 +50,7 @@ export class NewTablePage extends BasicPage{
 }
 
 interface IBwTableElementPara extends IComponentPara{
-    tableEl: IBW_Table
+    tableEl: IBW_Table 
     asynData? : obj[]
 }
 export class BwTableElement extends Component{
@@ -65,6 +65,7 @@ export class BwTableElement extends Component{
     constructor(para: IBwTableElementPara) {
         super(para);
         // d.classAdd(this.dom.parentElement, 'table-page');
+        console.log('bw table ele', para);
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
             hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
