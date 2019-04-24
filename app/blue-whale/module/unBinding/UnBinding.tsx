@@ -40,7 +40,7 @@ export class UnBinding {
             }
 
         }
-        if (data.length > 1) {
+        if (data.length > 0) {
             let list = data.filter(item => {
                 return item.UUID != deviceInfo.uuid
             })
