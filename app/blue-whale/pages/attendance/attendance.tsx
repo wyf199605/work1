@@ -120,7 +120,8 @@ export = class AttendancePage extends BasicPage {
                     fingerTitle.innerHTML = '<span class="green">' + result.userName + result.result + '</span>';
                     // fingerObj.addFinger(result.fingerData);
                     resolve(result.fingerData)
-                }).catch(() => {
+                }).catch((e) => {
+                    console.log(e);
                     Modal.toast('考勤失败请重试');
                     fingerTitle.innerHTML = '<span class="red">考勤失败，请重新录入</span>';
                     reject();

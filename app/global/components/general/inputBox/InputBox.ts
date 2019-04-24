@@ -250,11 +250,17 @@ export class InputBox extends Component {
                 this._moreBtn && this._moreBtn.destroy();
                 this._moreBtn = null;
             } else {
-                this.children.slice(this._lastNotMoreIndex).forEach((btn) => {
-                    if (this.moreBtn.dropDown) {
-                        this.moreBtn.dropDown.getUlDom().appendChild(btn.wrapper);
-                    }
-                });
+                let children = this.children.slice(this._lastNotMoreIndex);
+                if(children.length > 1){
+                    this.children.slice(this._lastNotMoreIndex).forEach((btn) => {
+                        if (this.moreBtn.dropDown) {
+                            this.moreBtn.dropDown.getUlDom().appendChild(btn.wrapper);
+                        }
+                    });
+                }else{
+                    this._moreBtn && this._moreBtn.destroy();
+                    this._moreBtn = null;
+                }
             }
         }
     }
