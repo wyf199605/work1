@@ -7,13 +7,13 @@ import {TablePage} from "./tablePage";
 export = class TablePageMb extends TablePage {
     protected initTable(tableModule: typeof TableModuleMb,newMtPara : TableModulePara,queryData : obj) {
         this.dealConf.add(newMtPara);
-
+        console.log('table mb', this.para)
         if(!this.para.tableDom){
             this.para.tableDom = <HTMLTableElement>d.create('<table class="mobileTable"><tbody></tbody></table>');
             let mobileCon = d.query('body > .mui-content');
             d.append(mobileCon,this.para.tableDom);
         }
-
+        console.log('table page mb',this.para);
         this.tableModule = new tableModule({
             tableEl: this.para.tableDom,
             scrollEl: document.body,

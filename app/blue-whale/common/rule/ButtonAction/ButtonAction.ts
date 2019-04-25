@@ -789,6 +789,7 @@ export class ButtonAction {
                 rightPanel: inputBox
             };
         }
+        console.log('modal', para);
         modal = new Modal(para);
         tipDom = d.query('.progress-title', modal.bodyWrapper); //盘点机提示
 
@@ -930,10 +931,10 @@ export class ButtonAction {
 
             require(['NewTablePage'], (e) => {
                 // debugger;
-                console.log('......', tableData);
+                console.log('......', tableData, e);
                 table = new e.BwTableElement({
                     tableEl: Object.assign(tableData, {
-                        // subButtons: [],
+                        subButtons: [],
                         operationType: {
                             autoEdit: type === 13,
                             editType: 'current'
