@@ -70,11 +70,13 @@
 
     .head-wrapper {
         .modal-header {
-            height: 45px;
+            height: 60px;
+            padding-top: 30px;
 
             .close {
                 margin-top: 0;
                 line-height: 45px;
+                display: none
             }
 
             .modal-title {
