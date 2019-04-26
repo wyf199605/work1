@@ -41,6 +41,7 @@ export class LoginPage {
         let response = props.responseBean;
         this.device = Device.get();
         this.deviceUpdate();
+
         if (response && response.body && response.body.bodyList && response.body.bodyList[0]) {
             let dataList = response.body.bodyList[0].dataList;
             let meta = response.body.bodyList[0].meta;
@@ -64,9 +65,15 @@ export class LoginPage {
         //     container: document.body
         // });
         this.setLoginType();
+        //判断是否拥有指纹识别
+        Shell.other.isSupportFinger((res) => {
+            if (!res) {
+                props.fingerMbBtn.style.display = "none";
+            }
+        })
     }
 
-    protected setLoginType(){
+    protected setLoginType() {
         G.Ajax.fetch(tools.url.addObj(CONF.url.login, {
             output: 'json'
         })).then(({ response }) => {
@@ -81,9 +88,9 @@ export class LoginPage {
                 regButton
             } = this.props;
 
-            if(data){
-                if(data.iconName){
-                    let logoWrapper = tools.isMb ? d.query('.login-logo') :d.query('.logo');
+            if (data) {
+                if (data.iconName) {
+                    let logoWrapper = tools.isMb ? d.query('.login-logo') : d.query('.logo');
                     logoWrapper.innerHTML = '';
                     d.append(logoWrapper, d.create(`
                     <img src="${G.requireBaseUrl + "../img/logo/" + data.iconName + ".png"}" alt="${data.iconName}"/>
@@ -93,31 +100,31 @@ export class LoginPage {
                     `));
                 }
 
-                if(data.loginMessage == 1){
-                    if(SMSBtn instanceof Button){
+                if (data.loginMessage == 1) {
+                    if (SMSBtn instanceof Button) {
                         SMSBtn.destroy();
-                    }else{
+                    } else {
                         d.remove(SMSBtn);
                     }
                 }
 
-                if(data.loginScan == 1){
+                if (data.loginScan == 1) {
                     d.remove(scanButton);
                 }
 
-                if(data.loginWechat == 1){
+                if (data.loginWechat == 1) {
                     d.remove(wxButton);
                 }
 
-                if(data.loginFingerprint == 1){
+                if (data.loginFingerprint == 1) {
                     d.remove(fingerPcBtn);
                     d.remove(fingerMbBtn);
                 }
 
-                if(data.singIn == 1){
-                    if(regButton instanceof Button){
+                if (data.singIn == 1) {
+                    if (regButton instanceof Button) {
                         regButton.destroy();
-                    }else{
+                    } else {
                         d.remove(regButton);
                     }
                 }
@@ -211,7 +218,7 @@ export class LoginPage {
             container: document.body,
             header: ' ',
             body,
-            isMb:true,
+            isMb: true,
             width: '730px',
             isShow: true,
             isOnceDestroy: true,
@@ -421,7 +428,6 @@ export class LoginPage {
 
         d.append(body, title);
         d.append(body, form);
-
         // 初始化短信验证码登录模态框
         let modal = new Modal({
             container: document.body,
@@ -431,28 +437,44 @@ export class LoginPage {
             width: '730px',
             isShow: true,
             isOnceDestroy: true,
-            className: 'sms-login'
+            className: 'sms-login',
+            onClose() {
+                window.location.reload();
+            }
         });
 
         // 短信验证码登录
         d.on(form, 'submit', (ev) => {
             ev.preventDefault();
-            // let a=[{
-            //     MODEL : "搜索",
-            //     VENDOR : "xxx",
-            //     REGISTER_TIME :"xxx",
-            //     UUID : "xxxy"
-            // },{
-            //     MODEL : "搜索2",
-            //     VENDOR : "xxx2",
-            //     REGISTER_TIME :"xxx2",
-            //     UUID : "xxxy"
-            // }]
-            // new UnBinding(a);
-            // return false;
             let telVal = tel.value,
                 codeVal = code.value,
                 userVal = user.value;
+            let deviceInfo = JSON.parse(localStorage.getItem("deviceInfo"));
+            // let a = [{
+            //     MODEL: "搜索",
+            //     VENDOR: "xxx",
+            //     REGISTER_TIME: "xxx",
+            //     UUID: "xxxy"
+            // }, {
+            //     MODEL: "搜索2",
+            //     VENDOR: "xxx2",
+            //     REGISTER_TIME: "xxx2",
+            //     UUID: "xxxy"
+            // }, {
+            //     MODEL: "搜索4",
+            //     VENDOR: "xxx2",
+            //     REGISTER_TIME: "xxx2",
+            //     UUID: ""
+            // }];
+            // let obj = {
+            //     mobile: telVal,
+            //     check_code: codeVal,
+            //     userid: userVal,
+            //     uuid: deviceInfo.uuid
+            // }
+            // new UnBinding(a, obj);
+            // return false;
+
             // 验证是否输入手机号与短信验证码
             if (tools.isEmpty(userVal)) {
                 Modal.alert('请输入员工号');
@@ -465,21 +487,26 @@ export class LoginPage {
                 loginBtn.isDisabled = true;
                 loginBtn.content = '前往中...';
                 // 前端验证通过后向后台发送数据
-                let deviceInfo=JSON.parse(localStorage.getItem("deviceInfo"))
                 BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
                     data: {
                         mobile: telVal,
                         check_code: codeVal,
                         userid: userVal,
-                        uuid:deviceInfo.uuid
+                        uuid: deviceInfo.uuid
                     },
                     type: 'get'
                 }).then(({ response }) => {
-                    new UnBinding(response.data)
+                    new UnBinding(response.data, {
+                        mobile: telVal,
+                        check_code: codeVal,
+                        userid: userVal,
+                        uuid: deviceInfo.uuid
+                    })
                 }).finally(() => {
                     loginBtn.isLoading = false;
                     loginBtn.isDisabled = false;
                     loginBtn.content = '前往解绑';
+
                 })
             }
         });
@@ -1189,12 +1216,12 @@ export class LoginPage {
                     }
                     clearInterval(this.Interval)
                 }
-                let state=Number(response.state);
-                if(state<0){
-                    if(state===-2){
+                let state = Number(response.state);
+                if (state < 0) {
+                    if (state === -2) {
                         d.query(".refresh_code").style.display = "block";
-                        if(d.query(".has_logined")){
-                            Modal.alert(response.msg||'二维码失效，请重试')
+                        if (d.query(".has_logined")) {
+                            Modal.alert(response.msg || '二维码失效，请重试')
                         }
                     }
                     clearInterval(this.Interval)

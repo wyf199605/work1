@@ -83,7 +83,14 @@ export class RegPage {
             }).then(({response}) => {
                 if (response.msg.indexOf('成功')>-1) {
                     Modal.toast('注册成功!');
-                    sys.window.logout();
+                    
+                    setTimeout(() => {
+                        if (sys.os !== 'pc') {
+                            sys.window.back('');
+                        }
+                        sys.window.logout();
+                        window.location.reload();
+                    }, 2000);
                 } else {
                     Modal.confirm({
                         msg: response.msg,

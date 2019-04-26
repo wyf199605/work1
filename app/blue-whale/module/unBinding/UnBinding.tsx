@@ -14,12 +14,17 @@ interface UnBindingPara {
 }
 export class UnBinding {
     private modal: Modal;
-    constructor(data: UnBindingPara[]) {
+    private config: obj;
+    private ul: HTMLElement;
+    private length: Number;
+    constructor(data: UnBindingPara[], config: obj) {
         let full;
         if (sys.os !== 'pc') {
             full = 'full';
         }
         let ul = <ul className="device-view" />;
+        this.ul = ul;
+        this.config = config;
         this.modal = new Modal({
             header: '设备管理',
             body: ul,
@@ -27,15 +32,41 @@ export class UnBinding {
             isOnceDestroy: true
         });
         this.modal.isShow = true;
-        let deviceInfo = JSON.parse(localStorage.getItem("deviceInfo"))
+        this.renderList(data)
         //遍历li
+
+        let self = this;
+        //unbind
+        d.on(ul, 'click', '.unbind', function () {
+            let data = JSON.stringify([{ uuid: this.dataset.name }]);
+            BwRule.Ajax.fetch(CONF.ajaxUrl.unbound, {
+                type: 'post',
+                data: data,
+            }).then(() => {
+                if (self.length === 1) {
+                    self.modal.isShow = false;
+                } else {
+                    self.getData();
+                }
+                Modal.toast('解绑成功');
+            });
+        });
+    }
+
+    show() {
+        this.modal.isShow = true;
+    }
+    renderList(data) {
+        this.length = data.length;
+        this.ul.innerHTML = '';
+        let deviceInfo = JSON.parse(localStorage.getItem("deviceInfo"))
         if (data.length > 0) {
             let list = data.filter(item => {
                 return item.UUID == deviceInfo.uuid
             })
             if (list.length > 0) {
                 let first = <div class="dev_title"><p>当前设备</p></div>
-                ul.appendChild(first)
+                this.ul.appendChild(first)
                 first.appendChild(this.deviceTpl(list[0]));
             }
 
@@ -46,36 +77,33 @@ export class UnBinding {
             })
             if (list.length > 0) {
                 let second = <div class="dev_title"><p>其他设备</p></div>
-                ul.appendChild(second)
+                this.ul.appendChild(second)
                 list.forEach(d => {
-                    ul.appendChild(this.deviceTpl(d));
+                    this.ul.appendChild(this.deviceTpl(d));
                 });
             }
         }
-        let self = this;
-        //unbind
-        d.on(ul, 'click', '.unbind', function () {
-            let data = JSON.stringify([{ uuid: this.dataset.name }]);
-            // Rule.ajax(CONF.ajaxUrl.unbound,{
-            //     type: 'post',
-            //     data: data,
-            //     success : function (r) {
-            //         self.modal.isShow = false;
-            //         Modal.toast('解绑成功');
-            //     }
-            // });
-            BwRule.Ajax.fetch(CONF.ajaxUrl.unbound, {
-                type: 'post',
-                data: data,
-            }).then(() => {
-                self.modal.isShow = false;
-                Modal.toast('解绑成功');
-            });
-        });
     }
-
-    show() {
-        this.modal.isShow = true;
+    getData() {
+        // let data = [{
+        //     MODEL: "搜索",
+        //     VENDOR: "xxx",
+        //     REGISTER_TIME: "xxx",
+        //     UUID: "xxxy"
+        // }];
+        // this.renderList(data)
+        // return false;
+        BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
+            data: {
+                mobile: this.config.mobile,
+                check_code: this.config.mobile,
+                userid: this.config.userid,
+                uuid: this.config.uuid
+            },
+            type: 'get'
+        }).then(({ response }) => {
+            this.renderList(response.data)
+        })
     }
 
     private deviceTpl(data: UnBindingPara): HTMLUListElement {

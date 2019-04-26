@@ -624,8 +624,13 @@ namespace G {
             }
         };
         const other = {
+            //消息数量
             sendMsgCount(data: obj,back?: IShellEventHandler) {
                 return ShellBase.handler('receiveMessage', data,back);
+            },
+            //是否支持指纹
+            isSupportFinger(back?:IShellEventHandler){
+                return ShellBase.handler('isSupportFinger',{},back)
             }
         }
         return {
