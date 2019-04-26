@@ -341,6 +341,10 @@ gulp.task('js', function() {
 
     gulpTsModule(["chartPageComponents/stacked-histogram-component/stacked-histogram.component"], "StackedHistogramComponnet.js");
 
+    gulpTsModule(["chartPageComponents/chart-page.component"], "ChartPageComponnet.js");
+
+
+
     gulpTsPage('index/password', 'personPassword.js');
     gulpTsPage('form/formPage', 'form-page.js');
     gulpTsPage('rfid/RfidBing/RfidBing', 'rfidbing.js');

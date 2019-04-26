@@ -235,7 +235,7 @@ export class ButtonAction {
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     console.log('res',response);
                     if(response.uiType === "assselect") {
-                        Reflect.set(response.body.elements[0], 'actionType', 13);
+                        response.body.elements[0]['actionType'] = 13;
                     }
                     //创建条码扫码页面
                     self.btnPopup(response, () => {

@@ -1,7 +1,6 @@
 
 /// <amd-module name="StackedHistogramComponnet"/>
 
-
 export default  {"type": "FeatureCollection",
 "features":
 [

@@ -477,7 +477,10 @@ export = class FormPage extends BasicPage {
             //     }
             // });
         } else if (this.isInsert && tools.isNotEmpty(form.defDataAddrList)) {
-            this.defData.then(data => {
+            Promise.all([
+                this.defData,
+                this.lookup
+            ]).then(([data]) => {
                 if (tools.isEmpty(data)) {
                     return;
                 }
