@@ -14,6 +14,7 @@ export class ButtonGroup{
     private leftBtn : HTMLElement; //保存左侧节点的父节点
     constructor(private conf : BtnsRenderConf){
             this.leftBtn = conf.container;
+            console.log('conf',conf);
         if(typeof conf.maxBtn === 'number' && conf.maxBtn > 0){
             if( (conf.btns.length > conf.maxBtn) && (conf.btns.length-1) != conf.maxBtn){
                 this.initOverMaxBtn(conf);

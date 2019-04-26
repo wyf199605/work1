@@ -53,6 +53,16 @@ export class InputBox extends Component {
         // this.container = inputBox.container;
         // this.container.appendChild(this.wrapper);
         this.responsive();
+        $(window).on('orientationchange',(event) => {
+            console.log('orientationchange');
+            let timer = setTimeout(()=>{
+                clearTimeout(timer);
+                this.responsive();
+            },100)
+            
+
+        });
+        
 
     }
 
@@ -63,6 +73,7 @@ export class InputBox extends Component {
      */
     private _children: Array<Button>;
     set children(children: Array<Button>) {
+        console.log('children', children);
         this._children = tools.isEmpty(children) ? [] : children;
     }
     get children() {
@@ -126,6 +137,7 @@ export class InputBox extends Component {
             this.wrapper.classList.add('compact');
         }
         this.responsive();
+        
         // compactWidth = tools.isEmpty(compactWidth) ? 0 : compactWidth;
         //
         // if (compactWidth > 0) {
@@ -208,6 +220,7 @@ export class InputBox extends Component {
         if (!this.isResponsive) {
             return;
         }
+        console.log('............');
         let childrenWidth = 56, isFirst = true;
         let wrapperWidth = this.wrapper.offsetWidth;
         for (let c of this.children) {
