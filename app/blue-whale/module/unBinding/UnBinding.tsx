@@ -43,14 +43,14 @@ export class UnBinding {
                 type: 'post',
                 data: data,
             }).then(() => {
+                self.getData();
                 Modal.toast('解绑成功');
                 if (self.length <= 1) {
                     setTimeout(() => {
                         sys.window.load(CONF.url.reg);
                     }, 1000);
-                } else {
-                    self.getData();
                 }
+               
             });
         });
     }
