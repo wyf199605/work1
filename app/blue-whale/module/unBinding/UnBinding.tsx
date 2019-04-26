@@ -43,8 +43,14 @@ export class UnBinding {
                 type: 'post',
                 data: data,
             }).then(() => {
-                self.getData();
                 Modal.toast('解绑成功');
+                if (self.length <= 1) {
+                    setTimeout(() => {
+                        sys.window.load(CONF.url.reg);
+                    }, 1000);
+                } else {
+                    self.getData();
+                }
             });
         });
     }
@@ -65,7 +71,6 @@ export class UnBinding {
                 this.ul.appendChild(first)
                 first.appendChild(this.deviceTpl(list[0]));
             }
-
         }
         if (data.length > 0) {
             let list = data.filter(item => {
@@ -98,9 +103,6 @@ export class UnBinding {
             },
             type: 'get'
         }).then(({ response }) => {
-            if (response.data.length<=0) {
-                sys.window.load(CONF.url.reg);
-            }
             this.renderList(response.data)
         })
     }

@@ -36,6 +36,15 @@ export class RegisterMbPage extends RegPage{
         d.on(d.query('.register-form', body), 'submit', (e) => {
             e.preventDefault();
         });
+        d.on(d.query("#tel",body),"blur",()=>{
+            document.body.scrollTop = 0;
+        })
+        d.on(d.query("#verifyCodeInput",body),"blur",()=>{
+            document.body.scrollTop = 0;
+        })
+        d.on(d.query("#verify",body),"blur",()=>{
+            document.body.scrollTop = 0;
+        })
         let registerBtn = new Button({
             container: d.query('.btn-group', body),
             content: '注册',
