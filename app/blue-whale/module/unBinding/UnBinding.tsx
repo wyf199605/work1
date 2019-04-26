@@ -16,8 +16,7 @@ export class UnBinding {
     private modal: Modal;
     private config: obj;
     private ul: HTMLElement;
-    private length: Number;
-    constructor(data: UnBindingPara[], config: obj) {
+    constructor(config: obj) {
         let full;
         if (sys.os !== 'pc') {
             full = 'full';
@@ -32,25 +31,20 @@ export class UnBinding {
             isOnceDestroy: true
         });
         this.modal.isShow = true;
-        this.renderList(data)
+        this.getData()
         //遍历li
 
         let self = this;
         //unbind
         d.on(ul, 'click', '.unbind', function () {
             let data = JSON.stringify([{ uuid: this.dataset.name }]);
+            // self.getData();
             BwRule.Ajax.fetch(CONF.ajaxUrl.unbound, {
                 type: 'post',
                 data: data,
             }).then(() => {
                 self.getData();
                 Modal.toast('解绑成功');
-                if (self.length <= 1) {
-                    setTimeout(() => {
-                        sys.window.load(CONF.url.reg);
-                    }, 1000);
-                }
-               
             });
         });
     }
@@ -59,7 +53,6 @@ export class UnBinding {
         this.modal.isShow = true;
     }
     renderList(data) {
-        this.length = data.length;
         this.ul.innerHTML = '';
         let deviceInfo = JSON.parse(localStorage.getItem("deviceInfo"))
         if (data.length > 0) {
@@ -86,14 +79,6 @@ export class UnBinding {
         }
     }
     getData() {
-        // let data = [{
-        //     MODEL: "搜索",
-        //     VENDOR: "xxx",
-        //     REGISTER_TIME: "xxx",
-        //     UUID: "xxxy"
-        // }];
-        // this.renderList(data)
-        // return false;
         BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
             data: {
                 mobile: this.config.mobile,
@@ -104,6 +89,9 @@ export class UnBinding {
             type: 'get'
         }).then(({ response }) => {
             this.renderList(response.data)
+            // this.renderList(response.data)
+        }).catch(err=>{
+            sys.window.load(CONF.url.reg);
         })
     }
 

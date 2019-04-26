@@ -468,9 +468,17 @@ export class LoginPage {
                 } else if (tools.isEmpty(deviceInfo) && tools.isEmpty(deviceInfo.uuid)) {
                     Modal.alert('uuid为空');
                 } else {
-                    loginBtn.isLoading = true;
-                    loginBtn.isDisabled = true;
-                    loginBtn.content = '前往中...';
+                    loginBtn.isLoading = false;
+                    loginBtn.isDisabled = false;
+                    loginBtn.content = '前往解绑';
+                    new UnBinding({
+                        mobile: telVal,
+                        check_code: codeVal,
+                        userid: userVal,
+                        uuid: deviceInfo.uuid
+                    })
+                  
+                    return false;
                     // 前端验证通过后向后台发送数据
                     BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
                         data: {
