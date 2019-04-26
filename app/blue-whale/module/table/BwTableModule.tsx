@@ -82,6 +82,7 @@ export class BwTableModule extends Component {
         this.editParam = para.editParam;
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
+        console.log('para', para);
         this.isModalEdit = ui.operationType && ui.operationType.editType
             ? ui.operationType.editType === 'modal' : false;
         this.isPivot = ui.relateType === 'P';
@@ -2286,7 +2287,7 @@ export class BwTableModule extends Component {
                 className: !tools.isMb ? 'more-btns' : ''
             });
             //btnsUi = [{ "caption": "测试设计", "title": "测试设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 10 }, { "caption": "流程设计", "title": "流程设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 0 }];
-           console.log(btnsUi)
+           console.log(btnsUi);
             Array.isArray(btnsUi) && btnsUi.forEach((btnUiItem) => {
                 let btn = new Button({
                     icon: btnUiItem.icon,
@@ -2659,6 +2660,7 @@ export class BwTableModule extends Component {
         if (!this._btnWrapper) {
             // debugger;
             if (tools.isMb) {
+                console.log('footer bar');
                 d.classAdd(this.wrapper, 'has-footer-btn');
                 this._btnWrapper = <footer className="mui-bar mui-bar-footer" />;
                 //
