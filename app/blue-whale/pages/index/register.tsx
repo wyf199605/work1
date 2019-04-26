@@ -1,23 +1,23 @@
 /// <amd-module name="RegPage"/>
 import sys = BW.sys;
 import CONF = BW.CONF;
-import {BwRule} from "../../common/rule/BwRule";
-import {Modal} from "global/components/feedback/modal/Modal";
-import {ShellAction} from "global/action/ShellAction";
+import { BwRule } from "../../common/rule/BwRule";
+import { Modal } from "global/components/feedback/modal/Modal";
+import { ShellAction } from "global/action/ShellAction";
 import d = G.d;
 import tools = G.tools;
 import Shell = G.Shell;
-import {UnBinding} from "../../module/unBinding/UnBinding";
-import {Button} from "../../../global/components/general/button/Button";
-import {Loading} from "../../../global/components/ui/loading/loading";
-import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import { UnBinding } from "../../module/unBinding/UnBinding";
+import { Button } from "../../../global/components/general/button/Button";
+import { Loading } from "../../../global/components/ui/loading/loading";
+import { Spinner } from "../../../global/components/ui/spinner/spinner";
 
 interface IProps {
     goLogin: HTMLElement,   // 返回登录
     saveReg: HTMLElement,   // 注册
     sendVerify: HTMLElement,// 获取短信验证码
     tel: HTMLInputElement,  // 输入手机号
-    verifyELCodeInput?:HTMLInputElement,    // 输入前端的验证码
+    verifyELCodeInput?: HTMLInputElement,    // 输入前端的验证码
     verifyELCode?: HTMLCanvasElement,       // 显示前端的验证码
     smsCheckCode: HTMLInputElement;         // 输入短信验证码
     fqaBtn?: Button,
@@ -31,38 +31,38 @@ export class RegPage {
         let self = this;
         self.getDevice();
         // self.setVerifyCode();
-        d.on(props.goLogin, 'click',() => {
+        d.on(props.goLogin, 'click', () => {
             sys.window.load(CONF.url.login);
         });
-        if(tools.isMb){
+        if (tools.isMb) {
             this.code = this.renderCheckCode(props.verifyELCode);
-            d.on(props.verifyELCode.parentElement, 'click', ()=>{
+            d.on(props.verifyELCode.parentElement, 'click', () => {
                 // self.setVerifyCode();
-                let canvas = <canvas width="80" height="30"/>;
+                let canvas = <canvas width="80" height="30" />;
                 d.replace(canvas, props.verifyELCode);
                 props.verifyELCode = canvas;
                 this.code = this.renderCheckCode(props.verifyELCode);
             });
         }
-        d.on(props.saveReg, 'click',() => {
+        d.on(props.saveReg, 'click', () => {
             if (props.tel.value.trim().length === 0) {
                 Modal.alert('请输入手机号');
                 return;
             }
-            if (props.verifyELCodeInput){
+            if (props.verifyELCodeInput) {
                 if (!self.confirmLocalCode()) {
                     return;
                 }
             }
-            if(props.smsCheckCode.value.trim().length === 0){
+            if (props.smsCheckCode.value.trim().length === 0) {
                 Modal.alert('请输入短信验证码');
                 return;
             }
-            if(!this.deviceData['uuid']){
+            if (!this.deviceData['uuid']) {
                 Modal.alert('获取不到设备UUID');
                 return;
             }
-            
+
             BwRule.Ajax.fetch(CONF.ajaxUrl.register, {
                 type: 'POST',
                 data: {
@@ -80,16 +80,15 @@ export class RegPage {
                     finger_type: '1',
                 },
                 data2url: true,
-            }).then(({response}) => {
-                if (response.msg.indexOf('成功')>-1) {
+            }).then(({ response }) => {
+                if (response.msg.indexOf('成功') > -1) {
                     Modal.toast('注册成功!');
-                    
                     setTimeout(() => {
+                        sys.window.logout();
                         if (sys.os !== 'pc') {
                             sys.window.back('');
                         }
-                        sys.window.logout();
-                        window.location.reload();
+                        // window.location.reload();
                     }, 2000);
                 } else {
                     Modal.confirm({
@@ -106,7 +105,7 @@ export class RegPage {
             });
         });
 
-        d.on(props.sendVerify,'click', function(e) {
+        d.on(props.sendVerify, 'click', function (e) {
             let sendVerify = this;
             let mobile = G.tools.str.toEmpty(props.tel.value);
             if (G.tools.isEmpty(mobile) || !G.tools.valid.isTel(mobile)) {
@@ -114,7 +113,7 @@ export class RegPage {
                 return;
             }
             // mb端，验证本地验证码
-            if (props.verifyELCodeInput){
+            if (props.verifyELCodeInput) {
                 if (!self.confirmLocalCode()) {
                     return;
                 }
@@ -124,7 +123,7 @@ export class RegPage {
             sendVerify.innerHTML = countdown + 's';
 
             let timer = setInterval(function () {
-                countdown --;
+                countdown--;
                 if (countdown == 0) {
                     clearInterval(timer);
                     sendVerify.classList.remove('disabled');
@@ -142,7 +141,7 @@ export class RegPage {
                 },
                 data2url: true,
                 type: 'POST',
-                headers: {uuid: self.deviceData['uuid']}
+                headers: { uuid: self.deviceData['uuid'] }
             }).then(() => {
                 Modal.toast('验证码发送成功');
             }).catch(() => {
@@ -157,7 +156,7 @@ export class RegPage {
             sys.window.close = double_back;
         }
 
-        if(props.fqaBtn){
+        if (props.fqaBtn) {
             props.fqaBtn.onClick = tools.pattern.throttling(() => {
                 // 使用异步加载fqa模块，防止一进入页面直接加载，堵塞
                 props.fqaBtn.disabled = true;
@@ -167,13 +166,13 @@ export class RegPage {
                 });
                 spinner.show();
                 new Promise((resolve, reject) => {
-                    if(tools.isMb){
+                    if (tools.isMb) {
                         require(['FqaModal'], (f) => {
                             new f.FqaModal({});
                             resolve();
                         });
                     }
-                    else{
+                    else {
                         require(['FqaPcModal'], (f) => {
                             new f.FqaPcModal({});
                             resolve();
@@ -190,29 +189,31 @@ export class RegPage {
     private deviceData = {};
     private getDevice() {
         if (sys.os === 'ip') {
-            let shell:any = ShellAction.get();
-            shell.device().getInfo({callback:(e:CustomEvent) => {
-                let json = JSON.parse(e.detail);
-                if (json.success) {
-                    this.deviceData = json.msg;
-                } else {
-                    Modal.toast(json.msg);
+            let shell: any = ShellAction.get();
+            shell.device().getInfo({
+                callback: (e: CustomEvent) => {
+                    let json = JSON.parse(e.detail);
+                    if (json.success) {
+                        this.deviceData = json.msg;
+                    } else {
+                        Modal.toast(json.msg);
+                    }
                 }
-            }});
+            });
         } else if (sys.os === 'ad') {
-            let shell:any = ShellAction.get();
+            let shell: any = ShellAction.get();
             let data = shell.device().getInfo().data;
-            if(data.success) {
+            if (data.success) {
                 this.deviceData = (data.msg);
             } else {
                 Modal.toast(data.msg);
             }
-        } else if('AppShell' in window) {
+        } else if ('AppShell' in window) {
             this.deviceData = Shell.base.device.data;
         } else if ('BlueWhaleShell' in window) {
-            let shell:any = ShellAction.get();
+            let shell: any = ShellAction.get();
             this.deviceData = shell.device().getInfo().data;
-        }else{
+        } else {
             //let deviceInfo={"model":"AT/AT COMPATIBLE","name":"Windows 7","version":"6.1.7601","vendor":"LENOVO","scale":16.3,"resolutionWidth":1366,"resolutionHeight":768,"uuid":"28-D2-44-0C-4E-B5"};
             //showDevice(deviceInfo);
         }
@@ -287,7 +288,7 @@ export class RegPage {
     // }
 
     // 用于记录生成的本地验证码
-    private code : string;
+    private code: string;
     /**
      * 生成本地验证码
      */
@@ -347,30 +348,30 @@ export class RegPage {
         }
         return result;
     }
-   /* private getVerifyElCode() : any[]{
-        let randomArray = [],
-            resultArray = [];
-        for (let i = 48; i <= 57; i++) {
-            randomArray.push(String.fromCharCode(i));            
-        }
-        for (let i = 65; i <= 90; i++) {
-            randomArray.push(String.fromCharCode(i));            
-        }
-        for (let i = 97; i <= 122; i++) {
-            randomArray.push(String.fromCharCode(i));            
-        }
-        let len = randomArray.length;
-        
-        while (resultArray.length < 5){
-            let random = Math.floor(Math.random() * len);
-            let randomCode = randomArray[random];
-            if (resultArray.indexOf(randomCode) == -1) {
-                resultArray.push(randomCode);
-            }
-        }
-
-        return resultArray;
-    }*/
+    /* private getVerifyElCode() : any[]{
+         let randomArray = [],
+             resultArray = [];
+         for (let i = 48; i <= 57; i++) {
+             randomArray.push(String.fromCharCode(i));            
+         }
+         for (let i = 65; i <= 90; i++) {
+             randomArray.push(String.fromCharCode(i));            
+         }
+         for (let i = 97; i <= 122; i++) {
+             randomArray.push(String.fromCharCode(i));            
+         }
+         let len = randomArray.length;
+         
+         while (resultArray.length < 5){
+             let random = Math.floor(Math.random() * len);
+             let randomCode = randomArray[random];
+             if (resultArray.indexOf(randomCode) == -1) {
+                 resultArray.push(randomCode);
+             }
+         }
+ 
+         return resultArray;
+     }*/
     /**
      * 设置本地验证码
      */
@@ -391,7 +392,7 @@ export class RegPage {
     /**
      * 验证输入的内容是否和本地验证码一致
      */
-    private confirmLocalCode() : Boolean{
+    private confirmLocalCode(): Boolean {
         let value = this.props.verifyELCodeInput.value.toLowerCase();
         if (this.code.toLowerCase() !== value) {
             Modal.alert('验证码输入不正确');

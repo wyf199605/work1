@@ -362,13 +362,13 @@ export class LoginPage {
         let form = d.create(`
         <form action="#" class="login-form">
             <div class="form-group">
-                <input class="user" type="text" placeholder="请输入员工号"/>
+                <input class="user" id="flow0" type="text" placeholder="请输入员工号"/>
             </div>
             <div class="form-group">
-                <input class="tel" type="number" placeholder="请输入手机号码"/>
+                <input class="tel" id="flow1" type="number" placeholder="请输入手机号码"/>
             </div>
             <div class="form-group">
-                <input class="code" type="number" placeholder="请输入短信验证码"/>
+                <input class="code" id="flow2" type="number" placeholder="请输入短信验证码"/>
             </div>
             <div class="btn-group"></div>
         </form>`);
@@ -422,8 +422,82 @@ export class LoginPage {
         let loginBtn = new Button({
             container: d.query('.btn-group', form),
             content: '前往解绑',
-            className: 'login-submit',
+            className: 'login-submit wjb',
+            onClick: (ev) => {
+                // 短信验证码登录
+                ev.preventDefault();
+                let telVal = tel.value,
+                    codeVal = code.value,
+                    userVal = user.value;
+                let deviceInfo = JSON.parse(localStorage.getItem("deviceInfo"));
+                if (user.value) {
+                    userVal = user.value.toUpperCase();
+                }
+                // let a = [{
+                //     MODEL: "搜索",
+                //     VENDOR: "xxx",
+                //     REGISTER_TIME: "xxx",
+                //     UUID: "xxxy"
+                // }, {
+                //     MODEL: "搜索2",
+                //     VENDOR: "xxx2",
+                //     REGISTER_TIME: "xxx2",
+                //     UUID: "xxxy"
+                // }, {
+                //     MODEL: "搜索4",
+                //     VENDOR: "xxx2",
+                //     REGISTER_TIME: "xxx2",
+                //     UUID: ""
+                // }];
+                // let obj = {
+                //     mobile: telVal,
+                //     check_code: codeVal,
+                //     userid: userVal,
+                //     uuid: deviceInfo.uuid
+                // }
+                // new UnBinding(a, obj);
+                // return false;
+
+                // 验证是否输入手机号与短信验证码
+                if (tools.isEmpty(userVal)) {
+                    Modal.alert('请输入员工号');
+                } else if (!tools.valid.isTel(telVal)) {
+                    Modal.alert('请输入正确的手机号码');
+                } else if (tools.isEmpty(codeVal)) {
+                    Modal.alert('请输入短信验证码');
+                } else if (tools.isEmpty(deviceInfo) && tools.isEmpty(deviceInfo.uuid)) {
+                    Modal.alert('uuid为空');
+                } else {
+                    loginBtn.isLoading = true;
+                    loginBtn.isDisabled = true;
+                    loginBtn.content = '前往中...';
+                    // 前端验证通过后向后台发送数据
+                    BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
+                        data: {
+                            mobile: telVal,
+                            check_code: codeVal,
+                            userid: userVal,
+                            uuid: deviceInfo.uuid
+                        },
+                        type: 'get'
+                    }).then(({ response }) => {
+                        new UnBinding(response.data, {
+                            mobile: telVal,
+                            check_code: codeVal,
+                            userid: userVal,
+                            uuid: deviceInfo.uuid
+                        })
+                    }).finally(() => {
+                        loginBtn.isLoading = false;
+                        loginBtn.isDisabled = false;
+                        loginBtn.content = '前往解绑';
+
+                    })
+                }
+
+            }
         });
+
         (<HTMLButtonElement>loginBtn.wrapper).type = 'submit';
 
         d.append(body, title);
@@ -442,76 +516,17 @@ export class LoginPage {
                 window.location.reload();
             }
         });
-
-        // 短信验证码登录
-        d.on(form, 'submit', (ev) => {
-            ev.preventDefault();
-            let telVal = tel.value,
-                codeVal = code.value,
-                userVal = user.value;
-            let deviceInfo = JSON.parse(localStorage.getItem("deviceInfo"));
-            // let a = [{
-            //     MODEL: "搜索",
-            //     VENDOR: "xxx",
-            //     REGISTER_TIME: "xxx",
-            //     UUID: "xxxy"
-            // }, {
-            //     MODEL: "搜索2",
-            //     VENDOR: "xxx2",
-            //     REGISTER_TIME: "xxx2",
-            //     UUID: "xxxy"
-            // }, {
-            //     MODEL: "搜索4",
-            //     VENDOR: "xxx2",
-            //     REGISTER_TIME: "xxx2",
-            //     UUID: ""
-            // }];
-            // let obj = {
-            //     mobile: telVal,
-            //     check_code: codeVal,
-            //     userid: userVal,
-            //     uuid: deviceInfo.uuid
-            // }
-            // new UnBinding(a, obj);
-            // return false;
-
-            // 验证是否输入手机号与短信验证码
-            if (tools.isEmpty(userVal)) {
-                Modal.alert('请输入员工号');
-            } else if (!tools.valid.isTel(telVal)) {
-                Modal.alert('请输入正确的手机号码');
-            } else if (tools.isEmpty(codeVal)) {
-                Modal.alert('请输入短信验证码');
-            } else {
-                loginBtn.isLoading = true;
-                loginBtn.isDisabled = true;
-                loginBtn.content = '前往中...';
-                // 前端验证通过后向后台发送数据
-                BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
-                    data: {
-                        mobile: telVal,
-                        check_code: codeVal,
-                        userid: userVal,
-                        uuid: deviceInfo.uuid
-                    },
-                    type: 'get'
-                }).then(({ response }) => {
-                    new UnBinding(response.data, {
-                        mobile: telVal,
-                        check_code: codeVal,
-                        userid: userVal,
-                        uuid: deviceInfo.uuid
-                    })
-                }).finally(() => {
-                    loginBtn.isLoading = false;
-                    loginBtn.isDisabled = false;
-                    loginBtn.content = '前往解绑';
-
-                })
-            }
-        });
+        /** 按钮上弹无法点击 */
+        let test = document.querySelector("#flow0"),
+            test1 = document.querySelector("#flow1"),
+            test2 = document.querySelector("#flow2");
+        d.on(test, "blur", this.scrollTop);
+        d.on(test1, "blur", this.scrollTop);
+        d.on(test2, "blur", this.scrollTop);
     }
-
+    private scrollTop() {
+        document.body.scrollTop = 0;
+    }
     /**
      * 电脑指纹登录
      */

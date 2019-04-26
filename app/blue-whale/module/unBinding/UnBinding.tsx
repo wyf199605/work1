@@ -43,11 +43,7 @@ export class UnBinding {
                 type: 'post',
                 data: data,
             }).then(() => {
-                if (self.length === 1) {
-                    self.modal.isShow = false;
-                } else {
-                    self.getData();
-                }
+                self.getData();
                 Modal.toast('解绑成功');
             });
         });
@@ -102,6 +98,9 @@ export class UnBinding {
             },
             type: 'get'
         }).then(({ response }) => {
+            if (response.data.length<=0) {
+                sys.window.load(CONF.url.reg);
+            }
             this.renderList(response.data)
         })
     }
