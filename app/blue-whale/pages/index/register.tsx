@@ -85,9 +85,9 @@ export class RegPage {
                     Modal.toast('注册成功!');
                     setTimeout(() => {
                         sys.window.logout();
-                        if (sys.os !== 'pc') {
-                            sys.window.back('');
-                        }
+                        // if (sys.os !== 'pc') {
+                        //     sys.window.back('');
+                        // }
                         // window.location.reload();
                     }, 2000);
                 } else {
