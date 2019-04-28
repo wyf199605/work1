@@ -468,18 +468,6 @@ export class LoginPage {
                 } else if (tools.isEmpty(deviceInfo) && tools.isEmpty(deviceInfo.uuid)) {
                     Modal.alert('uuid为空');
                 } else {
-                    loginBtn.isLoading = false;
-                    loginBtn.isDisabled = false;
-                    loginBtn.content = '前往解绑';
-                    new UnBinding({
-                        mobile: telVal,
-                        check_code: codeVal,
-                        userid: userVal,
-                        uuid: deviceInfo.uuid
-                    })
-                  
-                    return false;
-                    // 前端验证通过后向后台发送数据
                     BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
                         data: {
                             mobile: telVal,
@@ -489,20 +477,31 @@ export class LoginPage {
                         },
                         type: 'get'
                     }).then(({ response }) => {
-                        new UnBinding(response.data, {
+                        // new UnBinding(response.data, {
+                        //     mobile: telVal,
+                        //     check_code: codeVal,
+                        //     userid: userVal,
+                        //     uuid: deviceInfo.uuid
+                        // })
+                        new UnBinding({
                             mobile: telVal,
                             check_code: codeVal,
                             userid: userVal,
                             uuid: deviceInfo.uuid
                         })
+                    }).catch((err) => {
+                        // console.log(JSON.parse(err.xhr.response));
+                        // if (JSON.parse(err.xhr.response).msg == '当前设备已解绑成功') {
+                        //     setTimeout(() => {
+                        //         sys.window.load(CONF.url.reg);
+                        //     }, 2000);
+                        // }
                     }).finally(() => {
                         loginBtn.isLoading = false;
                         loginBtn.isDisabled = false;
                         loginBtn.content = '前往解绑';
-
                     })
                 }
-
             }
         });
 
