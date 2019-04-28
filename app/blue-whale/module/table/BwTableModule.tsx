@@ -2869,7 +2869,9 @@ export class BwTableModule extends Component {
             bwTable.ftable.off(FastTable.EVT_CELL_EDIT_CANCEL, handler);
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
                 if (cell.isEdited) {
-                    validList.push(validate(editModule, cell));
+                    editModule ? editModule.assignPromise.then(() => {
+                        validList.push(validate(editModule, cell))
+                    }) : validList.push(validate(editModule, cell));
                 }
             });
         };
