@@ -16,6 +16,7 @@ export class UnBinding {
     private modal: Modal;
     private config: obj;
     private ul: HTMLElement;
+    private List: any;
     constructor(config: obj) {
         let full;
         if (sys.os !== 'pc') {
@@ -38,13 +39,19 @@ export class UnBinding {
         //unbind
         d.on(ul, 'click', '.unbind', function () {
             let data = JSON.stringify([{ uuid: this.dataset.name }]);
-            // self.getData();
             BwRule.Ajax.fetch(CONF.ajaxUrl.unbound, {
                 type: 'post',
                 data: data,
             }).then(() => {
-                self.getData();
+                // self.getData();
                 Modal.toast('解绑成功');
+                self.List = self.List.filter(item => {
+                    return item.UUID != this.dataset.name
+                })
+                self.renderList(self.List)
+                if (self.List.length === 0) {
+                    sys.window.load(CONF.url.reg);
+                }
             });
         });
     }
@@ -79,29 +86,31 @@ export class UnBinding {
         }
     }
     getData() {
-        let obj:obj={};
-        if(this.config.register){
-            obj.register=this.config.register;
+        let obj: obj = {};
+        if (this.config.register) {
+            obj.register = this.config.register;
         }
-        if(this.config.userid){
-            obj.userid=this.config.userid;
+        if (this.config.userid) {
+            obj.userid = this.config.userid;
         }
-        if(this.config.check_code){
-            obj.check_code=this.config.check_code;
+        if (this.config.check_code) {
+            obj.check_code = this.config.check_code;
         }
-        if(this.config.uuid){
-            obj.uuid=this.config.uuid;
+        if (this.config.uuid) {
+            obj.uuid = this.config.uuid;
         }
-        if(this.config.mobile){
-            obj.mobile=this.config.mobile;
+        if (this.config.mobile) {
+            obj.mobile = this.config.mobile;
         }
         BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
             data: obj,
             type: 'get'
         }).then(({ response }) => {
+            console.log(response.data)
+            this.List = response.data;
             this.renderList(response.data)
             // this.renderList(response.data)
-        }).catch(err=>{
+        }).catch(err => {
             sys.window.load(CONF.url.reg);
         })
     }
