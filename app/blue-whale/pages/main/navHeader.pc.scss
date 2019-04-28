@@ -85,6 +85,25 @@
   background-color: $color-default;
   color: #fff;
 }
+.fl-pc{
+  .navbar.navbar-default.navbar-static-top{
+    .navbar-collapse{
+      display: flex!important;
+      justify-content: space-between;
+
+      .top-navbar-menu{
+        flex: 1 1 auto;
+        width: auto!important;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+      .content-tabs{
+        flex: 0 0 auto;
+      }
+    }
+  }
+
+}
 
 .navbar {
   position: fixed;

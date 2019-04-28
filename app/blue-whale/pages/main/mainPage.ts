@@ -373,12 +373,44 @@ export = class MainPage {
 
         let init = () => {
             let container = d.query('.content-tabs'),
-                li = d.create(`<li class="dropdown pull-right"><a href="#">打开系统</a></li>`);
+                li = d.create(`<li class="dropdown pull-right"><a href="#">
+                    <span>打开系统</span>
+                    <i class="iconfont icon-expanse" style="color: #000;"></i>
+                    </a></li>`);
             d.append(container, li);
+            let span = d.query('span', li),
+                icon = d.query('i', li);
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({ response }) => {
-                let data = tools.keysVal(response, 'body', 'bodyList');
+                let data: obj[] = tools.keysVal(response, 'body', 'bodyList');
                 if (tools.isNotEmpty(data)) {
-                    if (data.length === 1) {
+                    let item = data[0];
+                    span.innerHTML = `<span class="${'iconfont ' + item.systemIcon}"></span>${item.systemName}`;
+                    d.on(span, 'click', () => {
+                        handlerClick(item);
+                    });
+                    if(data.length > 1){
+                        let popover = new Popover({
+                            target: icon,
+                            // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
+                            isWatch: true,
+                            items: data.slice(1).map((item) => {
+                                return {
+                                    title: item.systemName,
+                                    icon: 'iconfont ' + item.systemIcon,
+                                    onClick: () => {
+                                        handlerClick(item);
+                                    }
+                                }
+                            }),
+                            isBackground: false,
+                            onClick: function () {
+                                popover.show = false;
+                            }
+                        });
+                    }else{
+                        d.remove(icon);
+                    }
+                    /*if (data.length === 1) {
                         let item = data[0],
                             el = d.create(`<li class="dropdown pull-right">
                                     <a href="#">                                   
@@ -409,7 +441,7 @@ export = class MainPage {
                                 popover.show = false;
                             }
                         });
-                    }
+                    }*/
                 } else {
                     d.remove(li);
                 }
