@@ -74,6 +74,7 @@ export class EditDetail extends DetailBase {
     private initAllButtons() {
         let subButtons: R_Button[] = this.para.fm.subButtons,
             buttons: R_Button[] = [],
+            btnHandler,
             self = this;
         // 更多按钮
         function createMoreBtn(buttonss: R_Button[], wrapper: HTMLElement) {
@@ -383,6 +384,15 @@ export class EditDetail extends DetailBase {
                         data = ListItemDetail.getOldFieldData(btn, data || {});
                     }
                     ButtonAction.get().clickHandle(btn, data, () => {
+                        self.off(DetailBase.EVT_RENDER, btnHandler);
+                        if(btn.refresh === 1){
+                            self.on(DetailBase.EVT_RENDER, btnHandler = () => {
+                                if(self.totalNumber === 0){
+                                    ButtonAction.get().btnRefresh(3, self.para.url);
+                                }
+                                self.off(DetailBase.EVT_RENDER, btnHandler);
+                            })
+                        }
                     }, self.para.url || '');
                     break;
             }

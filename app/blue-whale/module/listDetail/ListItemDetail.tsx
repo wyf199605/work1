@@ -17,6 +17,8 @@ import {IDetailBasePara} from "./DetailBase";
 import sys = BW.sys;
 
 export class ListItemDetail extends Component{
+    static EVT_RENDER = '__event_list_detail_render_data__';
+
     // DOM容器
     private cells: objOf<ListItemDetailCell> = {};
     public defaultData: obj = {};
@@ -274,12 +276,14 @@ export class ListItemDetail extends Component{
         for (let key in cells) {
             cells[key].render(tools.isEmpty(data[key]) ? '' : data[key]);
         }
+        this.trigger(ListItemDetail.EVT_RENDER);
     }
 
     // 初始化详情按钮
     initDetailButtons() {
         let buttons: R_Button[] = this.para.fm.subButtons,
-            self = this;
+            self = this,
+            btnHandler;
 
         // 更多按钮
         function createMoreBtn(buttons: R_Button[], wrapper: HTMLElement, isPage: boolean) {
@@ -564,6 +568,15 @@ export class ListItemDetail extends Component{
                 default:
                     // 其他按钮
                     ButtonAction.get().clickHandle(btn, self.defaultData, () => {
+                        self.off(ListItemDetail.EVT_RENDER, btnHandler);
+                        if(btn.refresh === 1){
+                            self.on(ListItemDetail.EVT_RENDER, btnHandler = () => {
+                                if(self.totalNumber === 0){
+                                    ButtonAction.get().btnRefresh(3, self.pageUrl);
+                                }
+                                self.off(ListItemDetail.EVT_RENDER, btnHandler);
+                            })
+                        }
                     }, self.pageUrl);
                     break;
             }

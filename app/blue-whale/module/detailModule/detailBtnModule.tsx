@@ -227,7 +227,8 @@ export class DetailBtnModule extends DetailModule {
     })();
 
     protected btnManager = (() => {
-        let box: InputBox;
+        let box: InputBox,
+            btnHandler;
 
         let initStatus = () => {
             let data = this.detailData;
@@ -324,8 +325,19 @@ export class DetailBtnModule extends DetailModule {
                         return;
                     }
                     // 普通操作按钮
-                    let data = this.getData();
-                    ButtonAction.get().clickHandle(btn, data, () => { }, this.pageUrl || '');
+                    let btnAction = ButtonAction.get(),
+                        data = this.getData();
+                    btnAction.clickHandle(btn, data, () => {
+                        this.off(DetailModule.EVT_RENDERED, btnHandler);
+                        if(btn.refresh === 1){
+                            this.on(DetailModule.EVT_RENDERED, btnHandler = () => {
+                                if(this.total === 0){
+                                    btnAction.btnRefresh(3, this.pageUrl);
+                                }
+                                this.off(DetailModule.EVT_RENDERED, btnHandler);
+                            })
+                        }
+                    }, this.pageUrl || '');
 
                 }
             })

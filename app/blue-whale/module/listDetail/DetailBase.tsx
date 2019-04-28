@@ -28,6 +28,7 @@ export interface IDetailBasePara extends IComponentPara {
 
 export abstract class DetailBase extends Component {
 
+    static EVT_RENDER = '__event_detail_base_render_data__';
     static detailTypes = ['edit_detail', 'noedit_detail']; // edit_view
     protected para: IDetailBasePara;
     protected fields: R_Field[];
@@ -170,6 +171,7 @@ export abstract class DetailBase extends Component {
             this.checkPageButtonDisabled();
             this.detailForm.editData = data;
             this.isEdit = this.para.isEdit;
+            this.trigger(DetailBase.EVT_RENDER)
         });
     };
 
