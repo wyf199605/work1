@@ -79,13 +79,24 @@ export class UnBinding {
         }
     }
     getData() {
+        let obj:obj={};
+        if(this.config.register){
+            obj.register=this.config.register;
+        }
+        if(this.config.userid){
+            obj.userid=this.config.userid;
+        }
+        if(this.config.check_code){
+            obj.check_code=this.config.check_code;
+        }
+        if(this.config.uuid){
+            obj.uuid=this.config.uuid;
+        }
+        if(this.config.mobile){
+            obj.mobile=this.config.mobile;
+        }
         BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
-            data: {
-                mobile: this.config.mobile,
-                check_code: this.config.mobile,
-                userid: this.config.userid,
-                uuid: this.config.uuid
-            },
+            data: obj,
             type: 'get'
         }).then(({ response }) => {
             this.renderList(response.data)
