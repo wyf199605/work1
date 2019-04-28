@@ -373,18 +373,19 @@ export = class MainPage {
 
         let init = () => {
             let container = d.query('.content-tabs'),
-                li = d.create(`<li class="dropdown pull-right"><a href="#">
+                li = d.create(`<li class="dropdown-system dropdown pull-right"><a href="#">
                     <span>打开系统</span>
-                    <i class="iconfont icon-expanse" style="color: #000;"></i>
-                    </a></li>`);
+                    </a>
+                    <i class="more-btn iconfont icon-expanse" style="color: #000;"></i>
+                    </li>`);
             d.append(container, li);
-            let span = d.query('span', li),
+            let span = d.query('a', li),
                 icon = d.query('i', li);
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({ response }) => {
                 let data: obj[] = tools.keysVal(response, 'body', 'bodyList');
                 if (tools.isNotEmpty(data)) {
                     let item = data[0];
-                    span.innerHTML = `<span class="${'iconfont ' + item.systemIcon}"></span>${item.systemName}`;
+                    span.innerHTML = `<span class="${'icon-system iconfont ' + item.systemIcon}"></span>${item.systemName}`;
                     d.on(span, 'click', () => {
                         handlerClick(item);
                     });
