@@ -3,7 +3,7 @@
 import SPAPage = G.SPAPage;
 import d = G.d;
 import tools = G.tools;
-import {PrivilegeControl} from "../../../blue-whale/module/privilege/privilegeControl";
+// import {PrivilegeControl} from "../../../blue-whale/module/privilege/privilegeControl";
 import {DVAjax} from "../../module/util/DVAjax";
 
 export class AuthoritySearchPage extends SPAPage {
@@ -46,10 +46,10 @@ export class AuthoritySearchPage extends SPAPage {
                 localStorage.setItem('authority_search_elements',JSON.stringify(response.body.elements[0]));
             }
         });
-        new PrivilegeControl({
-            dom: d.query('.authoritySearchPage', this.wrapper),
-            url: 'http://bwd.fastlion.cn:7776/sf/app_sanfu_retail/v1/inter/dp/priv-1/privsget',
-            iurl:'./tpl.html'
-        })
+        // new PrivilegeControl({
+        //     dom: d.query('.authoritySearchPage', this.wrapper),
+        //     url: 'http://bwd.fastlion.cn:7776/sf/app_sanfu_retail/v1/inter/dp/priv-1/privsget',
+        //     iurl:'./tpl.html'
+        // })
     }
 }
