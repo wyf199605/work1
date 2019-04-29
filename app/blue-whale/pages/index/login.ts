@@ -477,10 +477,9 @@ export class LoginPage {
                         },
                         type: 'get'
                     }).then(({ response }) => {
-                        let res = JSON.parse(response)
-                        console.log(response)
-                        console.log(response.errorCode)
-                        if (Number(res.errorCode) == 0) {
+                        let res = JSON.parse(response);
+                        // alert(response);
+                        if (Number(res.errorCode) === 0) {
                             new UnBinding({
                                 mobile: telVal,
                                 check_code: codeVal,
@@ -488,8 +487,7 @@ export class LoginPage {
                                 uuid: deviceInfo.uuid
                             })
                             return false;
-                        }
-                        if (res.errorCode == 50012) {
+                        }else if(res.errorCode == 50012) {
                             if (res.msg === '当前设备已解绑成功') {
                                 Modal.alert(res.msg, null, () => { sys.window.load(CONF.url.reg); });
                             } else {
@@ -498,8 +496,8 @@ export class LoginPage {
                         } else {
                             Modal.alert(res.msg);
                         }
-
-
+                    }).catch(err => {
+                        console.log(err)
                     }).finally(() => {
                         loginBtn.isLoading = false;
                         loginBtn.isDisabled = false;
