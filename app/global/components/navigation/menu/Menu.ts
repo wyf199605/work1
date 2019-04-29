@@ -44,6 +44,7 @@ export class Menu extends ElementTreeNode {
             }
         }
 
+        // 设置角标 （渔人码头：设置菜单栏标红）
         this.setSubScript(para);
 
 
@@ -64,10 +65,15 @@ export class Menu extends ElementTreeNode {
             : para.isHorizontal;
         this.eventInit();
     }
+
+    /**
+     * // 设置角标 （渔人码头：设置菜单栏标红）
+     * @param menuItem 获取菜单栏
+     */
     setSubScript(menuItem) {
         // console.log($('.icon-shenpil').parent('.tree-text-wrapper'));
         
-        if(!menuItem.content.subScriptUrl ) return ;
+        if( !menuItem || !menuItem.content || !menuItem.content.subScriptUrl ) return ;
         // console.log('subS',menuItem);
         // console.log(sessionStorage.getItem('siteUrl'));
         let url = sessionStorage.getItem('siteUrl') + menuItem.content.subScriptUrl;
