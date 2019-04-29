@@ -23,6 +23,9 @@ export = class webscoket {
         let network, user = User.get(), self = this;
         let single = tools.isMb ? '/single/' : '/pc/';
 
+        setInterval(() => {
+            this.onMessage(1);
+        }, 15000)
 
         if (!user.userid) {
             user.userid = 'null';
@@ -100,7 +103,14 @@ export = class webscoket {
     }
 
     private onMessage(r) {
+        // let r = { "isTrusted": false, "data": "{\"data\":{\"userId\":\"CW5\",\"notifyIds\":\"8922038,8922040,8922042,8922043,8922039,8922041\",\"dataMap\":[{\"notifyId\":8922038,\"notifyType\":3,\"sender\":\"1000\",\"isread\":0,\"objectName\":\"TxtMsg\",\"content\":{\"caption\":\"消息标题测试3\",\"content\":\"发送消息测试1\"},\"createDate\":\"2019-04-29 16:27:37\"},{\"notifyId\":8922040,\"notifyType\":3,\"sender\":\"1000\",\"isread\":0,\"objectName\":\"TxtMsg\",\"content\":{\"caption\":\"消息标题测试3\",\"content\":\"发送消息测试1\"},\"createDate\":\"2019-04-29 16:27:40\"},{\"notifyId\":8922042,\"notifyType\":3,\"sender\":\"1000\",\"isread\":0,\"objectName\":\"TxtMsg\",\"content\":{\"caption\":\"消息标题测试3\",\"content\":\"发送消息测试1\"},\"createDate\":\"2019-04-29 16:28:28\"},{\"notifyId\":8922043,\"notifyType\":3,\"sender\":\"1000\",\"isread\":0,\"objectName\":\"TxtMsg\",\"content\":{\"caption\":\"消息标题测试3\",\"content\":\"发送消息测试1\"},\"createDate\":\"2019-04-29 16:29:00\"},{\"notifyId\":8922039,\"notifyType\":3,\"sender\":\"1000\",\"isread\":0,\"objectName\":\"TxtMsg\",\"content\":{\"caption\":\"消息标题测试3\",\"content\":\"发送消息测试1\"},\"createDate\":\"2019-04-29 16:27:39\"},{\"notifyId\":8922041,\"notifyType\":3,\"sender\":\"1000\",\"isread\":0,\"objectName\":\"TxtMsg\",\"content\":{\"caption\":\"消息标题测试3\",\"content\":\"发送消息测试1\"},\"createDate\":\"2019-04-29 16:27:42\"}]},\"respType\":\"notify\",\"respDesc\":\"\"}" }
+        // console.log(r)
+        // console.log(JSON.stringify(r))
+        // let r={"isTrusted":false,"data":"{\"data\":{\"userId\":\"CW5\",\"notifyIds\":\"89220381\",\"dataMap\":[{\"notifyId\":8922038,\"notifyType\":3,\"sender\":\"1000\",\"isread\":0,\"objectName\":\"TxtMsg\",\"content\":{\"caption\":\"消息标题测试3\",\"content\":\"发送消息测试1\"},\"createDate\":\"2019-04-29 16:27:37\"}]},\"respType\":\"notify\",\"respDesc\":\"\"}"};
         let data = JSON.parse(r.data), type = data.respType, self = this;
+        // console.log(data);
+        // data.data.dataMap[0].notifyId=Math.random();
+        // console.log(type);
         switch (type) {
             case "notify":
                 let dataMap = data.data.dataMap[0];
