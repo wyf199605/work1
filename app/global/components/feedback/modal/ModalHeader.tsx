@@ -106,9 +106,9 @@ export class ModalHeader extends Component {
     private _isClose?: boolean;
     set isClose(isClose: boolean) {
         this._isClose = isClose;
-        this._modalCloseEl = d.query('.close', this.wrapper);
+        this._modalCloseEl = d.query('.close_x', this.wrapper);
         if (!this._modalCloseEl && this._isClose) {
-            this._modalCloseEl = <span className="close">×</span>;
+            this._modalCloseEl = <span className="header-btn-right close_x">×</span>;
             this.wrapper.appendChild(this._modalCloseEl);
 
         } else {
