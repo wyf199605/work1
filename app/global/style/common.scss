@@ -65,3 +65,8 @@ body.fl-pc{
 ul, li{
   list-style: none;
 }
+
+// 去除Bootstrap按钮右外边距
+button.btn > span:nth-of-type(1){
+  margin-right: 0;
+}
