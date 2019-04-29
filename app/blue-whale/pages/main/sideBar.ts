@@ -63,6 +63,7 @@ export default class SideBarMrg {
   private initMainNavMenu() {
     let firstLoadSpinner = SideBarMrg.loadTpl();
     d.append(this.para.menu, firstLoadSpinner);
+    sessionStorage.setItem('siteUrl',CONF.siteUrl);
     this.menu = new Menu({
       expand: true,
       container: this.para.menu,
