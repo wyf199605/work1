@@ -13,6 +13,7 @@ import CONF = BW.CONF;
 import { BwRule } from "../../common/rule/BwRule";
 import localMsg = G.localMsg;
 import { ShellAction } from "../../../global/action/ShellAction";
+
 declare let ReconnectingWebSocket: any;
 
 export = class webscoket {
@@ -57,10 +58,10 @@ export = class webscoket {
         self.ws.onopen = () => {
             heartCheck.reset().start();
             console.info("websocket 连接打开.");
+            require(['messagePage'], (messagePage) => {
+                messagePage.setSysBadge();
+            });
 
-            if (tools.isMb) {
-                G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
-            }
         };
         self.ws.onmessage = (r) => {
             heartCheck.reset().start();
@@ -140,12 +141,17 @@ export = class webscoket {
                 if (tools.isMb) {
                     let unreadMsgNum = d.query('#unreadMsgNum'),
                         num = localMsg.getUnreadCount();
-                    if (num > 0) {
-                        unreadMsgNum.classList.remove('hide');
-                        unreadMsgNum.innerText = num + '';
+                    if (unreadMsgNum) {
+                        if (num > 0) {
+                            unreadMsgNum.classList.remove('hide');
+                            unreadMsgNum.innerText = num + '';
+                        }
                     }
                     tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
-                    G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
+                    // G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() }, () => { })
+                    require(['messagePage'], (messagePage) => {
+                        messagePage.setSysBadge();
+                    });
                 }
                 let os = BW.sys.os;
                 if (os === 'ip' || os === 'ad') {
@@ -184,7 +190,7 @@ export = class webscoket {
                     'notifyIds': data.data.notifyIds
                 };
                 self.ws.send(JSON.stringify(jsonMsg));
-              
+
                 break;
             case "sql":
                 let content = d.query('#sqlMonitorContent', document.body);
@@ -235,7 +241,7 @@ export = class webscoket {
                 //     time: new Date().toLocaleTimeString(),
                 //     num: 2
                 // });
-               
+
                 break;
             default:
                 console.info("后台返回未知的消息(" + type + ")类型.");
