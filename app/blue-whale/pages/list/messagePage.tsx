@@ -228,9 +228,7 @@ export = class messagePage {
     static setSysBadge() {
         let badge = d.query(`[data-field=sys]`),
             num = localMsg.getUnreadCount();
-            console.log(badge)
         if (badge) {
-            console.log(11)
             if (num > 0) {
                 badge.classList.remove('hide');
                 badge.textContent = num + '';
