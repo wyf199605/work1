@@ -32,7 +32,8 @@ export class BtnGroup extends Component {
                 }));
                 // if(btnItem.)
                 // 是否拖動按鈕
-                if( G.tools.isMb && btnItem.className.includes('import-scanning-single-moving')) {
+                // let classNameStr = btnItem.className
+                if( G.tools.isMb && btnItem.className.indexOf('import-scanning-single-moving') !== -1) {
                     console.log(btn.className)
                     btnItem.className = btnItem.className + ' keystep btnBottom';
                     setTimeout(() => {
@@ -40,7 +41,7 @@ export class BtnGroup extends Component {
                         btnItem.fixedAndMoving(wrapper);
                     }, 500);
                 }
-                else if( G.tools.isMb && btnItem.className.includes('import-scanning-many-moving')) {
+                else if( G.tools.isMb && btnItem.className.indexOf('import-scanning-many-moving') !== -1) {
                     console.log(btn.className)
                     btnItem.className = btnItem.className + ' keystep';
                     setTimeout(() => {

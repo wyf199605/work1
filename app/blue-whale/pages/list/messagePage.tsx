@@ -20,6 +20,7 @@ export = class messagePage {
     private p: obj;
     private tab: Tab;
     private SysDom: HTMLElement;
+    static tastList: Array<obj> = [];
     constructor(private para) {
         this.p = para;
         let container = d.query('.mui-scroll'),
@@ -39,7 +40,8 @@ export = class messagePage {
                 name: 'sys',
             }],
             onClick: (index) => {
-                index === 1 ? this.showSysList(localMsg.get(), false, listDOM) : null
+                index === 1 ? this.showSysList(localMsg.get(), false, listDOM) : null;
+                messagePage.setSysBadge();
             }
         });
 
@@ -59,6 +61,9 @@ export = class messagePage {
             type: 'get'
         }).then(({ response }) => {
             d.append(taskDom, this.showTaskList(response.data));
+            // console.log(response.data)
+            messagePage.tastList = response.data;
+            messagePage.setSysBadge();
         });
 
     }
@@ -107,19 +112,18 @@ export = class messagePage {
             this.showSysList(JSON.parse(e.detail), true, listDOM);
         });
 
-        this.setSysBadge();
+        messagePage.setSysBadge();
 
         sys.window.close = double_back;
     }
 
     private read(msgDOM) {
-        console.log(msgDOM)
-        
+
         let unreadDot = d.query('.mui-badge.unread', msgDOM);
         if (unreadDot !== null) {
             d.remove(unreadDot);
             localMsg.read(Number(msgDOM.dataset.notifyId));
-            this.setSysBadge();
+            messagePage.setSysBadge();
         }
     }
     // static uploadMsg(list: obj[], isAppend: boolean, listDOM: HTMLElement) {
@@ -127,7 +131,7 @@ export = class messagePage {
     // }
     private showSysList(list: obj[], isAppend: boolean, listDOM: HTMLElement) {
         if (G.tools.isMb) {
-            G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
+            messagePage.setSysBadge();
         }
         // alert('渲染')
         let self = this;
@@ -136,7 +140,7 @@ export = class messagePage {
                 case 'read':
                     let tapThis = this;
                     self.read(tapThis);
-                    if(tapThis.dataset.url === 'undefined'||tapThis.dataset.url==''){
+                    if (tapThis.dataset.url === 'undefined' || tapThis.dataset.url == '') {
                         break;
                     }
                     BwRule.Ajax.fetch(CONF.ajaxUrl.userMsg, {
@@ -205,7 +209,7 @@ export = class messagePage {
                                 if (flag) {
                                     localMsg.remove(data.notifyId);
                                     d.remove(html as any);
-                                    this.setSysBadge();
+                                    messagePage.setSysBadge();
                                 }
                             }
                         });
@@ -215,22 +219,27 @@ export = class messagePage {
             });
 
         }
-        this.setSysBadge();
+        messagePage.setSysBadge();
     }
 
     /**
     * 设置角标，数字为0时，则不显示角标
     */
-    private setSysBadge() {
+    static setSysBadge() {
         let badge = d.query(`[data-field=sys]`),
             num = localMsg.getUnreadCount();
-        if (num > 0) {
-            badge.classList.remove('hide');
-            badge.textContent = num + '';
-        } else {
-            badge.classList.add('hide');
+        if (badge) {
+            if (num > 0) {
+                badge.classList.remove('hide');
+                badge.textContent = num + '';
+            } else {
+                badge.classList.add('hide');
+            }
         }
-        G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() },()=>{})
+        console.log(messagePage.tastList.length)
+        let total = messagePage.tastList.length + localMsg.getUnreadCount();
+        console.log(total)
+        G.Shell.other.sendMsgCount({ MsgCount: total }, () => { })
     }
 
 }
