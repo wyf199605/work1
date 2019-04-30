@@ -5,6 +5,7 @@ const gulp = require('gulp'), //gulp
     rename = require('gulp-rename'), //文件重命名
     concat = require('gulp-concat'), //合并文件
     minifyjs = require('gulp-uglify'), //压缩js文件
+    stripDebug = require('gulp-strip-debug');
     minifycss = require('gulp-clean-css'), //压缩css文件
     css = require('gulp-scss'), //打包css文件
     sass = require('gulp-sass'),
@@ -227,11 +228,21 @@ module.exports = class Compiler {
     }
 
     static compressor(type, src, target) {
-        let fun = type === 'js' ? minifyjs() : minifycss();
-
-        gulp.src(src)
-            .pipe(fun)
+        // let fun = type === 'js' ? minifyjs() : minifycss();
+        
+        // gulp.src(src)
+        //     .pipe(fun)
+        //     .pipe(gulp.dest(target));
+        if (type === 'js') {
+            gulp.src(src)
+            .pipe(minifyjs())
+            .pipe(stripDebug())
+            .pipe(gulp.dest(target)); 
+        } else {
+            gulp.src(src)
+            .pipe(minifycss())
             .pipe(gulp.dest(target));
+        }
     }
 
     /**

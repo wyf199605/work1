@@ -1877,16 +1877,16 @@ export class BwTableModule extends Component {
                     }
                 }
             }
-            if(text && typeof text === 'object' && text['localName'] === 'img' && tools.isMb){
-                text['onclick'] = (e)=> {
-                    e.preventDefault();
-                    console.log('123');
-                    console.log(e.path[0].baseURI);
-                    let picture = e.path[0].src.replace(/thumbnail/i,'picture');
-                    console.log(picture);
-                    sys.window.openImg(picture);
-                }
-            }
+            // if(text && typeof text === 'object' && text['localName'] === 'img' && tools.isMb){
+            //     text['onclick'] = (e)=> {
+            //         e.preventDefault();
+            //         console.log('123');
+            //         console.log(e.path[0].baseURI);
+            //         let picture = e.path[0].src.replace(/thumbnail/i,'picture');
+            //         console.log(picture);
+            //         sys.window.openImg(picture);
+            //     }
+            // }
             return { text, classes, bgColor, color, data };
     }
 
@@ -2297,7 +2297,7 @@ export class BwTableModule extends Component {
                 className: !tools.isMb ? 'more-btns' : ''
             });
             //btnsUi = [{ "caption": "测试设计", "title": "测试设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 10 }, { "caption": "流程设计", "title": "流程设计", "icon": "", "actionAddr": { "type": "none", "needGps": 0, "dataAddr": "/app_sanfu_retail/null/audit/flow-6/2/flow_design", "varList": [{ "varName": "PROCESS_ID" }], "varType": 0, "addrType": false, "commitType": 1 }, "buttonType": 0, "subType": "", "openType": "flow-design", "hintBeforeAction": false, "refresh": 0, "multiselect": 1, "level_no": 0 }];
-           console.log(btnsUi);
+        //    console.log(btnsUi);
             Array.isArray(btnsUi) && btnsUi.forEach((btnUiItem) => {
                 let btn = new Button({
                     icon: btnUiItem.icon,
