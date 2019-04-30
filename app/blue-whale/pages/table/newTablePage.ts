@@ -180,7 +180,6 @@ export class BwTableElement extends Component{
                     this.queryModule = new Query({
                         qm: bwTableEl.querier,
                         refresher: (ajaxData) => {
-                            // debugger;
                             return this.tableModule.refresh(ajaxData).then(() => {
                                 let locationLine = bwTableEl.scannableLocationLine;
                                 if(locationLine && ajaxData.mobilescan){
@@ -230,7 +229,6 @@ export class BwTableElement extends Component{
         let inputs = para.tableEl.inputs,
             line = para.tableEl.scannableLocationLine,
             querier = para.tableEl.querier;
-
         if(!isDynamic && bwTableEl.scannableField){
             this.mobileScanInit(bwTableEl);
         }else if(!isDynamic && inputs && !bwTableEl.scannableField){

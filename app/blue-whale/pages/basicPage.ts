@@ -90,6 +90,7 @@ export default class BasicPage {
                 });
             })
         }
+        require(['photoSwipe', 'photoSwipeUi'], (photoSwipe, PhotoSwipeUI_Default) => {});
     }
 
     protected wrapperInit(): HTMLElement {

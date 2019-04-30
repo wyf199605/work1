@@ -82,7 +82,7 @@ export = class TableModulePc extends TableModule {
         //         new Inputs({
         //             inputs : this.para.inputs,
         //             container : this.tableConf.tableEl,
-        //             table : this,
+        //             // table : this,
         //         })
         //     }
         // },200);

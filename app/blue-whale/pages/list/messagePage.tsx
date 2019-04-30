@@ -236,9 +236,9 @@ export = class messagePage {
                 badge.classList.add('hide');
             }
         }
-        console.log(messagePage.tastList.length)
+        // console.log(messagePage.tastList.length)
         let total = messagePage.tastList.length + localMsg.getUnreadCount();
-        console.log(total)
+        // console.log(total)
         G.Shell.other.sendMsgCount({ MsgCount: total }, () => { })
     }
 

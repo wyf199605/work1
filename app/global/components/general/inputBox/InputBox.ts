@@ -220,7 +220,6 @@ export class InputBox extends Component {
         if (!this.isResponsive) {
             return;
         }
-        console.log('............');
         let childrenWidth = 56, isFirst = true;
         let wrapperWidth = this.wrapper.offsetWidth;
         for (let c of this.children) {

@@ -23,9 +23,9 @@ export = class webscoket {
         let network, user = User.get(), self = this;
         let single = tools.isMb ? '/single/' : '/pc/';
 
-        setInterval(() => {
-            this.onMessage(1);
-        }, 15000)
+        // setInterval(() => {
+        //     this.onMessage(1);
+        // }, 15000)
 
         if (!user.userid) {
             user.userid = 'null';
