@@ -945,18 +945,6 @@ namespace G {
     // };
 
     document.body.classList.add(tools.isMb ? 'fl-mobile' : 'fl-pc'); // 全局类
-    if( tools.isMb) {
-        console.log(window);
-        // window.addEventListener（"orientationchange"，function（）{
-        //     alert("the orientation fo the device is now " + screen.orientation.angle）;
-        // }）;
-        $(window).on('orientationchange',(event) => {
-            console.log('orientationchange');
-            // location.reload();
-
-        });
-        
-    }
 
 }
 

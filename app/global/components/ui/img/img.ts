@@ -56,6 +56,7 @@ export const ImgModal = (() => {
 
                 if(typeof para.turnPage === 'function'){
                     d.on(pre, 'click', () => {
+                     
                         para.turnPage(false);
                     });
 

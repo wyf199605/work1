@@ -584,6 +584,13 @@ namespace G {
             // 保存图片至本地
             saveImg(img: string) {
                 return ShellBase.handler('saveImg', { img })
+            },
+            
+            // 移动端下载图片
+            downloadImg(url: string, back: IShellEventHandler) {
+                ShellBase.handler('downloadImg', {
+                    url
+                }, back);
             }
         };
 
