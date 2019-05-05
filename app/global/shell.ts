@@ -1,5 +1,5 @@
 
-namespace G { 
+namespace G {
 
     export const Shell = ((window, document) => {
 
@@ -538,7 +538,7 @@ namespace G {
             photoAlbum(callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
                 this.getImg(1, callback, error);
             },
-            fileGet(callback: (file: CustomFile[]) => void){
+            fileGet(callback: (file: CustomFile[]) => void) {
                 let input = <HTMLInputElement>d.create('<input type="file" class="hide"/>');
                 d.on(input, 'change', () => {
                     callback && callback(Array.prototype.slice.call(input.files).map((file: File): CustomFile => {
@@ -585,26 +585,12 @@ namespace G {
             saveImg(img: string) {
                 return ShellBase.handler('saveImg', { img })
             },
-            
+
             // 移动端下载图片
             downloadImg(url: string, back: IShellEventHandler) {
                 ShellBase.handler('downloadImg', {
                     url
                 }, back);
-            },
-
-            // image 转base64 
-            getBase64Image(url) {
-                var img = new Image();
-                img.src = url;
-                var canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                var ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0, img.width, img.height);
-                var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
-                var dataURL = canvas.toDataURL("image/" + ext);
-                return dataURL;
             }
         };
 
@@ -621,8 +607,8 @@ namespace G {
         //表格上方的发送位置-停止发送
         const location = {
             //开始定位
-            startRecord(info = {timeStep: 5000}, back?: IShellEventHandler) {
-                return ShellBase.handler('startRecord', info , back);
+            startRecord(info = { timeStep: 5000 }, back?: IShellEventHandler) {
+                return ShellBase.handler('startRecord', info, back);
             },
             //结束定位
             stopRecord(info, back?: IShellEventHandler) {
@@ -646,12 +632,12 @@ namespace G {
         };
         const other = {
             //消息数量
-            sendMsgCount(data: obj,back?: IShellEventHandler) {
-                return ShellBase.handler('receiveMessage', data,back);
+            sendMsgCount(data: obj, back?: IShellEventHandler) {
+                return ShellBase.handler('receiveMessage', data, back);
             },
             //是否支持指纹
-            isSupportFinger(back?:IShellEventHandler){
-                return ShellBase.handler('isSupportFinger',{},back)
+            isSupportFinger(back?: IShellEventHandler) {
+                return ShellBase.handler('isSupportFinger', {}, back)
             }
         }
         return {

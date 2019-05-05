@@ -23,7 +23,6 @@
 
 var PhotoSwipeUI_Default =
  function(pswp, framework) {
-
 	var ui = this;
 	var _overlayUIUpdated = false,
 		_controlsVisible = true,
@@ -68,9 +67,10 @@ var PhotoSwipeUI_Default =
 			zoomEl: true,
 			shareEl: true,
 			counterEl: true,
-			arrowEl: true,
             preloaderEl: true,
             downloadEl: true,
+            nextEl: true,
+            prevEl: true,
 
 			tapToClose: false,
 			tapToToggleControls: true,
@@ -124,9 +124,8 @@ var PhotoSwipeUI_Default =
 
 			for(var i = 0; i < _uiElements.length; i++) {
                 uiElement = _uiElements[i];
-                console.log('llllll',uiElement)
 				if(uiElement.onTap && clickedClass.indexOf('pswp__' + uiElement.name ) > -1 ) {
-					uiElement.onTap();
+                    uiElement.onTap();
 					found = true;
 
 				}
@@ -172,7 +171,6 @@ var PhotoSwipeUI_Default =
 			_togglePswpClass(_shareModal, 'share-modal--hidden', _shareModalHidden);
 		},
 		_toggleShareModal = function() {
-
 			_shareModalHidden = !_shareModalHidden;
 			
 			
@@ -400,7 +398,6 @@ var PhotoSwipeUI_Default =
 			// Hide controls when pinching to close
 			var pinchControlsHidden;
 			_listen('onPinchClose' , function(now) {
-                console.log('111');
 				if(_controlsVisible && now < 0.9) {
 					ui.hideControls();
 					pinchControlsHidden = true;
@@ -466,14 +463,14 @@ var PhotoSwipeUI_Default =
 			onTap: pswp.close
 		},
 		{ 
-			name: 'button--arrow--left', 
-			option: 'arrowEl',
-			onTap: pswp.prev
+			name: 'button--next',  
+			option: 'nextEl',
+			onTap: pswp.nextImg
 		},
 		{ 
-			name: 'button--arrow--right', 
-			option: 'arrowEl',
-			onTap: pswp.next
+			name: 'button--prev', 
+			option: 'prevEl',
+			onTap: pswp.prevImg
         },
         { 
 			name: 'button--download', 
