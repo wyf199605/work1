@@ -10,6 +10,7 @@ import { FastBtnTable } from "../../../global/components/FastBtnTable/FastBtnTab
 import { Button } from "../../../global/components/general/button/Button";
 import { ShellAction } from "../../../global/action/ShellAction";
 import Shell = G.Shell;
+import { BarCode } from "cashier/global/utils/barCode";
 
 interface InputsPara {
     inputs: R_Input[]
@@ -74,7 +75,7 @@ export class Inputs {
                 return response;
             }).catch(() => {
                 this.isProcess = false;
-            }).finally(()=>{
+            }).finally(() => {
                 this.isProcess = false;
             })
     }
@@ -270,7 +271,7 @@ export class Inputs {
                 let item = all[i] as any;
                 if (item.hasAttribute('readonly')) {
                     item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
-                    item.parentNode.style.position="relative";
+                    item.parentNode.style.position = "relative";
                     let htl = d.create('<div class="undisalbe"></div>')
                     item.parentNode.appendChild(htl)
                 }
@@ -316,6 +317,10 @@ export class Inputs {
                 line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 let handle = () => {
+                    if (text.indexOf('Shift') > -1) {
+                       text= text.replace('Shift', '')
+                    }
+                    // console.log(text)
                     let reg = regExpMatch(input, text);
                     //匹配成功
                     if (reg) {
@@ -328,7 +333,7 @@ export class Inputs {
                     text = '';
                 },
                     code = e.keyCode || e.which || e.charCode;
-
+                console.log(code)
                 if (code === 13) {
                     handle();
                 } else {
@@ -360,7 +365,7 @@ export class Inputs {
 /**
  *
  */
-export class KeyStep { 
+export class KeyStep {
     private p: IKeyStepPara;
     constructor(para: IKeyStepPara) {
         this.p = para;
@@ -540,5 +545,5 @@ function regExpMatch(input: R_Input, inputContent: string) {
             }
         });
     }
-    return data;
+    return data
 }
