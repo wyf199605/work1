@@ -2,9 +2,11 @@
 // import sys = G.sys;
 import d = G.d;
 import tools = G.tools;
+import Shell = G.Shell;
 
-import {Modal} from "../../feedback/modal/Modal";
-import {Loading} from "../loading/loading";
+import { Modal } from "../../feedback/modal/Modal";
+import { Loading } from "../loading/loading";
+
 
 export interface ImgModalPara {
     downAddr?: string;
@@ -15,7 +17,7 @@ export interface ImgModalPara {
     isThumbnail?: boolean; // 默认false,
     textArr?: string[];
     onDownload?(url: string);
-    turnPage?(next? : boolean)
+    turnPage?(next?: boolean)
 }
 
 export const ImgModal = (() => {
@@ -43,27 +45,30 @@ export const ImgModal = (() => {
 
                     //下载按钮
                     if (downAddr && onDownload) {
-                        d.on(container, 'click', '.icon-download', () => {
-                            onDownload(downAddr);
+                        d.on(container, 'click', () => {
+                            // onDownload(downAddr);
+                            console.log(1111);
                         });
                     } else {
-                        d.query('.icon-download', wrapper).classList.add('hide');
+                        if (tools.isPc) {
+                            d.query('.icon-download', wrapper).classList.add('hide');
+                        }
                     }
                     // ImgModal.initTag = false;
                 }
+
                 let pre = d.query('.pre-page', wrapper),
                     next = d.query('.next-page', wrapper);
 
-                if(typeof para.turnPage === 'function'){
+                if (typeof para.turnPage === 'function') {
                     d.on(pre, 'click', () => {
-                     
                         para.turnPage(false);
                     });
 
                     d.on(next, 'click', () => {
                         para.turnPage(true);
                     });
-                }else {
+                } else {
                     pre.classList.add('hide');
                     next.classList.add('hide');
                 }
@@ -87,7 +92,7 @@ export const ImgModal = (() => {
                 }
 
                 Promise.all(pros).then(items => {
-                    if (tools.isNotEmpty(items)){
+                    if (tools.isNotEmpty(items)) {
                         gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
                             // history & focus options are disabled on CodePen
                             history: false
@@ -111,6 +116,18 @@ export const ImgModal = (() => {
                         gallery.init();
                         gallery.listen('close', function () {
                             destroy();
+                        });
+                        gallery.listen('download', function () {
+                            // destroy();?
+                            console.log(1324);
+
+                            // var image = new Image();
+                            // image.src = para.img[0];
+                            var base64 = Shell.image.getBase64Image(para.img[0]);
+                            console.log(base64);
+                            Shell.image.downloadImg(base64, (res) => {
+                                console.log(123333);
+                            });
                         })
                     }
                 }).finally(() => {
@@ -182,34 +199,34 @@ export const ImgModal = (() => {
     }
 })();
 
-const imgModalTpl = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">' +
-    '<div class="pswp__bg"></div>' +
-    '<div class="pswp__scroll-wrap">' +
-    '<div class="pswp__container">' +
-    '<div class="pswp__item"></div>' +
-    '<div class="pswp__item"></div>' +
-    '<div class="pswp__item"></div>' +
-    '</div>' +
-    '<div class="pswp__ui pswp__ui--hidden">' +
-    '<div class="pswp__top-bar">' +
-    '<div class="pswp__counter"></div>' +
-    '<button class="pswp__button pswp__button--close iconfont icon-close"></button>' +
-    '<button class="pswp__button pswp__button--fs iconfont icon-maximize"></button>' +
-    '<button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button>' +
-    '<button class="pswp__button iconfont icon-download"> </button>' +
-    '<button class="pswp__button next-page iconfont icon-arrow-right"></button>' +
-    '<button class="pswp__button pre-page iconfont icon-arrow-left"></button>' +
-    '<div class="pswp__preloader">' +
-    '<div class="pswp__preloader__icn">' +
-    '<div class="pswp__preloader__cut">' +
-    '<div class="pswp__preloader__donut"></div>' +
-    '</div></div></div></div>' +
-    '<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">' +
-    '<div class="pswp__share-tooltip"></div>' +
-    '</div>' +
-    '<button class="pswp__button pswp__button--arrow--left iconfont icon-arrow-left">' +
-    '<span class=" iconfont icon-arrow-left"></span> </button>' +
-    '<button class="pswp__button pswp__button--arrow--right">' +
-    '<span class=" iconfont icon-arrow-right"></span> </button>' +
-    '<div class="pswp__caption"> ' +
-    '<div class="pswp__caption__center"></div></div></div></div></div>';
+const imgModalTpl = `<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true"> 
+    <div class="pswp__bg"></div> 
+    <div class="pswp__scroll-wrap"> 
+    <div class="pswp__container"> 
+    <div class="pswp__item"></div> 
+    <div class="pswp__item"></div> 
+    <div class="pswp__item"></div> 
+    </div> 
+    // <div class="pswp__ui pswp__ui--hidden"> 
+    <div class="pswp__top-bar"> 
+    <div class="pswp__counter"></div> 
+    <button class="pswp__button pswp__button--close iconfont icon-close"></button> 
+    // <button class="pswp__button pswp__button--fs iconfont icon-maximize"></button> 
+    <button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button> 
+    <button class="pswp__button pswp__button--download iconfont icon-download"> </button> 
+    <button class="pswp__button next-page iconfont icon-arrow-right"></button> 
+    <button class="pswp__button pre-page iconfont icon-arrow-left"></button> 
+    <div class="pswp__preloader"> 
+    <div class="pswp__preloader__icn"> 
+    <div class="pswp__preloader__cut"> 
+    <div class="pswp__preloader__donut"></div> 
+    </div></div></div></div> 
+    <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"> 
+    <div class="pswp__share-tooltip"></div> 
+    </div> 
+    <button class="pswp__button pswp__button--arrow--left iconfont icon-arrow-left"> 
+    <span class=" iconfont icon-arrow-left"></span> </button> 
+    <button class="pswp__button pswp__button--arrow--right"> 
+    <span class=" iconfont icon-arrow-right"></span> </button> 
+    <div class="pswp__caption">  
+    <div class="pswp__caption__center"></div></div></div></div></div>`;

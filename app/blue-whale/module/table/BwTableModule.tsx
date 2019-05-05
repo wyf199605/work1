@@ -2359,8 +2359,8 @@ export class BwTableModule extends Component {
                                 needGps: btnUiItem.actionAddr  ?  btnUiItem.actionAddr.needGps : '',
                                 timeStep: 5000,
                             };
-                           
-                            let stopBtn = d.query(".stop_location", wrapper) 
+
+                            let stopBtn = d.query(".stop_location", wrapper)
                             let startBtn = d.query(".start_location", wrapper);
                             // let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
                             let keStatus = G.Shell.location.startRecord(startLocationJson,() => {

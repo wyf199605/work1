@@ -965,6 +965,7 @@ var publicMethods = {
 
 	// Close the gallery, then destroy it
 	close: function() {
+        console.log('close');
 		if(!_isOpen) {
 			return;
 		}
@@ -1002,7 +1003,11 @@ var publicMethods = {
 		_stopAllAnimations();
 
 		_listeners = null;
-	},
+    },
+    
+    download: function() {
+        _shout('download');
+    },
 
 	/**
 	 * Pan image to position
