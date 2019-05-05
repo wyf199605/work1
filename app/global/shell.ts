@@ -1,5 +1,5 @@
 
-namespace G {
+namespace G { 
 
     export const Shell = ((window, document) => {
 
@@ -591,6 +591,20 @@ namespace G {
                 ShellBase.handler('downloadImg', {
                     url
                 }, back);
+            },
+
+            // image 转base64 
+            getBase64Image(url) {
+                var img = new Image();
+                img.src = url;
+                var canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                var ext = img.src.substring(img.src.lastIndexOf(".") + 1).toLowerCase();
+                var dataURL = canvas.toDataURL("image/" + ext);
+                return dataURL;
             }
         };
 

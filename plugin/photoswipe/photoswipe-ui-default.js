@@ -69,7 +69,8 @@ var PhotoSwipeUI_Default =
 			shareEl: true,
 			counterEl: true,
 			arrowEl: true,
-			preloaderEl: true,
+            preloaderEl: true,
+            downloadEl: true,
 
 			tapToClose: false,
 			tapToToggleControls: true,
@@ -122,7 +123,8 @@ var PhotoSwipeUI_Default =
 				found;
 
 			for(var i = 0; i < _uiElements.length; i++) {
-				uiElement = _uiElements[i];
+                uiElement = _uiElements[i];
+                console.log('llllll',uiElement)
 				if(uiElement.onTap && clickedClass.indexOf('pswp__' + uiElement.name ) > -1 ) {
 					uiElement.onTap();
 					found = true;
@@ -398,6 +400,7 @@ var PhotoSwipeUI_Default =
 			// Hide controls when pinching to close
 			var pinchControlsHidden;
 			_listen('onPinchClose' , function(now) {
+                console.log('111');
 				if(_controlsVisible && now < 0.9) {
 					ui.hideControls();
 					pinchControlsHidden = true;
@@ -471,6 +474,11 @@ var PhotoSwipeUI_Default =
 			name: 'button--arrow--right', 
 			option: 'arrowEl',
 			onTap: pswp.next
+        },
+        { 
+			name: 'button--download', 
+			option: 'downloadEl',
+			onTap: pswp.download 
 		},
 		{ 
 			name: 'button--fs', 
