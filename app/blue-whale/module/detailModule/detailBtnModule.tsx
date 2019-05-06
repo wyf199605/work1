@@ -331,10 +331,10 @@ export class DetailBtnModule extends DetailModule {
                         this.off(DetailModule.EVT_RENDERED, btnHandler);
                         if(btn.refresh === 1){
                             this.on(DetailModule.EVT_RENDERED, btnHandler = () => {
+                                this.off(DetailModule.EVT_RENDERED, btnHandler);
                                 if(this.total === 0){
                                     btnAction.btnRefresh(3, this.pageUrl);
                                 }
-                                this.off(DetailModule.EVT_RENDERED, btnHandler);
                             })
                         }
                     }, this.pageUrl || '');
