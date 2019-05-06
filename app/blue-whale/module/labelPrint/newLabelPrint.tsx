@@ -257,21 +257,30 @@ export class NewLabelPrint {
         }
 
         return new Promise((resolve, reject) => {
-            Promise.all([
-                tmpPromise,
-                BwRule.Ajax.fetch(CONF.siteUrl + addr, {
-                    data2url: dataAddr.varType !== 3,
-                    // type: 'GET',
-                    data: ajaxData,
-                })
-            ]).then(([{response: response1}, {response: response2}]) => {
-                let tmp = tools.keysVal(response1, 'body', 'bodyList', 0) as ILabelPrintResponse,
-                    data = tools.keysVal(response2, 'data') as obj[];
-                resolve({
-                    tmp: tmp,
-                    data: data,
-                    title: caption
-                })
+            tmpPromise.then(({response}) => {
+                let tmp = tools.keysVal(response, 'body', 'bodyList', 0) as ILabelPrintResponse,
+                    names = this.ui.cols.map((field) => field.name),
+                    tmpNames = tmp.selectFields.map((field) => field.fieldName);
+                if(tmpNames.every((name) => !!~names.indexOf(name))){
+                    resolve({
+                        tmp: tmp,
+                        data: tableData,
+                        title: caption
+                    })
+                }else{
+                    BwRule.Ajax.fetch(CONF.siteUrl + addr, {
+                        data2url: dataAddr.varType !== 3,
+                        // type: 'GET',
+                        data: ajaxData,
+                    }).then(({response}) => {
+                        let data = tools.keysVal(response, 'data') as obj[];
+                        resolve({
+                            tmp: tmp,
+                            data: data,
+                            title: caption
+                        })
+                    });
+                }
             }).catch((e) => {
                 reject(e);
             })
@@ -762,7 +771,7 @@ const getDpi = (() => {
         }
         let dpi = arrDPI[0],
             scale = 72 / 28.346;
-
+        console.log(deviceDpi);
         return deviceDpi = dpi / scale;
     }
 })();
