@@ -5,11 +5,11 @@
 的[fastlion-img](http://114.116.73.147/front/fastlion-img)和[release](http://114.116.73.147/publish/release)这两个项目
 
 ## 2.环境：java jdk、tomcat、iNode智能客户端
-   - iNode连三福环境必须打开VPN
-   - iNode账号：fastlion03 / fastSANFU@567
+   - iNode连三福环境必须打开VPN，刷新电信节点
+   - iNode账号：fastlion02 / 密码：fastSANFU@567
 
 ## 3.运行
-### 3.1：修改release/master/sf/WEB_INF/conf.properties文件
+### 3.1：修改release/master/sf/WEB_INF/classes/conf.properties文件
    - sys.isProduce 改为false
    - sys.appserver 改为本地ip比如：http://192.168.1.222:8080/sf
    - sys.imgserver 改为本地ip比如：http://192.168.1.222:8080/img
@@ -22,9 +22,13 @@
 ### 3.3：开启tomcat服务器
 
 ### 3.4：fastlion-img 项目下
-   - cd app 安装下npm包
-   - cd blue-whale 运行gulp BW_Start开启编译出dist文件; 开发调试开启gulp BW_Watch任务;打包压缩执行gulp BW_Compressor任务编译dist.min文件夹;
-   - cd global 运行gulp G_Start 开启编译出dist文件 开发调试开启G_Watch任务， 打包压缩运行 gulp G_Compressor任务编译dist.min文件夹
+   - cd app 安装npm包;
+   - cd blue-whale 执行 gulp BW_Start 命令，开启编译出dist文件; 
+   - 执行 gulp BW_Watch 开启开发调试;
+   - 执行 gulp BW_Compressor 打包压缩任务编译dist.min文件夹;
+   - cd global 执行 gulp G_Start 开启编译出dist文件;
+   - 执行 gulp G_Watch 开启开发调试;
+   - 执行 gulp G_Compressor 打包压缩任务编译dist.min文件夹;
 
 ## 4.开发服务器
    - 安装ftp
