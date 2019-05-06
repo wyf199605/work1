@@ -15,9 +15,12 @@
    - sys.imgserver 改为本地ip比如：http://192.168.1.222:8080/img
    - sys.sockserver 改为本地ip比如：ws://192.168.1.222:8080/sf
    - sys.envName表示运行的环境： master目录下可选速狮测试与三福测试；develop目录下可选速狮开发与三福开发；
+
 ### 3.2：iNodeVpn连接：
    - 账号/密码:fastlion02/fastSANFU@567    fastlion01/fastSANFU@325
+
 ### 3.3：开启tomcat服务器
+
 ### 3.4：fastlion-img 项目下
    - cd app 安装下npm包
    - cd blue-whale 运行gulp BW_Start开启编译出dist文件; 开发调试开启gulp BW_Watch任务;打包压缩执行gulp BW_Compressor任务编译dist.min文件夹;
