@@ -420,9 +420,7 @@ namespace G {
             downloadbarcode(uniqueFlag: string, downUrl: string, uploadUrl: string, defaultUpload: boolean, back: IShellEventHandler) {
                 return ShellBase.handler('downloadbarcode', { uniqueFlag: uniqueFlag, downUrl: downUrl, uploadUrl: uploadUrl, defaultUpload: defaultUpload }, back, null, false);
             },
-            getScanData(uniqueFlag: string, back?: IShellEventHandler) {
-                return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag }, back)
-            },
+            getScanData: getScanData,
             //条码扫码总量统计
             getCountData(uniqueFlag: string, where: obj, back: IShellEventHandler) {
                 return ShellBase.handler('getCountData', { uniqueFlag: uniqueFlag, where: where }, back);
@@ -491,6 +489,15 @@ namespace G {
                 }
             }
         };
+        function getScanData(uniqueFlag: string): IShellResult;
+        function getScanData(uniqueFlag: string, back: IShellEventHandler): boolean;
+        function getScanData(uniqueFlag, back?){
+            if(typeof back === 'function'){
+                return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag }, back);
+            }else{
+                return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag });
+            }
+        }
 
         /**
          * 离线操作
