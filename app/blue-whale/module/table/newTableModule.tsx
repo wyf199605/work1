@@ -885,6 +885,41 @@ export class NewTableModule extends AGroupTabItem{
         }
     })();
 
+    saveData(){
+        return new Promise((resolve, reject) => {
+            let bwTable = this.active.isMain ? this.main : this.sub[this.subTabActiveIndex];
+            if(!bwTable.ftable.editing){
+                resolve();
+                return
+            }
+            bwTable.modify.save().then((data) => {
+                if(tools.isEmpty(data)){
+                    Modal.toast('没有数据改变');
+                    this.editManage.end(bwTable);
+                    resolve();
+                }else{
+                    Modal.confirm({
+                        msg: '数据已修改，是否保存？',
+                        callback: (flag) => {
+                            if(flag){
+                                this.editManage.save(bwTable).then(() => {
+                                    resolve()
+                                }).catch(() => {
+                                    // Modal.alert('数据保存失败')
+                                    reject();
+                                });
+                            }else{
+                                this.editManage.end(bwTable);
+                                resolve();
+                            }
+                        }
+                    })
+                }
+            })
+        });
+
+    }
+
     protected active = (() => {
         let isMainActive = true,
             handler1, handler2,
