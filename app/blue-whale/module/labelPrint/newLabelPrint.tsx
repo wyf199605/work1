@@ -162,7 +162,7 @@ export class NewLabelPrint {
                         //         Modal.alert('打印失败');
                         //     });
                         // }
-                        this.scale = getDpi() / 10 * 3;
+                        this.scale = getDpi() * 3;
                         promise = this.preview(true).catch((e) => {
                             console.log(e);
                             Modal.alert('打印失败');
@@ -170,7 +170,7 @@ export class NewLabelPrint {
                         break;
                     case 'preview':
                     default:
-                        this.scale = getDpi() / 10;
+                        this.scale = getDpi();
                         promise = this.preview().catch((e) => {
                             console.log(e);
                             Modal.alert('预览失败');
@@ -757,21 +757,14 @@ const getDpi = (() => {
             return deviceDpi;
         }
         let arrDPI = [];
-        if (window.screen['deviceXDPI']) {
-            arrDPI[0] = window.screen['deviceXDPI'];
-            arrDPI[1] = window.screen['deviceXDPI'];
-        }
-        else {
-            let tmpNode = document.createElement("div");
-            tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
-            document.body.appendChild(tmpNode);
-            arrDPI[0] = tmpNode.offsetWidth;
-            arrDPI[1] = tmpNode.offsetHeight;
-            tmpNode.parentNode.removeChild(tmpNode);
-        }
-        let dpi = arrDPI[0],
-            scale = 72 / 28.346;
-        console.log(deviceDpi);
-        return deviceDpi = dpi / scale;
+        let tmpNode = document.createElement("div");
+        tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+        document.body.appendChild(tmpNode);
+        arrDPI[0] = tmpNode.offsetWidth;
+        arrDPI[1] = tmpNode.offsetHeight;
+        tmpNode.parentNode.removeChild(tmpNode);
+        deviceDpi = arrDPI[0] / 25.4;
+        deviceDpi = deviceDpi || 3.78;
+        return deviceDpi;
     }
 })();
