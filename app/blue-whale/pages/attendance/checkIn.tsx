@@ -91,7 +91,8 @@ export = class CheckInPage extends BasicPage {
    * */
     protected registerFinger() {
         //创建确定与关闭按钮
-        let inputBox = new InputBox({}),
+        let self = this,
+            inputBox = new InputBox({}),
             cancelBtn = new Button({content: '取消', type: 'danger', key: 'cancelBtn',}),
             okBtn = new Button({
                 content: '确定',
@@ -215,9 +216,12 @@ export = class CheckInPage extends BasicPage {
                         Shell.finger.cancel();
                     })
                 } else {
+                    main.destroy();
+                    text.set('');
                     Shell.finger.cancel();
-                    msg.innerHTML = '<span>' + e.msg + '</span>';
-                    this.registerFinger();//调用指纹录入
+                    Modal.toast(e.msg || '指纹录入失败');
+                    // msg.innerHTML = '<span>' + e.msg + '</span>';
+                    self.registerFinger();//调用指纹录入
                 }
             }, (ev) => {
                 msg.innerHTML = '<span>' + ev.data.text + '</span>';

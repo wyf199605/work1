@@ -45,7 +45,7 @@ export class NewFinger {
     protected initFingerOpen(){
         Shell.finger.cancel();
         setTimeout(() => {
-            Shell.finger.get({
+            let flag = Shell.finger.get({
                 type: 0,
                 option: 0
             }, (ev) => {
@@ -57,7 +57,7 @@ export class NewFinger {
                 } else {
                     // this.againOpen();
                     Modal.alert('指纹获取失败！');
-                    this.initFingerOpen();
+                    // this.initFingerOpen();
                 }
             }, (ev) => {
                 /*
@@ -66,6 +66,9 @@ export class NewFinger {
                 // console.log(ev);
                 this._callFinger && this._callFinger(ev.data.text);
             }, true);
+            if(!flag){
+                this.initFingerOpen();
+            }
         }, 100);
 
     }
