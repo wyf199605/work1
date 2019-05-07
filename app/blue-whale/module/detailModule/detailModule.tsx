@@ -16,6 +16,7 @@ import AGroupTabItem = BW.AGroupTabItem;
 import IGroupTabItemPara = BW.IGroupTabItemPara;
 import {FormCom} from "../../../global/components/form/basic";
 import {NewIDB} from "../../../global/NewIDB";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 export interface IDetailModulePara extends IGroupTabItemPara {
     ui: IBW_Detail; // 根据ui生成detail页
@@ -94,6 +95,7 @@ export class DetailModule extends AGroupTabItem {
         this.dataManager = new DetailDataManager({
             render: () => {
                 // 渲染方法
+                tools.isEmpty(this.dataManager.data) && Modal.alert('数据为空');
                 this.render(this.dataManager.data[0] || {});
             },
             container: this.wrapper,

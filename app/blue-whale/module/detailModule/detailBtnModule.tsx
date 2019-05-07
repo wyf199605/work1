@@ -231,6 +231,12 @@ export class DetailBtnModule extends DetailModule {
             btnHandler;
 
         let initStatus = () => {
+            if(this.total <= 0){
+                box && box.children.forEach((btn: Button) => {
+                    btn.isDisabled = false;
+                });
+                return ;
+            }
             let data = this.detailData;
             box && box.children.forEach((btn: Button) => {
                 let btnUi = btn.custom as R_Button;
