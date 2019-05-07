@@ -162,7 +162,7 @@ export class NewLabelPrint {
                         //         Modal.alert('打印失败');
                         //     });
                         // }
-                        this.scale = getDpi() / 10 * 3;
+                        this.scale = getDpi() * 3;
                         promise = this.preview(true).catch((e) => {
                             console.log(e);
                             Modal.alert('打印失败');
@@ -170,7 +170,7 @@ export class NewLabelPrint {
                         break;
                     case 'preview':
                     default:
-                        this.scale = getDpi() / 10;
+                        this.scale = getDpi();
                         promise = this.preview().catch((e) => {
                             console.log(e);
                             Modal.alert('预览失败');
@@ -257,21 +257,30 @@ export class NewLabelPrint {
         }
 
         return new Promise((resolve, reject) => {
-            Promise.all([
-                tmpPromise,
-                BwRule.Ajax.fetch(CONF.siteUrl + addr, {
-                    data2url: dataAddr.varType !== 3,
-                    // type: 'GET',
-                    data: ajaxData,
-                })
-            ]).then(([{response: response1}, {response: response2}]) => {
-                let tmp = tools.keysVal(response1, 'body', 'bodyList', 0) as ILabelPrintResponse,
-                    data = tools.keysVal(response2, 'data') as obj[];
-                resolve({
-                    tmp: tmp,
-                    data: data,
-                    title: caption
-                })
+            tmpPromise.then(({response}) => {
+                let tmp = tools.keysVal(response, 'body', 'bodyList', 0) as ILabelPrintResponse,
+                    names = this.ui.cols.map((field) => field.name),
+                    tmpNames = tmp.selectFields.map((field) => field.fieldName);
+                if(tmpNames.every((name) => !!~names.indexOf(name))){
+                    resolve({
+                        tmp: tmp,
+                        data: tableData,
+                        title: caption
+                    })
+                }else{
+                    BwRule.Ajax.fetch(CONF.siteUrl + addr, {
+                        data2url: dataAddr.varType !== 3,
+                        // type: 'GET',
+                        data: ajaxData,
+                    }).then(({response}) => {
+                        let data = tools.keysVal(response, 'data') as obj[];
+                        resolve({
+                            tmp: tmp,
+                            data: data,
+                            title: caption
+                        })
+                    });
+                }
             }).catch((e) => {
                 reject(e);
             })
@@ -748,21 +757,14 @@ const getDpi = (() => {
             return deviceDpi;
         }
         let arrDPI = [];
-        if (window.screen['deviceXDPI']) {
-            arrDPI[0] = window.screen['deviceXDPI'];
-            arrDPI[1] = window.screen['deviceXDPI'];
-        }
-        else {
-            let tmpNode = document.createElement("div");
-            tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
-            document.body.appendChild(tmpNode);
-            arrDPI[0] = tmpNode.offsetWidth;
-            arrDPI[1] = tmpNode.offsetHeight;
-            tmpNode.parentNode.removeChild(tmpNode);
-        }
-        let dpi = arrDPI[0],
-            scale = 72 / 28.346;
-
-        return deviceDpi = dpi / scale;
+        let tmpNode = document.createElement("div");
+        tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+        document.body.appendChild(tmpNode);
+        arrDPI[0] = tmpNode.offsetWidth;
+        arrDPI[1] = tmpNode.offsetHeight;
+        tmpNode.parentNode.removeChild(tmpNode);
+        deviceDpi = arrDPI[0] / 25.4;
+        deviceDpi = deviceDpi || 3.78;
+        return deviceDpi;
     }
 })();

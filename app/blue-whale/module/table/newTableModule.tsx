@@ -748,59 +748,64 @@ export class NewTableModule extends AGroupTabItem{
             tables.forEach((table) => {
                 promises.push(table.modify.save());
             });
-            return Promise.all(promises).then((data) => {
-                let saveData = {
-                    param: [] as obj[]
-                };
-                data.forEach((d) => {
-                    if(tools.isNotEmpty(d)){
-                        saveData.param.push(d);
+            return new Promise((resolve, reject) => {
+                Promise.all(promises).then((data) => {
+                    let saveData = {
+                        param: [] as obj[]
+                    };
+                    data.forEach((d) => {
+                        if(tools.isNotEmpty(d)){
+                            saveData.param.push(d);
+                        }
+                    });
+                    if(tools.isEmpty(saveData.param)){
+                        Modal.toast('没有数据改变');
+                        end(bwTable);
+                        resolve();
+                        return ;
                     }
-                });
-                if(tools.isEmpty(saveData.param)){
-                    Modal.toast('没有数据改变');
-                    end(bwTable);
-                    return ;
-                }
 
-                let url;
-                if(bwTable.ui.tableAddr){
-                   url = bwTable.ui.tableAddr.dataAddr
-                }
-                if(this.bwEl.tableAddr){
-                    url = this.bwEl.tableAddr.dataAddr;
-                }
-                if(url){
-                    let loading = new Loading({
-                        msg: '保存中',
-                        disableEl: this.main.wrapper
-                    });
-                    BwRule.Ajax.fetch(CONF.siteUrl + url, {
-                        type: 'POST',
-                        data: saveData,
-                    }).then(({response}) => {
-
-                        BwRule.checkValue(response, saveData, () => {
-                            this.currentSelectedIndexes = [];
-                            // 主表子表刷新
-                            this.refresh();
-                            Modal.toast(response.msg);
-                            // loading && loading.destroy();
-                            // loading = null;
-                            end(bwTable);
-                            tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                    let url;
+                    if(bwTable.ui.tableAddr){
+                        url = bwTable.ui.tableAddr.dataAddr
+                    }
+                    if(this.bwEl.tableAddr){
+                        url = this.bwEl.tableAddr.dataAddr;
+                    }
+                    if(url){
+                        let loading = new Loading({
+                            msg: '保存中',
+                            disableEl: this.main.wrapper
                         });
-                    }).finally(() => {
-                        loading && loading.destroy();
-                        loading = null;
-                    });
-                }else{
-                    Modal.alert('保存失败');
-                }
-            }).catch((e) => {
-                console.log(e);
-                e && e !== 'noMessage' && Modal.alert(e);
-            })
+                        BwRule.Ajax.fetch(CONF.siteUrl + url, {
+                            type: 'POST',
+                            data: saveData,
+                        }).then(({response}) => {
+
+                            BwRule.checkValue(response, saveData, () => {
+                                this.currentSelectedIndexes = [];
+                                // 主表子表刷新
+                                this.refresh().then(() => resolve()).catch(reject);
+                                Modal.toast(response.msg);
+                                // loading && loading.destroy();
+                                // loading = null;
+                                end(bwTable);
+                                tools.event.fire(NewTableModule.EVT_EDIT_SAVE);
+                            });
+                        }).finally(() => {
+                            loading && loading.destroy();
+                            loading = null;
+                        });
+                    }else{
+                        Modal.alert('保存失败');
+                        reject()
+                    }
+                }).catch((e) => {
+                    console.log(e);
+                    reject();
+                    e && e !== 'noMessage' && Modal.alert(e);
+                });
+            });
         };
 
         let start = (bwTable: BwTableModule): Promise<any> => {
@@ -879,6 +884,41 @@ export class NewTableModule extends AGroupTabItem{
             windowControl
         }
     })();
+
+    saveData(){
+        return new Promise((resolve, reject) => {
+            let bwTable = this.active.isMain ? this.main : this.sub[this.subTabActiveIndex];
+            if(!bwTable.ftable.editing){
+                resolve();
+                return
+            }
+            bwTable.modify.save().then((data) => {
+                if(tools.isEmpty(data)){
+                    Modal.toast('没有数据改变');
+                    this.editManage.end(bwTable);
+                    resolve();
+                }else{
+                    Modal.confirm({
+                        msg: '数据已修改，是否保存？',
+                        callback: (flag) => {
+                            if(flag){
+                                this.editManage.save(bwTable).then(() => {
+                                    resolve()
+                                }).catch(() => {
+                                    // Modal.alert('数据保存失败')
+                                    reject();
+                                });
+                            }else{
+                                this.editManage.end(bwTable);
+                                resolve();
+                            }
+                        }
+                    })
+                }
+            })
+        });
+
+    }
 
     protected active = (() => {
         let isMainActive = true,

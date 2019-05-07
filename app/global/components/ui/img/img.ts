@@ -57,21 +57,21 @@ export const ImgModal = (() => {
                     // ImgModal.initTag = false;
                 }
 
-                let pre = d.query('.pre-page', wrapper),
-                    next = d.query('.next-page', wrapper);
+                // let pre = d.query('.pre-page', wrapper),
+                //     next = d.query('.next-page', wrapper);
 
-                if (typeof para.turnPage === 'function') {
-                    d.on(pre, 'click', () => {
-                        para.turnPage(false);
-                    });
+                // if (typeof para.turnPage === 'function') {
+                //     d.on(pre, 'click', () => {
+                //         para.turnPage(false);
+                //     });
 
-                    d.on(next, 'click', () => {
-                        para.turnPage(true);
-                    });
-                } else {
-                    pre.classList.add('hide');
-                    next.classList.add('hide');
-                }
+                //     d.on(next, 'click', () => {
+                //         para.turnPage(true);
+                //     });
+                // } else {
+                //     pre.classList.add('hide');
+                //     next.classList.add('hide');
+                // }
 
 
                 let pswpElement = d.query('.pswp', container),
@@ -113,22 +113,37 @@ export const ImgModal = (() => {
                             , hideAnimationDuration: 0
                             , index: index
                         });
-                        gallery.init();
+                        gallery.init()
                         gallery.listen('close', function () {
                             destroy();
                         });
                         gallery.listen('download', function () {
-                            // destroy();?
-                            console.log(1324);
-
-                            // var image = new Image();
-                            // image.src = para.img[0];
-                            var base64 = Shell.image.getBase64Image(para.img[0]);
-                            console.log(base64);
-                            Shell.image.downloadImg(base64, (res) => {
-                                console.log(123333);
-                            });
-                        })
+                            // var base64 = Shell.image.getBase64Image(para.img[0]);
+                            // Shell.image.downloadImg(base64, (res) => {});
+                            var image = new Image();
+                            image.src = para.img[0]; //s是图片的路径
+                            image.onload = function () { //image.onload是等待图片加载完毕，等待图片加载完毕之后，才能对图片进行操作
+                                var width = image.width; //根据图片的宽高，将图片进行压缩
+                                var height = image.height;
+                                var canvas = document.createElement("canvas");
+                                var cax = canvas.getContext('2d');
+                                canvas.width = width;
+                                canvas.height = height;
+                                cax.drawImage(image, 0, 0, width, height); //重绘
+                                var dataUrl = canvas.toDataURL("image/png"); //dataUrl 即为base编码字符串
+                                // alert(dataUrl);
+                                // return dataUrl;
+                                Shell.image.downloadImg(dataUrl, () => { });
+                            }
+                        });
+                        gallery.listen('prevImg', function () {
+                            console.log(para);
+                            para.turnPage(false);
+                        });
+                        gallery.listen('nextImg', function () {
+                            console.log(321);
+                            para.turnPage(true);
+                        });
                     }
                 }).finally(() => {
                     loading && loading.hide();
@@ -207,15 +222,13 @@ const imgModalTpl = `<div class="pswp" tabindex="-1" role="dialog" aria-hidden="
     <div class="pswp__item"></div> 
     <div class="pswp__item"></div> 
     </div> 
-    // <div class="pswp__ui pswp__ui--hidden"> 
+    <div class="pswp__ui pswp__ui--hidden"> 
     <div class="pswp__top-bar"> 
     <div class="pswp__counter"></div> 
     <button class="pswp__button pswp__button--close iconfont icon-close"></button> 
-    // <button class="pswp__button pswp__button--fs iconfont icon-maximize"></button> 
-    <button class="pswp__button pswp__button--zoom iconfont icon-magnifier"></button> 
     <button class="pswp__button pswp__button--download iconfont icon-download"> </button> 
-    <button class="pswp__button next-page iconfont icon-arrow-right"></button> 
-    <button class="pswp__button pre-page iconfont icon-arrow-left"></button> 
+    <button class="pswp__button pswp__button--next next-page iconfont icon-arrow-right "></button> 
+    <button class="pswp__button pswp__button--prev pre-page iconfont icon-arrow-left "></button> 
     <div class="pswp__preloader"> 
     <div class="pswp__preloader__icn"> 
     <div class="pswp__preloader__cut"> 
@@ -224,9 +237,9 @@ const imgModalTpl = `<div class="pswp" tabindex="-1" role="dialog" aria-hidden="
     <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"> 
     <div class="pswp__share-tooltip"></div> 
     </div> 
-    <button class="pswp__button pswp__button--arrow--left iconfont icon-arrow-left"> 
+    <button class="pswp__button pswp__button--arrow--left  iconfont icon-arrow-left"> 
     <span class=" iconfont icon-arrow-left"></span> </button> 
-    <button class="pswp__button pswp__button--arrow--right"> 
+    <button class="pswp__button pswp__button--arrow--right "> 
     <span class=" iconfont icon-arrow-right"></span> </button> 
     <div class="pswp__caption">  
     <div class="pswp__caption__center"></div></div></div></div></div>`;

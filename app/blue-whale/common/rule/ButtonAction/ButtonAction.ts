@@ -33,6 +33,7 @@ export class ButtonAction {
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
     }, url?: string, itemId?: string, atvData?: obj) {
         let self = this;
+        console.log('buttonAction', btn);
         if (btn.subType === 'excel') {
             callback(null);
             let com;
@@ -104,6 +105,7 @@ export class ButtonAction {
                 })
             });
         } else {
+            
             if (btn.hintBeforeAction || btn.buttonType === 3) {
                 let hintWords = ['查询', '新增', '修改', '删除'],
                     word = hintWords[btn.buttonType];
@@ -438,6 +440,7 @@ export class ButtonAction {
                                     Modal.alert(data.showText);
                                 } else if (btn.openType !== 'popup' && btn.subType !== 'import') {
                                     Modal.toast(response.msg || `${btn.title}成功`);
+                                    window.sessionStorage.setItem('subScriptStatus','1');
                                 }
                             }
 

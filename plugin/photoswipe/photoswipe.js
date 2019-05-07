@@ -965,7 +965,6 @@ var publicMethods = {
 
 	// Close the gallery, then destroy it
 	close: function() {
-        console.log('close');
 		if(!_isOpen) {
 			return;
 		}
@@ -1007,6 +1006,12 @@ var publicMethods = {
     
     download: function() {
         _shout('download');
+    },
+    prevImg: function() {
+        _shout('prevImg');
+    },
+    nextImg: function() {
+        _shout('nextImg');
     },
 
 	/**

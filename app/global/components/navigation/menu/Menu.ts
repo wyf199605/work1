@@ -45,7 +45,13 @@ export class Menu extends ElementTreeNode {
         }
 
         // 设置角标 （渔人码头：设置菜单栏标红）
-        this.setSubScript(para);
+        window.sessionStorage.setItem('subScriptStatus','1');
+        setInterval(()=> {
+            let subScriptStatus = window.sessionStorage.getItem('subScriptStatus');
+            if(subScriptStatus === '1') {
+                this.setSubScript(para);
+            } 
+        },500);
 
 
 
@@ -71,24 +77,24 @@ export class Menu extends ElementTreeNode {
      * @param menuItem 获取菜单栏
      */
     setSubScript(menuItem) {
-        // console.log($('.icon-shenpil').parent('.tree-text-wrapper'));
-        
         if( !menuItem || !menuItem.content || !menuItem.content.subScriptUrl ) return ;
-        // console.log('subS',menuItem);
-        // console.log(sessionStorage.getItem('siteUrl'));
         let url = sessionStorage.getItem('siteUrl') + menuItem.content.subScriptUrl;
         $.get(url,(res) => {
-            console.log($('.icon-shenpi1'));
-            console.log('tttt', res);
+            console.log('subscript', res);
             if(res.body && res.body.bodyList && res.body.bodyList.length > 0){
+                window.sessionStorage.setItem('subScriptStatus','0');
                 let num = res.body.bodyList[0].dataList[0][0];
-                console.log(num);
-                let dom = `<span class="menu-sub-script">(${num})</span>`
-            d.query(".tree-text-wrapper", this.wrapper).appendChild(d.create(dom))
+                let subScriptParent = d.query(".tree-text-wrapper>.menu-sub-script", this.wrapper);
+                console.log(subScriptParent);
+                if( subScriptParent ) {
+                    return subScriptParent.textContent = `(${num})`;
+                } 
+                let dom = `<span class="menu-sub-script">(${num})</span>`;
+                // this.wrapper.removeChild(d.query('.menu-sub-script'))
+                
+                d.query(".tree-text-wrapper", this.wrapper).appendChild(d.create(dom))
             }
-        })
-        
-
+        });
     }
 
     private isHoverExpand: boolean;

@@ -2306,25 +2306,25 @@ export class BwTableModule extends Component {
                     isDisabled: !(btnUiItem.multiselect === 0 || btnUiItem.multiselect === 2 && btnUiItem.selectionFlag),
                     data: btnUiItem,
                     onClick: () => {
+                        this.tableModule.saveData().then(() => {
+                            if (btn.data.openType.indexOf('rfid') > -1) {
+                                // RFID 操作按钮
+                                InventoryBtn(btn, this);
+                            } else if (btn.data.openType === "buildMap") {
+                                this.mapState = false;
+                                this.submitState = false;
+                                this.viewMap(btn.data);
+                            } else if (btn.data.openType === "submit") {
+                                this.mapState = false;
+                                this.submitState = false;
+                                this.sumitMap();
+                            } else if (btn.data.openType === 'stopLocation') {
+                                console.log('stopLocation');
+                                let stopBtn = d.query(".stop_location", wrapper)
+                                let startBtn = d.query(".start_location", wrapper);
+                                // let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled");
 
-                        if (btn.data.openType.indexOf('rfid') > -1) {
-                            // RFID 操作按钮
-                            InventoryBtn(btn, this);
-                        } else if (btn.data.openType === "buildMap") {
-                            this.mapState = false;
-                            this.submitState = false;
-                            this.viewMap(btn.data);
-                        } else if (btn.data.openType === "submit") {
-                            this.mapState = false;
-                            this.submitState = false;
-                            this.sumitMap();
-                        } else if (btn.data.openType === 'stopLocation') {
-                            console.log('stopLocation');
-                            let stopBtn = d.query(".stop_location", wrapper)
-                            let startBtn = d.query(".start_location", wrapper);
-                            // let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled");
-
-                            // if(btnStatus) {
+                                // if(btnStatus) {
                                 const  dataAddr =  BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
                                 const stopLocationJson = {
                                     dataAddr : btnUiItem.actionAddr  ? dataAddr : ''
@@ -2336,226 +2336,230 @@ export class BwTableModule extends Component {
                                 //     stopBtn.classList.add("disabled")
                                 //     startBtn.classList.remove("disabled")
                                 // }
-                            // }
-                            // if (!btnStatus) {
-                            //     // Modal.toast("请先选择开始记录")
-                            // } else {
-                            //     let keStatus = G.Shell.location.stopRecord(() => {
-                            //     })
-                            //     if (keStatus) {
-                            //         // Modal.toast("已结束发送位置")
-                            //         stopBtn.classList.add("disabled")
-                            //         startBtn.classList.remove("disabled")
-                            //     } else {
-                            //         // Modal.toast("结束发送位置失败")
-                            //     }
-                            // }
-                        } else if (btn.data.openType === 'startLocation') {
-                            console.log(ftable, '==============');
-                            // const  dataAddr = CONF.siteUrl + BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
-                            const  dataAddr =  BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
-                            const startLocationJson = {
-                                dataAddr : btnUiItem.actionAddr  ? dataAddr : '',
-                                needGps: btnUiItem.actionAddr  ?  btnUiItem.actionAddr.needGps : '',
-                                timeStep: 5000,
-                            };
+                                // }
+                                // if (!btnStatus) {
+                                //     // Modal.toast("请先选择开始记录")
+                                // } else {
+                                //     let keStatus = G.Shell.location.stopRecord(() => {
+                                //     })
+                                //     if (keStatus) {
+                                //         // Modal.toast("已结束发送位置")
+                                //         stopBtn.classList.add("disabled")
+                                //         startBtn.classList.remove("disabled")
+                                //     } else {
+                                //         // Modal.toast("结束发送位置失败")
+                                //     }
+                                // }
+                            } else if (btn.data.openType === 'startLocation') {
+                                console.log(ftable, '==============');
+                                // const  dataAddr = CONF.siteUrl + BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
+                                const  dataAddr =  BwRule.reqAddr(btnUiItem.actionAddr,ftable.selectedPreRowData);
+                                const startLocationJson = {
+                                    dataAddr : btnUiItem.actionAddr  ? dataAddr : '',
+                                    needGps: btnUiItem.actionAddr  ?  btnUiItem.actionAddr.needGps : '',
+                                    timeStep: 5000,
+                                };
 
-                            let stopBtn = d.query(".stop_location", wrapper)
-                            let startBtn = d.query(".start_location", wrapper);
-                            // let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
-                            let keStatus = G.Shell.location.startRecord(startLocationJson,() => {
-                            })
-                            console.log(keStatus);
-                            // if (keStatus) {
-                            //     // Modal.toast("已开始发送位置")
-                            //     stopBtn.classList.remove("disabled")
-                            //     startBtn.classList.add("disabled")
-                            // } 
-                            // else {
-                            //     // Modal.toast("发送位置失败")
-                            // }
+                                let stopBtn = d.query(".stop_location", wrapper)
+                                let startBtn = d.query(".start_location", wrapper);
+                                // let btnStatus = stopBtn.classList.contains("disabled") || startBtn.classList.contains("disabled")
+                                let keStatus = G.Shell.location.startRecord(startLocationJson,() => {
+                                })
+                                console.log(keStatus);
+                                // if (keStatus) {
+                                //     // Modal.toast("已开始发送位置")
+                                //     stopBtn.classList.remove("disabled")
+                                //     startBtn.classList.add("disabled")
+                                // }
+                                // else {
+                                //     // Modal.toast("发送位置失败")
+                                // }
 
-                        } else if (btn.data.openType === 'passwd') {
-                            let selectData = ftable.selectedRowsData[0];
-                            if (selectData) {
-                                let res = G.Rule.varList(btn.data.actionAddr.varList, selectData, true),
-                                    data = [];
-                                for (let key in res) {
-                                    for (let col of this.ui.cols) {
-                                        if (col.name.toLowerCase() === key) {
-                                            data.push({
-                                                title: col.caption,
-                                                name: key,
-                                                value: res[key]
-                                            });
-                                            break;
-                                        }
-                                    }
-                                }
-                                new PasswdModal({
-                                    data,
-                                    confirm: (res) => {
-                                        let ajaxData = {};
-                                        for (let key in res) {
-                                            if (key === 'new_password') {
-                                                ajaxData[key] = res[key];
-                                            } else {
-                                                ajaxData['up' + key] = res[key];
+                            } else if (btn.data.openType === 'passwd') {
+                                let selectData = ftable.selectedRowsData[0];
+                                if (selectData) {
+                                    let res = G.Rule.varList(btn.data.actionAddr.varList, selectData, true),
+                                        data = [];
+                                    for (let key in res) {
+                                        for (let col of this.ui.cols) {
+                                            if (col.name.toLowerCase() === key) {
+                                                data.push({
+                                                    title: col.caption,
+                                                    name: key,
+                                                    value: res[key]
+                                                });
+                                                break;
                                             }
                                         }
-                                        return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, { isAdmin: 1 }, false), {
-                                            type: 'POST',
-                                            data: JSON.stringify([ajaxData])
-                                        }).then(({ response }) => {
-                                            return new Promise((resolve) => {
-                                                if (response.errorCode === 0) {
-                                                    resolve(true);
-                                                    Modal.alert(response.msg, '温馨提示', () => {
-                                                        ButtonAction.get().btnRefresh(btn.data.refresh, this.pageUrl);
-                                                    })
+                                    }
+                                    new PasswdModal({
+                                        data,
+                                        confirm: (res) => {
+                                            let ajaxData = {};
+                                            for (let key in res) {
+                                                if (key === 'new_password') {
+                                                    ajaxData[key] = res[key];
                                                 } else {
-                                                    resolve(false);
-                                                    Modal.alert(response.msg);
+                                                    ajaxData['up' + key] = res[key];
                                                 }
-                                            })
-                                        })
-                                    }
-                                })
-                            }
-                        } else if (btn.data.openType.indexOf('flow') > -1) {
-                            // 流程引擎操作按钮
-                            let btnUi = btn.data as R_Button,
-                                { multiselect, selectionFlag } = btnUi,
-                                selectedData = multiselect === 2 && selectionFlag ?
-                                    ftable.unselectedRowsData : ftable.selectedRowsData;
-                            let select = multiselect === 1 ? selectedData[0] : selectedData,
-                                dataAddr = BW.CONF.siteUrl + btnUi.actionAddr.dataAddr,
-                                varList = btnUi.actionAddr.varList;
-                            if (tools.isNotEmpty(varList)) {
-                                varList.forEach((li, index) => {
-                                    let name = li.varName;
-                                    for (let key in select) {
-                                        if (key === name) {
-                                            if (index === 0) {
-                                                dataAddr += '?';
-                                            } else {
-                                                dataAddr += '&';
                                             }
-                                            dataAddr = dataAddr + `${key.toLowerCase()}=${select[key]}`
+                                            return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, { isAdmin: 1 }, false), {
+                                                type: 'POST',
+                                                data: JSON.stringify([ajaxData])
+                                            }).then(({ response }) => {
+                                                return new Promise((resolve) => {
+                                                    if (response.errorCode === 0) {
+                                                        resolve(true);
+                                                        Modal.alert(response.msg, '温馨提示', () => {
+                                                            ButtonAction.get().btnRefresh(btn.data.refresh, this.pageUrl);
+                                                        })
+                                                    } else {
+                                                        resolve(false);
+                                                        Modal.alert(response.msg);
+                                                    }
+                                                })
+                                            })
                                         }
+                                    })
+                                }
+                            } else if (btn.data.openType.indexOf('flow') > -1) {
+                                // 流程引擎操作按钮
+                                let btnUi = btn.data as R_Button,
+                                    { multiselect, selectionFlag } = btnUi,
+                                    selectedData = multiselect === 2 && selectionFlag ?
+                                        ftable.unselectedRowsData : ftable.selectedRowsData;
+                                let select = multiselect === 1 ? selectedData[0] : selectedData,
+                                    dataAddr = BW.CONF.siteUrl + btnUi.actionAddr.dataAddr,
+                                    varList = btnUi.actionAddr.varList;
+                                if (tools.isNotEmpty(varList)) {
+                                    varList.forEach((li, index) => {
+                                        let name = li.varName;
+                                        for (let key in select) {
+                                            if (key === name) {
+                                                if (index === 0) {
+                                                    dataAddr += '?';
+                                                } else {
+                                                    dataAddr += '&';
+                                                }
+                                                dataAddr = dataAddr + `${key.toLowerCase()}=${select[key]}`
+                                            }
+                                        }
+                                    })
+                                }
+                                let field = btn.data.openType.split('-')[1];
+                                switch (field) {
+                                    case 'look': {
+                                        BwRule.Ajax.fetch(dataAddr).then(({ response }) => {
+                                            new FlowDesigner(response, field);
+                                        }).catch(err => {
+                                            console.log(err);
+                                        });
                                     }
-                                })
-                            }
-                            let field = btn.data.openType.split('-')[1];
-                            switch (field) {
-                                case 'look': {
-                                    BwRule.Ajax.fetch(dataAddr).then(({ response }) => {
-                                        new FlowDesigner(response, field);
-                                    }).catch(err => {
-                                        console.log(err);
-                                    });
+                                        break;
+                                    case 'design': {
+                                        BwRule.Ajax.fetch(dataAddr, {
+                                            type: 'GET'
+                                        }).then(({ response }) => {
+                                            new FlowDesigner(response, field);
+                                        }).catch(err => {
+                                            console.log(err);
+                                        });
+                                    }
+                                        break;
                                 }
-                                    break;
-                                case 'design': {
-                                    BwRule.Ajax.fetch(dataAddr, {
-                                        type: 'GET'
-                                    }).then(({ response }) => {
-                                        new FlowDesigner(response, field);
-                                    }).catch(err => {
-                                        console.log(err);
-                                    });
-                                }
-                                    break;
-                            }
-                        } else {
-                            // 通用操作按钮
-                            // if (multiselect === 2 && !selectedData[0]) {
-                            //     // 验证多选
-                            //     Modal.alert('请至少选一条数据');
-                            //     return;
-                            // } else if (btn.data.multiselect === 1 && (!selectedData[0] || selectedData[1])) {
-                            //     // 单选验证
-                            //     Modal.alert('请选最多一条数据');
-                            //     return;
-                            // }
-                            console.log('popup000000--=========');
-                            box.children.forEach((button) => {
-                                button && (button.isDisabled = true);
-                            });
-                            let spinner = new Spinner({
-                                el: btn.wrapper,
-                                type: Spinner.SHOW_TYPE.replace,
-                                time: 5000,
-                                onTimeout: () => {
-                                    box.children.forEach((button) => {
-                                        button && (button.isDisabled = false);
-                                    });
-                                    // Modal.toast('当前网络不佳～');
-                                }
-                            });
-                            spinner.show();
-                            let btnUi = btn.data as R_Button,
-                                { multiselect, selectionFlag } = btnUi,
-                                selectedData = multiselect === 2 && selectionFlag ?
-                                    ftable.unselectedRowsData : ftable.selectedRowsData;
-                            let linkedData = this.linkedData || {};
-                            let select = multiselect === 1
-                                ? Object.assign({}, linkedData, selectedData[0] || {})
-                                : (
-                                    multiselect === 2
-                                        ? selectedData.map((o) =>
-                                            Object.assign({}, linkedData || {}, o))
-                                        : null
-                                );
-                            select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
-
-                            let tData = ftable.tableData.data;
-
-                            if (btnUi.haveRoll) {
-                                let addr = btnUi.actionAddr,
-                                    varList = addr.varList,
-                                    index = 0,
-                                    arr = [];
-                                tData.forEach((td, i) => {
-                                    let obj = {};
-                                    varList.forEach(list => {
-                                        let name = list.varName;
-                                        obj[name] = td[name];
-                                    });
-                                    arr.push(obj);
-                                    if (tools.obj.isEqual(select, td)) {
-                                        index = i;
+                            } else {
+                                // 通用操作按钮
+                                // if (multiselect === 2 && !selectedData[0]) {
+                                //     // 验证多选
+                                //     Modal.alert('请至少选一条数据');
+                                //     return;
+                                // } else if (btn.data.multiselect === 1 && (!selectedData[0] || selectedData[1])) {
+                                //     // 单选验证
+                                //     Modal.alert('请选最多一条数据');
+                                //     return;
+                                // }
+                                console.log('popup000000--=========');
+                                box.children.forEach((button) => {
+                                    button && (button.isDisabled = true);
+                                });
+                                let spinner = new Spinner({
+                                    el: btn.wrapper,
+                                    type: Spinner.SHOW_TYPE.replace,
+                                    time: 5000,
+                                    onTimeout: () => {
+                                        box.children.forEach((button) => {
+                                            button && (button.isDisabled = false);
+                                        });
+                                        // Modal.toast('当前网络不佳～');
                                     }
                                 });
-                                window.localStorage.setItem('currentKeyField', index + '');
-                                window.localStorage.setItem('nextKeyField', JSON.stringify(arr));
+                                spinner.show();
+                                let btnUi = btn.data as R_Button,
+                                    { multiselect, selectionFlag } = btnUi,
+                                    selectedData = multiselect === 2 && selectionFlag ?
+                                        ftable.unselectedRowsData : ftable.selectedRowsData;
+                                let linkedData = this.linkedData || {};
+                                let select = multiselect === 1
+                                    ? Object.assign({}, linkedData, selectedData[0] || {})
+                                    : (
+                                        multiselect === 2
+                                            ? selectedData.map((o) =>
+                                                Object.assign({}, linkedData || {}, o))
+                                            : null
+                                    );
+                                select = tools.isEmpty(select) ? Object.assign({}, linkedData) : select;
 
-                                let interval = setInterval(() => {
-                                    let locData = window.localStorage.getItem('nextKeyField');
-                                    if (tools.isNotEmpty(locData)) {
-                                        clearInterval(interval);
-                                        ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                            console.log('0----------------');
-                                            box.children.forEach((button) => {
-                                                button && (button.isDisabled = false);
-                                            });
-                                            spinner && spinner.hide();
-                                        }, this.pageUrl, this.ui.itemId);
-                                    }
-                                }, 50);
+                                let tData = ftable.tableData.data;
 
-                            } else {
-                                window.localStorage.removeItem('nextKeyField');
-                                window.localStorage.removeItem('currentKeyField');
-                                ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                    console.log('1111111');
-                                   box.children.forEach((button) => {
-                                        button && (button.isDisabled = false);
+                                if (btnUi.haveRoll) {
+                                    let addr = btnUi.actionAddr,
+                                        varList = addr.varList,
+                                        index = 0,
+                                        arr = [];
+                                    tData.forEach((td, i) => {
+                                        let obj = {};
+                                        varList.forEach(list => {
+                                            let name = list.varName;
+                                            obj[name] = td[name];
+                                        });
+                                        arr.push(obj);
+                                        if (tools.obj.isEqual(select, td)) {
+                                            index = i;
+                                        }
                                     });
-                                    spinner && spinner.hide();
-                                }, this.pageUrl, this.ui.itemId);
+                                    window.localStorage.setItem('currentKeyField', index + '');
+                                    window.localStorage.setItem('nextKeyField', JSON.stringify(arr));
+
+                                    let interval = setInterval(() => {
+                                        let locData = window.localStorage.getItem('nextKeyField');
+                                        if (tools.isNotEmpty(locData)) {
+                                            clearInterval(interval);
+                                            ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                                console.log('0----------------');
+                                                box.children.forEach((button) => {
+                                                    button && (button.isDisabled = false);
+                                                });
+                                                spinner && spinner.hide();
+                                            }, this.pageUrl, this.ui.itemId);
+                                        }
+                                    }, 50);
+
+                                } else {
+                                    window.localStorage.removeItem('nextKeyField');
+                                    window.localStorage.removeItem('currentKeyField');
+                                    ButtonAction.get().clickHandle(btnUi, select, (res) => {
+                                        console.log('1111111');
+                                        box.children.forEach((button) => {
+                                            button && (button.isDisabled = false);
+                                        });
+                                        spinner && spinner.hide();
+                                    }, this.pageUrl, this.ui.itemId);
+                                }
                             }
-                        }
+                        }).catch(() => {
+
+                        })
+
                     }
                 });
                 if (btn.data.openType === 'stopLocation') {

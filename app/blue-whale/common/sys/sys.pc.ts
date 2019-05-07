@@ -173,6 +173,7 @@ namespace BW {
                         // 如果关闭当前打开的页面，则关闭后打开历史倒数第二位置的页面
                         if (sysPcHistory.len() > 0 && isLast) {
                             self.window.open({ url: sysPcHistory.last() });
+                            self.window.fire(event, data, sysPcHistory.last());
                         }
                     }
                 },

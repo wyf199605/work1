@@ -56,12 +56,12 @@ export = class AttendancePage extends BasicPage {
             dots = '';
         let fingerMsg = this.fingerNode.querySelector('.finger-msg') as HTMLElement;
         self.msgTimer = setInterval(() => {
-            if(i >= 10){
-                Modal.alert('初始化指纹机失败，请重新刷新!');
-                fingerMsg.innerHTML = '初始化指纹机失败！';
-                clearInterval(self.msgTimer);
-                return ;
-            }
+            // if(i >= 10){
+            //     Modal.alert('初始化指纹机失败，请重新刷新!');
+            //     fingerMsg.innerHTML = '初始化指纹机失败！';
+            //     clearInterval(self.msgTimer);
+            //     return ;
+            // }
             dots += '.';
             fingerMsg.innerHTML = text + dots;
             if(i ++ % 3 === 0) {
