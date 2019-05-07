@@ -2789,6 +2789,7 @@ export class BwTableModule extends Component {
                                 }
                             }
                             let content = cell.column.content as R_Field;
+                            console.log(isValid);
                             if (isValid && content.assignSelectFields && content.assignSelectFields[0]) {
                                 validate(editModule, cell);
                             }
@@ -2884,7 +2885,9 @@ export class BwTableModule extends Component {
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
                 if (cell.isEdited) {
                     editModule ? editModule.assignPromise.then(() => {
-                        validList.push(validate(editModule, cell))
+                        // setTimeout(() => {
+                            validList.push(validate(editModule, cell))
+                        // }, 100);
                     }) : validList.push(validate(editModule, cell));
                 }
             });
@@ -3119,7 +3122,7 @@ export class BwTableModule extends Component {
                         }).finally(() => {
                             validList = [];
                         })
-                    }, 100)
+                    }, 200)
 
                 }) : resolve();
             })
