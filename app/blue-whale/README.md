@@ -21,9 +21,18 @@
 
 ### 3.3：开启tomcat服务器
    - 打开tomcat安装目录下的conf/server.xml文件，修改两个Context标签为以下内容，没有则添加：
-      - 前端工程统一设置：<Context docBase="D:\frontend\gitlab\fastlion-img" path="/img" reloadable="true"/>
-      - 编译配置开发环境设置为：<Context docBase="D:\frontend\gitlab\release\develop\sf" path="/sf" reloadable="true"/>
-      - 编译配置测试环境设置为：<Context docBase="D:\frontend\gitlab\release\master\sf" path="/sf" reloadable="true"/>
+      - 前端工程统一设置：
+      ```
+      <Context docBase="D:\frontend\gitlab\fastlion-img" path="/img" reloadable="true"/>
+      ```
+      - 编译配置开发环境设置为：
+      ```
+      <Context docBase="D:\frontend\gitlab\release\develop\sf" path="/sf" reloadable="true"/>
+      ```
+      - 编译配置测试环境设置为：
+      ```
+      <Context docBase="D:\frontend\gitlab\release\master\sf" path="/sf" reloadable="true"/>
+      ```
    - 运行tomcat
 
 ### 3.4：执行前端工程，fastlion-img项目下执行以下步骤，blue-whale和global目录都需要先编译dist
