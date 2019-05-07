@@ -42,6 +42,14 @@ export class NewFinger {
         this.initFingerOpen();
     }
 
+    protected fingerEvent: {on: Function, off: Function};
+    fingerOn(){
+        this.fingerOff();
+       this.fingerEvent.on && this.fingerEvent.on();
+    }
+    fingerOff(){
+        this.fingerEvent.off && this.fingerEvent.off();
+    }
     protected initFingerOpen(){
         Shell.finger.cancel();
         setTimeout(() => {
@@ -49,6 +57,7 @@ export class NewFinger {
                 type: 0,
                 option: 0
             }, (ev) => {
+                this.fingerOff();
                 // console.log(ev);
                 if (ev.success) {
                     let print = ev.data.finger,
@@ -58,6 +67,7 @@ export class NewFinger {
                     // this.againOpen();
                     Modal.alert('指纹获取失败！');
                     // this.initFingerOpen();
+                    this.fingerOn();
                 }
             }, (ev) => {
                 /*
@@ -66,6 +76,9 @@ export class NewFinger {
                 // console.log(ev);
                 this._callFinger && this._callFinger(ev.data.text);
             }, true);
+            if(typeof flag === 'object'){
+                this.fingerEvent = flag;
+            }
             if(!flag){
                 this.initFingerOpen();
             }
@@ -124,17 +137,22 @@ export class NewFinger {
                         this.fingerFinish(data).then((print) => {
                             if(data.verify === '1'){
                                 let printData = Object.assign({}, data, {print});
-                                this.autoCache && this.addFinger(printData).catch((e) => {
+                                this.autoCache ? this.addFinger(printData).catch((e) => {
                                     console.log(e);
                                 }).finally(() => {
                                     // this.initFingerOpen();
-                                }); // this.initFingerOpen();
+                                    this.fingerOn();
+                                }) : this.fingerOn();
                             }else{
                                 //this.initFingerOpen();
+                                this.fingerOn();
                             }
                         }).catch(() => {
                             //this.initFingerOpen();
+                            this.fingerOn();
                         });
+                    }else{
+                        this.fingerOn();
                     }
                     // else{
                     //     this.autoCache && this.addFinger(data).finally(() => {
@@ -147,6 +165,7 @@ export class NewFinger {
                     console.log(e);
                     Modal.toast('请重新获取指纹');
                     // this.initFingerOpen();
+                    this.fingerOn();
                 })
             });
         })
