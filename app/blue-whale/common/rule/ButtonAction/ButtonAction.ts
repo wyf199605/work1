@@ -16,7 +16,7 @@ import { RingProgress } from "../../../../global/components/ui/progress/ringProg
 import Shell = G.Shell;
 import { Spinner } from "../../../../global/components/ui/spinner/spinner";
 import { TextInput } from "../../../../global/components/form/text/text";
-import {BwTableElement} from "../../../pages/table/newTablePage";
+import { BwTableElement } from "../../../pages/table/newTablePage";
 import sys = BW.sys;
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
@@ -105,7 +105,7 @@ export class ButtonAction {
                 })
             });
         } else {
-            
+
             if (btn.hintBeforeAction || btn.buttonType === 3) {
                 let hintWords = ['查询', '新增', '修改', '删除'],
                     word = hintWords[btn.buttonType];
@@ -235,8 +235,8 @@ export class ButtonAction {
 
                 addr = tools.url.addObj(addr, { output: 'json' });
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
-                    console.log('res',response);
-                    if(response.uiType === "assselect") {
+                    console.log('res', response);
+                    if (response.uiType === "assselect") {
                         response.body.elements[0]['actionType'] = 13;
                     }
                     //创建条码扫码页面
@@ -295,14 +295,14 @@ export class ButtonAction {
                 break;
             case 'download':
             case 'newwin':
-            default:{
+            default: {
                 let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
                 if (varType === 3 && res) {
                     openUrl = tools.url.addObj(openUrl, { bodyParams: res }, false)
                 }
-                if(btn.openType === 'download'){
+                if (btn.openType === 'download') {
                     sys.window.download(openUrl);
-                }else{
+                } else {
                     BW.sys.window.open({
                         url: openUrl,
                         gps: !!btn.actionAddr.needGps,
@@ -440,7 +440,7 @@ export class ButtonAction {
                                     Modal.alert(data.showText);
                                 } else if (btn.openType !== 'popup' && btn.subType !== 'import') {
                                     Modal.toast(response.msg || `${btn.title}成功`);
-                                    window.sessionStorage.setItem('subScriptStatus','1');
+                                    window.sessionStorage.setItem('subScriptStatus', '1');
                                 }
                             }
 
@@ -621,7 +621,7 @@ export class ButtonAction {
                                 }
                             } else if (type === 5) {
                                 data[0] = table.tableModule.main.ftable.selectedRowsData;
-                                if(tools.isEmpty(data[0])){
+                                if (tools.isEmpty(data[0])) {
                                     Modal.alert('请选择数据后再进行操作');
                                     return
                                 }
@@ -632,7 +632,7 @@ export class ButtonAction {
                         console.log('-------------------------');
                         // console.log(BwRule.atvar);
                         // console.log(tools.url.addObj(obj.actionAddr.dataAddr,{ 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) } ))
-                        if(obj.openType === 'buildmap') {
+                        if (obj.openType === 'buildmap') {
 
                             // BwRule.reqAddr(obj.actionAddr)
                             //  let url = CONF.siteUrl + BwRule.reqAddr(obj.actionAddr);
@@ -648,15 +648,15 @@ export class ButtonAction {
                             //     G.Shell.location.localSubmit(localSubmitObj);
                             // });
                             //  G.Shell.location.localSubmit(response)
-                            const dataAddr = tools.url.addObj(obj.actionAddr.dataAddr,{ 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) });
+                            const dataAddr = tools.url.addObj(obj.actionAddr.dataAddr, { 'atvarparams': JSON.stringify(BwRule.atvar.dataGet()) });
                             console.log(dataAddr);
                             const localSubmitObj = {
-                                        // startTime: res.atvarparams[0].atrrs.defaultValue,
-                                        // endTime: res.atvarparams[0].atrrs.defaultValue,
-                                        // dataAddr: obj.actionAddr.dataAddr,
-                                        // atvarparams: JSON.stringify(BwRule.atvar.dataGet())
-                                        dataAddr
-                                    };
+                                // startTime: res.atvarparams[0].atrrs.defaultValue,
+                                // endTime: res.atvarparams[0].atrrs.defaultValue,
+                                // dataAddr: obj.actionAddr.dataAddr,
+                                // atvarparams: JSON.stringify(BwRule.atvar.dataGet())
+                                dataAddr
+                            };
 
                             return G.Shell.location.localSubmit(localSubmitObj);
                         }
@@ -897,7 +897,7 @@ export class ButtonAction {
                     let item = all[i] as any;
                     if (item.hasAttribute('readonly')) {
                         item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
-                        item.parentNode.style.position="relative";
+                        item.parentNode.style.position = "relative";
                         let htl = d.create('<div class="undisalbe"></div>')
                         item.parentNode.appendChild(htl)
                     }
@@ -937,7 +937,7 @@ export class ButtonAction {
                 console.log('......', tableData, e);
                 table = new e.BwTableElement({
                     tableEl: Object.assign(tableData, {
-                        subButtons: [],
+                        subButtons: tableData && tableData.uiType === 'assselect' ? tableData.subButtons :  [],
                         operationType: {
                             autoEdit: type === 13,
                             editType: 'current'
