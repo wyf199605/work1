@@ -165,7 +165,7 @@ namespace BW {
                     if (sysPcHistory.indexOf(url) > -1) {
                         let isLast = lastUrl === url;
                         //事件发送
-                        self.window.fire(event, data, sysPcHistory.getRefer(url)[0]);
+                        // self.window.fire(event, data, sysPcHistory.getRefer(url)[0]);
                         // 历史清除
                         sysPcHistory.remove(url);
                         self.pages.close(url);
@@ -173,6 +173,7 @@ namespace BW {
                         // 如果关闭当前打开的页面，则关闭后打开历史倒数第二位置的页面
                         if (sysPcHistory.len() > 0 && isLast) {
                             self.window.open({ url: sysPcHistory.last() });
+                            //事件发送
                             self.window.fire(event, data, sysPcHistory.last());
                         }
                     }

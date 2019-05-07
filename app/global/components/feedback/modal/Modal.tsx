@@ -865,7 +865,7 @@ export class Modal extends Component {
     /**
      *静态方式创建alert框，使用后立即销毁
      */
-    static alert(msg: any = '', title?: string, onClick?: Function): Modal {
+    static alert(msg: any = '', title?: string, onClick?: Function, container = document.body): Modal {
         //将msg转为json字符串
         if (msg instanceof Object || Array.isArray(msg)) {
             msg = JSON.stringify(msg);
@@ -885,6 +885,7 @@ export class Modal extends Component {
 
         inputBox.addItem(okBtn);
         let m = new Modal({
+            container,
             isOnceDestroy: true,
             header: !title ? '提示' : tools.str.htmlEncode(title),
             width: '270px',

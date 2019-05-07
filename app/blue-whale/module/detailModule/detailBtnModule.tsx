@@ -233,7 +233,8 @@ export class DetailBtnModule extends DetailModule {
         let initStatus = () => {
             if(this.total <= 0){
                 box && box.children.forEach((btn: Button) => {
-                    btn.isDisabled = false;
+                    let btnUi = btn.custom as R_Button;
+                    btnUi.multiselect !== 0 && (btn.isDisabled = false);
                 });
                 return ;
             }
