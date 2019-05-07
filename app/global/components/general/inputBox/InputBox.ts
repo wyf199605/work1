@@ -40,6 +40,7 @@ export class InputBox extends Component {
     }
 
     private init(inputBox: IInputBoxPara) {
+        console.log('inputBox', inputBox);
         this.limitCount = inputBox.limitCount || -1;
         this.isVertical = !!inputBox.isVertical;
         this.wrapper.classList.add(this.isVertical ? 'input-box-vertical' : 'input-box-horizontal');
