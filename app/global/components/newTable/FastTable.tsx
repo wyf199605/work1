@@ -1804,7 +1804,8 @@ export class FastTable extends Component {
     render(start: number, length: number, position?: number, isUpdateFoot?: boolean): void
     render(x, y?, w?, z = true) {
         // debugger;
-
+        // let parent = this.wrapper.parentElement;
+        // d.remove(this.wrapper, false);
         this.wrapper.style.display = 'none';
         this.tablesEach(table => {
             table.render(x, y, w, z);
@@ -1868,7 +1869,12 @@ export class FastTable extends Component {
         this.pseudoTable && this.pseudoTable.render();
         this.noData.toggle(Object.keys(this.tableData.data).length === 0);
 
+        this.rows && this.rows.forEach((row) => {
+            row.format();
+        });
+
         this.wrapper.style.display = 'block';
+        // d.append(parent, this.wrapper);
         // this.tablesEach((table) => {
         //     table.adjustColWidth(0);
         //     // if (this.tableData.serverMode) {
@@ -1882,10 +1888,6 @@ export class FastTable extends Component {
         //
         // this.calcWidth();
         // this.setMainTableWidth();
-
-        this.rows && this.rows.forEach((row) => {
-            row.format();
-        });
         if (tools.isPc) {
             // PC端
             this.scrollEvent.off();
@@ -2848,12 +2850,12 @@ export class FastTable extends Component {
                     this._drawSelectedCells();
                 }
             } else {
+                this.mainTable.cancelEditor();
+                this.leftTable && this.leftTable.cancelEditor();
                 this.edit.event.click.off();
                 !tools.isMb && this.hoverMoreEvent.on();
                 this.sortEvent.on();
                 this.click.on();
-                this.mainTable.cancelEditor();
-                this.leftTable && this.leftTable.cancelEditor();
                 this.edit.event.scroll.off();
                 this.rowDel(this.edit.addIndex.spaceRowIndex());
                 this.tablesEach(table => {
@@ -2874,7 +2876,6 @@ export class FastTable extends Component {
                 this.rows.forEach((row) => {
                     row.isAdd = false;
                 });
-                this.render(0, void 0);
             }
         }
     }
@@ -2934,7 +2935,6 @@ export class FastTable extends Component {
                 }
             });
         })
-
     }
 
     editorCancel() {
@@ -2946,14 +2946,15 @@ export class FastTable extends Component {
             table.off(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index]);
         });
 
-
     }
 
     protected initDisabledEditorRow(row) {
-        let editor = this.editor;
+        let editor = this.editor,
+            updatable = editor.updatable,
+            rowCanInit = editor.rowCanInit(row);
         row && row.cells.forEach((cell: TableDataCell) => {
             let column = cell.column;
-            if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(column as FastTableColumn, 1))) {
+            if (!(updatable && rowCanInit && editor.cellCanInit(column as FastTableColumn, 1))) {
                 cell.disabled = true;
                 cell.isNotPassiveModify = tools.isEmpty(column.content.flag) ? false : !column.content.flag;
             }
@@ -2961,25 +2962,35 @@ export class FastTable extends Component {
     }
 
     protected initDisabledEditor() {
-        let editor = this.editor;
+        console.time('start');
+        let editor = this.editor,
+            updatable = editor.updatable;
+        this.wrapper.style.display = 'none';
         this.rows.forEach((row) => {
-            row && row.cells.forEach((cell: TableDataCell) => {
-                let column = cell.column;
-                if (!(editor.updatable && editor.rowCanInit(row) && editor.cellCanInit(column as FastTableColumn, 0))) {
-                    cell.disabled = true;
-                    cell.isNotPassiveModify = tools.isEmpty(column.content.flag) ? false : !column.content.flag;
-                }
-            })
-        })
+            if(row){
+                let rowCanInit = editor.rowCanInit(row);
+                row.cells.forEach((cell: TableDataCell) => {
+                    let column = cell.column;
+                    if (!(updatable && rowCanInit && editor.cellCanInit(column as FastTableColumn, 0))) {
+                        cell.disabled = true;
+                        cell.isNotPassiveModify = tools.isEmpty(column.content.flag) ? false : !column.content.flag;
+                    }
+                })
+            }
+        });
+        this.wrapper.style.display = 'block';
+        console.timeEnd('start');
     }
 
     protected clearDisabledEditor() {
+        this.wrapper.style.display = 'none';
         this.rows.forEach((row) => {
             row && row.cells.forEach((cell) => {
                 cell.disabled = false;
                 cell.errorMsg = '';
             })
-        })
+        });
+        this.wrapper.style.display = 'block';
     }
 
     protected _isWrapLine = false;
