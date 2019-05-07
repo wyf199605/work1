@@ -545,51 +545,49 @@ export class EditModule {
                 }
                 return;
             }
-            this._assignPromise = new Promise<void>(() => {
-                this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.assignAddr, data), {
+            this._assignPromise = this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(field.assignAddr, data), {
                     cache: true,
-                }).then(({ response }) => {
-                    let resData = tools.keysVal(response, 'data');
+            }).then(({ response }) => {
+                let resData = tools.keysVal(response, 'data');
 
-                    return new Promise<obj>((resolve) => {
-                        if (resData && resData.length > 1 && this.cols) {
-                            let meta = tools.keysVal(response, 'body', 'bodyList', 0, 'meta') || [];
+                return new Promise<obj>((resolve) => {
+                    if (resData && resData.length > 1 && this.cols) {
+                        let meta = tools.keysVal(response, 'body', 'bodyList', 0, 'meta') || [];
 
-                            let fields: R_Field[] = meta.map((name) => {
-                                let cols = this.cols.filter((col) => {
-                                    return col.name === name;
-                                });
-                                return cols[0] || null;
-                            }).filter((field) => tools.isNotEmpty(field));
-                            new PickTable({
-                                fields: fields,
-                                data: resData,
-                                title: field.caption,
-                                container: this.para.container,
-                                onDataGet: (data) => {
-                                    resolve(data[0] || {});
-                                },
-                                onClose: () => {
-                                    resolve({});
-                                }
+                        let fields: R_Field[] = meta.map((name) => {
+                            let cols = this.cols.filter((col) => {
+                                return col.name === name;
                             });
-                        } else {
-                            resolve(resData ? resData[0] : {});
-                        }
-                    }).then((data) => {
-                        let assignData1 = assignDataGet(val, data);
+                            return cols[0] || null;
+                        }).filter((field) => tools.isNotEmpty(field));
+                        new PickTable({
+                            fields: fields,
+                            data: resData,
+                            title: field.caption,
+                            container: this.para.container,
+                            onDataGet: (data) => {
+                                resolve(data[0] || {});
+                            },
+                            onClose: () => {
+                                resolve({});
+                            }
+                        });
+                    } else {
+                        resolve(resData ? resData[0] : {});
+                    }
+                }).then((data) => {
+                    let assignData1 = assignDataGet(val, data);
 
-                        for (let key in assignData1) {
-                            assignData1[key] = Array.isArray(assignData1[key]) ? assignData1[key].join(';') : ''
-                        }
+                    for (let key in assignData1) {
+                        assignData1[key] = Array.isArray(assignData1[key]) ? assignData1[key].join(';') : ''
+                    }
 
-                        assign2extra(field, assignData1);
-                        // debugger;
-                        Object.assign(assignData, assignData1);
-                        onExtra && onExtra(assignData1, field.assignSelectFields, true, false, true);
-                    })
-
+                    assign2extra(field, assignData1);
+                    // debugger;
+                    Object.assign(assignData, assignData1);
+                    onExtra && onExtra(assignData1, field.assignSelectFields, true, false, true);
                 })
+
             })
 
         };
