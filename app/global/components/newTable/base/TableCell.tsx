@@ -366,18 +366,28 @@ export class TableDataCell extends TableCell {
         if(this.table.editing){
             let guidIndex = this.table.tableData.get()[this.row.index][TableBase.GUID_INDEX],
                 rowData = null;
-            for(let data of this.table.tableData.edit.getOriginalData()){
-                if(data[TableBase.GUID_INDEX] === guidIndex){
-                    rowData = data;
-                    break;
+            if(!this.originalData){
+                for(let data of this.table.tableData.edit.getOriginalData()){
+                    if(data[TableBase.GUID_INDEX] === guidIndex){
+                        rowData = data;
+                        this.originalData = tools.isEmpty(rowData) ? null : rowData[this.name];
+                        break;
+                    }
                 }
             }
             // console.log(rowsData);
-            let originalCellData = tools.isEmpty(rowData) ? null : rowData[this.name];
             // console.log(tools.str.toEmpty(originalCellData), tools.str.toEmpty(this.data));
-            this.isEdited = tools.str.toEmpty(originalCellData) != tools.str.toEmpty(this.data);
+            this.isEdited = tools.str.toEmpty(this.originalData) != tools.str.toEmpty(this.data);
         }
     }
+
+    reset(){
+        if(this.isEdited){
+            this.data = this.originalData;
+            this.originalData = null;
+        }
+    }
+    protected originalData: null;
 
     render(cellData?){
         // debugger

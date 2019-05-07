@@ -103,10 +103,11 @@ export class NewTableModule extends AGroupTabItem{
                 this.initEdit(main);
                 this.active.onChange = (isMain) => {
                     if(isMain){
-                        this.main.modify.end();
+                        if(this.main.ftable.editing)
+                            this.main.modify.end();
                     }else{
                         let sub = this.sub[this.subTabActiveIndex];
-                        sub && sub.modify.end();
+                        sub && sub.ftable.editing && sub.modify.end();
                     }
                 }
             }else if(this.editType === 'self' && this.main.editParam){
