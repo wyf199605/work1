@@ -29,6 +29,16 @@ interface IKeyStepPara {
     inputs?: R_Input[]
     locationLine?: string
 }
+interface IRfidConfPara {
+    line: number,
+    ip: string,
+    port: number,
+    com: string,
+    baud: number,
+    aerial: number,
+    buzz: boolean,
+    led: boolean,
+}
 /**
  * Inputs在pc端为按键输入，移动端为扫码,根据后台返回类型区分各种操作
  */
@@ -38,11 +48,41 @@ export class Inputs {
     private isProcess: boolean = false; // 连续扫码，记录当前操作是否结束
     private url: string;  //记录当前请求的url步骤,每次请求从该步骤开始
     private keyStep: KeyStep;
+    private port: any;
     constructor(private para: InputsPara) {
         console.log('------------', para);
         this.p = para;
         para.container.tabIndex = parseInt(G.tools.getGuid());
         this.eventInit(para);
+        /**rfid设置 */
+        let conf = JSON.parse(window.localStorage.getItem('rfidConf'));
+        this.port = getRfidPort(conf);
+        console.log("RFID"+JSON.stringify(this.port))
+        Shell.rfid.start(this.port.str, this.port.num, (result) => {
+            // console.log(result);
+            /**
+             * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
+             */
+            // alert(JSON.stringify(result));
+            let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
+                data = result.data;
+            console.log(msg);
+            if (result.success) {
+                // this.matchPass(reg, text);
+                para.inputs.forEach(input => {
+                    let line = para.locationLine;
+                    let reg = regExpMatch(input, data[0]);
+                    //匹配成功
+                    if (reg) {
+                        this.matchPass(reg, data[0]);
+                    } else if (line) {
+                        this.rowSelect(line, data[0]);
+                    }
+                });
+            }
+
+        });
+
         // setTimeout(() => {
         //     this.ajax("http://192.168.1.222:8080/sf/app_sanfu_retail/null/monitorkey/n1-move-19?needparam=%5B%7B%22n%22%3A%22toshopid%22%7D%2C%7B%22n%22%3A%22TOSHOPID%22%7D%5D&toshopid=1111&inputtext=8100247691", () => {
 
@@ -318,7 +358,7 @@ export class Inputs {
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 let handle = () => {
                     if (text.indexOf('Shift') > -1) {
-                       text= text.replace('Shift', '')
+                        text = text.replace('Shift', '')
                     }
                     // console.log(text)
                     let reg = regExpMatch(input, text);
@@ -333,7 +373,6 @@ export class Inputs {
                     text = '';
                 },
                     code = e.keyCode || e.which || e.charCode;
-                console.log(code)
                 if (code === 13) {
                     handle();
                 } else {
@@ -359,6 +398,9 @@ export class Inputs {
             }
             resolve();
         })
+    }
+    destory() {
+        Shell.rfid.stop(() => { });
     }
 }
 
@@ -547,3 +589,17 @@ function regExpMatch(input: R_Input, inputContent: string) {
     }
     return data
 }
+
+/**rfid */
+var getRfidPort = (conf: IRfidConfPara) => {
+    let str, num;
+    if (conf.line === 1) {
+        str = conf.com;
+        num = conf.baud;
+    } else {
+        str = conf.ip;
+        num = conf.port;
+    }
+    num = parseInt(num);
+    return { str, num }
+};
