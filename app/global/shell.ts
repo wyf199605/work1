@@ -61,8 +61,8 @@ namespace G {
         };
 
         const finger = {
-            get(para: obj, back: IShellEventHandler, info: IShellEventHandler, isKeepOn = false) {
-                return ShellBase.handler('fingerGet', para, back, info, isKeepOn);
+            get(para: obj, back: IShellEventHandler, info: IShellEventHandler, isKeepOn = true) {
+                return ShellBase.handler('fingerGet', para, back, info, !isKeepOn);
             },
             cancel() {
                 ShellBase.eventOff('fingerGet');
