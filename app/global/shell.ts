@@ -671,7 +671,7 @@ namespace G {
     }
     interface IShellHandler {
         (action: string, data: obj | string): IShellResult;
-        (action: string, data: obj | string, back: IShellEventHandler, infor?: IShellEventHandler, isAutoOff?: boolean): boolean;
+        (action: string, data: obj | string, back: IShellEventHandler, infor?: IShellEventHandler, isAutoOff?: boolean): boolean | {on: Function, off: Function};
 
     }
 
@@ -713,6 +713,34 @@ namespace G {
                         events.push(eventBack, eventInfor);
                     }
 
+                    let event = {
+                        on: () => {
+                            // 异步完成通知
+                            if (eventBack) {
+                                d.on(window, eventBack, function (e: CustomEvent) {
+                                    let detail = e.detail;
+                                    if (isAutoOff) {
+                                        d.off(window, eventInfor);
+                                        d.off(window, eventBack);
+                                    }
+                                    try {
+                                        detail = typeof detail === 'string' ? JSON.parse(detail) : detail;
+                                    } catch (e) {
+                                        console.log(e, 'JSON解析错误');
+                                        console.log(detail);
+                                        alert('JSON解析错误');
+                                        return;
+                                    }
+                                    // alert(JSON.stringify(e.detail));
+                                    back(detail);
+                                })
+                            }
+                        },
+                        off: () => {
+                            d.off(window, eventBack);
+                        }
+                    };
+
                     if (eventInfor) {
                         d.on(window, eventInfor, function (e: CustomEvent) {
                             // alert(typeof e.detail === 'string' ? e.detail : e);
@@ -726,27 +754,7 @@ namespace G {
                             }
                         })
                     }
-                    // 异步完成通知
-                    if (eventBack) {
-                        d.on(window, eventBack, function (e: CustomEvent) {
-                            let detail = e.detail;
-                            if (isAutoOff) {
-
-                                d.off(window, eventInfor);
-                                d.off(window, eventBack);
-                            }
-                            try {
-                                detail = typeof detail === 'string' ? JSON.parse(detail) : detail;
-                            } catch (e) {
-                                console.log(e, 'JSON解析错误');
-                                console.log(detail);
-                                alert('JSON解析错误');
-                                return;
-                            }
-                            // alert(JSON.stringify(e.detail));
-                            back(detail);
-                        })
-                    }
+                    event.on();
 
                     // 异步调用
                     let flag, shellData = Object.assign({ data: dataStr } || {}, { back: eventBack, info: eventInfor });
@@ -763,7 +771,7 @@ namespace G {
                         d.off(window, eventInfor);
                         d.off(window, eventBack);
                     }
-                    return flag;
+                    return flag ? event : false;
                 }
             } else {
                 return false;
