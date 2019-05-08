@@ -98,7 +98,7 @@ export class DetailModule extends AGroupTabItem {
         this.dataManager = new DetailDataManager({
             render: () => {
                 // 渲染方法
-                tools.isEmpty(this.dataManager.data) && Modal.alert('数据为空', '温馨提示', null, this.container);
+                // tools.isEmpty(this.dataManager.data) && Modal.alert('数据为空', '温馨提示', null, this.container);
                 this.render(this.dataManager.data[0] || {});
             },
             container: this.wrapper,

@@ -165,7 +165,7 @@ export class BwTableModule extends Component {
                 name: null,
                 isReplaceTable: this.isDrill,
             } : {
-                name: [this.isRfid ? null : 'search', 'statistic', 'export'],
+                name: [this.isRfid ? null : null, 'statistic', 'export'],
                 type: tools.isMb ? "dropdown" : "button",
                 target: tools.isMb ? d.query('[data-target="popover"]>[data-action="down-menu"]') : void 0,
                 isReplaceTable: this.isDrill,
@@ -426,14 +426,14 @@ export class BwTableModule extends Component {
         );
         this.ftable.btnShow = this.btnShow;
 
-        !this.isDrill && this.ftable.btnAdd('filter', {
-            type: 'default',
-            icon: 'sousuo',
-            content: '本地过滤',
-            onClick: () => {
-                this.filter.init();
-            },
-        }, 1);
+        // !this.isDrill && this.ftable.btnAdd('filter', {
+        //     type: 'default',
+        //     icon: 'sousuo',
+        //     content: '本地过滤',
+        //     onClick: () => {
+        //         this.filter.init();
+        //     },
+        // }, 1);
 
         (this.ui.rfidFlag == 1) && this.ftable.btnAdd('rfid', {
             type: 'default',
