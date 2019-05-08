@@ -47,9 +47,15 @@ export class EditDetail extends DetailBase {
                 //     btn.disabled = isEdit;
                 // })
             }
-            this.cancelBtn.disabled = !isEdit;
-            this.updateBtn.disabled = isEdit;
-            this.saveBtn.disabled = !isEdit;
+            if (this.cancelBtn) {
+                this.cancelBtn.disabled = !isEdit;
+            }
+            if (this.updateBtn) {
+                this.updateBtn.disabled = isEdit;
+            }
+            if (this.saveBtn) {
+                this.saveBtn.disabled = !isEdit;
+            }
             tools.isNotEmpty(this.moreBtn) && (this.moreBtn.disabled = !isEdit);
             this.fields.forEach(f => {
                 if (!f.noShow && !f.noEdit) {
