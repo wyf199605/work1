@@ -6,6 +6,7 @@ import {TextInput, ITextInputBasicPara, ITextInputPara} from "../text/text";
 import tools = G.tools;
 import {IFormComPara} from "../basic";
 import {RichTextMb} from "../richText/richTextMb";
+import d = G.d;
 
 interface RichTextModalPara extends ITextInputBasicPara, IFormComPara{
     onClose?: (value: string) => void
@@ -19,16 +20,21 @@ export class RichTextModal extends TextInput{
     constructor(para: RichTextModalPara){
         super(Object.assign({}, para, {
             readonly : true,
-            icons : ['iconfont icon-arrow-down'],
-            iconHandle: () => {
-                if(this.modal === null){
-                    this.initRichText();
-                }
-            }
+            // icons : ['iconfont icon-arrow-down'],
+            // iconHandle: () => {
+            // }
         }) as ITextInputPara);
+        d.on(this.input, 'click', () => {
+            if(!this.modal){
+                this.initRichText();
+            }
+            this.modal.isShow = true;
+            this.richText && this.richText.set(this._value);
+        });
 
         this.onClose = para.onClose;
         this.initRichText();
+        this.modal.isShow = false;
     }
 
     protected initRichText(){
@@ -37,16 +43,20 @@ export class RichTextModal extends TextInput{
             container: document.body,
             header: '编辑',
             body,
-            isOnceDestroy: true,
             isAdaptiveCenter: true,
             className: 'rich-text-modal',
             width: '750px',
             height: '425px',
+            isShow: true,
             onClose: () => {
+                // this.modal = null;
+            },
+            footer: {},
+            onOk: () => {
                 this.input.value = tools.str.removeHtmlTags(this.richText.get());
                 this._value = this.richText.get();
                 typeof this.onSet === 'function' && this.onSet(this.get());
-                this.modal = null;
+                this.modal && (this.modal.isShow = false);
             }
         });
 
@@ -73,6 +83,8 @@ export class RichTextModal extends TextInput{
     }
 
     destroy(){
+        this.modal && this.modal.destroy();
+        this.modal = null;
         this.richText.destroy();
         super.destroy();
     }

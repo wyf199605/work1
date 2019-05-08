@@ -320,6 +320,9 @@ export class Modal extends Component {
     // private _height?: string;
     set height(height: string) {
         // this._height = tools.isEmpty(height) ? '' : height;
+        if(!this.wrapper){
+            return ;
+        }
         this.wrapper.style.height = height;
         let otherHeight = this.headWrapper ? this.headWrapper.offsetHeight : 0;
         otherHeight = otherHeight + (this._footWrapper ? this._footWrapper.offsetHeight : 0);

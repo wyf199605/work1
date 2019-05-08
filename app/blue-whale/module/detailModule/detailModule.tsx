@@ -26,10 +26,13 @@ export interface IDetailModulePara extends IGroupTabItemPara {
 export class DetailModule extends AGroupTabItem {
     protected wrapperInit() {
         return <div className="detail-wrapper">
-            <div className="detail-content"/>
+            <div className="detail-container">
+                <div className="detail-content"/>
+            </div>
         </div>;
     }
 
+    static backUp = '__back_up_flag__';
     public ajaxData = {}; // 关联数据
     protected dataManager: DetailDataManager; // 数据管理
     protected ui: IBW_Detail; // ui 数据

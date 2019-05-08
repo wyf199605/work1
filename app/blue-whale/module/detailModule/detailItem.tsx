@@ -34,9 +34,10 @@ export class DetailItem extends Component{
 
         this._name = name;
 
-        let className = DetailItem.isBlock(dataType) ? 'col-xs-12' :' col-xs-12 col-md-4 col-sm-6';
+        let className = DetailItem.isBlock(dataType) ? 'block-item' :'';
         if(tools.isMb){
-            className = 'col-xs-12'
+            // className = 'col-xs-12'
+            className = 'block-item';
         }
 
         return isShow ? <div className={"detail-item " + className} data-name={name}>

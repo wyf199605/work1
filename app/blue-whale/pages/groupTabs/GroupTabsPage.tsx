@@ -20,6 +20,8 @@ import { Loading } from "../../../global/components/ui/loading/loading";
 import sys = BW.sys;
 import {BwTableModule} from "../../module/table/BwTableModule";
 import CONF = BW.CONF;
+import {DetailModule} from "../../module/detailModule/detailModule";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -86,8 +88,15 @@ export class GroupTabsPage extends BasicPage {
             this.createTabItem(0, this.wrapper);
         }
 
-        this.on(BwRule.EVT_REFRESH, () => {
-            this.refresh();
+        this.on(BwRule.EVT_REFRESH, (e: CustomEvent) => {
+            let backup = window.sessionStorage.getItem(DetailModule.backUp);
+            window.sessionStorage.removeItem(DetailModule.backUp);
+            this.refresh().then(() => {
+                if(backup && this.main instanceof DetailModule && this.main.total <= 0){
+                    window.sessionStorage.setItem(DetailModule.backUp, '1');
+                    ButtonAction.get().btnRefresh(3, this.main.pageUrl);
+                }
+            });
         });
 
         let bwTableEl = this.ui as IBW_Table,

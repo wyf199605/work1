@@ -340,6 +340,7 @@ export class DetailBtnModule extends DetailModule {
                             this.on(DetailModule.EVT_RENDERED, btnHandler = () => {
                                 this.off(DetailModule.EVT_RENDERED, btnHandler);
                                 if(this.total === 0){
+                                    window.sessionStorage.setItem(DetailModule.backUp, '1');
                                     btnAction.btnRefresh(3, this.pageUrl);
                                 }
                             })
