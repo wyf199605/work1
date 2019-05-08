@@ -2,15 +2,15 @@
 import d = G.d;
 import tools = G.tools;
 import IComponentPara = G.IComponentPara; import Component = G.Component;
-import { Drag } from "components/ui/drag/drag";
-import { InputBox } from "../../general/inputBox/InputBox";
+import {Drag} from "components/ui/drag/drag";
+import {InputBox} from "../../general/inputBox/InputBox";
 
-export interface IModalHeaderPara extends IComponentPara {
+export interface IModalHeaderPara extends IComponentPara{
     // container?: HTMLElement,
     title?: string;
     isDrag?: boolean;
     isClose?: boolean;
-    dragEl?: HTMLElement;
+    dragEl? : HTMLElement;
     isFullScreen?: boolean;
     rightPanel?: InputBox | HTMLElement; // --
 }
@@ -24,7 +24,7 @@ export class ModalHeader extends Component {
     }
 
     private drag: Drag; //头部拖拽，控制开关
-    private _dragEl: HTMLElement; // 拖拽容器
+    private _dragEl : HTMLElement; // 拖拽容器
 
     init(modalHeader: IModalHeaderPara) {
         // if(this.wrapper){
@@ -81,7 +81,7 @@ export class ModalHeader extends Component {
         }
         this._isDrag = tools.isEmpty(isDrag) ? true : isDrag;
         if (this._isDrag) {
-            this.drag = new Drag({ dom: this._dragEl, container: this._dragEl.parentElement, head: this.wrapper });
+            this.drag = new Drag({dom: this._dragEl, container: this._dragEl.parentElement, head: this.wrapper});
         }
         if (this.drag && !this._isDrag) {
             this.drag.pullEventOff();
@@ -98,31 +98,17 @@ export class ModalHeader extends Component {
      * 类型:Boolean
      * 默认值:true
      * */
-    private _modalCloseEl: HTMLElement;
-    get modalCloseEl() {
+    private _modalCloseEl : HTMLElement;
+    get modalCloseEl(){
         return this._modalCloseEl;
     }
 
     private _isClose?: boolean;
     set isClose(isClose: boolean) {
         this._isClose = isClose;
-        this._modalCloseEl = null;
-        //移动端特殊化
-        if (tools.isMb) {
-            this._modalCloseEl = d.query('.close_x', this.wrapper);
-        } else {
-            this._modalCloseEl = d.query('.close', this.wrapper);
-        }
-
+        this._modalCloseEl = d.query('.close', this.wrapper);
         if (!this._modalCloseEl && this._isClose) {
-            let dom = null;
-            //移动端特殊化
-            if (tools.isMb) {
-                dom = <span className="header-btn-right close_x">×</span>;
-            } else {
-                dom = <span className="header-btn-right close">×</span>;
-            }
-            this._modalCloseEl = dom
+            this._modalCloseEl = <span className="close">×</span>;
             this.wrapper.appendChild(this._modalCloseEl);
 
         } else {
@@ -190,7 +176,7 @@ export class ModalHeader extends Component {
             let modalEnlarge = <span data-fullscreen="enlarge" className="iconfont icon-maximize modal-enlarge"></span>;
             this.wrapper.appendChild(modalEnlarge);
         } else {
-            d.remove(modalEnlarge);
+            d.remove(modalEnlarge); 
             modalEnlarge = null;
         }
     }
@@ -269,6 +255,6 @@ export class ModalHeader extends Component {
             isDrag: true,
             isFullScreen: false,
         };
-        this.init(tools.obj.merge(defaultPara, modalHeader));
+        this.init(tools.obj.merge(defaultPara,modalHeader));
     }
 }
