@@ -513,6 +513,7 @@ th.selected{
   display: none;
   border: solid 1px #e2e2e2;
   font-size: 14px;
+  z-index: 1001;
   .tree-child-wrapper{
     .tree-child-wrapper{
       max-height: 120px;

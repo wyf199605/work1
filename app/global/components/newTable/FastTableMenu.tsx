@@ -97,13 +97,23 @@ export class FastTableMenu {
 
     private mousedownEvent = (() => {
         let mousedownHandler = (e) => {
-            this.show = false;
+            let ftableMenu = this.ftableMenu as FastTablePCMenu,
+                wrapper = ftableMenu.contextMenu.wrapper;
+            console.log(d.closest(e.target, '.ftable-context-menu', wrapper));
+            if(d.closest(e.target, '.ftable-context-menu') !== wrapper){
+                this.show = false;
+            }
         };
         return {
-            on: () => d.on(document, 'click', mousedownHandler),
-            off: () => d.off(document, 'click', mousedownHandler)
+            on: () => {
+                document.addEventListener('click', mousedownHandler, true);
+            },
+            off: () => {
+                document.removeEventListener('click', mousedownHandler, true);
+            }
         }
     })();
+
     private cell: FastTableCell = null;
     private contextMenuEvent = (() => {
         let eventType = tools.isMb ? 'press' : 'contextmenu';
@@ -226,7 +236,7 @@ class FastTablePCMenu {
     constructor(para: IFastTableMenu) {
         this.ftable = para.ftable;
         this.contextMenu = new Menu({
-            container: para.ftable.wrapper,
+            container: document.body,
             expand: true,
             isOutline: true,
             isHoverExpand: true,
