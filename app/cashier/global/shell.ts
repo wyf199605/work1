@@ -11,7 +11,7 @@ namespace C {
                 return _device;
             },
             fullScreenSet(fullScreen: boolean, back: IShellEventHandler) {
-                return ShellBase.handler('setFullScreen', {fullScreen}, back);
+                return ShellBase.handler('setFullScreen', { fullScreen }, back);
             },
             versionGet() {
                 return ShellBase.handler('versionGet', {});
@@ -21,9 +21,9 @@ namespace C {
 
                 return Ajax.fetch(url, {
                     type: 'POST',
-                    data: {msg: versionGet && versionGet.data},
+                    data: { msg: versionGet && versionGet.data },
                     dataType: 'json'
-                }).then(({response}) => {
+                }).then(({ response }) => {
                     if (response && response.data && response.data.byteLength > 0) {
                         ShellBase.handler('versionUpdate', {
                             byteLength: response.data.byteLength,
@@ -112,10 +112,10 @@ namespace C {
                 let innerBack = function () {
                     back(ShellBase.handler('casioDataGet', {}));
                 };
-                return ShellBase.handler('casioUpload', {port, speed}, innerBack, infor);
+                return ShellBase.handler('casioUpload', { port, speed }, innerBack, infor);
             },
             download(port: string, speed: string, data: obj, back: IShellEventHandler, infor: IShellEventHandler) {
-                return ShellBase.handler('casioDownload', {port, speed}, back, infor);
+                return ShellBase.handler('casioDownload', { port, speed }, back, infor);
             }
         };
 
@@ -123,11 +123,11 @@ namespace C {
             function query(str: string, back: IShellEventHandler): boolean;
             function query(str: string): IShellResult;
             function query(str: string, back?) {
-                return back ? ShellBase.handler('sqliteQuery', {query: str}, back) :
-                    ShellBase.handler('sqliteQuery', {query: str});
+                return back ? ShellBase.handler('sqliteQuery', { query: str }, back) :
+                    ShellBase.handler('sqliteQuery', { query: str });
             }
 
-            return {query};
+            return { query };
         })();
 
         const rfid = (() => {
@@ -136,22 +136,22 @@ namespace C {
             // config :{led:true;buzzer:false;power:5}
             function start(str: string, num: number, back: IShellEventHandler) {
                 // 判断是否是ip
-                let data = str.split('.').length === 4 ? {ipAddress: str, ipPort: num} : {comPort: str, comBaud: num};
+                let data = str.split('.').length === 4 ? { ipAddress: str, ipPort: num } : { comPort: str, comBaud: num };
 
                 return ShellBase.handler('rfidStart', data, back, null, false);
             }
 
             function reset(str: string, num: number, back: IShellEventHandler) {
-                let data = str.split('.').length === 4 ? {ipAddress: str, ipPort: num} : {comPort: str, comBaud: num};
+                let data = str.split('.').length === 4 ? { ipAddress: str, ipPort: num } : { comPort: str, comBaud: num };
 
                 return ShellBase.handler('rfidReset', data, back, null, false);
             }
 
             function config(str: string, num: number, config: { led?: boolean, buzzer?: boolean, power?: number }, back: IShellEventHandler) {
                 // 判断是否是ip
-                let data = str.split('.').length === 4 ? {ipAddress: str, ipPort: num} : {comPort: str, comBaud: num};
+                let data = str.split('.').length === 4 ? { ipAddress: str, ipPort: num } : { comPort: str, comBaud: num };
                 // document.body.innerHTML = JSON.stringify( Object.assign(data, {config}));
-                return ShellBase.handler('rfidConfig', Object.assign(data, {config}), back, null, false);
+                return ShellBase.handler('rfidConfig', Object.assign(data, { config }), back, null, false);
             }
 
 
@@ -160,13 +160,13 @@ namespace C {
                 return ShellBase.handler('rfidStop', null, back);
             }
 
-            return {start, stop, config, reset}
+            return { start, stop, config, reset }
         })();
 
         const startUp = {
 
             start(autoStart: boolean) {
-                return ShellBase.handler('setAutoStart', {autoStart});
+                return ShellBase.handler('setAutoStart', { autoStart });
             },
             query() {
                 return ShellBase.handler('queryAutoStart', {});
@@ -181,7 +181,7 @@ namespace C {
                 return ShellBase.handler('printersGet', {});
             },
             labelPrint(quantity: number, driveCode: number, image: string, back: IShellEventHandler) {
-                return ShellBase.handler('labelPrint', {quantity, driveCode, image}, back);
+                return ShellBase.handler('labelPrint', { quantity, driveCode, image }, back);
             }
         };
         const inventory = {
@@ -191,26 +191,26 @@ namespace C {
                 });
             },
             loadData(url: string, uploadUrl: string, inventoryKey: string, back: IShellEventHandler) {
-                return ShellBase.handler('loadData', {url, uploadUrl, inventoryKey}, back);
+                return ShellBase.handler('loadData', { url, uploadUrl, inventoryKey }, back);
             },
             uploadData(url: string, inventoryKey: string, back: IShellEventHandler) {
-                return ShellBase.handler('uploadData', {url, inventoryKey}, back);
+                return ShellBase.handler('uploadData', { url, inventoryKey }, back);
             },
             insertData(data: { gooId: string, barcode: string, epc: string, check: boolean }[], inventoryKey: string, back: IShellEventHandler) {
-                return ShellBase.handler('insertData', {data, inventoryKey}, back);
+                return ShellBase.handler('insertData', { data, inventoryKey }, back);
             },
             delData(data: { goodId: string, barcode: string, epc: string, check: boolean }[], inventoryKey: string, back: IShellEventHandler) {
-                return ShellBase.handler('delData', {data, inventoryKey}, back);
+                return ShellBase.handler('delData', { data, inventoryKey }, back);
             },
             clearData(dbName: string, back: IShellEventHandler) {
-                return ShellBase.handler('clearData', {dbName}, back);
+                return ShellBase.handler('clearData', { dbName }, back);
             },
             rfidOpen(back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'open'}, back, null, false);
+                return ShellBase.handler('rfid', { type: 'open' }, back, null, false);
             },
             rfidClose(back: IShellEventHandler) {
                 ShellBase.eventOff('rfid');
-                return ShellBase.handler('rfid', {type: 'close'}, back);
+                return ShellBase.handler('rfid', { type: 'close' }, back);
             },
             /**
              *
@@ -219,7 +219,7 @@ namespace C {
              * @returns {boolean}
              */
             getBand(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'getBand', value}, back);
+                return ShellBase.handler('rfid', { type: 'getBand', value }, back);
             },
             /**
              *
@@ -228,7 +228,7 @@ namespace C {
              * @returns {boolean}
              */
             getMinMaxBand(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'getMinMaxBand', value}, back);
+                return ShellBase.handler('rfid', { type: 'getMinMaxBand', value }, back);
             },
             /**
              *
@@ -237,11 +237,11 @@ namespace C {
              * @returns {boolean}
              */
             startCheck(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'startCheck', value}, back, null, false);
+                return ShellBase.handler('rfid', { type: 'startCheck', value }, back, null, false);
             },
             stopCheck(value: obj, back: IShellEventHandler) {
                 ShellBase.eventOff('rfid');
-                return ShellBase.handler('rfid', {type: 'endCheck', value}, back);
+                return ShellBase.handler('rfid', { type: 'endCheck', value }, back);
             },
             /**
              *
@@ -250,7 +250,7 @@ namespace C {
              * @returns {boolean}
              */
             rfidSetParam(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'setParam', value}, back);
+                return ShellBase.handler('rfid', { type: 'setParam', value }, back);
             },
             /**
              *
@@ -259,7 +259,7 @@ namespace C {
              * @returns {boolean}
              */
             rfidGetParam(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'getParam', value}, back);
+                return ShellBase.handler('rfid', { type: 'getParam', value }, back);
             },
             /**
              *
@@ -268,7 +268,7 @@ namespace C {
              * @returns {boolean}
              */
             findGoods(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'findGoods', value}, back, null, false);
+                return ShellBase.handler('rfid', { type: 'findGoods', value }, back, null, false);
             },
             /**
              *
@@ -278,7 +278,7 @@ namespace C {
              */
             stopFind(value: obj, back: IShellEventHandler) {
                 ShellBase.eventOff('rfid');
-                return ShellBase.handler('rfid', {type: 'stopFind', value}, back);
+                return ShellBase.handler('rfid', { type: 'stopFind', value }, back);
             },
             /**
              *
@@ -287,11 +287,11 @@ namespace C {
              * @returns {boolean}
              */
             startEpc(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'startEpc', value}, back, null, false);
+                return ShellBase.handler('rfid', { type: 'startEpc', value }, back, null, false);
             },
             stopEpc(value: obj, back: IShellEventHandler) {
                 ShellBase.eventOff('rfid');
-                return ShellBase.handler('rfid', {type: 'stopEpc', value}, back);
+                return ShellBase.handler('rfid', { type: 'stopEpc', value }, back);
             },
             /**
              *
@@ -300,13 +300,13 @@ namespace C {
              * @returns {boolean}
              */
             clearEpc(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'clearEpc', value}, back);
+                return ShellBase.handler('rfid', { type: 'clearEpc', value }, back);
             },
             setPwm(value: obj, back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'setPwm', value}, back);
+                return ShellBase.handler('rfid', { type: 'setPwm', value }, back);
             },
             getPwn(back: IShellEventHandler) {
-                return ShellBase.handler('rfid', {type: 'getPwm'}, back);
+                return ShellBase.handler('rfid', { type: 'getPwm' }, back);
             },
             /**
              *
@@ -315,7 +315,7 @@ namespace C {
              * @returns {boolean}
              */
             openScan(back: IShellEventHandler) {
-                return ShellBase.handler('supon', {type: 'openScanFunction'}, back, null, false);
+                return ShellBase.handler('supon', { type: 'openScanFunction' }, back, null, false);
             },
             /**
              *
@@ -325,7 +325,7 @@ namespace C {
              */
             closeScan(back: IShellEventHandler) {
                 ShellBase.eventOff('supon');
-                return ShellBase.handler('supon', {type: 'closeScanFunction'}, back, null, false);
+                return ShellBase.handler('supon', { type: 'closeScanFunction' }, back, null, false);
             },
             /**
              *
@@ -335,10 +335,10 @@ namespace C {
              */
             getData(inventoryKey: string, field: string, back: IShellEventHandler) {
 
-                return ShellBase.handler('getData', {inventoryKey, field}, back, null, false);
+                return ShellBase.handler('getData', { inventoryKey, field }, back, null, false);
             },
             getScanCount(summary: string, back: IShellEventHandler) {
-                return ShellBase.handler('getScanCount', {summary}, back, null, false);
+                return ShellBase.handler('getScanCount', { summary }, back, null, false);
             },
             // scan2dOn(back: IShellEventHandler) {
             //     return ShellBase.handler('startScan2DResult', '', back, null, false);
@@ -370,11 +370,19 @@ namespace C {
                 }
             }
         };
+        const image = {
+            // 移动端下载图片
+            downloadImg(url: string, back: IShellEventHandler) {
+                ShellBase.handler('downloadImg', {
+                    url
+                }, back);
+            }
 
+        }
 
         return {
 
-            base, finger, file, casio, sqlite, printer, rfid, inventory, startUp
+            image, base, finger, file, casio, sqlite, printer, rfid, inventory, startUp
         }
     })(window, document);
 
