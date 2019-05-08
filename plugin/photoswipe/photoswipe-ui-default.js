@@ -1,6 +1,6 @@
-/*! PhotoSwipe Default UI - 4.1.1 - 2015-12-24
+/*! PhotoSwipe Default UI - 4.1.3 - 2019-01-08
 * http://photoswipe.com
-* Copyright (c) 2015 Dmitry Semenov; */
+* Copyright (c) 2019 Dmitry Semenov; */
 /**
 *
 * UI on top of main sliding area (caption, arrows, close button, etc.).
@@ -69,7 +69,8 @@ var PhotoSwipeUI_Default =
 			shareEl: true,
 			counterEl: true,
 			arrowEl: true,
-			preloaderEl: true,
+            preloaderEl: true,
+            downloadEl: true,
 
 			tapToClose: false,
 			tapToToggleControls: true,
@@ -471,6 +472,11 @@ var PhotoSwipeUI_Default =
 			name: 'button--arrow--right', 
 			option: 'arrowEl',
 			onTap: pswp.next
+        },
+        { 
+			name: 'button--download', 
+			option: 'downloadEl',
+			onTap: pswp.download
 		},
 		{ 
 			name: 'button--fs', 
