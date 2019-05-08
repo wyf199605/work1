@@ -52,7 +52,7 @@ export class FastTableMenu {
             });
             this.ftableMenu = new NewPopMenu({
                 items: popItems,
-                container: para.ftable.wrapper
+                container: document.body
             })
         } else {
             this.ftableMenu = new FastTablePCMenu({
@@ -97,10 +97,11 @@ export class FastTableMenu {
 
     private mousedownEvent = (() => {
         let mousedownHandler = (e) => {
-            let ftableMenu = this.ftableMenu as FastTablePCMenu,
-                wrapper = ftableMenu.contextMenu.wrapper;
-            console.log(d.closest(e.target, '.ftable-context-menu', wrapper));
-            if(d.closest(e.target, '.ftable-context-menu') !== wrapper){
+            let ftableMenu = this.ftableMenu,
+                wrapper = ftableMenu.contextMenu.wrapper,
+                className = tools.isMb ? '.pop-mbmenu-wrapper' : '.ftable-context-menu';
+            console.log(d.closest(e.target, className, wrapper));
+            if(d.closest(e.target, className) !== wrapper){
                 this.show = false;
             }
         };
@@ -141,11 +142,12 @@ export class FastTableMenu {
             let children = fm.contextMenu.children;
             this.updateMenu();
             this.show = true;
-            let offsetLeft = tools.offset.left(this.ftable.wrapper),
-                offsetTop = tools.offset.top(this.ftable.wrapper),
-                scrollTop = tools.getScrollTop(this.ftable.wrapper);
+            // let offsetLeft = tools.offset.left(this.ftable.wrapper),
+            //     offsetTop = tools.offset.top(this.ftable.wrapper),
+            //     scrollTop = tools.getScrollTop(this.ftable.wrapper);
+            console.log(e.deltaY);
             if (tools.isMb) {
-                fm.contextMenu.setPosition(e.deltaX - offsetLeft, e.deltaY - offsetTop + scrollTop);
+                fm.contextMenu.setPosition(e.deltaX, e.deltaY);
             } else {
                 fm.contextMenu.setPosition(e.clientX, e.clientY);
             }
