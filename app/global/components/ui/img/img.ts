@@ -2,9 +2,11 @@
 // import sys = G.sys;
 import d = G.d;
 import tools = G.tools;
+import Shell = G.Shell;
 
-import {Modal} from "../../feedback/modal/Modal";
-import {Loading} from "../loading/loading";
+import { Modal } from "../../feedback/modal/Modal";
+import { Loading } from "../loading/loading";
+
 
 export interface ImgModalPara {
     downAddr?: string;
@@ -15,7 +17,7 @@ export interface ImgModalPara {
     isThumbnail?: boolean; // 默认false,
     textArr?: string[];
     onDownload?(url: string);
-    turnPage?(next? : boolean)
+    turnPage?(next?: boolean)
 }
 
 export const ImgModal = (() => {
@@ -43,11 +45,14 @@ export const ImgModal = (() => {
 
                     //下载按钮
                     if (downAddr && onDownload) {
-                        d.on(container, 'click', '.icon-download', () => {
-                            onDownload(downAddr);
+                        d.on(container, 'click', () => {
+                            // onDownload(downAddr);
+                            console.log(1111);
                         });
                     } else {
-                        d.query('.icon-download', wrapper).classList.add('hide');
+                        if (tools.isPc) {
+                            d.query('.icon-download', wrapper).classList.add('hide');
+                        }
                     }
                     // ImgModal.initTag = false;
                 }
@@ -88,7 +93,7 @@ export const ImgModal = (() => {
                 }
 
                 Promise.all(pros).then(items => {
-                    if (tools.isNotEmpty(items)){
+                    if (tools.isNotEmpty(items)) {
                         gallery = new photoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
                             // history & focus options are disabled on CodePen
                             history: false
@@ -109,7 +114,7 @@ export const ImgModal = (() => {
                             , hideAnimationDuration: 0
                             , index: index
                         });
-                        gallery.init();
+                        gallery.init()
                         gallery.listen('close', function () {
                             destroy();
                         });
