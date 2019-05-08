@@ -163,8 +163,16 @@
     .detail-container{
       flex: 1 1 auto;
 
-      .detail-item-title{
-        border-right: 1px solid #f0f0f0;
+      .detail-content{
+        border-left: 1px solid #f0f0f0;
+        border-top: 1px solid #f0f0f0;
+
+        .detail-item-title{
+          border-right: 1px solid #f0f0f0;
+        }
+        .detail-item-content{
+          min-width: 150px;
+        }
       }
     }
   }
@@ -252,7 +260,7 @@
       height: 100%;
       .detail-item {
         background-color: white;
-        padding: 5px 0;
+        padding: 8px 0;
         border-right: none;
         .detail-item-title {
           width: 120px;

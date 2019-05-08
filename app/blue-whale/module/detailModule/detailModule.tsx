@@ -32,7 +32,7 @@ export class DetailModule extends AGroupTabItem {
         </div>;
     }
 
-    static backUp = '__back_up_flag__';
+    static backUp = '__back_up_flag__'; // 单页无数据是否返回上一级
     public ajaxData = {}; // 关联数据
     protected dataManager: DetailDataManager; // 数据管理
     protected ui: IBW_Detail; // ui 数据
