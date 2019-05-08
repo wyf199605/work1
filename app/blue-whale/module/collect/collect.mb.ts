@@ -44,11 +44,17 @@ export class Collect extends BaseCollect {
               content: "取消",
               onClick: () => {
                 this.ModalContent.isShow = false;
+                setTimeout(() => {
+                  document.body.scrollTop = 0;
+                }, 100)
               }
             },
             {
               content: "确定",
               onClick: () => {
+                setTimeout(() => {
+                  document.body.scrollTop = 0;
+                }, 100)
                 let InputBlock = <HTMLElement>d.query(".collect_input"),
                   InputDom = <HTMLInputElement>d.query(".inp_name"),
                   SelectBlock = <HTMLSelectElement>d.query(".select_group"),
