@@ -2876,6 +2876,7 @@ export class FastTable extends Component {
                 this.rows.forEach((row) => {
                     row.isAdd = false;
                 });
+                this.render(0, void 0);
             }
         }
     }
