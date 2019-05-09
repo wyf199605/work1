@@ -22,7 +22,7 @@ export class Graffiti {
     constructor(para? : IGraffitiPara){
         d.append(document.body, this.graffitiBtn());
         d.on(this._graffitiBtnEl, 'click', () => {
-            this.hideBtn();
+            // this.hideBtn();
             setTimeout(() => {
                 this.getEditImg(para);
             },100);
@@ -51,7 +51,7 @@ export class Graffiti {
             }else {
                 this.showBtn();
             }
-        },1000);
+        },500);
         Shell.base.getEditImg(null, null, even);
     }
 
@@ -66,10 +66,10 @@ export class Graffiti {
     }
 
     private showBtn(){
-        this._graffitiBtnEl.classList.remove('hide');
+        // this._graffitiBtnEl.classList.remove('hide');
     }
     private hideBtn(){
-        this._graffitiBtnEl.classList.add('hide');
+        // this._graffitiBtnEl.classList.add('hide');
     }
 }
 
@@ -179,7 +179,7 @@ export class Share {
                     this.callBack()
                 }
             });
-        },1000);
+        },200);
 
         d.on(this._edit, 'click', even);
 

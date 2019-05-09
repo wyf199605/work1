@@ -53,7 +53,7 @@ namespace G {
                 return ShellBase.handler('getSignImg', { type, image }, back);
             },
             wxShare(data: string) {
-                return ShellBase.handler('wxShare', { data });
+                return ShellBase.handler('wxShare', { data },()=>{});
             },
             testAPI(data: string, back: IShellEventHandler, info: IShellEventHandler) {
                 return ShellBase.handler('testAPI', { data }, back, info);
@@ -583,7 +583,7 @@ namespace G {
             },
             // 保存图片至本地
             saveImg(img: string) {
-                return ShellBase.handler('saveImg', { img })
+                return ShellBase.handler('saveImg', { img },()=>{})
             },
             // 移动端下载图片
             downloadImg(url: string, back: IShellEventHandler) {
