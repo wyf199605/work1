@@ -116,19 +116,14 @@ export const ImgModal = (() => {
                         });
                         gallery.init();
                         gallery.listen('close', function () {
-                           $('mui-pull-right').addClass('pointer-event');
-                            let timer = setTimeout(() => {
-                                destroy();
-                                $('mui-pull-right').removeClass('pointer-event');
-                                clearTimeout(timer);
-                            },400);
+                            destroy();
                         });
                         gallery.listen('download', function () {
                             // var base64 = Shell.image.getBase64Image(para.img[0]);
                             // Shell.image.downloadImg(base64, (res) => {});
-                            console.log('download');
+                            console.log('download', gallery.getCurrentIndex());
                             var image = new Image();
-                            image.src = para.img[0]; //s是图片的路径
+                            image.src = para.img[gallery.getCurrentIndex()]; //s是图片的路径
                             image.onload = function () { //image.onload是等待图片加载完毕，等待图片加载完毕之后，才能对图片进行操作
                                 var width = image.width; //根据图片的宽高，将图片进行压缩
                                 var height = image.height;
@@ -138,7 +133,7 @@ export const ImgModal = (() => {
                                 canvas.height = height;
                                 cax.drawImage(image, 0, 0, width, height); //重绘
                                 var dataUrl = canvas.toDataURL("image/png"); //dataUrl 即为base编码字符串
-                                // alert(dataUrl);
+                                console.log(image.src);
                                 // return dataUrl;
                                 Shell.image.downloadImg(dataUrl, () => { });
                             }
