@@ -892,7 +892,7 @@ export class ButtonAction {
 
                 for (var i = 0; i < all.length; i++) {
                     let item = all[i] as any;
-                    if (item.hasAttribute('readonly')) {
+                    if (item.hasAttribute('readonly')&&tools.isMb) {
                         item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
                         item.parentNode.style.position="relative";
                         let htl = d.create('<div class="undisalbe"></div>')
