@@ -985,12 +985,14 @@ var publicMethods = {
 			return;
 		}
 
-		_isOpen = false;
-		_isDestroying = true;
-		_shout('close');
-		_unbindEvents();
-
-		_showOrHide(self.currItem, null, true, self.destroy);
+		let timer = setTimeout(() => {
+            _isOpen = false;
+            _isDestroying = true;
+            _shout('close');
+            _unbindEvents();
+            _showOrHide(self.currItem, null, true, self.destroy);
+            clearTimeout(timer);
+        },350);
 	},
 
 	// destroys the gallery (unbinds events, cleans up intervals and timeouts to avoid memory leaks)
