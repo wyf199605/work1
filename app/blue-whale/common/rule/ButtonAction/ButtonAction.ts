@@ -413,6 +413,14 @@ export class ButtonAction {
 
                     }).then(({ response }) => {
                         let data = tools.keysVal(response, 'body', 'bodyList', 0);
+
+                        if(response.errorCode === 200) {
+                            Modal.alert(response.msg, '', () => {
+                                resolve(response);
+                            }); 
+                            return ; 
+                        } 
+
                         if (data && (data.type || data.type === 0)) {
                             if (data.type === 0) {
                                 Modal.alert(data.showText);
