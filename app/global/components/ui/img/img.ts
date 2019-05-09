@@ -114,9 +114,14 @@ export const ImgModal = (() => {
                             , hideAnimationDuration: 0
                             , index: index
                         });
-                        gallery.init()
+                        gallery.init();
                         gallery.listen('close', function () {
-                            destroy();
+                           $('mui-pull-right').addClass('pointer-event');
+                            let timer = setTimeout(() => {
+                                destroy();
+                                $('mui-pull-right').removeClass('pointer-event');
+                                clearTimeout(timer);
+                            },400);
                         });
                         gallery.listen('download', function () {
                             // var base64 = Shell.image.getBase64Image(para.img[0]);
