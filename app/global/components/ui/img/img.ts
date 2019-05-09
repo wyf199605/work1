@@ -116,9 +116,10 @@ export const ImgModal = (() => {
                         });
                         gallery.init();
                         gallery.listen('close', function () {
+                           $('mui-pull-right').addClass('pointer-event');
                             let timer = setTimeout(() => {
                                 destroy();
-                                console.log(123);
+                                $('mui-pull-right').removeClass('pointer-event');
                                 clearTimeout(timer);
                             },400);
                         });
