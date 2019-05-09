@@ -114,9 +114,13 @@ export const ImgModal = (() => {
                             , hideAnimationDuration: 0
                             , index: index
                         });
-                        gallery.init()
+                        gallery.init();
                         gallery.listen('close', function () {
-                            destroy();
+                            let timer = setTimeout(() => {
+                                destroy();
+                                console.log(123);
+                                clearTimeout(timer);
+                            },310);
                         });
                         gallery.listen('download', function () {
                             // var base64 = Shell.image.getBase64Image(para.img[0]);
