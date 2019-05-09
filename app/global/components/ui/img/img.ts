@@ -120,7 +120,7 @@ export const ImgModal = (() => {
                                 destroy();
                                 console.log(123);
                                 clearTimeout(timer);
-                            },310);
+                            },400);
                         });
                         gallery.listen('download', function () {
                             // var base64 = Shell.image.getBase64Image(para.img[0]);
