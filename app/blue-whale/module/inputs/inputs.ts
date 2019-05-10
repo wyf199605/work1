@@ -67,19 +67,21 @@ export class Inputs {
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
             console.log(msg);
+            console.log(data);
             if (result.success) {
-                data.forEach(item => {
-                    para.inputs.forEach(input => {
-                        let line = para.locationLine;
-                        let reg = regExpMatch(input, item);
-                        //匹配成功
-                        if (reg) {
-                            this.matchPass(reg, item);
-                        } else if (line) {
-                            this.rowSelect(line, item);
-                        }
-                    });
-                })
+                // data.forEach(item => {
+                   
+                // })
+                para.inputs.forEach(input => {
+                    let line = para.locationLine;
+                    let reg = regExpMatch(input, data[0]);
+                    //匹配成功
+                    if (reg) {
+                        this.matchPass(reg,  data[0]);
+                    } else if (line) {
+                        this.rowSelect(line,  data[0]);
+                    }
+                });
                 // this.matchPass(reg, text);
 
             }
