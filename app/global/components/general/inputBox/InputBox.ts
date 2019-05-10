@@ -40,7 +40,6 @@ export class InputBox extends Component {
     }
 
     private init(inputBox: IInputBoxPara) {
-        console.log('inputBox', inputBox);
         this.limitCount = inputBox.limitCount || -1;
         this.isVertical = !!inputBox.isVertical;
         this.wrapper.classList.add(this.isVertical ? 'input-box-vertical' : 'input-box-horizontal');
@@ -78,7 +77,6 @@ export class InputBox extends Component {
      */
     private _children: Array<Button>;
     set children(children: Array<Button>) {
-        console.log('children', children);
         this._children = tools.isEmpty(children) ? [] : children;
     }
     get children() {
