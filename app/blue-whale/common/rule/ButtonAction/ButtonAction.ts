@@ -413,8 +413,10 @@ export class ButtonAction {
                         let data = tools.keysVal(response, 'body', 'bodyList', 0);
                         if (data && (data.type || data.type === 0)) {
                             if (data.type === 0) {
-                                Modal.alert(data.showText);
-                                reject();
+                                Modal.alert(data.showText, '', () => {
+                                    resolve(response)
+                                });
+                                // reject();
                             } else if (data.type === 2) {
                                 this.progressPopup(data.url, data.showText, resolve);
                             } else {

@@ -57,7 +57,7 @@ export class Inputs {
         /**rfid设置 */
         let conf = JSON.parse(window.localStorage.getItem('rfidConf'));
         this.port = getRfidPort(conf);
-        console.log("RFID"+JSON.stringify(this.port))
+        console.log("RFID" + JSON.stringify(this.port))
         Shell.rfid.start(this.port.str, this.port.num, (result) => {
             // console.log(result);
             /**
@@ -66,25 +66,22 @@ export class Inputs {
             // alert(JSON.stringify(result));
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
-           
             console.log(msg);
-            console.log(data);
             if (result.success) {
-                // this.matchPass(reg, text);
-                para.inputs.forEach(input => {
-                    let line = para.locationLine;
-                    if(data&&data.length>0){
-                        let reg = regExpMatch(input, data[0]);
+                data.forEach(item => {
+                    para.inputs.forEach(input => {
+                        let line = para.locationLine;
+                        let reg = regExpMatch(input, item);
                         //匹配成功
                         if (reg) {
-                            this.matchPass(reg, data[0]);
+                            this.matchPass(reg, item);
                         } else if (line) {
-                            this.rowSelect(line, data[0]);
+                            this.rowSelect(line, item);
                         }
-                    }
-                });
-            }else{
-                Modal.alert(msg);
+                    });
+                })
+                // this.matchPass(reg, text);
+
             }
 
         });
