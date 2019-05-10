@@ -58,10 +58,14 @@ export class InputBox extends Component {
             console.log('orientationchange');
             let timer = setTimeout(()=>{
                 clearTimeout(timer);
-                this.responsive();
-            },100)
-            
+                let offsetWidth: number = $(document.body).width();
+                // this.wrapper.offsetWidth = offsetWidth;
 
+                this.responsive(offsetWidth);
+                // alert(offsetWidth);
+            },300)
+            // this.wrapper.offsetWidth = $(document.body).width();
+            // this.responsive();
         });
         
 
@@ -217,12 +221,13 @@ export class InputBox extends Component {
         return this._isResponsive;
     }
 
-    responsive() {
+    responsive(offsetWidth?) {
         if (!this.isResponsive) {
             return;
         }
         let childrenWidth = 56, isFirst = true;
-        let wrapperWidth = this.wrapper.offsetWidth;
+        
+        let wrapperWidth = offsetWidth? offsetWidth : this.wrapper.offsetWidth;
         for (let c of this.children) {
             d.append(this.wrapper, c.wrapper);
         }
