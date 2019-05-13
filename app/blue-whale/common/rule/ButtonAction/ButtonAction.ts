@@ -34,6 +34,8 @@ export class ButtonAction {
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
     }, url?: string, itemId?: string, atvData?: obj) {
         let self = this;
+        // 没有按钮的状态。。。。
+        window.sessionStorage.setItem('subScriptStatus', '1');
         console.log('buttonAction', btn);
         if (btn.subType === 'excel') {
             callback(null);

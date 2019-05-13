@@ -273,6 +273,7 @@ export = class webscoket {
         }
     }
     private handleUrl(code: string) {
+        console.log(1111);
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/commonsvc/scan", {
             data: {
                 code: code
