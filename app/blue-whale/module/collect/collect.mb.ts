@@ -90,7 +90,7 @@ export class Collect extends BaseCollect {
                     </div>
                     <div class="collect_input">
                       <div class="collect">
-                        <input placeholder="请输入分组名" type="text" class="inp_name">
+                        <input placeholder="请输入分组名" type="text" class="inp_name" onBlur="setTimeout(function(){document.body.scrollTop=0;},100);">
                         <span class="mui-icon mui-icon-plusempty add_i"></span>
                       </div>
                     </div>

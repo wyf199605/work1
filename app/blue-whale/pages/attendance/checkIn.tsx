@@ -101,7 +101,7 @@ export = class CheckInPage extends BasicPage {
                     if (tools.isEmpty(text.get())) {
                         Modal.toast('员工号不能为空');
                     } else {
-                        let flag = false;
+                        let flag: any = false;
                         if('AppShell' in window || 'BlueWhaleShell' in window){
                             let userid = text.get().toUpperCase();
                             if('AppShell' in window) {
