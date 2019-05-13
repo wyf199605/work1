@@ -178,7 +178,7 @@ export class BwRule extends Rule {
                                 reject(Ajax.errRes(xhr, 'logout', ''));
                                 return;
                             }
-                            if (response.errorCode && response.errorCode !== 0 && !isLogout) {
+                            if (response.errorCode && response.errorCode !== 0 && response.errorCode !== 200 && !isLogout) {
                                 if (tools.isPc || (response.errorCode >= 10000 && response.errorCode <= 100001)) {
                                     alert(response.msg || response.errorMsg || '后台错误');
                                 } else {
@@ -209,7 +209,7 @@ export class BwRule extends Rule {
                                 reject(Ajax.errRes(xhr, 'errorCode', ''));
                                 return;
                             }
-                            if (!response.errorCode) {
+                            if (!response.errorCode || response.errorCode === 200) {
                                 let dataList = [];
                                 let meta = [];
                                 if (response.body && response.body.bodyList && response.body.bodyList[0]) {

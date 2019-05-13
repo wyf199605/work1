@@ -18,6 +18,7 @@ import { Spinner } from "../../../../global/components/ui/spinner/spinner";
 import { TextInput } from "../../../../global/components/form/text/text";
 import { BwTableElement } from "../../../pages/table/newTablePage";
 import sys = BW.sys;
+import { QrCode } from "../../../../global/utils/QRCode";
 // import {RfidBarCode} from "../../../pages/rfid/RfidBarCode/RfidBarCode";
 // import {NewTablePage} from "../../../pages/table/newTablePage";
 
@@ -33,6 +34,8 @@ export class ButtonAction {
     clickHandle(btn: R_Button, data: obj | obj[], callback = (r) => {
     }, url?: string, itemId?: string, atvData?: obj) {
         let self = this;
+        // 没有按钮的状态。。。。
+        window.sessionStorage.setItem('subScriptStatus', '1');
         console.log('buttonAction', btn);
         if (btn.subType === 'excel') {
             callback(null);
@@ -222,6 +225,12 @@ export class ButtonAction {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
+                if(btn.subType === 'shareCode') {
+                    this.genetateQrCode(btn, dataObj, addr, url).then((response)=> {
+                        callback(response);
+                    });
+                    return ;
+                }
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
@@ -404,6 +413,7 @@ export class ButtonAction {
                     }).catch(() => reject());
                     break;
                 default:
+                    console.log('default action');
                     BwRule.Ajax.fetch(BW.CONF.siteUrl + addr, {
                         data2url: btn.actionAddr.varType !== 3,
                         type: ajaxType,
@@ -413,10 +423,20 @@ export class ButtonAction {
 
                     }).then(({ response }) => {
                         let data = tools.keysVal(response, 'body', 'bodyList', 0);
+
+                        if(response.errorCode === 200) {
+                            Modal.alert(response.msg, '', () => {
+                                resolve(response);
+                            }); 
+                            return ; 
+                        } 
+
                         if (data && (data.type || data.type === 0)) {
                             if (data.type === 0) {
-                                Modal.alert(data.showText);
-                                reject();
+                                Modal.alert(data.showText, '', () => {
+                                    resolve(response)
+                                });
+                                // reject();
                             } else if (data.type === 2) {
                                 this.progressPopup(data.url, data.showText, resolve);
                             } else {
@@ -452,6 +472,53 @@ export class ButtonAction {
 
         })
 
+    }
+    /**
+     * 
+     * @param url 
+     * @param msg 
+     * @param callback 
+     */
+    private genetateQrCode(btn: R_Button, dataArr: any, addr: string, url: string): Promise<any> {
+        let subUrl =  `?addr=${encodeURIComponent(url.split('sf')[1])}`;
+        let dataList = dataArr.map(item => {
+            return Object.values(item);
+        });
+        console.log(dataList[0]);
+        let meta = dataArr.length ? Object.keys(dataArr[0]) : {};
+        console.log(dataList);
+        let body = {
+            bodyList: [
+                {
+                    dataList,
+                    dataType: -1,
+                    meta
+                }
+            ]
+        }
+        // let data = encodeURIComponent(body);
+
+        return new Promise((resolve,reject) => {
+            BwRule.Ajax.fetch(BW.CONF.siteUrl + addr + subUrl , {
+                data2url: btn.actionAddr.varType !== 3,
+                type: 'POST',
+                data: body,
+                needGps: btn.actionAddr.needGps
+
+            }).then(({ response }) => {
+                let dom = `<div id="share-qr-code" >
+                    <button>关闭</button>
+                </div>`
+                let bodyEl = d.query('body');
+                bodyEl.appendChild(d.create(dom));
+                let shareQrCodeEl = d.query("#share-qr-code")
+                QrCode.toCanvas(response.code, 150, 150, shareQrCodeEl);
+                d.query('#share-qr-code button').addEventListener('click', () => {
+                    bodyEl.removeChild(shareQrCodeEl);
+                });
+                resolve(response);
+            });
+        })
     }
 
     progressPopup(url: string, msg: string, callback?: Function) {
@@ -895,7 +962,7 @@ export class ButtonAction {
 
                 for (var i = 0; i < all.length; i++) {
                     let item = all[i] as any;
-                    if (item.hasAttribute('readonly')) {
+                    if (item.hasAttribute('readonly')&&tools.isMb) {
                         item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
                         item.parentNode.style.position = "relative";
                         let htl = d.create('<div class="undisalbe"></div>')

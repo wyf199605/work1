@@ -43,7 +43,8 @@ gulp.task('css', function() {
 
     const globalArr = [
         'module/**/*',
-        'pages/**/*'
+        'pages/**/*',
+        'common/**/*'
     ];
 
     const pcArr = [

@@ -105,7 +105,7 @@ namespace BW {
                     }
                     self.handle('opentab', dict);
                 },
-                logout: function (url: string = CONF.url.login) {
+                logout: function (url: string = CONF.url.index) {
 
                     this.getDevice("uuid");
                     d.once(window, 'getDevice', function (e: CustomEvent) {

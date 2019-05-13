@@ -196,7 +196,6 @@ export class TextInput extends FormCom {
     set inputType(str: string) {
         let types = ['text', 'button', 'checkbox', 'password', 'radio', 'image', 'reset', 'file', 'submit', 'textarea', 'number'],
             type = types.indexOf(str) > -1 ? str : types[0];
-        console.log('input type-------',this.para);
         this.input.type = this._inputType = this.para.custom && (this.para.custom.dataType === '11' || this.para.custom.dataType === '10') ? 'number' : type ;
     }
 

@@ -53,7 +53,7 @@ export class RfidInventory {
         this.init(data);
     }
 
-    private init(data) {
+    private init(data: IRfidInventoryPara) {
         this.modal = new Modal({
             header: {
                 title: data.data.caption
@@ -91,10 +91,12 @@ export class RfidInventory {
                         callback : (flag) => {
                             flag && this.commit();
                             Shell.rfid.stop(() => {});
+                            data.onClose&&data.onClose();
                         }
                     })
                 }else {
                     Shell.rfid.stop(() => {});
+                    data.onClose&&data.onClose();
                 }
             }
         });
