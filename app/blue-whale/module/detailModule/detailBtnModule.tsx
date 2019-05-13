@@ -228,13 +228,13 @@ export class DetailBtnModule extends DetailModule {
 
     protected btnManager = (() => {
         let box: InputBox,
-            btnHandler;
+            btnHandler = () => {};
 
         let initStatus = () => {
             if(this.total <= 0){
                 box && box.children.forEach((btn: Button) => {
                     let btnUi = btn.custom as R_Button;
-                    btnUi.multiselect !== 0 && (btn.isDisabled = false);
+                    btnUi && btnUi.multiselect !== 0 && (btn.isDisabled = false);
                 });
                 return ;
             }
