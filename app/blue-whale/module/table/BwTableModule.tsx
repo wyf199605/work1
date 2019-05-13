@@ -1880,18 +1880,17 @@ export class BwTableModule extends Component {
                     bgColor = `rgb(${r},${g},${b})`
                 }
             }
-        }
-        // if(text && typeof text === 'object' && text['localName'] === 'img' && tools.isMb){
-        //     text['onclick'] = (e)=> {
-        //         e.preventDefault();
-        //         console.log('123');
-        //         console.log(e.path[0].baseURI);
-        //         let picture = e.path[0].src.replace(/thumbnail/i,'picture');
-        //         console.log(picture);
-        //         sys.window.openImg(picture);
-        //     }
-        // }
-        return {text, classes, bgColor, color, data};
+            // if(text && typeof text === 'object' && text['localName'] === 'img' && tools.isMb){
+            //     text['onclick'] = (e)=> {
+            //         e.preventDefault();
+            //         console.log('123');
+            //         console.log(e.path[0].baseURI);
+            //         let picture = e.path[0].src.replace(/thumbnail/i,'picture');
+            //         console.log(picture);
+            //         sys.window.openImg(picture);
+            //     }
+            // }
+            return { text, classes, bgColor, color, data };
     }
 
     // 多图查看与编辑

@@ -210,7 +210,6 @@ export class Pagination extends Component {
 
     protected loading = false;
     private changedPage(ifRefresh = false) {
-        console.log(ifRefresh);
         this.loading = true;
         this.paging && this.paging.initItem(this._current);
         if (tools.isMb) {

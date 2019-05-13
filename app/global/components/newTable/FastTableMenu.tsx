@@ -100,7 +100,6 @@ export class FastTableMenu {
             let ftableMenu = this.ftableMenu,
                 wrapper = ftableMenu.contextMenu.wrapper,
                 className = tools.isMb ? '.pop-mbmenu-wrapper' : '.ftable-context-menu';
-            console.log(d.closest(e.target, className, wrapper));
             if(d.closest(e.target, className) !== wrapper){
                 this.show = false;
             }

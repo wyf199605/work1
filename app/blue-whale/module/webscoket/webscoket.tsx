@@ -215,6 +215,9 @@ export = class webscoket {
                 }
                 break;
             case "hint":
+                require(['messagePage'], (messagePage) => {
+                    messagePage.setSysBadge();
+                });
                 if (tools.isMb) {
                     return
                 }

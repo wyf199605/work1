@@ -28,7 +28,6 @@ export class NewTablePage extends BasicPage{
         
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
-        console.log('new table page', para, bwTableEl);
         let bwTable = new BwTableElement({
             container: tools.isPc ? this.dom : d.query('body > .mui-content'),
             tableEl: bwTableEl,

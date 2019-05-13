@@ -102,6 +102,8 @@ export = class QueryModulePc extends QueryModule {
         }
         //是否有选项
         if (para.qm.hasOption === true) {
+            // console.log(para);
+            // console.log("---------");
             this.initQueryConf();
             tab.push({
                 title: '选项查询',
