@@ -85,11 +85,12 @@ export = class AttendancePage extends BasicPage {
     /*
     * 指纹考勤
     * */
+    protected fingerObj: NewFinger;
     protected attendFinger() {
         let self = this;
         let fingerMsg = this.fingerNode.querySelector('.finger-msg') as HTMLElement;
         let fingerTitle = this.fingerNode.querySelector('.finger-title');
-        let fingerObj = new NewFinger({
+        this.fingerObj = new NewFinger({
             callFinger: (text) => {
                 if(self.msgTimer !== null){
                     clearInterval(self.msgTimer);
@@ -147,6 +148,8 @@ export = class AttendancePage extends BasicPage {
     //销毁
     protected destroy() {
         clearInterval(this.timer);
+        this.fingerObj && this.fingerObj.destroy();
+        this.fingerObj = null;
         // this.shell.erp().cancelFinger();
     }
 
