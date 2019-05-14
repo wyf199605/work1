@@ -54,7 +54,7 @@
       - blue-whale  为蓝鲸后台逻辑代码
       - global代码为底层与业务无关的代码，比如ui组件，基础方法封装等
    - 构建说明
-      - globa项目和blue-whale项目各有一个gulpfile文件，项目运行两个项目必须要同时开启任务，项目中加入模块或页面都必须手打到gulpfile添加文件流
+      - global项目和blue-whale项目各有一个gulpfile文件，项目运行两个项目必须要同时开启任务，项目中加入模块或页面都必须手打到gulpfile添加文件流
    - blue-whale目录结构
       - 移动端首页分类页面：page/menu/homePage.tsx
       - 移动端二级分类事件绑定：page/menu/menuMbPage.ts
@@ -62,3 +62,5 @@
       - 移动端网络检测：page/myself/checkNetwork.tsx
       - 移动端收藏弹层：module/collect/collect.mb.ts
       - 登录页：page/index/**
+   - global目录结构
+      - PC端个人中心菜单 components/ui/popover/
