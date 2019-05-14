@@ -107,7 +107,7 @@ export class LoginPcPage extends LoginPage {
             scanButton: d.query(".scanLogin", loginOption),
             fqaBtn
         });
-        this.shareCode();
+        // this.shareCode();
     }
 
     /**
