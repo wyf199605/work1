@@ -225,7 +225,7 @@ export = class messagePage {
     /**
     * 设置角标，数字为0时，则不显示角标
     */
-    static setSysBadge() {
+    static setSysBadge(numMessage:number=0) {
         let badge = d.query(`[data-field=sys]`),
             num = localMsg.getUnreadCount();
         if (badge) {
@@ -237,7 +237,12 @@ export = class messagePage {
             }
         }
         // console.log(messagePage.tastList.length)
-        let total = messagePage.tastList.length + localMsg.getUnreadCount();
+        let total;
+        if(numMessage>0){
+            total= numMessage + localMsg.getUnreadCount();
+        }else{
+           total= messagePage.tastList.length + localMsg.getUnreadCount();
+        }
         // console.log(total)
         G.Shell.other.sendMsgCount({ MsgCount: total }, () => { })
     }
