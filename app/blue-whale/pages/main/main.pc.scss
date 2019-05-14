@@ -140,3 +140,10 @@
 .home-self-menu {
   z-index: 2000;
 }
+
+// 打开系统popover需要左对齐
+.system-menu-popover{
+  .popover-item{
+    justify-content: flex-start!important;
+  }
+}

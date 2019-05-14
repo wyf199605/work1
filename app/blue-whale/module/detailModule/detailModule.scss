@@ -63,6 +63,9 @@
       &.cell-link {
         .detail-item-content {
           cursor: pointer!important;
+          input[readonly]{
+            cursor: pointer!important;
+          }
         }
       }
       .detail-item-title {
@@ -262,6 +265,7 @@
         background-color: white;
         padding: 8px 0;
         border-right: none;
+
         .detail-item-title {
           width: 120px;
           color: $title;

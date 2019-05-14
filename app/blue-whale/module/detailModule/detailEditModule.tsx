@@ -97,6 +97,23 @@ export class DetailEditModule {
         return com;
     }
 
+    isChanged(){
+        let editData = this.editModule.get(),
+            detailData = this.detail.detailData;
+
+        return Object.keys(detailData).some((key) => {
+            let detailItem = detailData[key],
+                editItem = editData[key];
+            if(!(key in detailData && key in editData)){
+                return false;
+            }
+            if(tools.isEmpty(detailItem) && tools.isEmpty(editItem)){
+                return false;
+            }
+            return detailData[key] != editData[key];
+        })
+    }
+
     protected editType: 'insert' | 'update' | 'delete';
     start(type: 'current' | 'modal' = 'current') {
         this.editType = 'update';

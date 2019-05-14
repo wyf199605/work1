@@ -391,6 +391,7 @@ export = class MainPage {
                     });
                     if(data.length > 1){
                         let popover = new Popover({
+                            className: 'system-menu-popover',
                             target: icon,
                             // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
                             isWatch: true,
@@ -414,7 +415,7 @@ export = class MainPage {
                     /*if (data.length === 1) {
                         let item = data[0],
                             el = d.create(`<li class="dropdown pull-right">
-                                    <a href="#">                                   
+                                    <a href="#">
                                         <span class="${'iconfont icon-' + item.systemIcon}"></span>
                                         ${item.systemName}
                                     </a>

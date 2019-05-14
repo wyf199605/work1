@@ -157,7 +157,7 @@ export class BwRule extends Rule {
                     super.fetch(url, setting).then((result) => {
                         // debugger;
                         let { response, xhr } = result;
-                        response.errorCode = response.errorCode ? Number(response.errorCode) : null;
+                        response.errorCode = response.errorCode || response.errorCode === 0 ? Number(response.errorCode) : null;
                         if (tools.isEmpty(response)) {
                             alert('后台数据为空');
                             reject(Ajax.errRes(xhr, 'emptyData', ''));

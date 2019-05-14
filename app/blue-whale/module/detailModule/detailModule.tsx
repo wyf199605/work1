@@ -84,7 +84,7 @@ export class DetailModule extends AGroupTabItem {
         this.items.forEach((item) => {
             item.edit.init(inputInit);
         });
-        this.clickEvent.off();
+        // this.clickEvent.off();
     }
 
     static EVT_RENDERED = '__event_detail_rendered__';
@@ -171,6 +171,7 @@ export class DetailModule extends AGroupTabItem {
     protected clickEvent = (() => {
         return {
             on: () => {
+                this.clickEvent.off();
                 this.linkManager.on();
                 this.imgManager.on();
             },
