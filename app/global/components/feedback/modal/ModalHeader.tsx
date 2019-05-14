@@ -37,8 +37,14 @@ export class ModalHeader extends Component {
         // this.container = modalHeader.container;
         this.title = modalHeader.title;
         this.isDrag = modalHeader.isDrag;
-        this.isClose = modalHeader.isClose; //增加...
         this.isFullScreen = modalHeader.isFullScreen;  //增加
+       
+        this.isClose = modalHeader.isClose; //增加...
+        if(tools.isMb){
+            if(d.query(".modal-title",this.wrapper).innerHTML=='提示'){
+                d.query(".close_x",this.wrapper).remove();
+            }
+        }
         this.rightPanel = modalHeader.rightPanel;
         // this.color = modalHeader.color;
 
@@ -119,6 +125,7 @@ export class ModalHeader extends Component {
             //移动端特殊化
             if (tools.isMb) {
                 dom = <span className="header-btn-right close_x">×</span>;
+                // dom.classList.add("mui-icon","mui-icon-left-nav","mui-pull-right")
             } else {
                 dom = <span className="header-btn-right close">×</span>;
             }

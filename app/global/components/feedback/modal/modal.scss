@@ -489,15 +489,14 @@
     padding: 0;
     height: 40px;
     .close_x {
-      opacity: 1;
-      line-height: 40px;
-      font-size: 36px;
-      padding: 0 18px;
+      // opacity: 1;
+      line-height: 38px;
+      font-size: 33px;
+      // padding: 0 18px;
       font-weight: 300;
       color: #007aff !important;
-      right: -6px!important;
-      position: absolute;
-      top:0px;
+      padding-right: 4px;
+      margin-top: -2px
     }
     span {
       cursor: pointer;

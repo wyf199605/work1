@@ -745,6 +745,13 @@ export class LoginPage {
      * 密码登录
      */
     private loginClick() {
+        // Modal.confirm({
+        //     msg: '登录已超时,是否跳转到登录页',
+        //     callback: (index) => {
+               
+        //     }
+        // });
+        // return false;
         let loginPage = this,
             saveBtn = loginPage.props.saveButton,
             isSavePw = saveBtn instanceof CheckBox ? saveBtn.checked : (<HTMLInputElement>saveBtn).checked,
