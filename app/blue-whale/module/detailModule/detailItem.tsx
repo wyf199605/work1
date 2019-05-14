@@ -122,13 +122,11 @@ export class DetailItem extends Component{
             init: (inputInit: (field: R_Field, item: DetailItem) => FormCom) => {
                 let field = this.custom,
                     isEdit = !field.noEdit;
-
                 this.contentEl && (this.contentEl.innerHTML = '');
                 com = inputInit(this.custom, this);
                 if(this.wrapper){
                     this.wrapper.classList.add('editing');
                 }
-                
 
                 if(com instanceof FormCom){
                     let onSet = com.onSet;
@@ -142,12 +140,21 @@ export class DetailItem extends Component{
 
                 this.disabled = false;
                 if(!isEdit && com){
-                    com.disabled = true;
-                    this.disabled = true;
-                    tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
-                        Modal.toast(field.caption + '不可编辑');
-                    });
+                    if(this.wrapper.classList.contains('cell-link')){
+                        if(this.detail.autoEdit && !isEdit){
+                            this.wrapper.classList.remove('editing');
+                        }
+                        let input = d.query('input', com.wrapper) as HTMLInputElement;
+                        input && (input.readOnly = true);
+                    }else{
+                        com.disabled = true;
+                        this.disabled = true;
+                        tools.isMb && com.wrapper && com.wrapper.addEventListener('click', () => {
+                            Modal.toast(field.caption + '不可编辑');
+                        });
+                    }
                 }
+
             },
             cancel: () => {
                 if(com){
