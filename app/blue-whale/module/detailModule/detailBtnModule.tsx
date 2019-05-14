@@ -37,13 +37,14 @@ export class DetailBtnModule extends DetailModule {
             this.paging.initState();
             this.editBtn.initState();
             this.btnManager.initStatus();
+            this.autoEdit && this.detailEdit && this.detailEdit.start(this.editType);
         });
-        let handler;
-        this.on(DetailModule.EVT_RENDERED, handler = () => {
-            let btn = this.btnManager.box.getItem('edit');
-            btn && this.autoEdit && btn.wrapper && btn.wrapper.click();
-            this.off(DetailModule.EVT_RENDERED, handler)
-        });
+        // let handler;
+        // this.on(DetailModule.EVT_RENDERED, handler = () => {
+        //     // let btn = this.btnManager.box.getItem('edit');
+        //     // btn && this.autoEdit && btn.wrapper && btn.wrapper.click();
+        //     this.off(DetailModule.EVT_RENDERED, handler)
+        // });
     }
 
     protected paging = (() => {
@@ -58,6 +59,9 @@ export class DetailBtnModule extends DetailModule {
                         content: '上一页',
                         key: 'prev',
                         onClick: tools.pattern.throttling(() => {
+                            if(this.editBtn.isChanged){
+                                return
+                            }
                             this.dataManager && !this.dataManager.toPrev()
                         }, 500)
                     });
@@ -68,6 +72,9 @@ export class DetailBtnModule extends DetailModule {
                         content: '下一页',
                         key: 'next',
                         onClick: tools.pattern.throttling(() => {
+                            if(this.editBtn.isChanged){
+                                return
+                            }
                             this.dataManager && !this.dataManager.toNext()
                         }, 500)
                     });
@@ -109,21 +116,56 @@ export class DetailBtnModule extends DetailModule {
 
     protected editBtn = (() => {
         let editBox: InputBox,
-            detailEdit: DetailEditModule;
-        let initEditState = () => {
-            let inputBox = new InputBox({
+            detailEdit: DetailEditModule,
+            changeHandler = () => false;
+        let initEditState = (boxInput?: InputBox) => {
+            let inputBox = boxInput || new InputBox({
                 container: this.btnWrapper
             }),
                 saveBtn = new Button({
                     content: '保存',
                     onClick: () => {
-                        // this.edit.save(btn).then(() => {
-                        //     onFinish && onFinish();
-                        //     inputBox.destroy();
-                        // }).catch(() => {
-                        //     Modal.alert('保存失败')
-                        // });
-                        this.detailEdit && this.detailEdit.save().then(() => {
+                        save();
+                    }
+                }),
+                cancelBtn = new Button({
+                    content: '取消',
+                    onClick: () => {
+                        // this.edit.cancel();
+                        close();
+                    }
+                });
+            inputBox.addItem(saveBtn);
+            inputBox.addItem(cancelBtn);
+            boxInput || editBox.wrapper.classList.add('hide');
+
+            changeHandler = () => {
+                if(!this.autoEdit){
+                    return false;
+                }
+                let isChanged = this.detailEdit ? this.detailEdit.isChanged() : false;
+
+                if(isChanged){
+                    Modal.confirm({
+                        msg: '数据已修改，是否保存？',
+                        callback: (flag) => {
+                            if(flag){
+                                save()
+                            }else{
+                                close();
+                            }
+                        }
+                    })
+                }
+
+                return isChanged;
+            };
+
+            let save = () => {
+                if(this.detailEdit){
+                    let isChanged = this.detailEdit.isChanged();
+                    if(isChanged){
+                        this.detailEdit.save().then(() => {
                             close();
                             this.refresh().then(() => {
                                 Modal.toast('保存成功');
@@ -134,24 +176,21 @@ export class DetailBtnModule extends DetailModule {
                             console.log(e);
                             Modal.alert('保存失败')
                         });
-                    }
-                }),
-                cancelBtn = new Button({
-                    content: '取消',
-                    onClick: () => {
-                        // this.edit.cancel();
+                    }else{
+                        Modal.toast('暂无数据改变');
                         close();
                         this.render();
                     }
-                });
-            inputBox.addItem(saveBtn);
-            inputBox.addItem(cancelBtn);
-            editBox.wrapper.classList.add('hide');
-            let close = () => {
 
-                this.detailEdit && this.detailEdit.cancel();
-                inputBox.destroy();
-                editBox.wrapper.classList.remove('hide');
+                }
+            };
+            let close = () => {
+                if(!boxInput){
+                    this.detailEdit && this.detailEdit.cancel();
+                    inputBox.destroy();
+                    editBox.wrapper.classList.remove('hide');
+                }
+                this.render();
             }
         };
         return {
@@ -160,23 +199,31 @@ export class DetailBtnModule extends DetailModule {
                 detailEdit = this.detailEdit;
                 editBox = box;
                 if (detailEdit) {
-                    if (detailEdit.isUpdate) {
-                        box.addItem(new Button({
-                            key: 'edit',
-                            content: '编辑',
-                            onClick: () => {
-                                detailEdit.start(editType);
-                                if (editType !== 'modal') {
-                                    initEditState();
+                    if(this.autoEdit){
+                        initEditState(box);
+                    }else{
+                        if (detailEdit.isUpdate) {
+                            box.addItem(new Button({
+                                key: 'edit',
+                                content: '编辑',
+                                onClick: () => {
+                                    detailEdit.start(editType);
+                                    if (editType !== 'modal') {
+                                        initEditState();
+                                    }
                                 }
-                            }
-                        }))
+                            }))
+                        }
                     }
+
                     if (detailEdit.isDelete) {
                         box.addItem(new Button({
                             content: '删除',
                             key: 'del',
                             onClick: () => {
+                                if(this.editBtn.isChanged){
+                                    return
+                                }
                                 Modal.confirm({
                                     msg: '确定要删除吗？',
                                     callback: (flag) => {
@@ -210,6 +257,9 @@ export class DetailBtnModule extends DetailModule {
                     }
                 }
             },
+            get isChanged(){
+                return changeHandler();
+            } ,
             initState: () => {
                 if(!editBox){
                     return ;
@@ -225,6 +275,8 @@ export class DetailBtnModule extends DetailModule {
             }
         }
     })();
+
+
 
     protected btnManager = (() => {
         let box: InputBox,
@@ -256,6 +308,9 @@ export class DetailBtnModule extends DetailModule {
                 custom: btn,
                 level: btn.level_no,
                 onClick: () => {
+                    if(this.editBtn.isChanged){
+                        return
+                    }
 
                     // 流程引擎操作按钮
                     if (btn.subType.indexOf("flow_add_sign") > -1) {
