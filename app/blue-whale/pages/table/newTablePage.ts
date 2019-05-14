@@ -67,7 +67,7 @@ export class BwTableElement extends Component{
         console.log('bw table ele', para);
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
-            hasQuery = bwTableEl.querier && ([2,3, 13].includes(bwTableEl.querier.queryType));
+            hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
 
         if(isDynamic) {
             // 动态加载查询模块

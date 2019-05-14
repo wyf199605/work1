@@ -101,7 +101,7 @@ export class GroupTabsPage extends BasicPage {
         });
 
         let bwTableEl = this.ui as IBW_Table,
-            hasQuery = bwTableEl.querier && ([2,3, 13].includes(bwTableEl.querier.queryType));
+            hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
 
         if(hasQuery) {
             require([queryModuleName], (Query) => {
