@@ -1,5 +1,10 @@
 # 开发流程
 
+## UI渲染结构
+    1. uiType: 页面UI勾画的类型
+    2. caption: 导航栏
+    3. body: 数据
+
 ## 安装步骤
     1.下载并配置Tomcat环境，
     2.配置tomcat编译文件的路径的conf/servcer.xml文件
@@ -61,5 +66,8 @@
     4. 切到路径 global, 启动监控 gulp G_Watch
     5. 切到路径 blue-whale, 启动监控 gulp BW_Watch 
     6. 编译成功后，打开 ip:8080/sf;
+
+
+
 
     
