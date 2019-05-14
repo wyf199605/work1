@@ -690,9 +690,14 @@ export class GroupTabsPage extends BasicPage {
                 delete this.ui.subButtons;
             }
             this.main = GroupTabsPage.createTable(this.ui, wrapper);
-            this.main.onDataChange = () => {
-                this.subIndexes = [];
-            };
+            console.log('this.main');
+            if(this.main) {
+                console.log(this.main);
+                this.main.onDataChange = () => {
+                    this.subIndexes = [];
+                };
+            }
+            
             this.main.onRender = () => {
                 if (this.styleType === 'panel-on' && this.tab instanceof Panel) {
                     this.tab.toggleAll(true);
