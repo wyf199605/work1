@@ -704,7 +704,8 @@ export class LoginPage {
                 if (json.msg == 1) {
                     Modal.toast("指纹匹配不正确");
                 } else if (json.msg == 2) {
-                    Modal.toast("该设备不支持指纹");
+                    //1098bug单说由壳提示
+                    // Modal.toast("该设备不支持指纹");
                 } else {
                     Modal.toast(json.msg);
                 }
