@@ -15,8 +15,8 @@ namespace BW {
         abstract btnWrapper: HTMLElement;
         abstract getData(): obj;
         abstract onDataChange: Function;
-        abstract total: number;
-        abstract pageUrl: string;
+        total: number;
+        pageUrl: string;
         abstract onRender: Function;
         editInit(fn: Function){};
     }
