@@ -87,7 +87,7 @@ export class RfidInventory {
             onClose : () => {
                 if(G.tools.isNotEmptyArray(this.epc)){
                     Modal.confirm({
-                        msg : '退出前是否要提交尚未处理的RFID标签？',
+                        msg : '退出前是否要提交尚未处理的'+this.epc.length+'个RFID标签？',
                         callback : (flag) => {
                             flag && this.commit();
                             Shell.rfid.stop(() => {});
