@@ -70,7 +70,7 @@ export class Inputs {
             console.log(data);
             if (result.success) {
                 // data.forEach(item => {
-                   
+
                 // })
                 para.inputs.forEach(input => {
                     let line = para.locationLine;
@@ -108,21 +108,32 @@ export class Inputs {
         } else {
             newUrl += '?';
         }
-        let ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
-        return this.ajax(ajaxUrl, open);
+        this.ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
+        return this.refresh(open);
+    }
+
+    protected ajaxUrl;
+    get isMatch(){
+        return tools.isNotEmpty(this.ajaxUrl);
+    }
+    refresh(fun?: Function){
+        return this.ajax(this.ajaxUrl, fun)
     }
 
     private ajax(aUrl: string, open: Function) {
         this.isProcess = true;
-        return BwRule.Ajax.fetch(aUrl)
-            .then(({ response }) => {
-                this.condition(response, aUrl, open);
-                return response;
-            }).catch(() => {
-                this.isProcess = false;
-            }).finally(() => {
-                this.isProcess = false;
-            })
+        return BwRule.Ajax.fetch(aUrl, {
+            loading: {
+                msg: '加载中...'
+            }
+        }).then(({ response }) => {
+            this.condition(response, aUrl, open);
+            return response;
+        }).catch(() => {
+            this.isProcess = false;
+        }).finally(() => {
+            this.isProcess = false;
+        })
     }
 
     private condition(response: obj, aUrl: string, open: Function) {
@@ -336,7 +347,7 @@ export class Inputs {
     }
 
     /**
-     * 初始化按键事件 
+     * 初始化按键事件
      * @param para
      */
     private eventInit(para: InputsPara) {
@@ -363,9 +374,10 @@ export class Inputs {
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 let handle = () => {
                     if (text.indexOf('Shift') > -1) {
-                        text = text.replace('Shift', '')
+                        text = text.replace(/Shift/g, '')
                     }
-                    // console.log(text)
+
+                    console.log(text)
                     let reg = regExpMatch(input, text);
                     //匹配成功
                     if (reg) {
