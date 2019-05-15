@@ -55,7 +55,7 @@ export class Inputs {
         para.container.tabIndex = parseInt(G.tools.getGuid());
         this.eventInit(para);
         /**rfid设置 */
-        let result:any=Shell.other.getData();
+        let result: any = Shell.other.getData();
         let conf = result;
         this.port = getRfidPort(conf);
         console.log("RFID" + JSON.stringify(this.port))
@@ -78,9 +78,9 @@ export class Inputs {
                     let reg = regExpMatch(input, data[0]);
                     //匹配成功
                     if (reg) {
-                        this.matchPass(reg,  data[0]);
+                        this.matchPass(reg, data[0]);
                     } else if (line) {
-                        this.rowSelect(line,  data[0]);
+                        this.rowSelect(line, data[0]);
                     }
                 });
                 // this.matchPass(reg, text);
@@ -114,10 +114,10 @@ export class Inputs {
     }
 
     protected ajaxUrl;
-    get isMatch(){
+    get isMatch() {
         return tools.isNotEmpty(this.ajaxUrl);
     }
-    refresh(fun?: Function){
+    refresh(fun?: Function) {
         return this.ajax(this.ajaxUrl, fun)
     }
 
@@ -391,12 +391,14 @@ export class Inputs {
                     text = '';
                 },
                     code = e.keyCode || e.which || e.charCode;
-                if (code === 13) {
-                    handle();
-                } else {
-                    text += e.key;
-                    if (timer) {
-                        clearTimeout(timer);
+                if (![8, 9, 16, 20, 32, 33, 34, 35, 37, 38, 39, 40, 46].includes(code)) {
+                    if (code === 13) {
+                        handle();
+                    } else {
+                        text += e.key;
+                        if (timer) {
+                            clearTimeout(timer);
+                        }
                     }
                 }
 
