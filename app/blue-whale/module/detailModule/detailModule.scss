@@ -54,12 +54,6 @@
       min-height: 44px;
       min-width: 250px;
       color: $text;
-      &.disabled {
-        opacity: .9;
-        pointer-events: auto !important;
-        background: #e3e3e3 !important;
-        color: #3a3a3a;
-      }
       &.cell-link {
         .detail-item-content {
           cursor: pointer!important;
@@ -122,6 +116,12 @@
         border-left: 1px solid #f0f0f0;
         border-top: 1px solid #f0f0f0;
         .detail-item {
+          &.disabled {
+            opacity: .9;
+            pointer-events: auto !important;
+            background: #e3e3e3 !important;
+            color: #3a3a3a;
+          }
           .detail-item-content {
             justify-content: flex-end;
             padding-right: 12px;
@@ -244,7 +244,7 @@
           border-color: #005bac;
           color: #005bac;
           padding: 0 14px;
-          max-width: 25%;
+          //max-width: 25%;
         }
       }
       .detail-count {

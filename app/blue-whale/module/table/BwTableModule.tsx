@@ -1890,7 +1890,8 @@ export class BwTableModule extends Component {
             //         sys.window.openImg(picture);
             //     }
             // }
-            return { text, classes, bgColor, color, data };
+            return {text, classes, bgColor, color, data};
+        }
     }
 
     // 多图查看与编辑

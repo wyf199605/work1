@@ -25,7 +25,7 @@ export class NewTablePage extends BasicPage{
     constructor(para: ITablePagePara) {
         super(para);
         d.classAdd(this.dom.parentElement, 'table-page');
-        
+
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
         let bwTable = new BwTableElement({
@@ -36,7 +36,7 @@ export class NewTablePage extends BasicPage{
 
         // Shell触发的刷新事件
         this.on(BwRule.EVT_REFRESH, () => {
-            bwTable.tableModule && bwTable.tableModule.refresh();
+            bwTable.refresh();
         });
         // 显示当前页时触发的事件
         // d.on(this.dom,BW.EVT_SHOW_PAGE,'',()=>{
@@ -49,7 +49,7 @@ export class NewTablePage extends BasicPage{
 }
 
 interface IBwTableElementPara extends IComponentPara{
-    tableEl: IBW_Table 
+    tableEl: IBW_Table
     asynData? : obj[]
 }
 export class BwTableElement extends Component{
@@ -242,10 +242,19 @@ export class BwTableElement extends Component{
             new asyn.AsynQuery(asynData);
         })
     }
+    refresh(){
+        let inputs = this._inputs || (this.queryModule && this.queryModule.Inputs);
+        if(inputs && inputs.isMatch){
+            return inputs.refresh();
+        }else{
+            return this.tableModule && this.tableModule.refresh();
+        }
+    }
 
+    protected _inputs: Inputs;
     private inputs(inputs,line){
         require(['Inputs'], (i) => {
-            new i.Inputs({
+            this._inputs = new i.Inputs({
                 inputs: inputs,
                 container: this.container,
                 locationLine : line,
