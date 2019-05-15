@@ -110,12 +110,17 @@ export class RfidInventory {
 
     private keyHandle = (e) => {
         let code = e.keyCode || e.which || e.charCode;
-        if (code === 13) {
-            this.scan(this.value);
-            this.value = '';
-        } else {
-            this.value += e.key;
+        //8 :退格  9:制表 16 shiftleft 20 capsLock 
+        if(![8,9,16,20,32,33,34,35,37,38,39,40,46].includes(code)){
+            if (code === 13) {
+                // console.log(this.value)
+                this.scan(this.value);
+                this.value = '';
+            } else {
+                this.value += e.key;
+            }
         }
+       
     };
 
     private dataGet(){
