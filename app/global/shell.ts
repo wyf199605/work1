@@ -537,6 +537,10 @@ namespace G {
         };
 
         const image = {
+            //是否能打开文件
+            upLoadFile(back: IShellEventHandler){
+                ShellBase.handler('upLoadFile', {}, back)
+            },
             // 拍照
             photograph(callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
                 this.getImg(0, callback, error);

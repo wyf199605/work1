@@ -4,15 +4,15 @@ import d = G.d;
 import tools = G.tools;
 import Ajax = G.Ajax;
 import sys = BW.sys;
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {User} from "../../../global/entity/User";
-import {FormCom, IFormComPara} from "../../../global/components/form/basic";
-import {FileUpload, IFileBlock} from "../../../global/components/form/upload/fileUpload";
-import {ILoadingPara, Loading} from "../../../global/components/ui/loading/loading";
-import {G_FILE_MD5, G_MD5} from "../../../global/utils/md5";
-import {ActionSheet, IActionSheetButton} from "../../../global/components/ui/actionSheet/actionSheet";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { User } from "../../../global/entity/User";
+import { FormCom, IFormComPara } from "../../../global/components/form/basic";
+import { FileUpload, IFileBlock } from "../../../global/components/form/upload/fileUpload";
+import { ILoadingPara, Loading } from "../../../global/components/ui/loading/loading";
+import { G_FILE_MD5, G_MD5 } from "../../../global/utils/md5";
+import { ActionSheet, IActionSheetButton } from "../../../global/components/ui/actionSheet/actionSheet";
 import Shell = G.Shell;
-import {BwRule} from "../../common/rule/BwRule";
+import { BwRule } from "../../common/rule/BwRule";
 
 type uploadType = 'file' | 'sign';
 export interface IBwUploaderPara extends IFormComPara {
@@ -66,7 +66,7 @@ export class BwUploader extends FormCom {
 
     protected wrapperInit(para) {
         this.text = typeof para.text === 'string' ? para.text : '点击上传';
-        this.input = <input className="file-input" type="text" value={this.text}/>;
+        this.input = <input className="file-input" type="text" value={this.text} />;
         this.input.readOnly = true;
         return <div className="bw-upload-wrapper">
             {this.input}
@@ -75,7 +75,7 @@ export class BwUploader extends FormCom {
 
     constructor(para: IBwUploaderPara) {
         super(para);
-        if(tools.isNotEmpty(para.loading)){
+        if (tools.isNotEmpty(para.loading)) {
             this.loading = new Loading(para.loading);
             this.loading.hide();
         }
@@ -91,7 +91,7 @@ export class BwUploader extends FormCom {
         this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
 
         // ios暂未支持新接口
-        if(/*sys.os === 'ip' || */sys.os === 'ad'){
+        if (/*sys.os === 'ip' || */sys.os === 'ad') {
             this.initActionSheet(para.buttons || []);
         }
 
@@ -112,15 +112,15 @@ export class BwUploader extends FormCom {
         }, 1000));
     }
 
-    protected addFile(files: CustomFile[]){
+    protected addFile(files: CustomFile[]) {
         this.temFiles = [];
-        if(tools.isNotEmpty(files)){
+        if (tools.isNotEmpty(files)) {
             files.forEach((file) => {
-                if(this.maxSize !== -1 && file.size > this.maxSize){
+                if (this.maxSize !== -1 && file.size > this.maxSize) {
                     Modal.alert('文件' + file.name + '大小超过限制');
-                }else if(!this.acceptVerify(file)){
+                } else if (!this.acceptVerify(file)) {
                     Modal.alert('文件' + file.name + '类型有误');
-                }else {
+                } else {
                     this.temFiles.push(file);
                 }
             });
@@ -129,11 +129,11 @@ export class BwUploader extends FormCom {
         }
     }
 
-    static hintMsg(msg: string){
+    static hintMsg(msg: string) {
         tools.isNotEmpty(msg) && Modal.alert(msg, '温馨提示');
     }
 
-    protected initActionSheet(buttons: IActionSheetButton[] = []){
+    protected initActionSheet(buttons: IActionSheetButton[] = []) {
         this.actionSheet = new ActionSheet({
             buttons: [
                 {
@@ -157,9 +157,14 @@ export class BwUploader extends FormCom {
                 {
                     content: '文件',
                     onClick: () => {
-                        Shell.image.fileGet(((files) => {
-                            this.addFile(files);
-                        }));
+                        Shell.image.upLoadFile((e: any) => {
+                            if (e) {
+                                Shell.image.fileGet(((files) => {
+                                    this.addFile(files);
+                                }));
+                            }
+                        })
+
                     }
                 }
             ].concat(buttons),
@@ -167,49 +172,49 @@ export class BwUploader extends FormCom {
         })
     }
 
-    click(){
+    click() {
         this.wrapper && this.wrapper.click();
     }
 
-    protected getFile(callback: (file: CustomFile[]) => void , error?: Function){
-        switch (this.uploadType){
+    protected getFile(callback: (file: CustomFile[]) => void, error?: Function) {
+        switch (this.uploadType) {
             case "file":
-                if(this.actionSheet){
+                if (this.actionSheet) {
                     this.actionSheet.isShow = true;
-                }else{
+                } else {
                     sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
                 }
                 break;
             case 'sign':
-                if(sys.window.getSign){
+                if (sys.window.getSign) {
                     sys.window.getSign(callback, error);
-                }else{
+                } else {
                     sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
                 }
                 break;
         }
     }
 
-    protected acceptVerify(file: CustomFile){
-        if(this.accept && this.accept.extensions && file.name){
+    protected acceptVerify(file: CustomFile) {
+        if (this.accept && this.accept.extensions && file.name) {
             let arr = file.name.split('.'),
                 ext = arr.reverse()[0],
                 exts = this.accept.extensions.split(',');
             return exts.indexOf(ext) > -1;
-        }else{
+        } else {
             return true;
         }
     }
 
-    get(){
+    get() {
         return this.value;
     }
 
-    set(value: string){
+    set(value: string) {
         this.value = value;
     }
 
-    set disabled(e: boolean){
+    set disabled(e: boolean) {
         if (this._disabled !== e) {
             if (tools.isNotEmpty(e)) {
                 this._disabled = e;
@@ -223,21 +228,21 @@ export class BwUploader extends FormCom {
         this.input && (this.input.disabled = e);
     }
 
-    get value(){
+    get value() {
         return this.filename;
     }
 
-    set value(value: string){
+    set value(value: string) {
         this.filename = value;
         this.setInputValue(value)
     }
 
-    protected setInputValue(value: string){
+    protected setInputValue(value: string) {
         this.isChangeText && this.input && (this.input.value = value || this.text);
     }
 
-    destroy(){
-        this.fileUpload &&this.fileUpload.abort();
+    destroy() {
+        this.fileUpload && this.fileUpload.abort();
         this.temFiles = null;
         this.files = null;
         this.fileUpload = null;
@@ -246,7 +251,7 @@ export class BwUploader extends FormCom {
     }
 
     // 调用方法上传暂存文件
-    upload(files: CustomFile[] = this.temFiles){
+    upload(files: CustomFile[] = this.temFiles) {
         this.loading && this.loading.show();
         this._isFinish = false;
         this.wrapper.classList.remove('error');
@@ -332,25 +337,25 @@ export class BwUploader extends FormCom {
                     , timeout: 1000 //todo 超时的话，只能认为该文件不曾上传过
                     , dataType: "json"
 
-                }).then(function ({response}) {
-                    if(response.code == 200){
-                        if(response.ifExist){
+                }).then(function ({ response }) {
+                    if (response.code == 200) {
+                        if (response.ifExist) {
                             reject(response);
-                        }else{
+                        } else {
                             resolve({
                                 md5: md5Code,
                                 uniqueFileName,
                             });
                         }
-                    }else{
+                    } else {
                         reject();
                         response.message && Modal.alert(response.message);
                     }
                 }).catch((err: IAjaxError) => {
-                    if(err.statusText === 'error'){
+                    if (err.statusText === 'error') {
                         reject();
                         err.errorThrown && Modal.alert(err.errorThrown);
-                    }else{
+                    } else {
                         resolve({
                             md5: md5Code,
                             uniqueFileName
@@ -378,7 +383,7 @@ export class BwUploader extends FormCom {
                 , timeout: 1000 //todo 超时的话，只能认为该分片未上传过
                 , dataType: "json"
                 , isLowCase: false
-            }).then(({response}) => {
+            }).then(({ response }) => {
                 resolve(response);
             }).catch(() => {
                 reject(false);
@@ -387,11 +392,11 @@ export class BwUploader extends FormCom {
     }
 
     // 合并请求
-    protected afterSendFile(file: CustomFile, data): Promise<any>{
+    protected afterSendFile(file: CustomFile, data): Promise<any> {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 let chunksTotal = Math.ceil(file.size / this.chunkSize);
-                if(chunksTotal >= 1){
+                if (chunksTotal >= 1) {
                     let userInfo = User.get().userid,
                         ajaxData: obj = {
                             status: "chunksMerge"
@@ -411,16 +416,16 @@ export class BwUploader extends FormCom {
                         , data: ajaxData
                         // , cache: false
                         , dataType: "json"
-                    }).then(({response}) => {
-                        if(response.code == '200'){
+                    }).then(({ response }) => {
+                        if (response.code == '200') {
                             resolve(response);
-                        }else{
+                        } else {
                             reject(response.msg || response.errorMsg);
                         }
                     }).catch(() => {
                         reject();
                     })
-                }else{
+                } else {
                     reject();
                 }
             }, 100);
