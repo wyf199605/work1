@@ -55,7 +55,8 @@ export class GroupTabsPage extends BasicPage {
         this.ui = para.ui.body.elements[0];
         let btns = para.ui.body.subButtons;
         if (Array.isArray(btns)) {
-            this.ui.subButtons = [...btns, ...(this.ui.subButtons || [])]
+            this.ui.subButtons = [...btns, ...(this.ui.subButtons || [])];
+        
         }
 
         this.ui.uiType = this.ui.uiType || para.ui.uiType;
@@ -103,7 +104,7 @@ export class GroupTabsPage extends BasicPage {
         });
 
         let bwTableEl = this.ui as IBW_Table,
-            hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
+            hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
 
         if(hasQuery) {
             require([queryModuleName], (Query) => {
@@ -741,6 +742,7 @@ export class GroupTabsPage extends BasicPage {
             }),
             isOpenFirst: true,
             onChange: ({ index, isSelected, item }) => {
+             
                 if (isSelected) {
                     let panel = this.tab as Panel;
                     if (this.styleType === 'panel-off') {

@@ -237,8 +237,8 @@ export class RfidInventory {
     private start() {
         this.beginEl.classList.add('disabled-none');
         this.stopEl.classList.remove('disabled-none');
-
-        let conf = JSON.parse(window.localStorage.getItem('rfidConf')),
+        let ipResult:any=Shell.other.getData();
+        let conf = ipResult,
             port = this.getRfidPort(conf);
 
         Shell.rfid.start(port.str, port.num, (result) => {

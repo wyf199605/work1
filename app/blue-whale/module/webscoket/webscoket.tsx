@@ -215,8 +215,12 @@ export = class webscoket {
                 }
                 break;
             case "hint":
+            //    alert(data.data.dataMap)
                 require(['messagePage'], (messagePage) => {
-                    messagePage.setSysBadge();
+                    // console.log(data.data.dataMap)
+                    if(data.data.dataMap){
+                        messagePage.setSysBadge(data.data.dataMap.length);
+                    }
                 });
                 if (tools.isMb) {
                     return

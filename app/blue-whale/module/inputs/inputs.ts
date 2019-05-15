@@ -55,7 +55,8 @@ export class Inputs {
         para.container.tabIndex = parseInt(G.tools.getGuid());
         this.eventInit(para);
         /**rfid设置 */
-        let conf = JSON.parse(window.localStorage.getItem('rfidConf'));
+        let result:any=Shell.other.getData();
+        let conf = result;
         this.port = getRfidPort(conf);
         console.log("RFID" + JSON.stringify(this.port))
         Shell.rfid.start(this.port.str, this.port.num, (result) => {

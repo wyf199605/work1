@@ -704,7 +704,8 @@ export class LoginPage {
                 if (json.msg == 1) {
                     Modal.toast("指纹匹配不正确");
                 } else if (json.msg == 2) {
-                    Modal.toast("该设备不支持指纹");
+                    //1098bug单说由壳提示
+                    // Modal.toast("该设备不支持指纹");
                 } else {
                     Modal.toast(json.msg);
                 }
@@ -745,6 +746,13 @@ export class LoginPage {
      * 密码登录
      */
     private loginClick() {
+        // Modal.confirm({
+        //     msg: '登录已超时,是否跳转到登录页',
+        //     callback: (index) => {
+               
+        //     }
+        // });
+        // return false;
         let loginPage = this,
             saveBtn = loginPage.props.saveButton,
             isSavePw = saveBtn instanceof CheckBox ? saveBtn.checked : (<HTMLInputElement>saveBtn).checked,

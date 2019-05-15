@@ -1363,7 +1363,7 @@ export class BwTableModule extends Component {
 
     private reportCaptionInit() {
         let reportCaption = this.ui.reportTitle;
-        if (!reportCaption) {
+        if (!reportCaption||reportCaption=='null') {
             return;
         }
         d.prepend(this.wrapper, <div className="table-module-report">{reportCaption}</div>);
