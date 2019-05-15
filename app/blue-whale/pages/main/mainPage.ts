@@ -497,8 +497,8 @@ export = class MainPage {
     private static myselfMenu = (function () {
         //顶部个人信息下拉窗口点击事件
         let rfid: RfidConfig,
-            conf = window.localStorage.getItem('rfidConf');
-        !conf && window.localStorage.setItem('rfidConf', JSON.stringify({
+            conf = Shell.other.getData();
+        !conf && Shell.other.putData(JSON.stringify({
             line: 0,
             ip: '192.168.1.200',
             port: 100,
