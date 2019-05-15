@@ -498,7 +498,8 @@ export = class MainPage {
         //顶部个人信息下拉窗口点击事件
         let rfid: RfidConfig,
             conf = Shell.other.getData();
-        !conf && Shell.other.putData(JSON.stringify({
+            // console.log(conf);
+        tools.isEmpty(conf)&& Shell.other.putData(JSON.stringify({
             line: 0,
             ip: '192.168.1.200',
             port: 100,

@@ -41,7 +41,7 @@ export class ModalHeader extends Component {
        
         this.isClose = modalHeader.isClose; //增加...
         if(tools.isMb){
-            if(d.query(".modal-title",this.wrapper).innerHTML=='提示'){
+            if(d.query(".modal-title",this.wrapper).innerHTML.indexOf('提示')>-1){
                 d.query(".close_x",this.wrapper).remove();
             }
         }

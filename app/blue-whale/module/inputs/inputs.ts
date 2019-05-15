@@ -56,7 +56,7 @@ export class Inputs {
         this.eventInit(para);
         /**rfid设置 */
         let result:any=Shell.other.getData();
-        let conf = JSON.parse(result);
+        let conf = result;
         this.port = getRfidPort(conf);
         console.log("RFID" + JSON.stringify(this.port))
         Shell.rfid.start(this.port.str, this.port.num, (result) => {

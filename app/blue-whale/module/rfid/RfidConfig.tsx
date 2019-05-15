@@ -93,7 +93,7 @@ export class RfidConfig {
 
 
         let ipResult: any = Shell.other.getData();
-        let rfidConf: IRfidConfPara = JSON.parse(ipResult),
+        let rfidConf: IRfidConfPara = ipResult,
             lineDisabled = () => {
                 ipInput.setAttribute('disabled', '');
                 portInput.setAttribute('disabled', '');
