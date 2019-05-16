@@ -56,7 +56,7 @@ export class GroupTabsPage extends BasicPage {
         let btns = para.ui.body.subButtons;
         if (Array.isArray(btns)) {
             this.ui.subButtons = [...btns, ...(this.ui.subButtons || [])];
-        
+
         }
 
         this.ui.uiType = this.ui.uiType || para.ui.uiType;
@@ -146,10 +146,10 @@ export class GroupTabsPage extends BasicPage {
         }
 
 
-        let tableUi = this.ui as IBW_Table,
-            isDynamic = tools.isEmpty(tableUi.cols),
+        let tableUi: IBW_Detail | IBW_Table = this.ui,
+            isDynamic = tools.isEmpty((tableUi as IBW_Table).cols || tableUi.fields),
             inputs = tableUi.inputs,
-            line = tableUi.scannableLocationLine,
+            line = (tableUi as IBW_Table).scannableLocationLine,
             querier = tableUi.querier;
         if(!isDynamic && bwTableEl.scannableField){
             this.mobileScanInit(bwTableEl);
@@ -162,25 +162,27 @@ export class GroupTabsPage extends BasicPage {
 
     protected _inputs: Inputs;
     private inputs(inputs,line){
-        if(this.main instanceof NewTableModule){
-            let table = this.main;
-            require(['Inputs'], (i) => {
-                this._inputs = new i.Inputs({
-                    inputs: inputs,
-                    container: this.dom,
-                    locationLine : line,
-                    table : () => {
+        let table = this.main;
+        require(['Inputs'], (i) => {
+            this._inputs = new i.Inputs({
+                inputs: inputs,
+                container: this.dom,
+                locationLine : line,
+                table : () => {
+                    if(table instanceof NewTableModule){
                         return table && table.main.ftable
-                    },
-                    tableModule : () => {
+                    }else{
                         return table
-                    },
-                    queryModule : () => {
-                        return this.queryModule;
                     }
-                })
-            });
-        }
+                },
+                tableModule : () => {
+                    return table
+                },
+                queryModule : () => {
+                    return this.queryModule;
+                }
+            })
+        });
 
     }
     /**
@@ -742,7 +744,7 @@ export class GroupTabsPage extends BasicPage {
             }),
             isOpenFirst: true,
             onChange: ({ index, isSelected, item }) => {
-             
+
                 if (isSelected) {
                     let panel = this.tab as Panel;
                     if (this.styleType === 'panel-off') {

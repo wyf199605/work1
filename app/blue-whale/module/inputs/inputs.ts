@@ -11,13 +11,15 @@ import { Button } from "../../../global/components/general/button/Button";
 import { ShellAction } from "../../../global/action/ShellAction";
 import Shell = G.Shell;
 import { BarCode } from "cashier/global/utils/barCode";
+import {NewTableModule} from "../table/newTableModule";
+import {DetailModule} from "../detailModule/detailModule";
 
 interface InputsPara {
     inputs: R_Input[]
     locationLine?: string
     container: HTMLElement
     keyField?: string
-    table?: Function    // 获取表格ftable
+    table?: () => FastBtnTable | DetailModule;    // 获取表格ftable
     afterScan?: Function
     tableModule?: Function // 获取表格模块
     queryModule?: Function // 查询器
@@ -56,39 +58,40 @@ export class Inputs {
         this.eventInit(para);
         /**rfid设置 */
         let result: any = Shell.other.getData();
-        let conf = result;
-        this.port = getRfidPort(conf);
-        console.log("RFID" + JSON.stringify(this.port))
-        Shell.rfid.start(this.port.str, this.port.num, (result) => {
-            // console.log(result);
-            /**
-             * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
-             */
-            // alert(JSON.stringify(result));
-            let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
-                data = result.data;
-            console.log(msg);
-            console.log(data);
-            if (result.success) {
-                // data.forEach(item => {
+        if(result){
+            let conf = result;
+            this.port = getRfidPort(conf);
+            console.log("RFID" + JSON.stringify(this.port))
+            Shell.rfid.start(this.port.str, this.port.num, (result) => {
+                // console.log(result);
+                /**
+                 * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
+                 */
+                    // alert(JSON.stringify(result));
+                let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
+                    data = result.data;
+                console.log(msg);
+                console.log(data);
+                if (result.success) {
+                    // data.forEach(item => {
 
-                // })
-                para.inputs.forEach(input => {
-                    let line = para.locationLine;
-                    let reg = regExpMatch(input, data[0]);
-                    //匹配成功
-                    if (reg) {
-                        this.matchPass(reg, data[0]);
-                    } else if (line) {
-                        this.rowSelect(line, data[0]);
-                    }
-                });
-                // this.matchPass(reg, text);
+                    // })
+                    para.inputs.forEach(input => {
+                        let line = para.locationLine;
+                        let reg = regExpMatch(input, data[0]);
+                        //匹配成功
+                        if (reg) {
+                            this.matchPass(reg, data[0]);
+                        } else if (line) {
+                            this.rowSelect(line, data[0]);
+                        }
+                    });
+                    // this.matchPass(reg, text);
 
-            }
+                }
 
-        });
-
+            });
+        }
         // setTimeout(() => {
         //     this.ajax("http://192.168.1.222:8080/sf/app_sanfu_retail/null/monitorkey/n1-move-19?needparam=%5B%7B%22n%22%3A%22toshopid%22%7D%2C%7B%22n%22%3A%22TOSHOPID%22%7D%5D&toshopid=1111&inputtext=8100247691", () => {
 
@@ -149,7 +152,7 @@ export class Inputs {
             atvarObj = body.atvarObj,
             catType = category.type,
             showText = category.showText,
-            ftable: FastBtnTable = tools.isFunction(this.p.table) && this.p.table();
+            ftable = tools.isFunction(this.p.table) && this.p.table();
 
         if (atvarObj) {
             this.atvarParams(atvarObj.atvarparams, atvarObj.subButtons, aUrl, open);
@@ -233,7 +236,7 @@ export class Inputs {
      * @param ftable
      * @param response
      */
-    private dataCover(ftable: FastBtnTable, response: obj) {
+    private dataCover(ftable: FastBtnTable | DetailModule, response: obj) {
         let data = response.data,
             queryModule = this.para.queryModule && this.para.queryModule();
         if (tools.isEmpty(data)) return;
@@ -410,7 +413,7 @@ export class Inputs {
     private rowSelect(line: string, text: string) {
         return new Promise(resolve => {
             let fstable = tools.isFunction(this.para.table) && this.para.table(),
-                index = fstable && fstable.locateToRow(line, text, true),
+                index = fstable && fstable instanceof FastBtnTable && fstable.locateToRow(line, text, true),
                 tableModule = tools.isFunction(this.para.tableModule) && this.para.tableModule();
 
             if (tools.isNotEmpty(index) && tableModule && tableModule.bwEl.subTableList) {
