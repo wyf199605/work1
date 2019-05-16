@@ -181,6 +181,7 @@ export class NewTableModule extends AGroupTabItem {
                 this.active.on();
                 let isFirst = true;
                 mftable.on(FastTable.EVT_RENDERED, () => {
+                    debugger;
                     // let sub = this.sub || this.subInit(subUi);
                     if (mftable.editing) {
                         return;
@@ -195,35 +196,42 @@ export class NewTableModule extends AGroupTabItem {
                     pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                     firstRow.selected = true;
                     let noLoadSub = this.noLoadSub(mftable, main);
-                    if (tools.isEmpty(this.tab)) {
-                        this.tab = new Tab({
-                            panelParent: tabWrapper,
-                            tabParent: tabWrapper,
-                            tabs: tabs,
-                            onClick: (index) => {
-                                this.subTabActiveIndex = index;
-                                let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
-                                    ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
-                                if (!tools.isNotEmpty(this.sub[index])) {
-                                    let { subParam } = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
-                                        tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
-                                        subUi = this.bwEl.subTableList[index];
 
-                                    this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
-                                    this.currentSelectedIndexes.push(index);
-                                } else {
-                                    this.mobileModal && (this.mobileModal.isShow = true);
-                                    if (!~this.currentSelectedIndexes.indexOf(index)) {
-                                        this.sub[index].refresh(ajaxData).then(() => {
-                                            this.sub[index].isPivot && this.initEdit(this.sub[index]);
-                                        }).catch();
+                    if (tools.isEmpty(this.tab)) {
+                        let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
+                        if (tools.isNotEmpty(this.showSubField)&&tools.isEmpty(selectedData[this.showSubField])) {
+                          //console.log("不显示tab")
+                        }else{
+                            this.tab = new Tab({
+                                panelParent: tabWrapper,
+                                tabParent: tabWrapper,
+                                tabs: tabs,
+                                onClick: (index) => {
+                                    this.subTabActiveIndex = index;
+                                    let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
+                                        ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
+                                    if (!tools.isNotEmpty(this.sub[index])) {
+                                        let { subParam } = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
+                                            tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
+                                            subUi = this.bwEl.subTableList[index];
+    
+                                        this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
                                         this.currentSelectedIndexes.push(index);
+                                    } else {
+                                        this.mobileModal && (this.mobileModal.isShow = true);
+                                        if (!~this.currentSelectedIndexes.indexOf(index)) {
+                                            this.sub[index].refresh(ajaxData).then(() => {
+                                                this.sub[index].isPivot && this.initEdit(this.sub[index]);
+                                            }).catch();
+                                            this.currentSelectedIndexes.push(index);
+                                        }
+                                        this.sub[index].linkedData = selectedData;
+                                        this.sub[index].ftable && this.sub[index].ftable.recountWidth();
                                     }
-                                    this.sub[index].linkedData = selectedData;
-                                    this.sub[index].ftable && this.sub[index].ftable.recountWidth();
                                 }
-                            }
-                        });
+                            });
+                        }
+                      
 
                         !tools.isMb && !this.subIconWrapper && this.initSubIcon();
                     }
@@ -240,27 +248,25 @@ export class NewTableModule extends AGroupTabItem {
                         this.subWrapper.classList.remove('hide');
                     }
                     setTimeout(() => {
-                        // this.subRefresh(firstRow.data);111
                         if (isFirst && !noLoadSub) {
                             let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
-                            if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
-                                let list = selectedData[this.showSubField].split(',');
-                                console.log(list)
-                                let bwEl = this.bwEl;
-                                let showSubSeq = [];
-                              
-                                list.forEach((item) => {
-                                    bwEl.subTableList.forEach((child,index)=>{
-                                        if (child.itemId== item) {
-                                            showSubSeq.push(index + 1)
-                                        }
+                            if (tools.isNotEmpty(this.showSubField)) {
+                                if (tools.isNotEmpty(selectedData[this.showSubField])) {
+                                    let list = selectedData[this.showSubField].split(',');
+                                    let bwEl = this.bwEl;
+                                    let showSubSeq = [];
+                                    list.forEach((item) => {
+                                        bwEl.subTableList.forEach((child, index) => {
+                                            if (child.itemId == item) {
+                                                showSubSeq.push(index + 1)
+                                            }
+                                        })
+
                                     })
-                                  
-                                })
-                                console.log(showSubSeq)
-                                this.tab.setTabsShow(showSubSeq);
-                                this.tab.active(parseInt(showSubSeq[0]) - 1);
-                                parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
+                                    this.tab.setTabsShow(showSubSeq);
+                                    this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
+                                }
                             } else {
                                 this.tab.active(0);
                                 this.currentSelectedIndexes.push(0);
@@ -402,17 +408,16 @@ export class NewTableModule extends AGroupTabItem {
             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(row.data[this.showSubField])) {
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 // let showSubSeq = row.data[this.showSubField].split(',');
-                let list =  row.data[this.showSubField].split(',');
-                console.log(list)
+                let list = row.data[this.showSubField].split(',');
                 let bwEl = this.bwEl;
                 let showSubSeq = [];
                 list.forEach((item) => {
-                    bwEl.subTableList.forEach((child,index)=>{
-                        if (child.itemId== item) {
+                    bwEl.subTableList.forEach((child, index) => {
+                        if (child.itemId == item) {
                             showSubSeq.push(index + 1)
                         }
                     })
-                  
+
                 })
                 console.log(showSubSeq)
                 this.tab.setTabsShow(showSubSeq);
@@ -484,12 +489,12 @@ export class NewTableModule extends AGroupTabItem {
             let bwEl = this.bwEl;
             let showSubSeq = [];
             list.forEach((item) => {
-                bwEl.subTableList.forEach((child,index)=>{
-                    if (child.itemId== item) {
+                bwEl.subTableList.forEach((child, index) => {
+                    if (child.itemId == item) {
                         showSubSeq.push(index + 1)
                     }
                 })
-              
+
             })
             console.log(showSubSeq)
             this.tab.setTabsShow(showSubSeq);
