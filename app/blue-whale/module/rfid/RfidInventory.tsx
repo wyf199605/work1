@@ -104,7 +104,7 @@ export class RfidInventory {
         this.stopEl = d.query('.rfid-stop', this.modal.wrapper);
         this.beginEl = d.query('.rfid-begin', this.modal.wrapper);
         this.stopEl.classList.add('disabled-none');
-        this.sortUi();
+        
         this.atvar(data.data.body.elements[0]);
     }
 
@@ -245,10 +245,13 @@ export class RfidInventory {
         let ipResult:any=Shell.other.getData();
         let conf = ipResult,
             port = this.getRfidPort(conf);
-
+        
         Shell.rfid.start(port.str, port.num, (result) => {
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
+            if(result.success&&tools.isEmpty(result.data)){
+                this.sortUi();
+            }
             if (data) {
                 msg = result.msg + '：' + data[0];
             }
