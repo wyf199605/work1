@@ -181,7 +181,6 @@ export class NewTableModule extends AGroupTabItem {
                 this.active.on();
                 let isFirst = true;
                 mftable.on(FastTable.EVT_RENDERED, () => {
-                    debugger;
                     // let sub = this.sub || this.subInit(subUi);
                     if (mftable.editing) {
                         return;
