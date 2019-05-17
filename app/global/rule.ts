@@ -17,6 +17,8 @@ namespace G{
 
         static DT_BOOL = '17'; // 布尔
 
+        static DT_TEXT_AREA = '18'; // 多行文本
+
         static DT_IMAGE = '20'; // 图片
 
         static DT_SIGN = '26'; // 签名图片
@@ -34,7 +36,7 @@ namespace G{
         static DT_FILE = '43'; // 文件
 
         static DT_UNI_FILE = '47'; // 新单附件
-        
+
         static DT_UNI_MUL_FILE = '48'; // 新多附件
 
         static isNumber(dataType: string) {
@@ -80,7 +82,7 @@ namespace G{
 
             return dotNum.join('.');
         }
-        
+
         static parseNumber(number, displayFormat) {
             let formatArr, hasDot;
             if (!tools.isEmpty(displayFormat) && typeof number === 'number') {
@@ -284,7 +286,7 @@ namespace G{
             if (!reqAddr.commitType||!this.reqAddrCommit[reqAddr.commitType]) {
                 reqAddr.commitType = 1;
             }
-            
+
             return this.reqAddrCommit[reqAddr.commitType](reqAddr, data);
 
         }
@@ -326,7 +328,7 @@ namespace G{
                     data: reqAddr.varType === 2 ? <obj>urlPara : varData
                 }
             },
-            
+
         };
         /**
          * 解析varList数据
