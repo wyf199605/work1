@@ -197,41 +197,41 @@ export class NewTableModule extends AGroupTabItem {
                     let noLoadSub = this.noLoadSub(mftable, main);
 
                     if (tools.isEmpty(this.tab)) {
-                        let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
-                        if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
-                            //console.log("不显示tab")
-                        } else {
-                            this.tab = new Tab({
-                                panelParent: tabWrapper,
-                                tabParent: tabWrapper,
-                                tabs: tabs,
-                                onClick: (index) => {
-                                    this.subTabActiveIndex = index;
-                                    let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
-                                        ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
-                                    if (!tools.isNotEmpty(this.sub[index])) {
-                                        let { subParam } = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
-                                            tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
-                                            subUi = this.bwEl.subTableList[index];
+                    
+                        // if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
+                        //     //console.log("不显示tab")
+                        // } else {
 
-                                        this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
+                        // }
+                        this.tab = new Tab({
+                            panelParent: tabWrapper,
+                            tabParent: tabWrapper,
+                            tabs: tabs,
+                            onClick: (index) => {
+                                this.subTabActiveIndex = index;
+                                let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
+                                    ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
+                                if (!tools.isNotEmpty(this.sub[index])) {
+                                    let { subParam } = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
+                                        tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
+                                        subUi = this.bwEl.subTableList[index];
+
+                                    this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
+                                    this.currentSelectedIndexes.push(index);
+                                } else {
+                                    this.mobileModal && (this.mobileModal.isShow = true);
+                                    if (!~this.currentSelectedIndexes.indexOf(index)) {
+                                        this.sub[index].refresh(ajaxData).then(() => {
+                                            this.sub[index].isPivot && this.initEdit(this.sub[index]);
+                                        }).catch();
                                         this.currentSelectedIndexes.push(index);
-                                    } else {
-                                        this.mobileModal && (this.mobileModal.isShow = true);
-                                        if (!~this.currentSelectedIndexes.indexOf(index)) {
-                                            this.sub[index].refresh(ajaxData).then(() => {
-                                                this.sub[index].isPivot && this.initEdit(this.sub[index]);
-                                            }).catch();
-                                            this.currentSelectedIndexes.push(index);
-                                        }
-                                        this.sub[index].linkedData = selectedData;
-                                        this.sub[index].ftable && this.sub[index].ftable.recountWidth();
                                     }
+                                    this.sub[index].linkedData = selectedData;
+                                    this.sub[index].ftable && this.sub[index].ftable.recountWidth();
                                 }
-                            });
-                        }
-
-
+                            }
+                        });
+                       
                         !tools.isMb && !this.subIconWrapper && this.initSubIcon();
                     }
                     this.tab.len <= 0 && this.bwEl.subTableList.forEach((sub) => {
@@ -246,7 +246,13 @@ export class NewTableModule extends AGroupTabItem {
                     } else {
                         this.subWrapper.classList.remove('hide');
                     }
+                    let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
+                    if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
+                        // this.tab.setTabsShow([]);
+                        this.subWrapper.classList.add('hide');
+                    }
                     setTimeout(() => {
+                        
                         if (isFirst && !noLoadSub) {
                             let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
                             if (tools.isNotEmpty(this.showSubField)) {
@@ -320,10 +326,10 @@ export class NewTableModule extends AGroupTabItem {
         };
     }
     private computedIndex(list) {
-     //   console.log("配置选项"+list);
+        console.log("配置选项" + list);
         let showSubSeq = [];
         let bwEl = this.bwEl;
-        // console.log(bwEl.subTableList);
+        console.log(bwEl.subTableList);
         list.forEach((item) => {
             bwEl.subTableList.forEach((child, index) => {
                 if (child.itemId == item) {
@@ -332,7 +338,10 @@ export class NewTableModule extends AGroupTabItem {
             })
 
         })
-        // console.log("输出选项"+showSubSeq)
+        console.log("输出选项" + showSubSeq)
+        if(showSubSeq.length>0&&this.subWrapper.classList.contains('hide')){
+            this.subWrapper.classList.remove('hide');
+        }
         return showSubSeq;
     }
     protected subIconWrapper: HTMLElement = null;
@@ -497,6 +506,7 @@ export class NewTableModule extends AGroupTabItem {
                 this.tab.active(this.subTabActiveIndex);
             }
         } else {
+            this.subWrapper.classList.add('hide');
             Object.values(this.sub).forEach((subTable) => {
                 promise.push(subTable.refresh(ajaxData).catch());
                 subTable.linkedData = selectedData;
