@@ -87,7 +87,7 @@ export class RfidInventory {
             onClose : () => {
                 if(G.tools.isNotEmptyArray(this.epc)){
                     Modal.confirm({
-                        msg : '退出前是否要提交尚未处理的RFID标签？',
+                        msg : '退出前是否要提交尚未处理的'+this.epc.length+'个RFID标签？',
                         callback : (flag) => {
                             flag && this.commit();
                             Shell.rfid.stop(() => {});
@@ -104,18 +104,23 @@ export class RfidInventory {
         this.stopEl = d.query('.rfid-stop', this.modal.wrapper);
         this.beginEl = d.query('.rfid-begin', this.modal.wrapper);
         this.stopEl.classList.add('disabled-none');
-        this.sortUi();
+        
         this.atvar(data.data.body.elements[0]);
     }
 
     private keyHandle = (e) => {
         let code = e.keyCode || e.which || e.charCode;
-        if (code === 13) {
-            this.scan(this.value);
-            this.value = '';
-        } else {
-            this.value += e.key;
+        //8 :退格  9:制表 16 shiftleft 20 capsLock 
+        if(![8,9,16,20,32,33,34,35,37,38,39,40,46].includes(code)){
+            if (code === 13) {
+                // console.log(this.value)
+                this.scan(this.value);
+                this.value = '';
+            } else {
+                this.value += e.key;
+            }
         }
+       
     };
 
     private dataGet(){
@@ -237,13 +242,16 @@ export class RfidInventory {
     private start() {
         this.beginEl.classList.add('disabled-none');
         this.stopEl.classList.remove('disabled-none');
-
-        let conf = JSON.parse(window.localStorage.getItem('rfidConf')),
+        let ipResult:any=Shell.other.getData();
+        let conf = ipResult,
             port = this.getRfidPort(conf);
-
+        
         Shell.rfid.start(port.str, port.num, (result) => {
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
+            if(result.success&&tools.isEmpty(result.data)){
+                this.sortUi();
+            }
             if (data) {
                 msg = result.msg + '：' + data[0];
             }

@@ -1,30 +1,30 @@
 /// <amd-module name="SelectBox"/>
 
 import tools = G.tools;
-import {CheckBox} from "../checkbox/checkBox";
+import { CheckBox } from "../checkbox/checkBox";
 import d = G.d;
-import {FormCom, IFormComPara} from "../basic";
-import {RadioBox} from "../radiobox/radioBox";
-import {BasicCheckBox} from "../checkbox/basicCheckBox";
+import { FormCom, IFormComPara } from "../basic";
+import { RadioBox } from "../radiobox/radioBox";
+import { BasicCheckBox } from "../checkbox/basicCheckBox";
 
-interface ISelectBoxPara extends IFormComPara{
+interface ISelectBoxPara extends IFormComPara {
     select: {
         multi: boolean,
-        callback?(index: number,item?:HTMLElement),
-        isRadioNotchecked ?: boolean //单选框是否允许多次选中，默认状态：不可多次选中
-        isStopPropatation ? :boolean //选项框是否取消冒泡：默认状态：不取消
+        callback?(index: number, item?: HTMLElement),
+        isRadioNotchecked?: boolean //单选框是否允许多次选中，默认状态：不可多次选中
+        isStopPropatation?: boolean //选项框是否取消冒泡：默认状态：不取消
     }
     // container: HTMLElement;
     data?: ListItem[];
-    noteDataByTitle?:boolean;//临时用于权限模块，是否通过选项框的title值来记录数据
+    noteDataByTitle?: boolean;//临时用于权限模块，是否通过选项框的title值来记录数据
 }
 
-export class SelectBox extends FormCom{
+export class SelectBox extends FormCom {
     onSet: (val) => void;
     private selectArr: number[];
     private type: string;
     private guidName: string;
-    private lastRadioBox : HTMLInputElement;
+    private lastRadioBox: HTMLInputElement;
 
     constructor(private para: ISelectBoxPara) {
 
@@ -42,23 +42,23 @@ export class SelectBox extends FormCom{
     }
 
 
-    getChecked(){
+    getChecked() {
         let inputs = d.queryAll('input', this.wrapper),
             arr = [];
-        Array.isArray(inputs) && inputs.forEach((input : HTMLInputElement) => {
-            if(input.checked){
+        Array.isArray(inputs) && inputs.forEach((input: HTMLInputElement) => {
+            if (input.checked) {
                 arr.push(parseInt(input.parentElement.dataset.index));
             }
         });
         return arr;
     }
 
-    protected keyHandle = (e : KeyboardEvent) => {
+    protected keyHandle = (e: KeyboardEvent) => {
         let index = this.getChecked()[0],
             keyCode = e.keyCode || e.which || e.charCode,
             num = index === 0 ? 1 : 0,
             key = this.para.tabIndexKey || 13;
-        if(keyCode === key){
+        if (keyCode === key) {
             this.set([num]);
             this.para.select.callback && this.para.select.callback(num);
         }
@@ -78,7 +78,7 @@ export class SelectBox extends FormCom{
         self.lastRadioBox = null;
         //如果单选框不允许多次选中，默认第一个单选框为选中状态，则lastRadioBox为第一个单选框
         if (!self.para.select.isRadioNotchecked && self.type === 'radio') {
-            let radioInput = <HTMLInputElement> self.para.container.querySelector('input');
+            let radioInput = <HTMLInputElement>self.para.container.querySelector('input');
             if (radioInput) {
                 self.lastRadioBox = radioInput;
             }
@@ -99,42 +99,42 @@ export class SelectBox extends FormCom{
         //     }
         // })
     }
-    protected clickHandler(input: HTMLInputElement | BasicCheckBox){
+    protected clickHandler(input: HTMLInputElement | BasicCheckBox) {
         this.checked(input);
-        if(input instanceof BasicCheckBox){
+        if (input instanceof BasicCheckBox) {
             input = input.wrapper.querySelector('input');
         }
         if (this.para.select && this.para.select.callback) {
             ////临时用于权限模块，通过选项框的title值来记录数据
-            if(this.para.noteDataByTitle) {
-                if(this.para.data[input.parentElement.dataset.index]) {
+            if (this.para.noteDataByTitle) {
+                if (this.para.data[input.parentElement.dataset.index]) {
                     input.parentElement.title = this.para.data[input.parentElement.dataset.index].value;
                 }
             }
-            this.para.select.callback(parseInt(input.parentElement.dataset.index),input.parentElement);
+            this.para.select.callback(parseInt(input.parentElement.dataset.index), input.parentElement);
         }
     }
 
     private checked(input: HTMLInputElement | BasicCheckBox) {
         let self = this;
-        if(input instanceof BasicCheckBox){
+        if (input instanceof BasicCheckBox) {
             let inputEl = input.wrapper.querySelector('input');
             let index = parseInt(inputEl.parentElement.dataset.index);
-            if(input.type === 'checkbox'){
-                if(input.checked){
+            if (input.type === 'checkbox') {
+                if (input.checked) {
                     self.selectArr.push(index);
-                }else{
+                } else {
                     let i = self.selectArr.indexOf(index);
                     if (i > -1) {
                         self.selectArr.splice(i, 1);
                     }
                 }
-            }else{
+            } else {
                 if (self.lastRadioBox !== inputEl) {
                     self.selectArr[0] = index;
                     inputEl.value = 'true';
                     inputEl.checked = true;
-                }else{
+                } else {
                     if (self.para.select.isRadioNotchecked) {
                         if (input.checked) {
                             self.selectArr[0] = index;
@@ -148,7 +148,7 @@ export class SelectBox extends FormCom{
                 }
                 self.lastRadioBox = inputEl;
             }
-        }else {
+        } else {
             let index = parseInt(input.parentElement.dataset.index);
             //多选框两种情况
             if (input.type === 'checkbox') {
@@ -253,7 +253,7 @@ export class SelectBox extends FormCom{
      * */
     setDisabled(indexs: number[]) {
         Array.isArray(indexs) && indexs.forEach((i) => {
-            let selectBox = <HTMLElement> this.para.container.childNodes[i];
+            let selectBox = <HTMLElement>this.para.container.childNodes[i];
             selectBox.classList.add('disabled');
         })
     }
@@ -263,7 +263,7 @@ export class SelectBox extends FormCom{
      * */
     unsetDisabled(indexs: number[]) {
         Array.isArray(indexs) && indexs.forEach((i) => {
-            let selectBox = <HTMLElement> this.para.container.childNodes[i];
+            let selectBox = <HTMLElement>this.para.container.childNodes[i];
             selectBox.classList.remove('disabled');
         })
     }
@@ -275,11 +275,11 @@ export class SelectBox extends FormCom{
         return this.selectArr;
     }
 
-    getSelect() : ListItem[] {
-        let selected : ListItem[] = [];
-        this.get().forEach( n => {
+    getSelect(): ListItem[] {
+        let selected: ListItem[] = [];
+        this.get().forEach(n => {
             this.para.data.forEach((d, i) => {
-                if(i === n){
+                if (i === n) {
                     selected.push(d);
                 }
             });
@@ -289,24 +289,24 @@ export class SelectBox extends FormCom{
     }
 
     //不保留状态，空数组默认全清
-    set(index : Array<number>) : void{
+    set(index: Array<number>): void {
         this.unsetSelectedAll();
         this.selected(index, true);
     }
 
     //全选
-    setAll(){
+    setAll() {
         this.selectAll(true);
 
     }
 
     //添加选中状态
-    addSelected(index : Array<number>){
+    addSelected(index: Array<number>) {
         this.selected(index, true);
     }
 
     // 取消选中
-    unSet(index : Array<number>) {
+    unSet(index: Array<number>) {
         this.selected(index);
     }
 
@@ -315,9 +315,9 @@ export class SelectBox extends FormCom{
      * @param index 只能传下标
      * @param set true为set，false为unset
      */
-    private selected(index : Array<number>, set? : boolean) {
+    private selected(index: Array<number>, set?: boolean) {
         let self = this,
-            spans = d.queryAll( 'span.check-span',self.para.container),
+            spans = d.queryAll('span.check-span', self.para.container),
             isSelected = false,
             selectNum = self.get();
 
@@ -329,11 +329,16 @@ export class SelectBox extends FormCom{
             });
             if (set) {
                 if (!isSelected) {
-                    self.checked(<HTMLInputElement>d.query( 'input', spans[i].parentElement))
+                    if (spans[i] && spans[i].parentElement) {
+                        self.checked(<HTMLInputElement>d.query('input', spans[i].parentElement))
+                    }
                 }
             } else {
                 if (isSelected) {
-                    self.checked(<HTMLInputElement>d.query( 'input', spans[i].parentElement))
+                    if (spans[i] && spans[i].parentElement) {
+                        self.checked(<HTMLInputElement>d.query('input', spans[i].parentElement))
+                    }
+
                 }
             }
 
@@ -348,7 +353,7 @@ export class SelectBox extends FormCom{
     }
 
     private selectAll(set?: boolean) {
-        let data = d.queryAll( 'span.check-span',this.para.container),
+        let data = d.queryAll('span.check-span', this.para.container),
             nums = [];
         data && data.forEach((n, i) => {
             nums.push(i);
@@ -357,10 +362,10 @@ export class SelectBox extends FormCom{
         this.selected(nums, set);
     }
 
-    get value(){
+    get value() {
         return this.selectArr;
     }
-    set value(index: number[]){
+    set value(index: number[]) {
         this.unsetSelectedAll();
         this.selected(index, true);
     }

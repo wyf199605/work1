@@ -25,7 +25,7 @@ export class NewTablePage extends BasicPage{
     constructor(para: ITablePagePara) {
         super(para);
         d.classAdd(this.dom.parentElement, 'table-page');
-        
+
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
         let bwTable = new BwTableElement({
@@ -36,7 +36,7 @@ export class NewTablePage extends BasicPage{
 
         // Shell触发的刷新事件
         this.on(BwRule.EVT_REFRESH, () => {
-            bwTable.tableModule && bwTable.tableModule.refresh();
+            bwTable.refresh();
         });
         // 显示当前页时触发的事件
         // d.on(this.dom,BW.EVT_SHOW_PAGE,'',()=>{
@@ -49,7 +49,7 @@ export class NewTablePage extends BasicPage{
 }
 
 interface IBwTableElementPara extends IComponentPara{
-    tableEl: IBW_Table 
+    tableEl: IBW_Table
     asynData? : obj[]
 }
 export class BwTableElement extends Component{
@@ -67,7 +67,7 @@ export class BwTableElement extends Component{
         console.log('bw table ele', para);
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
-            hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
+            hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
 
         if(isDynamic) {
             // 动态加载查询模块
@@ -169,16 +169,49 @@ export class BwTableElement extends Component{
             });
         } else {
 
-            this.tableModule = new NewTableModule({
-                bwEl: bwTableEl,
-                container: this.container
-            });
+          
 
             if(hasQuery) {
                 require([queryModuleName], (Query) => {
-                    this.queryModule = new Query({
+                    let query = this.queryModule = new Query({
                         qm: bwTableEl.querier,
                         refresher: (ajaxData) => {
+                            if(!this.tableModule){
+                                this.tableModule = new NewTableModule({
+                                    bwEl: bwTableEl,
+                                    container: this.container
+                                });
+                                
+                                !sys.isMb && query.toggleCancle();
+                                if(tools.isMb) {
+                                    //打开查询面板
+                                    d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
+                                        this.queryModule.show();
+                                    });
+                                } else {
+            
+                                    let main = this.tableModule.main;
+                                    let addBtn = () => {
+                                        main.ftable.btnAdd('query', {
+                                            content: '查询器',
+                                            type: 'default',
+                                            icon: 'shaixuan',
+                                            onClick: () => {this.queryModule.show()}
+                                        }, 0);
+                                    };
+                                    // if( bwTableEl.querier.queryType===1&&bwTableEl.querier.autTag===1){
+                                    //     main.wrapper.style.visibility='hidden';
+                                      
+                                    // }
+                                    if(main.ftable){
+                                        addBtn()
+                                    }else{
+                                        main.on(BwTableModule.EVT_READY, () => {
+                                            addBtn()
+                                        });
+                                    }
+                                }
+                            }
                             return this.tableModule.refresh(ajaxData).then(() => {
                                 let locationLine = bwTableEl.scannableLocationLine;
                                 if(locationLine && ajaxData.mobilescan){
@@ -191,30 +224,14 @@ export class BwTableElement extends Component{
                         container: this.container,
                         tableGet: () => this.tableModule.main
                     });
-                    if(tools.isMb) {
-                        //打开查询面板
-                        d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
-                            this.queryModule.show();
-                        });
-                    } else {
-                        let main = this.tableModule.main;
-                        let addBtn = () => {
-                            main.ftable.btnAdd('query', {
-                                content: '查询器',
-                                type: 'default',
-                                icon: 'shaixuan',
-                                onClick: () => {this.queryModule.show()}
-                            }, 0);
-                        };
-                        if(main.ftable){
-                            addBtn()
-                        }else{
-                            main.on(BwTableModule.EVT_READY, () => {
-                                addBtn()
-                            });
-                        }
-                    }
+                    
+                    !sys.isMb && query.toggleCancle();
                 })
+            }else{
+                this.tableModule = new NewTableModule({
+                    bwEl: bwTableEl,
+                    container: this.container
+                });
             }
             if(bwTableEl.autoRefresh) {
                 sys.window.wake("wake", null);
@@ -242,10 +259,19 @@ export class BwTableElement extends Component{
             new asyn.AsynQuery(asynData);
         })
     }
+    refresh(){
+        let inputs = this._inputs || (this.queryModule && this.queryModule.Inputs);
+        if(inputs && inputs.isMatch){
+            return inputs.refresh();
+        }else{
+            return this.tableModule && this.tableModule.refresh();
+        }
+    }
 
+    protected _inputs: Inputs;
     private inputs(inputs,line){
         require(['Inputs'], (i) => {
-            new i.Inputs({
+            this._inputs = new i.Inputs({
                 inputs: inputs,
                 container: this.container,
                 locationLine : line,

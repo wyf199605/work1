@@ -11,6 +11,7 @@ import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
 import {MobileScan} from "../mobileScan/MobileScan";
 import {BwMainTableModule} from "../table/BwMainTable";
+import {Inputs} from "../inputs/inputs";
 
 export interface QueryModulePara{
     qm: IBw_Query,
@@ -127,12 +128,16 @@ export abstract class QueryModule {
         }
     }
 
+    protected _inputs: Inputs;
+    get Inputs(){
+        return this._inputs;
+    }
     private inputs(inputs){
         if(!inputs){
             return;
         }
         require(['Inputs'], (i) => {
-            new i.Inputs({
+            this.inputs = new i.Inputs({
                 inputs: inputs,
                 container: this.para.container,
                 table : () => {

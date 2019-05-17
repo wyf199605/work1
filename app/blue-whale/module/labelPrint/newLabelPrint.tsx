@@ -195,13 +195,26 @@ export class NewLabelPrint {
 
     getDefaultProp(): obj {
         // 获取默认数据
-        let defaultVal = {};
+        let defaultVal;
         try {
             defaultVal = JSON.parse(this.ui.printSetting);
         } catch (e) {
             console.log(e);
         }
-        console.log(defaultVal);
+        if(tools.isEmpty(defaultVal)){
+            defaultVal = {
+                printer: 0,
+                port: 25,
+                paper: '210.0*297.0',
+                labelType: 0,
+                up: 0,
+                down: 0,
+                left: 0,
+                right: 0,
+                rowSpace: 10,
+                colSpace: 10,
+            };
+        }
         return defaultVal;
     }
 

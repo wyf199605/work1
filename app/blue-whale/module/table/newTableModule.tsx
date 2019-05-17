@@ -1,24 +1,24 @@
 /// <amd-module name="newTableModule"/>
-import {BwRule} from "../../common/rule/BwRule";
-import {BwMainTableModule} from "./BwMainTable";
-import {FastTable} from "../../../global/components/newTable/FastTable";
-import {BwSubTableModule} from "./BwSubTableModule";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {MbPage} from "../../../global/components/view/mbPage/MbPage";
+import { BwRule } from "../../common/rule/BwRule";
+import { BwMainTableModule } from "./BwMainTable";
+import { FastTable } from "../../../global/components/newTable/FastTable";
+import { BwSubTableModule } from "./BwSubTableModule";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { MbPage } from "../../../global/components/view/mbPage/MbPage";
 import d = G.d;
 import tools = G.tools;
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {InputBox} from "../../../global/components/general/inputBox/InputBox";
-import {Button, IButton} from "../../../global/components/general/button/Button";
+import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
+import { InputBox } from "../../../global/components/general/inputBox/InputBox";
+import { Button, IButton } from "../../../global/components/general/button/Button";
 import CONF = BW.CONF;
-import {Loading} from "../../../global/components/ui/loading/loading";
-import {BwTableModule} from "./BwTableModule";
-import {EditModule} from "../edit/editModule";
-import {FastTableCell} from "../../../global/components/newTable/FastTableCell";
+import { Loading } from "../../../global/components/ui/loading/loading";
+import { BwTableModule } from "./BwTableModule";
+import { EditModule } from "../edit/editModule";
+import { FastTableCell } from "../../../global/components/newTable/FastTableCell";
 import IComponentPara = G.IComponentPara;
-import {ITab, Tab} from "../../../global/components/ui/tab/tab";
-import {FormCom} from "../../../global/components/form/basic";
-import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
+import { ITab, Tab } from "../../../global/components/ui/tab/tab";
+import { FormCom } from "../../../global/components/form/basic";
+import { TableDataCell } from "../../../global/components/newTable/base/TableCell";
 import AGroupTabItem = BW.AGroupTabItem;
 import IGroupTabItemPara = BW.IGroupTabItemPara;
 
@@ -28,19 +28,19 @@ export interface ITableModulePara extends IGroupTabItemPara {
     data?: obj[];
 }
 
-export class NewTableModule extends AGroupTabItem{
+export class NewTableModule extends AGroupTabItem {
 
     static EVT_DATA_GET = "__event_data_get__";
 
     static EVT_EDIT_SAVE = "__event_edit_save__";
-    wrapperInit(){
+    wrapperInit() {
         return null;
     }
 
-    get btnWrapper(){
+    get btnWrapper() {
         return this.main.btnWrapper;
     }
-    getData(){
+    getData() {
         return this.main.ftable.selectedPreRowData || null;
     }
     onDataChange;
@@ -68,17 +68,17 @@ export class NewTableModule extends AGroupTabItem{
 
     constructor(para: ITableModulePara) {
         super(para);
-        // console.log(para);
+        console.log(para, '----------------------');
         this.bwEl = para.bwEl;
         this.showSubField = para.bwEl.showSubField;
         this._defaultData = para.data || null;
         this.subTabActiveIndex = 0;
         let subUi = this.bwEl.subTableList,
-            {mainParam, subParam} = getMainSubVarList(para.bwEl.tableAddr);
+            { mainParam, subParam } = getMainSubVarList(para.bwEl.tableAddr);
         // this.mainEditable = !!mainVarList;
         // this.subEditable = !!subVarList;
         this.editable = !!(mainParam || (subUi && subParam));
-        if(this.bwEl.uiType === 'templ_single'){
+        if (this.bwEl.uiType === 'templ_single') {
             this.editType = 'self';
             this.editable = false;
         }
@@ -102,15 +102,15 @@ export class NewTableModule extends AGroupTabItem{
             if (this.editType === 'linkage' && this.editable) {
                 this.initEdit(main);
                 this.active.onChange = (isMain) => {
-                    if(isMain){
-                        if(this.main.ftable.editing)
+                    if (isMain) {
+                        if (this.main.ftable.editing)
                             this.main.modify.end();
-                    }else{
+                    } else {
                         let sub = this.sub[this.subTabActiveIndex];
                         sub && sub.ftable.editing && sub.modify.end();
                     }
                 }
-            }else if(this.editType === 'self' && this.main.editParam){
+            } else if (this.editType === 'self' && this.main.editParam) {
                 this.initEdit(main);
             }
             let box = tools.keysVal(this.main, 'subBtns', 'box');
@@ -128,10 +128,10 @@ export class NewTableModule extends AGroupTabItem{
                 let tabWrapper: HTMLElement = null;
                 if (!tools.isMb) {
                     if (tools.isEmpty(this.dragLine)) {
-                        this.dragLine = <div className="drag-line"/>;
+                        this.dragLine = <div className="drag-line" />;
                         d.append(container, this.dragLine);
                     }
-                    tabWrapper = <div className="sub-table-tab-wrapper"/>;
+                    tabWrapper = <div className="sub-table-tab-wrapper" />;
                     d.append(container, tabWrapper);
                 } else {
                     this.subModal = modal = new Modal({
@@ -195,7 +195,14 @@ export class NewTableModule extends AGroupTabItem{
                     pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                     firstRow.selected = true;
                     let noLoadSub = this.noLoadSub(mftable, main);
+
                     if (tools.isEmpty(this.tab)) {
+                    
+                        // if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
+                        //     //console.log("不显示tab")
+                        // } else {
+
+                        // }
                         this.tab = new Tab({
                             panelParent: tabWrapper,
                             tabParent: tabWrapper,
@@ -205,7 +212,7 @@ export class NewTableModule extends AGroupTabItem{
                                 let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
                                     ajaxData = Object.assign({}, main.ajaxData, BwRule.varList(this.bwEl.subTableList[this.subTabActiveIndex].dataAddr.varList, selectedData));
                                 if (!tools.isNotEmpty(this.sub[index])) {
-                                    let {subParam} = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
+                                    let { subParam } = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
                                         subUi = this.bwEl.subTableList[index];
 
@@ -224,7 +231,7 @@ export class NewTableModule extends AGroupTabItem{
                                 }
                             }
                         });
-
+                       
                         !tools.isMb && !this.subIconWrapper && this.initSubIcon();
                     }
                     this.tab.len <= 0 && this.bwEl.subTableList.forEach((sub) => {
@@ -239,15 +246,23 @@ export class NewTableModule extends AGroupTabItem{
                     } else {
                         this.subWrapper.classList.remove('hide');
                     }
+                    let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
+                    if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
+                        // this.tab.setTabsShow([]);
+                        this.subWrapper.classList.add('hide');
+                    }
                     setTimeout(() => {
-                        // this.subRefresh(firstRow.data);
+                        
                         if (isFirst && !noLoadSub) {
                             let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
-                            if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
-                                let showSubSeq = selectedData[this.showSubField].split(',');
-                                this.tab.setTabsShow(showSubSeq);
-                                this.tab.active(parseInt(showSubSeq[0]) - 1);
-                                parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
+                            if (tools.isNotEmpty(this.showSubField)) {
+                                if (tools.isNotEmpty(selectedData[this.showSubField])) {
+                                    let list = selectedData[this.showSubField].split(',');
+                                    let showSubSeq = this.computedIndex(list);
+                                    this.tab.setTabsShow(showSubSeq);
+                                    this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
+                                }
                             } else {
                                 this.tab.active(0);
                                 this.currentSelectedIndexes.push(0);
@@ -261,16 +276,16 @@ export class NewTableModule extends AGroupTabItem{
                 let self = this;
                 mftable.click.add('.section-inner-wrapper.pseudo-table tbody tr[data-index]', function () {
                     let subTables = Object.values(self.sub);
-                    if(subTables.some((table) => table.ftable.editing)){
+                    if (subTables.some((table) => table.ftable.editing)) {
                         Modal.confirm({
                             msg: '是否保存正在编辑的子表的数据？',
                             callback: (flag) => {
                                 let editSubTables = subTables.filter((table) => table.ftable.editing);
-                                if(flag){
+                                if (flag) {
                                     Promise.all(editSubTables.map((table) => {
                                         return self.editManage.save(table);
                                     }))
-                                }else{
+                                } else {
                                     editSubTables.forEach((table) => {
                                         self.editManage.end(table);
                                     });
@@ -280,13 +295,13 @@ export class NewTableModule extends AGroupTabItem{
                                 }
                             }
                         })
-                    }else{
+                    } else {
                         let rowIndex = parseInt(this.dataset.index);
                         self.currentSelectedIndexes = [];
                         self.subRefreshByIndex(rowIndex);
                     }
                 });
-            }else{
+            } else {
                 let self = this;
                 main.ftable.click.add('.section-inner-wrapper.pseudo-table tbody tr[data-index]', function () {
                     let rowIndex = parseInt(this.dataset.index);
@@ -302,17 +317,35 @@ export class NewTableModule extends AGroupTabItem{
 
                 this.autoEdit && setTimeout(() => {
                     editBtn &&
-                    editBtn.wrapper &&
-                    editBtn.wrapper.click();
+                        editBtn.wrapper &&
+                        editBtn.wrapper.click();
                 }, 600);
                 this.autoEdit = false;
                 this.off(NewTableModule.EVT_DATA_GET, handler);
             });
         };
     }
-   
+    private computedIndex(list) {
+        console.log("配置选项" + list);
+        let showSubSeq = [];
+        let bwEl = this.bwEl;
+        console.log(bwEl.subTableList);
+        list.forEach((item) => {
+            bwEl.subTableList.forEach((child, index) => {
+                if (child.itemId == item) {
+                    showSubSeq.push(index + 1)
+                }
+            })
+
+        })
+        console.log("输出选项" + showSubSeq)
+        if(showSubSeq.length>0&&this.subWrapper.classList.contains('hide')){
+            this.subWrapper.classList.remove('hide');
+        }
+        return showSubSeq;
+    }
     protected subIconWrapper: HTMLElement = null;
-    protected initSubIcon(){
+    protected initSubIcon() {
         let navbar = d.query('ul.nav-tabs', this.subWrapper),
             maxIcon,
             minIcon,
@@ -320,9 +353,9 @@ export class NewTableModule extends AGroupTabItem{
         navbar.classList.add('sub-tab-navbar');
 
         let iconWrapper = this.subIconWrapper = <div className="sub-icon-navbar">
-            {maxIcon = <i title="最大化" className="fa fa-expand sub-icon"/>}
-            {minIcon = <i title="最小化" className="iconfont icon-zuixiaohua sub-icon"/>}
-            {btnShowIcon = <i title="点击隐藏按钮" className="iconfont icon-arrow-up sub-icon"/>}
+            {maxIcon = <i title="最大化" className="fa fa-expand sub-icon" />}
+            {minIcon = <i title="最小化" className="iconfont icon-zuixiaohua sub-icon" />}
+            {btnShowIcon = <i title="点击隐藏按钮" className="iconfont icon-arrow-up sub-icon" />}
         </div>;
         d.append(this.subWrapper, iconWrapper);
 
@@ -388,7 +421,9 @@ export class NewTableModule extends AGroupTabItem{
         if (row && row.selected) {
             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(row.data[this.showSubField])) {
                 pseudoTable && pseudoTable.setPresentSelected(index);
-                let showSubSeq = row.data[this.showSubField].split(',');
+                // let showSubSeq = row.data[this.showSubField].split(',');
+                let list = row.data[this.showSubField].split(',');
+                let showSubSeq = this.computedIndex(list);
                 this.tab.setTabsShow(showSubSeq);
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
                 this.tab.active(parseInt(showSubSeq[0]) - 1);
@@ -409,7 +444,7 @@ export class NewTableModule extends AGroupTabItem{
     }
 
     private noLoadSub(mftable, main) {
-        if(tools.isEmpty(this.bwEl.subTableList)){
+        if (tools.isEmpty(this.bwEl.subTableList)) {
             return true;
         }
         let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {}),
@@ -435,7 +470,7 @@ export class NewTableModule extends AGroupTabItem{
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
             let seqIndex = parseInt(showSubSeq[0]) - 1;
-            if(tools.isEmpty(this.sub[seqIndex])){
+            if (tools.isEmpty(this.sub[seqIndex])) {
                 this.subTabActiveIndex = seqIndex;
             }
         }
@@ -452,7 +487,9 @@ export class NewTableModule extends AGroupTabItem{
         delete ajaxData['queryoptionsparam'];
         this.mobileModal && (this.mobileModal.isShow = true);
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
-            let showSubSeq = selectedData[this.showSubField].split(',');
+            // let showSubSeq = selectedData[this.showSubField].split(',');
+            let list = selectedData[this.showSubField].split(',');
+            let showSubSeq = this.computedIndex(list);
             this.tab.setTabsShow(showSubSeq);
             this.currentSelectedIndexes.push(this.subTabActiveIndex);
             let subs = [];
@@ -469,6 +506,7 @@ export class NewTableModule extends AGroupTabItem{
                 this.tab.active(this.subTabActiveIndex);
             }
         } else {
+            this.subWrapper.classList.add('hide');
             Object.values(this.sub).forEach((subTable) => {
                 promise.push(subTable.refresh(ajaxData).catch());
                 subTable.linkedData = selectedData;
@@ -476,7 +514,7 @@ export class NewTableModule extends AGroupTabItem{
         }
         return Promise.all(promise).then((arr) => {
             Object.values(this.sub).forEach((subTable) => {
-                if(subTable.isPivot){
+                if (subTable.isPivot) {
                     this.initEdit(subTable);
                 }
             });
@@ -488,7 +526,7 @@ export class NewTableModule extends AGroupTabItem{
     private subWrapper: HTMLElement = null;
 
     subInit(ui: IBW_Table, editParam: IBW_TableAddrParam, rowData: obj, ajaxData?: obj, tabEl?: HTMLElement) {
-        if(ui.tableAddr && ui.tableAddr.param && ui.tableAddr.param[0]){
+        if (ui.tableAddr && ui.tableAddr.param && ui.tableAddr.param[0]) {
             editParam = ui.tableAddr.param[0];
         }
         let subTable = this.sub[this.subTabActiveIndex] = new BwSubTableModule({
@@ -502,13 +540,13 @@ export class NewTableModule extends AGroupTabItem{
         });
 
         subTable.onFtableReady = () => {
-            subTable.onFtableReady = () => {};
+            subTable.onFtableReady = () => { };
             subTable.linkedData = rowData;
-            if(this.editType === 'self'){
+            if (this.editType === 'self') {
                 this.initEdit(subTable);
-            }else if(this.editType === 'linkage'){
+            } else if (this.editType === 'linkage') {
                 subTable.modify.init(this.main.modify.box, !(this.active.isMain || this.editManage.editing));
-                if(this.editManage.editing && !this.main.ftable.editing){
+                if (this.editManage.editing && !this.main.ftable.editing) {
                     let handler;
                     subTable.ftable.on(FastTable.EVT_RENDERED, handler = () => {
                         this.editManage.start(this.sub[this.subTabActiveIndex]);
@@ -528,8 +566,8 @@ export class NewTableModule extends AGroupTabItem{
             mouseMoveHandler = null,
             mouseUpHandler = null;
         return {
-            set subHeight(height: number){
-                if(mainWrapper && subWrapper){
+            set subHeight(height: number) {
+                if (mainWrapper && subWrapper) {
                     mainHeight = mainHeight + subHeight - height;
                     subHeight = height;
                     mainWrapper.style.height = mainHeight + 'px';
@@ -606,10 +644,10 @@ export class NewTableModule extends AGroupTabItem{
         });
     }
 
-    protected initEdit(bwTable: BwTableModule){
+    protected initEdit(bwTable: BwTableModule) {
         let time = 500;
-        if((this.editType === 'self' && tools.isNotEmpty(bwTable.editParam)) ||
-            (this.editType === 'linkage' && this.editable)){
+        if ((this.editType === 'self' && tools.isNotEmpty(bwTable.editParam)) ||
+            (this.editType === 'linkage' && this.editable)) {
             let editBtnData = [
                 // {
                 //     key: 'modal-edit',
@@ -655,9 +693,9 @@ export class NewTableModule extends AGroupTabItem{
                     key: 'del',
                     content: '删除',
                     onClick: tools.pattern.throttling(() => {
-                        if(this.active.isMain && this.bwEl.subTableList && this.bwEl.subTableList.length === 1){
+                        if (this.active.isMain && this.bwEl.subTableList && this.bwEl.subTableList.length === 1) {
                             let sub = this.sub[0];
-                            if(sub && sub.ftable.data.length !== 0){
+                            if (sub && sub.ftable.data.length !== 0) {
                                 Modal.alert('不能删除有子表明细的数据');
                                 return;
                             }
@@ -703,17 +741,17 @@ export class NewTableModule extends AGroupTabItem{
             if (flag) {
                 editing = false;
                 this.active.on();
-                if(this.main.editParam){
+                if (this.main.editParam) {
                     this.main.modify.isCanEdit = flag;
                     this.main.modify.box.disabled = false;
                 }
                 this.tab && this.tab.panelContainer.classList.remove('disabled');
             } else {
                 editing = true;
-                switch (this.editType){
+                switch (this.editType) {
                     case 'self':
                         if (bwTable.modify.box !== this.main.modify.box) {
-                            if(this.main.editParam){
+                            if (this.main.editParam) {
                                 this.main.modify.box.disabled = true;
                                 this.main.modify.isCanEdit = flag;
                             }
@@ -733,7 +771,7 @@ export class NewTableModule extends AGroupTabItem{
 
         let getTables = (bwTable: BwTableModule, isMain = true): BwTableModule[] => {
             let tables: BwTableModule[] = [];
-            switch (this.editType){
+            switch (this.editType) {
                 case 'self':
                     tables = [bwTable];
                     break;
@@ -755,25 +793,25 @@ export class NewTableModule extends AGroupTabItem{
                         param: [] as obj[]
                     };
                     data.forEach((d) => {
-                        if(tools.isNotEmpty(d)){
+                        if (tools.isNotEmpty(d)) {
                             saveData.param.push(d);
                         }
                     });
-                    if(tools.isEmpty(saveData.param)){
+                    if (tools.isEmpty(saveData.param)) {
                         Modal.toast('没有数据改变');
                         end(bwTable);
                         resolve();
-                        return ;
+                        return;
                     }
 
                     let url;
-                    if(bwTable.ui.tableAddr){
+                    if (bwTable.ui.tableAddr) {
                         url = bwTable.ui.tableAddr.dataAddr
                     }
-                    if(this.bwEl.tableAddr){
+                    if (this.bwEl.tableAddr) {
                         url = this.bwEl.tableAddr.dataAddr;
                     }
-                    if(url){
+                    if (url) {
                         let loading = new Loading({
                             msg: '保存中',
                             disableEl: this.main.wrapper
@@ -781,7 +819,7 @@ export class NewTableModule extends AGroupTabItem{
                         BwRule.Ajax.fetch(CONF.siteUrl + url, {
                             type: 'POST',
                             data: saveData,
-                        }).then(({response}) => {
+                        }).then(({ response }) => {
 
                             BwRule.checkValue(response, saveData, () => {
                                 this.currentSelectedIndexes = [];
@@ -797,7 +835,7 @@ export class NewTableModule extends AGroupTabItem{
                             loading && loading.destroy();
                             loading = null;
                         });
-                    }else{
+                    } else {
                         Modal.alert('保存失败');
                         reject()
                     }
@@ -831,7 +869,7 @@ export class NewTableModule extends AGroupTabItem{
 
         let insert = (bwTable: BwTableModule) => {
             editStatusToggle(bwTable, false);
-            switch (this.editType){
+            switch (this.editType) {
                 case 'self':
                     bwTable.modify.insert();
                     break;
@@ -845,7 +883,7 @@ export class NewTableModule extends AGroupTabItem{
 
         let del = (bwTable: BwTableModule) => {
             editStatusToggle(bwTable, false);
-            switch (this.editType){
+            switch (this.editType) {
                 case 'self':
                     bwTable.modify.delete();
                     break;
@@ -858,13 +896,13 @@ export class NewTableModule extends AGroupTabItem{
         };
 
         let windowControl = (bwTable: BwTableModule) => {
-            switch (this.editType){
-                case 'self':{
+            switch (this.editType) {
+                case 'self': {
                     let ftable = bwTable.ftable;
                     ftable && ftable.dataControl();
                     break;
                 }
-                case 'linkage':{
+                case 'linkage': {
                     let main = this.main,
                         sub = this.sub[this.subTabActiveIndex],
                         table = this.active.isMain ? main : sub;
@@ -874,7 +912,7 @@ export class NewTableModule extends AGroupTabItem{
             }
         };
         return {
-            get editing(){
+            get editing() {
                 return editing
             },
             save,
@@ -886,30 +924,30 @@ export class NewTableModule extends AGroupTabItem{
         }
     })();
 
-    saveData(){
+    saveData() {
         return new Promise((resolve, reject) => {
             let bwTable = this.active.isMain ? this.main : this.sub[this.subTabActiveIndex];
-            if(!bwTable.ftable.editing){
+            if (!bwTable.ftable.editing) {
                 resolve();
                 return
             }
             bwTable.modify.save().then((data) => {
-                if(tools.isEmpty(data)){
+                if (tools.isEmpty(data)) {
                     Modal.toast('没有数据改变');
                     this.editManage.end(bwTable);
                     resolve();
-                }else{
+                } else {
                     Modal.confirm({
                         msg: '数据已修改，是否保存？',
                         callback: (flag) => {
-                            if(flag){
+                            if (flag) {
                                 this.editManage.save(bwTable).then(() => {
                                     resolve()
                                 }).catch(() => {
                                     // Modal.alert('数据保存失败')
                                     reject();
                                 });
-                            }else{
+                            } else {
                                 this.editManage.end(bwTable);
                                 resolve();
                             }
@@ -936,14 +974,14 @@ export class NewTableModule extends AGroupTabItem{
                 isMainActive = true;
                 tools.isFunction(onChange) && onChange(isMainActive);
             });
-           /* this.sub && this.subWrapper.addEventListener('click', handler1 = () => {
-                isMainActive = false;
-                tools.isFunction(onChange) && onChange(isMainActive);
-            }, true);
-            this.main.wrapper.addEventListener('click', handler2 = () => {
-                isMainActive = true;
-                tools.isFunction(onChange) && onChange(isMainActive);
-            }, true)*/
+            /* this.sub && this.subWrapper.addEventListener('click', handler1 = () => {
+                 isMainActive = false;
+                 tools.isFunction(onChange) && onChange(isMainActive);
+             }, true);
+             this.main.wrapper.addEventListener('click', handler2 = () => {
+                 isMainActive = true;
+                 tools.isFunction(onChange) && onChange(isMainActive);
+             }, true)*/
         };
 
         let off = () => {

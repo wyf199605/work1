@@ -22,6 +22,8 @@ import {BwTableModule} from "../../module/table/BwTableModule";
 import CONF = BW.CONF;
 import {DetailModule} from "../../module/detailModule/detailModule";
 import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {QueryModule} from "../../module/query/queryModule";
+import {Inputs} from "../../module/inputs/inputs";
 
 interface IGroupTabsPagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Slave_Ui>
@@ -40,6 +42,7 @@ export class GroupTabsPage extends BasicPage {
     protected main: AGroupTabItem;
     protected subs: AGroupTabItem[] = [];
 
+    protected queryModule: QueryModule;
     protected tab: Tab | Panel;
     protected wrapper: HTMLElement;
     protected subIndexes = [];
@@ -52,7 +55,8 @@ export class GroupTabsPage extends BasicPage {
         this.ui = para.ui.body.elements[0];
         let btns = para.ui.body.subButtons;
         if (Array.isArray(btns)) {
-            this.ui.subButtons = [...btns, ...(this.ui.subButtons || [])]
+            this.ui.subButtons = [...btns, ...(this.ui.subButtons || [])];
+
         }
 
         this.ui.uiType = this.ui.uiType || para.ui.uiType;
@@ -100,7 +104,7 @@ export class GroupTabsPage extends BasicPage {
         });
 
         let bwTableEl = this.ui as IBW_Table,
-            hasQuery = bwTableEl.querier && ([3, 13].includes(bwTableEl.querier.queryType));
+            hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
 
         if(hasQuery) {
             require([queryModuleName], (Query) => {
@@ -141,6 +145,121 @@ export class GroupTabsPage extends BasicPage {
             })
         }
 
+
+        let tableUi: IBW_Detail | IBW_Table = this.ui,
+            isDynamic = tools.isEmpty((tableUi as IBW_Table).cols || tableUi.fields),
+            inputs = tableUi.inputs,
+            line = (tableUi as IBW_Table).scannableLocationLine,
+            querier = tableUi.querier;
+        if(!isDynamic && bwTableEl.scannableField){
+            this.mobileScanInit(bwTableEl);
+        }else if(!isDynamic && inputs && !bwTableEl.scannableField){
+            this.inputs(inputs, line)
+        }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
+            this.locationLine(line, para);
+        }
+    }
+
+    protected _inputs: Inputs;
+    private inputs(inputs,line){
+        let table = this.main;
+        require(['Inputs'], (i) => {
+            this._inputs = new i.Inputs({
+                inputs: inputs,
+                container: this.dom,
+                locationLine : line,
+                table : () => {
+                    if(table instanceof NewTableModule){
+                        return table && table.main.ftable
+                    }else{
+                        return table
+                    }
+                },
+                tableModule : () => {
+                    return table
+                },
+                queryModule : () => {
+                    return this.queryModule;
+                }
+            })
+        });
+
+    }
+    /**
+     * 扫码定位
+     * @param line
+     * @param para
+     */
+    private locationLine(line : string, para){
+        if(tools.isMb){
+            require(['Inputs'], (e) => {
+                new e.KeyStep({
+                    locationLine : line,
+                    callback : (ajaxData) => {
+                        this.rowSelect(line, ajaxData);
+                    }
+                })
+            });
+        }else {
+            let text = '', timer = null;
+            d.on(para.container, 'keydown', (e: KeyboardEvent) => {
+                let handle = () => {
+                        this.rowSelect(line, text);
+                        timer = null;
+                        text = '';
+                    },
+                    code = e.keyCode || e.which || e.charCode;
+                if(code === 13){
+                    handle();
+                }else {
+                    text += e.key;
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                }
+
+                timer = setTimeout(handle, 1000);
+            });
+        }
+
+    }
+    private rowSelect(line, text){
+        if(this.main instanceof NewTableModule){
+            let index = this.main.main.ftable.locateToRow(line, text, true);
+            if(tools.isNotEmpty(index) && this.main.bwEl.subTableList){
+                this.main.subRefreshByIndex(index);
+            }
+        }
+    }
+    private mobileScanInit(ui: IBW_Table) {
+        let field = ui.scannableField;
+        if (tools.isPc) {
+            return;
+        }
+        require(['MobileScan'],  (M) => {
+            new M.MobileScan({
+                container: this.dom,
+                cols: ui.cols,
+                scannableField : field.toUpperCase(),
+                scannableType : ui.scannableType,
+                scannableTime : ui.scannableTime,
+                callback: (ajaxData) => {
+                    let query = this.queryModule,
+                        table = this.main as NewTableModule;
+                    if(query){
+                        query.hide();
+                        return query.search(ajaxData, true)
+                    }else {
+                        return table.refresh(Object.assign(table.main.ajaxData, ajaxData)).then(() => {
+                            let locationLine = ui.scannableLocationLine;
+                            if(locationLine){
+                                table.main.ftable && table.main.ftable.locateToRow(locationLine, ajaxData.mobilescan)
+                            }
+                        })
+                    }
+                }
+            });
+        });
     }
 
     protected isInventory = false;
@@ -297,7 +416,7 @@ export class GroupTabsPage extends BasicPage {
             //     const wrapper = document.getElementsByClassName('keystep')[0];
             //     this.fixedAndMoving(wrapper);
             // }, 500);
-        
+
 
             d.append(this.wrapper, this.imports.footer);
 
@@ -326,7 +445,7 @@ export class GroupTabsPage extends BasicPage {
             });
 
         },
-        
+
         openRfid() {
             Shell.inventory.scan2dOn((result) => {
                 if (result.success) {
@@ -375,7 +494,7 @@ export class GroupTabsPage extends BasicPage {
             if (!this.subUi[0]) {
                 field = {};
             }
-            
+
             Shell.imports.operateScanTable(value+'', option || this.imports.getOption(), this.ui.uniqueFlag,
                 field, this.imports.getTextPara().name, this.imports.getNum(), (result) => {
                     if (result.success) {
@@ -625,6 +744,7 @@ export class GroupTabsPage extends BasicPage {
             }),
             isOpenFirst: true,
             onChange: ({ index, isSelected, item }) => {
+
                 if (isSelected) {
                     let panel = this.tab as Panel;
                     if (this.styleType === 'panel-off') {
@@ -695,7 +815,7 @@ export class GroupTabsPage extends BasicPage {
                     this.subIndexes = [];
                 };
             }
-            
+
             this.main.onRender = () => {
                 if (this.styleType === 'panel-on' && this.tab instanceof Panel) {
                     this.tab.toggleAll(true);
@@ -799,9 +919,15 @@ export class GroupTabsPage extends BasicPage {
 
 
     refresh(ajaxData?){
-        return this.main ? this.main.refresh(ajaxData).then(() => {
-            this.subRefresh();
-        }) : Promise.reject();
+
+        let inputs = this._inputs || (this.queryModule && this.queryModule.Inputs);
+        if(inputs && inputs.isMatch){
+            return inputs.refresh();
+        }else{
+            return this.main ? this.main.refresh(ajaxData).then(() => {
+                this.subRefresh();
+            }) : Promise.reject();
+        }
     }
     /**
      * @author WUML

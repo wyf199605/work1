@@ -57,6 +57,7 @@ export class DetailItem extends Component{
             BwRule.DT_UNI_FILE,
             BwRule.DT_UNI_MUL_IMAGE,
             BwRule.DT_UNI_IMAGE,
+            BwRule.DT_TEXT_AREA,
         ].indexOf(dataType);
     }
 

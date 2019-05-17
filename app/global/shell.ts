@@ -53,7 +53,7 @@ namespace G {
                 return ShellBase.handler('getSignImg', { type, image }, back);
             },
             wxShare(data: string) {
-                return ShellBase.handler('wxShare', { data },()=>{});
+                return ShellBase.handler('wxShare', { data }, () => { });
             },
             testAPI(data: string, back: IShellEventHandler, info: IShellEventHandler) {
                 return ShellBase.handler('testAPI', { data }, back, info);
@@ -491,10 +491,10 @@ namespace G {
         };
         function getScanData(uniqueFlag: string): IShellResult;
         function getScanData(uniqueFlag: string, back: IShellEventHandler): boolean;
-        function getScanData(uniqueFlag, back?){
-            if(typeof back === 'function'){
+        function getScanData(uniqueFlag, back?) {
+            if (typeof back === 'function') {
                 return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag }, back);
-            }else{
+            } else {
                 return ShellBase.handler('getScanData', { uniqueFlag: uniqueFlag });
             }
         }
@@ -537,6 +537,10 @@ namespace G {
         };
 
         const image = {
+            //是否能打开文件
+            upLoadFile(back: IShellEventHandler){
+                ShellBase.handler('upLoadFile', {}, back)
+            },
             // 拍照
             photograph(callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
                 this.getImg(0, callback, error);
@@ -590,7 +594,7 @@ namespace G {
             },
             // 保存图片至本地
             saveImg(img: string) {
-                return ShellBase.handler('saveImg', { img },()=>{})
+                return ShellBase.handler('saveImg', { img }, () => { })
             },
             // 移动端下载图片
             downloadImg(url: string, back: IShellEventHandler) {
@@ -644,7 +648,15 @@ namespace G {
             //是否支持指纹
             isSupportFinger(back?: IShellEventHandler) {
                 return ShellBase.handler('isSupportFinger', {}, back)
-            }
+            },
+            //存数据
+            putData(data: string, back?: IShellEventHandler) {
+                return ShellBase.handler('putData', data)
+            },
+            //取数据
+            getData(back?: IShellEventHandler) {
+                return ShellBase.handler('getData',{})
+            },
         }
         return {
             other, base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem, clearCache, network
@@ -670,7 +682,7 @@ namespace G {
     }
     interface IShellHandler {
         (action: string, data: obj | string): IShellResult;
-        (action: string, data: obj | string, back: IShellEventHandler, infor?: IShellEventHandler, isAutoOff?: boolean): boolean | {on: Function, off: Function};
+        (action: string, data: obj | string, back: IShellEventHandler, infor?: IShellEventHandler, isAutoOff?: boolean): boolean | { on: Function, off: Function };
 
     }
 
