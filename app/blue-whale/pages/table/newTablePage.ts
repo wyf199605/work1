@@ -169,16 +169,49 @@ export class BwTableElement extends Component{
             });
         } else {
 
-            this.tableModule = new NewTableModule({
-                bwEl: bwTableEl,
-                container: this.container
-            });
+          
 
             if(hasQuery) {
                 require([queryModuleName], (Query) => {
-                    this.queryModule = new Query({
+                    let query = this.queryModule = new Query({
                         qm: bwTableEl.querier,
                         refresher: (ajaxData) => {
+                            if(!this.tableModule){
+                                this.tableModule = new NewTableModule({
+                                    bwEl: bwTableEl,
+                                    container: this.container
+                                });
+                                
+                                !sys.isMb && query.toggleCancle();
+                                if(tools.isMb) {
+                                    //打开查询面板
+                                    d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
+                                        this.queryModule.show();
+                                    });
+                                } else {
+            
+                                    let main = this.tableModule.main;
+                                    let addBtn = () => {
+                                        main.ftable.btnAdd('query', {
+                                            content: '查询器',
+                                            type: 'default',
+                                            icon: 'shaixuan',
+                                            onClick: () => {this.queryModule.show()}
+                                        }, 0);
+                                    };
+                                    // if( bwTableEl.querier.queryType===1&&bwTableEl.querier.autTag===1){
+                                    //     main.wrapper.style.visibility='hidden';
+                                      
+                                    // }
+                                    if(main.ftable){
+                                        addBtn()
+                                    }else{
+                                        main.on(BwTableModule.EVT_READY, () => {
+                                            addBtn()
+                                        });
+                                    }
+                                }
+                            }
                             return this.tableModule.refresh(ajaxData).then(() => {
                                 let locationLine = bwTableEl.scannableLocationLine;
                                 if(locationLine && ajaxData.mobilescan){
@@ -191,30 +224,14 @@ export class BwTableElement extends Component{
                         container: this.container,
                         tableGet: () => this.tableModule.main
                     });
-                    if(tools.isMb) {
-                        //打开查询面板
-                        d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
-                            this.queryModule.show();
-                        });
-                    } else {
-                        let main = this.tableModule.main;
-                        let addBtn = () => {
-                            main.ftable.btnAdd('query', {
-                                content: '查询器',
-                                type: 'default',
-                                icon: 'shaixuan',
-                                onClick: () => {this.queryModule.show()}
-                            }, 0);
-                        };
-                        if(main.ftable){
-                            addBtn()
-                        }else{
-                            main.on(BwTableModule.EVT_READY, () => {
-                                addBtn()
-                            });
-                        }
-                    }
+                    
+                    !sys.isMb && query.toggleCancle();
                 })
+            }else{
+                this.tableModule = new NewTableModule({
+                    bwEl: bwTableEl,
+                    container: this.container
+                });
             }
             if(bwTableEl.autoRefresh) {
                 sys.window.wake("wake", null);
