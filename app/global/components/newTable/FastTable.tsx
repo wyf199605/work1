@@ -54,6 +54,7 @@ export interface IFastTablePara extends IComponentPara {
     dragCol?: boolean; // 列拖动
     isWrapLine?: boolean; // 是否换行，默认false
     isLockRight?: boolean; // 是否右侧锁列，默认否
+    autoEdit?: false | ITableEditInitPara;
     dataAction?: (data: obj, type: 'show' | 'edit' | 'insert', callback?: (data: obj) => void) => void;
 }
 

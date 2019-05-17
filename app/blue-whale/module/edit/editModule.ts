@@ -417,7 +417,8 @@ export class EditModule {
         textarea: (p) => {
             return new TextAreaInput({
                 container: p.dom,
-                custom: p.field
+                custom: p.field,
+                autoHeight: true
             });
         }
 
