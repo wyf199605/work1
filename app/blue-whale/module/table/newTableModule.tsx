@@ -198,9 +198,9 @@ export class NewTableModule extends AGroupTabItem {
 
                     if (tools.isEmpty(this.tab)) {
                         let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
-                        if (tools.isNotEmpty(this.showSubField)&&tools.isEmpty(selectedData[this.showSubField])) {
-                          //console.log("不显示tab")
-                        }else{
+                        if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
+                            //console.log("不显示tab")
+                        } else {
                             this.tab = new Tab({
                                 panelParent: tabWrapper,
                                 tabParent: tabWrapper,
@@ -213,7 +213,7 @@ export class NewTableModule extends AGroupTabItem {
                                         let { subParam } = getMainSubVarList(this.bwEl.tableAddr, this.bwEl.subTableList[index].itemId),
                                             tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
                                             subUi = this.bwEl.subTableList[index];
-    
+
                                         this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
                                         this.currentSelectedIndexes.push(index);
                                     } else {
@@ -230,7 +230,7 @@ export class NewTableModule extends AGroupTabItem {
                                 }
                             });
                         }
-                      
+
 
                         !tools.isMb && !this.subIconWrapper && this.initSubIcon();
                     }
@@ -252,16 +252,7 @@ export class NewTableModule extends AGroupTabItem {
                             if (tools.isNotEmpty(this.showSubField)) {
                                 if (tools.isNotEmpty(selectedData[this.showSubField])) {
                                     let list = selectedData[this.showSubField].split(',');
-                                    let bwEl = this.bwEl;
-                                    let showSubSeq = [];
-                                    list.forEach((item) => {
-                                        bwEl.subTableList.forEach((child, index) => {
-                                            if (child.itemId == item) {
-                                                showSubSeq.push(index + 1)
-                                            }
-                                        })
-
-                                    })
+                                    let showSubSeq = this.computedIndex(list);
                                     this.tab.setTabsShow(showSubSeq);
                                     this.tab.active(parseInt(showSubSeq[0]) - 1);
                                     parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
@@ -328,7 +319,22 @@ export class NewTableModule extends AGroupTabItem {
             });
         };
     }
+    private computedIndex(list) {
+     //   console.log("配置选项"+list);
+        let showSubSeq = [];
+        let bwEl = this.bwEl;
+        // console.log(bwEl.subTableList);
+        list.forEach((item) => {
+            bwEl.subTableList.forEach((child, index) => {
+                if (child.itemId == item) {
+                    showSubSeq.push(index + 1)
+                }
+            })
 
+        })
+        // console.log("输出选项"+showSubSeq)
+        return showSubSeq;
+    }
     protected subIconWrapper: HTMLElement = null;
     protected initSubIcon() {
         let navbar = d.query('ul.nav-tabs', this.subWrapper),
@@ -408,17 +414,7 @@ export class NewTableModule extends AGroupTabItem {
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 // let showSubSeq = row.data[this.showSubField].split(',');
                 let list = row.data[this.showSubField].split(',');
-                let bwEl = this.bwEl;
-                let showSubSeq = [];
-                list.forEach((item) => {
-                    bwEl.subTableList.forEach((child, index) => {
-                        if (child.itemId == item) {
-                            showSubSeq.push(index + 1)
-                        }
-                    })
-
-                })
-                console.log(showSubSeq)
+                let showSubSeq = this.computedIndex(list);
                 this.tab.setTabsShow(showSubSeq);
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
                 this.tab.active(parseInt(showSubSeq[0]) - 1);
@@ -484,18 +480,7 @@ export class NewTableModule extends AGroupTabItem {
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             // let showSubSeq = selectedData[this.showSubField].split(',');
             let list = selectedData[this.showSubField].split(',');
-
-            let bwEl = this.bwEl;
-            let showSubSeq = [];
-            list.forEach((item) => {
-                bwEl.subTableList.forEach((child, index) => {
-                    if (child.itemId == item) {
-                        showSubSeq.push(index + 1)
-                    }
-                })
-
-            })
-            console.log(showSubSeq)
+            let showSubSeq = this.computedIndex(list);
             this.tab.setTabsShow(showSubSeq);
             this.currentSelectedIndexes.push(this.subTabActiveIndex);
             let subs = [];
