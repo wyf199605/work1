@@ -2,14 +2,24 @@
 import { BwRule } from "../rule/BwRule";
 import CONF = BW.CONF;
 import sys = BW.sys;
+import { QrCode } from "../../../global/utils/QRCode";
 
 /**
 * 二维码分享扫码
 */
 export class ShareCode {
+    url: string;
+    data: object;
+    queryParams0: string;
 
     constructor() {
-        this.shareCode();
+        this.url = sessionStorage.getItem('tableUrl');
+        this.queryParams0 = sessionStorage.getItem('queryParams0');
+        
+        // this.shareCode();
+        // this.url = url;
+        // this.data = data;
+        // this.queryParams = queryParams;
     }
     shareCode() {
         let _this = this;
@@ -62,7 +72,6 @@ export class ShareCode {
 
             if (response.errorCode === 0) {
                 console.log(code);
-
                 BwRule.Ajax.fetch(CONF.siteUrl + response.next.url, {
                     data: {
                         [response.next.vars[0]]: code
@@ -71,7 +80,7 @@ export class ShareCode {
                 }).then(({ response }) => {
                     console.log('test', response);
                     // sys.window.opentab(void 0, void 0, noShow);
-                    let lockKey: string, hidden: [];
+                    let lockKey: string, hidden;
 
                     response.dataArr.forEach((col, index) => {
                         switch (col.NAME) {
@@ -105,4 +114,8 @@ export class ShareCode {
             }
         });
     }
+    generateCode() {
+
+    }
+    
 }

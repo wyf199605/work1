@@ -134,8 +134,15 @@ namespace BW {
                         this.open(o)
                     },100);
                 },
+                /**
+                 * 系统打开main（除了头部和菜单部分）的显示部分
+                 * @param o 保存url的对象
+                 * @param refer 
+                 */
                 open: function (o: winOpen, refer?: string) {
                     let url = o.url;
+                    console.log(url);
+                    sessionStorage.setItem('tableUrl',url);
                     if (self.inMain) {
                         let isNew = self.pages.open(o),
                             isNotBtl = url.indexOf('newPage') > -1;

@@ -36,6 +36,7 @@ import {NewIDB} from "../../../global/NewIDB";
 import {Datetime} from "../../../global/components/form/datetime/datetime";
 import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
 import {BwTableEditModule} from "./BwTableEditModule";
+import { ShareCode } from '../../common/share-code/shareCode';
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -442,6 +443,17 @@ export class BwTableModule extends Component {
                 require(['RfidSetting'], function (RfidSetting) {
                     new RfidSetting.RfidSettingModal();
                 });
+            },
+        });
+        let _this = this;
+        this.ftable.btnAdd('shareCode', {
+            type: 'default',
+            content: '二维码分享',
+            onClick: () => {
+                console.log('二维码分享',ui);
+                // console.log(this);
+                // new ShareCode();
+
             },
         });
 

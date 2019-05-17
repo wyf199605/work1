@@ -225,12 +225,12 @@ export class ButtonAction {
                     Modal.alert('buttonType不在0-3之间, 找不到请求类型!');
                     return;
                 }
-                if(btn.subType === 'shareCode') {
-                    this.genetateQrCode(btn, dataObj, addr, url).then((response)=> {
-                        callback(response);
-                    });
-                    return ;
-                }
+                // if(btn.subType === 'shareCode') {
+                //     this.genetateQrCode(btn, dataObj, addr, url).then((response)=> {
+                //         callback(response);
+                //     });
+                //     return ;
+                // }
                 self.checkAction(btn, dataObj, addr, ajaxType, res, url).then(response => {
                     callback(response);
                     self.btnRefresh(btn.refresh, url);
@@ -473,53 +473,53 @@ export class ButtonAction {
         })
 
     }
-    /**
-     * 
-     * @param url 
-     * @param msg 
-     * @param callback 
-     */
-    private genetateQrCode(btn: R_Button, dataArr: any, addr: string, url: string): Promise<any> {
-        let subUrl =  `?addr=${encodeURIComponent(url.split('sf')[1])}`;
-        let dataList = dataArr.map(item => {
-            return Object.values(item);
-        });
-        console.log(dataList[0]);
-        let meta = dataArr.length ? Object.keys(dataArr[0]) : {};
-        console.log(dataList);
-        let body = {
-            bodyList: [
-                {
-                    dataList,
-                    dataType: -1,
-                    meta
-                }
-            ]
-        }
-        // let data = encodeURIComponent(body);
+    // /**
+    //  * 
+    //  * @param url 
+    //  * @param msg 
+    //  * @param callback 
+    //  */
+    // private genetateQrCode(btn: R_Button, dataArr: any, addr: string, url: string): Promise<any> {
+    //     let subUrl =  `?addr=${encodeURIComponent(url.split('sf')[1])}`;
+    //     let dataList = dataArr.map(item => {
+    //         return Object.values(item);
+    //     });
+    //     console.log(dataList[0]);
+    //     let meta = dataArr.length ? Object.keys(dataArr[0]) : {};
+    //     console.log(dataList);
+    //     let body = {
+    //         bodyList: [
+    //             {
+    //                 dataList,
+    //                 dataType: -1,
+    //                 meta
+    //             }
+    //         ]
+    //     }
+    //     // let data = encodeURIComponent(body);
 
-        return new Promise((resolve,reject) => {
-            BwRule.Ajax.fetch(BW.CONF.siteUrl + addr + subUrl , {
-                data2url: btn.actionAddr.varType !== 3,
-                type: 'POST',
-                data: body,
-                needGps: btn.actionAddr.needGps
+    //     return new Promise((resolve,reject) => {
+    //         BwRule.Ajax.fetch(BW.CONF.siteUrl + addr + subUrl , {
+    //             data2url: btn.actionAddr.varType !== 3,
+    //             type: 'POST',
+    //             data: body,
+    //             needGps: btn.actionAddr.needGps
 
-            }).then(({ response }) => {
-                let dom = `<div id="share-qr-code" >
-                    <button>关闭</button>
-                </div>`
-                let bodyEl = d.query('body');
-                bodyEl.appendChild(d.create(dom));
-                let shareQrCodeEl = d.query("#share-qr-code")
-                QrCode.toCanvas(response.code, 150, 150, shareQrCodeEl);
-                d.query('#share-qr-code button').addEventListener('click', () => {
-                    bodyEl.removeChild(shareQrCodeEl);
-                });
-                resolve(response);
-            });
-        })
-    }
+    //         }).then(({ response }) => {
+    //             let dom = `<div id="share-qr-code" >
+    //                 <button>关闭</button>
+    //             </div>`
+    //             let bodyEl = d.query('body');
+    //             bodyEl.appendChild(d.create(dom));
+    //             let shareQrCodeEl = d.query("#share-qr-code")
+    //             QrCode.toCanvas(response.code, 150, 150, shareQrCodeEl);
+    //             d.query('#share-qr-code button').addEventListener('click', () => {
+    //                 bodyEl.removeChild(shareQrCodeEl);
+    //             });
+    //             resolve(response);
+    //         });
+    //     })
+    // }
 
     progressPopup(url: string, msg: string, callback?: Function) {
         if (url) {
