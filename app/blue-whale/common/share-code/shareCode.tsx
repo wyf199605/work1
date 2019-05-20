@@ -3,6 +3,8 @@ import { BwRule } from "../rule/BwRule";
 import CONF = BW.CONF;
 import sys = BW.sys;
 import { QrCode } from "../../../global/utils/QRCode";
+import { DataManager } from '../../../global/components/DataManager/DataManager';
+import { Paging } from "global/components/navigation/pagination/pagination";
 
 /**
 * 二维码分享扫码
@@ -20,6 +22,7 @@ export class ShareCode {
         // this.url = url;
         // this.data = data;
         // this.queryParams = queryParams;
+        console.log(Paging);
     }
     shareCode() {
         let _this = this;
@@ -116,6 +119,11 @@ export class ShareCode {
     }
     generateCode() {
 
+    }
+    createDomElement(): HTMLDivElement {
+        return  <div>
+            
+        </div>
     }
     
 }

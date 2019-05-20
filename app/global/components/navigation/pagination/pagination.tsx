@@ -664,6 +664,7 @@ export class Paging extends Component {
 
     // 渲染整个paging控件
     protected init() {
+        sessionStorage.setItem('pageparams',JSON.stringify({ index:1, size:50, total:1 }))
         const selectWrapper = <span className="paging-option"></span>,
             inputWrapper = <span className="paging-elevator">跳至<span
                 className="paging-elevator-wrapper"></span>页</span>;
@@ -764,10 +765,17 @@ export class Paging extends Component {
     protected event = ((self) => {
         let enter, blur;
 
+        let pageparams = {
+            index: 1,
+            size: 50,
+            total: 1,
+        }
         // 点击按钮时触发的事件
         function itemClick(e: Event) {
             e.preventDefault();
             let index = this.dataset.index;
+            pageparams.index = index;
+            sessionStorage.setItem('pageparams', JSON.stringify(pageparams));
             if (isNaN(index)) {
                 if (index === 'prev') {
                     self.pagination && self.setCurrent(self.pagination.current - 1);
@@ -783,6 +791,8 @@ export class Paging extends Component {
         // 选择框事件
         function change() {
             let val = parseInt(this.value);
+            pageparams.size = val;
+            sessionStorage.setItem('pageparams', JSON.stringify(pageparams));
             if (self.pageSize !== val) {
                 self.pageSize = val;
             }
