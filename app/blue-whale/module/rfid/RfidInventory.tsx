@@ -124,7 +124,10 @@ export class RfidInventory {
     };
 
     private dataGet(){
-        return Object.assign(this.recentData, {rfidepc : this.epc.join(',')})
+        let obj:any=this.recentData
+        let splitObj={BARCODE:obj.BARCODE};
+        // console.log(Object.assign(splitObj, {rfidepc : this.epc.join(',')}))
+        return Object.assign(splitObj, {rfidepc : this.epc.join(',')})
     }
 
     private scan(value : string){
@@ -167,17 +170,21 @@ export class RfidInventory {
         this.sortEls.forEach( el => {
             let name = el.dataset.name.split(','),
                 value = '';
-            name.forEach((n, i) => {
-                if(n in this.recentData){
-                    if(i !== 0){
-                        value += '-'
-                    }
-                    value += this.recentData[n];
-                }
-            });
+            // name.forEach((n, i) => {
+            //     if(n in this.recentData){
+            //         if(i !== 0){
+            //             value += '-'
+            //         }
+            //         value += this.recentData[n];
+            //     }
+            // });
+            console.log(data);
             if(name[0] === 'BARCODE'){
-                let caption = this.recentData[this.ui.nameField];
-                value = value + (caption ? caption : '')
+                this.ui.nameField.split(",").forEach(item=>{
+                    let caption = this.recentData[item];
+                    value = value + (caption ? caption : '')+" "
+                })
+               
             }
             el.innerHTML = value;
         });
@@ -249,7 +256,8 @@ export class RfidInventory {
         Shell.rfid.start(port.str, port.num, (result) => {
             let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                 data = result.data;
-            if(result.success&&tools.isEmpty(result.data)){
+            // alert(JSON.stringify(result))
+            if(result.success&&G.tools.isEmpty(result.data)){
                 this.sortUi();
             }
             if (data) {
@@ -356,6 +364,8 @@ export class RfidInventory {
             url = element.downloadAddr.dataAddr;
         this.uniqueFlag = element.uniqueFlag;
         Shell.rfid.downLoad(CONF.siteUrl +  url, this.token, this.uniqueFlag,(result) => {
+            // alert(CONF.siteUrl +  url)
+            // alert(JSON.stringify(result))
             if(result && result.success){
                 this.ui = result.data;
                 let info = this.ui && this.ui.classifyInfo;
@@ -370,13 +380,13 @@ export class RfidInventory {
                 });
                 if(this.ui && this.ui.keyField){
                     d.append(this.sortEl, <div className="rfid-li">
-                        <div>{this.ui.keyName}：</div>
+                        {/* <div>{this.ui.keyName}：</div> */}
                         {this._keyFildEl = <div data-name={this.ui.keyField}/>}
                     </div>)
                 }
                 this.titleEl.innerHTML = this.ui && this.ui.title || '';
             }else {
-                Modal.alert('下载数据失败', null, () => this.focus());
+                Modal.alert(result.msg, null, () => this.focus());
             }
             loading.destroy();
             this.focus();
