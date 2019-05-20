@@ -163,6 +163,7 @@ export class BwRule extends Rule {
                             reject(Ajax.errRes(xhr, 'emptyData', ''));
                             return;
                         }
+                        // debugger;
                         if (typeof response === 'object') {
 
                             let isLogout = response.errorCode === 50001;

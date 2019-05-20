@@ -32,6 +32,7 @@ export abstract class QueryModule {
 
     public abstract show(); // 显示查询框
     public abstract hide(); // 隐藏查询框
+    private initStatus:boolean=false;
     //
     // public abstract loadingShow();
     // public abstract loadingHide();
@@ -187,7 +188,7 @@ export abstract class QueryModule {
 
         queryJson.textCase = this.textCase.get();
         console.log(queryJson);
-
+     
         BwRule.Ajax.fetch(settingSaveUrl, {
             type: 'PUT',
             data2url: true,
@@ -249,9 +250,10 @@ export abstract class QueryModule {
             noQueryParam.atvarparams = queryJson.atvarparams;
             queryJson = noQueryParam;
         }
-
+        // debugger;
         // 选项
         if(this.para.qm.hasOption && this.hasOption && !noQuery){
+            
             let data = JSON.parse(queryJson.queryoptionsparam);
             if(data.showFields && data.showFields.length === 0 && (data.itemSumCount || (data.groupByFields && data.groupByFields[0]))){
                 Modal.alert('未设置显示字段');
@@ -265,10 +267,24 @@ export abstract class QueryModule {
             if(data.itemCount && data.showFields && !data.showFields[0]){
                 return this.optionLoad(queryJson);
             }else {
-                return this.queryLoad(queryJson);
+                // return this.queryLoad(queryJson);
+                if(!this.initStatus&&this.para.qm.queryType===2 ){
+                    this.initStatus=true;
+                    return this.queryLoad('');
+                }else{
+                    return this.queryLoad(queryJson);
+                }
             }
         }else{
-            return this.queryLoad(queryJson);
+            /** queryType==2的时候，首次亲求不给后端带入queryJson（查询器的默认值） */
+            if(!this.initStatus&&this.para.qm.queryType===2 ){
+                this.initStatus=true;
+                return this.queryLoad('');
+            }else{
+                return this.queryLoad(queryJson);
+            }
+           
+          
         }
 
 
