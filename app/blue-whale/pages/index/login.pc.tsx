@@ -4,8 +4,6 @@ import { LoginPage } from "./login";
 import { Button } from "../../../global/components/general/button/Button";
 import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
 import d = G.d;
-import {BwRule} from "../../common/rule/BwRule";
-import CONF = BW.CONF;
 
 export class LoginPcPage extends LoginPage {
 
@@ -107,51 +105,7 @@ export class LoginPcPage extends LoginPage {
             scanButton: d.query(".scanLogin", loginOption),
             fqaBtn
         });
-        // this.shareCode();
     }
-
-    /**
-     * 二维码分享扫码
-     */
-    // shareCode() {
-    //     console.log('share start');
-    //     let code = "";
-    //     let lastTime, nextTime;
-    //     let lastCode, nextCode;
-    //     document.onkeypress = function (e) {
-    //         nextCode = e.which;
-    //         if (e.which === 13) {
-    //             if (code.length < 2) { //手动输入的时间不会让code的长度大于2，所以这里只会对扫码枪有效
-    //                 return
-    //             }
-    //             lastTime = null;
-    //             lastCode = null;
-    //             code = '';
-    //             return;
-    //         }
-    //         nextTime = new Date().getTime();
-    //         if (!lastTime && !lastCode) {
-    //             code += e.key;
-    //         }
-    //         if (lastCode != null && lastTime != null && nextTime - lastTime <= 30) {
-    //             code += e.key;
-    //         } else if (lastCode != null && lastTime != null && nextTime - lastTime > 500) {//当扫码前有keypress事件时,防止首字缺失
-    //             code = e.key;
-    //         }
-    //         lastCode = nextCode;
-    //         lastTime = nextTime;
-            
-
-    //     };
-    //     BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/commonsvc/scan", {
-    //         data: {
-    //             code: lastCode
-    //         }
-    //     }).then(({ response }) => {
-    //         console.log(response);
-    //     })
-
-    // }
 
 
 

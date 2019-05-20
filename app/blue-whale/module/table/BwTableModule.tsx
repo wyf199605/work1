@@ -18,24 +18,25 @@ import { Loading } from "../../../global/components/ui/loading/loading";
 import { LayoutImage } from "../../../global/components/view/LayoutImg/LayoutImage";
 import { NewTableModule } from "./newTableModule";
 import Shell = G.Shell;
-import { ButtonAction } from "../../common/rule/ButtonAction/ButtonAction";
-import { Inputs } from "../inputs/inputs";
-import { FlowDesigner } from "../flowDesigner/FlowDesigner";
-import { PasswdModal } from "../changePassword/passwdModal";
-import { Spinner } from "../../../global/components/ui/spinner/spinner";
-import { FormCom } from "../../../global/components/form/basic";
-import { EditModule } from "../edit/editModule";
-import { TableDataCell } from "../../../global/components/newTable/base/TableCell";
-import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
-import { BwUploader } from "../uploadModule/bwUploader";
-import { ImgModal, ImgModalPara } from "../../../global/components/ui/img/img";
-import { BwLayoutImg } from "../uploadModule/bwLayoutImg";
-import { TableDataRow } from "../../../global/components/newTable/base/TableRow";
-import { FastTableColumn } from "../../../global/components/newTable/FastTabelColumn";
-import { NewIDB } from "../../../global/NewIDB";
-import { Datetime } from "../../../global/components/form/datetime/datetime";
-import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
-import { BwTableEditModule } from "./BwTableEditModule";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {Inputs} from "../inputs/inputs";
+import {FlowDesigner} from "../flowDesigner/FlowDesigner";
+import {PasswdModal} from "../changePassword/passwdModal";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import {FormCom} from "../../../global/components/form/basic";
+import {EditModule} from "../edit/editModule";
+import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
+import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import {BwUploader} from "../uploadModule/bwUploader";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
+import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
+import {FastTableColumn} from "../../../global/components/newTable/FastTabelColumn";
+import {NewIDB} from "../../../global/NewIDB";
+import {Datetime} from "../../../global/components/form/datetime/datetime";
+import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
+import {BwTableEditModule} from "./BwTableEditModule";
+import { ShareCode } from '../../common/share-code/shareCode';
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -441,6 +442,17 @@ export class BwTableModule extends Component {
                 require(['RfidSetting'], function (RfidSetting) {
                     new RfidSetting.RfidSettingModal();
                 });
+            },
+        });
+        let _this = this;
+        this.ftable.btnAdd('shareCode', {
+            type: 'default',
+            content: '二维码分享',
+            onClick: () => {
+                console.log('二维码分享',ui);
+                // console.log(this);
+                // new ShareCode();
+
             },
         });
 

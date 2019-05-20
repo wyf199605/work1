@@ -218,7 +218,10 @@ export class InputBox extends Component {
     get isResponsive() {
         return this._isResponsive;
     }
-
+    /**
+     * 创建一个div 生成一个按钮组
+     * @param offsetWidth 横竖屏判断宽度是否改变
+     */
     responsive(offsetWidth?) {
         if (!this.isResponsive) {
             return;
