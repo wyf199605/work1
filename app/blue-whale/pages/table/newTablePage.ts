@@ -188,6 +188,10 @@ export class BwTableElement extends Component{
                                     d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
                                         this.queryModule.show();
                                     });
+                                    d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
+                                        console.log(1111)
+                                        // this.queryModule.show();
+                                    });
                                 } else {
             
                                     let main = this.tableModule.main;

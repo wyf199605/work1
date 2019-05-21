@@ -644,6 +644,10 @@ export class NewTableModule extends AGroupTabItem {
         });
     }
 
+    /**
+     * 初始化窗口操作
+     * @param bwTable 
+     */
     protected initEdit(bwTable: BwTableModule) {
         let time = 500;
         if ((this.editType === 'self' && tools.isNotEmpty(bwTable.editParam)) ||

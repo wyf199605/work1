@@ -444,17 +444,15 @@ export class BwTableModule extends Component {
                 });
             },
         });
-        let _this = this;
-        this.ftable.btnAdd('shareCode', {
-            type: 'default',
-            content: '二维码分享',
-            onClick: () => {
-                console.log('二维码分享',ui);
-                // console.log(this);
-                // new ShareCode();
+        // this.ftable.btnAdd('shareCode', {
+        //     type: 'default',
+        //     content: '二维码分享',
+        //     onClick: () => {
+        //         console.log('二维码分享',ui);
+        //         new ShareCode();
 
-            },
-        });
+        //     },
+        // });
 
         this.ftableReady();
 

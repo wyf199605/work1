@@ -37,7 +37,25 @@ export = class homePage extends BasicPage {
                             badge.classList.add('hide');
                         }
                     }
+                    // sessionStorage.setItem('subScriptStatus','0');
                 });
+                setInterval(() => {
+                    item.subScriptUrl && BwRule.Ajax.fetch(CONF.siteUrl + item.subScriptUrl)
+                        .then(({ response }) => {
+                            let num = tools.keysVal(response, 'data', '0', 'N');
+                            if (num) {
+                                num = parseInt(num);
+                                let badge = d.query('.mui-badge.mui-badge-danger', li);
+                                if (num > 0) {
+                                    // badge.classList.remove('hide');
+                                    badge.textContent = num;
+                                } else {
+                                    // badge.classList.add('hide');
+                                }
+                            }
+                            // sessionStorage.setItem('subScriptStatus','0');
+                        });
+                },1000);
         });
         this.homeList.classList.toggle('no-data', this.homeList.innerHTML === '');
     }
