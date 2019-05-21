@@ -6,22 +6,30 @@
       text-align: center;
     }
     .rfid-sort{
-      .rfid-li{
-        display: inline-block;
-        margin: 5px;
-        padding: 3px 5px;
-        float: left;
-        &>div{
-          display: inline-block;
-
-        }
-        [data-prop]{
-
-        }
-        [data-name]{
-
-        }
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 12px;
+      flex-direction: column;
+      .rfid-li:first-child{
+        margin-bottom: 8px;
       }
+      // .rfid-li{
+      //   display: inline-block;
+      //   margin: 5px;
+      //   padding: 3px 5px;
+      //   float: left;
+      //   &>div{
+      //     display: inline-block;
+
+      //   }
+      //   [data-prop]{
+
+      //   }
+      //   [data-name]{
+
+      //   }
+      // }
     }
     .rfid-content{
       width: 100%;

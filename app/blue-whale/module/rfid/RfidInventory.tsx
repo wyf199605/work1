@@ -48,7 +48,8 @@ export class RfidInventory {
     private recentData = {};
     private epc: string[] = [];
     private token: string;
-
+    private isNew: boolean;
+    private oldValue: string;
     constructor(data: IRfidInventoryPara) {
         this.p = data;
         this.init(data);
@@ -74,7 +75,9 @@ export class RfidInventory {
                 }, {
                     content: "提交",
                     onClick: () => {
-                        this.commit().then();
+                        this.commit().then((msg) => {
+                            Modal.toast(msg);
+                        });
                     }
                 }],
                 rightPanel: [{
@@ -126,7 +129,20 @@ export class RfidInventory {
 
     private dataGet() {
         let obj: any = this.recentData
-        let splitObj = { BARCODE: obj.BARCODE };
+        let splitObj: obj = {};
+        if (this.ui && this.ui.classifyInfo) {
+            let str: any = this.ui.classifyInfo
+            let list = str.split(",");
+            list.forEach(item => {
+                if (obj[item]) {
+                    splitObj[item] = obj[item];
+                }
+            })
+        }
+        if (this.ui && this.ui.keyField) {
+            // BARCODE: obj.BARCODE
+            splitObj[this.ui.keyField] = obj[this.ui.keyField];
+        }
         // console.log(Object.assign(splitObj, {rfidepc : this.epc.join(',')}))
         return Object.assign(splitObj, { rfidepc: this.epc.join(',') })
     }
@@ -139,7 +155,21 @@ export class RfidInventory {
             return;
         }
         if (scanCode.success) {
-            data = scanCode.data[0]
+            data = scanCode.data[0];
+            if (this.isNew) {
+                if (this.recentData) {
+                    if (this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
+                        this.isNew = true;
+                    }
+                }else{
+                    this.isNew = false;
+                }
+            } else {
+                this.isNew = false;
+            }
+
+
+
         } else {
             this.alert(scanCode.msg);
             return;
@@ -161,7 +191,7 @@ export class RfidInventory {
             this.setValue(data);
             if (this.isSortEmpty()) {
                 this.barCodeEl && (this.barCodeEl.innerHTML = '');
-                this.recentData['BARCODE'] = '';
+                this.recentData[this.ui.keyField] = '';
             }
         }
     }
@@ -171,16 +201,15 @@ export class RfidInventory {
         this.sortEls.forEach(el => {
             let name = el.dataset.name.split(','),
                 value = '';
-            // name.forEach((n, i) => {
-            //     if(n in this.recentData){
-            //         if(i !== 0){
-            //             value += '-'
-            //         }
-            //         value += this.recentData[n];
-            //     }
-            // });
-            console.log(data);
-            if (name[0] === 'BARCODE') {
+            name.forEach((n, i) => {
+                if (n in this.recentData) {
+                    if (i !== 0) {
+                        value += '-'
+                    }
+                    value += this.recentData[n];
+                }
+            });
+            if (name[0] === this.ui.keyField) {
                 this.ui.nameField.split(",").forEach(item => {
                     let caption = this.recentData[item];
                     value = value + (caption ? caption : '') + " "
@@ -269,9 +298,7 @@ export class RfidInventory {
                     this.epc.push(d);
                     this.contentEl.appendChild(<div class="r">{msg}</div>);
                     this.contentEl.scrollTop = 100000000;
-                    this.allCount++;
                     this.thisCount++;
-                    this.allEl.innerHTML = this.allCount + '';
                     this.thisEl.innerHTML = this.thisCount + '';
                 }
             });
@@ -289,7 +316,7 @@ export class RfidInventory {
     private isSortEmpty() {
         let isEmpty = false;
         this.sortEls.forEach(el => {
-            if (el.innerHTML === '' && el.dataset.name !== 'BARCODE') {
+            if (el.innerHTML === '' && el.dataset.name !== this.ui.keyField) {
                 isEmpty = true;
             }
         });
@@ -308,7 +335,10 @@ export class RfidInventory {
                 this.alert('分类数据不能为空');
                 return;
             }
-
+            if (this.isNew) {
+                this.alert('条码数据不能为空!');
+                return;
+            }
             if (this._keyFildEl && G.tools.isEmpty(this._keyFildEl.innerHTML)) {
                 this.alert('条码数据不能为空');
                 return;
@@ -333,13 +363,15 @@ export class RfidInventory {
                 data: this.dataGet(),
                 type: 'post',
             }).then(({ response }) => {
+                let msg = response.msg;
                 // Modal.toast(response.msg);
                 BwRule.checkValue(response, this.dataGet(), (e) => {
-                    console.log(e)
-                    debugger;
                     this.clearData();
                     this.modal.wrapper.focus();
-                    resolve();
+                    this.isNew = true;
+                    this.allCount = this.allCount + this.epc.length;
+                    this.allEl.innerHTML = this.allCount + '';
+                    resolve(msg);
                 });
                 // console.log(response);
             }).finally(() => {
@@ -369,20 +401,30 @@ export class RfidInventory {
             url = element.downloadAddr.dataAddr;
         this.uniqueFlag = element.uniqueFlag;
         Shell.rfid.downLoad(CONF.siteUrl + url, this.token, this.uniqueFlag, (result) => {
-            // alert(CONF.siteUrl +  url)
-            // alert(JSON.stringify(result))
             if (result && result.success) {
                 this.ui = result.data;
                 let info = this.ui && this.ui.classifyInfo;
-                // console.log(this.ui,'这是下载数据');
-                Array.isArray(info) && info.forEach(obj => {
-                    let keys = Object.keys(obj),
-                        li = <div class="rfid-li">
-                            <div>{obj[keys[0]]}：</div>
-                            <div data-name={keys.join(',')} />
-                        </div>;
+                // Array.isArray(info) && info.forEach(obj => {
+                //     let keys = Object.keys(obj),
+                //         li = <div class="rfid-li">
+                //             <div>{obj[keys[0]]}：</div>
+                //             <div data-name={keys.join(',')} />
+                //         </div>;
+                //     d.append(this.sortEl, li);
+                // });
+                //    let domlist= d.queryAll(".rfid-li",this.sortEl);
+                //    if(domlist&&domlist.length>0){
+                //        for(var i=0;i<domlist.length;i++){
+                //            domlist[i].remove();
+                //        }
+                //    }
+                // this.sortEl.innerHTML="";
+                if (info) {
+                    let li = <div class="rfid-li">
+                        <div data-name={info} />
+                    </div>;
                     d.append(this.sortEl, li);
-                });
+                }
                 if (this.ui && this.ui.keyField) {
                     d.append(this.sortEl, <div className="rfid-li">
                         {/* <div>{this.ui.keyName}：</div> */}
