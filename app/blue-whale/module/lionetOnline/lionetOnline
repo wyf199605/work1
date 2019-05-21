@@ -1,0 +1,12 @@
+/// <amd-module name="LionetOnline"/>
+
+interface ILionetOnlinePara {
+
+}
+
+export class LionetOnline{
+    constructor(props: ILionetOnlinePara) {
+
+    }
+
+}
