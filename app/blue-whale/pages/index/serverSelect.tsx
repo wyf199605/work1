@@ -8,9 +8,10 @@ import sys = BW.sys;
 export class ServerSelect extends BasicPage {
     constructor(para){
         super(para);
-        d.append(para.dom, ServerSelect.initDOM());
+        d.append(para.dom, tools.isMb ? ServerSelect.initDOM() : ServerSelect.initPcDom());
         let text = d.query('#serverText') as HTMLTextAreaElement,
             select = d.query('#sel') as HTMLSelectElement,
+            backBtn = d.query('#turnBack'),
             uuid = '';
 
         d.on(select, 'change', () => {
@@ -24,10 +25,10 @@ export class ServerSelect extends BasicPage {
         };
         if(sys.os==='ip'){
             sys.window.getDevice("uuid");
-        }else{
-            if(sys.os==='ad'){
-                uuid = sys.window.getDevice("uuid").msg;
-            }
+        }else if(sys.os==='ad'){
+            uuid = sys.window.getDevice("uuid").msg;
+        }else if ('AppShell' in window) {
+            uuid = Shell.base.device.data.uuid;
         }
         window.addEventListener('getDevice', function (e: CustomEvent) {
             let json = JSON.parse(e.detail);
@@ -43,6 +44,46 @@ export class ServerSelect extends BasicPage {
                 }
             })
         }
+
+        backBtn && d.on(backBtn, 'click', (e: Event) => {
+            e.preventDefault();
+            sys.window.close();
+        })
+    }
+
+    static initPcDom(){
+        let options = ServerSelect.initOption();
+
+        return <div className="main-login">
+            <div className="box-login">
+                <div className="page-header">
+                    <h2><img src={''} alt="" style="height: 40px;margin-right: 5px"/><span>选择服务器</span></h2>
+                </div>
+                <form className="form-login" id="login-form">
+                    <fieldset>
+                        <div className="form-group">
+                            <label>服务器：</label>
+                            <select id="sel" onChange="change()">
+                                {options}
+                            </select>
+                        </div>
+                        <div className="form-group form-actions">
+                            <textarea id="serverText" className="mui-input-clear"
+                                      style="border-radius: 4px;height: 100px;width: 100%"></textarea>
+                        </div>
+                        <div className="form-group">
+                            <a id="turnBack" className="btn btn-primary" href="#">
+                                返回
+                            </a>
+                            <button id="login" type="button" data-loading-icon="mui-spinner mui-spinner-custom"
+                                    className="btn btn-primary">前往
+                            </button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
     }
 
     static initDOM(){
