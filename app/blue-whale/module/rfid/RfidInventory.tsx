@@ -150,13 +150,14 @@ export class RfidInventory {
     private scan(value: string) {
         let scanCode = Shell.rfid.scanCode(value, this.uniqueFlag),
             data = null;
+        // debugger;
         if (!this.beginEl.classList.contains('disabled-none')) {
             this.value = '';
             return;
         }
         if (scanCode.success) {
             data = scanCode.data[0];
-            if (this.isNew && this.recentData && this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
+            if (this.recentData && this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
                 this.isNew = true;
             } else {
                 this.isNew = false;
@@ -184,11 +185,8 @@ export class RfidInventory {
         // 若扫入条码
         if ('BARCODE' in data) {
             // 若已有条码，先提交数据
-            if (G.tools.isNotEmpty(this.recentData['BARCODE'])) {
-                if (!this.isNew) {
-                    this.commit(true).then(() => this.setValue(data));
-                }
-
+            if (G.tools.isNotEmpty(this.recentData['BARCODE']) && !this.isNew) {
+                this.commit(true).then(() => this.setValue(data));
             } else {
                 // 若分类为空，不可设置条码值
                 if (this.isSortEmpty()) {
@@ -282,6 +280,7 @@ export class RfidInventory {
     private stop() {
         this.stopEl.classList.add('disabled-none');
         this.beginEl.classList.remove('disabled-none');
+        this.recentData = {};
         Shell.rfid.stop((result) => {
             this.contentEl.appendChild(<div class="r">{result.msg}</div>);
         });
@@ -433,7 +432,7 @@ export class RfidInventory {
                 //            domlist[i].remove();
                 //        }
                 //    }
-                this.sortEl.innerHTML = "";
+                this.sortEl.innerHTML = "<div></div>";
                 if (info) {
                     let li = <div class="rfid-li">
                         <div data-name={info} />
