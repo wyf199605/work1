@@ -189,7 +189,10 @@ export class FlowDesigner {
             body: body,
             header: {
                 title: '流程设计',
-                rightPanel: <i className={'icon-fullscreen iconfont icon-zuidahua'}/>
+                rightPanel: <div>
+                    <i className={'icon-fullscreen iconfont icon-zuidahua'}/>
+                    <i className={'icon-guanbi iconfont icon-close'} />
+                    </div>
             },
             className: FlowDesigner.FlowType === 'look' ? 'flow-modal flow-look' : 'flow-modal',
             width: tools.isMb ? '100%' : '90%',
@@ -463,17 +466,24 @@ export class FlowDesigner {
             FlowDesigner.PAPER.setSize(d.query('#design-canvas').clientWidth, d.query('#design-canvas').clientHeight);
             FlowEditor.refreshAllPosition();
         };
+        let clickCloseIcon = () => {
+            console.log('关闭按钮11');
+            this.destroy();
+            this.modal.destroy();
+        }
 
         return {
             on: () => {
                 d.on(d.query('#design-canvas'), 'click', 'svg', clickSVG);
                 d.on(window, 'resize', resizeHandler);
                 d.on(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
+                d.on(d.query('.icon-guanbi'), 'click', clickCloseIcon);
             },
             off: () => {
                 d.off(d.query('#design-canvas'), 'click', 'svg', clickSVG);
                 d.off(window, 'resize', resizeHandler);
                 d.off(d.query('.icon-fullscreen'), 'click', clickFullscreenHandler);
+                d.off(d.query('.icon-guanbi'), 'click', clickCloseIcon);
             },
         }
     })();

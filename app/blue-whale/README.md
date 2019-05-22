@@ -62,5 +62,6 @@
       - 移动端网络检测：page/myself/checkNetwork.tsx
       - 移动端收藏弹层：module/collect/collect.mb.ts
       - 登录页：page/index/**
+      - PC流程设计模态框：module/flowDesigner/FlowDesigner.tsx
    - global目录结构
       - PC端个人中心菜单 components/ui/popover/
