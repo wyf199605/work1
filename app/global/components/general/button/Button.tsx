@@ -8,6 +8,7 @@ export interface IButton extends IComponentPara {
     content?: string;
     icon?: string;
     iconPre?: string;
+    iconNoPre?: boolean;
     isDisabled?: boolean;
     isLoading?: boolean;
     isShow?: boolean;
@@ -51,6 +52,7 @@ export class Button extends Component implements IButton {
         // }
 
         this.iconPre = button.iconPre || 'iconfont';
+        this.iconNoPre = button.iconNoPre || false;
 
         this.isLoading = button.isLoading;
         this.key = button.key;
@@ -67,6 +69,7 @@ export class Button extends Component implements IButton {
     }
 
     public iconPre: string;
+    public iconNoPre: boolean;
 
     protected wrapperInit(): HTMLElement {
         return <button type="button" className="btn" />;
@@ -98,8 +101,8 @@ export class Button extends Component implements IButton {
         //移除原有icon
         this.iconEl && this._iconEl.parentElement.removeChild(this._iconEl);
 
-
-        let iconStr = this.iconPre === 'iconfont' ? `icon-${icon}` : icon,
+        console.log('iconnp')
+        let iconStr = this.iconPre === 'iconfont' && !this.iconNoPre ? `icon-${icon}` : icon,
             className = `${this.iconPre} button-icon ${iconStr}`;
 
         if (icon === 'spinner' && this._isLoading) {
