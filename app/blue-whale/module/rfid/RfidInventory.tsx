@@ -150,23 +150,31 @@ export class RfidInventory {
     private scan(value: string) {
         let scanCode = Shell.rfid.scanCode(value, this.uniqueFlag),
             data = null;
+        // debugger;
         if (!this.beginEl.classList.contains('disabled-none')) {
             this.value = '';
             return;
         }
         if (scanCode.success) {
             data = scanCode.data[0];
-            if (this.isNew) {
-                if (this.recentData) {
-                    if (this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
-                        this.isNew = true;
-                    }
-                }else{
-                    this.isNew = false;
-                }
+            if (this.recentData && this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
+                this.isNew = true;
             } else {
                 this.isNew = false;
             }
+            // if (this.isNew) {
+            //     if (this.recentData) {
+            //         if (this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
+            //             this.isNew = true;
+            //         }else{
+            //             this.isNew = false;
+            //         }
+            //     }else{
+            //         this.isNew = false;
+            //     }
+            // } else {
+            //     this.isNew = false;
+            // }
 
 
 
@@ -177,8 +185,8 @@ export class RfidInventory {
         // 若扫入条码
         if ('BARCODE' in data) {
             // 若已有条码，先提交数据
-            if (G.tools.isNotEmpty(this.recentData['BARCODE'])) {
-                this.commit().then(() => this.setValue(data));
+            if (G.tools.isNotEmpty(this.recentData['BARCODE']) && !this.isNew) {
+                this.commit(true).then(() => this.setValue(data));
             } else {
                 // 若分类为空，不可设置条码值
                 if (this.isSortEmpty()) {
@@ -208,7 +216,7 @@ export class RfidInventory {
                     value = value + (caption ? caption : '') + " "
                 })
 
-            }else{
+            } else {
                 name.forEach((n, i) => {
                     if (n in this.recentData) {
                         if (i !== 0) {
@@ -272,6 +280,7 @@ export class RfidInventory {
     private stop() {
         this.stopEl.classList.add('disabled-none');
         this.beginEl.classList.remove('disabled-none');
+        this.recentData = {};
         Shell.rfid.stop((result) => {
             this.contentEl.appendChild(<div class="r">{result.msg}</div>);
         });
@@ -325,7 +334,7 @@ export class RfidInventory {
         return isEmpty;
     }
 
-    private commit() {
+    private commit(come: boolean = false) {
         return new Promise(resolve => {
             if (!this.epc[0]) {
                 this.alert('无盘点数据');
@@ -337,7 +346,7 @@ export class RfidInventory {
                 this.alert('分类数据不能为空');
                 return;
             }
-            if (this._keyFildEl &&this.isNew) {
+            if (this._keyFildEl && this.isNew) {
                 this.alert('条码数据不能为空!');
                 return;
             }
@@ -368,11 +377,14 @@ export class RfidInventory {
                 let msg = response.msg;
                 // Modal.toast(response.msg);
                 BwRule.checkValue(response, this.dataGet(), (e) => {
-                    this.clearData();
-                    this.modal.wrapper.focus();
-                    this.isNew = true;
+                    if (!come) {
+                        //扫码提交上次纪律不值true
+                        this.isNew = true;
+                    }
                     this.allCount = this.allCount + this.epc.length;
                     this.allEl.innerHTML = this.allCount + '';
+                    this.modal.wrapper.focus();
+                    this.clearData();
                     resolve(msg);
                 });
                 // console.log(response);
@@ -420,8 +432,7 @@ export class RfidInventory {
                 //            domlist[i].remove();
                 //        }
                 //    }
-                // this.sortEl.innerHTML="";
-   
+                this.sortEl.innerHTML = "<div></div>";
                 if (info) {
                     let li = <div class="rfid-li">
                         <div data-name={info} />
