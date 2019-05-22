@@ -74,6 +74,14 @@ $tip-item__type-color-map: (task: #65b3f0, custom: #71d189, subprocess: #f56767,
           opacity: 0.7;
         }
       }
+      .icon-guanbi {
+        font-size: 16px;
+        color: #fff;
+        cursor: pointer;
+        &:hover {
+          opacity: 0.7;
+        }
+      }
     }
 
   }
