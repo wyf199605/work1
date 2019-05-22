@@ -46,7 +46,7 @@ export class ServerSelect extends BasicPage {
                     }
                 })
             }
-        }else{
+        }else if('AppShell' in window){
             let data = Shell.base.clientCode();
             if(data.success){
                 let urls = tools.keysVal(data, 'data', 'content', 'appUrls');
