@@ -19,7 +19,7 @@ interface InputsPara {
     locationLine?: string
     container: HTMLElement
     keyField?: string
-    table?: () => FastBtnTable | DetailModule;    // 获取表格ftable
+    table?: () => FastBtnTable;    // 获取表格ftable
     afterScan?: Function
     tableModule?: Function // 获取表格模块
     queryModule?: Function // 查询器
@@ -236,7 +236,7 @@ export class Inputs {
      * @param ftable
      * @param response
      */
-    private dataCover(ftable: FastBtnTable | DetailModule, response: obj) {
+    private dataCover(ftable: FastBtnTable, response: obj) {
         let data = response.data,
             queryModule = this.para.queryModule && this.para.queryModule();
         if (tools.isEmpty(data)) return;

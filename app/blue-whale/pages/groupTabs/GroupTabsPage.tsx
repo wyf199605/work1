@@ -164,24 +164,36 @@ export class GroupTabsPage extends BasicPage {
     private inputs(inputs,line){
         let table = this.main;
         require(['Inputs'], (i) => {
-            this._inputs = new i.Inputs({
-                inputs: inputs,
-                container: this.dom,
-                locationLine : line,
-                table : () => {
-                    if(table instanceof NewTableModule){
-                        return table && table.main.ftable
-                    }else{
-                        return table
+            if(table instanceof NewTableModule){
+                let table1 = table;
+                this._inputs = new i.Inputs({
+                    inputs: inputs,
+                    container: this.dom,
+                    locationLine : line,
+                    table : () => {
+                        return table1 && table1.main.ftable
+                    },
+                    tableModule : () => {
+                        return table1
+                    },
+                    queryModule : () => {
+                        return this.queryModule;
                     }
-                },
-                tableModule : () => {
-                    return table
-                },
-                queryModule : () => {
-                    return this.queryModule;
-                }
-            })
+                })
+            }else if (table instanceof DetailModule){
+                let table2 = table;
+                this._inputs = new i.Inputs({
+                    inputs: inputs,
+                    container: this.dom,
+                    queryModule : () => {
+                        return this.queryModule;
+                    },
+                    setListItemData: (data) => {
+                        data && data[0] && table2.setData(data[0]);
+                    }
+                })
+            }
+
         });
 
     }

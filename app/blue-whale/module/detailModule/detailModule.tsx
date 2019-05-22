@@ -285,6 +285,11 @@ export class DetailModule extends AGroupTabItem {
         return this.detailData;
     }
 
+    setData(data: obj){
+        this.dataManager.data = [data];
+        this.render();
+    }
+
     // 刷新方法
     refresh(ajaxData?: obj): Promise<any> {
         this.ajaxData = ajaxData || this.ajaxData;
