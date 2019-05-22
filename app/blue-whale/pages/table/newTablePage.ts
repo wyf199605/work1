@@ -13,6 +13,7 @@ import IComponentPara = G.IComponentPara; import Component = G.Component;
 import {BwTableModule} from "../../module/table/BwTableModule";
 import {FastTable} from "global/components/newTable/FastTable";
 import {Inputs} from "../../module/inputs/inputs";
+import { ShareCode } from "blue-whale/common/share-code/shareCode";
 
 export interface ITablePagePara extends BasicPagePara{
     ui: IBW_UI<IBW_Table>
@@ -189,8 +190,10 @@ export class BwTableElement extends Component{
                                         this.queryModule.show();
                                     });
                                     d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
-                                        console.log(1111)
+                                        // console.log(1111)
                                         // this.queryModule.show();
+                                       new ShareCode(this.tableModule.main.ftable.selectedRowsData);
+                                    //    console.log(new ShareCode())
                                     });
                                 } else {
             
