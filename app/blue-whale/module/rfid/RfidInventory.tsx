@@ -201,20 +201,22 @@ export class RfidInventory {
         this.sortEls.forEach(el => {
             let name = el.dataset.name.split(','),
                 value = '';
-            name.forEach((n, i) => {
-                if (n in this.recentData) {
-                    if (i !== 0) {
-                        value += '-'
-                    }
-                    value += this.recentData[n];
-                }
-            });
             if (name[0] === this.ui.keyField) {
+                //
                 this.ui.nameField.split(",").forEach(item => {
                     let caption = this.recentData[item];
                     value = value + (caption ? caption : '') + " "
                 })
 
+            }else{
+                name.forEach((n, i) => {
+                    if (n in this.recentData) {
+                        if (i !== 0) {
+                            value += '-'
+                        }
+                        value += this.recentData[n];
+                    }
+                });
             }
             el.innerHTML = value;
         });
@@ -335,7 +337,7 @@ export class RfidInventory {
                 this.alert('分类数据不能为空');
                 return;
             }
-            if (this.isNew) {
+            if (this._keyFildEl &&this.isNew) {
                 this.alert('条码数据不能为空!');
                 return;
             }
