@@ -252,7 +252,6 @@ export class NewTableModule extends AGroupTabItem {
                         this.subWrapper.classList.add('hide');
                     }
                     setTimeout(() => {
-                        
                         if (isFirst && !noLoadSub) {
                             let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
                             if (tools.isNotEmpty(this.showSubField)) {
@@ -486,27 +485,32 @@ export class NewTableModule extends AGroupTabItem {
         // 查询从表时不需要带上选项参数
         delete ajaxData['queryoptionsparam'];
         this.mobileModal && (this.mobileModal.isShow = true);
-        if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
+        if (tools.isNotEmpty(this.showSubField)) {
             // let showSubSeq = selectedData[this.showSubField].split(',');
-            let list = selectedData[this.showSubField].split(',');
-            let showSubSeq = this.computedIndex(list);
-            this.tab.setTabsShow(showSubSeq);
-            this.currentSelectedIndexes.push(this.subTabActiveIndex);
-            let subs = [];
-            for (let key in this.sub) {
-                if (~showSubSeq.indexOf(parseInt(key) + 1 + '') && tools.isNotEmpty(this.sub[key])) {
-                    subs.push(this.sub[key]);
+            if(tools.isNotEmpty(selectedData[this.showSubField])){
+                let list = selectedData[this.showSubField].split(',');
+                let showSubSeq = this.computedIndex(list);
+                this.tab.setTabsShow(showSubSeq);
+                this.currentSelectedIndexes.push(this.subTabActiveIndex);
+                let subs = [];
+                for (let key in this.sub) {
+                    if (~showSubSeq.indexOf(parseInt(key) + 1 + '') && tools.isNotEmpty(this.sub[key])) {
+                        subs.push(this.sub[key]);
+                    }
                 }
+                subs.forEach((subTable) => {
+                    promise.push(subTable.refresh(ajaxData).catch());
+                    subTable.linkedData = selectedData;
+                });
+                if (tools.isEmpty(this.sub[this.subTabActiveIndex])) {
+                    this.tab.active(this.subTabActiveIndex);
+                }
+            }else{
+                this.subWrapper.classList.add('hide');
             }
-            subs.forEach((subTable) => {
-                promise.push(subTable.refresh(ajaxData).catch());
-                subTable.linkedData = selectedData;
-            });
-            if (tools.isEmpty(this.sub[this.subTabActiveIndex])) {
-                this.tab.active(this.subTabActiveIndex);
-            }
+
         } else {
-            this.subWrapper.classList.add('hide');
+           
             Object.values(this.sub).forEach((subTable) => {
                 promise.push(subTable.refresh(ajaxData).catch());
                 subTable.linkedData = selectedData;
