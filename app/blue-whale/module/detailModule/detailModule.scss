@@ -236,15 +236,28 @@
         display: flex;
         display: -webkit-flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         .btn {
           font-size: 14px;
           height: 40px;
           //margin-left: 15px;
-          border-color: #005bac;
-          color: #005bac;
+          //border-color: #005bac;
+          //color: #005bac;
           padding: 0 14px;
           //max-width: 25%;
+          border: none;
+        }
+        .btn:not(:last-child){
+          &::after{
+            content: ' ';
+            position: absolute;
+            display: block;
+            width: 2px;
+            height: 15px;
+            background-color: #bbb;
+            top: 13px;
+            right: 0;
+          }
         }
       }
       .detail-count {
