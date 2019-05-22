@@ -421,6 +421,7 @@ export class RfidInventory {
                 //        }
                 //    }
                 // this.sortEl.innerHTML="";
+   
                 if (info) {
                     let li = <div class="rfid-li">
                         <div data-name={info} />
