@@ -4,6 +4,7 @@ import BasicPage from "../basicPage";
 import d = G.d;
 import tools = G.tools;
 import sys = BW.sys;
+import Shell = G.Shell;
 
 export class ServerSelect extends BasicPage {
     constructor(para){
@@ -37,12 +38,24 @@ export class ServerSelect extends BasicPage {
             }
         });
 
-        if(sys.window.clientCode){
-            sys.window.clientCode((html) => {
-                if(html){
-                    select.innerHTML = html;
+        if(tools.isMb){
+            if(sys.window.clientCode){
+                sys.window.clientCode((html) => {
+                    if(html){
+                        select.innerHTML = html;
+                    }
+                })
+            }
+        }else{
+            let data = Shell.base.clientCode();
+            if(data.success){
+                let urls = tools.keysVal(data, 'data', 'content', 'appUrls');
+                if(urls){
+                    select.innerHTML = ['<option value="">-select-</option>'].concat(urls.map((item) => {
+                        return `<option value="${item.envUrl}">${item.envName}</option>`;
+                    })).join('');
                 }
-            })
+            }
         }
 
         backBtn && d.on(backBtn, 'click', (e: Event) => {

@@ -57,6 +57,9 @@ namespace G {
             },
             testAPI(data: string, back: IShellEventHandler, info: IShellEventHandler) {
                 return ShellBase.handler('testAPI', { data }, back, info);
+            },
+            clientCode(){
+                return ShellBase.handler('clientCode', {});
             }
         };
 
