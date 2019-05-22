@@ -19,7 +19,7 @@ namespace BW {
                     });
                 },
                 open: function (o: winOpen) {
-                    sessionStorage.setItem('tableUrl',o.url);
+                    localStorage.setItem('tableUrl',o.url);
                     localStorage.setItem('viewData', JSON.stringify(o.extras));
                     let win = window.parent ? window.parent : window;
                     win.location.href = o.url;

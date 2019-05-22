@@ -1,3 +1,4 @@
+// 移动
 .share-code {
     position: absolute;
     // top: 50px;
@@ -150,3 +151,63 @@
         }
     }
 }
+
+// pc
+.share-code-pc {
+    height: 100%;
+    width: 100%;
+    background-color: rgba(107, 103, 103, 0.3);
+    position:absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .share-code-pc-container {
+        width: 360px;
+        height: 300px;
+        background: white;
+        border-radius: 10px;
+        .share-code-pc-header {
+            height: 48px;
+            background-color: #1D2B36;
+            color: #fff;
+            overflow: hidden;
+            line-height: 48px;
+            padding: 0 15px;
+            span {
+                &:first-child {
+                    float: left;
+                    padding: 0 15px;
+                }
+                &:last-child {
+                    float: right;
+                    font-size: 18px;
+                    padding: 0 15px;
+                }
+            }
+        }
+        .share-code-pc-main {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+            img {
+                display: block;
+                width: 110px;
+                height: 110px;
+            }
+        }
+        .share-code-pc-btns {
+            text-align: center;
+            .share-code-pc-btns-btn {
+                color: #005BAC;
+                border-color: #005BAC;
+                margin: 0 10px;
+            }
+        }
+    }
+}
+
