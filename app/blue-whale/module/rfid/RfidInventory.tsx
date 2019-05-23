@@ -49,6 +49,7 @@ export class RfidInventory {
     private epc: string[] = [];
     private token: string;
     private isNew: boolean;
+    private isUnCommit:boolean;
     private oldValue: string;
     constructor(data: IRfidInventoryPara) {
         this.p = data;
@@ -159,8 +160,13 @@ export class RfidInventory {
         }
         if (scanCode.success) {
             data = scanCode.data[0];
+
             if (this.recentData && this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
+                if(this.isNew){
+                    this.isUnCommit=true;
+                }
                 this.isNew = true;
+                
             } else {
                 this.isNew = false;
             }
@@ -220,7 +226,7 @@ export class RfidInventory {
                     value = value + (caption ? caption : '') + " "
                 })
                 d.query('.main_key', this.sortEl).innerHTML = value;
-               
+
             } else {
                 name.forEach((n, i) => {
                     if (n in this.recentData) {
@@ -353,7 +359,7 @@ export class RfidInventory {
                 this.alert('分类数据不能为空');
                 return;
             }
-            if (this._keyFildEl && this.isNew) {
+            if (!this.isUnCommit&&this._keyFildEl && this.isNew) {
                 this.alert('条码数据不能为空!');
                 return;
             }
@@ -388,6 +394,7 @@ export class RfidInventory {
                         //扫码提交上次纪律不值true
                         this.isNew = true;
                     }
+                    this.isUnCommit=false;
                     this.allCount = this.allCount + this.epc.length;
                     this.allEl.innerHTML = this.allCount + '';
                     this.modal.wrapper.focus();
