@@ -287,7 +287,7 @@ export class RfidInventory {
     private stop() {
         this.stopEl.classList.add('disabled-none');
         this.beginEl.classList.remove('disabled-none');
-        this.recentData = {};
+        // this.recentData = {};
         Shell.rfid.stop((result) => {
             this.contentEl.appendChild(<div class="r">{result.msg}</div>);
         });
