@@ -157,7 +157,7 @@ export class OfflineBtn {
                 // sub && this.imports.clear(this.para.subId);
                 this.del(this.para.mainId,this.para.mainKey.name, null, 'delete', false);
             } else {
-                Modal.toast(result.msg);
+                Modal.alert(result.msg);
             }
             loading.destroy();
         });

@@ -29,7 +29,12 @@ export default class BasicPage {
                 this.setTitle(para.title);
             } else {
                 /*在当前页面打开时*/
-                this.url = d.closest(para.dom, '.page-container[data-src]').dataset.src;
+                let dom = d.closest(para.dom, '.page-container[data-src]');
+                if(dom){
+                    this.url = dom.dataset.src;
+                }else{
+                    this.url = '';
+                }
             }
         }
         this.param = tools.url.getObjPara(this.url);

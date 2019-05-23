@@ -2281,6 +2281,10 @@ export class BwTableModule extends Component {
                         selectionFlag = btnField.selectionFlag,
                         len = btnField.selectionFlag ? allLen - selectedLen : selectedLen;
 
+                    if(btnField.multiselect === 0){
+                        btn.isDisabled = false;
+                        return ;
+                    }
                     if (len === 0) {
                         btn.isDisabled = selectionFlag ? false : btnField.multiselect > 0;
                     } else if (selectedLen === 1) {

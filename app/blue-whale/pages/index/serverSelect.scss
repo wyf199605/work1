@@ -1,0 +1,106 @@
+.server-select-page{
+  .l-wrapper{
+    display: none;
+  }
+  .error{
+    color: red !important;
+  }
+  .fa{
+    color: #fff;
+  }
+  body{
+    background: rgb(247,247,255);
+
+  }
+  .tip{
+    margin: 0;
+    font-weight: bold;
+  }
+  .main-login .form-actions {
+    margin-top: 0px;
+    padding-top: 0px;
+    display: block;
+  }
+  .page-header{
+    text-align: center;
+    border-bottom: 0;
+    margin: 0;
+    padding-top: 10px;
+    padding-bottom: 0;
+  }
+  .page-header span{
+    font-family:"NSimSun",新宋体;
+  }
+  .page-header h2{
+    /*margin-left:15%;*/
+  }
+  .input-icon span {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    line-height: 40px;
+    font-weight: bold;
+  }
+  #sendVerify{
+    width: 80px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 40px;
+  }
+  .input-icon input{
+    padding-left: 70px !important;
+    height: 40px;
+  }
+  .box-login{
+    max-width: 300px;
+    margin: 0 auto!important;
+    margin-top:30px!important;
+  }
+
+  .list-group-item input{
+    float: right;
+    padding: 0!important;
+    border: 0!important;
+  }
+  .list-group-item{
+    padding: 8px;
+  }
+  fieldset legend{
+    color: #8e8e93;
+  }
+  /*@media (max-width: 991px) {*/
+  /*.box-login {*/
+  /*margin-left: 0 !important;*/
+  /*}*/
+  /*}*/
+  .new-account{
+    float: right;
+    margin-right: 25%;
+    margin-top: -30px;
+    font-size: 15px;
+  }
+  #login{
+    width: 100%;
+  }
+  .main-login{
+    max-width: none;
+    padding-top: 50px;
+  }
+  #sel{
+    margin-top: 7px;
+    margin-left: 90px;
+    width: 128px;
+  }
+  .form-group label{
+    font-size: 20px;
+    color: black;
+  }
+  #turnBack{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  #serverText{
+    resize: none;
+  }
+}
