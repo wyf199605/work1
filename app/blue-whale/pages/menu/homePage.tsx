@@ -287,7 +287,6 @@ export = class homePage extends BasicPage {
                 callback: (event) => {
                     let detail = JSON.parse(event.detail);
                     if(detail.data.indexOf('share-') !== -1){
-                        alert('share');
                         ShareCode.codeXhr(detail.data);
                         return;
                     }

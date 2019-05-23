@@ -8,6 +8,7 @@ import d = G.d;
 import tools = G.tools;
 import Shell = G.Shell;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import { ShellAction } from "global/action/ShellAction";
 
 /** 
  * 分页器
@@ -30,7 +31,7 @@ export class ShareCode {
     keyField: string;  // 根据ui接口获取keyField
     selectedRow: Array<object> // 表格选中的行
     shareDiv:HTMLElement; // 分享
-
+    websocket: any;
 
     constructor(selectedRow) {
 
@@ -44,8 +45,20 @@ export class ShareCode {
         this.currentEnv = (this.url.split('sf')[1]).split('/')[1];
         // alert('t'+tools.isMb)
         tools.isMb? this.createCodeBtnEle() : this.generateCode();
-        
+        this.initWebscoket();
 
+    }
+
+    protected initWebscoket() {
+        if (!G.tools.isMb) {
+            return;
+        }
+        require(['webscoket'], (webscoket) => {
+            this.websocket = new webscoket({
+                mgrPath: BW.CONF.siteUrl,
+                wsUrl: BW.CONF.webscoketUrl
+            });
+        });
     }
 
     /**
@@ -168,7 +181,7 @@ export class ShareCode {
     }
     static codeXhr(code) {
         
-        let tableUrl = localStorage.getItem('tableUrl') === null ? location.href : localStorage.getItem('tableUrl');
+        let tableUrl =  location.href;
         let currentEnv = (tableUrl.split('sf')[1]).split('/')[1];
        
         BwRule.Ajax.fetch(CONF.siteUrl + `/${currentEnv}/null/commonsvc/scan`, {
@@ -186,8 +199,20 @@ export class ShareCode {
 
                 }).then(({ response }) => {
                     if(response.errorCode === 0) {
-                        let url = CONF.siteUrl + response.body.bodyList[0].addr;
-                        sys.window.open({url});
+                        let url = `${CONF.siteUrl}${response.body.bodyList[0].addr}`; 
+                        
+                        // params = params.length > 0 ? params.substring(0,params.length - 1) : params;
+                        // url += params;
+                        let keyField = {
+                            data: response.body.bodyList[0].data ? response.body.bodyList[0].data : [],
+                            key: response.body.bodyList[0].keyField ? response.body.bodyList[0].keyField : ''
+                        }
+                        localStorage.setItem('keyField', JSON.stringify(keyField));
+                        localStorage.setItem('autTag', '0');
+                        localStorage.setItem('queryer',JSON.stringify(response.body.bodyList[0].select));
+                        console.log(JSON.stringify(response.body.bodyList[0].select))
+                        // console.log('sssss', params);
+                        sys.window.open({url });
                         
                     }
                     // console.log('test', response);
@@ -242,6 +267,7 @@ export class ShareCode {
         let getUrl = this.url.indexOf('?') === -1 ?  `${this.url}?output=json` :`${this.url}&output=json`
         BwRule.Ajax.fetch(getUrl).then(({response}) => {
             this.keyField = response.body.elements[0].keyField || null;
+            console.log('keyField',this.keyField);
             let data = [];
             if(this.keyField) {
                 data = this.selectedRow.map(item => item[this.keyField]);
@@ -251,6 +277,7 @@ export class ShareCode {
                 type: 'POST',
                 data: {
                     data,
+                    keyField: this.keyField,
                     select: selectObj,
                     addr: this.currentAddr
                 }
@@ -361,7 +388,36 @@ export class ShareCode {
             onClick: this.btnClk,
             className: 'share-code-btn '
         }
-        new Button(buttonData)
+        let flag = false;
+        let ScanBtn: IButton = {
+            container: ele,
+            content: '扫码',
+            icon: 'iconsaoma',
+            iconNoPre: true,
+            onClick: () => {
+                if (flag) {
+                    return false;
+                }
+                flag = true;
+                setTimeout(() => {
+                    flag = false;
+                }, 1500);
+                ShellAction.get().device().scan({
+                    callback: (event) => {
+                        let detail = JSON.parse(event.detail);
+                        if(detail.data.indexOf('share-') !== -1){
+                            ShareCode.codeXhr(detail.data);
+                            return;
+                        }
+                        
+                        this.websocket.handleUrl(detail.data);
+                    }
+                });
+            },
+            className: 'share-code-btn '
+        }
+        new Button(buttonData);
+        new Button(ScanBtn);
         
         // $('body > header').append(dom);
           

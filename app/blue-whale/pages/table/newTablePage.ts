@@ -70,7 +70,7 @@ export class BwTableElement extends Component{
             isDynamic = tools.isEmpty(bwTableEl.cols),
             hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
 
-        if(isDynamic) {
+        if(isDynamic ) {
             // 动态加载查询模块
             let bwQueryEl:IBw_Query = bwTableEl as any;
             require([queryModuleName], Query => {
@@ -173,7 +173,13 @@ export class BwTableElement extends Component{
           
 
             if(hasQuery) {
+                
                 require([queryModuleName], (Query) => {
+                    let autTag = localStorage.getItem('autTag');
+                    if(autTag) {
+                        bwTableEl.querier.autTag = 0;
+                        localStorage.removeItem('autTag');
+                    }
                     let query = this.queryModule = new Query({
                         qm: bwTableEl.querier,
                         refresher: (ajaxData) => {
@@ -189,13 +195,7 @@ export class BwTableElement extends Component{
                                     d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
                                         this.queryModule.show();
                                     });
-                                    d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
-                                        // console.log(1111)
-                                        // this.queryModule.show();
-                                        
-                                       new ShareCode(this.tableModule.main.ftable.selectedRowsData);
-                                    //    console.log(new ShareCode())
-                                    });
+                                    
                                 } else {
             
                                     let main = this.tableModule.main;
@@ -260,7 +260,18 @@ export class BwTableElement extends Component{
         }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
             this.locationLine(line, para);
         }
+        
+        // 移动端二维码分享
+        if(tools.isMb) {
+            d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
+                console.log(1111)
+               new ShareCode(this.tableModule.main.ftable.selectedRowsData);
+            });
+        }
+        
     }
+
+    
 
     private asynQuery(asynData){
         require(['AsynQuery'], asyn => {

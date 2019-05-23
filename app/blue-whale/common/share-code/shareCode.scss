@@ -41,6 +41,10 @@
         justify-content: center;
         border: 1px solid rgba(0, 0, 0, 0.3);
         border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        align-items: center;
         .share-code-btn {
             width: 80%;
             &:hover{
@@ -80,8 +84,8 @@
         color: #333;
         text-align: center;
         width: 100%;
-        height: 35px;
-        line-height: 35px;
+        height: 45px;
+        line-height: 45px;
         border-bottom: 1px solid gainsboro;
         &.cancel-share {
             margin-top: 5px;
@@ -102,10 +106,12 @@
     .share-page-qrcode {
         display: flex;
         justify-content: center;
+        
         img{
             background-color: white;
             padding: 30px;
             border-radius: 5px;
+            
         }
     }
     .share-page-methods {
@@ -151,6 +157,8 @@
         }
     }
 }
+
+
 
 // pc
 .share-code-pc {
