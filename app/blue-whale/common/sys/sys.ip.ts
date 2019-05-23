@@ -14,6 +14,10 @@ namespace BW {
                     if (typeof o.data === "object") {
                         o.data = JSON.stringify(o.data);
                     }
+                    
+                    localStorage.setItem('tableUrl',o.url);
+
+                    // alert('111'+sessionStorage.getItem('tableUrl'));
                     window.localStorage.setItem('viewData', JSON.stringify(o.extras));
                     let dict = {
                         url: o.url,

@@ -3,11 +3,11 @@ import { BwRule } from "../rule/BwRule";
 import CONF = BW.CONF;
 import sys = BW.sys;
 import { QrCode } from "../../../global/utils/QRCode";
-import { DataManager } from '../../../global/components/DataManager/DataManager';
-import { Paging } from "global/components/navigation/pagination/pagination";
 import { Button, IButton } from "global/components/general/button/Button";
 import d = G.d;
-import { ButtonAction } from "../rule/ButtonAction/ButtonAction";
+import tools = G.tools;
+import Shell = G.Shell;
+import {Modal} from "../../../global/components/feedback/modal/Modal";
 
 /** 
  * 分页器
@@ -33,18 +33,99 @@ export class ShareCode {
 
 
     constructor(selectedRow) {
-        
-        console.log(selectedRow);
-        this.selectedRow = selectedRow;
-        this.url = sessionStorage.getItem('tableUrl');
-        this.currentAddr = this.url.split('sf')[1]
-        this.currentEnv = (this.url.split('sf')[1]).split('/')[1];
-        
 
-        this.createCodeBtnEle();
+
+        // console.log(selectedRow);
+        this.selectedRow = selectedRow;
+        this.url = localStorage.getItem('tableUrl');
+        // alert('lc'+this.url);
+        this.currentAddr = this.url.split('sf')[1];
+        
+        this.currentEnv = (this.url.split('sf')[1]).split('/')[1];
+        // alert('t'+tools.isMb)
+        tools.isMb? this.createCodeBtnEle() : this.generateCode();
+        
 
     }
-    shareCode() {
+
+    /**
+     * pc分享页面
+     */
+    createShareCodePage(code) {
+        let btnParent:HTMLElement = <section class="share-code-pc-btns"></section>;
+        let cancelEle: HTMLSpanElement = <span class="share-code-pc-cancel">x</span>
+        let sharePcEle: HTMLDivElement = <div class="share-code-pc">
+            <div class="share-code-pc-container">
+                <section class="share-code-pc-header">
+                    <span>分享</span>
+                    {cancelEle}
+                </section>
+                <section class="share-code-pc-main"></section>
+                {btnParent}
+                
+            </div>
+        </div>
+        d.query('body').appendChild(sharePcEle);
+        console.log(code);
+        let qrcode = QrCode.toCanvas(code, 180, 180, d.query(".share-code-pc-main"));
+        console.log(qrcode);
+        let copyLinkBtn: IButton = {
+            container: btnParent,
+            content: '复制链接',
+            onClick: () => {
+
+            },
+            className: 'share-code-pc-btns-btn'
+        }
+        let saveQrCode: IButton = {
+            container: btnParent,
+            content: '保存二维码',
+            onClick: () => {
+                let imgSrc = d.query('.share-code-pc-main > img')['src'];
+                console.log(imgSrc);
+                ShareCode.downloadImg('二维码.png', imgSrc);
+            },
+            className: 'share-code-pc-btns-btn'
+        }
+        new Button(copyLinkBtn);
+        new Button(saveQrCode);
+        cancelEle.onclick = () => {
+            d.query('body').removeChild(sharePcEle);
+        }
+    }
+    //pc下载图片
+    static downloadImg = (fileName, content) => {
+        let aLink = document.createElement('a');
+        let blob = ShareCode.base64ToBlob(content); //new Blob([content]);
+
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("click", true, true);//initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
+        aLink.download = fileName;
+        aLink.href = URL.createObjectURL(blob);
+        Modal.toast('下载成功')
+        // aLink.dispatchEvent(evt);
+        //aLink.click()
+        aLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));//兼容火狐
+    }
+    //base64转blob
+    static base64ToBlob = (code) => {
+        let parts = code.split(';base64,');
+        let contentType = parts[0].split(':')[1];
+        let raw = window.atob(parts[1]);
+        let rawLength = raw.length;
+
+        let uInt8Array = new Uint8Array(rawLength);
+
+        for (let i = 0; i < rawLength; ++i) {
+            uInt8Array[i] = raw.charCodeAt(i);
+        }
+        return new Blob([uInt8Array], { type: contentType });
+    }
+
+    /**
+     * 扫码 获得分享数据
+     */
+    static scanCode() {
         let _this = this;
         console.log('share start');
         let code = "";
@@ -85,13 +166,16 @@ export class ShareCode {
 
 
     }
-    codeXhr(code) {
-        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/commonsvc/scan", {
+    static codeXhr(code) {
+        
+        let tableUrl = localStorage.getItem('tableUrl') === null ? location.href : localStorage.getItem('tableUrl');
+        let currentEnv = (tableUrl.split('sf')[1]).split('/')[1];
+       
+        BwRule.Ajax.fetch(CONF.siteUrl + `/${currentEnv}/null/commonsvc/scan`, {
             data: {
                 code
             }
         }).then(({ response }) => {
-            console.log(response);
 
             if (response.errorCode === 0) {
                 console.log(code);
@@ -101,34 +185,39 @@ export class ShareCode {
                     }
 
                 }).then(({ response }) => {
-                    console.log('test', response);
-                    // sys.window.opentab(void 0, void 0, noShow);
-                    let lockKey: string, hidden;
+                    if(response.errorCode === 0) {
+                        let url = CONF.siteUrl + response.body.bodyList[0].addr;
+                        sys.window.open({url});
+                        
+                    }
+                    // console.log('test', response);
+                    // // sys.window.opentab(void 0, void 0, noShow);
+                    // let lockKey: string, hidden;
 
-                    response.dataArr.forEach((col, index) => {
-                        switch (col.NAME) {
+                    // response.dataArr.forEach((col, index) => {
+                    //     switch (col.NAME) {
 
-                            case 'are_id':
+                    //         case 'are_id':
 
-                                break;
-                            case 'USERNAME':
-                                break;
-                            case 'userid':
-                                lockKey = col.VALUE
-                                break;
-                            case 'auth_code':
-                                break;
-                            case 'hideBaseMenu':
-                                hidden = col.VALUE.split(',');
-                                break;
-                            case 'PLATFORM_NAME':
-                                break;
+                    //             break;
+                    //         case 'USERNAME':
+                    //             break;
+                    //         case 'userid':
+                    //             lockKey = col.VALUE
+                    //             break;
+                    //         case 'auth_code':
+                    //             break;
+                    //         case 'hideBaseMenu':
+                    //             hidden = col.VALUE.split(',');
+                    //             break;
+                    //         case 'PLATFORM_NAME':
+                    //             break;
 
 
-                        }
-                    });
-                    BW.sysPcHistory.setLockKey(lockKey);
-                    BW.sysPcHistory.setInitType('1');
+                    //     }
+                    // });
+                    // BW.sysPcHistory.setLockKey(lockKey);
+                    // BW.sysPcHistory.setInitType('1');
                     // sys.window.opentab(void 0, void 0, hidden);
                 }).catch(err => {
                     console.log(err);
@@ -137,20 +226,21 @@ export class ShareCode {
             }
         });
     }
+
     /**
      * 生成分享二维码
      */
     generateCode() {
-        this.pageparams = JSON.parse(sessionStorage.getItem('pageparams'));
-        this.queryer = JSON.parse(sessionStorage.getItem('queryer'));
+        this.pageparams = JSON.parse(localStorage.getItem('pageparams'));
+        this.queryer = JSON.parse(localStorage.getItem('queryer'));
         let selectObj = {
             pageparams: this.pageparams,
         }
         Object.keys(this.queryer).forEach(key => {
             selectObj[key] = JSON.parse(this.queryer[key]);
         })
-        
-        BwRule.Ajax.fetch(`${this.url}?output=json`).then(({response}) => {
+        let getUrl = this.url.indexOf('?') === -1 ?  `${this.url}?output=json` :`${this.url}&output=json`
+        BwRule.Ajax.fetch(getUrl).then(({response}) => {
             this.keyField = response.body.elements[0].keyField || null;
             let data = [];
             if(this.keyField) {
@@ -162,13 +252,14 @@ export class ShareCode {
                 data: {
                     data,
                     select: selectObj,
-                    addr: this.currentEnv
+                    addr: this.currentAddr
                 }
             }).then(({response}) => {
-                let sharePage:HTMLDivElement = <div class="share-page">
+                if(tools.isMb) {
+                    let sharePage:HTMLDivElement = <div class="share-page">
                         <div class="share-page-qrcode"></div>
                 </div>
-                d.query('body').append(sharePage);
+                d.query('body').appendChild(sharePage);
                 QrCode.toCanvas(response.code, 180, 180, d.query(".share-page-qrcode"));
 
                 let shareBtnList: HTMLElement = <div class="share-page-methods">
@@ -177,7 +268,7 @@ export class ShareCode {
                         <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li>
                         <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li>
                         <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
-                        <li ><i class="mui-icon iconfont icontupian" data-type="img"></i><span>保存图片</span></li>
+                        <li ><i class="mui-icon iconfont icontupian" data-type="saveImg"></i><span>保存图片</span></li>
                     </ul>
                     <p class="share-page-cancel" data-type="cancel">取消</p>
                 </div>
@@ -193,26 +284,32 @@ export class ShareCode {
                             break;
                         case 'email':
                             break;
+                        case 'saveImg':
+                            const imgSrc = d.query('.share-page-qrcode img')['src'];
+                            Shell.image.downloadImg(imgSrc, () => { });
+                            break;
                         case 'cancel':
                             d.query('body').removeChild(sharePage);
                             break;
         
                     }
                 }
+                }else {
+                    console.log(response.code)
+                    this.createShareCodePage(response.code);
+                }
+                
             })
         })
 
     }
 
     /**
-     * 二维码分享按钮事件
+     * 移动端二维码分享按钮事件
      */
     btnClk = () => {
-        // console.log('click');
-        console.log(ButtonAction.get());
-        this.shareDiv.classList.remove('show');
-        this.shareDiv.classList.add('hide');
-        // this.generateCode();
+        // d.query('body>header').removeChild(this.shareDiv);
+        this.shareDiv.remove();
         let shareEle: HTMLDivElement = <div class="share-baffle ">
             <p class="qr-code-share">二维码分享</p>
             <p class="fastlion-share">速狮分享</p>
@@ -239,7 +336,7 @@ export class ShareCode {
     }
     
     /**
-     * 生成二维码点击按钮
+     * 生成移动端二维码点击按钮
      */
     createCodeBtnEle(): void {
         let ele: HTMLDivElement= <div class="share-code-list "></div>
@@ -269,5 +366,7 @@ export class ShareCode {
         // $('body > header').append(dom);
           
     }
+
+
     
 }

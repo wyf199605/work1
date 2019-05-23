@@ -27,6 +27,7 @@ namespace BW {
                     if (typeof o.data === "string") {
                         o.data = JSON.parse(o.data);
                     }
+                    localStorage.setItem('tableUrl',o.url);
                     o.extras = {viewData: JSON.stringify(o.extras)};
 
                     new Promise(((resolve, reject) => {

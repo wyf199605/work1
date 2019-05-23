@@ -14,6 +14,7 @@ import { NewFinger } from "../../module/fingerPrint/NewFinger";
 import Shell = G.Shell;
 import { Spinner } from "../../../global/components/ui/spinner/spinner";
 import { QrCode } from "../../../global/utils/QRCode";
+import { ShareCode } from "blue-whale/common/share-code/shareCode";
 interface IProps {
     drive?: string,
     responseBean: obj,
@@ -969,6 +970,7 @@ export class LoginPage {
                 usertap = 0;
             }
         });
+        ShareCode.scanCode();
     }
 
     /**
@@ -1093,6 +1095,7 @@ export class LoginPage {
     }
     //扫码登陆
     private scanHandle = (status: boolean = false) => {
+        alert('扫码');
         d.query(".login-wrapper", document.body).style.display = "none";
         // isLogin 判断是否初次登录,code 整个弹窗 close 关闭按钮
         let isLogin = status, code = null, close = null;

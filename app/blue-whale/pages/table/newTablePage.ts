@@ -192,6 +192,7 @@ export class BwTableElement extends Component{
                                     d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
                                         // console.log(1111)
                                         // this.queryModule.show();
+                                        
                                        new ShareCode(this.tableModule.main.ftable.selectedRowsData);
                                     //    console.log(new ShareCode())
                                     });

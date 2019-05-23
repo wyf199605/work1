@@ -12,6 +12,7 @@ import {
   Menu
 } from "../../../global/components/navigation/menu/Menu";
 import { Tree } from "../../../global/components/navigation/tree/Tree";
+import { ShareCode } from "blue-whale/common/share-code/shareCode";
 
 interface SideBarMrgPara {
   menu: HTMLUListElement; // 导航菜单dom
@@ -78,6 +79,8 @@ export default class SideBarMrg {
             typeof content === "string"
               ? content
               : CONF.siteUrl + BwRule.reqAddr(node.content.menuPath);
+        // console.log('menu',url);
+        // localStorage.setItem('tableUrl',url);
         return Promise.resolve(
           BwRule.Ajax.fetch(url, {
             data: { output: "json" }
@@ -138,6 +141,8 @@ export default class SideBarMrg {
     d.on(d.query("#js_chart_btn"), "click", () => {
         this.href(2);
       });
+    
+    ShareCode.scanCode();
   }
 
   private href = (type: number) => {

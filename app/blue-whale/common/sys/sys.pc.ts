@@ -142,7 +142,7 @@ namespace BW {
                 open: function (o: winOpen, refer?: string) {
                     let url = o.url;
                     console.log(url);
-                    sessionStorage.setItem('tableUrl',url);
+                    localStorage.setItem('tableUrl',url);
                     if (self.inMain) {
                         let isNew = self.pages.open(o),
                             isNotBtl = url.indexOf('newPage') > -1;
