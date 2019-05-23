@@ -11,6 +11,7 @@ import { ShellAction } from "../../../global/action/ShellAction";
 import BasicPage from "../../pages/basicPage";
 import { Collect } from "../../module/collect/collect.mb";
 import { User } from "../../../global/entity/User";
+import { ShareCode } from "blue-whale/common/share-code/shareCode";
 export = class homePage extends BasicPage {
 
     protected slideTab: SlideTab;
@@ -285,6 +286,12 @@ export = class homePage extends BasicPage {
             ShellAction.get().device().scan({
                 callback: (event) => {
                     let detail = JSON.parse(event.detail);
+                    if(detail.data.indexOf('share-') !== -1){
+                        alert('share');
+                        ShareCode.codeXhr(detail.data);
+                        return;
+                    }
+                    
                     this.websocket.handleUrl(detail.data);
                 }
             });

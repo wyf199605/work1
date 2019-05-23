@@ -278,7 +278,7 @@ export abstract class QueryModule {
 
     //查询
     private queryLoad(queryJson){
-        sessionStorage.setItem('queryer', JSON.stringify(queryJson));
+        localStorage.setItem('queryer', JSON.stringify(queryJson));
         this.hide();
         return this.para.refresher(queryJson);
     }

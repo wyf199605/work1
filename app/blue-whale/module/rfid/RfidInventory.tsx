@@ -70,6 +70,7 @@ export class RfidInventory {
                     content: '开始',
                     className: 'rfid-begin',
                     onClick: () => {
+
                         this.start();
                     }
                 }, {
@@ -148,9 +149,10 @@ export class RfidInventory {
     }
 
     private scan(value: string) {
+
         let scanCode = Shell.rfid.scanCode(value, this.uniqueFlag),
             data = null;
-        // debugger;
+
         if (!this.beginEl.classList.contains('disabled-none')) {
             this.value = '';
             return;
@@ -183,6 +185,7 @@ export class RfidInventory {
             return;
         }
         // 若扫入条码
+
         if ('BARCODE' in data) {
             // 若已有条码，先提交数据
             if (G.tools.isNotEmpty(this.recentData['BARCODE']) && !this.isNew) {
@@ -206,16 +209,18 @@ export class RfidInventory {
 
     private setValue(data: obj) {
         this.recentData = Object.assign(this.recentData, data);
+        console.log(this.sortEls);
         this.sortEls.forEach(el => {
             let name = el.dataset.name.split(','),
                 value = '';
-            if (name[0] === this.ui.keyField) {
+            if (name[0] === 'BARCODE') {
                 //
                 this.ui.nameField.split(",").forEach(item => {
                     let caption = this.recentData[item];
                     value = value + (caption ? caption : '') + " "
                 })
-
+                d.query('.main_key', this.sortEl).innerHTML = value;
+               
             } else {
                 name.forEach((n, i) => {
                     if (n in this.recentData) {
@@ -225,8 +230,10 @@ export class RfidInventory {
                         value += this.recentData[n];
                     }
                 });
+
+                el.innerHTML = value;
             }
-            el.innerHTML = value;
+
         });
         this.clearData();
     }
@@ -280,7 +287,7 @@ export class RfidInventory {
     private stop() {
         this.stopEl.classList.add('disabled-none');
         this.beginEl.classList.remove('disabled-none');
-        this.recentData = {};
+        // this.recentData = {};
         Shell.rfid.stop((result) => {
             this.contentEl.appendChild(<div class="r">{result.msg}</div>);
         });
@@ -432,7 +439,7 @@ export class RfidInventory {
                 //            domlist[i].remove();
                 //        }
                 //    }
-                this.sortEl.innerHTML = "<div></div>";
+                this.sortEl.innerHTML = "";
                 if (info) {
                     let li = <div class="rfid-li">
                         <div data-name={info} />
@@ -442,7 +449,7 @@ export class RfidInventory {
                 if (this.ui && this.ui.keyField) {
                     d.append(this.sortEl, <div className="rfid-li">
                         {/* <div>{this.ui.keyName}：</div> */}
-                        {this._keyFildEl = <div data-name={this.ui.keyField} />}
+                        {this._keyFildEl = <div data-name={this.ui.keyField} className='main_key' />}
                     </div>)
                 }
                 this.titleEl.innerHTML = this.ui && this.ui.title || '';
