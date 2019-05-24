@@ -35,7 +35,7 @@ export class ButtonAction {
     }, url?: string, itemId?: string, atvData?: obj) {
         let self = this;
         // 没有按钮的状态。。。。
-        window.sessionStorage.setItem('subScriptStatus', '1');
+        window.localStorage.setItem('subScriptStatus', '1');
         console.log('buttonAction', btn);
         if (btn.subType === 'excel') {
             callback(null);
@@ -460,7 +460,7 @@ export class ButtonAction {
                                     Modal.alert(data.showText);
                                 } else if (btn.openType !== 'popup' && btn.subType !== 'import') {
                                     Modal.toast(response.msg || `${btn.title}成功`);
-                                    window.sessionStorage.setItem('subScriptStatus', '1');
+                                    window.localStorage.setItem('subScriptStatus', '1');
                                 }
                             }
 
