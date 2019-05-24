@@ -139,7 +139,7 @@ export class Share {
                     break;
                 case 'mail':
                     btnPush('app-youjian', 'bg-blue', '邮件转发', () => {
-                        alert(this.p.tagId);
+                        // alert(this.p.tagId);
                         BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json', {
                             type: 'post',
                             data: {
