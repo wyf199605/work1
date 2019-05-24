@@ -218,16 +218,16 @@ export class DataManager {
 
     protected _ajaxData:obj = {};
     get ajaxData() {
-        let queryer = localStorage.getItem('queryer');
-        if(queryer) {
-            let params = {}
-            Object.keys(JSON.parse(queryer)).forEach((key) => {
-                // params += `${key}=${JSON.stringify(response.body.bodyList[0].select[key])}&`;
-                params[key] = queryer[key];
-            });
-            this._ajaxData = params;
-        }
-        console.log('ajaxdata',this._ajaxData);
+        // let queryer = localStorage.getItem('queryer');
+        // if(queryer) {
+        //     let params = {}
+        //     Object.keys(JSON.parse(queryer)).forEach((key) => {
+        //         // params += `${key}=${JSON.stringify(response.body.bodyList[0].select[key])}&`;
+        //         params[key] = queryer[key];
+        //     });
+        //     this._ajaxData = params;
+        // }
+        // console.log('ajaxdata',this._ajaxData);
         
         return this._ajaxData || {};
     }

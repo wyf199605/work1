@@ -49,9 +49,9 @@
    - 登录： bwadmin / Rt6Qy9W2 =》192.168.0.142:22
    - 速狮开发服务器地址：/opt/nginx/html/k_img/dist
 
-## 5.速狮代码说明
+## 5.蓝鲸代码说明
    - 目录说明
-      - blue-whale  为速狮后台逻辑代码
+      - blue-whale  为蓝鲸后台逻辑代码
       - global代码为底层与业务无关的代码，比如ui组件，基础方法封装等
    - 构建说明
       - global项目和blue-whale项目各有一个gulpfile文件，项目运行两个项目必须要同时开启任务，项目中加入模块或页面都必须手打到gulpfile添加文件流
@@ -66,3 +66,4 @@
    - global目录结构
       - PC端个人中心菜单 components/ui/popover/
       - 我的未完成明细操作栏 components/FastBtnTable/
+      - 按钮实例 components/general/button/
