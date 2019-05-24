@@ -434,6 +434,11 @@ export class KeyStep {
     private p: IKeyStepPara;
     constructor(para: IKeyStepPara) {
         this.p = para;
+        try {
+            Shell.other.startScan2DResult();
+        } catch (error) {
+            Modal.alert('startScan2DResult接口报错')
+        }
         let can2dScan = Shell.inventory.can2dScan,
             btn: Button;
 
