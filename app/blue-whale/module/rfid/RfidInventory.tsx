@@ -120,8 +120,12 @@ export class RfidInventory {
         if (![8, 9, 16, 20, 32, 33, 34, 35, 37, 38, 39, 40, 46].includes(code)) {
             if (code === 13) {
                 // console.log(this.value)
-                this.scan(this.value);
-                this.value = '';
+                try {
+                    this.scan(this.value);
+                    this.value = '';
+                } catch (error) {
+                    this.value = '';
+                }
             } else {
                 this.value += e.key;
             }

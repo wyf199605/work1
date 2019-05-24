@@ -100,7 +100,7 @@ export class LoginPcPage extends LoginPage {
             userId: document.getElementById('username') as HTMLInputElement,
             password: document.getElementById('password') as HTMLInputElement,
             saveButton: checkBox,
-            fingerMbBtn: d.query('.zhiwen', loginOption),
+            fingerPcBtn: d.query('.zhiwen', loginOption),
             regButton: d.query('.device', loginOption),
             scanButton: d.query(".scanLogin", loginOption),
             fqaBtn
