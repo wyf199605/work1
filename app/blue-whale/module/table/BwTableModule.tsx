@@ -449,7 +449,7 @@ export class BwTableModule extends Component {
             content: '二维码分享',
             onClick: () => {
                 console.log('二维码分享',ui);
-                new ShareCode(this.tableModule.main.ftable.selectedRows);
+                new ShareCode(this.tableModule.main.ftable.selectedRowsData);
 
             },
         });
@@ -1061,10 +1061,15 @@ export class BwTableModule extends Component {
     })();
 
     get ajaxData() {
+        
+        setTimeout(() => {
+            this.defaultSelected()
+        }, 500);
         return this.ftable.tableData.ajaxData;
     }
 
     refresh(data?: obj) {
+        
         if (this.isPivot) {
             this.ftable && this.ftable.destroy();
             this.modalEditCancel();
@@ -1075,11 +1080,43 @@ export class BwTableModule extends Component {
                 this.modalEditCancel();
                 setTimeout(() => {
                     this.subBtns.initState();
-                    this.ftable && this.ftable.clearSelectedRows();
+                    
+                     this.ftable && this.ftable.clearSelectedRows();
+                     this.defaultSelected();
+                    
                 }, 500)
             });
         }
 
+    }
+
+    protected defaultSelected() {
+        
+            let keyField = localStorage.getItem('keyField');
+            // localStorage.removeItem('keyField');
+            console.log('defaultSelected')
+            if(keyField) {
+                let shareData = JSON.parse(keyField);
+                this.ftable.clearSelectedRows();
+                
+
+                if(shareData.key) {
+                    this.ftable.data.forEach((row,i) => {
+                        if(Object.keys(row).includes(shareData.key)) {
+                            shareData.data && shareData.data.forEach( id => {
+                                if(id === row[shareData.key]) {
+                                    this.ftable.rows[i].selected = true;
+                                    this.ftable.rows[i].selected = true;
+                                    this.ftable._drawSelectedCells();
+                                    this.ftable.pseudoTable.setCheckBoxStatus();
+                                }
+                            })
+                        }
+                    })
+                }
+                
+            }
+            
     }
 
     // protected fastTableInit
