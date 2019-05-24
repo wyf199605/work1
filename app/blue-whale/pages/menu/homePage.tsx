@@ -41,12 +41,17 @@ export = class homePage extends BasicPage {
                     // sessionStorage.setItem('subScriptStatus','0');
                 });
                 setInterval(() => {
+                    if(localStorage.getItem('subScriptStatus') === '0') return ;
+                    console.log('test');
+                    
+                    // alert(CONF.siteUrl + item.subScriptUrl);
                     item.subScriptUrl && BwRule.Ajax.fetch(CONF.siteUrl + item.subScriptUrl)
                         .then(({ response }) => {
                             let num = tools.keysVal(response, 'data', '0', 'N');
                             if (num) {
                                 num = parseInt(num);
                                 let badge = d.query('.mui-badge.mui-badge-danger', li);
+                                // alert(num);
                                 if (num > 0) {
                                     // badge.classList.remove('hide');
                                     badge.textContent = num;
@@ -54,7 +59,8 @@ export = class homePage extends BasicPage {
                                     // badge.classList.add('hide');
                                 }
                             }
-                            // sessionStorage.setItem('subScriptStatus','0');
+                            localStorage.setItem('subScriptStatus','0');
+                            
                         });
                 },1000);
         });

@@ -45,9 +45,9 @@ export class Menu extends ElementTreeNode {
         }
 
         // 设置角标 （渔人码头：设置菜单栏标红）
-        window.sessionStorage.setItem('subScriptStatus','1');
+        window.localStorage.setItem('subScriptStatus','1');
         setInterval(()=> {
-            let subScriptStatus = window.sessionStorage.getItem('subScriptStatus');
+            let subScriptStatus = window.localStorage.getItem('subScriptStatus');
             if(subScriptStatus === '1') {
                 this.setSubScript(para);
             } 
@@ -82,7 +82,7 @@ export class Menu extends ElementTreeNode {
         $.get(url,(res) => {
             console.log('subscript', res);
             if(res.body && res.body.bodyList && res.body.bodyList.length > 0){
-                window.sessionStorage.setItem('subScriptStatus','0');
+                window.localStorage.setItem('subScriptStatus','0');
                 let num = res.body.bodyList[0].dataList[0][0];
                 let subScriptParent = d.query(".tree-text-wrapper>.menu-sub-script", this.wrapper);
                 console.log(subScriptParent);
