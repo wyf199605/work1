@@ -233,6 +233,7 @@ export class FastTable extends Component {
                 if(!tools.isMb && !this.tableData.serverMode){
                     if(isRefresh){
                         this.tableData.originalData = this.tableData.data;
+                        console.log(this.tableData.originalData);
                     }
                     tools.isEmpty(this.tableData.originalData) && (this.tableData.originalData = this.tableData.data);
                     this.tableData.data = this.tableData.originalData.slice(start, start + length);
