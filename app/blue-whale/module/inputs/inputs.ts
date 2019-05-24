@@ -11,8 +11,8 @@ import { Button } from "../../../global/components/general/button/Button";
 import { ShellAction } from "../../../global/action/ShellAction";
 import Shell = G.Shell;
 import { BarCode } from "cashier/global/utils/barCode";
-import {NewTableModule} from "../table/newTableModule";
-import {DetailModule} from "../detailModule/detailModule";
+import { NewTableModule } from "../table/newTableModule";
+import { DetailModule } from "../detailModule/detailModule";
 
 interface InputsPara {
     inputs: R_Input[]
@@ -56,9 +56,34 @@ export class Inputs {
         this.p = para;
         para.container.tabIndex = parseInt(G.tools.getGuid());
         this.eventInit(para);
+        // pda设备
+        try {
+            // let e={success:true,data:'24196200'};
+            Shell.other.startScan2DResult((e) => {
+                // Modal.alert(JSON.stringify(e))
+                // debugger;
+                // console.log(e);
+                // console.log("成功了"+typeof e);
+                // Modal.alert(JSON.stringify(e))
+                if (e.success) {
+                    para.inputs.forEach(input => {
+                        let line = para.locationLine;
+                        let reg = regExpMatch(input, e.data);
+                        //匹配成功
+                        if (reg) {
+                            this.matchPass(reg, e.data);
+                        } else if (line) {
+                            this.rowSelect(line, e.data);
+                        }
+                    });
+                }
+            });
+        } catch (error) {
+            Modal.alert('startScan2DResult接口报错')
+        }
         /**rfid设置 */
         let result: any = Shell.other.getData();
-        if(result){
+        if (result) {
             let conf = result;
             this.port = getRfidPort(conf);
             console.log("RFID" + JSON.stringify(this.port))
@@ -67,7 +92,7 @@ export class Inputs {
                 /**
                  * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
                  */
-                    // alert(JSON.stringify(result));
+                // alert(JSON.stringify(result));
                 let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
                     data = result.data;
                 console.log(msg);
@@ -434,11 +459,6 @@ export class KeyStep {
     private p: IKeyStepPara;
     constructor(para: IKeyStepPara) {
         this.p = para;
-        try {
-            Shell.other.startScan2DResult();
-        } catch (error) {
-            Modal.alert('startScan2DResult接口报错')
-        }
         let can2dScan = Shell.inventory.can2dScan,
             btn: Button;
 

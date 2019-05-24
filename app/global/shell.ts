@@ -670,8 +670,8 @@ namespace G {
                 return ShellBase.handler('getData',{})
             },
             //监听按键
-            startScan2DResult(back?: IShellEventHandler) {
-                return ShellBase.handler('startScan2DResult', {}, back)
+            startScan2DResult(back?: IShellEventHandler,info?: IShellEventHandler) {
+                return ShellBase.handler('startScan2DResult', {}, back,back)
             },
         }
         return {
