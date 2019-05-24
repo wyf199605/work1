@@ -429,6 +429,10 @@ export class TableDataCell extends TableCell {
             this._isEdited = flag;
             this.wrapper && this.wrapper.classList.toggle('edited-cell', flag);
         }
+        if(!flag){
+            this.originalData = null;
+            console.log(this.originalData);
+        }
     }
 
     protected input: FormCom = null;
