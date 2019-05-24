@@ -604,7 +604,16 @@ namespace G {
                 ShellBase.handler('downloadImg', {
                     url
                 }, back);
-            }
+            },
+
+            /** 
+             * 移动端涂鸦
+            */
+            getSignImg(back: IShellEventHandler) {
+                ShellBase.handler('getSignImg', {
+                    
+                }, back);
+            },
         };
 
         const openSystem = (path: string, param: string, back: IShellEventHandler) => {
