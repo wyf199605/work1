@@ -105,7 +105,7 @@ export class FqaModal {
     static initInstallTap(): HTMLElement{
         return <div>
             <p>苹果手机在苹果商店下载，下载完成后会自动安装（苹果仅支持9.0及以上系统，如果低于9.0将无法安装）如图所示：</p>
-            <img src="" data-src={FqaModal.initUrl("../img/fqa/IOSDownloadError.png")} alt="苹果手机下载失败"/>
+            {/*<img src="" data-src={FqaModal.initUrl("../img/fqa/IOSDownloadError.png")} alt="苹果手机下载失败"/>*/}
             <p>现在主要讲解下安卓手机的安装步骤，下载成功后，会弹出类似图3所示：</p>
             <img src="" data-src={FqaModal.initUrl("../img/fqa/androidDownloadSuccess.png")} alt="安卓手机下载成功"/>
             <p>请点击“仅允许本次安装”，会进入开始安装界面，这时候提示该app需要的权限，请点击信任或者默认情况下点击下一步或者安装，开始等待安装结束。如图所示：</p>
