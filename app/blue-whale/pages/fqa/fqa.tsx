@@ -42,7 +42,7 @@ export class FqaModal {
             isOpenFirst: false,
             panelItems: [
                 {
-                    title: '手机如何下载蓝鲸后台？',
+                    title: '手机如何下载速狮后台？',
                     content: FqaModal.initDownloadTap(),
                 },
                 {
@@ -54,7 +54,7 @@ export class FqaModal {
                     content: FqaModal.initRegisterTap(),
                 },
                 {
-                    title: '如何正确登录蓝鲸后台？',
+                    title: '如何正确登录速狮后台？',
                     content: FqaModal.initLoginTap(),
                 },
                 {
@@ -105,7 +105,7 @@ export class FqaModal {
     static initInstallTap(): HTMLElement{
         return <div>
             <p>苹果手机在苹果商店下载，下载完成后会自动安装（苹果仅支持9.0及以上系统，如果低于9.0将无法安装）如图所示：</p>
-            <img src="" data-src={FqaModal.initUrl("../img/fqa/IOSDownloadError.png")} alt="苹果手机下载失败"/>
+            {/*<img src="" data-src={FqaModal.initUrl("../img/fqa/IOSDownloadError.png")} alt="苹果手机下载失败"/>*/}
             <p>现在主要讲解下安卓手机的安装步骤，下载成功后，会弹出类似图3所示：</p>
             <img src="" data-src={FqaModal.initUrl("../img/fqa/androidDownloadSuccess.png")} alt="安卓手机下载成功"/>
             <p>请点击“仅允许本次安装”，会进入开始安装界面，这时候提示该app需要的权限，请点击信任或者默认情况下点击下一步或者安装，开始等待安装结束。如图所示：</p>
@@ -117,7 +117,7 @@ export class FqaModal {
 
     static initRegisterTap(): HTMLElement{
         return <div>
-            <p>安装成功后，打开蓝鲸后台app，正常情况下会出现如图所示界面。</p>
+            <p>安装成功后，打开速狮后台app，正常情况下会出现如图所示界面。</p>
             <img src="" data-src={FqaModal.initUrl("../img/fqa/register.png")} alt="注册页面"/>
             <p>如果出现图5所示，请输入熊猫后台的手机号码和验证码，如果手机号码和熊猫里面的号码不匹配，将会出现如图7所示，出现这种情况，请自行去bpm更改手机号码：</p>
             <img src="" data-src={FqaModal.initUrl("../img/fqa/registerError.png")} alt="注册失败"/>

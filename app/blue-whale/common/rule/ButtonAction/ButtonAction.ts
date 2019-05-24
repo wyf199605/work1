@@ -427,9 +427,9 @@ export class ButtonAction {
                         if(response.errorCode === 200) {
                             Modal.alert(response.msg, '', () => {
                                 resolve(response);
-                            }); 
-                            return ; 
-                        } 
+                            });
+                            return ;
+                        }
 
                         if (data && (data.type || data.type === 0)) {
                             if (data.type === 0) {
@@ -474,10 +474,10 @@ export class ButtonAction {
 
     }
     // /**
-    //  * 
-    //  * @param url 
-    //  * @param msg 
-    //  * @param callback 
+    //  *
+    //  * @param url
+    //  * @param msg
+    //  * @param callback
     //  */
     // private genetateQrCode(btn: R_Button, dataArr: any, addr: string, url: string): Promise<any> {
     //     let subUrl =  `?addr=${encodeURIComponent(url.split('sf')[1])}`;
@@ -801,7 +801,7 @@ export class ButtonAction {
                     type: 'primary',
                     onClick: (e) => {
                         if (!('BlueWhaleShell' in window || 'AppShell' in window)) {
-                            Modal.alert('当前操作仅支持在蓝鲸PC客户端使用');
+                            Modal.alert('当前操作仅支持在速狮PC客户端使用');
                             return null;
                         }
                         action = selectBox.getSelect()[0].value;

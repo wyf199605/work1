@@ -45,7 +45,7 @@ export default class SideBarMrg {
         maxWidth: 290
       });
 
-      //关于蓝鲸
+      //关于速狮
       d.on(d.query("#msgVersion"), "click", ".button-o", function () {
         sys.window.open({ url: CONF.url.msgVersion });
       });
@@ -141,7 +141,7 @@ export default class SideBarMrg {
     d.on(d.query("#js_chart_btn"), "click", () => {
         this.href(2);
       });
-    
+
     ShareCode.scanCode();
   }
 
@@ -151,7 +151,7 @@ export default class SideBarMrg {
       url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=recent" });
     } else if(type === 2) {
         url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=chart" });
-    } 
+    }
     else {
       url = CONF.siteUrl + BwRule.reqAddr({ dataAddr: "/app_sanfu_retail/null/commonui/pageroute?page=collect" });
     }
