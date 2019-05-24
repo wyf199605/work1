@@ -42,7 +42,7 @@ export class FqaModal {
             isOpenFirst: false,
             panelItems: [
                 {
-                    title: '手机如何下载蓝鲸后台？',
+                    title: '手机如何下载速狮后台？',
                     content: FqaModal.initDownloadTap(),
                 },
                 {
@@ -54,7 +54,7 @@ export class FqaModal {
                     content: FqaModal.initRegisterTap(),
                 },
                 {
-                    title: '如何正确登录蓝鲸后台？',
+                    title: '如何正确登录速狮后台？',
                     content: FqaModal.initLoginTap(),
                 },
                 {
@@ -117,7 +117,7 @@ export class FqaModal {
 
     static initRegisterTap(): HTMLElement{
         return <div>
-            <p>安装成功后，打开蓝鲸后台app，正常情况下会出现如图所示界面。</p>
+            <p>安装成功后，打开速狮后台app，正常情况下会出现如图所示界面。</p>
             <img src="" data-src={FqaModal.initUrl("../img/fqa/register.png")} alt="注册页面"/>
             <p>如果出现图5所示，请输入熊猫后台的手机号码和验证码，如果手机号码和熊猫里面的号码不匹配，将会出现如图7所示，出现这种情况，请自行去bpm更改手机号码：</p>
             <img src="" data-src={FqaModal.initUrl("../img/fqa/registerError.png")} alt="注册失败"/>
