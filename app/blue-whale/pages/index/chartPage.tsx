@@ -7,7 +7,7 @@ import { BwRule } from "../../common/rule/BwRule";
 import CONF = BW.CONF;
 import chinaJson from '../../module/chartPageComponents/stacked-histogram-component/stacked-histogram.component';
 declare const echarts;
-import ChartComponent from "../../module/chartPageComponents/chart-page.component";
+import { EchartModule } from "blue-whale/module/echart-module/echartModule";
 
 
 
@@ -17,17 +17,19 @@ interface ICollectPara {
 }
 export class ChartPage extends BasicPage {
     container: HTMLElement;
-    chartComponent = new ChartComponent();
     constructor(para: ICollectPara) {
         super(para);
         this.container = para.dom;
-
+        console.log(EchartModule.echartFn);
         G.d.append(para.dom, this.render());
-        let stackedHistogram = this.chartComponent.stackedHistogramFn();
-        // console.log(stackedHistogramComponnet())
-        let lineChart = this.chartComponent.lineChartFn();
+        let stackedHistogram = this.stackedHistogramFn();
+        stackedHistogram.on('click', function (params) {
+            // 控制台打印数据的名称
+            console.log(params);
+        });
+        let lineChart = this.lineChartFn();
         let areaChart = this.areaChartFn();
-        let pieChart = this.chartComponent.pieAndStackChartFn();
+        let pieChart = this.pieAndStackChartFn();
         let chinaMap = this.chinaMapFn();
         let lineStackedChart = this.stackedChartFn();
         let oneLineChart = this.oneLineChartFn();
@@ -42,15 +44,15 @@ export class ChartPage extends BasicPage {
         };
     }
     render() {
-        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/modularUi/select").then( res => {
-            let chartArr = [];
-            if(res.response && res.response.elements) {
-                let chart = {
-                    // title: 
-                }
-                console.log(res);
-            }
-        });
+        // BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/modularUi/select").then(res => {
+        //     let chartArr = [];
+        //     if (res.response && res.response.elements) {
+        //         let chart = {
+        //             // title: 
+        //         }
+        //         console.log(res);
+        //     }
+        // });
         return (
             <main class="chart-page">
                 <div class="main-first-part">
@@ -120,7 +122,7 @@ export class ChartPage extends BasicPage {
         )
     }
 
-    
+
 
     /**
      * 折线图（背景）
@@ -227,7 +229,7 @@ export class ChartPage extends BasicPage {
         return areaChart;
     }
 
-    
+
 
     /**
      * 中国地图
@@ -310,10 +312,10 @@ export class ChartPage extends BasicPage {
      */
     auditProcess() {
         let barBg = [
-            {backgroundColor:'#609ee9'},
-            {backgroundColor:'#f7ba2a'}, 
-            {backgroundColor:'#fd5457'},
-             {backgroundColor:'#39ca74'}];
+            { backgroundColor: '#609ee9' },
+            { backgroundColor: '#f7ba2a' },
+            { backgroundColor: '#fd5457' },
+            { backgroundColor: '#39ca74' }];
         return (
             <div class="audit-process">
                 <p class="audit-title">审计流程进度</p>
@@ -360,11 +362,188 @@ export class ChartPage extends BasicPage {
     }
 
     /**
-     * 柱状图
+     * 柱状图折线图组合(1 柱状图)
      */
     stackedChartFn() {
-        let stackedChart = echarts.init(document.getElementById('stacked-chart'));
+        // let stackedChart = echarts.init(document.getElementById('stacked-chart'));
         const stackedChartOption = {
+            title: {
+                text: '本月经营分析',
+                textStyle: {
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                    color: '#333'
+                    // fontWeight: 'bold',
+
+                },
+                padding: 15,
+            },
+            grid: {
+                show: false,
+                // top: 15,
+                left: 15,
+                right: 15,
+                bottom: 15,
+                containLabel: true
+            },
+            tooltip: {},
+            legend: {
+                data: ['销量', '购买力'],
+                top: 15,
+            },
+            yAxis: {
+                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+
+            xAxis: {
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+            series: [
+                {
+                    name: '销量',
+                    type: 'bar',
+                    color: '#609ee9',
+                    barMaxWidth: '10',
+                    data: [5, 20, 70, 10, 10, 20]
+                },
+                {
+                    name: '购买力',
+                    type: 'bar',
+                    color: '#f7ba2a',
+                    barMaxWidth: '10',
+                    data: [7, 18, 46, 52, 60, 16]
+                },
+                {
+                    name: '进货量',
+                    type: 'bar',
+                    color: '#39ca74',
+                    barMaxWidth: '10',
+                    data: [55, 24, 36, 33, 42, 28]
+                },
+            ]
+        };
+        // stackedChart.setOption(stackedChartOption);
+        return EchartModule.echartFn(stackedChartOption, 'stacked-chart');
+    }
+    /**
+     * 柱状图折线图组合(2 折线图)
+     */
+    oneLineChartFn() {
+        // let oneLineChart = echarts.init(document.getElementById('one-line-chart'));
+        const oneLineChartData = {
+
+            grid: {
+                // top: 15,
+                left: 15,
+                right: 15,
+                bottom: 15,
+                containLabel: true
+            },
+            tooltip: {},
+            // legend: {
+            //     data: ['销量', '购买力'],
+            //     top: 15,
+            // },
+            yAxis: {
+                show: true,
+                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+
+            xAxis: {
+                show: true,
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+            series: [
+                {
+                    name: '销量',
+                    type: 'line',
+                    // color: '#fd5457',
+                    itemStyle: {
+                        color: '#fd5457',
+                        shadowColor: '#facfd0',
+                        shadowBlur: 15
+                    },
+                    lineStyle: {
+                        color: '#fd5457',
+                    },
+
+                    lineMaxWidth: '10',
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    data: [5, 20, 36, 10, 10, 100],
+                }
+            ]
+        };
+        // oneLineChart.setOption(oneLineChartData);
+        // return oneLineChart;
+        return EchartModule.echartFn(oneLineChartData, 'one-line-chart');
+
+    }
+
+
+
+    /**
+     * 折线图
+     */
+    lineChartFn() {
+
+        // let lineChart = echarts.init(document.getElementById('line-chart'));
+        const lineChartData = {
             title: {
                 text: '本月经营分析',
                 textStyle: {
@@ -425,37 +604,69 @@ export class ChartPage extends BasicPage {
             series: [
                 {
                     name: '销量',
-                    type: 'bar',
+                    type: 'line',
                     color: '#609ee9',
-                    barMaxWidth: '10',
-                    data: [5, 20, 70, 10, 10, 20]
+                    lineMaxWidth: '10',
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    data: [5, 20, 36, 10, 10, 20]
                 },
                 {
                     name: '购买力',
-                    type: 'bar',
+                    type: 'line',
                     color: '#f7ba2a',
-                    barMaxWidth: '10',
+                    smooth: true,
+                    lineMaxWidth: '10',
+                    symbol: 'circle',
+                    symbolSize: 8,
                     data: [7, 18, 46, 52, 60, 16]
                 },
                 {
                     name: '进货量',
-                    type: 'bar',
+                    type: 'line',
+                    smooth: true,
                     color: '#39ca74',
-                    barMaxWidth: '10',
+                    lineMaxWidth: '10',
+                    symbol: 'circle',
+                    symbolSize: 8,
                     data: [55, 24, 36, 33, 42, 28]
                 },
             ]
         };
-        stackedChart.setOption(stackedChartOption);
-        return stackedChart;
+        // lineChart.setOption(lineChartData);
+
+        return EchartModule.echartFn(lineChartData, 'line-chart');
+
     }
+
     /**
-     * 折线图
+     * 柱状图
      */
-    oneLineChartFn() {
-        let oneLineChart = echarts.init(document.getElementById('one-line-chart'));
-        const oneLineChartData = {
-           
+    stackedHistogramFn() {
+        // let stackedHistogram = echarts.init(document.getElementById('stacked-histogram'));
+        const stackedHistogramOption = {
+            title: {
+                text: '本月经营分析',
+                textStyle: {
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                    color: '#333'
+                    // fontWeight: 'bold',
+
+                },
+                padding: 15,
+            },
+            dataZoom: {
+                type: 'slider',
+                show: true,
+                xAxisIndex: [0],
+                //   xAxisIndex: [0],
+                // left: '9%',
+                // bottom: -5,
+                // start: 10,
+                // end: 1000 //初始化滚动条
+            },
             grid: {
                 // top: 15,
                 left: 15,
@@ -464,13 +675,12 @@ export class ChartPage extends BasicPage {
                 containLabel: true
             },
             tooltip: {},
-            // legend: {
-            //     data: ['销量', '购买力'],
-            //     top: 15,
-            // },
+            legend: {
+                data: ['销量', '购买力'],
+                top: 15,
+            },
             xAxis: {
-                show:false,
-                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子", "衬", "羊毛", "雪纺", "袜子", "衬", "羊毛", "雪纺", "袜子", "衬", "羊毛", "雪纺", "雪纺", "袜子", "衬", "羊毛", "雪纺", "雪纺", "袜子", "衬", "羊毛", "雪纺", "雪纺", "袜子", "衬", "羊毛", "雪纺", "雪纺", "袜子", "衬", "羊毛", "雪纺", "雪纺", "袜子", "衬", "羊毛", "雪纺", "雪纺", "袜子", "衬", "羊毛", "雪纺", "雪纺", "袜子", "衬", "羊毛", "雪纺"],
                 splitLine: {
                     lineStyle: {
                         // 使用深浅的间隔色
@@ -488,7 +698,6 @@ export class ChartPage extends BasicPage {
             },
 
             yAxis: {
-                show:false,
                 splitLine: {
                     lineStyle: {
                         // 使用深浅的间隔色
@@ -507,30 +716,194 @@ export class ChartPage extends BasicPage {
             series: [
                 {
                     name: '销量',
+                    type: 'bar',
+                    color: '#609ee9',
+                    barMaxWidth: '10',
+                    data: [5, 20, 36, 10, 10, 20, 100, 30, 33, 36, 10, 10, 20, 100, 30, 33]
+                },
+                {
+                    name: '购买力',
+                    type: 'bar',
+                    color: '#f7ba2a',
+                    barMaxWidth: '10',
+                    data: [7, 18, 46, 52, 60, 16, 20, 36, 10, 36, 10, 10, 20, 100, 30, 33]
+                },
+                {
+                    name: '进货量',
                     type: 'line',
-                    // color: '#fd5457',
-                    itemStyle: {
-                        color: '#fd5457',
-                        shadowColor: '#facfd0',
-                        shadowBlur: 15
+                    color: '#39ca74',
+                    barMaxWidth: '10',
+                    data: [55, 24, 36, 33, 42, 28, 46, 52, 60, 36, 10, 10, 20, 100, 30, 33]
+                },
+            ]
+        };
+        // stackedHistogram.setOption(stackedHistogramOption);
+        return EchartModule.echartFn(stackedHistogramOption, 'stacked-histogram');
+    }
+
+    /**
+     * 饼状图&柱状图组合
+     */
+    pieAndStackChartFn() {
+        let pieChart = echarts.init(document.getElementById('combine-pie-chart'));
+        const pieChartData = {
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                right: '10%',
+                y: 'center',
+                data: ['直接访问', '邮件营销', '联盟广告', '视频广告']
+            },
+            series: [
+                {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['35%', '50%'],
+                    label: {
+                        normal: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            show: true,
+                            textStyle: {
+                                fontSize: '15',
+                                fontWeight: 'bold'
+                            }
+                        }
                     },
-                    lineStyle: {
-                        color: '#fd5457',
+                    labelLine: {
+                        normal: {
+                            show: false
+                        }
                     },
-                    
-                    lineMaxWidth: '10',
-                    smooth: true,
-                    symbol: 'circle',
-                    symbolSize: 8,
-                    data: [5, 20, 36, 10, 10, 100],
+                    data: [
+                        {
+                            value: 335,
+                            name: '直接访问',
+                            itemStyle: {
+                                color: '#609ee9',
+                            }
+                        },
+                        {
+                            value: 310,
+                            name: '邮件营销',
+                            itemStyle: {
+                                color: '#fd5457',
+                            }
+                        },
+                        {
+                            value: 234,
+                            name: '联盟广告',
+                            itemStyle: {
+                                color: '#39ca74',
+                            }
+                        },
+                        {
+                            value: 135,
+                            name: '视频广告',
+                            itemStyle: {
+                                color: '#f7ba2a',
+                            }
+                        }
+                    ]
                 }
             ]
         };
-        oneLineChart.setOption(oneLineChartData);
-        return oneLineChart;
+        pieChart.setOption(pieChartData);
 
+        let combineStackChart = echarts.init(document.getElementById('combine-stack-chart'));
+        const combineStackChartOption = {
+            title: {
+                text: '本月经营分析',
+                textStyle: {
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                    color: '#333'
+                    // fontWeight: 'bold',
+
+                },
+                padding: 15,
+            },
+            grid: {
+                // top: 15,
+                left: 15,
+                right: 15,
+                bottom: 15,
+                containLabel: true
+            },
+            tooltip: {},
+            legend: {
+                data: ['销量', '购买力'],
+                top: 15,
+                right: '10%',
+            },
+            xAxis: {
+                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+
+            yAxis: {
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+            series: [
+                {
+                    name: '销量',
+                    type: 'bar',
+                    color: '#609ee9',
+                    barMaxWidth: '10',
+                    data: [5, 20, 36, 10, 10, 20]
+                },
+                {
+                    name: '购买力',
+                    type: 'bar',
+                    color: '#f7ba2a',
+                    barMaxWidth: '10',
+                    data: [7, 18, 46, 52, 60, 16]
+                },
+                {
+                    name: '进货量',
+                    type: 'bar',
+                    color: '#39ca74',
+                    barMaxWidth: '10',
+                    data: [55, 24, 36, 33, 42, 28]
+                },
+            ]
+        };
+        combineStackChart.setOption(combineStackChartOption);
+        return combineStackChart;
     }
-    
+
 
 
 
