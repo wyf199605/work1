@@ -779,18 +779,23 @@ export class LoginPage {
      */
     private loginClick() {
         if (tools.isMb) {
-            Shell.other.isPermission((e) => {
-                if (e.data === 'false') {
-                    // Modal.alert("没有权限进入系统");
-                    Modal.alert("没有权限进入系统", "提示", () => {
-                        if (sys.os === 'ad' || sys.os === 'ip') {
-                            sys.window.quit();
-                        }
-                    })
-                } else {
-                    this.loginFunc();
-                }
-            });
+            try {
+                Shell.other.isPermission((e) => {
+                    if (e.data === 'false') {
+                        // Modal.alert("没有权限进入系统");
+                        Modal.alert("没有权限进入系统", "提示", () => {
+                            if (sys.os === 'ad' || sys.os === 'ip') {
+                                sys.window.quit();
+                            }
+                        })
+                    } else {
+                        this.loginFunc();
+                    }
+                });
+            } catch (error) {
+                 Modal.alert("isPermission接口报错")
+            }
+           
         } else {
             this.loginFunc();
         }
