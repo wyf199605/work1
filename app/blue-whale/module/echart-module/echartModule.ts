@@ -70,7 +70,7 @@ export class EchartModule {
      * @param domId 获取的dom元素id进行渲染绘制
      */
     static echartFn(chartData: DataType, domId: string) {
-        let lineChart = echarts.init(document.getElementById(domId));
+        let chart = echarts.init(document.getElementById(domId));
         let defaultData = {
             title: {
                 // text: '本月经营分析',
@@ -162,8 +162,17 @@ export class EchartModule {
                 // },
             ]
         };
-        Object.assign(defaultData, chartData);
-        lineChart.setOption(chartData);
-        return lineChart;
+        let data = EchartModule.deepMerge(defaultData, chartData);
+        console.log(data);
+        chart.setOption(data);
+        return chart;
+    }
+    static  deepMerge(obj1, obj2) {
+        var key;
+        for(key in obj2) {
+            obj1[key] = obj1[key] && obj1[key].toString() === "[object Object]" ?
+            EchartModule.deepMerge(obj1[key], obj2[key]) : obj1[key] = obj2[key];
+        }
+        return obj1;
     }
 }

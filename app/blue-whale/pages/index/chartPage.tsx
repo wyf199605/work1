@@ -648,14 +648,14 @@ export class ChartPage extends BasicPage {
         const stackedHistogramOption = {
             title: {
                 text: '本月经营分析',
-                textStyle: {
-                    fontFamily: 'monospace',
-                    fontSize: 18,
-                    color: '#333'
-                    // fontWeight: 'bold',
+                // textStyle: {
+                //     fontFamily: 'monospace',
+                //     fontSize: 18,
+                //     color: '#333'
+                //     // fontWeight: 'bold',
 
-                },
-                padding: 15,
+                // },
+                // padding: 15,
             },
             dataZoom: {
                 type: 'slider',
