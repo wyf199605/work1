@@ -19,6 +19,7 @@ namespace BW {
             msgVersion: `commonui/pageroute?page=static%2FmsgVersion`,
             imgRotate: `commonui/pageroute?page=static%2FimgRotation`,
             changePassword: `commonui/pageroute?page=static%2FchangePassword`,
+            lionetOnline: `commonui/pageroute?page=lionetOnline`,
 
             privilegeConfigure: `commonui/pageroute?page=privilege&uiTypeTest=privilegeConfigure`,
             privilegeSearch: 'commonui/pageroute?page=privilege&uiTypeTest=privilegeSearch',
@@ -111,13 +112,14 @@ namespace BW {
             queryTest:'ui/select/node_nobugs?output=json',
 
             fileInfo: 'rest/attachment/info/file', // 文件信息
+            fastlionOnline: 'commonsvc/lion', // 小狮在线
 
             /**扫码登录 */
             scanToken:'app_sanfu_retail/null/codelogin/code',//获取扫码二维码
             scanState:"app_sanfu_retail/null/codelogin/state ",//获取用户是否扫码的状态  轮询请求
-            scanFirstCode:"app_sanfu_retail/null/common/scan",//pc初次登录：手机扫码获得lgToken并访问 
-            scanSecondCode:"/app_sanfu_retail/null/codelogin/code",//pc非初次登录 
-            scanMbSure:"/app_sanfu_retail/null/codelogin/change",//手机扫码后点击确认登录 
+            scanFirstCode:"app_sanfu_retail/null/common/scan",//pc初次登录：手机扫码获得lgToken并访问
+            scanSecondCode:"/app_sanfu_retail/null/codelogin/code",//pc非初次登录
+            scanMbSure:"/app_sanfu_retail/null/codelogin/change",//手机扫码后点击确认登录
 
             pingUrl:'moblie/ping',
             location:'buildmap'

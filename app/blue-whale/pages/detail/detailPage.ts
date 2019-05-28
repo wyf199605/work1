@@ -1,4 +1,4 @@
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import tools = G.tools;
 import {BwRule} from "../../common/rule/BwRule";
 import sys = BW.sys;

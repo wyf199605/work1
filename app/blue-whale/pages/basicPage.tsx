@@ -5,7 +5,7 @@ import tools = G.tools;
 import Gesture = require("../module/gesture/gesture");
 import { ButtonAction } from "../common/rule/ButtonAction/ButtonAction";
 import { Modal } from "../../global/components/feedback/modal/Modal";
-import { Graffiti } from "../module/share/Share";
+import CONF = BW.CONF;
 
 export default class BasicPage {
     protected dom: HTMLElement;
@@ -96,6 +96,10 @@ export default class BasicPage {
             })
         }
         require(['photoSwipe', 'photoSwipeUi'], (photoSwipe, PhotoSwipeUI_Default) => {});
+
+        if(this.isMb){
+            BasicPage.initLionetOnline();
+        }
     }
 
     protected wrapperInit(): HTMLElement {
@@ -189,6 +193,53 @@ export default class BasicPage {
             });
         });
         document.body.appendChild(gestureIcon);
+    }
+
+    static initLionetOnline(){
+        const target = <div className="lionet-target">
+            <img src={G.requireBaseUrl + "../img/lionet.png"} alt=""/>
+        </div>;
+        d.append(document.body, target);
+        d.on(target, 'click', () => {
+            sys.window.open({url: CONF.url.lionetOnline});
+        });
+
+        let offsetWidth = document.body.offsetWidth,
+            offsetHeight = document.body.offsetHeight;
+        d.on(target, 'touchstart', function (e: TouchEvent) {
+            let ev = e.touches[0],
+                wrapper = target,
+                evX = ev.clientX,
+                evY = ev.clientY,
+                top = wrapper.offsetTop,
+                left = wrapper.offsetLeft;
+
+            let moveHandler = function (i: TouchEvent) {
+                let iv = i.touches[0],
+                    ivX = iv.clientX,
+                    ivY = iv.clientY,
+                    distanceX = evX - ivX,
+                    distanceY = evY - ivY,
+                    posLeft = left - distanceX,
+                    posTop = top - distanceY;
+
+                posLeft = Math.max(-30, posLeft);
+                posLeft = Math.min(offsetWidth - 30, posLeft);
+                posTop = Math.max(-30, posTop);
+                posTop = Math.min(offsetHeight - 30, posTop);
+
+                wrapper.style.left = posLeft + 'px';
+                wrapper.style.top = posTop + 'px';
+            };
+
+            let endHandler = function () {
+                d.off(document, 'touchmove', moveHandler);
+                d.off(document, 'touchend', endHandler);
+            };
+
+            d.on(document, 'touchmove', moveHandler);
+            d.on(document, 'touchend', endHandler);
+        })
     }
 
     protected destroy() {

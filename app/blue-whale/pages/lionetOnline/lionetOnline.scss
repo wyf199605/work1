@@ -1,0 +1,173 @@
+.lionet-target{
+  position: fixed;
+  left: -30px;
+  top: 50%;
+  z-index: 1001;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img{
+    max-width: 64px;
+  }
+}
+
+.ios-top{
+  .lionet-page{
+    .lionet-header{
+      @include iosxAdjustCalc(height, 86px);
+      @include iosxAdjustCalc(padding-top, 10px);
+    }
+  }
+
+}
+.lionet-page{
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .lionet-header{
+    height: 76px;
+    background: #005BAC;
+    flex: 0 0 auto;
+
+    .lionet-title{
+      margin: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+
+      .lionet-back{
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: #fff;
+        padding: 15px;
+      }
+    }
+
+
+  }
+
+  .lionet-container{
+    flex: 1 1 auto;
+    background: $default_5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .lionet-content{
+      flex: 1 1 auto;
+      padding: 20px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+
+      .lionet-msg{
+        display: inline-block;
+        border-radius:10px;
+        background: #fff;
+        padding: 14px;
+        margin-bottom: 14px;
+        color: $text;
+        position: relative;
+
+        .lionet-select{
+          p{
+            color: $text;
+            margin: 0;
+            font-size: inherit;
+            margin-bottom: 1em;
+          }
+          ul{
+            margin: 0;
+            padding: 0;
+            padding-left: 1em;
+            li > a{
+              display: block;
+              color: #005BAC;
+              padding: 6px 0;
+            }
+          }
+        }
+
+        &::after{
+          content: "";
+          display: block;
+          width: 14px;
+          height: 14px;
+          background: inherit;
+          position: absolute;
+          top: 50%;
+          left: -7px;
+          transform: translateY(-50%) rotate(-45deg);
+        }
+
+        &.myself-msg{
+          align-self: flex-end;
+          background: #005BAC;
+          color: #fff;
+          &::after{
+            left: auto;
+            right: -7px;
+          }
+        }
+      }
+    }
+    .lionet-siri{
+      flex: 0 0 auto;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      .spinner-siri {
+        width: 150px;
+        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 10px;
+      }
+
+      .spinner-siri > div {
+        background-color: #005BAC;
+        height: 100%;
+        width: 6px;
+        display: inline-block;
+        border-radius: 3px;
+        transform: scaleY(0.4);
+      }
+      .spinner-siri.animation > div {
+
+        -webkit-animation: stretchdelay 1s infinite ease-in-out;
+        animation: stretchdelay 1s infinite ease-in-out;
+
+      }
+    }
+  }
+}
+@-webkit-keyframes stretchdelay {
+  0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+  20% { -webkit-transform: scaleY(1.0) }
+}
+
+@keyframes stretchdelay {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+    -webkit-transform: scaleY(0.4);
+  }  20% {
+       transform: scaleY(1.0);
+       -webkit-transform: scaleY(1.0);
+     }
+}

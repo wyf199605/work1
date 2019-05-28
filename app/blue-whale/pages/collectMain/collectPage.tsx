@@ -1,5 +1,5 @@
 /// <amd-module name="CollectPage"/>
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import { BaseCollect, dataObj } from "../../module/collect/collect";
 import { Modal } from "global/components/feedback/modal/Modal";
 import { CollectPC } from "../../module/collect/collect.pc"
