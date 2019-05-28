@@ -25,11 +25,27 @@ export class LionetOnline {
         d.append(document.body, this.wrapper = this.render());
         this.content = d.query('.lionet-content', this.wrapper);
 
-        // 默认返回
+        // 初始提示
         this.setLionetMsg({
             type: 3,
             userMsg:'HI,我是小狮，很高兴为您服务，请问有什么需要帮助吗？'
         });
+        window['usermsg'] = '本日销售';
+    }
+
+    setLoadingMsg(myself = true): {close: Function}{
+        let el = this.renderMsg(
+            <div>
+                <div className="spinner"/>
+            </div>,
+            myself ? LionetOnline.myself_class_name : ''
+        );
+        return {
+            close: () => {
+                el && d.remove(el);
+                el = null;
+            }
+        }
     }
 
     // 设置我的语音输出
@@ -72,6 +88,7 @@ export class LionetOnline {
 
     // 根据语音或选择结果向后台请求
     reqLionetOnlone(text: string, reqtype: 0 | 1 = 0){
+        let {close} = this.setLoadingMsg(false);
         BwRule.Ajax.fetch(CONF.ajaxUrl.fastlionOnline, {
             type: "POST",
             data: {
@@ -81,12 +98,14 @@ export class LionetOnline {
                 stype: 0 // 用户使用语音输入的场景 0: 全局小狮子在线输入 1:菜单搜索语音输入 2:已经打开页面中唤醒
             }
         }).then(({response}: {response: IRes}) => {
+            close();
             this.setLionetMsg(response);
         });
     }
 
     // 点击输入语音事件
     speakHandler = (e: TouchEvent) => {
+        let {close} = this.setLoadingMsg();
         let handler,
             target = d.query('.spinner-siri', this.wrapper);
         target && target.classList.add('animation');
@@ -99,6 +118,7 @@ export class LionetOnline {
                 e.data && this.setMyselfMsg(e.data);
             });
             this.setMyselfMsg(window['usermsg']);
+            close();
         });
     };
 
@@ -132,13 +152,19 @@ export class LionetOnline {
     }
 
     // 渲染输出结果
-    renderMsg(msg: string | HTMLElement, className: string = ''): HTMLElement{
+    renderMsg(msg: string | HTMLElement, className: string = '', scrollIntoView = true): HTMLElement{
         let el = <div className={"lionet-msg " + className}>{msg}</div>;
         d.append(this.content, el);
-        if ('scrollIntoViewIfNeeded' in el) {
-            el.scrollIntoViewIfNeeded(false)
-        } else {
-            el.scrollIntoView(false);
+        if(scrollIntoView){
+            if ('scrollIntoView' in el) {
+                el.scrollIntoView({
+                    block: 'end',
+                    behavior: 'smooth'
+                });
+            } else if('scrollIntoViewIfNeeded' in el){
+                el.scrollIntoViewIfNeeded(false)
+
+            }
         }
         return el;
     }
