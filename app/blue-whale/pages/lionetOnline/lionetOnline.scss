@@ -83,6 +83,10 @@
         color: $text;
         position: relative;
 
+        &:last-child{
+          margin-bottom: 0;
+        }
+
         .lionet-select{
           p{
             color: $text;
@@ -133,7 +137,7 @@
       align-items: center;
       background: #fff;
       .spinner-siri {
-        width: 150px;
+        width: 120px;
         height: 70px;
         display: flex;
         justify-content: space-between;

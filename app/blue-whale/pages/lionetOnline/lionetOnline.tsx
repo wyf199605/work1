@@ -28,11 +28,12 @@ export class LionetOnline {
         // 初始提示
         this.setLionetMsg({
             type: 3,
-            userMsg:'HI,我是小狮，很高兴为您服务，请问有什么需要帮助吗？'
+            userMsg:'HI，我是小狮，很高兴为您服务，请问有什么需要帮助吗？'
         });
         window['usermsg'] = '本日销售';
     }
 
+    // 设置语音输出之前的加载
     setLoadingMsg(myself = true): {close: Function}{
         let el = this.renderMsg(
             <div>
@@ -114,11 +115,15 @@ export class LionetOnline {
         d.on(document, 'touchend', handler = () => {
             d.off(document, 'touchend', handler);
             target && target.classList.remove('animation');
-            speak(1, '', (e) => {
-                e.data && this.setMyselfMsg(e.data);
-            });
-            this.setMyselfMsg(window['usermsg']);
-            close();
+            if("AppShell" in window){
+                speak(1, '', (e) => {
+                    close();
+                    e.data && this.setMyselfMsg(e.data);
+                });
+            }else{
+                close();
+                this.setMyselfMsg(window['usermsg']);
+            }
         });
     };
 
