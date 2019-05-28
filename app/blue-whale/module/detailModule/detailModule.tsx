@@ -154,7 +154,7 @@ export class DetailModule extends AGroupTabItem {
         let groupInfos = this.ui.groupInfo,
             fields = this.fields;
         if(tools.isPc && tools.isNotEmpty(groupInfos)){
-            let items = [];
+            let items: DetailItem[] = [];
             container.classList.add('group-container-wrapper');
             d.append(container, <div className="group-wrapper">
                 {groupInfos.map((groupInfo) => {
