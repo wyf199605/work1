@@ -97,9 +97,9 @@ export default class BasicPage {
         }
         require(['photoSwipe', 'photoSwipeUi'], (photoSwipe, PhotoSwipeUI_Default) => {});
 
-        if(this.isMb){
-            BasicPage.initLionetOnline();
-        }
+        // if(this.isMb){
+        //     BasicPage.initLionetOnline();
+        // }
     }
 
     protected wrapperInit(): HTMLElement {
