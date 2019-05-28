@@ -19,9 +19,9 @@ interface DetailPagePara extends BasicPagePara{
 }
 
 interface IGroupInfo{
-    groupName?:string;
-    cloNames?:string;
-    columnNumber?:string;
+    groupName?:string; // 分组名称
+    cloNames?:string; // 分组一行有几列，优先级较低
+    columnNumber?:string; // 列名称，用 "," 隔开
 }
 
 interface EditPagePara extends BasicPagePara{
