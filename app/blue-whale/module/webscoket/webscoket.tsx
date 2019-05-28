@@ -22,7 +22,22 @@ export = class webscoket {
     constructor(private props) {
         let network, user = User.get(), self = this;
         let single = tools.isMb ? '/single/' : '/pc/';
-
+        // pda设备
+        try {
+            // let e={success:true,data:'24196200'};
+            Shell.other.startScan2DResult((e) => {
+                // Modal.alert(JSON.stringify(e))
+                // debugger;
+                // console.log(e);
+                // console.log("成功了"+typeof e);
+                // Modal.alert(JSON.stringify(e))
+                if (e.success) {
+                    this.openLoginModal(e.data)
+                }
+            });
+        } catch (error) {
+            Modal.alert('startScan2DResult接口报错')
+        }
         // setInterval(() => {
         //     this.onMessage(1);
         // }, 15000)
@@ -215,10 +230,10 @@ export = class webscoket {
                 }
                 break;
             case "hint":
-            //    alert(data.data.dataMap)
+                //    alert(data.data.dataMap)
                 require(['messagePage'], (messagePage) => {
                     // console.log(data.data.dataMap)
-                    if(data.data.dataMap){
+                    if (data.data.dataMap) {
                         messagePage.setSysBadge(data.data.dataMap.length);
                     }
                 });
