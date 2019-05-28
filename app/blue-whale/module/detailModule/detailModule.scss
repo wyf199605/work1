@@ -37,8 +37,6 @@
 
     &.group-container-wrapper{
       display: block;
-      border-left: none;
-      border-top: none;
 
       .group-item-wrapper{
         &:not(:last-child){
@@ -138,6 +136,8 @@
         width: calc(100% - 150px);
         position: relative;
         background: #fff;
+        word-wrap: break-word;
+        word-break: break-all;
         &>.text-input {
           width: 100%;
         }
@@ -224,6 +224,10 @@
       .detail-content{
         border-left: 1px solid #f0f0f0;
         border-top: 1px solid #f0f0f0;
+        &.group-container-wrapper{
+          border-left: none;
+          border-top: none;
+        }
 
         .detail-item-title{
           border-right: 1px solid #f0f0f0;
