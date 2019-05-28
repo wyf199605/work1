@@ -108,9 +108,13 @@ export = class messagePage {
         lis.forEach(li => {
             d.append(li, <span className="mui-badge mui-badge-primary hide" data-field={li.dataset.name} />);
         });
-        window.addEventListener('newMsg', (e: CustomEvent) => {
-            this.showSysList(JSON.parse(e.detail), true, listDOM);
-        });
+
+        //==== 此处监听存在重复性问题，待移除 ====//
+        // window.addEventListener('newMsg', (e: CustomEvent) => {
+        //     alert(JSON.parse(e.detail).length);
+        //     this.showSysList(JSON.parse(e.detail), true, listDOM);
+        // });
+        //=====================================//
 
         messagePage.setSysBadge();
 
@@ -133,7 +137,7 @@ export = class messagePage {
         if (G.tools.isMb) {
             messagePage.setSysBadge();
         }
-        // alert('渲染')
+        d.off(listDOM, 'click');
         let self = this;
         d.on(listDOM, 'click', '[data-action]', function () {
             switch (this.dataset.action) {
