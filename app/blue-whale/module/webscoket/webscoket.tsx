@@ -77,7 +77,13 @@ export = class webscoket {
             heartCheck.reset().start();
             console.info("websocket 连接打开.");
             require(['messagePage'], (messagePage) => {
-                messagePage.setSysBadge();
+                // 统计消息数量
+                BwRule.Ajax.fetch(CONF.url.taskMsg, {
+                    dataType: 'json',
+                    type: 'get'
+                }).then(({ response }) => {
+                    messagePage.setSysBadge(response.data.length);
+                });
             });
 
         };
