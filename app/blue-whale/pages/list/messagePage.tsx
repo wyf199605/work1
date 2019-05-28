@@ -228,6 +228,8 @@ export = class messagePage {
 
     /**
     * 设置角标，数字为0时，则不显示角标
+    * 存在延迟，因为需要等待任务数据请求完成才能统计，
+    * 所以最好将initTaskMsg()和initSysMsg()函数修改未同步;
     */
     static setSysBadge(numMessage:number=0) {
         let badge = d.query(`[data-field=sys]`),
@@ -247,6 +249,7 @@ export = class messagePage {
         }else{
            total= messagePage.tastList.length + localMsg.getUnreadCount();
         }
+        console.log('获取消息数量：',total)
         // console.log(total)
         G.Shell.other.sendMsgCount({ MsgCount: total }, () => { })
     }
