@@ -415,7 +415,8 @@ export class FastTable extends Component {
         if (!tools.isMb) {
             let minus = this.tableData.data.length * 40 > this.mainTable.body.wrapper.offsetHeight ? 0 : 10;
             width = (this.mainTable.width + this.calcMainTableLeftOffSet(width) - minus) + 7;
-            d.query(".scroll-content", this.wrapper).style.width = width + "px";
+            let scrollWrapper = d.query(".scroll-content", this.wrapper);
+            scrollWrapper && (scrollWrapper.style.width = width + "px");
         }
         // console.log(this.mainTable.width);
         // PC端设置表格高度
@@ -1562,6 +1563,7 @@ export class FastTable extends Component {
             } else if(!tools.isMb || isCanSelectMb) {
                 // 点击表格cell选中只在 “PC端” 或者 “cell 为link类型的 ”开启；
                 if (e.ctrlKey === true) {
+                    console.log('>>>');
                     if (this.selectedCells[rowIndex].length === this.rowGet(rowIndex).cells.length) {
                         let row = this.rowGet(rowIndex);
                         row && row._selectedInnerRowSet(true);
@@ -1667,7 +1669,7 @@ export class FastTable extends Component {
             if (rowObj) {
                 let cell = rowObj.cellGet(column);
                 if (!cell.isVirtual)
-                    cell._selectedInnerSet(true);
+                    cell._selectedInnerSet(!cell.selected);
             }
         };
         let singleSelectedPseudoTableCell = (row: number, mutiSelect = false) => {
@@ -2959,7 +2961,7 @@ export class FastTable extends Component {
             let column = cell.column;
             if (!(updatable && rowCanInit && editor.cellCanInit(column as FastTableColumn, 1))) {
                 cell.disabled = true;
-                cell.isNotPassiveModify = tools.isEmpty(column.content.flag) ? false : !column.content.flag;
+                cell.isNotPassiveModify = tools.isEmpty(column.content && column.content.flag) ? false : !column.content.flag;
             }
         });
     }
@@ -2976,7 +2978,7 @@ export class FastTable extends Component {
                     let column = cell.column;
                     if (!(updatable && rowCanInit && editor.cellCanInit(column as FastTableColumn, 0))) {
                         cell.disabled = true;
-                        cell.isNotPassiveModify = tools.isEmpty(column.content.flag) ? false : !column.content.flag;
+                        cell.isNotPassiveModify = tools.isEmpty(column.content && column.content.flag) ? false : !column.content.flag;
                     }
                 })
             }

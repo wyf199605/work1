@@ -107,7 +107,7 @@ export class NewTableModule extends AGroupTabItem {
                             this.main.modify.end();
                     } else {
                         let sub = this.sub[this.subTabActiveIndex];
-                        sub && sub.ftable.editing && sub.modify.end();
+                        sub && sub.ftable && sub.ftable.editing && sub.modify.end();
                     }
                 }
             } else if (this.editType === 'self' && this.main.editParam) {
@@ -197,7 +197,7 @@ export class NewTableModule extends AGroupTabItem {
                     let noLoadSub = this.noLoadSub(mftable, main);
 
                     if (tools.isEmpty(this.tab)) {
-                    
+
                         // if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
                         //     //console.log("不显示tab")
                         // } else {
@@ -231,7 +231,7 @@ export class NewTableModule extends AGroupTabItem {
                                 }
                             }
                         });
-                       
+
                         !tools.isMb && !this.subIconWrapper && this.initSubIcon();
                     }
                     this.tab.len <= 0 && this.bwEl.subTableList.forEach((sub) => {
@@ -510,7 +510,7 @@ export class NewTableModule extends AGroupTabItem {
             }
 
         } else {
-           
+
             Object.values(this.sub).forEach((subTable) => {
                 promise.push(subTable.refresh(ajaxData).catch());
                 subTable.linkedData = selectedData;
@@ -650,7 +650,7 @@ export class NewTableModule extends AGroupTabItem {
 
     /**
      * 初始化窗口操作
-     * @param bwTable 
+     * @param bwTable
      */
     protected initEdit(bwTable: BwTableModule) {
         let time = 500;
@@ -685,7 +685,7 @@ export class NewTableModule extends AGroupTabItem {
                     key: 'edit',
                     content: '编辑',
                     onClick: tools.pattern.throttling(() => {
-                        this.editManage.start(bwTable);
+                        this.editManage.start(bwTable).catch(console.log);
                     }, time),
                     icon: 'app-bianji',
                     iconPre: 'appcommon'
@@ -863,7 +863,7 @@ export class NewTableModule extends AGroupTabItem {
                 promises.push(table.modify.start());
             });
             return new Promise((resolve, reject) => {
-                Promise.all(promises).then(() => resolve()).catch(() => reject());
+                Promise.all(promises).then(() => resolve()).catch((e) => reject(e));
             });
         };
 

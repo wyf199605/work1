@@ -48,7 +48,7 @@ export class RfidInventory {
     private recentData = {};
     private epc: string[] = [];
     private token: string;
-    private isNew: boolean;
+    private isNew: boolean;//false：需要提交上条纪录   true：只扫码填充
     private isUnCommit:boolean;
     private oldValue: string;
     constructor(data: IRfidInventoryPara) {
@@ -64,6 +64,7 @@ export class RfidInventory {
             tabIndex: true,
             className: 'rfid-modal',
             isOnceDestroy: true,
+            isBackground:false,
             body: this.modalBody(),
             keyDownHandle: this.keyHandle,
             footer: {
@@ -174,22 +175,6 @@ export class RfidInventory {
             } else {
                 this.isNew = false;
             }
-            // if (this.isNew) {
-            //     if (this.recentData) {
-            //         if (this.recentData[this.ui.keyField] == data[this.ui.keyField]) {
-            //             this.isNew = true;
-            //         }else{
-            //             this.isNew = false;
-            //         }
-            //     }else{
-            //         this.isNew = false;
-            //     }
-            // } else {
-            //     this.isNew = false;
-            // }
-
-
-
         } else {
             this.alert(scanCode.msg);
             return;
@@ -307,6 +292,9 @@ export class RfidInventory {
     private start() {
         this.beginEl.classList.add('disabled-none');
         this.stopEl.classList.remove('disabled-none');
+        this.isUnCommit=false;
+        this.isNew=false;
+        this.recentData={};
         let ipResult: any = Shell.other.getData();
         let conf = ipResult,
             port = this.getRfidPort(conf);

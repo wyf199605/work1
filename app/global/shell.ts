@@ -669,6 +669,14 @@ namespace G {
             getData(back?: IShellEventHandler) {
                 return ShellBase.handler('getData',{})
             },
+            //监听按键
+            startScan2DResult(back?: IShellEventHandler,info?: IShellEventHandler) {
+                return ShellBase.handler('startScan2DResult', {}, back,back)
+            },
+            //登录权限
+            isPermission(back?: IShellEventHandler){
+                return ShellBase.handler('isPermission', {},back)
+            }
         }
         return {
             other, base, finger, file, casio, sqlite, printer, rfid, inventory, startUp, image, location, imports, openSystem, clearCache, network

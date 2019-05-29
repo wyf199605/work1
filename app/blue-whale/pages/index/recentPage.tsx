@@ -1,5 +1,5 @@
 /// <amd-module name="RecentPage"/>
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import d = G.d;
 import { BwRule } from "../../common/rule/BwRule";
 import CONF = BW.CONF;

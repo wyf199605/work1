@@ -275,7 +275,7 @@ export class BwRule extends Rule {
         static axios(url: string, type: string, data: FormData) {
             return new Promise((resolve, reject) => {
                 let method = type.toUpperCase();
-                //创建xhr对象 
+                //创建xhr对象
                 let xhr = new XMLHttpRequest();
                 if (method === "POST") {
                     xhr.open(method, url, true);
@@ -316,7 +316,7 @@ export class BwRule extends Rule {
      * @return {Array}
      */
     static createCrossTableCols(metaData: string[], fields: R_Field[]): IFastTableCol[][] {
-
+        metaData = metaData.filter((name) => name !== 'EDITEXPRESS');
         let tree: TreeNodeBase = new TreeNodeBase({
             content: {
                 name: '__nothing'

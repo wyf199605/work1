@@ -108,9 +108,13 @@ export = class messagePage {
         lis.forEach(li => {
             d.append(li, <span className="mui-badge mui-badge-primary hide" data-field={li.dataset.name} />);
         });
-        window.addEventListener('newMsg', (e: CustomEvent) => {
-            this.showSysList(JSON.parse(e.detail), true, listDOM);
-        });
+
+        //==== 此处监听存在重复性问题，待移除 ====//
+        // window.addEventListener('newMsg', (e: CustomEvent) => {
+        //     alert(JSON.parse(e.detail).length);
+        //     this.showSysList(JSON.parse(e.detail), true, listDOM);
+        // });
+        //=====================================//
 
         messagePage.setSysBadge();
 
@@ -133,7 +137,7 @@ export = class messagePage {
         if (G.tools.isMb) {
             messagePage.setSysBadge();
         }
-        // alert('渲染')
+        d.off(listDOM, 'click');
         let self = this;
         d.on(listDOM, 'click', '[data-action]', function () {
             switch (this.dataset.action) {
@@ -224,6 +228,8 @@ export = class messagePage {
 
     /**
     * 设置角标，数字为0时，则不显示角标
+    * 存在延迟，因为需要等待任务数据请求完成才能统计，
+    * 所以最好将initTaskMsg()和initSysMsg()函数修改未同步;
     */
     static setSysBadge(numMessage:number=0) {
         let badge = d.query(`[data-field=sys]`),
@@ -243,6 +249,7 @@ export = class messagePage {
         }else{
            total= messagePage.tastList.length + localMsg.getUnreadCount();
         }
+        console.log('获取消息数量：',total)
         // console.log(total)
         G.Shell.other.sendMsgCount({ MsgCount: total }, () => { })
     }

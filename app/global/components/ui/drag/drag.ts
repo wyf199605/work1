@@ -11,6 +11,7 @@ interface DragPara {
         minHeight?: number;//拖拉是能缩放的最小高度
     },
     container?: HTMLElement; //拖拉时的相对父容器
+    isDragOverBound?: boolean;
 }
 export class Drag {
     protected panelInfo: any;		// 用于缓存外边框边界数据，提高移动效率
@@ -21,7 +22,7 @@ export class Drag {
     private mouseDownScaleHandle;
     private _container; //父容器
 
-    constructor(private para) {
+    constructor(private para: DragPara) {
         this.init();
         this.dragEvent();
         this._container = (tools.isEmpty(para.container) || !para.scale) ? document.body : para.container;
@@ -179,7 +180,7 @@ export class Drag {
                         case 'right':
                             right = (this._container.clientWidth - event.pageX);
                             if (right > this._container.clientWidth - this.para.scale.minWidth) {
-                                right = this._container.clientWidth - this.para.minWidth;
+                                right = this._container.clientWidth - this.para.scale.minWidth;
                             }
                             this.para.dom.style.right = right + 'px';
                             this.para.dom.style.left = 0 + '';
