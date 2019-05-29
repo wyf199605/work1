@@ -74,7 +74,7 @@ export class ShareCode {
                     {cancelEle}
                 </section>
                 <section class="share-code-pc-main"></section>
-                {btnParent}
+                {/* {btnParent} */}
 
             </div>
         </div>
@@ -305,6 +305,7 @@ export class ShareCode {
                         const imgSrc = d.query('.share-page-qrcode img')['src'];
                         switch (type) {
                             case 'weixin':
+                                console.log(imgSrc);
                                 Shell.base.wxShare(imgSrc);
                                 break;
                             // case 'link':
