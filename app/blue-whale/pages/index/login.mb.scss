@@ -21,7 +21,7 @@
   width: 100%;
   background-color: #fff;
   position: relative;
-
+  overflow-y: scroll!important;
   &.modal-body-login{
 
     .login-title{
