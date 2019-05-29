@@ -294,7 +294,7 @@ export class ShareCode {
                             <li ><i class="mui-icon iconfont iconweixin" data-type="weixin"></i><span>微信</span></li>
                             {/* <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li>
                             <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li> */}
-                            <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
+                            <li class="disabled"><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
                             <li ><i class="mui-icon iconfont icontupian" data-type="saveImg"></i><span>保存图片</span></li>
                         </ul>
                         <p class="share-page-cancel" data-type="cancel">取消</p>
@@ -345,10 +345,7 @@ export class ShareCode {
         </div>
 
         shareEle.addEventListener('click', (e: Event) => {
-            let sharePage: HTMLDivElement = <div class="share-page">
-                {/* <div class="share-page-qrcode"></div> */}
-            </div>
-            d.query('body').appendChild(sharePage);
+            
             switch (e.target['className']) {
                 case 'qr-code-share':
                     this.generateCode();
@@ -356,6 +353,8 @@ export class ShareCode {
                     break;
                 case 'fastlion-share':
                     d.query('body').removeChild(shareEle);
+                    let sharePage: HTMLDivElement = <div class="share-page"></div>
+                    d.query('body').appendChild(sharePage);
                     let timer = setTimeout(() => {
                         clearTimeout(timer);
                         tools.isMb && Shell.image.getSignImg((res) => {
@@ -365,7 +364,7 @@ export class ShareCode {
                                     <li ><i class="mui-icon iconfont iconweixin" data-type="weixin"></i><span>微信</span></li>
                                     {/* <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li> */}
                                     {/* <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li> */}
-                                    <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
+                                    <li class="disabled"><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
                                     <li ><i class="mui-icon iconfont icontupian" data-type="saveImg"></i><span>保存图片</span></li>
                                 </ul>
                                 <p class="share-page-cancel" data-type="cancel">取消</p>

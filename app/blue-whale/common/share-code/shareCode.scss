@@ -47,6 +47,9 @@
         align-items: center;
         .share-code-btn {
             width: 80%;
+            i {
+                margin-right: 10px;
+            }
             &:hover{
                 border-color: #108ee9;
             }
@@ -125,7 +128,7 @@
         padding-bottom: 5px;
         ul {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-evenly;
             padding: 10px;
             margin: 0;
             li {
@@ -216,6 +219,15 @@
                 margin: 0 10px;
             }
         }
+    }
+}
+
+.disabled {
+     span {
+        color: gainsboro;
+    }
+    i{
+        color: gainsboro;
     }
 }
 
