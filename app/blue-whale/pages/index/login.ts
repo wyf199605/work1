@@ -778,6 +778,8 @@ export class LoginPage {
      * 密码登录
      */
     private loginClick() {
+        this.loginFunc();
+        return false;
         if (tools.isMb) {
             try {
                 Shell.other.isPermission((e) => {
