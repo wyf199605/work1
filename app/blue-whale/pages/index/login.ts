@@ -231,7 +231,6 @@ export class LoginPage {
             ev.preventDefault();
             let telVal = tel.value,
                 codeVal = code.value;
-            // 验证是否输入手机号与短信验证码
             if (!tools.valid.isTel(telVal)) {
                 Modal.alert('请输入正确的手机号码');
             } else if (tools.isEmpty(codeVal)) {
@@ -488,7 +487,7 @@ export class LoginPage {
                                 uuid: deviceInfo.uuid
                             })
                             return false;
-                        }else if(res.errorCode == 50012) {
+                        } else if (res.errorCode == 50012) {
                             if (res.msg === '当前设备已解绑成功') {
                                 Modal.alert(res.msg, null, () => { sys.window.load(CONF.url.reg); });
                             } else {
@@ -742,18 +741,7 @@ export class LoginPage {
             });
         }
     };
-
-    /**
-     * 密码登录
-     */
-    private loginClick() {
-        // Modal.confirm({
-        //     msg: '登录已超时,是否跳转到登录页',
-        //     callback: (index) => {
-               
-        //     }
-        // });
-        // return false;
+    private loginFunc = () => {
         let loginPage = this,
             saveBtn = loginPage.props.saveButton,
             isSavePw = saveBtn instanceof CheckBox ? saveBtn.checked : (<HTMLInputElement>saveBtn).checked,
@@ -786,7 +774,34 @@ export class LoginPage {
             });
         })
     }
-
+    /**
+     * 密码登录
+     */
+    private loginClick() {
+        this.loginFunc();
+        return false;
+        if (tools.isMb) {
+            try {
+                Shell.other.isPermission((e) => {
+                    if (e.data === 'false') {
+                        // Modal.alert("没有权限进入系统");
+                        Modal.alert("没有权限进入系统", "提示", () => {
+                            if (sys.os === 'ad' || sys.os === 'ip') {
+                                sys.window.quit();
+                            }
+                        })
+                    } else {
+                        this.loginFunc();
+                    }
+                });
+            } catch (error) {
+                 Modal.alert("isPermission接口报错")
+            }
+           
+        } else {
+            this.loginFunc();
+        }
+    }
     /**
      * 登录ajax
      */
