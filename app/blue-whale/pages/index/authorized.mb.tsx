@@ -1,8 +1,8 @@
-/** 
-  * 授权页面  登录模块 
+/**
+  * 授权页面  登录模块
 */
 /// <amd-module name="Authorized"/>
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import { BwRule } from "../../common/rule/BwRule";
 import tools = G.tools;
 import CONF = BW.CONF;

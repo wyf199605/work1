@@ -1,4 +1,4 @@
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import sys = BW.sys;
 import {BwRule} from "../../common/rule/BwRule";
 import {Modal} from "global/components/feedback/modal/Modal";

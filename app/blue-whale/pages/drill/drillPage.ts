@@ -1,6 +1,6 @@
 /// <amd-module name="drillPage">
 
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import {BwTableElement} from "../table/newTablePage";
 declare const initDataTable : any;
 export = class drillPage extends BasicPage{

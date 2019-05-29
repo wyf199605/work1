@@ -1,4 +1,4 @@
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import tools = G.tools;
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 

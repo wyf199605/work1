@@ -147,7 +147,7 @@ gulp.task('js', function() {
         'query/horizontalFormFactory',
         'query/customModule'
     ], 'query.pc.js');
-    
+
 
     // mb编辑模块
     gulpTsModule([
@@ -344,6 +344,8 @@ gulp.task('js', function() {
 
     gulpTsModule(["chartPageComponents/chart-page.component"], "ChartPageComponnet.js");
 
+    gulpTsPage(["lionetOnline/lionetOnline"], "lionetOnline.js");
+
 
 
     gulpTsPage('index/password', 'personPassword.js');
@@ -450,5 +452,5 @@ gulp.task('BW_Clean', function() {
 
 
 //gulp.task(name[, deps], fn) 定义任务  name：任务名称 deps：依赖任务名称 fn：回调函数
-//gulp.src(globs[, options]) 执行任务处理的文件  globs：处理的文件路径(字符串或者字符串数组) 
+//gulp.src(globs[, options]) 执行任务处理的文件  globs：处理的文件路径(字符串或者字符串数组)
 //gulp.dest(path[, options]) 处理完后文件生成路径

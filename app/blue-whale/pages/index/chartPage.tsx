@@ -1,7 +1,7 @@
 /// <amd-module name="ChartPage"/>
 /// <amd-dependency path="echarts" name="echarts"/>
 
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 import d = G.d;
 import { BwRule } from "../../common/rule/BwRule";
 import CONF = BW.CONF;
@@ -46,7 +46,7 @@ export class ChartPage extends BasicPage {
             let chartArr = [];
             if(res.response && res.response.elements) {
                 let chart = {
-                    // title: 
+                    // title:
                 }
                 console.log(res);
             }
@@ -120,7 +120,7 @@ export class ChartPage extends BasicPage {
         )
     }
 
-    
+
 
     /**
      * 折线图（背景）
@@ -227,7 +227,7 @@ export class ChartPage extends BasicPage {
         return areaChart;
     }
 
-    
+
 
     /**
      * 中国地图
@@ -311,7 +311,7 @@ export class ChartPage extends BasicPage {
     auditProcess() {
         let barBg = [
             {backgroundColor:'#609ee9'},
-            {backgroundColor:'#f7ba2a'}, 
+            {backgroundColor:'#f7ba2a'},
             {backgroundColor:'#fd5457'},
              {backgroundColor:'#39ca74'}];
         return (
@@ -455,7 +455,7 @@ export class ChartPage extends BasicPage {
     oneLineChartFn() {
         let oneLineChart = echarts.init(document.getElementById('one-line-chart'));
         const oneLineChartData = {
-           
+
             grid: {
                 // top: 15,
                 left: 15,
@@ -517,7 +517,7 @@ export class ChartPage extends BasicPage {
                     lineStyle: {
                         color: '#fd5457',
                     },
-                    
+
                     lineMaxWidth: '10',
                     smooth: true,
                     symbol: 'circle',
@@ -530,7 +530,7 @@ export class ChartPage extends BasicPage {
         return oneLineChart;
 
     }
-    
+
 
 
 

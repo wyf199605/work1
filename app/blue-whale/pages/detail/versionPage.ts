@@ -1,4 +1,4 @@
-import BasicPage from "basicPage";
+import BasicPage from "blue-whale/pages/basicPage";
 interface VersionPage extends BasicPagePara{
     version : obj
 }

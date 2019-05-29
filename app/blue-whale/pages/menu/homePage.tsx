@@ -8,7 +8,7 @@ import d = G.d;
 import { SlideTab } from "../../../global/components/ui/slideTab/slideTab";
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { ShellAction } from "../../../global/action/ShellAction";
-import BasicPage from "../../pages/basicPage";
+import BasicPage from "../basicPage";
 import { Collect } from "../../module/collect/collect.mb";
 import { User } from "../../../global/entity/User";
 import { ShareCode } from "blue-whale/common/share-code/shareCode";
@@ -40,29 +40,30 @@ export = class homePage extends BasicPage {
                     }
                     // sessionStorage.setItem('subScriptStatus','0');
                 });
-                setInterval(() => {
-                    if(localStorage.getItem('subScriptStatus') === '0') return ;
-                    console.log('test');
-                    
-                    // alert(CONF.siteUrl + item.subScriptUrl);
-                    item.subScriptUrl && BwRule.Ajax.fetch(CONF.siteUrl + item.subScriptUrl)
-                        .then(({ response }) => {
-                            let num = tools.keysVal(response, 'data', '0', 'N');
-                            if (num) {
-                                num = parseInt(num);
-                                let badge = d.query('.mui-badge.mui-badge-danger', li);
-                                // alert(num);
-                                if (num > 0) {
-                                    // badge.classList.remove('hide');
-                                    badge.textContent = num;
-                                } else {
-                                    // badge.classList.add('hide');
-                                }
+
+            item.subScriptUrl && setInterval(() => {
+                if(localStorage.getItem('subScriptStatus') === '0') return ;
+                console.log('test');
+
+                // alert(CONF.siteUrl + item.subScriptUrl);
+                BwRule.Ajax.fetch(CONF.siteUrl + item.subScriptUrl)
+                    .then(({ response }) => {
+                        let num = tools.keysVal(response, 'data', '0', 'N');
+                        if (num) {
+                            num = parseInt(num);
+                            let badge = d.query('.mui-badge.mui-badge-danger', li);
+                            // alert(num);
+                            if (num > 0) {
+                                // badge.classList.remove('hide');
+                                badge.textContent = num;
+                            } else {
+                                // badge.classList.add('hide');
                             }
-                            localStorage.setItem('subScriptStatus','0');
-                            
-                        });
-                },1000);
+                        }
+                        localStorage.setItem('subScriptStatus','0');
+
+                    });
+            },1000);
         });
         this.homeList.classList.toggle('no-data', this.homeList.innerHTML === '');
     }
@@ -296,7 +297,7 @@ export = class homePage extends BasicPage {
                         ShareCode.codeXhr(detail.data);
                         return;
                     }
-                    
+
                     this.websocket.handleUrl(detail.data);
                 }
             });
