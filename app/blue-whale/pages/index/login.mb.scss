@@ -21,7 +21,6 @@
   width: 100%;
   background-color: #fff;
   position: relative;
-  overflow-y: scroll!important;
   &.modal-body-login{
 
     .login-title{
@@ -187,5 +186,31 @@
     background-color: #fff!important;
     box-shadow: none!important;
     border: none!important;
+  }
+}
+@media screen and (max-height: 470px) {
+  .login-wrapper .login-logo {
+    padding: 0 0 10px;
+  }
+  .login-wrapper .login-logo img {
+    width: 70px;
+  }
+  .login-wrapper .login-form .form-group {
+    margin-bottom: 10px;
+  }
+  .login-wrapper .login-form .btn-group .login-submit {
+    height: 36px;
+  }
+  .login-wrapper .login-more {
+    padding: 5px 30px;
+  }
+  .login-wrapper .login-more .login-link-list {
+    margin-top: 5px;
+  }
+  .login-wrapper .login-more .login-link-list a .iconfont {
+    margin: 0 auto 5px;
+  }
+  .login-wrapper .login-more .login-fqa {
+    margin-top: 10px;
   }
 }
