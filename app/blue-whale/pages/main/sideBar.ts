@@ -143,7 +143,20 @@ export default class SideBarMrg {
       this.href(1);
     });
     d.on(d.query("#js_chart_btn"), "click", () => {
-        this.href(2);
+        // this.href(2);
+        // BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/modularUi/select").then(res => {
+        //   // let chartArr = [];
+        //   // if (res.response && res.response.elements) {
+        //   //     let chart = {
+        //   //         // title: 
+        //   //     }
+        //   //     console.log(res);
+        //   // }
+        //   console.log('chart', res);
+        // }).catch(err => {
+        //   console.log(err);
+        // });
+        sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/modularUi/chart"})
       });
 
     ShareCode.scanCode();

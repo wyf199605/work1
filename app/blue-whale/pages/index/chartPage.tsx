@@ -8,87 +8,73 @@ import CONF = BW.CONF;
 import chinaJson from '../../module/chartPageComponents/stacked-histogram-component/stacked-histogram.component';
 declare const echarts;
 import { EchartModule } from "blue-whale/module/echart-module/echartModule";
-
+import sys = BW.sys;
 
 
 interface ICollectPara {
     dom?: HTMLElement,
-    title?: string
+    title?: string,
+    ui?: IBW_UI<Element>
+}
+interface Element {
+    caption: string,
+    cols: Array<object>,
+    dataAddr: DataAddr,
+    data?: object,
+    itemId: string,
+    local: object,
+    panelId: string,
+    querier: object,
+    showType: string,
+    userLocal: string,
+}
+interface DataAddr {
+    addrType?: boolean
+    commitType?: number
+    dataAddr?: string
+    needGps?: number
+    type?: string
+    varType?: boolean
 }
 export class ChartPage extends BasicPage {
-    container: HTMLElement;
+
+    container: HTMLElement;   // btl 获取的dom元素即当前页面的容器
+    uiCharts: Element[];    // 获取的UI绘制
+
+
     constructor(para: ICollectPara) {
+
         super(para);
         this.container = para.dom;
-        console.log(EchartModule.echartFn);
+        this.uiCharts = para.ui.body.elements;
+
         G.d.append(para.dom, this.render());
-        let stackedHistogram = this.stackedHistogramFn();
-        stackedHistogram.on('click', function (params) {
-            // 控制台打印数据的名称
-            console.log(params);
-        });
-        let lineChart = this.lineChartFn();
-        let areaChart = this.areaChartFn();
-        let pieChart = this.pieAndStackChartFn();
-        let chinaMap = this.chinaMapFn();
-        let lineStackedChart = this.stackedChartFn();
-        let oneLineChart = this.oneLineChartFn();
-        window.onresize = function () {
-            stackedHistogram.resize();
-            lineChart.resize();
-            areaChart.resize();
-            pieChart.resize();
-            chinaMap.resize();
-            lineStackedChart.resize();
-            oneLineChart.resize();
-        };
+        this.initData();
     }
     render() {
-        // BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/modularUi/select").then(res => {
-        //     let chartArr = [];
-        //     if (res.response && res.response.elements) {
-        //         let chart = {
-        //             // title: 
-        //         }
-        //         console.log(res);
-        //     }
-        // });
+
         return (
             <main class="chart-page">
-                <div class="main-first-part">
-                    <section class="first-part-section this-week">
-                        <div class="mg-right-10">FIRST</div>
-                        <div>second</div>
-                    </section>
-                    {this.myBaseInfoFn()}
-                    <section class="first-part-section common-chart">
-                        <div id="stacked-histogram" style="width: 100%;height:100%"></div>
-                    </section>
-                    <section class="first-part-section common-chart">
-                        <div id="line-chart" style="width: 100%;height:100%"></div>
-                    </section>
-                    <section class="first-part-section common-chart">
-                        <div id="area-chart" style="width: 100%;height:100%"></div>
-                    </section>
-                    <section class="first-part-section common-chart combine-pie-stack">
-                        <div id="combine-pie-chart" style="width: 50%;height:100%"></div>
-                        <div id="combine-stack-chart" style="width: 50%;height:100%"></div>
-                    </section>
-                </div>
-                <div class="main-china-map">
-                    <div id="china-map" style="width: 100%;height:100%"></div>
-                </div>
-                <div class="main-first-part">
-                    <section class="first-part-section common-chart">
-                        {this.auditProcess()}
-                    </section>
-                    <section class="first-part-section common-chart">
-                        <div id="stacked-chart" style="width: 100%;height:100%"></div>
-                        <div id="one-line-chart" style="width: 100%;height:100%"></div>
-                    </section>
-                </div>
+
             </main>
         )
+
+    }
+
+    initData() {
+        this.uiCharts.forEach(uiChart => {
+            let addr = uiChart.dataAddr.dataAddr;
+            BwRule.Ajax.fetch(`${CONF.siteUrl}${addr}?nopage=true`).then(({response}) => {
+                
+                console.log('chart', response);
+                uiChart.data = response.body.bodyList[0];
+                
+            }).catch(err => {
+                console.log(err);
+            });
+            
+        });
+        
     }
 
     myBaseInfoFn() {
