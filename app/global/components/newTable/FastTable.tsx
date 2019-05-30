@@ -1563,13 +1563,13 @@ export class FastTable extends Component {
             } else if(!tools.isMb || isCanSelectMb) {
                 // 点击表格cell选中只在 “PC端” 或者 “cell 为link类型的 ”开启；
                 if (e.ctrlKey === true) {
-                    console.log('>>>');
-                    if (this.selectedCells[rowIndex].length === this.rowGet(rowIndex).cells.length) {
-                        let row = this.rowGet(rowIndex);
-                        row && row._selectedInnerRowSet(true);
-                    } else {
-                        singleSelectedTabelCell(rowIndex, columnIndex);
-                    }
+                    // if (this.selectedCells[rowIndex].length === this.rowGet(rowIndex).cells.length) {
+                    //     let row = this.rowGet(rowIndex);
+                    //     row && row._selectedInnerRowSet(true);
+                    // } else {
+                    //     singleSelectedTabelCell(rowIndex, columnIndex);
+                    // }
+                    singleSelectedTabelCell(rowIndex, columnIndex);
                     shiftComparePosition.rowIndex = rowIndex;
                     shiftComparePosition.columnIndex = columnIndex;
                 } else if (e.shiftKey === true) {

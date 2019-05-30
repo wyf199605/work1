@@ -165,8 +165,6 @@ export class PlanModule extends Component{
             cols = ui.cols;
 
         this.draw = new DrawPoint({
-            height: 800,
-            width: 1200,
             subButton,
             ui,
             container: this.wrapper,
@@ -312,17 +310,18 @@ export class PlanModule extends Component{
                 let img = new Image();
                 img.src = url;
                 img.onload = ()=>{
-                    this.draw.imgUrl = url;
+                    this.draw.setImgUrl(url, img.width, img.height);
+
                     resolve();
                 };
                 img.onerror = () => {
                     reject();
-                    this.draw.imgUrl = null;
+                    this.draw.setImgUrl(null);
                 }
 
             }else {
                 reject();
-                this.draw.imgUrl = null;
+                this.draw.setImgUrl(null);
             }
         });
 
@@ -680,11 +679,29 @@ export class PlanModule extends Component{
                     break;
                 }
             }
+            let scale = this.draw.scale,
+                offsetWidth = this.draw.widthOffset,
+                offsetHeight = this.draw.heightOffset;
             let editedData = this.draw.editedData,
                 getPointData = (data: obj): obj => {
                 let res = Object.assign({}, data);
                 if(pointField && res[DrawPoint.POINT_FIELD]){
                     res[pointField] = res[DrawPoint.POINT_FIELD];
+                    try{
+                        let pointData = JSON.parse(res[pointField]);
+                        pointData = pointData.map((point) => {
+                            let [x, y] = point;
+                            return [
+                                x / scale + offsetWidth,
+                                y / scale + offsetHeight
+                            ]
+                        });
+                        res[pointField] = JSON.stringify(pointData);
+                        console.log(res[pointField]);
+                    }catch (e) {
+                        res[pointField] = '';
+                        throw new Error();
+                    }
                     delete res[DrawPoint.POINT_FIELD];
                 }
                 return res;
