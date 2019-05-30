@@ -833,7 +833,7 @@ export class GroupTabsPage extends BasicPage {
                     this.tab.toggleAll(true);
                 }
 
-                if (!tools.isNotEmptyArray(this.subUi)) {
+                if (this.ui.offline) {
                     this.imports.init();
                 }
                 this.main.onRender = null;
