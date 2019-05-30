@@ -198,9 +198,10 @@ export class RegPage {
                     let json = JSON.parse(e.detail);
                     if (json.success) {
                         this.deviceData = json.msg;
-                    } else {
-                        Modal.toast(json.msg);
-                    }
+                    } 
+                    // else {
+                    //     Modal.toast(json.msg);
+                    // }
                 }
             });
         } else if (sys.os === 'ad') {
@@ -208,9 +209,10 @@ export class RegPage {
             let data = shell.device().getInfo().data;
             if (data.success) {
                 this.deviceData = (data.msg);
-            } else {
-                Modal.toast(data.msg);
             }
+            //  else {
+            //     Modal.toast(data.msg);
+            // }
         } else if ('AppShell' in window) {
             this.deviceData = Shell.base.device.data;
         } else if ('BlueWhaleShell' in window) {
