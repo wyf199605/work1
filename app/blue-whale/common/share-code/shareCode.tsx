@@ -74,7 +74,7 @@ export class ShareCode {
                     {cancelEle}
                 </section>
                 <section class="share-code-pc-main"></section>
-                {btnParent}
+                {/* {btnParent} */}
 
             </div>
         </div>
@@ -305,6 +305,7 @@ export class ShareCode {
                         const imgSrc = d.query('.share-page-qrcode img')['src'];
                         switch (type) {
                             case 'weixin':
+                                console.log(imgSrc);
                                 Shell.base.wxShare(imgSrc);
                                 break;
                             // case 'link':
@@ -345,10 +346,7 @@ export class ShareCode {
         </div>
 
         shareEle.addEventListener('click', (e: Event) => {
-            let sharePage: HTMLDivElement = <div class="share-page">
-                {/* <div class="share-page-qrcode"></div> */}
-            </div>
-            d.query('body').appendChild(sharePage);
+            
             switch (e.target['className']) {
                 case 'qr-code-share':
                     this.generateCode();
@@ -356,6 +354,9 @@ export class ShareCode {
                     break;
                 case 'fastlion-share':
                     d.query('body').removeChild(shareEle);
+                    let sharePage: HTMLDivElement = <div class="share-page"></div>
+                    d.query('body').appendChild(sharePage);
+                    
                     let timer = setTimeout(() => {
                         clearTimeout(timer);
                         tools.isMb && Shell.image.getSignImg((res) => {
@@ -398,7 +399,7 @@ export class ShareCode {
                     break;
                 case 'cancel-share':
                 default:
-                    d.query('body').removeChild(shareEle);
+                    document.querySelector('body').removeChild(shareEle);
                     break;
             }
         })

@@ -444,7 +444,7 @@ export class BwTableModule extends Component {
                 });
             },
         });
-        this.ftable.btnAdd('shareCode', {
+        !tools.isMb && this.ftable.btnAdd('shareCode', {
             type: 'default',
             content: '二维码分享',
             onClick: () => {
