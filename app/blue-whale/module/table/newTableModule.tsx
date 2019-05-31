@@ -323,15 +323,15 @@ export class NewTableModule extends AGroupTabItem {
             });
         };
     }
-    private computedIndex(list) {
+    private computedIndex(list: Array<string>): Array<string> {
         console.log("配置选项" + list);
-        let showSubSeq = [];
+        let showSubSeq: string[] = [];
         let bwEl = this.bwEl;
         console.log(bwEl.subTableList);
         list.forEach((item) => {
             bwEl.subTableList.forEach((child, index) => {
                 if (child.itemId == item) {
-                    showSubSeq.push(index + 1)
+                    showSubSeq.push(index + 1 + '')
                 }
             })
 
@@ -467,7 +467,9 @@ export class NewTableModule extends AGroupTabItem {
             selectedData = rowData ? rowData : (mftable.selectedPreRowData || {});
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
             let showSubSeq = selectedData[this.showSubField].split(',');
-            let seqIndex = parseInt(showSubSeq[0]) - 1;
+            let seqIndex = this.bwEl.subTableList.findIndex((item) => {
+                return item.itemId === showSubSeq[0]
+            });
             if (tools.isEmpty(this.sub[seqIndex])) {
                 this.subTabActiveIndex = seqIndex;
             }

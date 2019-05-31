@@ -2966,10 +2966,10 @@ export class FastTable extends Component {
     }
 
     protected initDisabledEditor() {
-        console.time('start');
         let editor = this.editor,
-            updatable = editor.updatable;
-        this.wrapper.style.display = 'none';
+            updatable = editor.updatable,
+            wrapper = this.wrapper;
+        wrapper && (this.wrapper.style.display = 'none');
         this.rows.forEach((row) => {
             if(row){
                 let rowCanInit = editor.rowCanInit(row);
@@ -2982,19 +2982,19 @@ export class FastTable extends Component {
                 })
             }
         });
-        this.wrapper.style.display = 'block';
-        console.timeEnd('start');
+        wrapper && (this.wrapper.style.display = 'block');
     }
 
     protected clearDisabledEditor() {
-        this.wrapper.style.display = 'none';
+        let wrapper = this.wrapper;
+        wrapper && (this.wrapper.style.display = 'none');
         this.rows.forEach((row) => {
             row && row.cells.forEach((cell) => {
                 cell.disabled = false;
                 cell.errorMsg = '';
             })
         });
-        this.wrapper.style.display = 'block';
+        wrapper && (this.wrapper.style.display = 'block');
     }
 
     protected _isWrapLine = false;
