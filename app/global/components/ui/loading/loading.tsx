@@ -13,8 +13,7 @@ export interface ILoadingPara {
 export class Loading {
     private modal: Modal = null;
     protected container: HTMLElement;
-    constructor(private para: ILoadingPara) {
-        para = para ? para : {};
+    constructor(private para: ILoadingPara = {}) {
         para.msg = para.msg ? para.msg : '加载中...';
         let body = document.body;
         this.container = tools.isEmpty(para.container) ? body : para.container;
