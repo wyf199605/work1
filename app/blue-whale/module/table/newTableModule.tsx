@@ -833,7 +833,7 @@ export class NewTableModule extends AGroupTabItem {
                                 this.currentSelectedIndexes = [];
                                 // 主表子表刷新
                                 this.refresh().then(() => resolve()).catch(reject);
-                                Modal.toast(response.msg);
+                                response.errorCode === 200 ? Modal.alert(response.msg) : Modal.toast(response.msg);
                                 // loading && loading.destroy();
                                 // loading = null;
                                 end(bwTable);
