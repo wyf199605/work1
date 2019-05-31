@@ -18,13 +18,21 @@ interface ICollectPara {
 }
 interface Element {
     caption: string,
-    cols: Array<object>,
+    cols: Array<{
+        caption: string,
+        name: string,
+        noShow: boolean,
+        supportLink: boolean,
+    }>,
     dataAddr: DataAddr,
-    data?: object,
+    data: [],
     itemId: string,
-    local: object,
+    local: {
+        xCoordinate: string,
+        yCoordinate: string
+    },
     panelId: string,
-    querier: object,
+    // querier: object,
     showType: string,
     userLocal: string,
 }
@@ -61,20 +69,25 @@ export class ChartPage extends BasicPage {
 
     }
 
+
     initData() {
-        this.uiCharts.forEach(uiChart => {
+        this.uiCharts.forEach((uiChart, i) => {
             let addr = uiChart.dataAddr.dataAddr;
-            BwRule.Ajax.fetch(`${CONF.siteUrl}${addr}?nopage=true`).then(({response}) => {
-                
-                console.log('chart', response);
-                uiChart.data = response.body.bodyList[0];
-                
+            BwRule.Ajax.fetch(`${CONF.siteUrl}${addr}?nopage=true`).then(({ response }) => {
+                const id = `chart${i}`
+                let chartDom: HTMLDivElement = <div id={id} class = "chart"></div>;
+                let areaDom: HTMLDivElement = <div id='areaDom' style="width:500px; height:500px"></div>
+                this.container.appendChild(chartDom);
+                this.container.appendChild(areaDom);
+                uiChart.data = response.data;
+                this.lineChartFn(uiChart, id);
+                this.areaChartFn();
             }).catch(err => {
                 console.log(err);
             });
-            
+
         });
-        
+
     }
 
     myBaseInfoFn() {
@@ -114,7 +127,7 @@ export class ChartPage extends BasicPage {
      * 折线图（背景）
      */
     areaChartFn() {
-        let areaChart = echarts.init(document.getElementById('area-chart'));
+        let areaChart = echarts.init(document.getElementById('areaDom'));
         const areaChartData = {
             title: {
                 text: '本月经营分析',
@@ -142,7 +155,7 @@ export class ChartPage extends BasicPage {
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                data: ["中欧", "美国", "中国", "英国"],
                 splitLine: {
                     lineStyle: {
                         // 使用深浅的间隔色
@@ -177,40 +190,30 @@ export class ChartPage extends BasicPage {
             },
             series: [
                 {
-                    name: '销量',
+                    name: '数量',
                     type: 'line',
                     color: '#609ee9',
                     lineMaxWidth: '10',
                     smooth: true,
                     symbol: 'circle',
                     symbolSize: 8,
-                    data: [5, 20, 36, 10, 10, 20],
+                    data: [65, 134, 325, 743],
                     areaStyle: {}
                 },
                 {
-                    name: '购买力',
+                    name: '"平板登记数量"',
                     type: 'line',
                     color: '#f7ba2a',
                     smooth: true,
                     lineMaxWidth: '10',
                     symbol: 'circle',
                     symbolSize: 8,
-                    data: [7, 18, 46, 52, 60, 16],
-                    areaStyle: {}
-                },
-                {
-                    name: '进货量',
-                    type: 'line',
-                    smooth: true,
-                    color: '#cfdce8',
-                    lineMaxWidth: '10',
-                    symbol: 'circle',
-                    symbolSize: 8,
-                    data: [55, 24, 36, 33, 42, 28],
+                    data: [34, 65, 15, 78],
                     areaStyle: {}
                 },
             ]
         };
+        console.log(areaChartData);
         areaChart.setOption(areaChartData);
         return areaChart;
     }
@@ -526,12 +529,13 @@ export class ChartPage extends BasicPage {
     /**
      * 折线图
      */
-    lineChartFn() {
+    lineChartFn(chartData: Element, eleId: string) {
+        // let lineChart = echarts.init(document.getElementById(eleId));
 
-        // let lineChart = echarts.init(document.getElementById('line-chart'));
+        let data = this.handleChartDataFn(chartData);
         const lineChartData = {
             title: {
-                text: '本月经营分析',
+                text: data.titleText,
                 textStyle: {
                     fontFamily: 'monospace',
                     fontSize: 18,
@@ -550,11 +554,13 @@ export class ChartPage extends BasicPage {
             },
             tooltip: {},
             legend: {
-                data: ['销量', '购买力'],
+                data: data.legendData,
                 top: 15,
             },
             xAxis: {
-                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+                type: 'category',
+                boundaryGap: false,
+                data: data.xAxisData,
                 splitLine: {
                     lineStyle: {
                         // 使用深浅的间隔色
@@ -568,7 +574,7 @@ export class ChartPage extends BasicPage {
                 },
                 axisLabel: {
                     color: '#333333'
-                }
+                },
             },
 
             yAxis: {
@@ -587,44 +593,153 @@ export class ChartPage extends BasicPage {
                     color: '#333333'
                 }
             },
-            series: [
-                {
-                    name: '销量',
-                    type: 'line',
-                    color: '#609ee9',
-                    lineMaxWidth: '10',
-                    smooth: true,
-                    symbol: 'circle',
-                    symbolSize: 8,
-                    data: [5, 20, 36, 10, 10, 20]
-                },
-                {
-                    name: '购买力',
-                    type: 'line',
-                    color: '#f7ba2a',
-                    smooth: true,
-                    lineMaxWidth: '10',
-                    symbol: 'circle',
-                    symbolSize: 8,
-                    data: [7, 18, 46, 52, 60, 16]
-                },
-                {
-                    name: '进货量',
-                    type: 'line',
-                    smooth: true,
-                    color: '#39ca74',
-                    lineMaxWidth: '10',
-                    symbol: 'circle',
-                    symbolSize: 8,
-                    data: [55, 24, 36, 33, 42, 28]
-                },
-            ]
+            series: data.series
         };
         // lineChart.setOption(lineChartData);
+        return EchartModule.echartFn(lineChartData, eleId);
+    }
+    handleChartDataFn(chartData: Element) {
+        console.log(chartData);
+        let xAxisName: Array<string> = chartData.local.xCoordinate.split(',');
+        let xAxisData: Array<any> = [];
+        let legendName: Array<string> = chartData.local.yCoordinate.split(',');
+        let legendData: Array<string> = [];
+        let titleText: string = chartData.caption;
+        let series = [];
+        xAxisName.forEach(name => {
+            xAxisData = chartData.data.map(item => item[name]);
+        });
+        legendName.forEach((legend, i) => {
 
-        return EchartModule.echartFn(lineChartData, 'line-chart');
+            let seriesItem = {
+                data: [],
+                name: '',
+                type: 'line',
+                color: '#609ee9',
+                lineMaxWidth: '10',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+            }
+            seriesItem.data = chartData.data.map(item => item[legend]);
+            // seriesItem.name = legendData[i];
+            chartData.cols.forEach(col => {
+                if (col.name === legend) {
+                    legendData.push(col.caption);
+                    seriesItem.name = col.caption;
+                }
+            });
+            series.push(seriesItem);
+        });
+        return {
+            titleText,
+            xAxisData,
+            legendData,
+            series
+        }
+
+
 
     }
+    // lineChartFn() {
+
+    //     // let lineChart = echarts.init(document.getElementById('line-chart'));
+    //     const lineChartData = {
+    //         title: {
+    //             text: '本月经营分析',
+    //             textStyle: {
+    //                 fontFamily: 'monospace',
+    //                 fontSize: 18,
+    //                 color: '#333'
+    //                 // fontWeight: 'bold',
+
+    //             },
+    //             padding: 15,
+    //         },
+    //         grid: {
+    //             // top: 15,
+    //             left: 15,
+    //             right: 15,
+    //             bottom: 15,
+    //             containLabel: true
+    //         },
+    //         tooltip: {},
+    //         legend: {
+    //             data: ['销量', '购买力'],
+    //             top: 15,
+    //         },
+    //         xAxis: {
+    //             data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+    //             splitLine: {
+    //                 lineStyle: {
+    //                     // 使用深浅的间隔色
+    //                     color: '#f7f7f8'
+    //                 },
+    //             },
+    //             axisLine: {
+    //                 lineStyle: {
+    //                     color: '#d5d5d5'
+    //                 }
+    //             },
+    //             axisLabel: {
+    //                 color: '#333333'
+    //             }
+    //         },
+
+    //         yAxis: {
+    //             splitLine: {
+    //                 lineStyle: {
+    //                     // 使用深浅的间隔色
+    //                     color: '#f7f7f8'
+    //                 },
+    //             },
+    //             axisLine: {
+    //                 lineStyle: {
+    //                     color: '#d5d5d5'
+    //                 }
+    //             },
+    //             axisLabel: {
+    //                 color: '#333333'
+    //             }
+    //         },
+    //         series: [
+    //             {
+    //                 name: '销量',
+    //                 type: 'line',
+    //                 color: '#609ee9',
+    //                 lineMaxWidth: '10',
+    //                 smooth: true,
+    //                 symbol: 'circle',
+    //                 symbolSize: 8,
+    //                 data: [5, 20, 36, 10, 10, 20]
+    //             },
+    //             {
+    //                 name: '购买力',
+    //                 type: 'line',
+    //                 color: '#f7ba2a',
+    //                 smooth: true,
+    //                 lineMaxWidth: '10',
+    //                 symbol: 'circle',
+    //                 symbolSize: 8,
+    //                 data: [7, 18, 46, 52, 60, 16]
+    //             },
+    //             {
+    //                 name: '进货量',
+    //                 type: 'line',
+    //                 smooth: true,
+    //                 color: '#39ca74',
+    //                 lineMaxWidth: '10',
+    //                 symbol: 'circle',
+    //                 symbolSize: 8,
+    //                 data: [55, 24, 36, 33, 42, 28]
+    //             },
+    //         ]
+    //     };
+    //     // lineChart.setOption(lineChartData);
+
+    //     return EchartModule.echartFn(lineChartData, 'line-chart');
+
+    // }
 
     /**
      * 柱状图
