@@ -98,7 +98,6 @@ export class NewTableModule extends AGroupTabItem {
                 main.subBtns.init(this.main.btnWrapper);
             }
             this.onRender && this.onRender();
-
             if (this.editType === 'linkage' && this.editable) {
                 this.initEdit(main);
                 this.active.onChange = (isMain) => {
@@ -519,7 +518,7 @@ export class NewTableModule extends AGroupTabItem {
         }
         return Promise.all(promise).then((arr) => {
             Object.values(this.sub).forEach((subTable) => {
-                if (subTable.isPivot) {
+                if (this.subTabActiveIndex !== 0 && this.editType === 'self' && subTable.isPivot) {
                     this.initEdit(subTable);
                 }
             });
