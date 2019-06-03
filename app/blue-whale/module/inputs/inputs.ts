@@ -82,40 +82,42 @@ export class Inputs {
             Modal.alert('startScan2DResult接口报错')
         }
         /**rfid设置 */
-        let result: any = Shell.other.getData();
-        if (result) {
-            let conf = result;
-            this.port = getRfidPort(conf);
-            console.log("RFID" + JSON.stringify(this.port))
-            Shell.rfid.start(this.port.str, this.port.num, (result) => {
-                // console.log(result);
-                /**
-                 * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
-                 */
-                // alert(JSON.stringify(result));
-                let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
-                    data = result.data;
-                console.log(msg);
-                console.log(data);
-                if (result.success) {
-                    // data.forEach(item => {
+        if(tools.isPc){
+            let result: any = Shell.other.getData();
+            if (result) {
+                let conf = result;
+                this.port = getRfidPort(conf);
+                console.log("RFID" + JSON.stringify(this.port))
+                Shell.rfid.start(this.port.str, this.port.num, (result) => {
+                    // console.log(result);
+                    /**
+                     * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
+                     */
+                        // alert(JSON.stringify(result));
+                    let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
+                        data = result.data;
+                    console.log(msg);
+                    console.log(data);
+                    if (result.success) {
+                        // data.forEach(item => {
 
-                    // })
-                    para.inputs.forEach(input => {
-                        let line = para.locationLine;
-                        let reg = regExpMatch(input, data[0]);
-                        //匹配成功
-                        if (reg) {
-                            this.matchPass(reg, data[0]);
-                        } else if (line) {
-                            this.rowSelect(line, data[0]);
-                        }
-                    });
-                    // this.matchPass(reg, text);
+                        // })
+                        para.inputs.forEach(input => {
+                            let line = para.locationLine;
+                            let reg = regExpMatch(input, data[0]);
+                            //匹配成功
+                            if (reg) {
+                                this.matchPass(reg, data[0]);
+                            } else if (line) {
+                                this.rowSelect(line, data[0]);
+                            }
+                        });
+                        // this.matchPass(reg, text);
 
-                }
+                    }
 
-            });
+                });
+            }
         }
         // setTimeout(() => {
         //     this.ajax("http://192.168.1.222:8080/sf/app_sanfu_retail/null/monitorkey/n1-move-19?needparam=%5B%7B%22n%22%3A%22toshopid%22%7D%2C%7B%22n%22%3A%22TOSHOPID%22%7D%5D&toshopid=1111&inputtext=8100247691", () => {
