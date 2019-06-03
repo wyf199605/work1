@@ -158,6 +158,14 @@ export class GroupTabsPage extends BasicPage {
         }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
             this.locationLine(line, para);
         }
+
+
+        if(tableUi.autoRefresh) {
+            sys.window.wake("wake", null);
+            d.on(window, 'wake', () => {
+                this.main && this.main.refresh();
+            });
+        }
     }
 
     protected _inputs: Inputs;
