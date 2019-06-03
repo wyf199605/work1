@@ -163,7 +163,7 @@ export class GroupTabsPage extends BasicPage {
         if(tableUi.autoRefresh) {
             sys.window.wake("wake", null);
             d.on(window, 'wake', () => {
-                this.main && this.main.refresh();
+                this.refresh();
             });
         }
     }
