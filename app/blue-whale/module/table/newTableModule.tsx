@@ -465,9 +465,9 @@ export class NewTableModule extends AGroupTabItem {
             mftable = main.ftable,
             selectedData = rowData ? rowData : (mftable.selectedPreRowData || {});
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
-            let showSubSeq = selectedData[this.showSubField].split(',');
+            let showSubSeq: string[] = selectedData[this.showSubField].split(',');
             let seqIndex = this.bwEl.subTableList.findIndex((item) => {
-                return item.itemId === showSubSeq[0]
+                return showSubSeq.includes(item.itemId);
             });
             if (tools.isEmpty(this.sub[seqIndex])) {
                 this.subTabActiveIndex = seqIndex;
