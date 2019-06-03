@@ -32,12 +32,14 @@ export class ShareCode {
     selectedRow: Array<object> // 表格选中的行
     shareDiv: HTMLElement; // 分享
     websocket: any;
+    tagId: string; // 邮件分享
 
-    constructor(selectedRow) {
+    constructor(selectedRow, tagId?: string) {
 
 
         // console.log(selectedRow);
         this.selectedRow = selectedRow;
+        this.tagId = tagId;
         this.url = localStorage.getItem('tableUrl');
         // alert('lc'+this.url);
         this.currentAddr = this.url.split('sf')[1];
@@ -313,6 +315,21 @@ export class ShareCode {
                             // case 'qq':
                             //     break;
                             case 'email':
+                                if( !this.tagId) return Modal.alert('当前页面不可以邮件分享');
+                                BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json', {
+                                    type: 'post',
+                                    data: {
+                                        tag_id: this.tagId,
+                                        file_name: '邮件分享',
+                                        content: imgSrc,
+                                    }
+                                }).then(({ response }) => {
+                                    let tempId = response && response.body && response.body.bodyList
+                                        && response.body.bodyList[0] && response.body.bodyList[0].temp_id;
+                                    sys.window.open({
+                                        url: CONF.ajaxUrl.mailForward + '?temp_id=' + tempId,
+                                    })
+                                })
                                 break;
                             case 'saveImg':
                                 Shell.image.downloadImg(imgSrc, () => { });

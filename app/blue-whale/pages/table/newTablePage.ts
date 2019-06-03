@@ -23,16 +23,17 @@ let queryModuleName = sys.isMb ? 'QueryModuleMb' : 'QueryModulePc';
 
 export class NewTablePage extends BasicPage{
 
+    
     constructor(para: ITablePagePara) {
         super(para);
         d.classAdd(this.dom.parentElement, 'table-page');
-
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
         let bwTable = new BwTableElement({
             container: tools.isPc ? this.dom : d.query('body > .mui-content'),
             tableEl: bwTableEl,
-            asynData : para.ui.body.elements[1] // 异步查询
+            asynData : para.ui.body.elements[1], // 异步查询
+            tagId: para.ui.tagId
         });
 
         // Shell触发的刷新事件
@@ -51,7 +52,8 @@ export class NewTablePage extends BasicPage{
 
 interface IBwTableElementPara extends IComponentPara{
     tableEl: IBW_Table
-    asynData? : obj[]
+    asynData? : obj[],
+    tagId?: string,
 }
 export class BwTableElement extends Component{
 
@@ -173,7 +175,6 @@ export class BwTableElement extends Component{
           
 
             if(hasQuery) {
-                
                 require([queryModuleName], (Query) => {
                     let autTag = localStorage.getItem('autTag');
                     if(autTag) {
@@ -264,8 +265,7 @@ export class BwTableElement extends Component{
         // 移动端二维码分享
         if(tools.isMb) {
             d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
-                console.log(1111)
-               new ShareCode(this.tableModule.main.ftable.selectedRowsData);
+               new ShareCode(this.tableModule.main.ftable.selectedRowsData, para.tagId);
             });
         }
         
