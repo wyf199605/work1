@@ -35,6 +35,7 @@ interface IBW_UI<U> {
     }
     caption?: string; // 标题
     uiType?: string;
+    tagId?: string; // 邮件分享
 }
 
 interface IBW_Plan_Table extends IBW_Table {
