@@ -137,7 +137,7 @@ namespace BW {
                 /**
                  * 系统打开main（除了头部和菜单部分）的显示部分
                  * @param o 保存url的对象
-                 * @param refer 
+                 * @param refer
                  */
                 open: function (o: winOpen, refer?: string) {
                     let url = o.url;
@@ -364,6 +364,7 @@ namespace BW {
                 },
                 reOpen: function (o: winOpen) {
                     sys.window.open(o);
+
                 },
                 refreshHome() {
                     sys.window.closeAll();

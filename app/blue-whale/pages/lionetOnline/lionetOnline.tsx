@@ -28,7 +28,7 @@ export class LionetOnline {
         // 初始提示
         this.setLionetMsg({
             type: 3,
-            userMsg:'HI，我是小狮，很高兴为您服务，请问有什么需要帮助吗？'
+            userMsg:'hi，我是小狮，很高兴为您服务，请问有什么需要帮助吗？'
         });
         window['usermsg'] = '本日销售';
     }
@@ -79,6 +79,12 @@ export class LionetOnline {
                 break;
             case 2:
                 // 跳转到dataset中的url
+                let data = dataSet[0];
+                if(data && data.url){
+                    sys.window.reOpen({
+                        url: CONF.siteUrl + data.url
+                    });
+                }
                 break;
             case 3:
             default:
