@@ -132,12 +132,7 @@ export class Inputs {
      */
     private matchPass(data: R_Input, text: string, open?: Function) {
         let newUrl = this.url ? this.url : data.dataAddr.dataAddr;
-        if (newUrl.indexOf('?') > -1) {
-            newUrl += '&';
-        } else {
-            newUrl += '?';
-        }
-        this.ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
+        this.ajaxUrl = tools.url.addObj(CONF.siteUrl + newUrl, {[data.fieldName.toLowerCase()]: text}, true, true);
         return this.refresh(open);
     }
 
