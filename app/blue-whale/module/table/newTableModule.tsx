@@ -526,6 +526,10 @@ export class NewTableModule extends AGroupTabItem {
         });
     }
 
+    initLabel(printList: printListArr[]){
+        this.main && this.main.initLabelModal(printList);
+    }
+
     public mobileModal: Modal = null;
     private subWrapper: HTMLElement = null;
 

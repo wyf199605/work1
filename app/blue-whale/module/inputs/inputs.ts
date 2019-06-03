@@ -193,9 +193,8 @@ export class Inputs {
             case 1:
                 // 标签打印
                 let tableModule = this.p.tableModule();
-                tableModule.labelPrint.show(tableModule.labelBtn.wrapper, category.printList, () => {
-                    this.ajax(CONF.siteUrl + this.url, open);
-                });
+
+                tableModule.initLabel(category.printList);
                 break;
             case 2:
                 // 提示错误信息
