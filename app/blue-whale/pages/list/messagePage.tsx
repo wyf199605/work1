@@ -140,6 +140,7 @@ export = class messagePage {
         d.off(listDOM, 'click');
         let self = this;
         d.on(listDOM, 'click', '[data-action]', function () {
+            event.preventDefault();
             switch (this.dataset.action) {
                 case 'read':
                     let tapThis = this;
@@ -156,7 +157,7 @@ export = class messagePage {
                         type: 'post'
                     }).then(({ response }) => {
                         // debugger;
-                        event.preventDefault();
+                      
                         // console.log(tapThis.dataset.url)
                         // debugger;
                         if (tapThis.dataset.url === 'undefined') {
