@@ -144,7 +144,11 @@ export = class messagePage {
             switch (this.dataset.action) {
                 case 'read':
                     let tapThis = this;
-                    self.read(tapThis);
+                    try {
+                        self.read(tapThis);
+                    } catch (error) {
+                       Modal.toast(error); 
+                    }
                     if (tapThis.dataset.url === 'undefined' || tapThis.dataset.url == '') {
                         break;
                     }
