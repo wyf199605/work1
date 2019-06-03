@@ -606,12 +606,12 @@ namespace G {
                 }, back);
             },
 
-            /** 
+            /**
              * 移动端涂鸦
             */
             getSignImg(back: IShellEventHandler) {
                 ShellBase.handler('getSignImg', {
-                    
+
                 }, back);
             },
         };
@@ -732,6 +732,9 @@ namespace G {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
 
                 if (tools.isEmpty(back) && tools.isEmpty(infor)) {
+                    if(tools.os.ios){
+                        return null;
+                    }
                     return JSON.parse(AppShell.syncFunction(action, dataStr));
                     // return JSON.parse(AppShell.postMessage({action, data : dataStr}));
                 } else {
