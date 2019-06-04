@@ -1090,6 +1090,9 @@ export class BwTableModule extends Component {
 
     }
 
+    /**
+     * 二维码分享，打开 页面默认选中分享的数据
+     */
     protected defaultSelected() {
 
             let keyField = localStorage.getItem('keyField');
