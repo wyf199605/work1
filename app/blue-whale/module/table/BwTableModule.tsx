@@ -1061,7 +1061,7 @@ export class BwTableModule extends Component {
     })();
 
     get ajaxData() {
-        
+
         setTimeout(() => {
             this.defaultSelected()
         }, 500);
@@ -1069,7 +1069,7 @@ export class BwTableModule extends Component {
     }
 
     refresh(data?: obj) {
-        
+
         if (this.isPivot) {
             this.ftable && this.ftable.destroy();
             this.modalEditCancel();
@@ -1080,10 +1080,10 @@ export class BwTableModule extends Component {
                 this.modalEditCancel();
                 setTimeout(() => {
                     this.subBtns.initState();
-                    
+
                      this.ftable && this.ftable.clearSelectedRows();
                      this.defaultSelected();
-                    
+
                 }, 500)
             });
         }
@@ -1091,14 +1091,14 @@ export class BwTableModule extends Component {
     }
 
     protected defaultSelected() {
-        
+
             let keyField = localStorage.getItem('keyField');
             // localStorage.removeItem('keyField');
             console.log('defaultSelected')
             if(keyField) {
                 let shareData = JSON.parse(keyField);
                 this.ftable.clearSelectedRows();
-                
+
 
                 if(shareData.key) {
                     this.ftable.data.forEach((row,i) => {
@@ -1114,9 +1114,9 @@ export class BwTableModule extends Component {
                         }
                     })
                 }
-                
+
             }
-            
+
     }
 
     // protected fastTableInit
@@ -2943,6 +2943,8 @@ export class BwTableModule extends Component {
                         validList.push(validate(editModule, cell))
                         // }, 100);
                     }) : validList.push(validate(editModule, cell));
+                }else {
+                    cell.errorMsg = '';
                 }
             });
         };
