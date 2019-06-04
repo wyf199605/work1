@@ -1093,6 +1093,7 @@ export class BwTableModule extends Component {
     protected defaultSelected() {
 
             let keyField = localStorage.getItem('keyField');
+            localStorage.removeItem('keyField');
             // localStorage.removeItem('keyField');
             console.log('defaultSelected')
             if(keyField) {

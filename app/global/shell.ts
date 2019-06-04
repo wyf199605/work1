@@ -611,7 +611,8 @@ namespace G {
             */
             getSignImg(back: IShellEventHandler) {
                 ShellBase.handler('getSignImg', {
-                    
+                    type: 1,
+                    image: 'null',
                 }, back);
             },
         };
