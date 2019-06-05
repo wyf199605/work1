@@ -6,15 +6,15 @@ import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {BwRule} from "../../common/rule/BwRule";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import { ChartTableModule } from "../echart-module/chartTableModule";
-import { EchartModule } from "../echart-module/echartModule";
 
 export class BwMainTableModule extends BwTableModule{
 
     constructor(protected para: IBwTableModulePara) {
         super(para);
         d.classAdd(this.wrapper, 'table-module-main');
-        console.log(ChartTableModule);
+
+        // 根据UI 的initShow 判断是否先展示图表， 先默认设置为展示图表
+        this.wrapper.style.display = 'none';
     }
     protected ftableReady(){
         super.ftableReady();

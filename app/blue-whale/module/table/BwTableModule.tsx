@@ -37,6 +37,7 @@ import {Datetime} from "../../../global/components/form/datetime/datetime";
 import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
 import {BwTableEditModule} from "./BwTableEditModule";
 import { ShareCode } from '../../common/share-code/shareCode';
+import { ChartTableModule } from "../echart-module/chartTableModule";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -410,6 +411,8 @@ export class BwTableModule extends Component {
                             // 获取lookup数据
                             this.lookup
                         ]).then(([{ response }]) => {
+                            this.wrapper.style.display = 'block';
+                            new ChartTableModule(this.ui, this.wrapper, response, this.ftable);
                             let { data, head } = response;
                             // 选项查询处理(wbf)
                             this.sectionField(response);
