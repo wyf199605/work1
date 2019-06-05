@@ -6,13 +6,15 @@ import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {BwRule} from "../../common/rule/BwRule";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import { ChartTableModule } from "../echart-module/chartTableModule";
+import { EchartModule } from "../echart-module/echartModule";
 
 export class BwMainTableModule extends BwTableModule{
 
     constructor(protected para: IBwTableModulePara) {
         super(para);
         d.classAdd(this.wrapper, 'table-module-main');
-
+        console.log(ChartTableModule);
     }
     protected ftableReady(){
         super.ftableReady();

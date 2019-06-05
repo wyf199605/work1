@@ -344,6 +344,7 @@ gulp.task('js', function() {
 
     
     gulpTsModule(["echart-module/echartModule"], "EchartModule.js");
+    gulpTsModule(["echart-module/chartTableModule"], "ChartTableModule.js");
 
     gulpTsPage(["lionetOnline/lionetOnline"], "lionetOnline.js");
 
