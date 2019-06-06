@@ -457,6 +457,23 @@ export class BwTableModule extends Component {
         //     },
         // });
 
+        !tools.isMb && this.ftable.btnAdd('switch-chart', {
+            type: 'default',
+            content: '图表',
+            onClick: () => {
+                console.log('图表',ui);
+                // new ShareCode(this.tableModule.main.ftable.selectedRowsData);
+                console.log(this);
+                debugger;
+                let chartDom: HTMLElement | null = d.query('.chart-table', this.container);
+                if(chartDom) {
+                    this.wrapper.style.display = 'none';
+                    chartDom.style.display = 'block';
+                }
+
+            },
+        });
+
         this.ftableReady();
 
         this.ftable.on(FastTable.EVT_TABLE_COL_CHANGE, (ev) => {

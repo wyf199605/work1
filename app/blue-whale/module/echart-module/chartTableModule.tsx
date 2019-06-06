@@ -32,7 +32,8 @@ export class ChartTableModule {
 
     initData() {
         this.wrapper.style.display = 'none';
-        this.parentDom.appendChild(this.render());
+        // this.parentDom.appendChild(this.render());
+        this.parentDom.insertBefore(this.render(),this.parentDom.childNodes[0]);
         let line = this.lineChartFn();
         window.onresize = () => {
             line.resize();
@@ -44,10 +45,10 @@ export class ChartTableModule {
      * 图表渲染函数
      */
     render() {
-        this.chartDom = <section style="width: 100%; height:20rem">图形</section>
+        this.chartDom = <section class="chart-container" >图形</section>
         this.chartBtnsContainer = <div class="chart-table">
             <section class="chart-btns">
-                <button class="switch-table" data-type="switchTable">表格</button>
+                <button class="switch-table btn-default" data-type="switchTable">表格</button>
             </section>
             {this.chartDom}
         </div>
@@ -62,7 +63,8 @@ export class ChartTableModule {
             let type = e.target && e.target['dataset'] && e.target['dataset'].type;
             switch (type) {
                 case 'switchTable':
-                    this.chartDom.style.display = 'none';
+                    debugger;
+                    this.chartBtnsContainer.style.display = 'none';
                     this.wrapper.style.display = 'block';
                     this.ftable.recountWidth();
                     break;
