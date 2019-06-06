@@ -11,6 +11,65 @@ import { FastBtnTable } from "global/components/FastBtnTable/FastBtnTable";
 
 declare const echarts;
 
+interface Data {
+    errorCode: number;
+    head: any;
+    body: {
+        bodyList: Array<{
+            dataType: number,
+            dataList: Array<any>,
+            meta: Array<any>,
+        }>
+    };
+    
+    bodyData?: Array<any> 
+}
+interface CommonChartData {
+    title?: {
+        text: string,
+        textStyle?: {
+            fontFamily?: string,
+            fontSize?: number,
+            color?: string
+            // fontWeight: 'bold',
+
+        },
+        padding?: number,
+    },
+    grid?: {
+        // top: 15,
+        left?: number,
+        right?: number,
+        bottom?: number,
+        containLabel?: boolean
+    },
+    tooltip?: object,
+    legend?: {
+        data: Array<string>,
+        top?: string,
+    },
+    xAxis: {
+        data?: Array<any>,
+        splitLine?: {
+            lineStyle?: {
+                // 使用深浅的间隔色
+                color?: string
+            },
+        },
+        axisLine?: {
+            lineStyle?: {
+                color: string
+            }
+        },
+        axisLabel?: {
+            color: string
+        }
+    },
+
+    yAxis?: any,
+    series: Array<any>
+}
+
 export class ChartTableModule {
 
     parentDom: Node;  // 当前表格的父元素
@@ -19,26 +78,150 @@ export class ChartTableModule {
     wrapper: HTMLElement;   // 当前表格 dom元素
     chartBtnsContainer: HTMLElement; // 图表自制按钮容器
     ftable: FastBtnTable  // 对表格基本操作的方法对象
+    data:Data; // 接口请求的表格数据 
+    color= ['#609ee9','#f7ba2a', '39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169'];
 
 
-    constructor(ui: IBW_Table, wrapper: HTMLElement, data, ftable: FastBtnTable) {
+    constructor(ui: IBW_Table, wrapper: HTMLElement, data: Data, ftable: FastBtnTable) {
         this.parentDom = wrapper.parentNode;
         this.ui = ui;
         this.wrapper = wrapper;
         this.ftable = ftable;
-        // debugger;
+        this.data = data;
         this.initData();
     }
 
     initData() {
         this.wrapper.style.display = 'none';
+        this.parentDom.insertBefore(this.render(),this.parentDom.childNodes[0]); 
         // this.parentDom.appendChild(this.render());
-        this.parentDom.insertBefore(this.render(),this.parentDom.childNodes[0]);
-        let line = this.lineChartFn();
+        let line ;
+        switch (this.ui.uiType ) {
+            case 'select':
+            case 'table':
+                line = this.initCommonChartFn();
+                break;
+            case 'detail':
+                line = this.ui.fields? null : this.initCommonChartFn();
+                break;
+        }
+
+        // let line = this.lineChartFn();
         window.onresize = () => {
-            line.resize();
+            line && line.resize();
         }
         this.chartBtnsClk();
+    }
+    /**
+     * 通用表格处理方法 
+     */
+    
+    initCommonChartFn() {
+        let chart = echarts.init(this.chartDom);
+        this.data.bodyData = [];
+        this.data.body.bodyList[0].dataList.forEach(list => {
+            let obj = {};
+            list.forEach((ele, index) => {
+                obj[this.data.body.bodyList[0].meta[index]] = ele;
+            });
+            this.data.bodyData.push(obj);
+        });
+        let caption = this.ui.caption;
+        let type = this.ui.showType || 'line';
+        let xAxisName: Array<string> = this.ui.local.xCoordinate.split(',');
+        let xAxisData: Array<any> = [];
+        let legendName: Array<string> = this.ui.local.yCoordinate.split(',');
+        let legendData: Array<string> = [];
+        let series = [];
+        xAxisName.forEach(name => {
+            xAxisData = this.data.bodyData.map(item => item[name]);
+        });
+        legendName.forEach((legend, i) => {
+
+            let seriesItem = {
+                data: [],
+                name: '',
+                type: type,
+                color: this.color[i],
+                lineMaxWidth: '10',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+            }
+            seriesItem.data = this.data.bodyData.map(item => item[legend]);
+            // seriesItem.name = legendData[i];
+            this.ui.cols.forEach(col => {
+                if (col.name === legend) {
+                    legendData.push(col.caption);
+                    seriesItem.name = col.caption;
+                }
+            });
+            series.push(seriesItem);
+        });
+        let chartData =  {
+            title: {
+                text: caption,
+                textStyle: {
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                    color: '#333'
+                    // fontWeight: 'bold',
+
+                },
+                padding: 15,
+            },
+            grid: {
+                // top: 15,
+                left: 15,
+                right: 15,
+                bottom: 15,
+                containLabel: true
+            },
+            tooltip: {},
+            legend: {
+                data: legendData,
+                top: 15,
+            },
+            xAxis: {
+                data: xAxisData,
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+
+            yAxis: {
+                splitLine: {
+                    lineStyle: {
+                        // 使用深浅的间隔色
+                        color: '#f7f7f8'
+                    },
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#d5d5d5'
+                    }
+                },
+                axisLabel: {
+                    color: '#333333'
+                }
+            },
+            series: series
+        };
+        chart.setOption(chartData);
+        return chart;
+        
+
     }
 
     /**
@@ -63,7 +246,6 @@ export class ChartTableModule {
             let type = e.target && e.target['dataset'] && e.target['dataset'].type;
             switch (type) {
                 case 'switchTable':
-                    debugger;
                     this.chartBtnsContainer.style.display = 'none';
                     this.wrapper.style.display = 'block';
                     this.ftable.recountWidth();

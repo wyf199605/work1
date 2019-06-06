@@ -101,6 +101,13 @@ interface IBW_Table {
         caption: string, // 如数量
     },
     timeOut?: number; // 超时时间
+    local?: {         // x...代表x轴， y代表几条数据
+        xCoordinate: string,
+        yCoordinate: string,
+    };
+    initShow?: number; // 1（先图）, 0(无图)， 2（先表)
+    showType?: string; // 图形类型 line(折线图), bar(柱状图)， pie(饼状图)
+
 }
 
 interface IBW_Detail {
