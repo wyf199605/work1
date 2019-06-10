@@ -306,10 +306,15 @@ export class DrawPoint extends Component {
             this.g.selectAll('circle').remove();
         }
         if (!tools.isMb) {
-            let scale = Math.max(0.1, this.container.offsetWidth / parseFloat(this.g.select('image').attr('width')))
+            let containerWidth = this.container.offsetWidth,
+                width = parseFloat(this.g.select('image').attr('width'));
+            let scale = Math.max(0.1, containerWidth / width / 2);
             this.zoom.scale(scale);
-            this.zoom.translate([0, 0]);
-            this.g.attr('transform', "scale(" + scale + ")");
+            this.zoom.translate([Math.abs((containerWidth - width) / 2) * scale, 0]);
+            this.g.attr(
+                'transform',
+                " translate(" + Math.abs((containerWidth - width) / 2) * scale + ", 0) scale(" + scale + ")"
+            );
         }
 
         this.renderData = data;

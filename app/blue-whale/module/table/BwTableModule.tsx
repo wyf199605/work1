@@ -2867,6 +2867,9 @@ export class BwTableModule extends Component {
                                                         let assignCell = row.cellGet(name);
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];
+                                                            if (isValid) {
+                                                                validate(editModule, assignCell);
+                                                            }
                                                         }
                                                     });
                                                     let rowData = row.data;
@@ -2955,6 +2958,16 @@ export class BwTableModule extends Component {
 
         let validate = (editModule: EditModule, cell: FastTableCell, checkLinkCell = true): Promise<any> => {
             let promise: Promise<any> = new Promise((resolve, reject) => {
+                for(let cel of cell.frow.cells){
+                    if(cel !== cell){
+                        let field: R_Field = cel.column.content;
+                        if(field.elementType === 'lookup' && field.lookUpKeyField === cell.name){
+                            cell = cel;
+                            break;
+                        }
+                    }
+                }
+
                 let name = cell.name,
                     row = cell.row,
                     field: R_Field = cell.column.content,
