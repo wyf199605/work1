@@ -82,8 +82,7 @@ export class ShareCode {
         </div>
         d.query('body').appendChild(sharePcEle);
         console.log(code);
-        let qrcode = QrCode.toCanvas(code, 180, 180, d.query(".share-code-pc-main"));
-        console.log(qrcode);
+        QrCode.toCanvas(code, 180, 180, d.query(".share-code-pc-main"));
         let copyLinkBtn: IButton = {
             container: btnParent,
             content: '复制链接',
@@ -265,13 +264,12 @@ export class ShareCode {
         }
         // // debugger;
         // alert(this.queryer);
-         this.queryer && Object.keys(this.queryer).forEach(key => {
+        this.queryer && Object.keys(this.queryer).forEach(key => {
             selectObj[key] = this.queryer[key];
         })
         let getUrl = this.url.indexOf('?') === -1 ? `${this.url}?output=json` : `${this.url}&output=json`
         BwRule.Ajax.fetch(getUrl).then(({ response }) => {
             this.keyField = response.body.elements[0].keyField || null;
-            console.log('keyField', this.keyField);
             let data = [];
             if (this.keyField) {
                 data = this.selectedRow.map(item => item[this.keyField]);
@@ -292,8 +290,7 @@ export class ShareCode {
                     </div>
                     d.query('body').appendChild(sharePage);
                     QrCode.toCanvas(response.code, 180, 180, d.query(".share-page-qrcode"));
-
-                    let emailDom : HTMLElement = this.tagId? 
+                    let emailDom: HTMLElement = this.tagId ?
                         <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
                         : <li class="disabled"><i class="mui-icon iconfont iconyoujian disabled" data-type="email"></i><span>邮件</span></li>;
                     let shareBtnList: HTMLElement = <div class="share-page-methods">
@@ -310,7 +307,8 @@ export class ShareCode {
                     sharePage.appendChild(shareBtnList);
                     shareBtnList.onclick = (e: Event) => {
                         let type = e.target['dataset'] ? e.target['dataset'].type : '';
-                        const imgSrc = d.query('.share-page-qrcode img')['src'];
+
+                        let imgSrc = this.toBase64Fn(response.code)  //返回的是一串Base64编码的URL并指定格式
                         switch (type) {
                             case 'weixin':
                                 console.log(imgSrc);
@@ -321,7 +319,7 @@ export class ShareCode {
                             // case 'qq':
                             //     break;
                             case 'email':
-                                if( !this.tagId) return ;
+                                if (!this.tagId) return;
                                 BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json', {
                                     type: 'post',
                                     data: {
@@ -369,7 +367,7 @@ export class ShareCode {
         </div>
 
         shareEle.addEventListener('click', (e: Event) => {
-            
+
             switch (e.target['className']) {
                 case 'qr-code-share':
                     this.generateCode();
@@ -382,7 +380,7 @@ export class ShareCode {
                         clearTimeout(timer);
                         tools.isMb && Shell.image.getSignImg((res) => {
                             alert(123);
-                            let emailDom : HTMLElement = this.tagId? 
+                            let emailDom: HTMLElement = this.tagId ?
                                 <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
                                 : <li class="disabled"><i class="mui-icon iconfont iconyoujian " data-type="email"></i><span>邮件</span></li>;
                             let shareBtnList: HTMLElement = <div class="share-page-methods">
@@ -396,7 +394,7 @@ export class ShareCode {
                                 </ul>
                                 <p class="share-page-cancel" data-type="cancel">取消</p>
                             </div>
-                            
+
                             let sharePage: HTMLDivElement = <div class="share-page"></div>
                             d.query('body').appendChild(sharePage);
                             sharePage.appendChild(shareBtnList);
@@ -494,6 +492,21 @@ export class ShareCode {
 
         // $('body > header').append(dom);
 
+    }
+
+    /**
+     * 字符串转base64
+     * @param code 字符串
+     */
+    toBase64Fn(code) {
+        let image = new Image();
+        let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
+        canvas.style.backgroundColor = '#fff';
+        let ctx = canvas.getContext("2d");
+
+        ctx.drawImage(image, 0, 0, 100, 100); //使用画布画图
+
+        return canvas.toDataURL("image/jpeg", 1);  //返回的是一串Base64编码的URL并指定格式
     }
 
 
