@@ -308,7 +308,8 @@ export class ShareCode {
                     shareBtnList.onclick = (e: Event) => {
                         let type = e.target['dataset'] ? e.target['dataset'].type : '';
 
-                        let imgSrc = this.toBase64Fn(response.code)  //返回的是一串Base64编码的URL并指定格式
+                        let imgSrc = d.query('.share-page-qrcode> img')['src'] ? d.query('.share-page-qrcode> img')['src'] : response.code;  
+
                         switch (type) {
                             case 'weixin':
                                 console.log(imgSrc);
@@ -492,21 +493,6 @@ export class ShareCode {
 
         // $('body > header').append(dom);
 
-    }
-
-    /**
-     * 字符串转base64
-     * @param code 字符串
-     */
-    toBase64Fn(code) {
-        let image = new Image();
-        let canvas = document.createElement("canvas");   //创建canvas DOM元素，并设置其宽高和图片一样
-        canvas.style.backgroundColor = '#fff';
-        let ctx = canvas.getContext("2d");
-
-        ctx.drawImage(image, 0, 0, 100, 100); //使用画布画图
-
-        return canvas.toDataURL("image/jpeg", 1);  //返回的是一串Base64编码的URL并指定格式
     }
 
 
