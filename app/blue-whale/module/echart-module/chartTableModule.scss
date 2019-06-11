@@ -1,6 +1,12 @@
+.chart-table {
+    height: 20rem;
+    overflow: scroll;
+}
+
 .chart-container {
     width: 100%;
     height: 20rem;
+    padding-bottom: 2rem;
 }
 .btn-default {
     // border-color: none;

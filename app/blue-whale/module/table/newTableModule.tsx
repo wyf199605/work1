@@ -728,6 +728,19 @@ export class NewTableModule extends AGroupTabItem {
                     }, time),
                     icon: 'app-quxiao',
                     iconPre: 'appcommon'
+                }, {
+                    key: 'switchChart',
+                    content: '图表',
+                    onClick: tools.pattern.throttling(() => {
+                        // this.editManage.end(bwTable);
+                        let chartDom: HTMLElement | null = d.query('.chart-table', this.container);
+                        if(chartDom) {
+                            chartDom.nextElementSibling && chartDom.nextElementSibling.style.display = 'none';
+                            chartDom.style.display = 'block';
+                        }
+                    }, time),
+                    // icon: 'app-quxiao',
+                    // iconPre: 'appcommon'
                 }
             ];
 

@@ -21,8 +21,8 @@ interface Data {
             meta: Array<any>,
         }>
     };
-    
-    bodyData?: Array<any> 
+
+    bodyData?: Array<any>
 }
 interface CommonChartData {
     title?: {
@@ -78,8 +78,8 @@ export class ChartTableModule {
     wrapper: HTMLElement;   // 当前表格 dom元素
     chartBtnsContainer: HTMLElement; // 图表自制按钮容器
     ftable: FastBtnTable  // 对表格基本操作的方法对象
-    data:Data; // 接口请求的表格数据 
-    color= ['#609ee9','#f7ba2a', '39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169'];
+    data: Data; // 接口请求的表格数据 
+    color = ['#609ee9', '#f7ba2a', '39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169'];
 
 
     constructor(ui: IBW_Table, wrapper: HTMLElement, data: Data, ftable: FastBtnTable) {
@@ -93,29 +93,31 @@ export class ChartTableModule {
 
     initData() {
         this.wrapper.style.display = 'none';
-        this.parentDom.insertBefore(this.render(),this.parentDom.childNodes[0]); 
+        this.parentDom.insertBefore(this.render(), this.parentDom.childNodes[0]);
         // this.parentDom.appendChild(this.render());
-        let line ;
-        switch (this.ui.uiType ) {
+        let chart;
+        switch (this.ui.uiType) {
             case 'select':
             case 'table':
-                line = this.initCommonChartFn();
+                    // this.initPieChartFn();
+                chart = this.ui.showType === 'pie'? this.initPieChartFn(): this.initCommonChartFn();
+                
                 break;
             case 'detail':
-                line = this.ui.fields? null : this.initCommonChartFn();
+                chart = this.ui.fields ? null : this.ui.showType === 'pie'? this.initPieChartFn(): this.initCommonChartFn();
                 break;
         }
 
         // let line = this.lineChartFn();
         window.onresize = () => {
-            line && line.resize();
+            chart && chart.resize();
         }
         this.chartBtnsClk();
     }
     /**
      * 通用表格处理方法 
      */
-    
+
     initCommonChartFn() {
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
@@ -158,7 +160,8 @@ export class ChartTableModule {
             });
             series.push(seriesItem);
         });
-        let chartData =  {
+         
+        let chartData = {
             title: {
                 text: caption,
                 textStyle: {
@@ -179,7 +182,7 @@ export class ChartTableModule {
             },
             tooltip: {},
             legend: {
-                data: legendData,
+                data: tools.isMb ?  [] : legendData,
                 top: 15,
             },
             xAxis: {
@@ -220,9 +223,91 @@ export class ChartTableModule {
         };
         chart.setOption(chartData);
         return chart;
-        
+
 
     }
+
+    initPieChartFn() {
+        let yCoordinate = this.ui.local.yCoordinate.split(',');
+        this.chartDom.style.height = yCoordinate? `${yCoordinate.length * 20}rem` : '20rem';
+        let chart = echarts.init(this.chartDom);
+        this.data.bodyData = [];
+        this.data.body.bodyList[0].dataList.forEach(list => {
+            let obj = {};
+            list.forEach((ele, index) => {
+                obj[this.data.body.bodyList[0].meta[index]] = ele;
+            });
+            this.data.bodyData.push(obj);
+        });
+        let caption = this.ui.caption;
+        let xAxisName: Array<string> = this.ui.local.xCoordinate.split(',');
+        let xAxisData: Array<any> = [];
+        let legendName: Array<string> = yCoordinate;
+        let legendData: Array<string> = [];
+        let series = [];
+        xAxisName.forEach(name => {
+            xAxisData = this.data.bodyData.map(item => item[name]);
+        });
+        legendName.forEach((legend, i) => {
+            let yAxis = ((i + 1) / legendName.length * 100 - 5 * (i + 1)) + '%';
+            let seriesItem = {
+                type: 'pie',
+                radius: [0, '20%'],
+                center: ['50%', yAxis],
+                data:this.data.bodyData.map(item => {
+                    return {
+                        name: item[this.ui.local.xCoordinate],
+                        value: item[legend],
+                        itemStyle: {
+                            color: this.color[i]
+                        }
+                    }
+                })
+            }
+            // seriesItem.data = this.data.bodyData.map(item => item[legend]);
+            // // seriesItem.name = legendData[i];
+            // this.ui.cols.forEach(col => {
+            //     if (col.name === legend) {
+            //         legendData.push(col.caption);
+            //         seriesItem.name = col.caption;
+            //     }
+            // });
+            series.push(seriesItem);
+        });
+         
+        let chartData = {
+            title: {
+                text: caption,
+                textStyle: {
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                    color: '#333'
+                    // fontWeight: 'bold',
+
+                },
+                padding: 15,
+            },
+            grid: {
+                // top: 15,
+                left: 15,
+                right: 15,
+                bottom: 15,
+                containLabel: true
+            },
+            tooltip: {},
+            legend: {
+                data: tools.isMb ?  [] : xAxisData,
+                top: 15,
+            },
+            series: series
+        };
+        chart.setOption(chartData);
+        // debugger;
+        return chart;
+    }
+
+  
+
 
     /**
      * 图表渲染函数

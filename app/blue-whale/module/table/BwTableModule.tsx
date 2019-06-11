@@ -412,7 +412,7 @@ export class BwTableModule extends Component {
                             this.lookup
                         ]).then(([{ response }]) => {
                             this.wrapper.style.display = 'block';
-                            new ChartTableModule(this.ui, this.wrapper, response, this.ftable);
+                            this.ui.initShow && new ChartTableModule(this.ui, this.wrapper, response, this.ftable);
                             let { data, head } = response;
                             // 选项查询处理(wbf)
                             this.sectionField(response);
@@ -461,10 +461,6 @@ export class BwTableModule extends Component {
             type: 'default',
             content: '图表',
             onClick: () => {
-                console.log('图表',ui);
-                // new ShareCode(this.tableModule.main.ftable.selectedRowsData);
-                console.log(this);
-                debugger;
                 let chartDom: HTMLElement | null = d.query('.chart-table', this.container);
                 if(chartDom) {
                     this.wrapper.style.display = 'none';
