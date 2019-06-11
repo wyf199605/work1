@@ -24,51 +24,6 @@ interface Data {
 
     bodyData?: Array<any>
 }
-interface CommonChartData {
-    title?: {
-        text: string,
-        textStyle?: {
-            fontFamily?: string,
-            fontSize?: number,
-            color?: string
-            // fontWeight: 'bold',
-
-        },
-        padding?: number,
-    },
-    grid?: {
-        // top: 15,
-        left?: number,
-        right?: number,
-        bottom?: number,
-        containLabel?: boolean
-    },
-    tooltip?: object,
-    legend?: {
-        data: Array<string>,
-        top?: string,
-    },
-    xAxis: {
-        data?: Array<any>,
-        splitLine?: {
-            lineStyle?: {
-                // 使用深浅的间隔色
-                color?: string
-            },
-        },
-        axisLine?: {
-            lineStyle?: {
-                color: string
-            }
-        },
-        axisLabel?: {
-            color: string
-        }
-    },
-
-    yAxis?: any,
-    series: Array<any>
-}
 
 export class ChartTableModule {
 
@@ -89,6 +44,7 @@ export class ChartTableModule {
         this.ftable = ftable;
         this.data = data;
         this.initData();
+        this.initTableBtns();
     }
 
     initData() {
@@ -113,6 +69,19 @@ export class ChartTableModule {
             chart && chart.resize();
         }
         this.chartBtnsClk();
+    }
+
+    initTableBtns() {
+        console.log(this.wrapper);
+        let btnsContainer = d.query('.fast-table-btns', this.wrapper);
+        if (!btnsContainer) return;
+        
+        let btn: HTMLElement = <button class="btn-default">图表</button>
+        btnsContainer.appendChild(btn);
+        btn.onclick = () => {
+            this.wrapper.style.display = 'none';
+            this.chartBtnsContainer.style.display = 'block';
+        }
     }
     /**
      * 通用表格处理方法 
@@ -227,6 +196,9 @@ export class ChartTableModule {
 
     }
 
+    /**
+     * 饼状图
+     */
     initPieChartFn() {
         let yCoordinate = this.ui.local.yCoordinate.split(',');
         this.chartDom.style.height = yCoordinate? `${yCoordinate.length * 20}rem` : '20rem';
