@@ -52,16 +52,20 @@ export class ChartTableModule {
         this.parentDom.insertBefore(this.render(), this.parentDom.childNodes[0]);
         // this.parentDom.appendChild(this.render());
         let chart;
-        debugger;
         switch (this.ui.uiType) {
             case 'select':
             case 'table':
             case 'web':
+            case 'drill':
                 chart = this.ui.showType === 'pie'? this.initPieChartFn(): this.initCommonChartFn();
                 break;
             case 'detail':
-                chart = this.ui.fields ? null : this.ui.showType === 'pie'? this.initPieChartFn(): this.initCommonChartFn();
+                this.ui.cols = this.ui.fields;
+                chart =  this.ui.showType === 'pie'? this.initPieChartFn(): this.initCommonChartFn();
                 break;
+            // case 'drill':
+            //     this.initDrillChart();
+            //     break;
         }
         window.onresize = () => {
             chart && chart.resize();
@@ -86,6 +90,7 @@ export class ChartTableModule {
      */
 
     initCommonChartFn() {
+        
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
@@ -147,7 +152,12 @@ export class ChartTableModule {
                 bottom: 15,
                 containLabel: true
             },
-            tooltip: {},
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross'
+                }
+            },
             legend: {
                 data: tools.isMb ?  [] : legendData,
                 top: 15,
@@ -188,7 +198,25 @@ export class ChartTableModule {
             },
             series: series
         };
+        tools.isMb && (chartData['dataZoom'] =  [
+            {
+                type: 'slider',
+                show: true,
+                xAxisIndex: [0],
+                start: 1,
+                end: 99
+            },
+            {
+                type: 'inside',
+                yAxisIndex: [0],
+                start: 1,
+                end: 99
+            }
+        ]);
         chart.setOption(chartData);
+        chart.on('click', function (params) {
+            console.log(params);
+        });
         return chart;
 
 
@@ -198,6 +226,7 @@ export class ChartTableModule {
      * 饼状图
      */
     initPieChartFn() {
+        debugger;
         let yCoordinate = this.ui.local.yCoordinate.split(',');
         this.chartDom.style.height = yCoordinate? `${yCoordinate.length * 20}rem` : '20rem';
         let chart = echarts.init(this.chartDom);
@@ -272,7 +301,6 @@ export class ChartTableModule {
             series: series
         };
         chart.setOption(chartData);
-        // debugger;
         return chart;
     }
 
@@ -284,7 +312,7 @@ export class ChartTableModule {
      */
     render() {
         this.chartDom = <section class="chart-container" >图形</section>
-        this.chartBtnsContainer = <div class="chart-table">
+        this.chartBtnsContainer = <div class="chart-table" >
             <section class="chart-btns">
                 <button class="switch-table btn-default" data-type="switchTable">表格</button>
             </section>
@@ -307,6 +335,14 @@ export class ChartTableModule {
                     break;
             }
         })
+    }
+
+    initDrillChart() {
+        if(this.ui.showType === 'pie') {
+            
+        } else {
+
+        }
     }
     
 }
