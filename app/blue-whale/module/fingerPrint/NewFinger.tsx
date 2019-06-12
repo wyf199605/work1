@@ -45,7 +45,7 @@ export class NewFinger {
     protected fingerEvent: {on: Function, off: Function};
     fingerOn(){
         this.fingerOff();
-       this.fingerEvent.on && this.fingerEvent.on();
+        this.fingerEvent.on && this.fingerEvent.on();
     }
     fingerOff(){
         this.fingerEvent.off && this.fingerEvent.off();
@@ -166,9 +166,15 @@ export class NewFinger {
                     Modal.toast('请重新获取指纹');
                     // this.initFingerOpen();
                     this.fingerOn();
-                })
+                });
+            }).catch(() =>{
+                Modal.toast('请重新获取指纹!');
+                this.fingerOn();
             });
-        })
+        }).catch(() => {
+            Modal.toast('请重新获取指纹!!');
+            this.fingerOn();
+        });
     }
 
     //创建模态框获取userid
