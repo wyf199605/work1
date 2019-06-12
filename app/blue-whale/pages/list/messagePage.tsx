@@ -61,11 +61,22 @@ export = class messagePage {
             type: 'get'
         }).then(({ response }) => {
             d.append(taskDom, this.showTaskList(response.data));
-            // console.log(response.data)
+            console.log('任务消息:',response.data);
+            let _len = response.data.length;
+            console.log('任务消息数量：',_len);
+            // 显示任务消息数量
+            let liDom = d.query('li[data-name="task"]');
+            if(_len) {
+                d.append(liDom, <span className="mui-badge mui-badge-primary custom-task" data-field="tast" >{_len}</span>);
+            }else{
+                d.append(liDom, <span className="mui-badge mui-badge-primary custom-task hide" data-field="tast" />);
+            }
+            
             messagePage.tastList = response.data;
+
+            // 给壳发送数量
             messagePage.setSysBadge();
         });
-
     }
 
     private noReminder(url: string) {
@@ -104,10 +115,12 @@ export = class messagePage {
     }
 
     initSysMsg(listDOM: HTMLElement) {
-        let lis = d.queryAll('li[data-name]', this.tab.getTab());
-        lis.forEach(li => {
-            d.append(li, <span className="mui-badge mui-badge-primary hide" data-field={li.dataset.name} />);
-        });
+        let liDom = d.query('li[data-name="sys"]');
+        d.append(liDom, <span className="mui-badge mui-badge-primary hide" data-field="sys" />);
+        // let lis = d.queryAll('li[data-name]', this.tab.getTab());
+        // lis.forEach(li => {
+        //     d.append(li, <span className="mui-badge mui-badge-primary hide" data-field={li.dataset.name} />);
+        // });
 
         //==== 此处监听存在重复性问题，待移除 ====//
         // window.addEventListener('newMsg', (e: CustomEvent) => {
