@@ -750,6 +750,7 @@ namespace G {
                         on: () => {
                             // 异步完成通知
                             if (eventBack) {
+                                d.off(window, eventBack);
                                 d.on(window, eventBack, function (e: CustomEvent) {
                                     let detail = e.detail;
                                     if (isAutoOff) {
