@@ -75,9 +75,37 @@ export = class webscoket {
                 BwRule.Ajax.fetch(CONF.url.taskMsg, {
                     dataType: 'json',
                     type: 'get'
-                }).then(({ response }) => {
-                    messagePage.setSysBadge(response.data.length);
-                });
+                }).then(({response}) => {
+                    messagePage.tastList = response.data;
+                    let _task_num = response.data.length;
+                    messagePage.setSysBadge(_task_num);
+                })
+                // 不停请求
+                setInterval(() => {
+                    BwRule.Ajax.fetch(CONF.url.taskMsg, {
+                        dataType: 'json',
+                        type: 'get'
+                    }).then(({response}) => {
+                        messagePage.tastList = response.data;
+                        let _task_num = response.data.length;
+                        messagePage.setSysBadge(_task_num);
+                    })
+                }, 3000);
+                // BwRule.Ajax.fetch(CONF.url.taskMsg, {
+                //     dataType: 'json',
+                //     type: 'get'
+                // }).then(({ response }) => {
+                //     let _sys_num = response.data.length;
+                //     BwRule.Ajax.fetch(CONF.url.taskMsg, {
+                //         dataType: 'json',
+                //         type: 'get'
+                //     }).then(({response}) => {
+                //         messagePage.tastList = response.data;
+                //         let _task_num = response.data.length;
+                //         messagePage.setSysBadge(_task_num);
+                //     })
+                    
+                // });
             });
 
         };

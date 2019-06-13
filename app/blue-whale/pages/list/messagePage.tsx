@@ -25,7 +25,7 @@ export = class messagePage {
         this.p = para;
         let container = d.query('.mui-scroll'),
             listDOM = <ul className="mui-table-view" />,
-            taskDom = <ul className="task" />;
+            taskDom = <ul className="task" id="task-ul-custom" />;
         this.SysDom = listDOM;
         this.tab = new Tab({
             panelParent: container,
@@ -48,13 +48,48 @@ export = class messagePage {
 
         this.initSysMsg(listDOM);
         this.initTaskMsg(taskDom);
-
-
+        let _self = this;
+        //不停请求任务数量（原因：服务端未配置websocket）
+        setInterval(() => {
+            _self.getTaskMsg();
+        }, 3000)
         d.on(window, BwRule.FRESH_SYS_MSG, () => {
             this.showSysList(localMsg.get(), false, listDOM)
         })
     }
 
+    // 获取任务消息数量
+    getTaskMsg() {
+        BwRule.Ajax.fetch(CONF.url.taskMsg, {
+            dataType: 'json',
+            type: 'get'
+        }).then(({response}) => {
+            messagePage.tastList = response.data;
+            let _num = response.data.length;
+            let _badge = document.getElementById('custom-task');
+            let _parent = document.getElementById('task-ul-custom');
+            let _childs = document.getElementsByClassName('task-msg');
+            
+            _badge.textContent = _num;
+            if(_num == 0) {
+                _badge.classList.add('hide');
+                for(let i=_childs.length-1; i>=0;i--) {
+                    _parent.removeChild(_childs[i]);
+                }
+                d.append(_parent, this.showTaskList(response.data));
+            }else{
+                _badge.classList.remove('hide');
+                for(let i=_childs.length-1; i>=0;i--) {
+                    _parent.removeChild(_childs[i]);
+                }
+                d.append(_parent, this.showTaskList(response.data));
+            }
+            console.log('任务数量：', _num,_badge.innerHTML);
+            messagePage.setSysBadge();
+        })
+    }
+
+    // 初始化任务消息
     initTaskMsg(taskDom: HTMLElement) {
         BwRule.Ajax.fetch(CONF.url.taskMsg, {
             dataType: 'json',
@@ -67,9 +102,9 @@ export = class messagePage {
             // 显示任务消息数量
             let liDom = d.query('li[data-name="task"]');
             if(_len) {
-                d.append(liDom, <span className="mui-badge mui-badge-primary custom-task" data-field="tast" >{_len}</span>);
+                d.append(liDom, <span className="mui-badge mui-badge-primary" id="custom-task" data-field="tast" >{_len}</span>);
             }else{
-                d.append(liDom, <span className="mui-badge mui-badge-primary custom-task hide" data-field="tast" />);
+                d.append(liDom, <span className="mui-badge mui-badge-primary hide" id="custom-task" data-field="tast" />);
             }
             
             messagePage.tastList = response.data;
