@@ -78,7 +78,7 @@ export class ChartTableModule {
         let btnsContainer = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
         
-        let btn: HTMLElement = <button class="btn-default">图表</button>
+        let btn: HTMLElement = <button class="btn button-type-default button-small">图表</button>
         btnsContainer.appendChild(btn);
         btn.onclick = () => {
             this.wrapper.style.display = 'none';
@@ -90,7 +90,7 @@ export class ChartTableModule {
      */
 
     initCommonChartFn() {
-        
+        this.chartDom.parentElement.style.height = '25rem';
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
@@ -102,14 +102,11 @@ export class ChartTableModule {
         });
         let caption = this.ui.caption;
         let type = this.ui.showType || 'line';
-        let xAxisName: Array<string> = this.ui.local.xCoordinate.split(',');
-        let xAxisData: Array<any> = [];
-        let legendName: Array<string> = this.ui.local.yCoordinate.split(',');
+        let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
+        let xAxisData: Array<any> = this.data.bodyData.map(item => item[xAxisName]);
+        let legendName: Array<string> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let legendData: Array<string> = [];
         let series = [];
-        xAxisName.forEach(name => {
-            xAxisData = this.data.bodyData.map(item => item[name]);
-        });
         legendName.forEach((legend, i) => {
 
             let seriesItem = {
@@ -213,6 +210,7 @@ export class ChartTableModule {
                 end: 99
             }
         ]);
+        
         chart.setOption(chartData);
         chart.on('click', function (params) {
             console.log(params);
@@ -226,8 +224,9 @@ export class ChartTableModule {
      * 饼状图
      */
     initPieChartFn() {
-        debugger;
-        let yCoordinate = this.ui.local.yCoordinate.split(',');
+        // debugger;
+        // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
+        let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
         this.chartDom.style.height = yCoordinate? `${yCoordinate.length * 20}rem` : '20rem';
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
@@ -238,28 +237,29 @@ export class ChartTableModule {
             });
             this.data.bodyData.push(obj);
         });
-        let caption = this.ui.caption;
-        let xAxisName: Array<string> = this.ui.local.xCoordinate.split(',');
-        let xAxisData: Array<any> = [];
+        // let caption = this.ui.caption;
+        let xAxisName:string = this.ui.local.xCoordinate.toUpperCase();
+        let xAxisData: Array<any> = this.data.bodyData.map(item => item[xAxisName]);;
         let legendName: Array<string> = yCoordinate;
         let legendData: Array<string> = [];
         let series = [];
-        xAxisName.forEach(name => {
-            xAxisData = this.data.bodyData.map(item => item[name]);
-        });
+        // xAxisName.forEach(name => {
+        //     xAxisData = this.data.bodyData.map(item => item[name]);
+        // });
         legendName.forEach((legend, i) => {
-            let yAxis = ((i + 1) / legendName.length * 100 - 5 * (i + 1)) + '%';
+            let yAxis = ((i + 0.5) / legendName.length * 100 ) + '%';
             let seriesItem = {
                 type: 'pie',
                 radius: [0, '20%'],
                 center: ['50%', yAxis],
-                data:this.data.bodyData.map(item => {
+                data:this.data.bodyData.map((item, j) => {
                     return {
-                        name: item[this.ui.local.xCoordinate],
+                        name: item[xAxisName],
                         value: item[legend],
-                        itemStyle: {
-                            color: this.color[i]
-                        }
+                        // itemStyle: {
+                        //     color: this.color[j]
+                        // }
+                        
                     }
                 })
             }
@@ -275,17 +275,17 @@ export class ChartTableModule {
         });
          
         let chartData = {
-            title: {
-                text: caption,
-                textStyle: {
-                    fontFamily: 'monospace',
-                    fontSize: 18,
-                    color: '#333'
-                    // fontWeight: 'bold',
+            // title: {
+            //     text: caption,
+            //     textStyle: {
+            //         fontFamily: 'monospace',
+            //         fontSize: 18,
+            //         color: '#333'
+            //         // fontWeight: 'bold',
 
-                },
-                padding: 15,
-            },
+            //     },
+            //     padding: 15,
+            // },
             grid: {
                 // top: 15,
                 left: 15,
@@ -314,7 +314,7 @@ export class ChartTableModule {
         this.chartDom = <section class="chart-container" >图形</section>
         this.chartBtnsContainer = <div class="chart-table" >
             <section class="chart-btns">
-                <button class="switch-table btn-default" data-type="switchTable">表格</button>
+                <button class="switch-table btn button-type-default button-small" data-type="switchTable">表格</button>
             </section>
             {this.chartDom}
         </div>
