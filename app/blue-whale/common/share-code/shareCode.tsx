@@ -384,7 +384,7 @@ export class ShareCode {
         this.shareDiv.remove();
         let shareEle: HTMLDivElement = <div class="share-baffle ">
             <p class="qr-code-share">二维码分享</p>
-            <p class="fastlion-share">涂鸦分享</p>
+            {/* <p class="fastlion-share">涂鸦分享</p> */}
             <p class="cancel-share">取消</p>
         </div>
 
