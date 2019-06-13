@@ -20,6 +20,7 @@ export = class messagePage {
     private p: obj;
     private tab: Tab;
     private SysDom: HTMLElement;
+    private TotalMsg: any;
     static tastList: Array<obj> = [];
     constructor(private para) {
         this.p = para;
@@ -45,9 +46,9 @@ export = class messagePage {
             }
         });
 
-
-        this.initSysMsg(listDOM);
         this.initTaskMsg(taskDom);
+        this.initSysMsg(listDOM);
+        
         let _self = this;
         //不停请求任务数量（原因：服务端未配置websocket）
         setInterval(() => {
@@ -70,22 +71,26 @@ export = class messagePage {
             let _parent = document.getElementById('task-ul-custom');
             let _childs = document.getElementsByClassName('task-msg');
             
-            _badge.textContent = _num;
-            if(_num == 0) {
-                _badge.classList.add('hide');
-                for(let i=_childs.length-1; i>=0;i--) {
-                    _parent.removeChild(_childs[i]);
+            // 判断消息数量是否有变化，变化才进行节点重新渲染
+            if(this.TotalMsg != _num) {
+                _badge.textContent = _num;
+                this.TotalMsg = _num;
+                if(_num == 0) {
+                    _badge.classList.add('hide');
+                    for(let i=_childs.length-1; i>=0;i--) {
+                        _parent.removeChild(_childs[i]);
+                    }
+                    d.append(_parent, this.showTaskList(response.data));
+                }else{
+                    _badge.classList.remove('hide');
+                    for(let i=_childs.length-1; i>=0;i--) {
+                        _parent.removeChild(_childs[i]);
+                    }
+                    d.append(_parent, this.showTaskList(response.data));
                 }
-                d.append(_parent, this.showTaskList(response.data));
-            }else{
-                _badge.classList.remove('hide');
-                for(let i=_childs.length-1; i>=0;i--) {
-                    _parent.removeChild(_childs[i]);
-                }
-                d.append(_parent, this.showTaskList(response.data));
+                console.log('任务数量：', _num,_badge.innerHTML);
+                messagePage.setSysBadge();
             }
-            console.log('任务数量：', _num,_badge.innerHTML);
-            messagePage.setSysBadge();
         })
     }
 
@@ -98,6 +103,7 @@ export = class messagePage {
             d.append(taskDom, this.showTaskList(response.data));
             console.log('任务消息:',response.data);
             let _len = response.data.length;
+            this.TotalMsg = response.data.length;
             console.log('任务消息数量：',_len);
             // 显示任务消息数量
             let liDom = d.query('li[data-name="task"]');
