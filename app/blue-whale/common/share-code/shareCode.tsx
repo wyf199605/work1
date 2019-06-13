@@ -1,4 +1,5 @@
 /// <amd-module name="ShareCode"/>
+/// <amd-dependency path="html2canvas" name="html2canvas"/>
 import { BwRule } from "../rule/BwRule";
 import CONF = BW.CONF;
 import sys = BW.sys;
@@ -9,6 +10,8 @@ import tools = G.tools;
 import Shell = G.Shell;
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { ShellAction } from "global/action/ShellAction";
+
+declare const html2canvas;
 
 /** 
  * 分页器
@@ -285,11 +288,26 @@ export class ShareCode {
                 }
             }).then(({ response }) => {
                 if (tools.isMb) {
+                    
                     let sharePage: HTMLDivElement = <div class="share-page">
                         <div class="share-page-qrcode"></div>
                     </div>
+                    // d.query('body').removeChild(d.query('.share-page'))
                     d.query('body').appendChild(sharePage);
-                    QrCode.toCanvas(response.code, 180, 180, d.query(".share-page-qrcode"));
+                    let qr = QrCode.toCanvas(response.code, 180, 180, d.query(".share-page-qrcode"));
+	    // var cas = document.createElement( 'canvas' );
+	    // var ctx = cas.getContext( '2d' );
+ 
+	    // cas.width = 100, cas.height = 100;
+	    // ctx.fillStyle = 'pink';
+	    // ctx.fillRect( 0, 0, 100, 100 );
+ 
+	    // 把画布的内容转换为base64编码格式的图片
+        // var data = cas.toDataURL( 'image/png', 1 );  //1表示质量(无损压缩)
+      
+ 
+        // 把画布的内容转换为base64编码格式的图片
+
                     let emailDom: HTMLElement = this.tagId ?
                         <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
                         : <li class="disabled"><i class="mui-icon iconfont iconyoujian disabled" data-type="email"></i><span>邮件</span></li>;
@@ -305,14 +323,17 @@ export class ShareCode {
                         <p class="share-page-cancel" data-type="cancel">取消</p>
                     </div>
                     sharePage.appendChild(shareBtnList);
+                    let qrWhiteBorder;
+                    html2canvas(qr).then(function(canvas) {
+                        qrWhiteBorder = canvas;
+                    });
                     shareBtnList.onclick = (e: Event) => {
                         let type = e.target['dataset'] ? e.target['dataset'].type : '';
 
-                        let imgSrc = d.query('.share-page-qrcode> img')['src'] ? d.query('.share-page-qrcode> img')['src'] : response.code;  
-
+                        let imgSrc = qrWhiteBorder.toDataURL( 'image/png', 1 );
+                        
                         switch (type) {
                             case 'weixin':
-                                console.log(imgSrc);
                                 Shell.base.wxShare(imgSrc);
                                 break;
                             // case 'link':
@@ -363,7 +384,7 @@ export class ShareCode {
         this.shareDiv.remove();
         let shareEle: HTMLDivElement = <div class="share-baffle ">
             <p class="qr-code-share">二维码分享</p>
-            <p class="fastlion-share">涂鸦分享</p>
+            {/* <p class="fastlion-share">涂鸦分享</p> */}
             <p class="cancel-share">取消</p>
         </div>
 
