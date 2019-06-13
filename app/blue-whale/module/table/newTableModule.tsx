@@ -257,7 +257,8 @@ export class NewTableModule extends AGroupTabItem {
                                     let list = selectedData[this.showSubField].split(',');
                                     let showSubSeq = this.computedIndex(list);
                                     this.tab.setTabsShow(showSubSeq);
-                                    this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    // this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    this.tab.active(0);
                                     parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
                                 }
                             } else {
@@ -335,7 +336,7 @@ export class NewTableModule extends AGroupTabItem {
             })
 
         })
-        console.log("输出选项" + showSubSeq)
+        // console.log("输出选项" + showSubSeq)
         if(showSubSeq.length>0&&this.subWrapper.classList.contains('hide')){
             this.subWrapper.classList.remove('hide');
         }
@@ -423,7 +424,8 @@ export class NewTableModule extends AGroupTabItem {
                 let showSubSeq = this.computedIndex(list);
                 this.tab.setTabsShow(showSubSeq);
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
-                this.tab.active(parseInt(showSubSeq[0]) - 1);
+                // this.tab.active(parseInt(showSubSeq[0]) - 1);
+                this.tab.active(0);
                 this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
             } else {
                 pseudoTable && pseudoTable.setPresentSelected(index);
