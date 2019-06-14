@@ -45,6 +45,8 @@ export class RegPage {
             });
         }
         d.on(props.saveReg, 'click', () => {
+            // new UnBinding({check_code: "123", mobile: "13799914019", uuid: "8C-16-45-29-A5-B8", register: "on"})
+            // return false;
             if (props.tel.value.trim().length === 0) {
                 Modal.alert('请输入手机号');
                 return;
@@ -82,7 +84,7 @@ export class RegPage {
                 },
                 data2url: true,
             }).then(({ response }) => {
-                console.log(response)
+                // console.log(response)
                 if (response.msg.indexOf('成功') > -1) {
                     Modal.toast('注册成功!');
                     setTimeout(() => {
