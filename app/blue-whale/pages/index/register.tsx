@@ -96,12 +96,35 @@ export class RegPage {
                         btns: ['取消', '前往解绑'],
                         callback: (index) => {
                             if (index === true) {
-                                new UnBinding({
+                                let config={
                                     check_code: props.smsCheckCode.value,
                                     mobile: props.tel.value,
                                     uuid: this.deviceData['uuid'],
                                     register: 'on'
+                                }
+                                let obj: obj = {};
+                                if (config.register) {
+                                    obj.register = config.register;
+                                }
+                                // if (config.userid) {
+                                //     obj.userid = config.userid;
+                                // }
+                                if (config.check_code) {
+                                    obj.check_code = config.check_code;
+                                }
+                                if (config.uuid) {
+                                    obj.uuid = config.uuid;
+                                }
+                                if (config.mobile) {
+                                    obj.mobile = config.mobile;
+                                }
+                                BwRule.Ajax.fetch(CONF.ajaxUrl.unBinding, {
+                                    data: obj,
+                                    type: 'get'
+                                }).then(({ response }) => {
+                                    new UnBinding(config)
                                 })
+                             
                                 // self.deviceMange(response.data);
                             }
                         }
