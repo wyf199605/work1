@@ -227,7 +227,7 @@ export class ChartTableModule {
         // debugger;
         // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
-        this.chartDom.style.height = yCoordinate? `${yCoordinate.length * 20}rem` : '20rem';
+        this.chartDom.style.height = tools.isMb? `${yCoordinate.length  * 20}rem`: yCoordinate? `${Math.ceil(yCoordinate.length / 3) * 20}rem` : '20rem';
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
@@ -247,11 +247,20 @@ export class ChartTableModule {
         //     xAxisData = this.data.bodyData.map(item => item[name]);
         // });
         legendName.forEach((legend, i) => {
-            let yAxis = ((i + 0.5) / legendName.length * 100 ) + '%';
+            let yAxis: string;
+            let xAxis = '50%';
+            if (tools.isMb) {
+                 yAxis = ((i + 0.5) / legendName.length * 100 ) + '%';
+            } else {
+                 let floor = Math.ceil(legendName.length / 3);
+                 let redidue = i % 3;
+                 yAxis = (50 / floor ) + '%';
+                 xAxis = ( 25 + redidue * 25) + '%';
+            }
             let seriesItem = {
                 type: 'pie',
-                radius: [0, '20%'],
-                center: ['50%', yAxis],
+                radius: 70,
+                center: [xAxis, yAxis],
                 data:this.data.bodyData.map((item, j) => {
                     return {
                         name: item[xAxisName],
@@ -295,12 +304,15 @@ export class ChartTableModule {
             },
             tooltip: {},
             legend: {
-                data: tools.isMb ?  [] : xAxisData,
-                top: 15,
+                data: xAxisData,
+                top: 5,
+                type: 'scroll',
             },
             series: series
         };
         chart.setOption(chartData);
+
+        tools.isMb && (this.chartDom.parentElement.style.height = `${yCoordinate.length  * 20 + 3}rem`);
         return chart;
     }
 
