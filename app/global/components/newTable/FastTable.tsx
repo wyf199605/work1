@@ -2783,12 +2783,12 @@ export class FastTable extends Component {
                                     }
                                 }
                                 // 新增
-                                sepData.keys.forEach((key) => {
-                                    if(tools.isNotEmpty(obj[key])){
-                                        pivotResult.insert.push(Object.assign({}, sepData.data,
-                                            {[key]: obj[key]}));
-                                    }
-                                });
+                                // sepData.keys.forEach((key) => {
+                                //     if(tools.isNotEmpty(obj[key])){
+                                //         pivotResult.insert.push(Object.assign({}, sepData.data,
+                                //             {[key]: obj[key]}));
+                                //     }
+                                // });
                                 break;
                             case 'delete':
                                 // 删除
