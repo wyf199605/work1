@@ -2766,22 +2766,22 @@ export class FastTable extends Component {
                         let sepData = FastTable.sepPivotData(obj);
                         switch (operation){
                             case 'insert':
-                                // for(let name of rowsName){
-                                //     let oldData = oldUpdateData[index] ? oldUpdateData[index][name] : null,
-                                //         data = obj[name];
-                                //
-                                //     if(data != oldData){
-                                //         sepData.keys.forEach((key) => {
-                                //             let data = obj[key];
-                                //
-                                //             // 新增 （原始数据为空）
-                                //             pivotResult.insert.push(Object.assign({}, sepData.data,
-                                //                 {[key]: data}));
-                                //
-                                //         });
-                                //         return;
-                                //     }
-                                // }
+                                for(let name of rowsName){
+                                    let oldData = oldUpdateData[index] ? oldUpdateData[index][name] : null,
+                                        data = obj[name];
+
+                                    if(data != oldData){
+                                        sepData.keys.forEach((key) => {
+                                            let data = obj[key];
+
+                                            // 新增 （原始数据为空）
+                                            pivotResult.insert.push(Object.assign({}, sepData.data,
+                                                {[key]: data}));
+
+                                        });
+                                        return;
+                                    }
+                                }
                                 // 新增
                                 sepData.keys.forEach((key) => {
                                     if(tools.isNotEmpty(obj[key])){
@@ -2810,23 +2810,23 @@ export class FastTable extends Component {
                                             let oldData = oldUpdateData[index] ? oldUpdateData[index][key] : null,
                                                 data = obj[key];
 
-                                            if(tools.isEmpty(oldData) && tools.isNotEmpty(data)) {
-                                                // 新增 （原始数据为空）
-                                                pivotResult.insert.push(Object.assign({}, sepData.data,
-                                                    {[key]: data}));
-                                            }else if(tools.isNotEmpty(oldData) && tools.isEmpty(data)){
-                                                // 删除 （现有数据变成空）
-                                                let delData: obj = {};
-                                                for(let key in sepData.data){
-                                                    delData[key] = oldUpdateData[index][key];
-                                                }
-                                                pivotResult.delete.push(Object.assign({}, delData,
-                                                    {[key]: oldData}));
-                                            }else{
+                                            // if(tools.isEmpty(oldData) && tools.isNotEmpty(data)) {
+                                            //     // 新增 （原始数据为空）
+                                            //     pivotResult.insert.push(Object.assign({}, sepData.data,
+                                            //         {[key]: data}));
+                                            // }else if(tools.isNotEmpty(oldData) && tools.isEmpty(data)){
+                                            //     // 删除 （现有数据变成空）
+                                            //     let delData: obj = {};
+                                            //     for(let key in sepData.data){
+                                            //         delData[key] = oldUpdateData[index][key];
+                                            //     }
+                                            //     pivotResult.delete.push(Object.assign({}, delData,
+                                            //         {[key]: oldData}));
+                                            // }else{
                                                 // 修改 （原始数据与修改过的数据都不为空，且不与原始数据一样）
                                                 pivotResult.update.push(Object.assign({}, sepData.data,
                                                     {[key]: data}));
-                                            }
+                                            // }
                                         });
                                         return;
                                     }
@@ -2837,15 +2837,16 @@ export class FastTable extends Component {
                                     let oldData = oldUpdateData[index] ? oldUpdateData[index][key] : null,
                                         data = obj[key];
 
-                                    if(tools.isEmpty(oldData) && tools.isNotEmpty(data)) {
-                                        // 新增 （原始数据为空）
-                                        pivotResult.insert.push(Object.assign({}, sepData.data,
-                                            {[key]: data}));
-                                    }else if(tools.isNotEmpty(oldData) && tools.isEmpty(data)){
-                                        // 删除 （现有数据变成空）
-                                        pivotResult.delete.push(Object.assign({}, sepData.data,
-                                            {[key]: oldData}));
-                                    }else if(oldData != data){
+                                    // if(tools.isEmpty(oldData) && tools.isNotEmpty(data)) {
+                                    //     // 新增 （原始数据为空）
+                                    //     pivotResult.insert.push(Object.assign({}, sepData.data,
+                                    //         {[key]: data}));
+                                    // }else if(tools.isNotEmpty(oldData) && tools.isEmpty(data)){
+                                    //     // 删除 （现有数据变成空）
+                                    //     pivotResult.delete.push(Object.assign({}, sepData.data,
+                                    //         {[key]: oldData}));
+                                    // }else
+                                    if(oldData != data){
                                         // 修改 （原始数据与修改过的数据都不为空，且不与原始数据一样）
                                         pivotResult.update.push(Object.assign({}, sepData.data,
                                             {[key]: data}));
