@@ -742,6 +742,8 @@ export class LoginPage {
         }
     };
     private loginFunc = () => {
+        // new UnBinding({check_code: "123", mobile: "13799914019", uuid: "8C-16-45-29-A5-B8", register: "on"})
+        // return false;
         let loginPage = this,
             saveBtn = loginPage.props.saveButton,
             isSavePw = saveBtn instanceof CheckBox ? saveBtn.checked : (<HTMLInputElement>saveBtn).checked,

@@ -42,6 +42,10 @@
         margin: 4px 10px;
         display: block;
         font-size: 40px;
+        margin-top: 10px;
+        &::before{
+          font-size: 42px;
+        }
       }
       .icon-device-mb {
         margin: 22px 11px;
@@ -86,4 +90,29 @@
       padding-top: 44px;
     }
   }
+  .pc-device-cell{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      margin-left: 30px;
+      margin-right: 20px;
+      color:#333333;
+     .pc-device-name{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 28px;
+        div{
+          margin-top: 5px;
+        }
+     }
+     .pc-btn-group button{
+      border:none;
+      background-color: #2A87EB;
+      color: white; 
+      border-radius: 6px;
+      padding:6px 12px;
+    }
+  }
+ 
 }

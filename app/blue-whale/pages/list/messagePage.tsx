@@ -49,11 +49,7 @@ export = class messagePage {
         this.initTaskMsg(taskDom);
         this.initSysMsg(listDOM);
         
-        let _self = this;
-        //不停请求任务数量（原因：服务端未配置websocket）
-        setInterval(() => {
-            _self.getTaskMsg();
-        }, 3000)
+
         d.on(window, BwRule.FRESH_SYS_MSG, () => {
             this.showSysList(localMsg.get(), false, listDOM)
         })
@@ -70,9 +66,9 @@ export = class messagePage {
             let _badge = document.getElementById('custom-task');
             let _parent = document.getElementById('task-ul-custom');
             let _childs = document.getElementsByClassName('task-msg');
-            
+
             // 判断消息数量是否有变化，变化才进行节点重新渲染
-            if(this.TotalMsg != _num) {
+            if(this.TotalMsg != _num && _badge) {
                 _badge.textContent = _num;
                 this.TotalMsg = _num;
                 if(_num == 0) {
@@ -305,6 +301,7 @@ export = class messagePage {
         let total;
         if(numMessage>0){
             total= numMessage + localMsg.getUnreadCount();
+            this.prototype.getTaskMsg();
         }else{
            total= messagePage.tastList.length + localMsg.getUnreadCount();
         }

@@ -251,7 +251,7 @@ namespace BW {
                     if ('AppShell' in window) {
                         data = Shell.base.device
                     }
-                    return data && data.msg;
+                    return data && data.data;
                     // let json = this.pcHandle('getDevice','');
                     // if(!tools.isEmpty(json)){
                     //     result.data = JSON.parse(json).msg;
