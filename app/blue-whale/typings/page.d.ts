@@ -2,7 +2,8 @@ interface BasicPagePara{
     dom? : HTMLElement
     title? : string;
     subButtons? :string;
-    ui? :obj
+    ui? :obj;
+    openWebscoket: boolean;
 }
 
 
