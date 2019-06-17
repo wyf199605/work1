@@ -3,7 +3,7 @@ interface BasicPagePara{
     title? : string;
     subButtons? :string;
     ui? :obj;
-    openWebscoket: boolean;
+    openWebscoket?: boolean;
 }
 
 
