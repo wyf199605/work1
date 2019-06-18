@@ -309,16 +309,16 @@ export class ShareCode {
         // 把画布的内容转换为base64编码格式的图片
 
                     let emailDom: HTMLElement = this.tagId ?
-                        <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
-                        : <li class="disabled"><i class="mui-icon iconfont iconyoujian disabled" data-type="email"></i><span>邮件</span></li>;
+                        <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
+                        : <li class="disabled"><i class="mui-icon iconfont icon-email disabled" data-type="email"></i><span>邮件</span></li>;
                     let shareBtnList: HTMLElement = <div class="share-page-methods">
                         <ul>
-                            <li ><i class="mui-icon iconfont iconweixin" data-type="weixin"></i><span>微信</span></li>
+                            <li ><i class="mui-icon iconfont icon-weixin1" data-type="weixin"></i><span>微信</span></li>
                             {/* <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li>
                             <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li> */}
-                            {/* <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li> */}
+                            {/* <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li> */}
                             {emailDom}
-                            <li ><i class="mui-icon iconfont icontupian" data-type="saveImg"></i><span>保存图片</span></li>
+                            <li ><i class="mui-icon iconfont icon-photo" data-type="saveImg"></i><span>保存图片</span></li>
                         </ul>
                         <p class="share-page-cancel" data-type="cancel">取消</p>
                     </div>
@@ -403,16 +403,16 @@ export class ShareCode {
                         tools.isMb && Shell.image.getSignImg((res) => {
                             alert(123);
                             let emailDom: HTMLElement = this.tagId ?
-                                <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
-                                : <li class="disabled"><i class="mui-icon iconfont iconyoujian " data-type="email"></i><span>邮件</span></li>;
+                                <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
+                                : <li class="disabled"><i class="mui-icon iconfont icon-email " data-type="email"></i><span>邮件</span></li>;
                             let shareBtnList: HTMLElement = <div class="share-page-methods">
                                 <ul>
-                                    <li ><i class="mui-icon iconfont iconweixin" data-type="weixin"></i><span>微信</span></li>
+                                    <li ><i class="mui-icon iconfont icon-weixin1" data-type="weixin"></i><span>微信</span></li>
                                     {/* <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li> */}
                                     {/* <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li> */}
-                                    {/* <li ><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li> */}
+                                    {/* <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li> */}
                                     {emailDom}
-                                    <li ><i class="mui-icon iconfont icontupian" data-type="saveImg"></i><span>保存图片</span></li>
+                                    <li ><i class="mui-icon iconfont icon-photo" data-type="saveImg"></i><span>保存图片</span></li>
                                 </ul>
                                 <p class="share-page-cancel" data-type="cancel">取消</p>
                             </div>
