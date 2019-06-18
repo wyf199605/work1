@@ -1,6 +1,7 @@
 .chart-table {
     height: 20rem;
     overflow: scroll;
+    background-color: white;
 }
 
 .chart-container {
@@ -35,4 +36,12 @@
 }
 .button-small {
     padding: 2px 15px !important;
+}
+.max-chart {
+    height: 100vh;
+    width: 100vw;
+    z-index: 10000;
+    position: absolute;
+    background-color: white;
+    top: 0;
 }

@@ -29,7 +29,10 @@ export class ChartTableModule {
 
     parentDom: Node;  // 当前表格的父元素
     ui: IBW_Table; // 当前UI元素
+    maxChartDom: HTMLElement; // 移动端图表放大
+    maxChart;
     chartDom: HTMLElement;  // 当前 图表dom元素
+    chart;
     wrapper: HTMLElement;   // 当前表格 dom元素
     chartBtnsContainer: HTMLElement; // 图表自制按钮容器
     ftable: FastBtnTable  // 对表格基本操作的方法对象
@@ -48,28 +51,41 @@ export class ChartTableModule {
     }
 
     initData() {
+        this.maxChartDom = <div class="max-chart"></div>
         this.wrapper.style.display = 'none';
         this.parentDom.insertBefore(this.render(), this.parentDom.childNodes[0]);
         // this.parentDom.appendChild(this.render());
-        let chart;
+        // let chart;
         switch (this.ui.uiType) {
             case 'select':
             case 'table':
             case 'web':
             case 'drill':
-                chart = this.ui.showType === 'pie'? this.initPieChartFn(): this.initCommonChartFn();
+                this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
                 break;
             case 'detail':
                 this.ui.cols = this.ui.fields;
-                chart =  this.ui.showType === 'pie'? this.initPieChartFn(): this.initCommonChartFn();
+                this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
                 break;
             // case 'drill':
             //     this.initDrillChart();
             //     break;
         }
         window.onresize = () => {
-            chart && chart.resize();
+            this.chart && this.chart.resize();
         }
+        window.addEventListener("orientationchange", () => {
+            // Announce the new orientation number
+            // alert(window.orientation);
+            // chart && chart.resize();
+            // this.maxChart && this.maxChart.resize();
+            // this.maxChart && this.maxChart.resize();
+            setTimeout(() => {
+                this.chart && this.chart.resize();
+                this.maxChart && this.maxChart.resize();
+            }, 300);
+        
+        }, false);
         this.chartBtnsClk();
     }
 
@@ -77,21 +93,25 @@ export class ChartTableModule {
         console.log(this.wrapper);
         let btnsContainer = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
-        
+
         let btn: HTMLElement = <button class="btn button-type-default button-small">图表</button>
         btnsContainer.appendChild(btn);
         btn.onclick = () => {
+            
             this.wrapper.style.display = 'none';
             this.chartBtnsContainer.style.display = 'block';
+            this.chart.resize();
         }
     }
     /**
      * 通用表格处理方法 
      */
 
-    initCommonChartFn() {
-        this.chartDom.parentElement.style.height = '25rem';
-        let chart = echarts.init(this.chartDom);
+    initCommonChartFn(chartEle: HTMLElement) {
+        chartEle.parentElement.style.height = '25rem';
+        // this.chartBtnsContainer.style.width = '100%';
+        // alert(chartEle.style.width);
+        let chart = echarts.init(chartEle);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
             let obj = {};
@@ -129,7 +149,7 @@ export class ChartTableModule {
             });
             series.push(seriesItem);
         });
-         
+
         let chartData = {
             title: {
                 text: caption,
@@ -156,7 +176,7 @@ export class ChartTableModule {
                 }
             },
             legend: {
-                data: tools.isMb ?  [] : legendData,
+                data: tools.isMb ? [] : legendData,
                 top: 15,
             },
             xAxis: {
@@ -195,22 +215,22 @@ export class ChartTableModule {
             },
             series: series
         };
-        tools.isMb && (chartData['dataZoom'] =  [
-            {
-                type: 'slider',
-                show: true,
-                xAxisIndex: [0],
-                start: 1,
-                end: 99
-            },
-            {
-                type: 'inside',
-                yAxisIndex: [0],
-                start: 1,
-                end: 99
-            }
-        ]);
-        
+        // tools.isMb && (chartData['dataZoom'] = [
+        //     {
+        //         type: 'slider',
+        //         show: true,
+        //         xAxisIndex: [0],
+        //         start: 1,
+        //         end: 99
+        //     },
+        //     {
+        //         type: 'inside',
+        //         yAxisIndex: [0],
+        //         start: 1,
+        //         end: 99
+        //     }
+        // ]);
+
         chart.setOption(chartData);
         chart.on('click', function (params) {
             console.log(params);
@@ -227,7 +247,7 @@ export class ChartTableModule {
         // debugger;
         // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
-        this.chartDom.style.height = tools.isMb? `${yCoordinate.length  * 20}rem`: yCoordinate? `${Math.ceil(yCoordinate.length / 3) * 20}rem` : '20rem';
+        this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 20}rem` : '20rem';
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
@@ -238,7 +258,7 @@ export class ChartTableModule {
             this.data.bodyData.push(obj);
         });
         // let caption = this.ui.caption;
-        let xAxisName:string = this.ui.local.xCoordinate.toUpperCase();
+        let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
         let xAxisData: Array<any> = this.data.bodyData.map(item => item[xAxisName]);;
         let legendName: Array<string> = yCoordinate;
         let legendData: Array<string> = [];
@@ -250,25 +270,25 @@ export class ChartTableModule {
             let yAxis: string;
             let xAxis = '50%';
             if (tools.isMb) {
-                 yAxis = ((i + 0.5) / legendName.length * 100 ) + '%';
+                yAxis = ((i + 0.5) / legendName.length * 100) + '%';
             } else {
-                 let floor = Math.ceil(legendName.length / 3);
-                 let redidue = i % 3;
-                 yAxis = (50 / floor ) + '%';
-                 xAxis = ( 25 + redidue * 25) + '%';
+                let floor = Math.ceil(legendName.length / 3);
+                let redidue = i % 3;
+                yAxis = (50 / floor) + '%';
+                xAxis = (25 + redidue * 25) + '%';
             }
             let seriesItem = {
                 type: 'pie',
                 radius: 70,
                 center: [xAxis, yAxis],
-                data:this.data.bodyData.map((item, j) => {
+                data: this.data.bodyData.map((item, j) => {
                     return {
                         name: item[xAxisName],
                         value: item[legend],
                         // itemStyle: {
                         //     color: this.color[j]
                         // }
-                        
+
                     }
                 })
             }
@@ -282,7 +302,7 @@ export class ChartTableModule {
             // });
             series.push(seriesItem);
         });
-         
+
         let chartData = {
             // title: {
             //     text: caption,
@@ -312,11 +332,13 @@ export class ChartTableModule {
         };
         chart.setOption(chartData);
 
-        tools.isMb && (this.chartDom.parentElement.style.height = `${yCoordinate.length  * 20 + 3}rem`);
+        tools.isMb && (this.chartDom.parentElement.style.height = `${yCoordinate.length * 20 + 3}rem`);
         return chart;
     }
 
-  
+
+
+
 
 
     /**
@@ -346,15 +368,43 @@ export class ChartTableModule {
                     this.ftable.recountWidth();
                     break;
             }
-        })
+        });
+
+        var i = 0;
+        let body:HTMLElement = d.query('body');
+        tools.isMb && this.chartDom.addEventListener('click',  () => {
+            i++;
+            setTimeout(function () {
+                i = 0;
+            }, 500);
+            if (i > 1) {
+                
+                // this.maxChartDom = <div class="max-chart">11</div>;
+                // div.appendChild(this.chartDom);
+                // d.query('.max-chart', body) && body.removeChild(d.query('.max-chart', body))
+                body.appendChild(this.maxChartDom);
+                this.maxChart = this.initCommonChartFn(this.maxChartDom);
+                
+
+            }
+        });
+
+        tools.isMb && this.maxChartDom.addEventListener('click',()=> {
+            i++;
+            setTimeout(function () {
+                i = 0;
+            }, 500);
+            i > 1 && body.removeChild(d.query('.max-chart', body));
+        } )
+
     }
 
     initDrillChart() {
-        if(this.ui.showType === 'pie') {
-            
+        if (this.ui.showType === 'pie') {
+
         } else {
 
         }
     }
-    
+
 }
