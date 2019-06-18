@@ -476,7 +476,7 @@ export class ShareCode {
         let buttonData: IButton = {
             container: ele,
             content: '分享',
-            icon: 'iconfenxiang',
+            icon: 'icon-fenxiang',
             iconNoPre: true,
             onClick: this.btnClk,
             className: 'share-code-btn '
@@ -485,7 +485,7 @@ export class ShareCode {
         let ScanBtn: IButton = {
             container: ele,
             content: '扫码',
-            icon: 'iconsaoma',
+            icon: 'icon-saoma1',
             iconNoPre: true,
             onClick: () => {
                 if (flag) {
