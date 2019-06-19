@@ -2790,8 +2790,17 @@ export class BwTableModule extends Component {
                 editModuleLoad(),
                 this.rowDefData
             ]).then(([TableEditModule, defData]) => {
+                let key = this.tableModule.bwEl.keyField;
 
-                tableEditInit(TableEditModule, this, Object.assign({}, defData, this.linkedData || {}));
+                tableEditInit(
+                    TableEditModule,
+                    this,
+                    Object.assign(
+                        {},
+                        defData,
+                        this.linkedData && key in this.linkedData ? {[key]: this.linkedData[key]} : {}
+                    )
+                );
             });
         };
 

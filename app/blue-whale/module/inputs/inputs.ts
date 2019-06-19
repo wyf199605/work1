@@ -376,7 +376,7 @@ export class Inputs {
      * @param para
      */
     private eventInit(para: InputsPara) {
-        console.log('keyStep', para)
+        let ftable = typeof para.table === 'function' && para.table();
         if (G.tools.isMb) {
             this.keyStep = new KeyStep({
                 inputs: para.inputs,
@@ -397,6 +397,9 @@ export class Inputs {
                 timeInterval = input.timeout,
                 line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
+                if(ftable && ftable.editing){
+                    return ;
+                }
                 let handle = () => {
                     if (text.indexOf('Shift') > -1) {
                         text = text.replace(/Shift/g, '')

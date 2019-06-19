@@ -79,8 +79,12 @@ export default class BasicPage {
                 }, 3000);
             });
         }
-        this.initWebscoket();
-        this.initHelpMsg(para);
+        let openWebscoket = 'openWebscoket' in para ? para.openWebscoket : true;
+        console.log(openWebscoket);
+        if(openWebscoket){
+            this.initWebscoket();
+            this.initHelpMsg(para);
+        }
 
         this._pageWrapper = this.wrapperInit();
         this._pageWrapper && d.append(para.dom, this._pageWrapper);

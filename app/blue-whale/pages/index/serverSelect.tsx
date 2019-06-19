@@ -8,7 +8,7 @@ import Shell = G.Shell;
 
 export class ServerSelect extends BasicPage {
     constructor(para){
-        super(para);
+        super(Object.assign({openWebscoket: false}, para));
         d.append(para.dom, tools.isMb ? ServerSelect.initDOM() : ServerSelect.initPcDom());
         let text = d.query('#serverText') as HTMLTextAreaElement,
             select = d.query('#sel') as HTMLSelectElement,

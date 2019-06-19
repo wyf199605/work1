@@ -426,7 +426,7 @@ export class NewTableModule extends AGroupTabItem {
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
                 // this.tab.active(parseInt(showSubSeq[0]) - 1);
                 this.tab.active(0);
-                this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
+                this.currentSelectedIndexes.push(0);
             } else {
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
