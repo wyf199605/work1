@@ -675,6 +675,10 @@ namespace G {
             //登录权限
             isPermission(back?: IShellEventHandler){
                 return ShellBase.handler('isPermission', {},back)
+            },
+            //去设置里打开权限
+            openSetting(back?:IShellEventHandler){
+                return ShellBase.handler('openSetting', {},()=>{})
             }
         }
         return {
