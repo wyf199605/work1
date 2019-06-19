@@ -84,7 +84,7 @@ export class ChartTableModule {
                 this.chart && this.chart.resize();
                 this.maxChart && this.maxChart.resize();
             }, 300);
-        
+
         }, false);
         this.chartBtnsClk();
     }
@@ -97,7 +97,7 @@ export class ChartTableModule {
         let btn: HTMLElement = <button class="btn button-type-default button-small">图表</button>
         btnsContainer.appendChild(btn);
         btn.onclick = () => {
-            
+
             this.wrapper.style.display = 'none';
             this.chartBtnsContainer.style.display = 'block';
             this.chart.resize();
@@ -232,8 +232,10 @@ export class ChartTableModule {
         // ]);
 
         chart.setOption(chartData);
-        chart.on('click', function (params) {
-            console.log(params);
+        chart.on('click', (params) => {
+            if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
+                this.drillPage(params);
+            }
         });
         return chart;
 
@@ -288,7 +290,7 @@ export class ChartTableModule {
                         // itemStyle: {
                         //     color: this.color[j]
                         // }
-
+                        item
                     }
                 })
             }
@@ -331,13 +333,88 @@ export class ChartTableModule {
             series: series
         };
         chart.setOption(chartData);
+        chart.on('click', (params) => {
+            // console.log(params);
+            if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
+                this.drillPage(params);
+            }
+        });
 
         tools.isMb && (this.chartDom.parentElement.style.height = `${yCoordinate.length * 20 + 3}rem`);
         return chart;
     }
 
 
+    /**
+     * 跳转到另一个页面
+     * @param params 点击图表后返回数据
+     */
 
+    drillPage(params) {
+        let cols = this.ui.cols.filter(col => !col.noShow && col.drillAddr);
+        console.log(cols);
+        let ul: HTMLUListElement = <ul class="drill-confirm ani"></ul>;
+        let div: HTMLDivElement = <div class="drill-baffle">{ul}</div>;
+        div.onclick = (e) => {
+            if(e.target['tagName'] === 'DIV') {
+                ul.classList.remove('drill-confirm');
+                    ul.classList.add('drill-confirm2');
+                    setTimeout(() => {
+                        // ul.classList.add('drill-confirm');
+                        d.query('body').removeChild(div);
+                    },300);
+            }
+        }
+        let liList: Array<HTMLLIElement> = [];
+        cols.forEach(col => {
+            let varNamesObj: object = {};
+            let noDrill = false;
+             col.drillAddr && col.drillAddr.varList.forEach( list => {
+               if(list.varName) {
+                   varNamesObj[list.varName] = params.data[list.varName];
+                   !params.data.item[list.varName] && (noDrill = true);
+               }
+            });
+            console.log(varNamesObj);
+            
+            if ( !noDrill && Object.keys(params.data.item).includes(col.name)) {
+                let li: HTMLLIElement = <li>
+                    <span>{col.caption} : {params.data.item[col.name]}</span>
+                </li>
+                // ul.appendChild(li);
+                liList.push(li);
+                
+                li.addEventListener('click', () => {
+                    console.log(123);
+                    ul.classList.remove('drill-confirm');
+                    ul.classList.add('drill-confirm2');
+                    // d.query('body').removeChild(div);
+                    this.getAjax(params, col);
+                    let timer = setTimeout(() => {
+                        // ul.classList.add('drill-confirm');
+                        d.query('body').removeChild(div);
+                        clearTimeout(timer);
+                    },300);
+                })
+            }
+        });
+        if(liList.length < 1) return;
+        liList.forEach(li => {
+            ul.appendChild(li);
+        })
+        d.query('body').appendChild(div);
+    }
+
+    /**
+     * 跳转页面的ajax
+     * @param params 点击后获取的数据
+     * @param col 对应的UI栏
+     */
+    getAjax(params, col) {
+        console.log(params);
+        console.log(col);
+        
+    }
 
 
 
@@ -371,31 +448,31 @@ export class ChartTableModule {
         });
 
         var i = 0;
-        let body:HTMLElement = d.query('body');
-        tools.isMb && this.chartDom.addEventListener('click',  () => {
+        let body: HTMLElement = d.query('body');
+        tools.isMb && this.chartDom.addEventListener('click', () => {
             i++;
             setTimeout(function () {
                 i = 0;
             }, 500);
             if (i > 1) {
-                
+
                 // this.maxChartDom = <div class="max-chart">11</div>;
                 // div.appendChild(this.chartDom);
                 // d.query('.max-chart', body) && body.removeChild(d.query('.max-chart', body))
                 body.appendChild(this.maxChartDom);
                 this.maxChart = this.initCommonChartFn(this.maxChartDom);
-                
+
 
             }
         });
 
-        tools.isMb && this.maxChartDom.addEventListener('click',()=> {
+        tools.isMb && this.maxChartDom.addEventListener('click', () => {
             i++;
             setTimeout(function () {
                 i = 0;
             }, 500);
             i > 1 && body.removeChild(d.query('.max-chart', body));
-        } )
+        })
 
     }
 
