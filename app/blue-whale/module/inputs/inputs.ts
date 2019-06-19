@@ -82,40 +82,42 @@ export class Inputs {
             Modal.alert('startScan2DResult接口报错')
         }
         /**rfid设置 */
-        let result: any = Shell.other.getData();
-        if (result) {
-            let conf = result;
-            this.port = getRfidPort(conf);
-            console.log("RFID" + JSON.stringify(this.port))
-            Shell.rfid.start(this.port.str, this.port.num, (result) => {
-                // console.log(result);
-                /**
-                 * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
-                 */
-                // alert(JSON.stringify(result));
-                let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
-                    data = result.data;
-                console.log(msg);
-                console.log(data);
-                if (result.success) {
-                    // data.forEach(item => {
+        if(tools.isPc){
+            let result: any = Shell.other.getData();
+            if (result) {
+                let conf = result;
+                this.port = getRfidPort(conf);
+                console.log("RFID" + JSON.stringify(this.port))
+                Shell.rfid.start(this.port.str, this.port.num, (result) => {
+                    // console.log(result);
+                    /**
+                     * result={data:["300833B2DDD9014000000000"],msg:"插入成功",success:true}
+                     */
+                        // alert(JSON.stringify(result));
+                    let msg = result.success ? 'rfid开启成功' : 'rfid开启失败',
+                        data = result.data;
+                    console.log(msg);
+                    console.log(data);
+                    if (result.success) {
+                        // data.forEach(item => {
 
-                    // })
-                    para.inputs.forEach(input => {
-                        let line = para.locationLine;
-                        let reg = regExpMatch(input, data[0]);
-                        //匹配成功
-                        if (reg) {
-                            this.matchPass(reg, data[0]);
-                        } else if (line) {
-                            this.rowSelect(line, data[0]);
-                        }
-                    });
-                    // this.matchPass(reg, text);
+                        // })
+                        para.inputs.forEach(input => {
+                            let line = para.locationLine;
+                            let reg = regExpMatch(input, data[0]);
+                            //匹配成功
+                            if (reg) {
+                                this.matchPass(reg, data[0]);
+                            } else if (line) {
+                                this.rowSelect(line, data[0]);
+                            }
+                        });
+                        // this.matchPass(reg, text);
 
-                }
+                    }
 
-            });
+                });
+            }
         }
         // setTimeout(() => {
         //     this.ajax("http://192.168.1.222:8080/sf/app_sanfu_retail/null/monitorkey/n1-move-19?needparam=%5B%7B%22n%22%3A%22toshopid%22%7D%2C%7B%22n%22%3A%22TOSHOPID%22%7D%5D&toshopid=1111&inputtext=8100247691", () => {
@@ -132,12 +134,7 @@ export class Inputs {
      */
     private matchPass(data: R_Input, text: string, open?: Function) {
         let newUrl = this.url ? this.url : data.dataAddr.dataAddr;
-        if (newUrl.indexOf('?') > -1) {
-            newUrl += '&';
-        } else {
-            newUrl += '?';
-        }
-        this.ajaxUrl = CONF.siteUrl + newUrl + data.fieldName.toLowerCase() + '=' + text;
+        this.ajaxUrl = tools.url.addObj(CONF.siteUrl + newUrl, {[data.fieldName.toLowerCase()]: text}, true, true);
         return this.refresh(open);
     }
 
@@ -193,9 +190,8 @@ export class Inputs {
             case 1:
                 // 标签打印
                 let tableModule = this.p.tableModule();
-                tableModule.labelPrint.show(tableModule.labelBtn.wrapper, category.printList, () => {
-                    this.ajax(CONF.siteUrl + this.url, open);
-                });
+
+                tableModule.initLabel(category.printList);
                 break;
             case 2:
                 // 提示错误信息
@@ -380,7 +376,7 @@ export class Inputs {
      * @param para
      */
     private eventInit(para: InputsPara) {
-        console.log('keyStep', para)
+        let ftable = typeof para.table === 'function' && para.table();
         if (G.tools.isMb) {
             this.keyStep = new KeyStep({
                 inputs: para.inputs,
@@ -401,6 +397,9 @@ export class Inputs {
                 timeInterval = input.timeout,
                 line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
+                if(ftable && ftable.editing){
+                    return ;
+                }
                 let handle = () => {
                     if (text.indexOf('Shift') > -1) {
                         text = text.replace(/Shift/g, '')

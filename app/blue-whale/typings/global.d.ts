@@ -35,6 +35,7 @@ interface IBW_UI<U> {
     }
     caption?: string; // 标题
     uiType?: string;
+    tagId?: string; // 邮件分享
 }
 
 interface IBW_Plan_Table extends IBW_Table {
@@ -118,6 +119,7 @@ interface IBW_Detail {
     defDataAddrList?: R_ReqAddr[];//默认值获取地址列表
     dataAddr?: R_ReqAddr;//获取数据后台地址
     updatefileData?: R_ReqAddr;
+    autoRefresh?: number;          // 回到本页面时表格是否自动刷新
     groupInfo?: IGroupInfo[];
     signField?: string;
     querier?: IBw_Query;           // 查询器

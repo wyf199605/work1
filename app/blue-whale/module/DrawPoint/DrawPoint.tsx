@@ -14,8 +14,6 @@ declare const D3;
 //开启绘制区域功能 （） 设置区域的动画 样式 标旗 ！默认出现弹窗样式显示信息
 
 interface IDrapPoint extends IComponentPara {
-    width: number | string
-    height: number | string
     image?: string;
     format?: (data: obj) => IDrawFormatData[];
     onAreaClick?: (areaType: IAreaType) => Promise<any>;
@@ -65,26 +63,33 @@ export class DrawPoint extends Component {
     constructor(protected para: IDrapPoint) {
         super(para);
         this.container.tabIndex = -1;
+        para['width'] = this.container.offsetWidth;
+        para['height'] = this.container.offsetHeight;
+
         if (!tools.isMb) {
             //PC的有键盘菜单初始化
             d.on(this.wrapper, 'contextmenu', (e) => {
                 e.preventDefault()
             })
         }
+
         //初始化右键菜单
-        this.contextMenu = new SubBtnMenu({
-            container: this.wrapper,
-            buttons: para.subButton,
-            onClick: (btn) => {
-                this.onAreaClick({
-                    type: 'btn',
-                    data: this.selectedData,
-                    content: {
-                        button: btn
-                    }
-                });
-            }
-        })
+        if(tools.isNotEmpty(para.subButton)){
+            this.contextMenu = new SubBtnMenu({
+                container: this.wrapper,
+                buttons: para.subButton,
+                onClick: (btn) => {
+                    this.onAreaClick({
+                        type: 'btn',
+                        data: this.selectedData,
+                        content: {
+                            button: btn
+                        }
+                    });
+                }
+            })
+        }
+
         this.ui = para.ui;
         this._keyField = para.ui.keyField;
         this.onAreaClick = para.onAreaClick;
@@ -159,7 +164,7 @@ export class DrawPoint extends Component {
             .attr('height', para.height)
         if (!tools.isMb) {
             this.svg.on('mousedown', (e) => {
-                this.contextMenu.show = false;
+                this.contextMenu && (this.contextMenu.show = false);
                 if (!this.isDrawLine) {
                     return
                 }
@@ -169,117 +174,49 @@ export class DrawPoint extends Component {
         }
         //防止PC端 hover文字时闪动问题
         this.g = this.svg.append('g').attr('class', 'g-wrapper').attr('user-select', "none");
-        //使用这个方法可以再次提高安卓手机端的缩放速度，中心缩放方法需要深究
-        // if (tools.isMb) {
-        //     let scale = 1,
-        //     touchCenter = {},
-        //     center = [];
-        //     D3.select(_this.wrapper).on('touchstart', function (ev) {
-        //         D3.event.preventDefault();
-        //         let ob1 = D3.event.changedTouches,
-        //             obj2 = D3.event.targetTouches,
-        //             obj3 = D3.event.touches;
-        //         _this.touchstart = true;
-        //         console.log(obj2)
-        //         if (obj2.length > 1) {
-        //             _this.distance['start'] = _this.getDistance({
-        //                 x: D3.event.targetTouches[0].screenX,
-        //                 y: D3.event.targetTouches[0].screenY
-        //             }, {
-        //                 x: D3.event.targetTouches[1].screenX,
-        //                 y: D3.event.targetTouches[1].screenY
-        //             })
-        //              touchCenter = _this.getOrigin({
-        //                  x: D3.event.targetTouches[0].screenX,
-        //                  y: D3.event.targetTouches[0].screenY
-        //              }, {
-        //                  x: D3.event.targetTouches[1].screenX,
-        //                  y: D3.event.targetTouches[1].screenY
-        //              })
-        //             _this.touchscale = scale
-        //             center = [];
-        //             center.push(touchCenter['x'])
-        //             center.push(touchCenter['y'])
-        //         }
-        //
-        //
-        //     }, true).on('touchmove', function (ev) {
-        //         D3.event.preventDefault();
-        //         let ob1 = D3.event.changedTouches,
-        //             obj2 = D3.event.targetTouches,
-        //             obj3 = D3.event.touches;
-        //         _this.touchTime++;
-        //         console.log(obj2.length)
-        //         if (obj2.length > 1 && (_this.touchTime % 2 !== 0) && _this.touchstart) {
-        //             _this.distance['stop'] = _this.getDistance({
-        //                 x: obj2[0].screenX,
-        //                 y: obj2[0].screenY
-        //             }, {
-        //                 x: obj2[1].screenX,
-        //                 y: obj2[1].screenY
-        //             })
-        //             touchCenter = _this.getOrigin({
-        //                 x: obj2[0].screenX,
-        //                 y: obj2[0].screenY
-        //             }, {
-        //                 x: obj2[1].screenX,
-        //                 y: obj2[1].screenY
-        //             })
-        //
-        //
-        //             //alert(JSON.stringify(_this.distance) + _this.touchTime);
-        //             scale = _this.distance['stop'] * _this.touchscale / (_this.distance['start']);
-        //             //alert(scale);
-        //             if(scale > 6){
-        //                 scale = 6
-        //             }
-        //
-        //             let slate = [-280, 0],center1 = [],slate1 = [280,0];
-        //             if(touchCenter['x'] && touchCenter['y']){
-        //                 // center.push(touchCenter['x'])
-        //                 // center.push(touchCenter['y'] )
-        //                 //获取中心点  得到缩放比例 然后再把原来的中心点减去 比例后的中心点 就是偏移量
-        //                 let pyx = center[0] - center[0] * scale,
-        //                     pyy = center[1] - center[1] * scale;
-        //              _this.g.transition()
-        //                        .duration(120)
-        //                        .ease('in')
-        //                        .attr("transform",   "scale(" + scale + ")" + "translate(" + [-280, 0 ] + ")"  + "translate(" + [-pyx,pyy ] + ")" );
-        //                         //.attr("transform", "translate("+[ (-center[0] * (scale - 1)), (-center[1] * (scale - 1))]+")"  + "scale(" + scale + ") " );
-        //                        //.attr("transform",    "scale(" + scale + ") " + "translate(" + center + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
-        //                        //.attr("transform",     "scale(" + scale + ") " + "translate(" + [-touchCenter['x'] - 280,-touchCenter['y'] ] + ")");
-        //
-        //             }else {
-        //                 _this.g.transition()
-        //                     .duration(150)
-        //                     .ease('in')
-        //                     .attr("transform", "translate(" + slate + ")"  + "scale(" + scale + ")" );
-        //             }
-        //
-        //         }
-        //
-        //     }, true).on('touchend', function () {
-        //         _this.touchstart = false
-        //     }, true)
-        // }
 
         let img = this.g.append('image').attr('xlink:href', () => {
             return para.image && tools.url.addObj(para.image, {version: new Date().getTime() + ''})
         }).attr('width', para.width).attr('height', para.height)//添加背景图
     }
 
+    scale: number = 1;
+    widthOffset: number = 0;
+    heightOffset: number = 0;
+    getPointX(x: number){
+        return (x - this.widthOffset) * this.scale;
+    }
+    getPointY(y: number){
+        return (y - this.heightOffset) * this.scale;
+    }
+
     //设置背景图的方法
-    set imgUrl(url) {
+    setImgUrl(url: string, width?: number, height?: number) {
+        if(typeof width === 'number' && typeof height === 'number'){
+            let widthScale = width / 1200,
+                heightScale = height / 800;
+            if(heightScale > widthScale){
+                this.scale = heightScale;
+                this.widthOffset = (1200 - width / heightScale) / 2;
+            }else{
+                this.scale = widthScale;
+                this.heightOffset = (800 - height / widthScale) / 2;
+            }
+        }
+
         this.g.select('image').attr('xlink:href',
             () => {
                 return url
             }
-        ).attr('width', this.para.width).attr('height', this.para.height)//添加背景图
+        ).attr('width', width).attr('height', height);//添加背景图
         if (tools.isMb) {
             let slate = [0, 0],
-                scale = Math.max(0.1, document.documentElement.offsetWidth / 1600);
+                elWidth = document.documentElement.offsetWidth,
+                elHeight = document.documentElement.offsetHeight,
+                scale = Math.max(0.1, elWidth / width);
             this.g.attr("transform", "scale(" + scale + ")" + "translate(" + slate + ")");
-            this.svg.attr('width', 1600).attr('height', 1900)
+            this.svg.attr('width', elWidth)
+                .attr('height', elHeight);
             this.zoom.translate(slate);
             this.zoom.scale(scale);
             this.svg.call(this.zoom);
@@ -369,10 +306,15 @@ export class DrawPoint extends Component {
             this.g.selectAll('circle').remove();
         }
         if (!tools.isMb) {
-            let scale = Math.max(0.1, this.container.offsetWidth / parseFloat(this.g.select('image').attr('width')))
+            let containerWidth = this.container.offsetWidth,
+                width = parseFloat(this.g.select('image').attr('width'));
+            let scale = Math.max(0.1, containerWidth / width / 2);
             this.zoom.scale(scale);
-            this.zoom.translate([0, 0]);
-            this.g.attr('transform', "scale(" + scale + ")");
+            this.zoom.translate([Math.abs((containerWidth - width) / 2) * scale, 0]);
+            this.g.attr(
+                'transform',
+                " translate(" + Math.abs((containerWidth - width) / 2) * scale + ", 0) scale(" + scale + ")"
+            );
         }
 
         this.renderData = data;
@@ -408,8 +350,10 @@ export class DrawPoint extends Component {
                         this.selectedData = d
                         D3.event.preventDefault();
                         let x = D3.mouse(this.svg.node())[0], y = D3.mouse(this.svg.node())[1]
-                        this.contextMenu.setPosition(x, y);
-                        this.contextMenu.show = true;
+                        if(this.contextMenu){
+                            this.contextMenu.setPosition(x, y);
+                            this.contextMenu.show = true;
+                        }
                         // }
                     });
                 }
@@ -440,9 +384,16 @@ export class DrawPoint extends Component {
                             return 'path' + index;
                         })
                         .attr("d", (d, i) => {
-                            point = data.data;
-                            this.map.set(index, data.data)
-                            return that.line(data.data)
+                            point = data.data.map((point) => {
+                                return [
+                                    this.getPointX(point[0]),
+                                    this.getPointY(point[1])
+                                ]
+                            });
+
+
+                            this.map.set(index, point)
+                            return that.line(point)
                         })
                     // 判断是否是编辑状态
                     //显示边框 以及 背景颜色
@@ -573,14 +524,15 @@ export class DrawPoint extends Component {
                 word,
                 line = [],
                 lineNumber = 0,
-                lineHeight = text.node().getBoundingClientRect().height,
+                lineHeight = parseInt(text.attr('font-size')),
                 x = +text.attr('x'),
                 y = +text.attr('y');
-            if (lineHeight >= 18) {
-                lineHeight = 15
-            } else {
-                lineHeight = 5.3
-            }
+            // console.log(lineHeight);
+            // if (lineHeight >= 18) {
+            //     lineHeight = 15
+            // } else {
+            //     lineHeight = 5.3
+            // }
             if (I == 2 && _this.wrapTime) {
                 I = 2.90;
                 _this.wrapTime = false;

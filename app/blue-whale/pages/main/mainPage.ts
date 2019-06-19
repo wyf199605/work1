@@ -378,10 +378,10 @@ export = class MainPage {
                     </a>
                     <i class="more-btn iconfont icon-expanse" style="color: #000;"></i>
                     </li>`);
-            d.append(container, li);
             let span = d.query('a', li),
                 icon = d.query('i', li);
             BwRule.Ajax.fetch(CONF.ajaxUrl.systemMenu).then(({ response }) => {
+                d.append(container, li);
                 let data: obj[] = tools.keysVal(response, 'body', 'bodyList');
                 if (tools.isNotEmpty(data)) {
                     let item = data[0];

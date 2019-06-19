@@ -76,6 +76,7 @@ export = class webscoket {
                     dataType: 'json',
                     type: 'get'
                 }).then(({ response }) => {
+                    messagePage.tastList = response.data;
                     messagePage.setSysBadge(response.data.length);
                 });
             });
@@ -175,7 +176,7 @@ export = class webscoket {
                     tools.event.fire(BwRule.FRESH_SYS_MSG);//刷新信息
                     // G.Shell.other.sendMsgCount({ MsgCount: localMsg.getUnreadCount() }, () => { })
                     require(['messagePage'], (messagePage) => {
-                        messagePage.setSysBadge();
+                        messagePage.setSysBadge(messagePage.tastList.length);
                     });
                 }
                 let os = BW.sys.os;

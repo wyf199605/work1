@@ -447,15 +447,15 @@ export class BwTableModule extends Component {
                 });
             },
         });
-        // this.ftable.btnAdd('shareCode', {
-        //     type: 'default',
-        //     content: '二维码分享',
-        //     onClick: () => {
-        //         console.log('二维码分享',ui);
-        //         new ShareCode(this.tableModule.main.ftable.selectedRowsData);
+        !tools.isMb && this.ftable.btnAdd('shareCode', {
+            type: 'default',
+            content: '二维码分享',
+            onClick: () => {
+                console.log('二维码分享',ui);
+                new ShareCode(this.tableModule.main.ftable.selectedRowsData);
 
-        //     },
-        // });
+            },
+        });
 
         !tools.isMb && this.ftable.btnAdd('switch-chart', {
             type: 'default',
@@ -1077,7 +1077,7 @@ export class BwTableModule extends Component {
     })();
 
     get ajaxData() {
-        
+
         setTimeout(() => {
             this.defaultSelected()
         }, 500);
@@ -1085,7 +1085,7 @@ export class BwTableModule extends Component {
     }
 
     refresh(data?: obj) {
-        
+
         if (this.isPivot) {
             this.ftable && this.ftable.destroy();
             this.modalEditCancel();
@@ -1096,25 +1096,29 @@ export class BwTableModule extends Component {
                 this.modalEditCancel();
                 setTimeout(() => {
                     this.subBtns.initState();
-                    
+
                      this.ftable && this.ftable.clearSelectedRows();
                      this.defaultSelected();
-                    
+
                 }, 500)
             });
         }
 
     }
 
+    /**
+     * 二维码分享，打开 页面默认选中分享的数据
+     */
     protected defaultSelected() {
-        
+
             let keyField = localStorage.getItem('keyField');
+            localStorage.removeItem('keyField');
             // localStorage.removeItem('keyField');
             console.log('defaultSelected')
             if(keyField) {
                 let shareData = JSON.parse(keyField);
                 this.ftable.clearSelectedRows();
-                
+
 
                 if(shareData.key) {
                     this.ftable.data.forEach((row,i) => {
@@ -1130,9 +1134,9 @@ export class BwTableModule extends Component {
                         }
                     })
                 }
-                
+
             }
-            
+
     }
 
     // protected fastTableInit
@@ -2802,8 +2806,17 @@ export class BwTableModule extends Component {
                 editModuleLoad(),
                 this.rowDefData
             ]).then(([TableEditModule, defData]) => {
+                let key = this.tableModule.bwEl.keyField;
 
-                tableEditInit(TableEditModule, this, Object.assign({}, defData, this.linkedData || {}));
+                tableEditInit(
+                    TableEditModule,
+                    this,
+                    Object.assign(
+                        {},
+                        defData,
+                        this.linkedData && key in this.linkedData ? {[key]: this.linkedData[key]} : {}
+                    )
+                );
             });
         };
 
@@ -2879,6 +2892,9 @@ export class BwTableModule extends Component {
                                                         let assignCell = row.cellGet(name);
                                                         if (assignCell) {
                                                             assignCell.data = data[0][name];
+                                                            if (isValid) {
+                                                                validate(editModule, assignCell);
+                                                            }
                                                         }
                                                     });
                                                     let rowData = row.data;
@@ -2959,12 +2975,24 @@ export class BwTableModule extends Component {
                         validList.push(validate(editModule, cell))
                         // }, 100);
                     }) : validList.push(validate(editModule, cell));
+                }else {
+                    cell.errorMsg = '';
                 }
             });
         };
 
         let validate = (editModule: EditModule, cell: FastTableCell, checkLinkCell = true): Promise<any> => {
             let promise: Promise<any> = new Promise((resolve, reject) => {
+                for(let cel of cell.frow.cells){
+                    if(cel !== cell){
+                        let field: R_Field = cel.column.content;
+                        if(field.elementType === 'lookup' && field.lookUpKeyField === cell.name){
+                            cell = cel;
+                            break;
+                        }
+                    }
+                }
+
                 let name = cell.name,
                     row = cell.row,
                     field: R_Field = cell.column.content,

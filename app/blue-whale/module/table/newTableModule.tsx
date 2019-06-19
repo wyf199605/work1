@@ -98,16 +98,14 @@ export class NewTableModule extends AGroupTabItem {
                 main.subBtns.init(this.main.btnWrapper);
             }
             this.onRender && this.onRender();
-
             if (this.editType === 'linkage' && this.editable) {
                 this.initEdit(main);
                 this.active.onChange = (isMain) => {
                     if (isMain) {
-                        if (this.main.ftable.editing)
                             this.main.modify.end();
                     } else {
                         let sub = this.sub[this.subTabActiveIndex];
-                        sub && sub.ftable && sub.ftable.editing && sub.modify.end();
+                        sub && sub.ftable && sub.modify.end();
                     }
                 }
             } else if (this.editType === 'self' && this.main.editParam) {
@@ -259,7 +257,8 @@ export class NewTableModule extends AGroupTabItem {
                                     let list = selectedData[this.showSubField].split(',');
                                     let showSubSeq = this.computedIndex(list);
                                     this.tab.setTabsShow(showSubSeq);
-                                    this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    // this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    this.tab.active(0);
                                     parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
                                 }
                             } else {
@@ -324,20 +323,20 @@ export class NewTableModule extends AGroupTabItem {
             });
         };
     }
-    private computedIndex(list) {
+    private computedIndex(list: Array<string>): Array<string> {
         console.log("配置选项" + list);
-        let showSubSeq = [];
+        let showSubSeq: string[] = [];
         let bwEl = this.bwEl;
         console.log(bwEl.subTableList);
         list.forEach((item) => {
             bwEl.subTableList.forEach((child, index) => {
                 if (child.itemId == item) {
-                    showSubSeq.push(index + 1)
+                    showSubSeq.push(index + 1 + '')
                 }
             })
 
         })
-        console.log("输出选项" + showSubSeq)
+        // console.log("输出选项" + showSubSeq)
         if(showSubSeq.length>0&&this.subWrapper.classList.contains('hide')){
             this.subWrapper.classList.remove('hide');
         }
@@ -425,8 +424,9 @@ export class NewTableModule extends AGroupTabItem {
                 let showSubSeq = this.computedIndex(list);
                 this.tab.setTabsShow(showSubSeq);
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
-                this.tab.active(parseInt(showSubSeq[0]) - 1);
-                this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
+                // this.tab.active(parseInt(showSubSeq[0]) - 1);
+                this.tab.active(0);
+                this.currentSelectedIndexes.push(0);
             } else {
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 !this.noLoadSub(mftable, main) && this.subRefresh(row.data);
@@ -467,8 +467,10 @@ export class NewTableModule extends AGroupTabItem {
             mftable = main.ftable,
             selectedData = rowData ? rowData : (mftable.selectedPreRowData || {});
         if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(selectedData[this.showSubField])) {
-            let showSubSeq = selectedData[this.showSubField].split(',');
-            let seqIndex = parseInt(showSubSeq[0]) - 1;
+            let showSubSeq: string[] = selectedData[this.showSubField].split(',');
+            let seqIndex = this.bwEl.subTableList.findIndex((item) => {
+                return showSubSeq.includes(item.itemId);
+            });
             if (tools.isEmpty(this.sub[seqIndex])) {
                 this.subTabActiveIndex = seqIndex;
             }
@@ -518,12 +520,16 @@ export class NewTableModule extends AGroupTabItem {
         }
         return Promise.all(promise).then((arr) => {
             Object.values(this.sub).forEach((subTable) => {
-                if (subTable.isPivot) {
+                if (this.subTabActiveIndex !== 0 && this.editType === 'self' && subTable.isPivot) {
                     this.initEdit(subTable);
                 }
             });
             return arr;
         });
+    }
+
+    initLabel(printList: printListArr[]){
+        this.main && this.main.initLabelModal(printList);
     }
 
     public mobileModal: Modal = null;
@@ -833,7 +839,7 @@ export class NewTableModule extends AGroupTabItem {
                                 this.currentSelectedIndexes = [];
                                 // 主表子表刷新
                                 this.refresh().then(() => resolve()).catch(reject);
-                                Modal.toast(response.msg);
+                                response.errorCode === 200 ? Modal.alert(response.msg) : Modal.toast(response.msg);
                                 // loading && loading.destroy();
                                 // loading = null;
                                 end(bwTable);

@@ -1563,13 +1563,13 @@ export class FastTable extends Component {
             } else if(!tools.isMb || isCanSelectMb) {
                 // 点击表格cell选中只在 “PC端” 或者 “cell 为link类型的 ”开启；
                 if (e.ctrlKey === true) {
-                    console.log('>>>');
-                    if (this.selectedCells[rowIndex].length === this.rowGet(rowIndex).cells.length) {
-                        let row = this.rowGet(rowIndex);
-                        row && row._selectedInnerRowSet(true);
-                    } else {
-                        singleSelectedTabelCell(rowIndex, columnIndex);
-                    }
+                    // if (this.selectedCells[rowIndex].length === this.rowGet(rowIndex).cells.length) {
+                    //     let row = this.rowGet(rowIndex);
+                    //     row && row._selectedInnerRowSet(true);
+                    // } else {
+                    //     singleSelectedTabelCell(rowIndex, columnIndex);
+                    // }
+                    singleSelectedTabelCell(rowIndex, columnIndex);
                     shiftComparePosition.rowIndex = rowIndex;
                     shiftComparePosition.columnIndex = columnIndex;
                 } else if (e.shiftKey === true) {
@@ -1810,7 +1810,7 @@ export class FastTable extends Component {
         // debugger;
         // let parent = this.wrapper.parentElement;
         // d.remove(this.wrapper, false);
-        this.wrapper.style.display = 'none';
+        this.wrapper && (this.wrapper.style.display = 'none');
         this.tablesEach(table => {
             table.render(x, y, w, z);
         });
@@ -1877,7 +1877,7 @@ export class FastTable extends Component {
             row.format();
         });
 
-        this.wrapper.style.display = 'block';
+        this.wrapper && (this.wrapper.style.display = 'block');
         // d.append(parent, this.wrapper);
         // this.tablesEach((table) => {
         //     table.adjustColWidth(0);
@@ -2757,45 +2757,96 @@ export class FastTable extends Component {
                     insert: [],
                     delete: [],
                 };
-                console.log(result);
+
+                let rowsName = this.columns.map((col) => {
+                    return col.name;
+                }).filter((name) => name.search(/\./) === -1);
                 for(let operation in result){
                     result[operation].forEach((obj, index) => {
                         let sepData = FastTable.sepPivotData(obj);
                         switch (operation){
                             case 'insert':
-                                // 新增
-                                sepData.keys.forEach((key) => {
-                                    if(tools.isNotEmpty(obj[key])){
-                                        pivotResult.insert.push(Object.assign({}, sepData.data,
-                                            {[key]: obj[key]}));
+                                for(let name of rowsName){
+                                    let oldData = oldUpdateData[index] ? oldUpdateData[index][name] : null,
+                                        data = obj[name];
+
+                                    if(data != oldData){
+                                        sepData.keys.forEach((key) => {
+                                            let data = obj[key];
+
+                                            // 新增 （原始数据为空）
+                                            pivotResult.insert.push(Object.assign({}, sepData.data,
+                                                {[key]: data}));
+
+                                        });
+                                        return;
                                     }
-                                });
+                                }
+                                // 新增
+                                // sepData.keys.forEach((key) => {
+                                //     if(tools.isNotEmpty(obj[key])){
+                                //         pivotResult.insert.push(Object.assign({}, sepData.data,
+                                //             {[key]: obj[key]}));
+                                //     }
+                                // });
                                 break;
                             case 'delete':
                                 // 删除
                                 sepData.keys.forEach((key) => {
-                                    if(tools.isNotEmpty(obj[key])){
-
-                                    }
+                                    // if(tools.isNotEmpty(obj[key])){
+                                    //
+                                    // }
                                     pivotResult.delete.push(Object.assign({}, sepData.data,
                                         {[key]: obj[key]}));
                                 });
                                 break;
                             case 'update':
+                                for(let name of rowsName){
+                                    let oldData = oldUpdateData[index] ? oldUpdateData[index][name] : null,
+                                        data = obj[name];
+
+                                    if(data != oldData){
+                                        sepData.keys.forEach((key) => {
+                                            let oldData = oldUpdateData[index] ? oldUpdateData[index][key] : null,
+                                                data = obj[key];
+
+                                            // if(tools.isEmpty(oldData) && tools.isNotEmpty(data)) {
+                                            //     // 新增 （原始数据为空）
+                                            //     pivotResult.insert.push(Object.assign({}, sepData.data,
+                                            //         {[key]: data}));
+                                            // }else if(tools.isNotEmpty(oldData) && tools.isEmpty(data)){
+                                            //     // 删除 （现有数据变成空）
+                                            //     let delData: obj = {};
+                                            //     for(let key in sepData.data){
+                                            //         delData[key] = oldUpdateData[index][key];
+                                            //     }
+                                            //     pivotResult.delete.push(Object.assign({}, delData,
+                                            //         {[key]: oldData}));
+                                            // }else{
+                                                // 修改 （原始数据与修改过的数据都不为空，且不与原始数据一样）
+                                                pivotResult.update.push(Object.assign({}, sepData.data,
+                                                    {[key]: data}));
+                                            // }
+                                        });
+                                        return;
+                                    }
+                                }
+
                                 // 修改需要分状态
                                 sepData.keys.forEach((key) => {
                                     let oldData = oldUpdateData[index] ? oldUpdateData[index][key] : null,
                                         data = obj[key];
 
-                                    if(tools.isEmpty(oldData) && tools.isNotEmpty(data)) {
-                                        // 新增 （原始数据为空）
-                                        pivotResult.insert.push(Object.assign({}, sepData.data,
-                                            {[key]: data}));
-                                    }else if(tools.isNotEmpty(oldData) && tools.isEmpty(data)){
-                                        // 删除 （现有数据变成空）
-                                        pivotResult.delete.push(Object.assign({}, sepData.data,
-                                            {[key]: data}));
-                                    }else if(oldData != data){
+                                    // if(tools.isEmpty(oldData) && tools.isNotEmpty(data)) {
+                                    //     // 新增 （原始数据为空）
+                                    //     pivotResult.insert.push(Object.assign({}, sepData.data,
+                                    //         {[key]: data}));
+                                    // }else if(tools.isNotEmpty(oldData) && tools.isEmpty(data)){
+                                    //     // 删除 （现有数据变成空）
+                                    //     pivotResult.delete.push(Object.assign({}, sepData.data,
+                                    //         {[key]: oldData}));
+                                    // }else
+                                    if(oldData != data){
                                         // 修改 （原始数据与修改过的数据都不为空，且不与原始数据一样）
                                         pivotResult.update.push(Object.assign({}, sepData.data,
                                             {[key]: data}));
@@ -2967,10 +3018,10 @@ export class FastTable extends Component {
     }
 
     protected initDisabledEditor() {
-        console.time('start');
         let editor = this.editor,
-            updatable = editor.updatable;
-        this.wrapper.style.display = 'none';
+            updatable = editor.updatable,
+            wrapper = this.wrapper;
+        wrapper && (this.wrapper.style.display = 'none');
         this.rows.forEach((row) => {
             if(row){
                 let rowCanInit = editor.rowCanInit(row);
@@ -2983,19 +3034,19 @@ export class FastTable extends Component {
                 })
             }
         });
-        this.wrapper.style.display = 'block';
-        console.timeEnd('start');
+        wrapper && (this.wrapper.style.display = 'block');
     }
 
     protected clearDisabledEditor() {
-        this.wrapper.style.display = 'none';
+        let wrapper = this.wrapper;
+        wrapper && (this.wrapper.style.display = 'none');
         this.rows.forEach((row) => {
             row && row.cells.forEach((cell) => {
                 cell.disabled = false;
                 cell.errorMsg = '';
             })
         });
-        this.wrapper.style.display = 'block';
+        wrapper && (this.wrapper.style.display = 'block');
     }
 
     protected _isWrapLine = false;

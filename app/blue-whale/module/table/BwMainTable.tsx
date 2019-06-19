@@ -81,7 +81,7 @@ export class BwMainTableModule extends BwTableModule{
 
             // iphone x 兼容
             if(tools.cssSupports('height', 'env(safe-area-inset-bottom)')){
-                
+
                 this.ftable.wrapper.style.height  = `calc(${clientHeight + 30}px - env(safe-area-inset-bottom)`;
                 console.log(this.ftable.wrapper.style.height + '----------------------------')
             }else{
@@ -132,74 +132,36 @@ export class BwMainTableModule extends BwTableModule{
     * 初始化标签打印
     * */
     protected initLabelPrint() {
-        let label;
-
         this.ftable.btnAdd('labelPrint', {
             content: '标签打印',
             icon: 'label',
             onClick: () => {
-                if(!label) {
-                    let sp = new Spinner({
-                        el : this.ftable.btnGet('labelPrint').wrapper,
-                        size : 14,
-                        type  : Spinner.SHOW_TYPE.replace,
-                    });
-                    sp.show();
-
-                    require(['NewLabelPrint'], (Print) => {
-                        label = new Print.NewLabelPrint({
-                            container: this.wrapper,
-                            getData: () => this.ftable.data,
-                            getSelectedData: () => this.ftable.selectedRowsData,
-                            ui: this.ui
-                        });
-                        sp.hide();
-                    })
-                    /*require(['LabelPrintModule'], (Print) => {
-                        let moneys = {};
-                        this.ftable.columnsVisible.forEach((col) => {
-                            if(col.content && col.content.dataType === '11'){
-                                moneys[col.name.toLowerCase()] = col.content;
-                            }
-                        });
-                        let defalutVal;
-                        try{
-                            defalutVal = JSON.parse(this.ui.printSetting);
-                        }catch (e){
-                            console.log(e);
-                        }
-                        try{
-                        label = new Print({
-                            moneys,
-                            defaultVal: defalutVal,
-                            printList: this.para.ui.printList,
-                            container: this.wrapper,
-                            cols: this.ftable.columns,
-                            getData: () => this.ftable.data,
-                            selectedData: () => this.ftable.selectedRowsData,
-                            onSetDefault: (data: string) => {
-                                console.log(data);
-                                BwRule.Ajax.fetch(tools.url.addObj(BW.CONF.ajaxUrl.labelDefault, {'item_id': this.ui.itemId}), {
-                                    type: 'POST',
-                                    data: {
-                                        printSetting: data
-                                    }
-                                }).then(() => {
-                                    Modal.toast('设置默认值成功');
-                                }).catch(() => {
-                                    Modal.toast('设置默认值失败');
-                                })
-                            }
-                        });
-                        }catch (e){
-                            console.log(e);
-                        }
-                        sp.hide();
-                    });*/
-                }else{
-                    label.modalShow = true;
-                }
+                let sp = new Spinner({
+                    el : this.ftable.btnGet('labelPrint').wrapper,
+                    size : 14,
+                    type  : Spinner.SHOW_TYPE.replace,
+                });
+                sp.show();
+                this.initLabelModal(this.ui.printList, () => sp.hide());
             }
         }, 0);
+    }
+
+    protected labelModal;
+    initLabelModal(printList: printListArr[] = this.ui.printList, callback?: Function){
+        if(!this.labelModal){
+            require(['NewLabelPrint'], (Print) => {
+                this.labelModal = new Print.NewLabelPrint({
+                    container: this.wrapper,
+                    getData: () => this.ftable.data,
+                    getSelectedData: () => this.ftable.selectedRowsData,
+                    ui: Object.assign({}, this.ui, {printList})
+                });
+                callback && callback();
+            });
+        }else{
+            this.labelModal.modalShow = true;
+            callback && callback();
+        }
     }
 }

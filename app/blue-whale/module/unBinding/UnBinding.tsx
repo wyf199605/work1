@@ -29,7 +29,8 @@ export class UnBinding {
             header: '设备管理',
             body: ul,
             position: full,
-            isOnceDestroy: true
+            isOnceDestroy: true,
+            width: tools.isPc ? '500px' : '100%'
         });
         this.modal.isShow = true;
         this.getData()
@@ -116,19 +117,38 @@ export class UnBinding {
     }
 
     private deviceTpl(data: UnBindingPara): HTMLUListElement {
-        return <li className="device-cell">
-            <div className="icon-box">
+        if (tools.isMb) {
+            return <li className="device-cell">
+                <div className="icon-box">
 
-                <span className={`iconfont ${tools.isMb ? 'icon-device-mb' : 'icon-device-pc'}`} />
-            </div>
-            <div className="device-name">
-                <div className="device-modal">型号：{data.MODEL}</div>
-                <div className="device-vendor">品牌：{data.VENDOR}</div>
-                <div className="device-time">注册时间：{data.REGISTER_TIME}</div>
-            </div>
-            <div className="btn-group">
-                <button className="unbind" data-name={data.UUID}>解绑</button>
-            </div>
-        </li>
+                    <span className={`iconfont ${tools.isMb ? 'icon-device-mb' : 'icon-device-pc'}`} />
+                </div>
+                <div className="device-name">
+                    <div className="device-modal">型号：{data.MODEL}</div>
+                    <div className="device-vendor">品牌：{data.VENDOR}</div>
+                    <div className="device-time">注册时间：{data.REGISTER_TIME}</div>
+                </div>
+                <div className="btn-group">
+                    <button className="unbind" data-name={data.UUID}>解绑</button>
+                </div>
+            </li>
+        } else {
+            return <li className="pc-device-cell">
+                <div>
+                    <div className="icon-box">
+                        <span className={`iconfont icon-device-pc`} />
+                    </div>
+                    <div className="pc-device-name">
+                        <div className="device-modal">型号：{data.MODEL}</div>
+                        <div className="device-vendor">品牌：{data.VENDOR}</div>
+                        <div className="device-time">注册时间：{data.REGISTER_TIME}</div>
+                    </div>
+                </div>
+                <div className="pc-btn-group">
+                    <button className="unbind" data-name={data.UUID}>解绑</button>
+                </div>
+            </li>
+        }
+
     }
 }

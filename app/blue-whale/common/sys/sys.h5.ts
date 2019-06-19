@@ -137,7 +137,8 @@ namespace BW {
                     input.click();
                 },
                 reOpen: function (o: winOpen) {
-                    sys.window.open(o);
+                    // sys.window.open(o);
+                    location.replace(o.url);
                 },
                 refreshHome: function() {
                     sys.window.open({

@@ -1,4 +1,5 @@
 /// <amd-module name="ShareCode"/>
+/// <amd-dependency path="html2canvas" name="html2canvas"/>
 import { BwRule } from "../rule/BwRule";
 import CONF = BW.CONF;
 import sys = BW.sys;
@@ -9,6 +10,8 @@ import tools = G.tools;
 import Shell = G.Shell;
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { ShellAction } from "global/action/ShellAction";
+
+declare const html2canvas;
 
 /** 
  * 分页器
@@ -32,12 +35,14 @@ export class ShareCode {
     selectedRow: Array<object> // 表格选中的行
     shareDiv: HTMLElement; // 分享
     websocket: any;
+    tagId: string; // 邮件分享
 
-    constructor(selectedRow) {
+    constructor(selectedRow, tagId?: string) {
 
 
         // console.log(selectedRow);
         this.selectedRow = selectedRow;
+        this.tagId = tagId;
         this.url = localStorage.getItem('tableUrl');
         // alert('lc'+this.url);
         this.currentAddr = this.url.split('sf')[1];
@@ -74,14 +79,13 @@ export class ShareCode {
                     {cancelEle}
                 </section>
                 <section class="share-code-pc-main"></section>
-                {btnParent}
+                {/* {btnParent} */}
 
             </div>
         </div>
         d.query('body').appendChild(sharePcEle);
         console.log(code);
-        let qrcode = QrCode.toCanvas(code, 180, 180, d.query(".share-code-pc-main"));
-        console.log(qrcode);
+        QrCode.toCanvas(code, 180, 180, d.query(".share-code-pc-main"));
         let copyLinkBtn: IButton = {
             container: btnParent,
             content: '复制链接',
@@ -261,13 +265,14 @@ export class ShareCode {
         let selectObj = {
             pageparams: this.pageparams,
         }
-        Object.keys(this.queryer).forEach(key => {
-            selectObj[key] = JSON.parse(this.queryer[key]);
+        // // debugger;
+        // alert(this.queryer);
+        this.queryer && Object.keys(this.queryer).forEach(key => {
+            selectObj[key] = this.queryer[key];
         })
         let getUrl = this.url.indexOf('?') === -1 ? `${this.url}?output=json` : `${this.url}&output=json`
         BwRule.Ajax.fetch(getUrl).then(({ response }) => {
             this.keyField = response.body.elements[0].keyField || null;
-            console.log('keyField', this.keyField);
             let data = [];
             if (this.keyField) {
                 data = this.selectedRow.map(item => item[this.keyField]);
@@ -283,26 +288,50 @@ export class ShareCode {
                 }
             }).then(({ response }) => {
                 if (tools.isMb) {
+                    
                     let sharePage: HTMLDivElement = <div class="share-page">
                         <div class="share-page-qrcode"></div>
                     </div>
+                    // d.query('body').removeChild(d.query('.share-page'))
                     d.query('body').appendChild(sharePage);
-                    QrCode.toCanvas(response.code, 180, 180, d.query(".share-page-qrcode"));
+                    let qr = QrCode.toCanvas(response.code, 180, 180, d.query(".share-page-qrcode"));
+	    // var cas = document.createElement( 'canvas' );
+	    // var ctx = cas.getContext( '2d' );
+ 
+	    // cas.width = 100, cas.height = 100;
+	    // ctx.fillStyle = 'pink';
+	    // ctx.fillRect( 0, 0, 100, 100 );
+ 
+	    // 把画布的内容转换为base64编码格式的图片
+        // var data = cas.toDataURL( 'image/png', 1 );  //1表示质量(无损压缩)
+      
+ 
+        // 把画布的内容转换为base64编码格式的图片
 
+                    let emailDom: HTMLElement = this.tagId ?
+                        <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
+                        : <li class="disabled"><i class="mui-icon iconfont icon-email disabled" data-type="email"></i><span>邮件</span></li>;
                     let shareBtnList: HTMLElement = <div class="share-page-methods">
                         <ul>
-                            <li ><i class="mui-icon iconfont iconweixin" data-type="weixin"></i><span>微信</span></li>
+                            <li ><i class="mui-icon iconfont icon-weixin1" data-type="weixin"></i><span>微信</span></li>
                             {/* <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li>
                             <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li> */}
-                            <li class="disabled"><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
-                            <li ><i class="mui-icon iconfont icontupian" data-type="saveImg"></i><span>保存图片</span></li>
+                            {/* <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li> */}
+                            {emailDom}
+                            <li ><i class="mui-icon iconfont icon-photo" data-type="saveImg"></i><span>保存图片</span></li>
                         </ul>
                         <p class="share-page-cancel" data-type="cancel">取消</p>
                     </div>
                     sharePage.appendChild(shareBtnList);
+                    let qrWhiteBorder;
+                    html2canvas(qr).then(function(canvas) {
+                        qrWhiteBorder = canvas;
+                    });
                     shareBtnList.onclick = (e: Event) => {
                         let type = e.target['dataset'] ? e.target['dataset'].type : '';
-                        const imgSrc = d.query('.share-page-qrcode img')['src'];
+
+                        let imgSrc = qrWhiteBorder.toDataURL( 'image/png', 1 );
+                        
                         switch (type) {
                             case 'weixin':
                                 Shell.base.wxShare(imgSrc);
@@ -312,6 +341,21 @@ export class ShareCode {
                             // case 'qq':
                             //     break;
                             case 'email':
+                                if (!this.tagId) return;
+                                BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json', {
+                                    type: 'post',
+                                    data: {
+                                        tag_id: this.tagId,
+                                        file_name: '邮件分享',
+                                        content: imgSrc,
+                                    }
+                                }).then(({ response }) => {
+                                    let tempId = response && response.body && response.body.bodyList
+                                        && response.body.bodyList[0] && response.body.bodyList[0].temp_id;
+                                    sys.window.open({
+                                        url: CONF.ajaxUrl.mailForward + '?temp_id=' + tempId,
+                                    })
+                                })
                                 break;
                             case 'saveImg':
                                 Shell.image.downloadImg(imgSrc, () => { });
@@ -340,12 +384,11 @@ export class ShareCode {
         this.shareDiv.remove();
         let shareEle: HTMLDivElement = <div class="share-baffle ">
             <p class="qr-code-share">二维码分享</p>
-            <p class="fastlion-share">涂鸦分享</p>
+            {/* <p class="fastlion-share">涂鸦分享</p> */}
             <p class="cancel-share">取消</p>
         </div>
 
         shareEle.addEventListener('click', (e: Event) => {
-            
             switch (e.target['className']) {
                 case 'qr-code-share':
                     this.generateCode();
@@ -353,22 +396,28 @@ export class ShareCode {
                     break;
                 case 'fastlion-share':
                     d.query('body').removeChild(shareEle);
-                    let sharePage: HTMLDivElement = <div class="share-page"></div>
-                    d.query('body').appendChild(sharePage);
+                    // alert('test');
                     let timer = setTimeout(() => {
                         clearTimeout(timer);
                         tools.isMb && Shell.image.getSignImg((res) => {
-                            // alert(res);
+                            alert(123);
+                            let emailDom: HTMLElement = this.tagId ?
+                                <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
+                                : <li class="disabled"><i class="mui-icon iconfont icon-email " data-type="email"></i><span>邮件</span></li>;
                             let shareBtnList: HTMLElement = <div class="share-page-methods">
                                 <ul>
-                                    <li ><i class="mui-icon iconfont iconweixin" data-type="weixin"></i><span>微信</span></li>
+                                    <li ><i class="mui-icon iconfont icon-weixin1" data-type="weixin"></i><span>微信</span></li>
                                     {/* <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li> */}
                                     {/* <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li> */}
-                                    <li class="disabled"><i class="mui-icon iconfont iconyoujian" data-type="email"></i><span>邮件</span></li>
-                                    <li ><i class="mui-icon iconfont icontupian" data-type="saveImg"></i><span>保存图片</span></li>
+                                    {/* <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li> */}
+                                    {emailDom}
+                                    <li ><i class="mui-icon iconfont icon-photo" data-type="saveImg"></i><span>保存图片</span></li>
                                 </ul>
                                 <p class="share-page-cancel" data-type="cancel">取消</p>
                             </div>
+
+                            let sharePage: HTMLDivElement = <div class="share-page"></div>
+                            d.query('body').appendChild(sharePage);
                             sharePage.appendChild(shareBtnList);
                             shareBtnList.onclick = (e: Event) => {
                                 let type = e.target['dataset'] ? e.target['dataset'].type : '';
@@ -397,7 +446,7 @@ export class ShareCode {
                     break;
                 case 'cancel-share':
                 default:
-                    d.query('body').removeChild(shareEle);
+                    document.querySelector('body').removeChild(shareEle);
                     break;
             }
         })
@@ -426,7 +475,7 @@ export class ShareCode {
         let buttonData: IButton = {
             container: ele,
             content: '分享',
-            icon: 'iconfenxiang',
+            icon: 'icon-fenxiang',
             iconNoPre: true,
             onClick: this.btnClk,
             className: 'share-code-btn '
@@ -435,7 +484,7 @@ export class ShareCode {
         let ScanBtn: IButton = {
             container: ele,
             content: '扫码',
-            icon: 'iconsaoma',
+            icon: 'icon-saoma1',
             iconNoPre: true,
             onClick: () => {
                 if (flag) {

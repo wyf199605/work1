@@ -41,12 +41,17 @@
         justify-content: center;
         border: 1px solid rgba(0, 0, 0, 0.3);
         border-radius: 5px;
+        padding-bottom: 10px;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
         align-items: center;
         .share-code-btn {
             width: 80%;
+<<<<<<< HEAD
+=======
+            margin: 10px;
+>>>>>>> hotfix/1.1.46
             i {
                 margin-right: 10px;
             }
@@ -77,7 +82,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 10001;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -104,13 +109,13 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 10001;
+    z-index: 1000;
     padding-top: 35%;
     .share-page-qrcode {
         display: flex;
         justify-content: center;
         
-        img{
+        img, canvas{
             background-color: white;
             padding: 30px;
             border-radius: 5px;
@@ -132,7 +137,7 @@
             padding: 10px;
             margin: 0;
             li {
-                width: 65px;
+                width: 33.33%;
                 height: 100px;
                 display: flex;
                 /* flex-wrap: wrap; */
@@ -160,6 +165,11 @@
         }
     }
 }
+.disabled {
+    i, span {
+        color: gainsboro;
+    }
+}
 
 
 
@@ -173,7 +183,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 10001;
+    z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -207,8 +217,8 @@
             padding: 30px;
             img {
                 display: block;
-                width: 110px;
-                height: 110px;
+                width: 150px;
+                height: 150px;
             }
         }
         .share-code-pc-btns {
@@ -222,12 +232,4 @@
     }
 }
 
-.disabled {
-     span {
-        color: gainsboro;
-    }
-    i{
-        color: gainsboro;
-    }
-}
 

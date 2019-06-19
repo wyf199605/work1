@@ -158,6 +158,14 @@ export class GroupTabsPage extends BasicPage {
         }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
             this.locationLine(line, para);
         }
+
+
+        if(tableUi.autoRefresh) {
+            sys.window.wake("wake", null);
+            d.on(window, 'wake', () => {
+                this.refresh();
+            });
+        }
     }
 
     protected _inputs: Inputs;
@@ -833,7 +841,7 @@ export class GroupTabsPage extends BasicPage {
                     this.tab.toggleAll(true);
                 }
 
-                if (!tools.isNotEmptyArray(this.subUi)) {
+                if (this.ui.offline) {
                     this.imports.init();
                 }
                 this.main.onRender = null;

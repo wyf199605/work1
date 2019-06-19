@@ -156,15 +156,17 @@
           //border-top-color: $primary;
           &::before {
             content: "";
-            position: absolute;
             display: block;
-            top: 0;
-            width: 100%;
+            position: absolute;
             height: 100%;
-            left: 0;
-            border-top: 1px solid $primary;
+            width: 100%;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left:0;
             z-index: 3;
             pointer-events: none;
+            border-top: 1px solid $primary;
           }
         }
         td.bottomBorder{
@@ -188,24 +190,30 @@
             height: 100%;
             width: 100%;
             top: 0;
-            left: 0;
-            border-left: 1px solid $primary;
+            right: 0;
+            bottom: 0;
+            left:0;
             z-index: 3;
             pointer-events: none;
+            border-left: 1px solid $primary;
           }
         }
         td.rightBorder{
-          border-right: 1px solid $primary;
-          //&::before {
-          //  content: "";
-          //  position: absolute;
-          //  top: 0px;
-          //  height: 100%;
-          //  right: 0px;
-          //  border-right: 1px solid $primary;
-          //  z-index: 9999;
-          //  pointer-events: none;
-          //}
+          //border-right: 1px solid $primary;
+          &::before {
+            content: "";
+            display: block;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left:0;
+            z-index: 3;
+            pointer-events: none;
+            border-right: 1px solid $primary;
+          }
         }
 
         td.error{
@@ -253,7 +261,7 @@
         color: $text;
       }
     }
-    
+
     .table-loaded-error{
       &::before{
         font-family: "appcommon" !important;
@@ -306,6 +314,14 @@
       min-height: 1px;
       transition: box-shadow 0.3s;
       box-shadow: none;
+      border-right: 1px solid #ddd;
+      tr {
+        th, td {
+          &:last-child{
+            border-right: none;
+          }
+        }
+      }
     }
     .table-padding{
       padding-left: 40px;

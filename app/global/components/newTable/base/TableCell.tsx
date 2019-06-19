@@ -431,7 +431,6 @@ export class TableDataCell extends TableCell {
         }
         if(!flag){
             this.originalData = null;
-            console.log(this.originalData);
         }
     }
 
