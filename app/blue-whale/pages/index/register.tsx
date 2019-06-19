@@ -45,6 +45,7 @@ export class RegPage {
             });
         }
         d.on(props.saveReg, 'click', () => {
+        
             // new UnBinding({check_code: "123", mobile: "13799914019", uuid: "8C-16-45-29-A5-B8", register: "on"})
             // return false;
             if (props.tel.value.trim().length === 0) {
@@ -61,8 +62,17 @@ export class RegPage {
                 return;
             }
             // this.deviceData['uuid'] = '864684036384317'
-            if(!this.deviceData['uuid']){
-                Modal.alert('获取不到设备UUID');
+            if (!this.deviceData['uuid']) {
+                // Modal.alert('获取不到设备UUID');
+                Modal.confirm({
+                    msg: `获取不到设备UUID`,
+                    btns: ["取消", "设置"],
+                    callback: (index) => {
+                        if (index === true) {
+                            Shell.other.openSetting()
+                        }
+                    }
+                });
                 return;
             }
 
@@ -96,7 +106,7 @@ export class RegPage {
                         btns: ['取消', '前往解绑'],
                         callback: (index) => {
                             if (index === true) {
-                                let config={
+                                let config = {
                                     check_code: props.smsCheckCode.value,
                                     mobile: props.tel.value,
                                     uuid: this.deviceData['uuid'],
@@ -124,7 +134,7 @@ export class RegPage {
                                 }).then(({ response }) => {
                                     new UnBinding(config)
                                 })
-                             
+
                                 // self.deviceMange(response.data);
                             }
                         }
@@ -223,7 +233,7 @@ export class RegPage {
                     let json = JSON.parse(e.detail);
                     if (json.success) {
                         this.deviceData = json.msg;
-                    } 
+                    }
                     // else {
                     //     Modal.toast(json.msg);
                     // }
