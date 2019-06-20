@@ -36,12 +36,14 @@ export class ShareCode {
     shareDiv: HTMLElement; // 分享
     websocket: any;
     tagId: string; // 邮件分享
+    ui:IBW_Table
 
-    constructor(selectedRow, tagId?: string) {
+    constructor(selectedRow, ui:IBW_Table, tagId?: string) {
 
 
         // console.log(selectedRow);
         this.selectedRow = selectedRow;
+        this.ui = ui;
         this.tagId = tagId;
         this.url = localStorage.getItem('tableUrl');
         // alert('lc'+this.url);
@@ -270,9 +272,9 @@ export class ShareCode {
         this.queryer && Object.keys(this.queryer).forEach(key => {
             selectObj[key] = this.queryer[key];
         })
-        let getUrl = this.url.indexOf('?') === -1 ? `${this.url}?output=json` : `${this.url}&output=json`
-        BwRule.Ajax.fetch(getUrl).then(({ response }) => {
-            this.keyField = response.body.elements[0].keyField || null;
+
+
+        this.keyField = this.ui.keyField || null;
             let data = [];
             if (this.keyField) {
                 data = this.selectedRow.map(item => item[this.keyField]);
@@ -309,7 +311,7 @@ export class ShareCode {
         // 把画布的内容转换为base64编码格式的图片
 
                     let emailDom: HTMLElement = this.tagId ?
-                        <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
+                        <li class="disabled"><i class="mui-icon iconfont icon-email disabled" data-type="email"></i><span>邮件</span></li>
                         : <li class="disabled"><i class="mui-icon iconfont icon-email disabled" data-type="email"></i><span>邮件</span></li>;
                     let shareBtnList: HTMLElement = <div class="share-page-methods">
                         <ul>
@@ -341,21 +343,21 @@ export class ShareCode {
                             // case 'qq':
                             //     break;
                             case 'email':
-                                if (!this.tagId) return;
-                                BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json', {
-                                    type: 'post',
-                                    data: {
-                                        tag_id: this.tagId,
-                                        file_name: '邮件分享',
-                                        content: imgSrc,
-                                    }
-                                }).then(({ response }) => {
-                                    let tempId = response && response.body && response.body.bodyList
-                                        && response.body.bodyList[0] && response.body.bodyList[0].temp_id;
-                                    sys.window.open({
-                                        url: CONF.ajaxUrl.mailForward + '?temp_id=' + tempId,
-                                    })
-                                })
+                                // if (!this.tagId) return;
+                                // BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json', {
+                                //     type: 'post',
+                                //     data: {
+                                //         tag_id: this.tagId,
+                                //         file_name: '邮件分享',
+                                //         content: imgSrc,
+                                //     }
+                                // }).then(({ response }) => {
+                                //     let tempId = response && response.body && response.body.bodyList
+                                //         && response.body.bodyList[0] && response.body.bodyList[0].temp_id;
+                                //     sys.window.open({
+                                //         url: CONF.ajaxUrl.mailForward + '?temp_id=' + tempId,
+                                //     })
+                                // })
                                 break;
                             case 'saveImg':
                                 Shell.image.downloadImg(imgSrc, () => { });
@@ -372,7 +374,110 @@ export class ShareCode {
                 }
 
             })
-        })
+
+        // let getUrl = this.url.indexOf('?') === -1 ? `${this.url}?output=json` : `${this.url}&output=json`
+        // BwRule.Ajax.fetch(getUrl).then(({ response }) => {
+        //     this.keyField = response.body.elements[0].keyField || null;
+        //     let data = [];
+        //     if (this.keyField) {
+        //         data = this.selectedRow.map(item => item[this.keyField]);
+        //     }
+        //     let address = `${CONF.siteUrl}/${this.currentEnv}/null/sharecode/code`;
+        //     BwRule.Ajax.fetch(address, {
+        //         type: 'POST',
+        //         data: {
+        //             data,
+        //             keyField: this.keyField,
+        //             select: selectObj,
+        //             addr: this.currentAddr
+        //         }
+        //     }).then(({ response }) => {
+        //         if (tools.isMb) {
+                    
+        //             let sharePage: HTMLDivElement = <div class="share-page">
+        //                 <div class="share-page-qrcode"></div>
+        //             </div>
+        //             // d.query('body').removeChild(d.query('.share-page'))
+        //             d.query('body').appendChild(sharePage);
+        //             let qr = QrCode.toCanvas(response.code, 180, 180, d.query(".share-page-qrcode"));
+	    // // var cas = document.createElement( 'canvas' );
+	    // // var ctx = cas.getContext( '2d' );
+ 
+	    // // cas.width = 100, cas.height = 100;
+	    // // ctx.fillStyle = 'pink';
+	    // // ctx.fillRect( 0, 0, 100, 100 );
+ 
+	    // // 把画布的内容转换为base64编码格式的图片
+        // // var data = cas.toDataURL( 'image/png', 1 );  //1表示质量(无损压缩)
+      
+ 
+        // // 把画布的内容转换为base64编码格式的图片
+
+        //             let emailDom: HTMLElement = this.tagId ?
+        //                 <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
+        //                 : <li class="disabled"><i class="mui-icon iconfont icon-email disabled" data-type="email"></i><span>邮件</span></li>;
+        //             let shareBtnList: HTMLElement = <div class="share-page-methods">
+        //                 <ul>
+        //                     <li ><i class="mui-icon iconfont icon-weixin1" data-type="weixin"></i><span>微信</span></li>
+        //                     {/* <li ><i class="mui-icon iconfont iconlianjie" data-type="link"></i><span>复制链接</span></li>
+        //                     <li ><i class="mui-icon iconfont iconqq" data-type="qq"></i><span>QQ</span></li> */}
+        //                     {/* <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li> */}
+        //                     {emailDom}
+        //                     <li ><i class="mui-icon iconfont icon-photo" data-type="saveImg"></i><span>保存图片</span></li>
+        //                 </ul>
+        //                 <p class="share-page-cancel" data-type="cancel">取消</p>
+        //             </div>
+        //             sharePage.appendChild(shareBtnList);
+        //             let qrWhiteBorder;
+        //             html2canvas(qr).then(function(canvas) {
+        //                 qrWhiteBorder = canvas;
+        //             });
+        //             shareBtnList.onclick = (e: Event) => {
+        //                 let type = e.target['dataset'] ? e.target['dataset'].type : '';
+
+        //                 let imgSrc = qrWhiteBorder.toDataURL( 'image/png', 1 );
+                        
+        //                 switch (type) {
+        //                     case 'weixin':
+        //                         Shell.base.wxShare(imgSrc);
+        //                         break;
+        //                     // case 'link':
+        //                     //     break;
+        //                     // case 'qq':
+        //                     //     break;
+        //                     case 'email':
+        //                         if (!this.tagId) return;
+        //                         BwRule.Ajax.fetch(CONF.ajaxUrl.mailTemp + '?output=json', {
+        //                             type: 'post',
+        //                             data: {
+        //                                 tag_id: this.tagId,
+        //                                 file_name: '邮件分享',
+        //                                 content: imgSrc,
+        //                             }
+        //                         }).then(({ response }) => {
+        //                             let tempId = response && response.body && response.body.bodyList
+        //                                 && response.body.bodyList[0] && response.body.bodyList[0].temp_id;
+        //                             sys.window.open({
+        //                                 url: CONF.ajaxUrl.mailForward + '?temp_id=' + tempId,
+        //                             })
+        //                         })
+        //                         break;
+        //                     case 'saveImg':
+        //                         Shell.image.downloadImg(imgSrc, () => { });
+        //                         break;
+        //                     case 'cancel':
+        //                         d.query('body').removeChild(sharePage);
+        //                         break;
+
+        //                 }
+        //             }
+        //         } else {
+        //             console.log(response.code)
+        //             this.createShareCodePage(response.code);
+        //         }
+
+        //     })
+        // })
 
     }
 
@@ -403,7 +508,7 @@ export class ShareCode {
                         tools.isMb && Shell.image.getSignImg((res) => {
                             alert(123);
                             let emailDom: HTMLElement = this.tagId ?
-                                <li ><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
+                                <li class="disabled"><i class="mui-icon iconfont icon-email" data-type="email"></i><span>邮件</span></li>
                                 : <li class="disabled"><i class="mui-icon iconfont icon-email " data-type="email"></i><span>邮件</span></li>;
                             let shareBtnList: HTMLElement = <div class="share-page-methods">
                                 <ul>
