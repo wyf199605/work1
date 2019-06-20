@@ -259,6 +259,7 @@ export class Inputs {
      */
     private dataCover(ftable: FastBtnTable, response: obj) {
         let data = response.data,
+            tableModule = this.para.tableModule && this.para.tableModule(),
             queryModule = this.para.queryModule && this.para.queryModule();
         if (tools.isEmpty(data)) return;
 
@@ -266,10 +267,12 @@ export class Inputs {
         if (queryModule && !ftable) {
             queryModule.para.refresher({}, true).then(() => {
                 this.p.table().data = data;
+                tableModule && tableModule.subRefreshByIndex(0);
             })
         } else if (ftable) {
             setTimeout(() => {
                 ftable.data = data;
+                tableModule && tableModule.subRefreshByIndex(0);
             }, 1000);
         } else if (tools.isFunction(this.para.setListItemData)) {
             this.para.setListItemData(data);
@@ -376,7 +379,7 @@ export class Inputs {
      * @param para
      */
     private eventInit(para: InputsPara) {
-        let ftable = typeof para.table === 'function' && para.table();
+        let tableModule: NewTableModule = typeof para.table === 'function' && para.tableModule();
         if (G.tools.isMb) {
             this.keyStep = new KeyStep({
                 inputs: para.inputs,
@@ -397,7 +400,11 @@ export class Inputs {
                 timeInterval = input.timeout,
                 line = para.locationLine;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
-                if(ftable && ftable.editing){
+                let subs: any[] = (tools.keysVal(tableModule, 'sub') || {}),
+                    mainEdit = tools.keysVal(tableModule, 'main', 'ftable', 'editing'),
+                    subEdit = Object.values(subs).some((sub) => tools.keysVal(sub, 'ftable', 'editing'));
+
+                if(mainEdit || subEdit){
                     return ;
                 }
                 let handle = () => {
