@@ -264,8 +264,9 @@ export class BwTableElement extends Component{
         
         // 移动端二维码分享
         if(tools.isMb) {
+            console.log('二维码',para);
             d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
-               new ShareCode(this.tableModule.main.ftable.selectedRowsData, para.tagId);
+               new ShareCode(this.tableModule.main.ftable.selectedRowsData, para.tableEl, para.tagId);
             });
         }
         
