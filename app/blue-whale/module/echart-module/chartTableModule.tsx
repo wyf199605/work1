@@ -27,7 +27,7 @@ interface Data {
 
 export class ChartTableModule {
 
-    parentDom: Node;  // 当前表格的父元素
+    parentDom: HTMLElement;  // 当前表格的父元素
     ui: IBW_Table; // 当前UI元素
     maxChartDom: HTMLElement; // 移动端图表放大
     maxChart;
@@ -41,11 +41,12 @@ export class ChartTableModule {
 
 
     constructor(ui: IBW_Table, wrapper: HTMLElement, data: Data, ftable: FastBtnTable) {
-        this.parentDom = wrapper.parentNode;
+        this.parentDom = wrapper.parentElement;
         this.ui = ui;
         this.wrapper = wrapper;
         this.ftable = ftable;
         this.data = data;
+        // debugger;
         this.initData();
         this.initTableBtns();
     }
@@ -53,6 +54,11 @@ export class ChartTableModule {
     initData() {
         this.maxChartDom = <div class="max-chart"></div>
         this.wrapper.style.display = 'none';
+        if(this.ui.uiType === 'detail') {
+            
+            let chartTableEle = d.query('.chart-table', this.parentDom);
+            chartTableEle && this.parentDom.removeChild(chartTableEle);
+        }
         this.parentDom.insertBefore(this.render(), this.parentDom.childNodes[0]);
         // this.parentDom.appendChild(this.render());
         // let chart;
@@ -94,7 +100,8 @@ export class ChartTableModule {
         let btnsContainer = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
 
-        let btn: HTMLElement = <button class="btn button-type-default button-small">图表</button>
+        let btn: HTMLElement = <button class="btn button-type-default button-small chart-btn">图表</button>
+        d.query('.chart-btn', btnsContainer) && btnsContainer.removeChild(d.query('.chart-btn', btnsContainer));
         btnsContainer.appendChild(btn);
         btn.onclick = () => {
 
@@ -123,7 +130,7 @@ export class ChartTableModule {
         });
         let caption = this.ui.caption;
         let type = this.ui.showType || 'line';
-        let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
+        let xAxisName: string = this.ui.local.xCoordinate.split(',').length >= 2 ? this.ui.local.xCoordinate.split(',')[0] : this.ui.local.xCoordinate.toUpperCase();
         let xAxisData: Array<any> = this.data.bodyData.map(item => item[xAxisName]);
         let legendName: Array<string> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let legendData: Array<string> = [];
@@ -238,7 +245,14 @@ export class ChartTableModule {
             //     this.drillPage(params);
             // }
             this.drillPage(params);
-            console.log(this.ui);
+            console.log(this.ftable);
+            // let tr = d.query('.pseudo-table', this.wrapper).getElementsByTagName('tr');
+            // console.log(d.query('.pseudo-table', this.wrapper));
+            // let tableEle = this.wrapper.querySelector('.fast-table-container>.tables>.new-table-wrapper>.table-body-wrapper');
+            // let tr = tableEle.querySelector('.table-scroll-wrapper>.pseudo-table>table>body')
+            // console.log(tr);
+            
+
         });
         return chart;
 
@@ -263,7 +277,7 @@ export class ChartTableModule {
             this.data.bodyData.push(obj);
         });
         // let caption = this.ui.caption;
-        let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
+        let xAxisName: string =  this.ui.local.xCoordinate.split(',').length >= 2 ? this.ui.local.xCoordinate.split(',')[0].toUpperCase() : this.ui.local.xCoordinate.toUpperCase();
         let xAxisData: Array<any> = this.data.bodyData.map(item => item[xAxisName]);;
         let legendName: Array<string> = yCoordinate;
         let legendData: Array<string> = [];
@@ -337,10 +351,11 @@ export class ChartTableModule {
         };
         chart.setOption(chartData);
         chart.on('click', (params) => {
-            // console.log(params);
-            if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
-                this.drillPage(params);
-            }
+            console.log(params);
+            // if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
+            //     this.drillPage(params);
+            // }
+            this.drillPage(params);
         });
        
         tools.isMb && (this.chartDom.parentElement.style.height = `${yCoordinate.length * 20 + 3}rem`);
@@ -354,7 +369,26 @@ export class ChartTableModule {
      */
 
     drillPage(params) {
-        let cols = this.ui.cols.filter(col => !col.noShow && col.drillAddr);
+        let cols = [] ;
+        switch (this.ui.uiType) {
+            case 'web':
+                cols = this.ui.cols.filter(col => !col.noShow && col.webDrillAddr);
+                cols.forEach(col => {
+                    col.drillAddr = col.webDrillAddr;
+                });
+                break;
+            case 'drill':
+                cols = this.ui.cols.filter(col => !col.noShow && col.drillAddr);
+                break;
+            case 'select':
+                cols = this.ui.cols.filter(col => !col.noShow && col.link);
+                cols.forEach(col => {
+                    col.drillAddr = col.link;
+                });
+                break;
+        }
+        console.log(cols);
+        if (cols.length === 0) return;
         console.log(cols);
         let ul: HTMLUListElement = <ul class="drill-confirm ani"></ul>;
         let div: HTMLDivElement = <div class="drill-baffle">{ul}</div>;
@@ -402,26 +436,27 @@ export class ChartTableModule {
             }
             
         });
-        if (this.ui.uiType === 'select' && this.ui.subTableList.length > 0) {
-            let li: HTMLLIElement = <li>
-                <span>明细</span>
-            </li>
-            // ul.appendChild(li);
-            liList.push(li);
+        // if (this.ui.uiType === 'select' && this.ui.subTableList.length > 0) {
+        //     let li: HTMLLIElement = <li>
+        //         <span>明细</span>
+        //     </li>
+        //     // ul.appendChild(li);
+        //     liList.push(li);
             
-            li.addEventListener('click', () => {
-                console.log(123);
-                ul.classList.remove('drill-confirm');
-                ul.classList.add('drill-confirm2');
-                // d.query('body').removeChild(div);
-                // this.getAjax(params, col);
-                let timer = setTimeout(() => {
-                    // ul.classList.add('drill-confirm');
-                    d.query('body').removeChild(div);
-                    clearTimeout(timer);
-                },300);
-            })
-        }
+        //     li.addEventListener('click', () => {
+        //         console.log(123);
+        //         ul.classList.remove('drill-confirm');
+        //         ul.classList.add('drill-confirm2');
+        //         // d.query('body').removeChild(div);
+        //         // this.getAjax(params, col);
+                
+        //         let timer = setTimeout(() => {
+        //             // ul.classList.add('drill-confirm');
+        //             d.query('body').removeChild(div);
+        //             clearTimeout(timer);
+        //         },200);
+        //     })
+        // }
         if(liList.length < 1) return;
         liList.forEach(li => {
             ul.appendChild(li);
