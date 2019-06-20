@@ -63,16 +63,16 @@ export class RegPage {
             }
             // this.deviceData['uuid'] = '864684036384317'
             if (!this.deviceData['uuid']) {
-                // Modal.alert('获取不到设备UUID');
-                Modal.confirm({
-                    msg: `获取不到设备UUID`,
-                    btns: ["取消", "设置"],
-                    callback: (index) => {
-                        if (index === true) {
-                            Shell.other.openSetting()
-                        }
-                    }
-                });
+                Modal.alert('获取不到设备UUID');
+                // Modal.confirm({
+                //     msg: `获取不到设备UUID`,
+                //     btns: ["取消", "设置"],
+                //     callback: (index) => {
+                //         if (index === true) {
+                //             Shell.other.openSetting()
+                //         }
+                //     }
+                // });
                 return;
             }
 
