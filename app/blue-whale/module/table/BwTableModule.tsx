@@ -452,7 +452,7 @@ export class BwTableModule extends Component {
             content: '二维码分享',
             onClick: () => {
                 console.log('二维码分享',ui);
-                new ShareCode(this.tableModule.main.ftable.selectedRowsData);
+                new ShareCode(this.tableModule.main.ftable.selectedRowsData,ui);
 
             },
         });
