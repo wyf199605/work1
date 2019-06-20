@@ -109,6 +109,7 @@ export class ChartTableModule {
 
     initCommonChartFn(chartEle: HTMLElement) {
         chartEle.parentElement.style.height = '25rem';
+        chartEle.style.height = '20rem';
         // this.chartBtnsContainer.style.width = '100%';
         // alert(chartEle.style.width);
         let chart = echarts.init(chartEle);
@@ -233,9 +234,11 @@ export class ChartTableModule {
 
         chart.setOption(chartData);
         chart.on('click', (params) => {
-            if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
-                this.drillPage(params);
-            }
+            // if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
+            //     this.drillPage(params);
+            // }
+            this.drillPage(params);
+            console.log(this.ui);
         });
         return chart;
 
@@ -339,7 +342,7 @@ export class ChartTableModule {
                 this.drillPage(params);
             }
         });
-
+       
         tools.isMb && (this.chartDom.parentElement.style.height = `${yCoordinate.length * 20 + 3}rem`);
         return chart;
     }
@@ -397,7 +400,28 @@ export class ChartTableModule {
                     },300);
                 })
             }
+            
         });
+        if (this.ui.uiType === 'select' && this.ui.subTableList.length > 0) {
+            let li: HTMLLIElement = <li>
+                <span>明细</span>
+            </li>
+            // ul.appendChild(li);
+            liList.push(li);
+            
+            li.addEventListener('click', () => {
+                console.log(123);
+                ul.classList.remove('drill-confirm');
+                ul.classList.add('drill-confirm2');
+                // d.query('body').removeChild(div);
+                // this.getAjax(params, col);
+                let timer = setTimeout(() => {
+                    // ul.classList.add('drill-confirm');
+                    d.query('body').removeChild(div);
+                    clearTimeout(timer);
+                },300);
+            })
+        }
         if(liList.length < 1) return;
         liList.forEach(li => {
             ul.appendChild(li);
