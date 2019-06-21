@@ -2,11 +2,13 @@
     height: 20rem;
     overflow: scroll;
     background-color: white;
+    min-width: 240px;
 }
 
 .chart-container {
     width: 100%;
     height: 20rem;
+    min-width: 240px;
 }
 // .btn-default {
 //     // border-color: none;
@@ -49,15 +51,24 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 10000;
+    z-index: 99999999;
     top: 0;
     background-color: rgba(0, 0, 0, 0.3);
     // display: flex;
     // justify-content: center;
     // align-items: center;
     .drill-confirm {
-        width: 500px;
-        min-height: 300px;
+
+        // width: 500px;
+        // min-height: 300px;
+        @media screen and (max-width: 628px) {
+            width: 80%; 
+            min-width: 200px;
+         }
+         @media screen and (min-width: 628px) {
+            width: 500px;
+            min-height: 300px;
+         }
         background-color: white;
         padding: 20px;
         text-align: center;
@@ -69,13 +80,22 @@
         top:50%;
         left:50%;
         transform:translate(-50%, -50%);
-        
+        // display: flex;
+        // flex-wrap: wrap;
+        // align-items: flex-end;
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        align-content: center;
         animation: doAlert 0.3s cubic-bezier(0.39, 0.575, 0.565, 1) ;
         li {
+            width: 100%;
             padding: 6px;
             border-radius: 5px;
             // background-color: gainsboro;
             background-color: rgb(64, 169, 255);
+            margin-bottom: 10px;
         }
         
     
@@ -121,7 +141,13 @@
             top:50%;
             left:50%;
             transform:translate(-50%, -50%);
-            width: 500px;
+            
+            @media screen and (max-width: 628px) {
+                width: 80%; 
+             }
+             @media screen and (min-width: 628px) {
+                width: 500px; 
+             }
             min-height: 300px;
         }
     }
