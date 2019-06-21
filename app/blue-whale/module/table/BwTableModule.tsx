@@ -2976,7 +2976,7 @@ export class BwTableModule extends Component {
                         // }, 100);
                     }) : validList.push(validate(editModule, cell));
                 }else {
-                    cell.errorMsg = '';
+                    // cell.errorMsg = '';
                 }
             });
         };
@@ -3019,6 +3019,9 @@ export class BwTableModule extends Component {
 
                 let errorMsg = result && (result[name] || result[field.name]);
                 if (errorMsg) {
+                    // if(cell.editing){
+                    //     return
+                    // }
                     cell.errorMsg = errorMsg.errMsg;
                     // lookUpCell && (lookUpCell.errorMsg = errorMsg.errMsg);
                     resolve();
@@ -3064,7 +3067,7 @@ export class BwTableModule extends Component {
                             Array.isArray(errors) && errors.forEach(err => {
                                 let { name, msg } = err,
                                     cell = fastRow.cellGet(name);
-                                if (cell) {
+                                if (cell /*&& !cell.editing*/) {
                                     cell.errorMsg = msg;
                                 }
                                 //     callback(el, false);

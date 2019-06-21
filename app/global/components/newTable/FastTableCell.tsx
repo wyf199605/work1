@@ -67,12 +67,16 @@ export class FastTableCell extends TableDataCell {
                 pos: isLastCol ? 'left' : 'right'
             });
             d.classAdd(this.wrapper, 'error');
-            this.wrapper.innerHTML = '';
-            d.append(this.wrapper, <div>{this.text}</div>)
+            if(!this.editing){
+                this.wrapper.innerHTML = '';
+                d.append(this.wrapper, <div>{this.text}</div>)
+            }
         }else{
             Tooltip.clear(this.wrapper);
-            this.wrapper.innerHTML = '';
-            d.append(this.wrapper, this.text);
+            if(!this.editing) {
+                this.wrapper.innerHTML = '';
+                d.append(this.wrapper, this.text);
+            }
             d.classRemove(this.wrapper, 'error');
         }
         this._errorMsg = msg;
