@@ -141,7 +141,7 @@ export class DetailItem extends Component{
 
                 this.disabled = false;
                 if(!isEdit && com){
-                    if(this.wrapper.classList.contains('cell-link')){
+                    if(this.wrapper && this.wrapper.classList.contains('cell-link')){
                         if(this.detail.autoEdit && !isEdit){
                             this.wrapper.classList.remove('editing');
                         }
