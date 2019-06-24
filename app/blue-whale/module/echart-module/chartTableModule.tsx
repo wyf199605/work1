@@ -135,7 +135,13 @@ export class ChartTableModule {
         let type = this.ui.showType || 'line';
         // let type = 'bar';
         let xAxisName: string = this.ui.local.xCoordinate.split(',').length >= 2 ? this.ui.local.xCoordinate.split(',')[0] : this.ui.local.xCoordinate.toUpperCase();
-        let xAxisData: Array<any> = this.data.bodyData.map(item => item[xAxisName]);
+        let xAxisData: Array<any> = this.data.bodyData.map((item, i) => {
+            return {
+                value: item[xAxisName],
+                test: 1
+
+            }
+        });
         let legendName: Array<string> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let legendData: Array<string> = [];
         let series = [];
@@ -163,17 +169,17 @@ export class ChartTableModule {
         });
 
         let chartData = {
-            title: {
-                text: caption,
-                textStyle: {
-                    fontFamily: 'monospace',
-                    fontSize: 18,
-                    color: '#333'
-                    // fontWeight: 'bold',
+            // title: {
+            //     text: caption,
+            //     textStyle: {
+            //         fontFamily: 'monospace',
+            //         fontSize: 18,
+            //         color: '#333'
+            //         // fontWeight: 'bold',
 
-                },
-                padding: 15,
-            },
+            //     },
+            //     padding: 15,
+            // },
             grid: {
                 // top: 15,
                 left: 15,
@@ -181,18 +187,14 @@ export class ChartTableModule {
                 bottom: 15,
                 containLabel: true
             },
-            tooltip: {
-                trigger: 'axis',
-                axisPointer: {
-                    type: 'cross'
-                }
-            },
+            
             legend: {
-                data: tools.isMb ? [] : legendData,
+                data: legendData,
                 top: 15,
             },
             xAxis: {
                 data: xAxisData,
+                triggerEvent: true,
                 splitLine: {
                     lineStyle: {
                         // 使用深浅的间隔色
@@ -205,7 +207,7 @@ export class ChartTableModule {
                     }
                 },
                 axisLabel: {
-                    color: '#333333'
+                    color: '#333333',
                 }
             },
 
@@ -227,6 +229,15 @@ export class ChartTableModule {
             },
             series: series
         };
+
+        if (!tools.isMb) {
+            chartData['tooltip']= {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross'
+                }
+            }
+        }
         // tools.isMb && (chartData['dataZoom'] = [
         //     {
         //         type: 'slider',
@@ -248,10 +259,50 @@ export class ChartTableModule {
             // if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
             //     this.drillPage(params);
             // }
-            // 
-            console.log(params);
-            let dataCol = this.data.bodyData[params.dataIndex];
-            this.drillPage(params, dataCol);
+            //
+            let col;
+            if (tools.isMb ) {
+                let tipDom: HTMLDivElement
+                if ( params.componentType === "xAxis" ) {
+                    params.seriesName = params.value;
+                    col = this.data.bodyData.find(item => item[xAxisName] === params.value);
+                    tipDom =this.tipLinkFn(params.seriesName);
+                } else {
+                    col = this.data.bodyData[params.dataIndex];
+                    tipDom =this.tipLinkFn(`${params.seriesName}: ${params.value}`);
+                }
+                let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, col);
+                if (ifBreak) return;
+                
+                d.query('.tip-link',this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link',this.chartBtnsContainer));
+                 
+                this.chartBtnsContainer.appendChild(tipDom);
+                tipDom.style.top = params.event.offsetY + 'px';
+                tipDom.style.left = (params.event.offsetX - 50) + 'px';
+                setTimeout(() =>{
+                    this.chartBtnsContainer.removeChild(tipDom);
+                }, 3000);
+                tipDom.onclick = () =>{
+                    this.chartBtnsContainer.removeChild(tipDom);
+                    debugger;
+                    this.getAjax(defaultCol, dataCol, varNamesObj);  
+                }
+            }
+            
+            else {
+                if ( params.componentType === "xAxis" ) {
+                    params.seriesName = params.value;
+                    col = this.data.bodyData.find(item => item[xAxisName] === params.value);  
+                } else {
+                    col = this.data.bodyData[params.dataIndex];
+                }
+                let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, col);
+                // this.drillPage(params, col);
+                !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
+            }
+
+
+            // this.drillPage(params, dataCol);
             // let tr = d.query('.pseudo-table', this.wrapper).getElementsByTagName('tr');
             // console.log(d.query('.pseudo-table', this.wrapper));
             // let tableEle = this.wrapper.querySelector('.fast-table-container>.tables>.new-table-wrapper>.table-body-wrapper');
@@ -263,6 +314,15 @@ export class ChartTableModule {
         return chart;
 
 
+    }
+
+    // 
+    tipLinkFn(value: string) {
+        let tipDom: HTMLDivElement = <div class="tip-link">
+            <p>{value}</p>
+            <p class="link-to">点击查看</p>
+        </div>;
+        return tipDom;
     }
 
     /**
@@ -347,21 +407,40 @@ export class ChartTableModule {
                 bottom: 15,
                 containLabel: true
             },
-            tooltip: {},
             legend: {
                 data: xAxisData,
                 top: 5,
                 type: 'scroll',
             },
             series: series
-        };
+        }; 
+        !tools.isMb && (chartData['tooltip'] = {})
         chart.setOption(chartData);
         chart.on('click', (params) => {
             console.log(params);
-            // if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
-            //     this.drillPage(params);
-            // }
-            this.drillPage(params, params.data.item);
+            let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, params.data.item);
+            if (tools.isMb && !ifBreak) {
+                let tipDom: HTMLDivElement
+                tipDom =this.tipLinkFn(`${params.name}: ${params.value}`);
+                
+                d.query('.tip-link',this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link',this.chartBtnsContainer));
+                 
+                this.chartBtnsContainer.appendChild(tipDom);
+                tipDom.style.top = params.event.offsetY + 'px';
+                tipDom.style.left = (params.event.offsetX - 50) + 'px';
+                setTimeout(() =>{
+                    this.chartBtnsContainer.removeChild(tipDom);
+                }, 3000);
+                tipDom.onclick = () =>{
+                    this.chartBtnsContainer.removeChild(tipDom);
+                    // this.drillPage(params, params.data.item); 
+                    this.getAjax(defaultCol, dataCol, varNamesObj);
+                }
+                return ;
+            }
+           
+            !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
+
         });
         tools.isMb && (this.chartDom.parentElement.style.height = `${yCoordinate.length * 20 + 3}rem`);
         return chart;
@@ -377,220 +456,194 @@ export class ChartTableModule {
         let cols = [];
         switch (this.ui.uiType) {
             case 'web':
-                cols = this.ui.cols.filter(col => !col.noShow && col.webDrillAddr);
+                cols = this.ui.cols.filter(col => col.webDrillAddr);
                 cols.forEach(col => {
                     col.drillAddr = col.webDrillAddr;
                 });
                 break;
             case 'drill':
-                cols = this.ui.cols.filter(col => !col.noShow && col.drillAddr);
+                cols = this.ui.cols.filter(col => col.drillAddr);
                 break;
             case 'select':
-                cols = this.ui.cols.filter(col => !col.noShow && col.link);
+                cols = this.ui.cols.filter(col => col.link);
                 cols.forEach(col => {
                     col.drillAddr = col.link;
                 });
                 break;
         }
         console.log(cols);
-        if (cols.length === 0) return;
-        console.log(cols);
-        let ul: HTMLUListElement = <ul class="drill-confirm ani"></ul>;
-        let div: HTMLDivElement = <div class="drill-baffle">{ul}</div>;
-        !tools.isMb && (div.onclick = (e) => {
-            if (e.target['className'] === 'drill-baffle') {
-                debugger;
-                ul.classList.remove('drill-confirm');
-                ul.classList.add('drill-confirm2');
-                setTimeout(() => {
-                    // ul.classList.add('drill-confirm');
-                    d.query('body').removeChild(div);
-                }, 300);
+        console.log(params);
+        console.log(dataCol);
+        if (cols.length === 0) return {
+            defaultCol : null,
+            varNamesObj : null,
+            dataCol : null,
+            ifBreak :true,
+        };
+
+        // 根据rowLinkField 设置默认跳转
+        let defaultCols;
+        if (this.ui.rowLinkField) {
+            defaultCols = cols.find(col => col.name === this.ui.rowLinkField);
+        }
+
+
+        // Object.keys(dataCol).forEach(key => {
+        //     if (params.seriesName === dataCol[key]) {
+
+        //     }
+        // }
+        let col;
+        if(this.ui.showType === 'pie') {
+            // col = cols.filter(col => col.caption === params.seriesName);
+            Object.keys(params.data.item).forEach((key)=> {
+                if(params.data.item[key] === params.name) {
+                    col = cols.find(col => col.name === key);
+                }
+            })
+        } else {
+            col = cols.find(col => col.caption === params.seriesName);
+        }
+        // let caption = this.ui.showType === 'pie' ? params.name : params.seriesName;
+         
+        let defaultCol = col ? col : defaultCols ? defaultCols : null;
+
+        if (!defaultCol) return {
+            defaultCol : null,
+            varNamesObj : null,
+            dataCol : null,
+            ifBreak :true,
+        };
+
+        console.log(defaultCol);
+        // debugger;
+        let varNamesObj: object = {};
+        let ifBreak: boolean = false;
+        defaultCol.drillAddr && defaultCol.drillAddr.varList.forEach(list => {
+            if (list.varName) {
+                varNamesObj[list.varName] = dataCol[list.varName];
+                !dataCol[list.varName] && (ifBreak = true);
             }
         });
-        let liList: Array<HTMLLIElement> = [];
-        cols.forEach(col => {
-            let varNamesObj: object = {};
-            let noDrill = false;
-            col.drillAddr && col.drillAddr.varList.forEach(list => {
-                if (list.varName) {
-                    varNamesObj[list.varName] = dataCol[list.varName];
-                    !dataCol[list.varName] && (noDrill = true);
+        if (ifBreak) return {
+            defaultCol : null,
+            varNamesObj : null,
+            dataCol : null,
+            ifBreak :true,
+        };
+        // this.getAjax(defaultCol, dataCol, varNamesObj);
+        return {
+            defaultCol,
+            varNamesObj,
+            dataCol,
+            ifBreak
+        }
+    }
+
+    /**
+     * 跳转页面的ajax
+     * @param params 点击后获取的数据
+     * @param col 对应的UI栏
+     */
+    getAjax(col, dataCol, varNamesObj) {
+        if (this.ui.uiType === 'drill') {
+            let url: string = CONF.siteUrl + col.drillAddr.dataAddr;
+            Object.keys(dataCol).forEach(key => {
+                if (url.indexOf(key) !== -1) {
+                    url = url.replace(`{${key}}`, dataCol[key]);
                 }
             });
-            console.log(varNamesObj);
+            url = `${url}&page=drill`;
+            sys.window.open({ url, gps: col.drillAddr.needGps });
+        } else {
 
-            if (!noDrill && Object.keys(dataCol).includes(col.name)) {
-                let li: HTMLLIElement = <li>
-                    <span>{col.caption} : {dataCol[col.name]}</span>
-                </li>
-                // ul.appendChild(li);
-                liList.push(li);
+            // let param = Object.assign({
+            //     type: 'GET',
+            //     needGps: col.drillAddr.needGps,
+            // }, varNamesObj);
+            let url = CONF.siteUrl + col.drillAddr.dataAddr;
+            // BwRule.Ajax.fetch(url, param).then(({response}) => {
+            //     console.log(response);
+            // })
+            sys.window.open({ url, data: varNamesObj, gps: col.drillAddr.needGps });
+        }
 
-                li.addEventListener('click', () => {
-                    console.log(123);
-                    ul.classList.remove('drill-confirm');
-                    ul.classList.add('drill-confirm2');
-                    // d.query('body').removeChild(div);
-                    this.getAjax(col, dataCol, varNamesObj);
-                    let timer = setTimeout(() => {
-                        // ul.classList.add('drill-confirm');
-                        d.query('body').removeChild(div);
-                        clearTimeout(timer);
-                    }, 300);
-                })
-            }
 
-        });
-        // if (this.ui.uiType === 'select' && this.ui.subTableList.length > 0) {
-        //     let li: HTMLLIElement = <li>
-        //         <span>明细</span>
-        //     </li>
-        //     // ul.appendChild(li);
-        //     liList.push(li);
-
-        //     li.addEventListener('click', () => {
-        //         console.log(123);
-        //         ul.classList.remove('drill-confirm');
-        //         ul.classList.add('drill-confirm2');
-        //         // d.query('body').removeChild(div);
-        //         // this.getAjax(params, col);
-
-        //         let timer = setTimeout(() => {
-        //             // ul.classList.add('drill-confirm');
-        //             d.query('body').removeChild(div);
-        //             clearTimeout(timer);
-        //         },200);
-        //     })
-        // }
-        if (liList.length < 1) return;
-        let li: HTMLLIElement = <li>
-            <span>关闭</span>
-        </li>
-        // ul.appendChild(li);
-        liList.push(li);
-
-        li.addEventListener('click', () => {
-            console.log(123);
-            ul.classList.remove('drill-confirm');
-            ul.classList.add('drill-confirm2');
-            // d.query('body').removeChild(div);
-            // this.getAjax(col, dataCol, varNamesObj);
-            let timer = setTimeout(() => {
-                // ul.classList.add('drill-confirm');
-                d.query('body').removeChild(div);
-                clearTimeout(timer);
-            }, 300);
-        })
-    
-    liList.forEach(li => {
-        ul.appendChild(li);
-        })
-d.query('body').appendChild(div);
     }
 
-/**
- * 跳转页面的ajax
- * @param params 点击后获取的数据
- * @param col 对应的UI栏
- */
-getAjax(col, dataCol, varNamesObj) {
-    if (this.ui.uiType === 'drill') {
-        let url: string = CONF.siteUrl + col.drillAddr.dataAddr;
-        Object.keys(dataCol).forEach(key => {
-            if (url.indexOf(key) !== -1) {
-                url = url.replace(`{${key}}`, dataCol[key]);
+
+
+    /**
+     * 图表渲染函数
+     */
+    render() {
+        this.chartDom = <section class="chart-container" >图形</section>
+        this.chartBtnsContainer = <div class="chart-table" >
+            <section class="chart-btns">
+                <button class="switch-table btn button-type-default button-small" data-type="switchTable">表格</button>
+            </section>
+            {this.chartDom}
+        </div>
+        return this.chartBtnsContainer;
+    }
+
+    /**
+     * 监控自制按钮事件
+     */
+    chartBtnsClk() {
+        
+        this.chartBtnsContainer.addEventListener('click', (e: Event) => {
+            let type = e.target && e.target['dataset'] && e.target['dataset'].type;
+            switch (type) {
+                case 'switchTable':
+                    this.chartBtnsContainer.style.display = 'none';
+                    this.wrapper.style.display = 'block';
+                    this.ftable.recountWidth();
+                    break;
             }
         });
-        url = `${url}&page=drill`;
-        sys.window.open({ url, gps: col.drillAddr.needGps });
-    } else {
 
-        // let param = Object.assign({
-        //     type: 'GET',
-        //     needGps: col.drillAddr.needGps,
-        // }, varNamesObj);
-        let url = CONF.siteUrl + col.drillAddr.dataAddr;
-        // BwRule.Ajax.fetch(url, param).then(({response}) => {
-        //     console.log(response);
-        // })
-        sys.window.open({ url, data: varNamesObj, gps: col.drillAddr.needGps });
-    }
+        if (this.ui.showType === 'pie') return;
+        var i = 0;
+        let body: HTMLElement = d.query('body');
+        tools.isMb && this.chartDom.addEventListener('click', () => {
+            i++;
+            setTimeout(function () {
+                i = 0;
+            }, 500);
+            if (i > 1) {
 
-
-}
-
+                // this.maxChartDom = <div class="max-chart">11</div>;
+                // div.appendChild(this.chartDom);
+                // d.query('.max-chart', body) && body.removeChild(d.query('.max-chart', body))
+                body.appendChild(this.maxChartDom);
+                this.maxChart = this.initCommonChartFn(this.maxChartDom, true);
 
 
-/**
- * 图表渲染函数
- */
-render() {
-    this.chartDom = <section class="chart-container" >图形</section>
-    this.chartBtnsContainer = <div class="chart-table" >
-        <section class="chart-btns">
-            <button class="switch-table btn button-type-default button-small" data-type="switchTable">表格</button>
-        </section>
-        {this.chartDom}
-    </div>
-    return this.chartBtnsContainer;
-}
+            }
+        });
 
-/**
- * 监控自制按钮事件
- */
-chartBtnsClk() {
-    this.chartBtnsContainer.addEventListener('click', (e: Event) => {
-        let type = e.target && e.target['dataset'] && e.target['dataset'].type;
-        switch (type) {
-            case 'switchTable':
-                this.chartBtnsContainer.style.display = 'none';
-                this.wrapper.style.display = 'block';
-                this.ftable.recountWidth();
-                break;
-        }
-    });
-
-    var i = 0;
-    let body: HTMLElement = d.query('body');
-    tools.isMb && this.chartDom.addEventListener('click', () => {
-        i++;
-        setTimeout(function () {
-            i = 0;
-        }, 500);
-        if (i > 1) {
-
-            // this.maxChartDom = <div class="max-chart">11</div>;
-            // div.appendChild(this.chartDom);
-            // d.query('.max-chart', body) && body.removeChild(d.query('.max-chart', body))
-            body.appendChild(this.maxChartDom);
-            this.maxChart = this.initCommonChartFn(this.maxChartDom, true);
-
-
-        }
-    });
-
-    tools.isMb && this.maxChartDom.addEventListener('click', () => {
-        i++;
-        setTimeout(function () {
-            i = 0;
-        }, 500);
-        // i > 1 && body.removeChild(d.query('.max-chart', body));
-        if (i > 1) {
-            body.removeChild(d.query('.max-chart', body));
-            // this.chart.resize();
-            d.query('.table-module-has-sub', body).style.height = '100vh';
-        }
-    })
-
-}
-
-initDrillChart() {
-    if (this.ui.showType === 'pie') {
-
-    } else {
+        tools.isMb && this.maxChartDom.addEventListener('click', () => {
+            i++;
+            setTimeout(function () {
+                i = 0;
+            }, 500);
+            // i > 1 && body.removeChild(d.query('.max-chart', body));
+            if (i > 1) {
+                body.removeChild(d.query('.max-chart', body));
+                // this.chart.resize();
+                d.query('.table-module-has-sub', body).style.height = '100vh';
+            }
+        })
 
     }
-}
+
+    initDrillChart() {
+        if (this.ui.showType === 'pie') {
+
+        } else {
+
+        }
+    }
 
 }
