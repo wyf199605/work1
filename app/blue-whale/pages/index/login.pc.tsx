@@ -4,6 +4,7 @@ import { LoginPage } from "./login";
 import { Button } from "../../../global/components/general/button/Button";
 import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
 import d = G.d;
+import {BwRule} from "../../common/rule/BwRule";
 
 export class LoginPcPage extends LoginPage {
 
@@ -93,6 +94,8 @@ export class LoginPcPage extends LoginPage {
         para.dom.style.backgroundImage = `url(${G.requireBaseUrl + '../img/bg.png'})`;
         para.dom.style.backgroundRepeat = 'repeat-x';
         para.dom.style.backgroundPositionY = 'center';
+
+        BwRule.initColor(para.dom);
 
         super({
             responseBean: para.responseBean,

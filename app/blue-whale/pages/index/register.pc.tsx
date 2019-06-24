@@ -3,6 +3,7 @@
 import {Button} from "../../../global/components/general/button/Button";
 import d = G.d;
 import {RegPage} from "./register";
+import {BwRule} from "../../common/rule/BwRule";
 
 export class RegisterPcPage extends RegPage {
     constructor(para) {
@@ -69,6 +70,7 @@ export class RegisterPcPage extends RegPage {
         para.dom.style.backgroundRepeat = 'repeat-x';
         para.dom.style.backgroundPositionY = 'center';
 
+        BwRule.initColor(para.dom);
         super({
             goLogin: goLogin.wrapper,
             saveReg: registerBtn.wrapper,

@@ -4,6 +4,29 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  &.green{
+    .has_logined, .code_login, .login-form{
+      border-color: $info!important;
+    }
+    .btn-group button{
+      background-color: $info!important;
+    }
+  }
+  &.blue{
+    .has_logined, .code_login, .login-form{
+      border-color: #fff!important;
+    }
+    .logo{
+      .text{
+        color: #fff!important;
+      }
+    }
+    .btn-group button{
+      background-color: rgb(75, 165, 251)!important;
+    }
+  }
+
   .scan_logo {
     text-align: center;
     margin-bottom: 45px;
@@ -50,7 +73,7 @@
       background-color: #169BDF;
       width: 140px;
       border: none;
-      padding-top: 1;
+      padding-top: 1px;
       padding: 6px auto;
       padding: 5px;
       border-radius: 5px;

@@ -943,4 +943,23 @@ export class BwRule extends Rule {
             }
         }
     }
+
+    static initColor(dom: HTMLElement){
+        const green = ['pcms', 'hygl'],
+            blue = ['whms', 'ccps'];
+
+        if(~green.indexOf(CONF.appid)){
+            dom.style.backgroundImage = `url(${G.requireBaseUrl + '../img/green.jpg'})`;
+            dom.style.backgroundRepeat = 'no-repeat';
+            dom.style.backgroundSize = '100% 100%';
+            dom.classList.add('green');
+
+        }else if(~blue.indexOf(CONF.appid)){
+            dom.style.backgroundImage = `url(${G.requireBaseUrl + '../img/blue.jpg'})`;
+            dom.style.backgroundRepeat = 'no-repeat';
+            dom.style.backgroundSize = '100% 100%';
+            dom.classList.add('blue');
+
+        }
+    }
 }
