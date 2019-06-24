@@ -2,9 +2,9 @@ import tools = G.tools;
 import d = G.d;
 import sys = BW.sys;
 import CONF = BW.CONF;
-import {BwRule} from "../../common/rule/BwRule";
-import {DataManager} from "../../../global/components/DataManager/DataManager";
-import {Loading} from "../../../global/components/ui/loading/loading";
+import { BwRule } from "../../common/rule/BwRule";
+import { DataManager } from "../../../global/components/DataManager/DataManager";
+import { Loading } from "../../../global/components/ui/loading/loading";
 /**
  * 树构造数据有三种情况
  * 1.有levelField ，每次点击再加载数据，根据treeField构造,如：收件人
@@ -12,15 +12,15 @@ import {Loading} from "../../../global/components/ui/loading/loading";
  * 3.levelField为空，recursion = 1，后台数据一次性给前端，此时TreeFields必须正好是三个字段：主键字段，父字段，标题字段。
  */
 interface contactsPagePara {
-    levelField ,
-    treeField ,
-    fromField ,
-    multValue ,
+    levelField,
+    treeField,
+    fromField,
+    multValue,
     otherField,
-    recursion : number, //0不是，1是TreeFields必须正好是三个字段：主键字段，父字段，标题字段。
+    recursion: number, //0不是，1是TreeFields必须正好是三个字段：主键字段，父字段，标题字段。
     dom,
-    dataAddr:R_ReqAddr;
-    isDev?:boolean;
+    dataAddr: R_ReqAddr;
+    isDev?: boolean;
 }
 let clickEvent = tools.isMb ? 'click' : 'click';
 
@@ -29,7 +29,7 @@ export = class contactsPage {
     constructor(private para: contactsPagePara) {
         let self = this,
             list = d.query('#list');
-            //传给后台参数
+        //传给后台参数
         let tmpName = '__HIGHLIGHT_NAME__';
         list.style.height = '100%';
         list.style.overflow = 'auto';
@@ -55,10 +55,10 @@ export = class contactsPage {
 
         let picker = (function () {
             let localData = localStorage.getItem('fromPickData'),
-                ajaxUrl = CONF.siteUrl + BwRule.reqAddr(para.dataAddr,  localData ? JSON.parse(localData) : null),
+                ajaxUrl = CONF.siteUrl + BwRule.reqAddr(para.dataAddr, localData ? JSON.parse(localData) : null),
                 page = 0,
                 len = 20,
-                queryData = {queryparam: '', pageparams: ''};
+                queryData = { queryparam: '', pageparams: '' };
 
             //一开始加载
             getList(ajaxUrl, queryData, function (response) {
@@ -66,23 +66,23 @@ export = class contactsPage {
             });
 
             let hasOpen;
-            function hasShow(target : HTMLElement){
+            function hasShow(target: HTMLElement) {
                 let tarPar = target;
-                if(tarPar.classList.contains('mui-active')){
+                if (tarPar.classList.contains('mui-active')) {
                     tarPar.classList.remove('mui-active');
                 }
-                else{
+                else {
                     tarPar.classList.add('mui-active');
                 }
             }
 
             d.on(list, clickEvent, '.mui-table-view-cell.mui-collapse a', function () {
                 setTimeout(() => {
-                    if(typeof hasOpen === 'undefined') {
+                    if (typeof hasOpen === 'undefined') {
                         hasOpen = this.parentElement.classList.contains('mui-active');
                     }
 
-                    if(!hasOpen){
+                    if (!hasOpen) {
                         hasShow(this.parentElement);
                     }
                 }, 0);
@@ -91,15 +91,15 @@ export = class contactsPage {
             d.on(list, clickEvent, '.mui-table-view-cell a.notLoad[data-query]', function () {
                 let tapThis = this;
                 function getLevelQuery(dom: HTMLElement, query = '') {
-                     let parent = d.closest(dom.parentElement, 'li.mui-table-view-cell', list),
-                         queryDom = d.query('[data-query]', dom),
-                         queryStr = query ? query + '&' + queryDom.dataset.query : queryDom.dataset.query;
+                    let parent = d.closest(dom.parentElement, 'li.mui-table-view-cell', list),
+                        queryDom = d.query('[data-query]', dom),
+                        queryStr = query ? query + '&' + queryDom.dataset.query : queryDom.dataset.query;
 
-                     if(parent) {
-                         return getLevelQuery(parent, queryStr)
-                     }else{
-                         return queryStr;
-                     }
+                    if (parent) {
+                        return getLevelQuery(parent, queryStr)
+                    } else {
+                        return queryStr;
+                    }
                 }
                 let url = '';
                 let parseQuery = function (query) {
@@ -110,27 +110,27 @@ export = class contactsPage {
                     }
                     return obj;
                 };
-                if(self.para.isDev){
-                    let forwardurl = tools.url.getPara('forwardurl',ajaxUrl),
+                if (self.para.isDev) {
+                    let forwardurl = tools.url.getPara('forwardurl', ajaxUrl),
                         addr = ajaxUrl.split('&forwardurl')[0],
                         queryStr = getLevelQuery(tapThis.parentElement),
                         queryObj = parseQuery(queryStr);
-                    url = tools.url.addObj(addr,{
-                        forwardurl:tools.url.addObj(forwardurl,Object.assign({},queryObj,{
-                            isMb:true,
-                            output:"json"
+                    url = tools.url.addObj(addr, {
+                        forwardurl: tools.url.addObj(forwardurl, Object.assign({}, queryObj, {
+                            isMb: true,
+                            output: "json"
                         }))
                     })
-                }else{
+                } else {
                     url = ajaxUrl + (~ajaxUrl.indexOf('?') ? '&' : '?') + getLevelQuery(tapThis.parentElement);
                 }
 
                 //数据一次性加载时
-                if(self.para.levelField === ''){
+                if (self.para.levelField === '') {
                     if (showList(tapThis.parentNode, parseInt(tapThis.dataset.level) + 1, self.response.data, null)) {
                         tapThis.classList.remove('notLoad');
                     }
-                }else{
+                } else {
                     getList(url, queryData, function (response) {
                         if (showList(tapThis.parentNode, parseInt(tapThis.dataset.level) + 1, response.data, null)) {
                             tapThis.classList.remove('notLoad');
@@ -140,14 +140,14 @@ export = class contactsPage {
             });
 
             inputOnChange(function (search) {
-                let inputValue:string = search.value, vLen = inputValue.length;
+                let inputValue: string = search.value, vLen = inputValue.length;
                 if (vLen === 0 || (/\S/).test(inputValue[vLen - 1])) {
                     page = 1;
                     list.querySelector('ul.mui-table-view').innerHTML = '<li class="mui-table-view-cell" style="text-align: center"> <span class="mui-spinner" style="vertical-align: bottom;"></span> </li>';
                     dataManager && dataManager.destroy();
                     if (vLen === 0) {
                         // pullScroll.pullRefresh().disablePullupToRefresh();
-                        queryData = {queryparam: '', pageparams: ''}
+                        queryData = { queryparam: '', pageparams: '' }
                         dataManager = null;
                         getList(ajaxUrl, queryData, function (response) {
                             let level = treeField.length - 1;
@@ -211,13 +211,13 @@ export = class contactsPage {
                 BwRule.Ajax.fetch(url, {
                     cache: true,
                     data: ajaxData,
-                }).then(({response}) => {
+                }).then(({ response }) => {
                     /**
                      * 如果是搜索，则直接显示叶子，并且显示数据的前6项
                      */
                     let searchInput = document.getElementById('searchInput') as HTMLInputElement,
                         value = searchInput.value;
-                    if(value !== queryparam && typeof queryparam !== 'undefined'){
+                    if (value !== queryparam && typeof queryparam !== 'undefined') {
                         return;
                     }
                     self.response = response;
@@ -236,9 +236,9 @@ export = class contactsPage {
 
                             tmpArr.forEach(function (t, i) {
                                 //设置高亮
-//                                if(i <= 2){
+                                //                                if(i <= 2){
                                 t = tools.highlight(t, ajaxData.queryparam, 'red');
-//                                }
+                                //                                }
                                 str += t;
                                 //换行
                                 if (i === 2) {
@@ -269,6 +269,7 @@ export = class contactsPage {
                 getList(ajaxUrl, queryData, function (response) {
                     let isEnd,
                         level = treeField.length - 1;
+                    debugger;
                     if (queryData.queryparam) {
                         level = treeField.length - 1;
                         list.classList.add('search');
@@ -290,6 +291,7 @@ export = class contactsPage {
             }
 
             function showList(dom, level, data, append?) {
+                debugger;
                 let ul = dom.querySelector('ul.mui-table-view'),
                     idField = levelField[level],
                     nameField = treeField[level],
@@ -314,67 +316,69 @@ export = class contactsPage {
                 }
 
                 let simData = [];
-                if(para.levelField === ''){
+                if (para.levelField === '') {
                     let parent = d.query('a[data-id]', dom),
                         id = parent && parent.dataset.id;
-                    if(para.recursion === 1){
+                    if (para.recursion === 1) {
                         subId = treeField[0];
                         // subName = treeField[2];
                         parentId = treeField[1];
                         data.forEach(obj => {
-                            if(level === 0){
-                                if(!obj[parentId]){
+                            if (level === 0) {
+                                if (!obj[parentId]) {
                                     simData.push(obj);
                                 }
-                            }else {
-                                if(obj[parentId] === parent.dataset.id){
+                            } else {
+                                if (obj[parentId] === parent.dataset.id) {
                                     simData.push(obj);
                                 }
                             }
                         });
                         console.timeEnd('data')
-                    }else if(para.recursion === 0){
+                    } else if (para.recursion === 0) {
                         //去重
                         let filterData = [], arr = {},
-                            parentValue = parent && parent.dataset.id,
-                            parentIndexes = Array.from({length: Math.max(level, 0)}, (v, i) => i);
-                        for(let d of data){
-                            if(tools.isNotEmpty(parentIndexes)){
-                                if(parentIndexes.map(name => {
-                                    let filedName = treeField[name];
-                                    return filedName ? d[filedName] : '';
-                                }).join('') !== parentValue){
-                                    continue;
-                                }
-                            }
+                            parentValue = parent && parent.dataset.id;
+                        let parentIndexes = Array.from({ length: Math.max(level, 0) }, (v, i) => i);
+                        console.log(data[0]);
+                        for (let d of data) {
+                            //未知问题，先注释:1299bug
+                            // if (tools.isNotEmpty(parentIndexes)) {
+                            //     const fName = parentIndexes.map(name => {
+                            //         let filedName = treeField[name];
+                            //         return filedName ? d[filedName] : '';
+                            //     })
+                            //     if (fName.join('') !== parentValue) continue;
+                            // }
                             let name = d[nameField];
-                            if(!arr[name]){
+                            if (!arr[name]) {
                                 arr[name] = true;
                                 filterData.push(d);
                             }
                         }
-
+                        console.log()
                         filterData.forEach((obj) => {
-                            for(let key in obj){
-                                if(level === 0){
-                                    if(key === treeField[level]){
+                            for (let key in obj) {
+                                if (level === 0) {
+                                    if (key === treeField[level]) {
                                         simData.push(obj);
                                     }
-                                }else {
+                                } else {
                                     let name = '';
-                                    if(key === treeField[level]){
-                                        for(let m = 0; m < level; m++ ){
+                                    if (key === treeField[level]) {
+                                        for (let m = 0; m < level; m++) {
                                             name += obj[treeField[m]];
                                         }
-                                        if(name === id){
-                                            simData.push(obj);
-                                        }
+                                        //未知问题，先注释1299bug
+                                        // if (name === id) {
+                                        simData.push(obj);
+                                        // }
                                     }
                                 }
                             }
                         });
                     }
-                }else {
+                } else {
                     simData = data;
                 }
 
@@ -382,19 +386,19 @@ export = class contactsPage {
                     let parseData: obj;
 
                     //数据一次性加载
-                    if(para.levelField === ''){
-                        if(para.recursion === 1){
+                    if (para.levelField === '') {
+                        if (para.recursion === 1) {
                             parseData = {
                                 name: m[fromField],
                                 level: level,
-                                id : m[subId],
+                                id: m[subId],
                                 valueJson: JSON.stringify(m)
                             };
-                        }else if(para.recursion === 0){
+                        } else if (para.recursion === 0) {
                             let /*field = treeField[level],
                                 parentField = treeField[level - 1],*/
                                 id = '';
-                            for(let i = 0; i < level + 1; i++){
+                            for (let i = 0; i < level + 1; i++) {
                                 id += m[treeField[i]];
                             }
                             // if(parentField){
@@ -403,12 +407,12 @@ export = class contactsPage {
                             parseData = {
                                 name: m[highlightName],
                                 level: level,
-                                id : id,
+                                id: id,
                                 valueJson: JSON.stringify(m)
                             };
                         }
 
-                    }else {
+                    } else {
                         //数据每次点击后加载
                         parseData = {
                             name: m[highlightName],
@@ -418,22 +422,22 @@ export = class contactsPage {
                         };
                     }
 
-                    if(para.recursion === 1){
+                    if (para.recursion === 1) {
                         let hasSub = false;
                         data.forEach(obj => {
-                            if(m[subId] === obj[parentId]){
+                            if (m[subId] === obj[parentId]) {
                                 hasSub = true;
                             }
                         });
-                        createHTML = (<HTMLScriptElement>G.d.query(hasSub ? '#notLeaf': '#leaf' )).text;
+                        createHTML = (<HTMLScriptElement>G.d.query(hasSub ? '#notLeaf' : '#leaf')).text;
                     }
                     if (!isLeaf) {
                         parseData.query = idField && idField.toLowerCase() + '=' + m[idField];
                     }
 
                     //颜色处理
-                    if(~Object.keys(m).indexOf(BwRule.ColorField)){
-                        let {r, g, b} = tools.val2RGB(m[BwRule.ColorField]);
+                    if (~Object.keys(m).indexOf(BwRule.ColorField)) {
+                        let { r, g, b } = tools.val2RGB(m[BwRule.ColorField]);
                         parseData.name = m[highlightName]
                             + `<span style="height: 14px;display: inline-block;margin-left: 10px;height: 14px; width:50px; background: rgb(${r},${g},${b})"></span>`;
                     }
@@ -471,7 +475,7 @@ export = class contactsPage {
                 });
 
                 searchInput && setTimeout(function () {
-                    searchInput.nextElementSibling && searchInput.nextElementSibling.addEventListener('click', function (e:Event) {
+                    searchInput.nextElementSibling && searchInput.nextElementSibling.addEventListener('click', function (e: Event) {
                         if ((<HTMLElement>e.target).classList.contains('mui-icon-clear')) {
                             callback(searchInput);
                             searchInput.blur();
