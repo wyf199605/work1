@@ -20,7 +20,6 @@ export class ServerSelect extends BasicPage {
             text.value = select.value;
         });
         d.on(d.query('#login'), 'click', () => {
-            console.log(text.value)
             let urls = tools.keysVal(this.data, 'data', 'content', 'appUrls');
             let url = '';
             urls && urls.map(item => {
