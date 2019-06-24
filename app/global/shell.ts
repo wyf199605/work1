@@ -58,7 +58,7 @@ namespace G {
             testAPI(data: string, back: IShellEventHandler, info: IShellEventHandler) {
                 return ShellBase.handler('testAPI', { data }, back, info);
             },
-            clientCode(){
+            clientCode() {
                 return ShellBase.handler('clientCode', {});
             }
         };
@@ -541,7 +541,7 @@ namespace G {
 
         const image = {
             //是否能打开文件
-            upLoadFile(back: IShellEventHandler){
+            upLoadFile(back: IShellEventHandler) {
                 ShellBase.handler('upLoadFile', {}, back)
             },
             // 拍照
@@ -666,19 +666,22 @@ namespace G {
             },
             //取数据
             getData(back?: IShellEventHandler) {
-                return ShellBase.handler('getData',{})
+                return ShellBase.handler('getData', {})
             },
             //监听按键
-            startScan2DResult(back?: IShellEventHandler,info?: IShellEventHandler) {
-                return ShellBase.handler('startScan2DResult', {}, back,back)
+            startScan2DResult(back?: IShellEventHandler, info?: IShellEventHandler) {
+                return ShellBase.handler('startScan2DResult', {}, back, back)
             },
             //登录权限
-            isPermission(back?: IShellEventHandler){
-                return ShellBase.handler('isPermission', {},back)
+            isPermission(back?: IShellEventHandler) {
+                return ShellBase.handler('isPermission', {}, back)
             },
             //去设置里打开权限
-            openSetting(back?:IShellEventHandler){
-                return ShellBase.handler('openSetting', {},()=>{})
+            openSetting(back?: IShellEventHandler) {
+                return ShellBase.handler('openSetting', {}, () => { })
+            },
+            setDownLoadUrl(data: obj, back?: IShellEventHandler) {
+                return ShellBase.handler('setDownLoadUrl', data, back)
             }
         }
         return {
@@ -735,7 +738,7 @@ namespace G {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
 
                 if (tools.isEmpty(back) && tools.isEmpty(infor)) {
-                    if(tools.os.ios){
+                    if (tools.os.ios) {
                         return null;
                     }
                     return JSON.parse(AppShell.syncFunction(action, dataStr));

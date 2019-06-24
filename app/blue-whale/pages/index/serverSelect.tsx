@@ -7,8 +7,9 @@ import sys = BW.sys;
 import Shell = G.Shell;
 
 export class ServerSelect extends BasicPage {
-    constructor(para){
-        super(Object.assign({openWebscoket: false}, para));
+    data: any;
+    constructor(para) {
+        super(Object.assign({ openWebscoket: false }, para));
         d.append(para.dom, tools.isMb ? ServerSelect.initDOM() : ServerSelect.initPcDom());
         let text = d.query('#serverText') as HTMLTextAreaElement,
             select = d.query('#sel') as HTMLSelectElement,
@@ -18,43 +19,57 @@ export class ServerSelect extends BasicPage {
         d.on(select, 'change', () => {
             text.value = select.value;
         });
-        d.on(d.query('#login'), 'click', function(){
-            sys.window.load(tools.url.addObj(text.value, {uuid: uuid}));
+        d.on(d.query('#login'), 'click', () => {
+            console.log(text.value)
+            let urls = tools.keysVal(this.data, 'data', 'content', 'appUrls');
+            let url = '';
+            urls && urls.map(item => {
+                if (item.envUrl == text.value) {
+                    url = item.downloadAdd;
+                }
+            })
+            Shell.other.setDownLoadUrl({ downloadAdd: url }, () => {
+                sys.window.load(tools.url.addObj(text.value, { uuid: uuid }));
+            })
+            // sys.window.load(tools.url.addObj(text.value, {uuid: uuid}));
         });
-        sys.window.close = function(){
+        sys.window.close = function () {
             sys.window.back('');
         };
-        if(sys.os==='ip'){
+        if (sys.os === 'ip') {
             sys.window.getDevice("uuid");
-        }else if(sys.os==='ad'){
+        } else if (sys.os === 'ad') {
             uuid = sys.window.getDevice("uuid").msg;
-        }else if ('AppShell' in window) {
+        } else if ('AppShell' in window) {
             uuid = Shell.base.device.data.uuid;
         }
         window.addEventListener('getDevice', function (e: CustomEvent) {
             let json = JSON.parse(e.detail);
-            if(json.success){
+            if (json.success) {
                 uuid = json.msg.uuid;
             }
         });
 
-        if(tools.isMb){
-            if(sys.window.clientCode){
+        if (tools.isMb) {
+            if (sys.window.clientCode) {
                 sys.window.clientCode((html) => {
-                    if(html){
+                    console.log(html)
+                    if (html) {
                         select.innerHTML = html;
                     }
                 })
             }
-        }else if('AppShell' in window){
+        } else if ('AppShell' in window) {
             let data = Shell.base.clientCode();
-            if(data.success){
+            console.log(data)
+            if (data.success) {
                 let urls = tools.keysVal(data, 'data', 'content', 'appUrls');
-                if(urls){
+                if (urls) {
                     select.innerHTML = ['<option value="">-select-</option>'].concat(urls.map((item) => {
                         return `<option value="${item.envUrl}">${item.envName}</option>`;
                     })).join('');
                 }
+                this.data = data;
             }
         }
 
@@ -64,13 +79,13 @@ export class ServerSelect extends BasicPage {
         })
     }
 
-    static initPcDom(){
+    static initPcDom() {
         let options = ServerSelect.initOption();
 
         return <div className="main-login">
             <div className="box-login">
                 <div className="page-header">
-                    <h2><img src={''} alt="" style="height: 40px;margin-right: 5px"/><span>选择服务器</span></h2>
+                    <h2><img src={''} alt="" style="height: 40px;margin-right: 5px" /><span>选择服务器</span></h2>
                 </div>
                 <form className="form-login" id="login-form">
                     <fieldset>
@@ -82,14 +97,14 @@ export class ServerSelect extends BasicPage {
                         </div>
                         <div className="form-group form-actions">
                             <textarea id="serverText" className="mui-input-clear"
-                                      style="border-radius: 4px;height: 100px;width: 100%"></textarea>
+                                style="border-radius: 4px;height: 100px;width: 100%"></textarea>
                         </div>
                         <div className="form-group">
                             <a id="turnBack" className="btn btn-primary" href="#">
                                 返回
                             </a>
                             <button id="login" type="button" data-loading-icon="mui-spinner mui-spinner-custom"
-                                    className="btn btn-primary">前往
+                                className="btn btn-primary">前往
                             </button>
                         </div>
                     </fieldset>
@@ -99,7 +114,7 @@ export class ServerSelect extends BasicPage {
 
     }
 
-    static initDOM(){
+    static initDOM() {
         let options = ServerSelect.initOption();
 
         return <div class="mui-row">
@@ -122,7 +137,7 @@ export class ServerSelect extends BasicPage {
         </div>
     }
 
-    static initOption(){
+    static initOption() {
         return [
             <option value="">-select-</option>,
             <option value="https://bw.sanfu.com/sf/index">三福生产环境</option>,
