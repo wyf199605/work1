@@ -33,8 +33,17 @@
 // }
 .chart-btns {
     margin-top: 5px;
-    // float: left;
+    height: 30px;
+    // float: right;
+    padding-right: 5px;
+    button {
+        float: right;
+        min-width: 30px;
+    }
     
+}
+.chart-btn {
+    float: right;
 }
 .button-small {
     padding: 2px 15px !important;
@@ -49,6 +58,7 @@
 }
 
 .tip-link {
+    z-index: 10001;
     position: absolute;
     background-color: rgba(50, 50, 50, 0.7);;
     color: white;

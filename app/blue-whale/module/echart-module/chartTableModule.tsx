@@ -100,12 +100,13 @@ export class ChartTableModule {
 
     initTableBtns() {
         console.log(this.wrapper);
-        let btnsContainer = d.query('.fast-table-btns', this.wrapper);
+        let btnsContainer:HTMLElement = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
 
         let btn: HTMLElement = <button class="btn button-type-default button-small chart-btn">图表</button>
         d.query('.chart-btn', btnsContainer) && btnsContainer.removeChild(d.query('.chart-btn', btnsContainer));
-        btnsContainer.appendChild(btn);
+        
+        btnsContainer.children.length > 0? btnsContainer.children[btnsContainer.children.length - 1].appendChild(btn) : btnsContainer.appendChild(btn);
         btn.onclick = () => {
 
             this.wrapper.style.display = 'none';
@@ -260,6 +261,7 @@ export class ChartTableModule {
             //     this.drillPage(params);
             // }
             //
+            // debugger;
             let col;
             if (tools.isMb ) {
                 let tipDom: HTMLDivElement
@@ -274,18 +276,20 @@ export class ChartTableModule {
                 let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, col);
                 if (ifBreak) return;
                 
-                d.query('.tip-link',this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link',this.chartBtnsContainer));
+                d.query('.tip-link', chartEle) && chartEle.removeChild(d.query('.tip-link', chartEle));
                  
-                this.chartBtnsContainer.appendChild(tipDom);
-                tipDom.style.top = params.event.offsetY + 'px';
+                chartEle.appendChild(tipDom);
+                let offsetY = max ? params.event.offsetY - 80 : params.event.offsetY;
+                tipDom.style.top = offsetY + 'px';
                 tipDom.style.left = (params.event.offsetX - 50) + 'px';
                 setTimeout(() =>{
-                    this.chartBtnsContainer.removeChild(tipDom);
+                    // this.chartBtnsContainer.removeChild(tipDom);
                 }, 3000);
-                tipDom.onclick = () =>{
-                    this.chartBtnsContainer.removeChild(tipDom);
-                    debugger;
-                    this.getAjax(defaultCol, dataCol, varNamesObj);  
+                tipDom.onclick = (e) =>{
+                    console.log(e);
+                    // debugger;
+                    // this.chartBtnsContainer.removeChild(tipDom);
+                    // this.getAjax(defaultCol, dataCol, varNamesObj);  
                 }
             }
             
@@ -364,7 +368,7 @@ export class ChartTableModule {
             }
             let seriesItem = {
                 type: 'pie',
-                radius: 70,
+                radius: 90,
                 center: [xAxis, yAxis],
                 data: this.data.bodyData.map((item, j) => {
                     return {
@@ -426,7 +430,7 @@ export class ChartTableModule {
                 d.query('.tip-link',this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link',this.chartBtnsContainer));
                  
                 this.chartBtnsContainer.appendChild(tipDom);
-                tipDom.style.top = params.event.offsetY + 'px';
+                tipDom.style.top = params.event.offsetY  + 'px';
                 tipDom.style.left = (params.event.offsetX - 50) + 'px';
                 setTimeout(() =>{
                     this.chartBtnsContainer.removeChild(tipDom);
@@ -580,7 +584,10 @@ export class ChartTableModule {
         this.chartDom = <section class="chart-container" >图形</section>
         this.chartBtnsContainer = <div class="chart-table" >
             <section class="chart-btns">
-                <button class="switch-table btn button-type-default button-small" data-type="switchTable">表格</button>
+                <button class="switch-table btn button-type-default button-small" data-type="switchTable">
+                    {/* <i class="iconfont app-saomazhifu"></i> */}
+                    表格
+                </button>
             </section>
             {this.chartDom}
         </div>

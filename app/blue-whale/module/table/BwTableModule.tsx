@@ -457,18 +457,18 @@ export class BwTableModule extends Component {
             },
         });
 
-        !tools.isMb && this.ftable.btnAdd('switch-chart', {
-            type: 'default',
-            content: '图表',
-            onClick: () => {
-                let chartDom: HTMLElement | null = d.query('.chart-table', this.container);
-                if(chartDom) {
-                    this.wrapper.style.display = 'none';
-                    chartDom.style.display = 'block';
-                }
+        // !tools.isMb && this.ftable.btnAdd('switch-chart', {
+        //     type: 'default',
+        //     content: '图表',
+        //     onClick: () => {
+        //         let chartDom: HTMLElement | null = d.query('.chart-table', this.container);
+        //         if(chartDom) {
+        //             this.wrapper.style.display = 'none';
+        //             chartDom.style.display = 'block';
+        //         }
 
-            },
-        });
+        //     },
+        // });
 
         this.ftableReady();
 
