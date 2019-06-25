@@ -95,6 +95,9 @@ interface INewLabelPrintPara {
     ui: IBW_Table;
 }
 
+window['scale'] = 3;
+window['count'] = 10;
+
 export class NewLabelPrint {
 
     protected container: HTMLElement;
@@ -162,7 +165,7 @@ export class NewLabelPrint {
                         //         Modal.alert('打印失败');
                         //     });
                         // }
-                        this.scale = getDpi() * 3;
+                        this.scale = getDpi() * window['scale'];
                         promise = this.preview(true).catch((e) => {
                             console.log(e);
                             Modal.alert('打印失败');
@@ -349,7 +352,7 @@ export class NewLabelPrint {
             let canvas = <canvas/>,
                 copies = this.printModal.getData('copies');
 
-            svgEl.innerHTML = new Array(11).join(svgEl.innerHTML);
+            svgEl.innerHTML = new Array(window['count']).join(svgEl.innerHTML);
             d.append(document.body, canvas);
 
             canvg(canvas, svgEl.outerHTML, {
