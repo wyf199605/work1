@@ -77,10 +77,9 @@ export class FastTableData extends DataManager{
                 dataArr = tableData;
             }else {
                 let fixedArr = [];
-                this.ftable.columns.forEach((column) => {
-                    if(column.isFixed){
-                        fixedArr.push(column.name);
-                    }
+                let columns = this.ftable.leftTable && this.ftable.leftTable.columns;
+                columns && columns.forEach((column) => {
+                    fixedArr.push(column.name);
                 });
 
                 dataArr = dataArr.map((data, i) => {

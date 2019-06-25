@@ -324,7 +324,7 @@ export class NewTableModule extends AGroupTabItem {
         };
     }
     private computedIndex(list: Array<string>): Array<string> {
-        console.log("配置选项" + list);
+        // console.log("配置选项" + list);
         let showSubSeq: string[] = [];
         let bwEl = this.bwEl;
         console.log(bwEl.subTableList);

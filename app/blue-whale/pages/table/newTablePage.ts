@@ -108,6 +108,7 @@ export class BwTableElement extends Component{
                             if(noQuery){
                                 tableEl.noQuery = noQuery;
                             }
+                            ;
                             // this.para.tableDom = null;
                             this.tableModule = new NewTableModule({
                                 bwEl: tableEl,
