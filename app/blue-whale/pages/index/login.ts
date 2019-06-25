@@ -93,12 +93,14 @@ export class LoginPage {
                 if (data.iconName) {
                     let logoWrapper = tools.isMb ? d.query('.login-logo') : d.query('.logo');
                     logoWrapper.innerHTML = '';
-                    d.append(logoWrapper, d.create(`
-                    <img src="${G.requireBaseUrl + "../img/logo/" + data.iconName + ".png"}" alt="${data.iconName}"/>
-                     `));
+                    if(data.iconName != 1){
+                        d.append(logoWrapper, d.create(`
+                        <img src="${G.requireBaseUrl + "../img/logo/" + data.iconName + ".png"}" alt="${data.iconName}"/>
+                         `));
+                    }
                     data.caption && d.append(logoWrapper, d.create(`
-                    <p class="text">${data.caption}</p>
-                    `));
+                        <p class="text">${data.caption}</p>
+                        `));
                 }
 
                 if (data.loginMessage == 1) {
@@ -799,7 +801,7 @@ export class LoginPage {
             } catch (error) {
                  Modal.alert("isPermission接口报错")
             }
-           
+
         } else {
             this.loginFunc();
         }
@@ -1206,7 +1208,7 @@ export class LoginPage {
     }
     // 点击登录 --非初次登录 通知服务端该用户点击登录了，服务端websocket给userid对应的用户弹出确认登录弹窗
     req_sendServer() {
-        //userid=XXX 
+        //userid=XXX
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
             data: {
                 userid: this.props.userId.value

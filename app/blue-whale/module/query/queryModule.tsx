@@ -220,6 +220,7 @@ export abstract class QueryModule {
         // }
 
         let queryJson = this.getQueryJson(false);
+        queryJson.textCase = this.textCase.get();
         if (param) {
             queryJson = Object.assign(queryJson, param);
         }
