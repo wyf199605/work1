@@ -1,12 +1,9 @@
 /// <amd-module name="ChartTableModule"/>
 /// <amd-dependency path="echarts" name="echarts"/>
 
-import BasicPage from "blue-whale/pages/basicPage";
 import tools = G.tools;
 import d = G.d;
-import { IBwTableModulePara } from "../table/BwTableModule";
 import { FastBtnTable } from "global/components/FastBtnTable/FastBtnTable";
-import { BwRule } from "../../common/rule/BwRule";
 import CONF = BW.CONF;
 import sys = BW.sys;
 
@@ -40,7 +37,7 @@ export class ChartTableModule {
     chartBtnsContainer: HTMLElement; // 图表自制按钮容器
     ftable: FastBtnTable  // 对表格基本操作的方法对象
     data: Data; // 接口请求的表格数据 
-    color = ['#609ee9', '#f7ba2a', '39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169'];
+    color = ['#609ee9', '#f7ba2a', '#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169', '#fa4166','#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc'];
 
 
     constructor(ui: IBW_Table, wrapper: HTMLElement, data: Data, ftable: FastBtnTable) {
@@ -75,20 +72,13 @@ export class ChartTableModule {
             case 'detail':
                 this.ui.cols = this.ui.fields;
                 this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
-                break;
-            // case 'drill':
-            //     this.initDrillChart();
-            //     break;
+                break;   break;
         }
         window.onresize = () => {
             this.chart && this.chart.resize();
         }
         window.addEventListener("orientationchange", () => {
-            // Announce the new orientation number
-            // alert(window.orientation);
-            // chart && chart.resize();
-            // this.maxChart && this.maxChart.resize();
-            // this.maxChart && this.maxChart.resize();
+            
             setTimeout(() => {
                 this.chart && this.chart.resize();
                 this.maxChart && this.maxChart.resize();
@@ -98,6 +88,9 @@ export class ChartTableModule {
         this.chartBtnsClk();
     }
 
+    /**
+     * 初始化图表切表格按钮
+     */
     initTableBtns() {
         console.log(this.wrapper);
         let btnsContainer:HTMLElement = d.query('.fast-table-btns', this.wrapper);
@@ -106,7 +99,7 @@ export class ChartTableModule {
         let btn: HTMLElement = <button class="btn button-type-default button-small chart-btn">图表</button>
         d.query('.chart-btn', btnsContainer) && btnsContainer.removeChild(d.query('.chart-btn', btnsContainer));
         
-        btnsContainer.children.length > 0? btnsContainer.children[btnsContainer.children.length - 1].appendChild(btn) : btnsContainer.appendChild(btn);
+        btnsContainer.children.length > 0? btnsContainer.children[0].appendChild(btn) : btnsContainer.appendChild(btn);
         btn.onclick = () => {
 
             this.wrapper.style.display = 'none';
@@ -114,10 +107,10 @@ export class ChartTableModule {
             this.chart.resize();
         }
     }
+
     /**
      * 通用表格处理方法 
      */
-
     initCommonChartFn(chartEle: HTMLElement, max?: boolean) {
         chartEle.parentElement.style.height = '25rem';
         !max && (chartEle.style.height = '20rem');
@@ -283,13 +276,13 @@ export class ChartTableModule {
                 tipDom.style.top = offsetY + 'px';
                 tipDom.style.left = (params.event.offsetX - 50) + 'px';
                 setTimeout(() =>{
-                    // this.chartBtnsContainer.removeChild(tipDom);
-                }, 3000);
+                    chartEle.removeChild(tipDom);
+                }, 2500);
                 tipDom.onclick = (e) =>{
                     console.log(e);
                     // debugger;
-                    // this.chartBtnsContainer.removeChild(tipDom);
-                    // this.getAjax(defaultCol, dataCol, varNamesObj);  
+                    chartEle.removeChild(tipDom);
+                    this.getAjax(defaultCol, dataCol, varNamesObj);  
                 }
             }
             
@@ -320,7 +313,10 @@ export class ChartTableModule {
 
     }
 
-    // 
+    /**
+     * 创建弹出连接框
+     * @param value 
+     */
     tipLinkFn(value: string) {
         let tipDom: HTMLDivElement = <div class="tip-link">
             <p>{value}</p>
@@ -368,15 +364,15 @@ export class ChartTableModule {
             }
             let seriesItem = {
                 type: 'pie',
-                radius: 90,
+                radius: tools.isMb ? 70 : 90,
                 center: [xAxis, yAxis],
                 data: this.data.bodyData.map((item, j) => {
                     return {
                         name: item[xAxisName],
                         value: item[legend],
-                        // itemStyle: {
-                        //     color: this.color[j]
-                        // }
+                        itemStyle: {
+                            color: this.color[j]
+                        },
                         item
                     }
                 })
@@ -452,7 +448,7 @@ export class ChartTableModule {
 
 
     /**
-     * 跳转到另一个页面
+     * 跳转到另一个页面的数据处理
      * @param params 点击图表后返回数据
      */
 
@@ -619,14 +615,13 @@ export class ChartTableModule {
                 i = 0;
             }, 500);
             if (i > 1) {
-
+                // 双击自定义提示框未消失；
+                d.query('.tip-link', this.chartDom) && this.chartDom.removeChild(d.query('.tip-link', this.chartDom));
                 // this.maxChartDom = <div class="max-chart">11</div>;
                 // div.appendChild(this.chartDom);
                 // d.query('.max-chart', body) && body.removeChild(d.query('.max-chart', body))
                 body.appendChild(this.maxChartDom);
                 this.maxChart = this.initCommonChartFn(this.maxChartDom, true);
-
-
             }
         });
 
@@ -645,12 +640,6 @@ export class ChartTableModule {
 
     }
 
-    initDrillChart() {
-        if (this.ui.showType === 'pie') {
-
-        } else {
-
-        }
-    }
+    
 
 }
