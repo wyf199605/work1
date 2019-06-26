@@ -42,7 +42,7 @@ export = class homePage extends BasicPage {
                 });
 
             item.subScriptUrl && setInterval(() => {
-                if(localStorage.getItem('subScriptStatus') === '0') return ;
+                if (localStorage.getItem('subScriptStatus') === '0') return;
                 console.log('test');
 
                 // alert(CONF.siteUrl + item.subScriptUrl);
@@ -60,10 +60,10 @@ export = class homePage extends BasicPage {
                                 // badge.classList.add('hide');
                             }
                         }
-                        localStorage.setItem('subScriptStatus','0');
+                        localStorage.setItem('subScriptStatus', '0');
 
                     });
-            },1000);
+            }, 1000);
         });
         this.homeList.classList.toggle('no-data', this.homeList.innerHTML === '');
     }
@@ -140,7 +140,6 @@ export = class homePage extends BasicPage {
         // this.initScan();
         let content = <div className="slide-panel-wrapper" />;
         d.append(para.container, content);
-
         let isAndroid4 = false;
         if (/(Android)/i.test(navigator.userAgent)) {
             let andrVersionArr = navigator.userAgent.match(/Android\s*(\d+)/);
@@ -293,7 +292,7 @@ export = class homePage extends BasicPage {
             ShellAction.get().device().scan({
                 callback: (event) => {
                     let detail = JSON.parse(event.detail);
-                    if(detail.data.indexOf('share-') !== -1){
+                    if (detail.data.indexOf('share-') !== -1) {
                         ShareCode.codeXhr(detail.data);
                         return;
                     }
@@ -302,6 +301,11 @@ export = class homePage extends BasicPage {
                 }
             });
         })
+        //解决iphonex的底部菜单名字没有显示的bug 1332
+        var isIphoneX = /iphone/gi.test(navigator.userAgent) && (screen.height == 812 && screen.width == 375)
+        if (isIphoneX) {
+            d.query(".slide-tab-wrapper").style.height = "96%";
+        }
     }
     // initScan() {
     //     let scanBtn = d.query("#scan_btn");
