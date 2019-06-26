@@ -345,6 +345,8 @@ gulp.task('js', function() {
     
     gulpTsModule(["echart-module/echartModule"], "EchartModule.js");
     gulpTsModule(["echart-module/chartTableModule"], "ChartTableModule.js");
+    gulpTsModule(["echart-module/city-map"], "CityMap.js");
+    gulpTsModule(["echart-module/province-map"], "ProvinceMap.js");
 
     gulpTsPage(["lionetOnline/lionetOnline"], "lionetOnline.js");
 

@@ -6,6 +6,8 @@ import d = G.d;
 import { FastBtnTable } from "global/components/FastBtnTable/FastBtnTable";
 import CONF = BW.CONF;
 import sys = BW.sys;
+import CityMap from './city-map';
+import Province from './province-map';
 
 
 
@@ -49,6 +51,10 @@ export class ChartTableModule {
         // debugger;
         this.initData();
         this.initTableBtns();
+        $.get('map/china.json').then(res => {
+            console.log(res);
+        });
+        console.log(CityMap);
     }
 
     initData() {
