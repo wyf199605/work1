@@ -276,7 +276,7 @@ export class ChartTableModule {
                 tipDom.style.top = offsetY + 'px';
                 tipDom.style.left = (params.event.offsetX - 50) + 'px';
                 setTimeout(() =>{
-                    chartEle.removeChild(tipDom);
+                    d.query('.tip-link', chartEle) && chartEle.removeChild(tipDom);
                 }, 2500);
                 tipDom.onclick = (e) =>{
                     console.log(e);

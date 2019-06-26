@@ -25,7 +25,7 @@ interface Element {
         supportLink: boolean,
     }>,
     dataAddr: DataAddr,
-    data: [],
+    data: Array<any>,
     itemId: string,
     local: {
         xCoordinate: string,
@@ -45,7 +45,7 @@ interface DataAddr {
     varType?: boolean
 }
 export class ChartPage extends BasicPage {
-
+    
     container: HTMLElement;   // btl 获取的dom元素即当前页面的容器
     uiCharts: Element[];    // 获取的UI绘制
 
@@ -55,15 +55,16 @@ export class ChartPage extends BasicPage {
         super(para);
         this.container = para.dom;
         this.uiCharts = para.ui.body.elements;
-
         G.d.append(para.dom, this.render());
         this.initData();
+        // debugger;
+        // this.chinaMapFn();
     }
     render() {
 
         return (
             <main class="chart-page">
-
+                <div id="china-map"></div>
             </main>
         )
 
@@ -76,12 +77,12 @@ export class ChartPage extends BasicPage {
             BwRule.Ajax.fetch(`${CONF.siteUrl}${addr}?nopage=true`).then(({ response }) => {
                 const id = `chart${i}`
                 let chartDom: HTMLDivElement = <div id={id} class = "chart"></div>;
-                let areaDom: HTMLDivElement = <div id='areaDom' style="width:500px; height:500px"></div>
+                let areaDom: HTMLDivElement = <div id='areaDom'></div>
                 this.container.appendChild(chartDom);
                 this.container.appendChild(areaDom);
                 uiChart.data = response.data;
-                this.lineChartFn(uiChart, id);
-                this.areaChartFn();
+                // this.lineChartFn(uiChart, id);
+                this.areaChartFn(id);
             }).catch(err => {
                 console.log(err);
             });
@@ -126,8 +127,8 @@ export class ChartPage extends BasicPage {
     /**
      * 折线图（背景）
      */
-    areaChartFn() {
-        let areaChart = echarts.init(document.getElementById('areaDom'));
+    areaChartFn(id:string) {
+        let areaChart = echarts.init(document.getElementById(id));
         const areaChartData = {
             title: {
                 text: '本月经营分析',
