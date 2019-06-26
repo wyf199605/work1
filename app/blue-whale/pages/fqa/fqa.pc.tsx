@@ -82,7 +82,7 @@ export class FqaPcModal{
                 <div class="fqa-modal-img"><img src="" data-src={FqaPcModal.initUrl("../img/fqa-pc/login.png")} alt="登录"/></div>
                 <p>帐号密码登录：帐号为员工号，密码需要联系QQ：2276799304，重置或询问相关密码事项。 如果在该设备上登录不属于自己的员工号，会提示如图信息</p>
                 <div class="fqa-modal-img"><img src="" data-src={FqaPcModal.initUrl("../img/fqa-pc/login1.png")} alt="账号密码登录"/></div>
-                <p> 指纹登录：指纹登录跟熊猫的指纹登陆一样，需插入指纹仪</p>
+                <p> 指纹登录：指纹登录跟熊猫的指纹登录一样，需插入指纹仪</p>
             </div>
         </div>
     }

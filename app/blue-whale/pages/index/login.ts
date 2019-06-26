@@ -238,7 +238,7 @@ export class LoginPage {
             } else {
                 loginBtn.isLoading = true;
                 loginBtn.isDisabled = true;
-                loginBtn.content = '登陆中...';
+                loginBtn.content = '登录中...';
                 // 前端验证通过后向后台发送数据
                 this.ajaxLogin(CONF.ajaxUrl.loginCode, {
                     mobile: telVal,
@@ -256,7 +256,7 @@ export class LoginPage {
                 }).then(() => {
                     // 登录成功
                     loginBtn.isLoading = false;
-                    loginBtn.content = '登陆成功';
+                    loginBtn.content = '登录成功';
                 }).catch(() => {
                     // 登录失败
                     loginBtn.isLoading = false;

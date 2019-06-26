@@ -1254,8 +1254,9 @@ export class BwTableModule extends Component {
                 d.append(aggrWrap, valSpan);
                 BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(aggr.dataAddr, urlData))
                     .then(({ response }) => {
+                        let attr:obj=this.ui.aggrList[0];
                         let value = tools.keysVal(response, 'data', 0, tools.keysVal(response, 'meta', 0));
-                        valSpan.innerHTML = `${aggr.caption}:${value || 0} &nbsp;&nbsp;`;
+                        valSpan.innerHTML =  `${aggr.caption}:${BwRule.formatTableText(value||0,  attr.atrrs)} &nbsp;&nbsp;`; 
                     });
             });
         };
@@ -2606,7 +2607,6 @@ export class BwTableModule extends Component {
                                     window.localStorage.removeItem('nextKeyField');
                                     window.localStorage.removeItem('currentKeyField');
                                     ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                        console.log('1111111');
                                         box.children.forEach((button) => {
                                             button && (button.isDisabled = false);
                                         });

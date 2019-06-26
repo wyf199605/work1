@@ -97,6 +97,13 @@ export class ButtonAction {
                         //     });
                         //     return obj;
                         // });
+                        // debugger;
+                        if(result.code===200){
+                            Modal.toast(result.errorMsg);
+                        }
+                        if(result.code===201){
+                            Modal.alert(result.errorMsg);
+                        }
                         setTimeout(() => {
                             com && com.destroy();
                             com = null;
