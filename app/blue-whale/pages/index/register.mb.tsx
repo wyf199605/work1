@@ -26,7 +26,7 @@ export class RegisterMbPage extends RegPage{
                     </div>
                 </div>
                 <div className="form-group">
-                    <input id="verify" type="number" placeholder="输入短信验证码"/>
+                    <input id="verify" type="number" maxlength="6" placeholder="输入短信验证码"/>
                     <div className="more-group"/>
                 </div>
                 <div className="btn-group"/>
