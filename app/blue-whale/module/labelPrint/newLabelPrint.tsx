@@ -96,7 +96,7 @@ interface INewLabelPrintPara {
 }
 
 window['scale'] = 3;
-window['count'] = 10;
+window['count'] = 8;
 
 export class NewLabelPrint {
 
@@ -349,13 +349,14 @@ export class NewLabelPrint {
         require(['canvg', 'rgbcolor', 'stackblur-canvas'], (canvg) => {
             // console.log(canvg);
 
-            let canvas = <canvas/>,
+            let canvas: HTMLCanvasElement = <canvas/>,
                 copies = this.printModal.getData('copies');
 
             svgEl.innerHTML = new Array(window['count']).join(svgEl.innerHTML);
             d.append(document.body, canvas);
-
+            console.log(svgEl.outerHTML);
             canvg(canvas, svgEl.outerHTML, {
+                useCORS: true,
                 renderCallback: () => {
                     let scale = 1,
                         printCanvas = <canvas width={canvas.width * scale} height={canvas.height * scale}/>,
@@ -514,13 +515,18 @@ export class NewLabelPrint {
                             .style('transform', `translate(${x}px, ${y}px) scale(${scale})`)
                     });
 
-            let wrapper = <svg className="label-print-content" style={{
-                width: width + 'px',
-                height: height + 'px',
-                "-webkit-flex-direction": isLengthWays ? 'column' : 'row',
-                "flex-direction": isLengthWays ? 'column' : 'row',
-                padding: `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`
-            }}/>;
+            let wrapper = <svg
+                className="label-print-content"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{
+                    width: width + 'px',
+                    height: height + 'px',
+                    position: 'relative'
+                    // "-webkit-flex-direction": isLengthWays ? 'column' : 'row',
+                    // "flex-direction": isLengthWays ? 'column' : 'row',
+                    // padding: `${paddingTop}px ${paddingRight}px ${paddingBottom}px ${paddingLeft}px`
+                }}
+            />;
 
             let svgHeight = tmp.height * this.scale,
                 svgWidth = tmp.width * this.scale,
@@ -532,15 +538,30 @@ export class NewLabelPrint {
             let pageSize = (row * col) || 1,
                 total = Math.ceil(data.length / (pageSize)),
                 marginRight = 'marginRight',
-                marginBottom = 'marginBottom';
+                marginBottom = 'marginBottom',
+                x = paddingLeft,
+                y = paddingTop;
 
             svgList.slice(0, pageSize).forEach((svg, index, {length}) => {
-                if((index + 1) % col !== 0){
-                    svg.svgEl.style[marginRight] = colSpace + 'px';
+                // if((index + 1) % col !== 0){
+                //     svg.svgEl.style[marginRight] = colSpace + 'px';
+                // }
+                // if(index < length - col){
+                //     svg.svgEl.style[marginBottom] = rowSpace + 'px';
+                // }
+                console.log(x, y);
+                d3.select(svg.svgEl).style({
+                    'transform': `translate(${x}px, ${y}px)`,
+                    "position": "absolute",
+                    left: 0,
+                    top: 0
+                });
+                x = x + svgWidth + colSpace;
+                if((index + 1) % col === 0){
+                    x = paddingLeft;
+                    y = y + svgHeight + rowSpace;
                 }
-                if(index < length - col){
-                    svg.svgEl.style[marginBottom] = rowSpace + 'px';
-                }
+
 
                 d.append(wrapper, svg.svgEl);
             });
