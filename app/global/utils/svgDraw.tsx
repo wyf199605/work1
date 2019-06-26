@@ -93,6 +93,7 @@ export class SvgDraw{
             .attr('width', para.width)
             .attr('height', para.height)
             .attr('xmlns', 'http://www.w3.org/2000/svg')
+            .attr('xmlns:xlink', 'http://www.w3.org/1999/xlink')
             .style('background', '#fff');
         this.group = this._svg.append('g');
     }
