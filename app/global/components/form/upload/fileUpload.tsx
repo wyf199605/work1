@@ -49,20 +49,23 @@ export class FileUpload {
                 // any是beforeSendFile函数中promise返回的数据，会带入到分块验证与合并请求中去。
 
                 // 分片验证
+
                 if (this.chunked) {
                     this.chunkUpload(file, ...any).then(() => {
                         // 合并请求
                         this.afterSendFile(file, ...any).then((...anyData) => {
                             // anyData 为成功后返回的数据
                             resolve(...anyData); // 上传成功
-                        }).catch(() => {
+                        }).catch((msg) => {
                             // 第一次合并请求失败时再次请求一次合并
-                            this.afterSendFile(file, ...any).then((...anyData) => {
-                                // anyData 为成功后返回的数据
-                                resolve(...anyData); // 上传成功
-                            }).catch((msg) => {
-                                reject(msg);
-                            });
+                            //1337 bug失败请求两次，故注释
+                            // this.afterSendFile(file, ...any).then((...anyData) => {
+                            //     // anyData 为成功后返回的数据
+                            //     resolve(...anyData); // 上传成功
+                            // }).catch((msg) => {
+                            //     reject(msg);
+                            // });
+                            reject(msg);
                         });
                     }).catch(() => {
                         reject(); // 表示分片上传失败
@@ -83,9 +86,9 @@ export class FileUpload {
                 }
             }).catch((...anyData) => {
                 console.log(anyData);
-                if(tools.isEmpty(anyData)){
+                if (tools.isEmpty(anyData)) {
                     reject();
-                }else{
+                } else {
                     resolve(...anyData); // 表示已存在后台
                 }
             })
@@ -112,7 +115,7 @@ export class FileUpload {
         this.xhrs = [];
 
         let totalPieces = total;
-        while(totalPieces--){
+        while (totalPieces--) {
             endSize = startSize + self.chunkSize;
             if (totalPieces === 0) {
                 endSize = file.size;
@@ -135,7 +138,7 @@ export class FileUpload {
                         lastModifiedDate: file.lastModifiedDate
                     };
                     // 当分块数量为1 时，上传数据无需传递分块参数
-                    if(total <= 1){
+                    if (total <= 1) {
                         delete data.chunks;
                         delete data.chunk;
                         blob = file.blob;
@@ -172,19 +175,19 @@ export class FileUpload {
                 }
 
                 formData.append('file', file, filename);
-                let result = {success: false, uploading: false, progress: 0};
+                let result = { success: false, uploading: false, progress: 0 };
                 let xhr = new XMLHttpRequest();
                 this.xhrs.push(xhr);
                 xhr.open("post", url, true);
                 xhr.addEventListener('error', () => {
-                    if(isLoop){
+                    if (isLoop) {
                         // 第一次上传失败时会再上传一次
                         this.uploadFile(file, filename, ajaxData, false).then(() => {
                             resolve();
                         }).catch(() => {
                             reject();
                         })
-                    }else{
+                    } else {
                         reject();
                     }
                 });

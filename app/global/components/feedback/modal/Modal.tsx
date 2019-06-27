@@ -266,7 +266,7 @@ export class Modal extends Component {
             return;
         }
         //生成身体元素，仅一次
-        let bodyWrapper = this.bodyWrapper;
+        let bodyWrapper:any = this.bodyWrapper;
         //删除掉原来挂载的身体
         if (this._body) {
             bodyWrapper.removeChild(this._body);
@@ -887,6 +887,8 @@ export class Modal extends Component {
         }
 
         inputBox.addItem(okBtn);
+        msg = msg.replace(/\n/g, "<br/>")
+        msg = msg.replace(/↵/g, "<br/>");
         let m = new Modal({
             container,
             isOnceDestroy: true,
@@ -894,7 +896,7 @@ export class Modal extends Component {
             width: '270px',
             position: 'center',
             className: 'modal-prompt',
-            body: document.createTextNode(msg),
+            body: d.create(msg),
             isMb: false,
             footer: {
                 rightPanel: inputBox
