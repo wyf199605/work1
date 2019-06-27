@@ -269,7 +269,6 @@ export = class contactsPage {
                 getList(ajaxUrl, queryData, function (response) {
                     let isEnd,
                         level = treeField.length - 1;
-                    debugger;
                     if (queryData.queryparam) {
                         level = treeField.length - 1;
                         list.classList.add('search');
@@ -291,7 +290,8 @@ export = class contactsPage {
             }
 
             function showList(dom, level, data, append?) {
-                debugger;
+                // debugger;
+                console.log(queryData)
                 let ul = dom.querySelector('ul.mui-table-view'),
                     idField = levelField[level],
                     nameField = treeField[level],
@@ -340,23 +340,23 @@ export = class contactsPage {
                         let filterData = [], arr = {},
                             parentValue = parent && parent.dataset.id;
                         let parentIndexes = Array.from({ length: Math.max(level, 0) }, (v, i) => i);
-                        console.log(data[0]);
+
                         for (let d of data) {
                             //未知问题，先注释:1299bug
-                            // if (tools.isNotEmpty(parentIndexes)) {
-                            //     const fName = parentIndexes.map(name => {
-                            //         let filedName = treeField[name];
-                            //         return filedName ? d[filedName] : '';
-                            //     })
-                            //     if (fName.join('') !== parentValue) continue;
-                            // }
+                            //queryData.queryparam有搜索值不进入
+                            if (!queryData.queryparam&&tools.isNotEmpty(parentIndexes)) {
+                                const fName = parentIndexes.map(name => {
+                                    let filedName = treeField[name];
+                                    return filedName ? d[filedName] : '';
+                                })
+                                if (fName.join('') !== parentValue) continue;
+                            }
                             let name = d[nameField];
                             if (!arr[name]) {
                                 arr[name] = true;
                                 filterData.push(d);
                             }
                         }
-                        console.log()
                         filterData.forEach((obj) => {
                             for (let key in obj) {
                                 if (level === 0) {

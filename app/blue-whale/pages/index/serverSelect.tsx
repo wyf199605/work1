@@ -27,9 +27,8 @@ export class ServerSelect extends BasicPage {
                     url = item.downloadAdd;
                 }
             })
-            Shell.other.setDownLoadUrl({ downloadAdd: url }, () => {
-                sys.window.load(tools.url.addObj(text.value, { uuid: uuid }));
-            })
+            Shell.other.setDownLoadUrl({ downloadAdd: url }, () => { })
+            sys.window.load(tools.url.addObj(text.value, { uuid: uuid }));
             // sys.window.load(tools.url.addObj(text.value, {uuid: uuid}));
         });
         sys.window.close = function () {
