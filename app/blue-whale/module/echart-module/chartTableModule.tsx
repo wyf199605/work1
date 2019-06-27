@@ -3,11 +3,13 @@
 
 import tools = G.tools;
 import d = G.d;
+import baseUrl = G.requireBaseUrl;
 import { FastBtnTable } from "global/components/FastBtnTable/FastBtnTable";
 import CONF = BW.CONF;
 import sys = BW.sys;
 import CityMap from './city-map';
 import Province from './province-map';
+import provinceMap from "./province-map";
 
 
 
@@ -39,7 +41,7 @@ export class ChartTableModule {
     chartBtnsContainer: HTMLElement; // 图表自制按钮容器
     ftable: FastBtnTable  // 对表格基本操作的方法对象
     data: Data; // 接口请求的表格数据 
-    color = ['#609ee9', '#f7ba2a', '#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169', '#fa4166','#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc'];
+    color = ['#609ee9', '#f7ba2a', '#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169', '#fa4166', '#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc'];
 
 
     constructor(ui: IBW_Table, wrapper: HTMLElement, data: Data, ftable: FastBtnTable) {
@@ -51,10 +53,11 @@ export class ChartTableModule {
         // debugger;
         this.initData();
         this.initTableBtns();
-        $.get('map/china.json').then(res => {
-            console.log(res);
-        });
         console.log(CityMap);
+        let img = CONF.siteUrl + '/map/china.json';
+        console.log(baseUrl);
+        // $('body').append(img);
+
     }
 
     initData() {
@@ -80,11 +83,13 @@ export class ChartTableModule {
                 this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
                 break;   break;
         }
+        // this.chart = this.initMap(this.chartDom);
+        // this.chart = this.initMap(this.chartDom)
         window.onresize = () => {
             this.chart && this.chart.resize();
         }
         window.addEventListener("orientationchange", () => {
-            
+
             setTimeout(() => {
                 this.chart && this.chart.resize();
                 this.maxChart && this.maxChart.resize();
@@ -99,13 +104,13 @@ export class ChartTableModule {
      */
     initTableBtns() {
         console.log(this.wrapper);
-        let btnsContainer:HTMLElement = d.query('.fast-table-btns', this.wrapper);
+        let btnsContainer: HTMLElement = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
 
         let btn: HTMLElement = <button class="btn button-type-default button-small chart-btn">图表</button>
         d.query('.chart-btn', btnsContainer) && btnsContainer.removeChild(d.query('.chart-btn', btnsContainer));
-        
-        btnsContainer.children.length > 0? btnsContainer.children[0].appendChild(btn) : btnsContainer.appendChild(btn);
+
+        btnsContainer.children.length > 0 ? btnsContainer.children[0].appendChild(btn) : btnsContainer.appendChild(btn);
         btn.onclick = () => {
 
             this.wrapper.style.display = 'none';
@@ -187,7 +192,7 @@ export class ChartTableModule {
                 bottom: 15,
                 containLabel: true
             },
-            
+
             legend: {
                 data: legendData,
                 top: 15,
@@ -231,28 +236,14 @@ export class ChartTableModule {
         };
 
         if (!tools.isMb) {
-            chartData['tooltip']= {
+            chartData['tooltip'] = {
                 trigger: 'axis',
                 axisPointer: {
                     type: 'cross'
                 }
             }
         }
-        // tools.isMb && (chartData['dataZoom'] = [
-        //     {
-        //         type: 'slider',
-        //         show: true,
-        //         xAxisIndex: [0],
-        //         start: 1,
-        //         end: 99
-        //     },
-        //     {
-        //         type: 'inside',
-        //         yAxisIndex: [0],
-        //         start: 1,
-        //         end: 99
-        //     }
-        // ]);
+
 
         chart.setOption(chartData);
         chart.on('click', (params) => {
@@ -262,40 +253,40 @@ export class ChartTableModule {
             //
             // debugger;
             let col;
-            if (tools.isMb ) {
+            if (tools.isMb) {
                 let tipDom: HTMLDivElement
-                if ( params.componentType === "xAxis" ) {
+                if (params.componentType === "xAxis") {
                     params.seriesName = params.value;
                     col = this.data.bodyData.find(item => item[xAxisName] === params.value);
-                    tipDom =this.tipLinkFn(params.seriesName);
+                    tipDom = this.tipLinkFn(params.seriesName);
                 } else {
                     col = this.data.bodyData[params.dataIndex];
-                    tipDom =this.tipLinkFn(`${params.seriesName}: ${params.value}`);
+                    tipDom = this.tipLinkFn(`${params.seriesName}: ${params.value}`);
                 }
                 let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, col);
                 if (ifBreak) return;
-                
+
                 d.query('.tip-link', chartEle) && chartEle.removeChild(d.query('.tip-link', chartEle));
-                 
+
                 chartEle.appendChild(tipDom);
                 let offsetY = max ? params.event.offsetY - 80 : params.event.offsetY;
                 tipDom.style.top = offsetY + 'px';
                 tipDom.style.left = (params.event.offsetX - 50) + 'px';
-                setTimeout(() =>{
+                setTimeout(() => {
                     d.query('.tip-link', chartEle) && chartEle.removeChild(tipDom);
                 }, 2500);
-                tipDom.onclick = (e) =>{
+                tipDom.onclick = (e) => {
                     console.log(e);
                     // debugger;
                     chartEle.removeChild(tipDom);
-                    this.getAjax(defaultCol, dataCol, varNamesObj);  
+                    this.getAjax(defaultCol, dataCol, varNamesObj);
                 }
             }
-            
+
             else {
-                if ( params.componentType === "xAxis" ) {
+                if (params.componentType === "xAxis") {
                     params.seriesName = params.value;
-                    col = this.data.bodyData.find(item => item[xAxisName] === params.value);  
+                    col = this.data.bodyData.find(item => item[xAxisName] === params.value);
                 } else {
                     col = this.data.bodyData[params.dataIndex];
                 }
@@ -419,7 +410,7 @@ export class ChartTableModule {
                 type: 'scroll',
             },
             series: series
-        }; 
+        };
         !tools.isMb && (chartData['tooltip'] = {})
         chart.setOption(chartData);
         chart.on('click', (params) => {
@@ -427,24 +418,24 @@ export class ChartTableModule {
             let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, params.data.item);
             if (tools.isMb && !ifBreak) {
                 let tipDom: HTMLDivElement
-                tipDom =this.tipLinkFn(`${params.name}: ${params.value}`);
-                
-                d.query('.tip-link',this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link',this.chartBtnsContainer));
-                 
+                tipDom = this.tipLinkFn(`${params.name}: ${params.value}`);
+
+                d.query('.tip-link', this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link', this.chartBtnsContainer));
+
                 this.chartBtnsContainer.appendChild(tipDom);
-                tipDom.style.top = params.event.offsetY  + 'px';
+                tipDom.style.top = params.event.offsetY + 'px';
                 tipDom.style.left = (params.event.offsetX - 50) + 'px';
-                setTimeout(() =>{
+                setTimeout(() => {
                     this.chartBtnsContainer.removeChild(tipDom);
                 }, 3000);
-                tipDom.onclick = () =>{
+                tipDom.onclick = () => {
                     this.chartBtnsContainer.removeChild(tipDom);
                     // this.drillPage(params, params.data.item); 
                     this.getAjax(defaultCol, dataCol, varNamesObj);
                 }
-                return ;
+                return;
             }
-           
+
             !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
 
         });
@@ -481,10 +472,10 @@ export class ChartTableModule {
         console.log(params);
         console.log(dataCol);
         if (cols.length === 0) return {
-            defaultCol : null,
-            varNamesObj : null,
-            dataCol : null,
-            ifBreak :true,
+            defaultCol: null,
+            varNamesObj: null,
+            dataCol: null,
+            ifBreak: true,
         };
 
         // 根据rowLinkField 设置默认跳转
@@ -500,10 +491,10 @@ export class ChartTableModule {
         //     }
         // }
         let col;
-        if(this.ui.showType === 'pie') {
+        if (this.ui.showType === 'pie') {
             // col = cols.filter(col => col.caption === params.seriesName);
-            Object.keys(params.data.item).forEach((key)=> {
-                if(params.data.item[key] === params.name) {
+            Object.keys(params.data.item).forEach((key) => {
+                if (params.data.item[key] === params.name) {
                     col = cols.find(col => col.name === key);
                 }
             })
@@ -511,14 +502,14 @@ export class ChartTableModule {
             col = cols.find(col => col.caption === params.seriesName);
         }
         // let caption = this.ui.showType === 'pie' ? params.name : params.seriesName;
-         
+
         let defaultCol = col ? col : defaultCols ? defaultCols : null;
 
         if (!defaultCol) return {
-            defaultCol : null,
-            varNamesObj : null,
-            dataCol : null,
-            ifBreak :true,
+            defaultCol: null,
+            varNamesObj: null,
+            dataCol: null,
+            ifBreak: true,
         };
 
         console.log(defaultCol);
@@ -532,10 +523,10 @@ export class ChartTableModule {
             }
         });
         if (ifBreak) return {
-            defaultCol : null,
-            varNamesObj : null,
-            dataCol : null,
-            ifBreak :true,
+            defaultCol: null,
+            varNamesObj: null,
+            dataCol: null,
+            ifBreak: true,
         };
         // this.getAjax(defaultCol, dataCol, varNamesObj);
         return {
@@ -600,7 +591,7 @@ export class ChartTableModule {
      * 监控自制按钮事件
      */
     chartBtnsClk() {
-        
+
         this.chartBtnsContainer.addEventListener('click', (e: Event) => {
             let type = e.target && e.target['dataset'] && e.target['dataset'].type;
             switch (type) {
@@ -646,6 +637,333 @@ export class ChartTableModule {
 
     }
 
-    
+
+    async initMap(chartEle) {
+        chartEle.parentElement.style.height = '25rem';
+        let chinaMap = echarts.init(chartEle);
+        // let chart = echarts.init(chartEle);
+        let mapJson = await $.get(`${baseUrl}../map/china.json`);
+        console.log(mapJson);
+        let chart = echarts.registerMap('china', mapJson);
+        let myData = [
+
+            {
+                name: '海门',
+                value: [121.15, 31.89, 90],
+                itemStyle: {
+                    color: '#609ee9'
+                }
+
+            },
+            {
+                name: '南平',
+                value: [1090.781327, 39.608266, 120],
+                itemStyle: {
+                    color: '#f7ba2a'
+                }
+            },
+            {
+                name: '招远',
+                value: [120.38, 370.35, 142],
+                itemStyle: {
+                    color: '#609ee9'
+                }
+            },
+            {
+                name: '舟山',
+                value: [121.509062, 25.044332, 123],
+                itemStyle: {
+                    color: 'red'
+                }
+            }
+        ];
+
+        function randomValue() {
+            return Math.round(Math.random() * 1500);
+        }
+        let chinaMapOption = {
+
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}<br/>{c} (p / km2)'
+            },
+            visualMap: {
+                min: 0,
+                max: 1500,
+                left: 'left',
+                top: 'bottom',
+                text: ['High', 'Low'],
+                seriesIndex: [1],
+                inRange: {
+                    color: ['lightskyblue', 'yellow', 'orangered']
+                },
+                calculable: true
+            },
+            geo: {
+                map: 'china',
+                roam: true,
+                label: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            color: 'rgba(0,0,0,0.4)'
+                        }
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        borderColor: 'rgba(0, 0, 0, 0.2)'
+                    },
+                    emphasis: {
+                        areaColor: null,
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 0,
+                        shadowBlur: 20,
+                        borderWidth: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            },
+
+            series: [
+                {
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: myData,
+                    symbolSize: 10,
+                    silent: true,
+                    symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
+                    // symbolRotate: 35,
+                    // symbolColor: 'red',
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        emphasis: {
+                            show: true
+                        },
+                        color: 'red'
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: 'red'
+                        }
+                    }
+                },
+                {
+                    name: 'categoryA',
+                    type: 'map',
+                    geoIndex: 0,
+                    // tooltip: {show: false},
+                    data: mapJson.features.map(city => city.properties.name).map(province => {
+                        return {name: province, value: Math.round(Math.random() * 1500)}
+                    })
+                }
+
+            ]
+        }
+
+        chinaMap.setOption(chinaMapOption);
+
+        return chinaMap;
+    }
+
+    async initProvince(chartEle, name) {
+        chartEle.parentElement.style.height = '25rem';
+        let myData =[];
+        
+        // let chart = echarts.init(chartEle);
+        let provinceName = provinceMap[name];
+        let citysJson = await $.get(`${baseUrl}../map/province/${provinceName}.json`);
+        echarts.registerMap(provinceName, citysJson);
+        let provinceEchart = echarts.init(chartEle);
+        console.log(citysJson);
+        let citys = citysJson.features.map(city => city.properties.name);
+        console.log(citys);
+        let options =  {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}<br/>{c} (p / km2)'
+            },
+            visualMap: {
+                min: 0,
+                max: 1500,
+                left: 'left',
+                top: 'bottom',
+                text: ['High', 'Low'],
+                seriesIndex: [1],
+                inRange: {
+                    color: ['lightskyblue', 'yellow', 'orangered']
+                },
+                calculable: true
+            },
+            geo: {
+                map: provinceName,
+                roam: true,
+                label: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            color: 'rgba(0,0,0,0.4)'
+                        }
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        borderColor: 'rgba(0, 0, 0, 0.2)'
+                    },
+                    emphasis: {
+                        areaColor: null,
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 0,
+                        shadowBlur: 20,
+                        borderWidth: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            },
+            series: [
+              {
+                type: 'scatter',
+                    coordinateSystem: 'geo',
+                    // data: myData,
+                    symbolSize: 10,
+                    silent: true,
+                    symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
+                    // symbolRotate: 35,
+                    // symbolColor: 'red',
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        emphasis: {
+                            show: true
+                        },
+                        color: 'red'
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: 'red'
+                        }
+                    }
+              },
+              {
+                name: 'categoryA',
+                type: 'map',
+                geoIndex: 0,
+                data: citys.map(city => {
+                    return {name: city, value: Math.round(Math.random() * 1500)}
+                })
+              }
+            ]
+          };
+        provinceEchart.setOption(options);
+
+        return provinceEchart;
+    }
+
+    async initCity(chartEle, name) {
+        chartEle.parentElement.style.height = '25rem';
+        let myData =[];
+        
+        // let chart = echarts.init(chartEle);
+        let cityCode = CityMap[name];
+        
+        let cityJson = await $.get(`${baseUrl}../map/citys/${cityCode}.json`);
+        echarts.registerMap(cityCode, cityJson);
+        let cityEchart = echarts.init(chartEle);
+        console.log(cityJson);
+        let districts = cityJson.features.map(district => district.properties.name);
+        console.log(districts);
+        let options =  {
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}<br/>{c} (p / km2)'
+            },
+            visualMap: {
+                min: 0,
+                max: 1500,
+                left: 'left',
+                top: 'bottom',
+                text: ['High', 'Low'],
+                seriesIndex: [1],
+                inRange: {
+                    color: ['lightskyblue', 'yellow', 'orangered']
+                },
+                calculable: true
+            },
+            geo: {
+                map: cityCode,
+                roam: true,
+                label: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            color: 'rgba(0,0,0,0.4)'
+                        }
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        borderColor: 'rgba(0, 0, 0, 0.2)'
+                    },
+                    emphasis: {
+                        areaColor: null,
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 0,
+                        shadowBlur: 20,
+                        borderWidth: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            },
+            series: [
+              {
+                type: 'scatter',
+                    coordinateSystem: 'geo',
+                    // data: myData,
+                    symbolSize: 10,
+                    silent: true,
+                    symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
+                    // symbolRotate: 35,
+                    // symbolColor: 'red',
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        emphasis: {
+                            show: true
+                        },
+                        color: 'red'
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: 'red'
+                        }
+                    }
+              },
+              {
+                name: 'categoryA',
+                type: 'map',
+                geoIndex: 0,
+                data: districts.map(district => {
+                    return {name: district, value: Math.round(Math.random() * 1500)}
+                })
+              }
+            ]
+          };
+          debugger;
+        cityEchart.setOption(options);
+
+        return cityEchart;
+    }
+
+
 
 }
