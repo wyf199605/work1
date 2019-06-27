@@ -264,7 +264,7 @@ export class BwUploader extends FormCom {
         files && files.forEach((file) => {
             promises.push(this.fileUpload.upload(file).catch((msg) => {
                 msg = msg && typeof msg === 'string' ? msg : '上传失败';
-                Modal.alert(msg);
+                Modal.alert(`<div>${msg}</div>`);
                 this.wrapper && this.wrapper.classList.add('error');
                 this.setInputValue('上传失败');
                 this.trigger(BwUploader.EVT_UPLOAD_ERROR, file);

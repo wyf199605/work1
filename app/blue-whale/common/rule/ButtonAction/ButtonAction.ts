@@ -98,11 +98,13 @@ export class ButtonAction {
                         //     return obj;
                         // });
                         // debugger;
-                        if(result.code===200){
-                            Modal.toast(result.errorMsg);
-                        }
-                        if(result.code===201){
-                            Modal.alert(result.errorMsg);
+                        if (result) {
+                            if (result.code === 200) {
+                                Modal.toast(result.errorMsg);
+                            }
+                            if (result.code === 201) {
+                                Modal.alert(result.errorMsg);
+                            }
                         }
                         setTimeout(() => {
                             com && com.destroy();
@@ -431,11 +433,11 @@ export class ButtonAction {
                     }).then(({ response }) => {
                         let data = tools.keysVal(response, 'body', 'bodyList', 0);
 
-                        if(response.errorCode === 200) {
+                        if (response.errorCode === 200) {
                             Modal.alert(response.msg, '', () => {
                                 resolve(response);
                             });
-                            return ;
+                            return;
                         }
 
                         if (data && (data.type || data.type === 0)) {
@@ -969,7 +971,7 @@ export class ButtonAction {
 
                 for (var i = 0; i < all.length; i++) {
                     let item = all[i] as any;
-                    if (item.hasAttribute('readonly')&&tools.isMb) {
+                    if (item.hasAttribute('readonly') && tools.isMb) {
                         item.style.cssText = "color:#9e9e9e;cursor:not-allowed";
                         item.parentNode.style.position = "relative";
                         let htl = d.create('<div class="undisalbe"></div>')
@@ -1011,7 +1013,7 @@ export class ButtonAction {
                 console.log('......', tableData, e);
                 table = new e.BwTableElement({
                     tableEl: Object.assign(tableData, {
-                        subButtons: tableData && tableData.uiType === 'assselect' ? tableData.subButtons :  [],
+                        subButtons: tableData && tableData.uiType === 'assselect' ? tableData.subButtons : [],
                         operationType: {
                             autoEdit: type === 13,
                             editType: 'current'
