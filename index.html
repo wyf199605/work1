@@ -43,8 +43,10 @@
     
     .pc {
         background-image: url("./img/download/bg.png");
-        background-size: 100% 100%;
+        background-size: contain;
         background-repeat: no-repeat;
+        background-position: center;
+        background-color: #0EA2F4;
     }
     
     .pc .header {
@@ -52,7 +54,7 @@
         justify-content: center;
         flex-direction: column;
         align-items: center;
-        margin-top: 8.4%;
+        margin-top: 7%;
     }
     
     .pc .logo {
@@ -90,7 +92,8 @@
     }
     
     .ad_hover,
-    .ios_hover {
+    .ios_hover,
+    .pda_hover {
         display: none;
     }
     
@@ -116,7 +119,7 @@
         vertical-align: middle;
     }
     
-    .pc .item:nth-child(-n+2) {
+    .pc .item:nth-child(-n+3) {
         margin-right: 15px;
     }
     
@@ -129,6 +132,10 @@
     }
     
     .item:nth-child(2):hover .ad_hover {
+        display: block;
+    }
+    
+    .item:nth-child(3):hover .pda_hover {
         display: block;
     }
     
@@ -191,8 +198,10 @@
     
     .mb .container {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         margin-top: 9.5vh;
+        flex-wrap: wrap;
+        height: auto;
     }
     
     .mb .item {
@@ -207,10 +216,15 @@
         cursor: pointer;
         vertical-align: middle;
         position: relative;
+        margin-bottom: 20px;
     }
     
-    .mb .item:first-child {
-        margin-right: 3.4%;
+    .mb .item:nth-child(odd) {
+        margin-left: 20px;
+    }
+    
+    .mb .item:nth-child(even) {
+        margin-right: 20px;
     }
     
     .mb .response_log:nth-child(1) {
@@ -236,9 +250,7 @@
                     <div class="hover ios_hover">
                         <div class="hover_container">
                             <span class="triangle"></span>
-                            <div class="response_img" id="ios_code">
-
-                            </div>
+                            <div class="response_img" id="ios_code"></div>
                             <!-- <img src="./img/download/qrcode.png" class="response_img"> -->
                         </div>
                     </div>
@@ -249,10 +261,18 @@
                     <div class="hover ad_hover">
                         <div class="hover_container">
                             <span class="triangle"></span>
-                            <div class="response_img" id="ad_code">
-
-                            </div>
+                            <div class="response_img" id="ad_code"></div>
                             <!-- <img src="./img/download/adQrcode.png" class="response_img"> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="item" id="pda_pc_item">
+                    <img src="./img/download/pda.png" class="response_log">
+                    <span> 盘点专用</span>
+                    <div class="hover pda_hover">
+                        <div class="hover_container">
+                            <span class="triangle"></span>
+                            <div class="response_img" id="pda_code"></div>
                         </div>
                     </div>
                 </div>
@@ -278,6 +298,10 @@
                     <img src="./img/download/ad.png" class="response_log">
                     <span> Android下载</span>
                 </div>
+                <div class="item" id="pda_btn">
+                    <img src="./img/download/pda.png" class="response_log">
+                    <span> 盘点专用</span>
+                </div>
             </div>
         </div>
     </div>
@@ -285,6 +309,13 @@
 <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
 <script>
+    let pdaBtn = document.querySelector("#pda_btn");
+    let PcBtn = document.querySelector("#pda_pc_item");
+    var sanfu = window.location.href.indexOf("https://bw.sanfu.com") > -1;
+    if (!sanfu) {
+        pdaBtn.style.display = "none";
+        PcBtn.style.display = "none";
+    }
     $.getJSON("./config.json", function(location) {
         // console.log(location.pcUrl); 
         if (!/Android|webOS|iPhone|iPod|BlackBerry|iPad/i.test(navigator.userAgent)) {
@@ -298,15 +329,29 @@
                 height: 98,
                 text: location.adUrl
             });
+            $('#pda_code') && $('#pda_code').qrcode({
+                width: 98,
+                height: 98,
+                text: location.pdaUrl
+            });
         }
-        document.querySelector("#ios_btn").onclick = function() {
+        var iosBtn = document.querySelector("#ios_btn");
+        iosBtn.onclick = function() {
             window.location.href = location.ipUrl;
         }
-        document.querySelector("#ad_btn").onclick = function() {
+        var adBtn = document.querySelector("#ad_btn");
+        adBtn.onclick = function() {
             window.location.href = location.adUrl;
         }
-        document.querySelector("#pc_btn").onclick = function() {
-            window.location.href = location.pcUrl;
+        var pcBtn = document.querySelector("#pc_btn")
+        pcBtn.onclick = function() {
+                window.location.href = location.pcUrl;
+            }
+            // var pdaBtn = document.querySelector("#pda_btn")
+        if (pdaBtn) {
+            pdaBtn.onclick = function() {
+                window.location.href = location.pdaUrl;
+            }
         }
     });
 </script>
