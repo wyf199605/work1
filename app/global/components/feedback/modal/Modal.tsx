@@ -887,8 +887,10 @@ export class Modal extends Component {
         }
 
         inputBox.addItem(okBtn);
+        console.log(msg)
         msg = msg.replace(/\n/g, "<br/>")
         msg = msg.replace(/↵/g, "<br/>");
+        msg=`<div>${msg}</div>`
         let m = new Modal({
             container,
             isOnceDestroy: true,

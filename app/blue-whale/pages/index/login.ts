@@ -770,7 +770,7 @@ export class LoginPage {
             }, () => {
                 return new Promise((resolve) => {
                     loginPage.device.userid = userId.toUpperCase();
-                    loginPage.device.password = password;
+                    // loginPage.device.password = password;
                     resolve();
                 });
             });
