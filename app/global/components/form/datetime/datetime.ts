@@ -68,7 +68,10 @@ export class Datetime extends TextInput {
             trigger: 'none',
             format: Datetime.format2Conf(this.para.format).format,
             type: conf.type,
-            theme: 'grid'
+            theme: 'grid',
+            done: (value, date, endDate) => {
+                typeof this.onSet === 'function' && this.onSet(value);
+            }
         });
         // this.set(this._value);
     }
@@ -158,7 +161,6 @@ export class Datetime extends TextInput {
         // this.com && this.com.setDate(str || '');
         let date = str && new Date(str);
         let dateStr = date ? Rule.dateFormat(date, this.para.format) : '';
-        console.log(dateStr);
         this._value = dateStr;
         this.com && (this.com.config.value = dateStr);
         super.set(dateStr);
