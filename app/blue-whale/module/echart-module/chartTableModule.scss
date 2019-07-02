@@ -3,7 +3,38 @@
     overflow: scroll;
     background-color: white;
     min-width: 240px;
+    position: relative;
+    .switch-table {
+        i {
+            margin-right: 5px;
+            color: #337ab7;
+        }
+    }
+    .mb-chart-btns {
+        position:absolute;
+        top: 5px;
+        right: .2rem;
+        .mb-switch-table {
+            z-index: 10001;
+            margin-right: .2rem;
+            // position: absolute;
+            float: right;
+            border: none;
+            padding: 3px;
+            i {
+                color: #337ab7;
+                font-size: 20px;
+                &.icon-bingzhuangtu {
+                    font-size: 18px;
+                }
+            }
+            
+        }
+    }
+    
 }
+
+
 
 .chart-container {
     width: 100%;
@@ -44,6 +75,14 @@
 }
 .chart-btn {
     float: right;
+}
+.mb-chart-btn {
+    border: none;
+    i {
+        color: #337ab7;
+        font-size: 18px !important;
+    }
+    background-color: transparent !important;
 }
 .button-small {
     padding: 2px 15px !important;

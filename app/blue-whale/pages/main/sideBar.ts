@@ -128,11 +128,6 @@ export default class SideBarMrg {
             <div class="icon iconfont icon-zuijin"></div>
             <p>最近<p>
         </div>
-        <div class="collect_item" id="js_chart_btn">
-            <div class="icon iconfont icon-zuijin"></div>
-            <p>图表<p>
-        </div>
-        
      </div>
     `;
     d.append(d.query("#customNavMenu"), d.create(collectDom));

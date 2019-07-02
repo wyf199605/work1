@@ -81,7 +81,7 @@ export class ChartTableModule {
             case 'detail':
                 this.ui.cols = this.ui.fields;
                 this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
-                break;   break;
+                break; break;
         }
         // this.chart = this.initMap(this.chartDom);
         // this.chart = this.initMap(this.chartDom)
@@ -107,7 +107,11 @@ export class ChartTableModule {
         let btnsContainer: HTMLElement = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
 
-        let btn: HTMLElement = <button class="btn button-type-default button-small chart-btn">图表</button>
+        let btn: HTMLElement = tools.isMb ? 
+            <button class="btn button-type-default button-small chart-btn mb-chart-btn">
+                <i class="appcommon app-tuxing" ></i>
+            </button> 
+            : <button class="btn button-type-default button-small chart-btn ">图表</button>
         d.query('.chart-btn', btnsContainer) && btnsContainer.removeChild(d.query('.chart-btn', btnsContainer));
 
         btnsContainer.children.length > 0 ? btnsContainer.children[0].appendChild(btn) : btnsContainer.appendChild(btn);
@@ -195,7 +199,9 @@ export class ChartTableModule {
 
             legend: {
                 data: legendData,
-                top: 15,
+                top: 10,
+                right: tools.isMb ? '60px' : '1px',
+                type: 'scroll',
             },
             xAxis: {
                 data: xAxisData,
@@ -341,7 +347,7 @@ export class ChartTableModule {
         });
         // let caption = this.ui.caption;
         let xAxisName: string = this.ui.local.xCoordinate.split(',').length >= 2 ? this.ui.local.xCoordinate.split(',')[0].toUpperCase() : this.ui.local.xCoordinate.toUpperCase();
-        let xAxisData: Array<any> = this.data.bodyData.map(item => item[xAxisName]);;
+        let xAxisData: Array<any> = this.data.bodyData.map(item => (item[xAxisName] ? item[xAxisName] : '') );
         let legendName: Array<string> = yCoordinate;
         let legendData: Array<string> = [];
         let series = [];
@@ -356,7 +362,7 @@ export class ChartTableModule {
             } else {
                 let floor = Math.ceil(legendName.length / 3);
                 let redidue = i % 3;
-                yAxis = (50 / floor) + '%';
+                yAxis = (50 / floor) + 6 + '%';
                 xAxis = (25 + redidue * 25) + '%';
             }
             let seriesItem = {
@@ -406,12 +412,13 @@ export class ChartTableModule {
             },
             legend: {
                 data: xAxisData,
-                top: 5,
+                top: 8,
                 type: 'scroll',
+                right: tools.isMb ? '60px' : '1px',
             },
             series: series
         };
-        !tools.isMb && (chartData['tooltip'] = {})
+        !tools.isMb && (chartData['tooltip'] = {});
         chart.setOption(chartData);
         chart.on('click', (params) => {
             console.log(params);
@@ -574,14 +581,32 @@ export class ChartTableModule {
      * 图表渲染函数
      */
     render() {
-        this.chartDom = <section class="chart-container" >图形</section>
-        this.chartBtnsContainer = <div class="chart-table" >
-            <section class="chart-btns">
-                <button class="switch-table btn button-type-default button-small" data-type="switchTable">
-                    {/* <i class="iconfont app-saomazhifu"></i> */}
-                    表格
+        this.chartDom = <section class="chart-container" >图形</section>;
+        this.chartBtnsContainer = tools.isMb ? 
+            <div class="chart-table" >
+                <section class="mb-chart-btns">
+                <button class="mb-switch-table btn button-type-default " data-type="switchTable">
+                    <i class=" appcommon app-biaoge" data-type="switchTable"></i>
                 </button>
+                <button class="mb-switch-table btn button-type-default " data-type="switchTable">
+                    <i class=" iconfont button-icon icon-bingzhuangtu" data-type="switchTable"></i>
+                </button>
+                </section>
+            {this.chartDom}
+        </div>
+        : <div class="chart-table" >
+        
+            <section class="chart-btns"> 
+                <button class="switch-table btn button-type-default button-small" data-type="switchTable">
+                    <i class="appcommon app-biaoge" data-type="switchTable"></i>
+                    表格
+                </button> 
+                <button class="switch-table btn button-type-default button-small" data-type="switchTable">
+                    <i class="iconfont button-icon icon-bingzhuangtu" data-type="switchTable"></i>
+                    设置
+                </button> 
             </section>
+        
             {this.chartDom}
         </div>
         return this.chartBtnsContainer;
@@ -638,7 +663,7 @@ export class ChartTableModule {
     }
 
 
-    async initMap(chartEle) {
+    async initMap(chartEle: HTMLElement) {
         chartEle.parentElement.style.height = '25rem';
         let chinaMap = echarts.init(chartEle);
         // let chart = echarts.init(chartEle);
@@ -758,7 +783,7 @@ export class ChartTableModule {
                     geoIndex: 0,
                     // tooltip: {show: false},
                     data: mapJson.features.map(city => city.properties.name).map(province => {
-                        return {name: province, value: Math.round(Math.random() * 1500)}
+                        return { name: province, value: Math.round(Math.random() * 1500) }
                     })
                 }
 
@@ -770,10 +795,10 @@ export class ChartTableModule {
         return chinaMap;
     }
 
-    async initProvince(chartEle, name) {
+    async initProvince(chartEle: HTMLElement, name: string) {
         chartEle.parentElement.style.height = '25rem';
-        let myData =[];
-        
+        let myData = [];
+
         // let chart = echarts.init(chartEle);
         let provinceName = provinceMap[name];
         let citysJson = await $.get(`${baseUrl}../map/province/${provinceName}.json`);
@@ -782,7 +807,7 @@ export class ChartTableModule {
         console.log(citysJson);
         let citys = citysJson.features.map(city => city.properties.name);
         console.log(citys);
-        let options =  {
+        let options = {
             tooltip: {
                 trigger: 'item',
                 formatter: '{b}<br/>{c} (p / km2)'
@@ -825,8 +850,8 @@ export class ChartTableModule {
                 }
             },
             series: [
-              {
-                type: 'scatter',
+                {
+                    type: 'scatter',
                     coordinateSystem: 'geo',
                     // data: myData,
                     symbolSize: 10,
@@ -850,36 +875,36 @@ export class ChartTableModule {
                             color: 'red'
                         }
                     }
-              },
-              {
-                name: 'categoryA',
-                type: 'map',
-                geoIndex: 0,
-                data: citys.map(city => {
-                    return {name: city, value: Math.round(Math.random() * 1500)}
-                })
-              }
+                },
+                {
+                    name: 'categoryA',
+                    type: 'map',
+                    geoIndex: 0,
+                    data: citys.map(city => {
+                        return { name: city, value: Math.round(Math.random() * 1500) }
+                    })
+                }
             ]
-          };
+        };
         provinceEchart.setOption(options);
 
         return provinceEchart;
     }
 
-    async initCity(chartEle, name) {
+    async initCity(chartEle: HTMLElement, name: string) {
         chartEle.parentElement.style.height = '25rem';
-        let myData =[];
-        
+        let myData = [];
+
         // let chart = echarts.init(chartEle);
         let cityCode = CityMap[name];
-        
+
         let cityJson = await $.get(`${baseUrl}../map/citys/${cityCode}.json`);
         echarts.registerMap(cityCode, cityJson);
         let cityEchart = echarts.init(chartEle);
         console.log(cityJson);
         let districts = cityJson.features.map(district => district.properties.name);
         console.log(districts);
-        let options =  {
+        let options = {
             tooltip: {
                 trigger: 'item',
                 formatter: '{b}<br/>{c} (p / km2)'
@@ -922,8 +947,8 @@ export class ChartTableModule {
                 }
             },
             series: [
-              {
-                type: 'scatter',
+                {
+                    type: 'scatter',
                     coordinateSystem: 'geo',
                     // data: myData,
                     symbolSize: 10,
@@ -947,18 +972,18 @@ export class ChartTableModule {
                             color: 'red'
                         }
                     }
-              },
-              {
-                name: 'categoryA',
-                type: 'map',
-                geoIndex: 0,
-                data: districts.map(district => {
-                    return {name: district, value: Math.round(Math.random() * 1500)}
-                })
-              }
+                },
+                {
+                    name: 'categoryA',
+                    type: 'map',
+                    geoIndex: 0,
+                    data: districts.map(district => {
+                        return { name: district, value: Math.round(Math.random() * 1500) }
+                    })
+                }
             ]
-          };
-          debugger;
+        };
+        // debugger;
         cityEchart.setOption(options);
 
         return cityEchart;
