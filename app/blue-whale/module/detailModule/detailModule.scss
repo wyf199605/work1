@@ -105,11 +105,11 @@
           margin-bottom: 10px;
         }
         .detail-item-content{
-          padding-right: 0;
-          justify-content: flex-start;
+          padding-right: 0!important;
+          justify-content: flex-start!important;;
         }
         .detail-item-title, .detail-item-content{
-          width: 100%;
+          width: 100%!important;;
         }
       }
       display: flex;
