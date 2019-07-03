@@ -131,7 +131,10 @@ export = class messagePage {
         list.forEach(m => {
             let link = m.openlink && m.openlink.dataAddr,
                 btnAddr = m.btnAddr && m.btnAddr.dataAddr,
-                body = d.create(`<div>${m.textMsg}</div>`)
+                textMsg = '';
+            textMsg = m.textMsg && m.textMsg.replace(/\n/g, "<br/>")
+            textMsg = m.textMsg && m.textMsg.replace(/↵/g, "<br/>");
+            let body = d.create(`<p>${textMsg}</p>`);
             let li = <li className="task-msg">
                 {/*<div class="task-msg-time">推送时间({m.createDate})</div>*/}
                 <div class="task-msg-body">
