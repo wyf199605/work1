@@ -94,8 +94,23 @@
     }
     .detail-item {
       flex: 1 1 33.3%;
+
       &.block-item{
         flex-basis: 100%;
+      }
+
+      &.item-column{
+        flex-direction: column;
+        .detail-item-title{
+          margin-bottom: 10px;
+        }
+        .detail-item-content{
+          padding-right: 0!important;
+          justify-content: flex-start!important;;
+        }
+        .detail-item-title, .detail-item-content{
+          width: 100%!important;;
+        }
       }
       display: flex;
       align-items: stretch;
