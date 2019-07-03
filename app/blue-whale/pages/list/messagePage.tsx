@@ -48,7 +48,7 @@ export = class messagePage {
 
         this.initTaskMsg(taskDom);
         this.initSysMsg(listDOM);
-        
+
 
         d.on(window, BwRule.FRESH_SYS_MSG, () => {
             this.showSysList(localMsg.get(), false, listDOM)
@@ -60,7 +60,7 @@ export = class messagePage {
         BwRule.Ajax.fetch(CONF.url.taskMsg, {
             dataType: 'json',
             type: 'get'
-        }).then(({response}) => {
+        }).then(({ response }) => {
             messagePage.tastList = response.data;
             let _num = response.data.length;
             let _badge = document.getElementById('custom-task');
@@ -68,23 +68,23 @@ export = class messagePage {
             let _childs = document.getElementsByClassName('task-msg');
 
             // 判断消息数量是否有变化，变化才进行节点重新渲染
-            if(this.TotalMsg != _num && _badge) {
+            if (this.TotalMsg != _num && _badge) {
                 _badge.textContent = _num;
                 this.TotalMsg = _num;
-                if(_num == 0) {
+                if (_num == 0) {
                     _badge.classList.add('hide');
-                    for(let i=_childs.length-1; i>=0;i--) {
+                    for (let i = _childs.length - 1; i >= 0; i--) {
                         _parent.removeChild(_childs[i]);
                     }
                     d.append(_parent, this.showTaskList(response.data));
-                }else{
+                } else {
                     _badge.classList.remove('hide');
-                    for(let i=_childs.length-1; i>=0;i--) {
+                    for (let i = _childs.length - 1; i >= 0; i--) {
                         _parent.removeChild(_childs[i]);
                     }
                     d.append(_parent, this.showTaskList(response.data));
                 }
-                console.log('任务数量：', _num,_badge.innerHTML);
+                console.log('任务数量：', _num, _badge.innerHTML);
                 messagePage.setSysBadge();
             }
         })
@@ -97,18 +97,18 @@ export = class messagePage {
             type: 'get'
         }).then(({ response }) => {
             d.append(taskDom, this.showTaskList(response.data));
-            console.log('任务消息:',response.data);
+            // console.log('任务消息:',response.data);
             let _len = response.data.length;
             this.TotalMsg = response.data.length;
-            console.log('任务消息数量：',_len);
+            // console.log('任务消息数量：',_len);
             // 显示任务消息数量
             let liDom = d.query('li[data-name="task"]');
-            if(_len) {
+            if (_len) {
                 d.append(liDom, <span className="mui-badge mui-badge-primary" id="custom-task" data-field="tast" >{_len}</span>);
-            }else{
+            } else {
                 d.append(liDom, <span className="mui-badge mui-badge-primary hide" id="custom-task" data-field="tast" />);
             }
-            
+
             messagePage.tastList = response.data;
 
             // 给壳发送数量
@@ -130,12 +130,13 @@ export = class messagePage {
         let fragment = document.createDocumentFragment();
         list.forEach(m => {
             let link = m.openlink && m.openlink.dataAddr,
-                btnAddr = m.btnAddr && m.btnAddr.dataAddr;
+                btnAddr = m.btnAddr && m.btnAddr.dataAddr,
+                body = d.create(`<div>${m.textMsg}</div>`)
             let li = <li className="task-msg">
                 {/*<div class="task-msg-time">推送时间({m.createDate})</div>*/}
                 <div class="task-msg-body">
                     <div class="task-msg-title">{m.caption}</div>
-                    <div class="task-msg-content">{m.textMsg}</div>
+                    <div class="task-msg-content">{body}</div>
                     <div className="task-msg-footer">
                         {link ? <Button onClick={() => sys.window.open({ url: CONF.siteUrl + link })} className="task-msg-link" content="打开" /> : ``}
                         {btnAddr ? this._noReminder = <Button onClick={() => this.noReminder(btnAddr)} className="task-msg-deal" content="今日不提醒" /> : ``}
@@ -197,7 +198,7 @@ export = class messagePage {
                     try {
                         self.read(tapThis);
                     } catch (error) {
-                       Modal.toast(error); 
+                        Modal.toast(error);
                     }
                     if (tapThis.dataset.url === 'undefined' || tapThis.dataset.url == '') {
                         break;
@@ -211,7 +212,7 @@ export = class messagePage {
                         type: 'post'
                     }).then(({ response }) => {
                         // debugger;
-                      
+
                         // console.log(tapThis.dataset.url)
                         // debugger;
                         if (tapThis.dataset.url === 'undefined') {
@@ -286,7 +287,7 @@ export = class messagePage {
     * 存在延迟，因为需要等待任务数据请求完成才能统计，
     * 所以最好将initTaskMsg()和initSysMsg()函数修改未同步;
     */
-    static setSysBadge(numMessage:number=0) {
+    static setSysBadge(numMessage: number = 0) {
         let badge = d.query(`[data-field=sys]`),
             num = localMsg.getUnreadCount();
         if (badge) {
@@ -299,13 +300,13 @@ export = class messagePage {
         }
         // console.log(messagePage.tastList.length)
         let total;
-        if(numMessage>0){
-            total= numMessage + localMsg.getUnreadCount();
+        if (numMessage > 0) {
+            total = numMessage + localMsg.getUnreadCount();
             this.prototype.getTaskMsg();
-        }else{
-           total= messagePage.tastList.length + localMsg.getUnreadCount();
+        } else {
+            total = messagePage.tastList.length + localMsg.getUnreadCount();
         }
-        console.log('获取消息数量：',total)
+        console.log('获取消息数量：', total)
         // console.log(total)
         G.Shell.other.sendMsgCount({ MsgCount: total }, () => { })
     }
