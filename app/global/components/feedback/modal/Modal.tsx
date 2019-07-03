@@ -887,7 +887,6 @@ export class Modal extends Component {
         }
 
         inputBox.addItem(okBtn);
-        console.log(msg)
         msg = msg.replace(/\n/g, "<br/>")
         msg = msg.replace(/↵/g, "<br/>");
         msg=`<div>${msg}</div>`
@@ -994,11 +993,12 @@ export class Modal extends Component {
         // if(Modal.toastModal) {
         //     Modal.toastModal.destroy();
         // }
-
+        msg = msg.replace(/\n/g, "<br/>")
+        msg = msg.replace(/↵/g, "<br/>");
         let m = new Modal({
             isMb: false,
             isBackground: false,
-            body: <div style="padding: 4px 15px;">{msg}</div>,
+            body: <div style="padding: 4px 15px;">{d.create(`<div>${msg}</div>`)}</div>,
             className: 'modal-toast'
         });
         // Modal.toastModal = m;
