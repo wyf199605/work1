@@ -38,7 +38,11 @@ export class DetailItem extends Component{
         if(tools.isMb){
             // className = 'col-xs-12'
             className = 'block-item';
+            if(dataType === BwRule.DT_HTML){
+                className += ' item-column';
+            }
         }
+
 
         return isShow ? <div className={"detail-item " + className} data-name={name}>
             {this._titleEl = <div className="detail-item-title">{title}</div>}
