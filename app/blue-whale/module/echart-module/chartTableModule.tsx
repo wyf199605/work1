@@ -41,6 +41,17 @@ export class ChartTableModule {
     chartBtnsContainer: HTMLElement; // 图表自制按钮容器
     ftable: FastBtnTable  // 对表格基本操作的方法对象
     data: Data; // 接口请求的表格数据 
+    baffleDom: HTMLDivElement; // 设置图表展示的类型
+    settingData = {
+        type: null,
+        xAxis: null,
+        yAxis: [],
+        types: ['line', 'bar', 'pie', 'area'],
+        yAxisLists: [],
+        xAxisLists: []
+
+
+    }
     color = ['#609ee9', '#f7ba2a', '#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc', '#496169', '#fa4166', '#39ca74', '#fc90a6', '#bbadf3', '#48bfe3', '#fca786', '#fe94ea', '#86e1fc'];
 
 
@@ -53,9 +64,9 @@ export class ChartTableModule {
         // debugger;
         this.initData();
         this.initTableBtns();
-        console.log(CityMap);
+        // console.log(CityMap);
         let img = CONF.siteUrl + '/map/china.json';
-        console.log(baseUrl);
+        // console.log(baseUrl);
         // $('body').append(img);
 
     }
@@ -69,6 +80,14 @@ export class ChartTableModule {
             chartTableEle && this.parentDom.removeChild(chartTableEle);
         }
         this.parentDom.insertBefore(this.render(), this.parentDom.childNodes[0]);
+        
+        
+        console.log(this.ui);
+        this.baffleDom = this.chartSettingRender();
+        this.chartBtnsContainer.appendChild(this.baffleDom);
+        this.baffleDom.addEventListener('click', this.baffleDomClkFn.bind(this));
+
+        tools.isMb || (this.chartBtnsContainer.style.height = '25rem');
         // this.parentDom.appendChild(this.render());
         // let chart;
         switch (this.ui.uiType) {
@@ -98,19 +117,126 @@ export class ChartTableModule {
         }, false);
         this.chartBtnsClk();
     }
+    chartSettingRender() {
+        let dataTypes = ['10','11','14','15'];
+        let cols = this.ui.cols.filter(col => !col.noShow)
+        let xAxisData = cols.map(col => ({name: col.name,value:col.caption}));
+        let yAxisData = cols.filter(col => dataTypes.includes(col.dataType)).map(col => ({name: col.name,value:col.caption}));
+        console.log(yAxisData, xAxisData);
+        let chartTypeData = {
+            types: [
+                { name: 'line', value: '折线图' },
+                { name: 'bar', value: '柱状图' },
+                { name: 'pie', value: '饼状图' },
+                { name: 'area', value: '面积图' }
+            ]
+        };
+        
+        const fieldsetTypeDom: HTMLElement[] = chartTypeData.types.map((type, index) => {
+            return (
+                <section class="radio-wrapper"  >
+                    <input type="radio" value={type.name} name='type' />
+                    <span class={index === 0 ? "label-radio checked-radio" : "label-radio"} name='type'></span>
+                    <span calss="radio-text" name='type'>{type.value}</span>
+                </section>
+            );
+        });
+        const xAxisDom: HTMLElement[] = xAxisData.map((item, index) => {
+            return (
+                <section class="radio-wrapper"  >
+                    <input type="radio" value={item.name} name='xAxis' />
+                    <span class={index === 0 ? "label-radio checked-radio" : "label-radio"} name='xAxis'></span>
+                    <span calss="radio-text" name='xAxis' title={item.value}>{item.value}</span>
+                </section>
+            );
+        });
+        const yAxisDom: HTMLElement[] = yAxisData.map((item, index) => {
+            return (
+                <section class="radio-wrapper"  >
+                    <input type="checkbox" value={item.name} name='yAxis' />
+                    <span class= "label-checkbox" name='yAxis'></span>
+                    <span calss="radio-text" name='yAxis' title={item.value}>{item.value}</span>
+                </section>
+            );
+        });
+        const settingDom: HTMLDivElement = tools.isMb ?
+        <div class="mb-chart-baffle"> </div>
+        : <div class="pc-chart-baffle">
+            <div class="pc-baffle-main">
+                <h1 class="pc-baffle-header">
+                    <span>图表统计</span>
+                    <span class="pc-baffle-close">x</span>
+                </h1>
+                <div class="row">
+                    <fieldset class="col-xs-4">
+                        <legend>类型</legend>
+                        <section class="cols-comtainer"><div>
+                            {fieldsetTypeDom}
+                        </div></section>
+                    </fieldset>
+                    
+                    <fieldset class="col-xs-4">
+                        <legend>横坐标</legend>
+                        <section class="cols-comtainer"><div>
+                            {xAxisDom}
+                        </div></section>
+                    </fieldset>
+                    <fieldset class="col-xs-4">
+                        <legend>纵坐标</legend>
+                        <section class="cols-comtainer"><div>
+                            {yAxisDom}
+                        </div></section>
+                    </fieldset>
+                    {/* {fieldsetTypeDom} */}
+                </div>
+                <div class="pc-baffle-footer">
+                    <button class="btn button-type-primary">确定</button>
+                </div>
+            </div>
+            
+        </div>;
+        return settingDom;
+
+    }
+
+    // 图形统计按钮
+    baffleDomClkFn(e: Event) {
+        let name = e.target['name'];
+        if(e.target['className'] === 'pc-baffle-close') {
+            this.baffleDom.style.display = 'none';
+        }
+        if (!name) return;
+        // this.chartDom.querySelector
+        if (name === 'yAxis') {
+            e.target['previousElementSibling'].checked;
+            // e.target['parentElement'].parentElement.querySelector('.checked-radio').classList.remove('checked-radio');
+            // e.target['classList'].add('checked-radio');
+            e.target['classList'].toggle('checked-radio');
+        } else {
+            e.target['previousElementSibling'].checked;
+            e.target['parentElement'].parentElement.querySelector('.checked-radio').classList.remove('checked-radio');
+            e.target['classList'].add('checked-radio');
+        }
+        switch (name) {
+            case 'type':
+                this.settingData.type = e.target['previousElementSibling'].value;
+                break;
+        }
+        console.log(this.settingData);
+    }
+
 
     /**
      * 初始化图表切表格按钮
      */
     initTableBtns() {
-        console.log(this.wrapper);
         let btnsContainer: HTMLElement = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
 
-        let btn: HTMLElement = tools.isMb ? 
+        let btn: HTMLElement = tools.isMb ?
             <button class="btn button-type-default button-small chart-btn mb-chart-btn">
                 <i class="appcommon app-tuxing" ></i>
-            </button> 
+            </button>
             : <button class="btn button-type-default button-small chart-btn ">图表</button>
         d.query('.chart-btn', btnsContainer) && btnsContainer.removeChild(d.query('.chart-btn', btnsContainer));
 
@@ -282,7 +408,6 @@ export class ChartTableModule {
                     d.query('.tip-link', chartEle) && chartEle.removeChild(tipDom);
                 }, 2500);
                 tipDom.onclick = (e) => {
-                    console.log(e);
                     // debugger;
                     chartEle.removeChild(tipDom);
                     this.getAjax(defaultCol, dataCol, varNamesObj);
@@ -347,7 +472,7 @@ export class ChartTableModule {
         });
         // let caption = this.ui.caption;
         let xAxisName: string = this.ui.local.xCoordinate.split(',').length >= 2 ? this.ui.local.xCoordinate.split(',')[0].toUpperCase() : this.ui.local.xCoordinate.toUpperCase();
-        let xAxisData: Array<any> = this.data.bodyData.map(item => (item[xAxisName] ? item[xAxisName] : '') );
+        let xAxisData: Array<any> = this.data.bodyData.map(item => (item[xAxisName] ? item[xAxisName] : ''));
         let legendName: Array<string> = yCoordinate;
         let legendData: Array<string> = [];
         let series = [];
@@ -421,7 +546,6 @@ export class ChartTableModule {
         !tools.isMb && (chartData['tooltip'] = {});
         chart.setOption(chartData);
         chart.on('click', (params) => {
-            console.log(params);
             let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, params.data.item);
             if (tools.isMb && !ifBreak) {
                 let tipDom: HTMLDivElement
@@ -475,9 +599,6 @@ export class ChartTableModule {
                 });
                 break;
         }
-        console.log(cols);
-        console.log(params);
-        console.log(dataCol);
         if (cols.length === 0) return {
             defaultCol: null,
             varNamesObj: null,
@@ -519,7 +640,6 @@ export class ChartTableModule {
             ifBreak: true,
         };
 
-        console.log(defaultCol);
         // debugger;
         let varNamesObj: object = {};
         let ifBreak: boolean = false;
@@ -582,33 +702,33 @@ export class ChartTableModule {
      */
     render() {
         this.chartDom = <section class="chart-container" >图形</section>;
-        this.chartBtnsContainer = tools.isMb ? 
+        this.chartBtnsContainer = tools.isMb ?
             <div class="chart-table" >
                 <section class="mb-chart-btns">
-                <button class="mb-switch-table btn button-type-default " data-type="switchTable">
-                    <i class=" appcommon app-biaoge" data-type="switchTable"></i>
+                    <button class="mb-switch-table btn button-type-default " data-type="switchTable">
+                        <i class=" appcommon app-biaoge" data-type="switchTable"></i>
+                    </button>
+                    <button class="mb-switch-table btn button-type-default " data-type="chartSetting">
+                        <i class=" iconfont button-icon icon-bingzhuangtu" data-type="chartSetting"></i>
+                    </button>
+                </section>
+                {this.chartDom}
+            </div>
+            : <div class="chart-table" >
+
+                <section class="chart-btns">
+                    <button class="switch-table btn button-type-default button-small" data-type="switchTable">
+                        <i class="appcommon app-biaoge" data-type="switchTable"></i>
+                        表格
                 </button>
-                <button class="mb-switch-table btn button-type-default " data-type="switchTable">
-                    <i class=" iconfont button-icon icon-bingzhuangtu" data-type="switchTable"></i>
+                    <button class="switch-table btn button-type-default button-small" data-type="chartSetting">
+                        <i class="iconfont button-icon icon-bingzhuangtu" data-type="chartSetting"></i>
+                        设置
                 </button>
                 </section>
-            {this.chartDom}
-        </div>
-        : <div class="chart-table" >
-        
-            <section class="chart-btns"> 
-                <button class="switch-table btn button-type-default button-small" data-type="switchTable">
-                    <i class="appcommon app-biaoge" data-type="switchTable"></i>
-                    表格
-                </button> 
-                <button class="switch-table btn button-type-default button-small" data-type="switchTable">
-                    <i class="iconfont button-icon icon-bingzhuangtu" data-type="switchTable"></i>
-                    设置
-                </button> 
-            </section>
-        
-            {this.chartDom}
-        </div>
+
+                {this.chartDom}
+            </div>
         return this.chartBtnsContainer;
     }
 
@@ -617,6 +737,7 @@ export class ChartTableModule {
      */
     chartBtnsClk() {
 
+
         this.chartBtnsContainer.addEventListener('click', (e: Event) => {
             let type = e.target && e.target['dataset'] && e.target['dataset'].type;
             switch (type) {
@@ -624,6 +745,10 @@ export class ChartTableModule {
                     this.chartBtnsContainer.style.display = 'none';
                     this.wrapper.style.display = 'block';
                     this.ftable.recountWidth();
+                    break;
+                case 'chartSetting':
+                    this.baffleDom.style.display = 'block';
+                    // tools.isMb ? this.mbChartSetting() : this.pcChartSetting();
                     break;
             }
         });
@@ -658,9 +783,18 @@ export class ChartTableModule {
                 // this.chart.resize();
                 d.query('.table-module-has-sub', body).style.height = '100vh';
             }
-        })
+        });
+
+
+
 
     }
+
+    mbChartSetting() {
+
+    }
+
+    
 
 
     async initMap(chartEle: HTMLElement) {
@@ -668,7 +802,6 @@ export class ChartTableModule {
         let chinaMap = echarts.init(chartEle);
         // let chart = echarts.init(chartEle);
         let mapJson = await $.get(`${baseUrl}../map/china.json`);
-        console.log(mapJson);
         let chart = echarts.registerMap('china', mapJson);
         let myData = [
 
@@ -804,9 +937,7 @@ export class ChartTableModule {
         let citysJson = await $.get(`${baseUrl}../map/province/${provinceName}.json`);
         echarts.registerMap(provinceName, citysJson);
         let provinceEchart = echarts.init(chartEle);
-        console.log(citysJson);
         let citys = citysJson.features.map(city => city.properties.name);
-        console.log(citys);
         let options = {
             tooltip: {
                 trigger: 'item',
@@ -901,9 +1032,7 @@ export class ChartTableModule {
         let cityJson = await $.get(`${baseUrl}../map/citys/${cityCode}.json`);
         echarts.registerMap(cityCode, cityJson);
         let cityEchart = echarts.init(chartEle);
-        console.log(cityJson);
         let districts = cityJson.features.map(district => district.properties.name);
-        console.log(districts);
         let options = {
             tooltip: {
                 trigger: 'item',
