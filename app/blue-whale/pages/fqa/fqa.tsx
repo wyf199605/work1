@@ -63,7 +63,7 @@ export class FqaModal {
                 },
                 {
                     title : '如果都无法解决注册问题，查看该选项',
-                    content : <div> </div>
+                    content : this.initDeviceMsg()
                 }
             ],
             onChange: (data) => {
@@ -75,9 +75,10 @@ export class FqaModal {
                         img.removeAttribute('data-src');
                     });
                 }
-                if(data.index === 5){
-                    item.content = this.initDeviceMsg();
-                }
+                // if(data.index === 5){
+                //     console.log('1111111111')
+                //     item.content = this.initDeviceMsg();
+                // }
             }
         });
         d.on(d.query('a[data-href]', panel.wrapper), 'click', function() {
