@@ -10,6 +10,8 @@ import sys = BW.sys;
 import CityMap from './city-map';
 import Province from './province-map';
 import provinceMap from "./province-map";
+// import { Modal } from "cashier/global/components/feedback/modal/Modal";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
 
 
 
@@ -80,11 +82,14 @@ export class ChartTableModule {
             chartTableEle && this.parentDom.removeChild(chartTableEle);
         }
         this.parentDom.insertBefore(this.render(), this.parentDom.childNodes[0]);
-        
-        
+
+
         console.log(this.ui);
+        this.settingData.type = this.ui.showType;
+        this.settingData.xAxis = this.ui.local.xCoordinate;
+        this.settingData.yAxis = this.ui.local.yCoordinate.split(',');
         this.baffleDom = this.chartSettingRender();
-        this.chartBtnsContainer.appendChild(this.baffleDom);
+        tools.isMb ? d.query('body').appendChild(this.baffleDom) : this.chartBtnsContainer.appendChild(this.baffleDom);
         this.baffleDom.addEventListener('click', this.baffleDomClkFn.bind(this));
 
         tools.isMb || (this.chartBtnsContainer.style.height = '25rem');
@@ -95,12 +100,14 @@ export class ChartTableModule {
             case 'table':
             case 'web':
             case 'drill':
+            case 'detail':
                 this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
                 break;
-            case 'detail':
-                this.ui.cols = this.ui.fields;
-                this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
-                break; break;
+            // case 'detail':
+            //     debugger;
+            //     this.ui.cols = this.ui.fields;
+            //     this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
+            //     break; break;
         }
         // this.chart = this.initMap(this.chartDom);
         // this.chart = this.initMap(this.chartDom)
@@ -118,10 +125,10 @@ export class ChartTableModule {
         this.chartBtnsClk();
     }
     chartSettingRender() {
-        let dataTypes = ['10','11','14','15'];
+        let dataTypes = ['10', '11', '14', '15']; // y轴根据UItype展示
         let cols = this.ui.cols.filter(col => !col.noShow)
-        let xAxisData = cols.map(col => ({name: col.name,value:col.caption}));
-        let yAxisData = cols.filter(col => dataTypes.includes(col.dataType)).map(col => ({name: col.name,value:col.caption}));
+        let xAxisData = cols.map(col => ({ name: col.name, value: col.caption }));
+        let yAxisData = cols.filter(col => dataTypes.includes(col.dataType)).map(col => ({ name: col.name, value: col.caption }));
         console.log(yAxisData, xAxisData);
         let chartTypeData = {
             types: [
@@ -131,12 +138,12 @@ export class ChartTableModule {
                 { name: 'area', value: '面积图' }
             ]
         };
-        
+
         const fieldsetTypeDom: HTMLElement[] = chartTypeData.types.map((type, index) => {
             return (
                 <section class="radio-wrapper"  >
-                    <input type="radio" value={type.name} name='type' />
-                    <span class={index === 0 ? "label-radio checked-radio" : "label-radio"} name='type'></span>
+                    <input type="radio" value={type.name} name='type' checked={type.name === this.settingData.type ? 'checked' : ''} />
+                    <span class={type.name === this.settingData.type ? "label-radio checked-radio" : "label-radio"} name='type'></span>
                     <span calss="radio-text" name='type'>{type.value}</span>
                 </section>
             );
@@ -144,8 +151,8 @@ export class ChartTableModule {
         const xAxisDom: HTMLElement[] = xAxisData.map((item, index) => {
             return (
                 <section class="radio-wrapper"  >
-                    <input type="radio" value={item.name} name='xAxis' />
-                    <span class={index === 0 ? "label-radio checked-radio" : "label-radio"} name='xAxis'></span>
+                    <input type="radio" value={item.name} name='xAxis' checked={item.name === this.settingData.xAxis ? 'checked' : ''} />
+                    <span class={item.name === this.settingData.xAxis ? "label-radio checked-radio" : "label-radio"} name='xAxis'></span>
                     <span calss="radio-text" name='xAxis' title={item.value}>{item.value}</span>
                 </section>
             );
@@ -153,48 +160,79 @@ export class ChartTableModule {
         const yAxisDom: HTMLElement[] = yAxisData.map((item, index) => {
             return (
                 <section class="radio-wrapper"  >
-                    <input type="checkbox" value={item.name} name='yAxis' />
-                    <span class= "label-checkbox" name='yAxis'></span>
+                    <input type="checkbox" value={item.name} name='yAxis' checked={this.settingData.yAxis.includes(item.name) ? 'checked' : ''} />
+                    <span class={this.settingData.yAxis.includes(item.name) ? 'checked-radio label-checkbox' : "label-checkbox"} name='yAxis'></span>
                     <span calss="radio-text" name='yAxis' title={item.value}>{item.value}</span>
                 </section>
             );
         });
         const settingDom: HTMLDivElement = tools.isMb ?
-        <div class="mb-chart-baffle"> </div>
-        : <div class="pc-chart-baffle">
-            <div class="pc-baffle-main">
-                <h1 class="pc-baffle-header">
-                    <span>图表统计</span>
-                    <span class="pc-baffle-close">x</span>
-                </h1>
-                <div class="row">
-                    <fieldset class="col-xs-4">
-                        <legend>类型</legend>
-                        <section class="cols-comtainer"><div>
-                            {fieldsetTypeDom}
-                        </div></section>
-                    </fieldset>
-                    
-                    <fieldset class="col-xs-4">
-                        <legend>横坐标</legend>
-                        <section class="cols-comtainer"><div>
-                            {xAxisDom}
-                        </div></section>
-                    </fieldset>
-                    <fieldset class="col-xs-4">
-                        <legend>纵坐标</legend>
-                        <section class="cols-comtainer"><div>
-                            {yAxisDom}
-                        </div></section>
-                    </fieldset>
-                    {/* {fieldsetTypeDom} */}
-                </div>
-                <div class="pc-baffle-footer">
-                    <button class="btn button-type-primary">确定</button>
+            <div class="mb-chart-baffle">
+                <div class="mb-baffle-main">
+                    <h5>图形统计</h5>
+                    <section class="mb-baffle-content">
+                        <div class="row">
+                            <fieldset class="col-xs-6">
+                                <legend>类型</legend>
+                                <section class="cols-comtainer">
+                                    {fieldsetTypeDom}
+                                </section>
+                            </fieldset>
+
+                            <fieldset class="col-xs-6">
+                                <legend>横坐标</legend>
+                                <section class="cols-comtainer">
+                                    {xAxisDom}
+                                </section>
+                            </fieldset>
+                            <fieldset class="col-xs-6">
+                                <legend>纵坐标</legend>
+                                <section class="cols-comtainer">
+                                    {yAxisDom}
+                                </section>
+                            </fieldset>
+                        </div>
+                        <div class="mb-baffle-footer">
+                            <button class="btn button-type-primary btn-confirm">确定</button>
+                            <button class="btn button-type-primary btn-cancel">取消</button>
+                        </div>
+                    </section>
                 </div>
             </div>
-            
-        </div>;
+            : <div class="pc-chart-baffle">
+                <div class="pc-baffle-main">
+                    <h1 class="pc-baffle-header">
+                        <span>图表统计</span>
+                        <span class="pc-baffle-close">x</span>
+                    </h1>
+                    <div class="row">
+                        <fieldset class="col-xs-4">
+                            <legend>类型</legend>
+                            <section class="cols-comtainer"><div>
+                                {fieldsetTypeDom}
+                            </div></section>
+                        </fieldset>
+
+                        <fieldset class="col-xs-4">
+                            <legend>横坐标</legend>
+                            <section class="cols-comtainer"><div>
+                                {xAxisDom}
+                            </div></section>
+                        </fieldset>
+                        <fieldset class="col-xs-4">
+                            <legend>纵坐标</legend>
+                            <section class="cols-comtainer"><div>
+                                {yAxisDom}
+                            </div></section>
+                        </fieldset>
+                        {/* {fieldsetTypeDom} */}
+                    </div>
+                    <div class="pc-baffle-footer">
+                        <button class="btn button-type-primary btn-confirm">确定</button>
+                    </div>
+                </div>
+
+            </div>;
         return settingDom;
 
     }
@@ -202,11 +240,28 @@ export class ChartTableModule {
     // 图形统计按钮
     baffleDomClkFn(e: Event) {
         let name = e.target['name'];
-        if(e.target['className'] === 'pc-baffle-close') {
+        if (e.target['className'] === 'pc-baffle-close' || e.target['classList'].contains('btn-cancel')) {
             this.baffleDom.style.display = 'none';
-        }
+        } else if (e.target['classList'].contains('btn-confirm')) {
+            if (!this.settingData.type) {
+                return Modal.alert('类型不能为空');
+            } else if (!this.settingData.xAxis) {
+                return Modal.alert('横坐标不能为空');
+            } else if (this.settingData.yAxis.length === 0) {
+                return Modal.alert('纵坐标不能为空');
+            }
+            this.baffleDom.style.display = 'none';
+            let chartTableEle = d.query('.chart-table', this.parentDom);
+            chartTableEle && this.parentDom.removeChild(chartTableEle);
+            console.log(this.settingData);
+            this.ui.showType = this.settingData.type;
+            this.ui.local.xCoordinate = this.settingData.xAxis;
+            this.ui.local.yCoordinate = this.settingData.yAxis.join(',');
+            new ChartTableModule(this.ui, this.wrapper, this.data, this.ftable);
+
+        } 
         if (!name) return;
-        // this.chartDom.querySelector
+        // this.chartDom.classList.contains
         if (name === 'yAxis') {
             e.target['previousElementSibling'].checked;
             // e.target['parentElement'].parentElement.querySelector('.checked-radio').classList.remove('checked-radio');
@@ -217,10 +272,22 @@ export class ChartTableModule {
             e.target['parentElement'].parentElement.querySelector('.checked-radio').classList.remove('checked-radio');
             e.target['classList'].add('checked-radio');
         }
+        let prevEleValue = e.target['previousElementSibling'].value;
         switch (name) {
             case 'type':
-                this.settingData.type = e.target['previousElementSibling'].value;
+                this.settingData.type = prevEleValue;
                 break;
+            case 'xAxis':
+                this.settingData.xAxis = prevEleValue;
+                break;
+            case 'yAxis':
+                if (e.target['classList'].contains('checked-radio')) {
+                    !this.settingData.yAxis.includes(prevEleValue) && this.settingData.yAxis.push(prevEleValue);
+                } else {
+                    if (this.settingData.yAxis.includes(prevEleValue)) {
+                        this.settingData.yAxis.splice(this.settingData.yAxis.indexOf(prevEleValue), 1);
+                    }
+                }
         }
         console.log(this.settingData);
     }
@@ -238,7 +305,9 @@ export class ChartTableModule {
                 <i class="appcommon app-tuxing" ></i>
             </button>
             : <button class="btn button-type-default button-small chart-btn ">图表</button>
-        d.query('.chart-btn', btnsContainer) && btnsContainer.removeChild(d.query('.chart-btn', btnsContainer));
+        // d.query('.chart-btn', btnsContainer) && d.query('.chart-btn', btnsContainer).parentElement.removeChild(d.query('.chart-btn', btnsContainer));
+        // let chartBtnEle: HTMLElement = d.query('.chart-btn', btnsContainer);
+        // chartBtnEle && chartBtnEle.parentElement.removeChild(chartBtnEle);
 
         btnsContainer.children.length > 0 ? btnsContainer.children[0].appendChild(btn) : btnsContainer.appendChild(btn);
         btn.onclick = () => {
@@ -268,6 +337,7 @@ export class ChartTableModule {
         });
         let caption = this.ui.caption;
         let type = this.ui.showType || 'line';
+        type = type === 'area' ? 'line' : type;
         // let type = 'bar';
         let xAxisName: string = this.ui.local.xCoordinate.split(',').length >= 2 ? this.ui.local.xCoordinate.split(',')[0] : this.ui.local.xCoordinate.toUpperCase();
         let xAxisData: Array<any> = this.data.bodyData.map((item, i) => {
@@ -292,6 +362,7 @@ export class ChartTableModule {
                 symbol: 'circle',
                 symbolSize: 15,
             }
+            this.settingData.type === 'area' && (seriesItem['areaStyle'] = {});
             seriesItem.data = this.data.bodyData.map(item => item[legend]);
             // seriesItem.name = legendData[i];
             this.ui.cols.forEach(col => {
@@ -794,7 +865,7 @@ export class ChartTableModule {
 
     }
 
-    
+
 
 
     async initMap(chartEle: HTMLElement) {
