@@ -168,8 +168,11 @@ export = class myselfMbPage {
         });
         /**网络测试 */
         d.on(d.query('#testNetwork'), 'click', () => {
-            modal.isShow = true;
-            new checkNetwork({ modal: modal })
+            sys.window.open({
+                url: CONF.url.checkNetwork
+            });
+            // modal.isShow = true;
+            // new checkNetwork({ modal: modal })
         });
         let modal = new Modal({
             header: '网络监控',

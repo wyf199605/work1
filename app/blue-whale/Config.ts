@@ -17,6 +17,7 @@ namespace BW {
             msgDetail: `commonui/pageroute?page=static%2Fmessage_detail`,
             myselfMenu: `commonui/pageroute?page=static%2FmyselfMenu`,
             msgVersion: `commonui/pageroute?page=static%2FmsgVersion`,
+            checkNetwork: `commonui/pageroute?page=static%2FcheckNetwork`,
             imgRotate: `commonui/pageroute?page=static%2FimgRotation`,
             changePassword: `commonui/pageroute?page=static%2FchangePassword`,
             lionetOnline: `commonui/pageroute?page=lionetOnline`,

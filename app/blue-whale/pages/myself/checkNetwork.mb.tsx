@@ -4,18 +4,22 @@ import tools = G.tools;
 import CONF = BW.CONF;
 import d = G.d;
 import { BwRule } from "../../common/rule/BwRule";
-import { Modal } from "global/components/feedback/modal/Modal";
-declare const echarts;
-interface pagePara {
-  modal: Modal
+import BasicPage from "blue-whale/pages/basicPage";
+interface pagePara extends BasicPagePara{
+    version : obj
 }
+// import { Modal } from "global/components/feedback/modal/Modal";
+declare const echarts;
+// interface pagePara {
+//   modal: Modal
+// }
 export class checkNetwork {
   private submitBtn: HTMLElement;
   private myChart: any;
   private option: any;
-  private modal: Modal;
+  // private modal: Modal;
   constructor(para: pagePara) {
-    this.modal = para.modal;
+    // this.modal = para.modal;
     let net = d.query(".check_netWork")
     if (net) {
       net.remove();
@@ -23,7 +27,7 @@ export class checkNetwork {
     // d.query(".modal-header", para.modal.headWrapper).style.cssText = "background-color:#005BAC!important";
     // d.query(".modal-title", para.modal.headWrapper).style.cssText = 'color:white!important';
     // d.query(".close", para.modal.headWrapper).style.cssText = 'color:white!important';
-    this.render(para.modal.body);
+    this.render(d.query("#check-network"));
     this.event();
     this.renderCircle()
   }
