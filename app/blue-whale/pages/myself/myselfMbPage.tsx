@@ -91,12 +91,12 @@ export = class myselfMbPage {
         //         sys.window.whiteBat();
         //     });
         // }
-        if (CONF.appid === 'app_fastlion_retail') {
-            let li = <li className="mui-table-view-cell" id="changePassword">
-                <a href="#" className="mui-navigate-right"> <i className="iconfont icon-renyuan" style="color:#FFB741;margin-right:10px"></i>密码修改</a>
-            </li>;
-            d.append(list, li);
-        }
+        // if (CONF.appid === 'app_fastlion_retail') {
+        //     let li = <li className="mui-table-view-cell" id="changePassword">
+        //         <a href="#" className="mui-navigate-right"> <i className="iconfont icon-renyuan" style="color:#FFB741;margin-right:10px"></i>密码修改</a>
+        //     </li>;
+        //     d.append(list, li);
+        // }
         if (sys.window.toClient) {
             let li = <li className="mui-table-view-cell">
                 <a href="#" className="mui-navigate-right">更改客户代码</a>
