@@ -101,8 +101,13 @@ export class ChartTableModule {
             case 'web':
             case 'drill':
             case 'detail':
-                this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
+                if (this.ui.showType === 'map') {
+                    this.initMap(this.chartDom);
+                } else {
+                    this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
+                }
                 break;
+
             // case 'detail':
             //     debugger;
             //     this.ui.cols = this.ui.fields;
@@ -124,6 +129,10 @@ export class ChartTableModule {
         }, false);
         this.chartBtnsClk();
     }
+
+    /**
+     * 图形统计弹出框设置图表方法
+     */
     chartSettingRender() {
         let dataTypes = ['10', '11', '14', '15']; // y轴根据UItype展示
         let cols = this.ui.cols.filter(col => !col.noShow)
@@ -241,7 +250,19 @@ export class ChartTableModule {
     baffleDomClkFn(e: Event) {
         let name = e.target['name'];
         if (e.target['className'] === 'pc-baffle-close' || e.target['classList'].contains('btn-cancel')) {
-            this.baffleDom.style.display = 'none';
+
+            // this.baffleDom.children[0].style.animation = 'doBaffleMain .3s ease-in-out reverse';
+            // this.baffleDom.style.display = 'none';
+            if (tools.isMb) {
+                this.baffleDom.children[0].classList.remove('showMain');
+                this.baffleDom.children[0].classList.add('hideMain');
+                // debugger;
+                setTimeout(() => {
+                    this.baffleDom.style.display = 'none';
+                }, 300);
+            } else {
+                this.baffleDom.style.display = 'none';
+            }
         } else if (e.target['classList'].contains('btn-confirm')) {
             if (!this.settingData.type) {
                 return Modal.alert('类型不能为空');
@@ -250,7 +271,17 @@ export class ChartTableModule {
             } else if (this.settingData.yAxis.length === 0) {
                 return Modal.alert('纵坐标不能为空');
             }
-            this.baffleDom.style.display = 'none';
+            // this.baffleDom.style.display = 'none';
+            if (tools.isMb) {
+                this.baffleDom.children[0].classList.remove('showMain');
+                this.baffleDom.children[0].classList.add('hideMain');
+                // debugger;
+                setTimeout(() => {
+                    this.baffleDom.style.display = 'none';
+                }, 300);
+            } else {
+                this.baffleDom.style.display = 'none';
+            }
             let chartTableEle = d.query('.chart-table', this.parentDom);
             chartTableEle && this.parentDom.removeChild(chartTableEle);
             console.log(this.settingData);
@@ -259,7 +290,7 @@ export class ChartTableModule {
             this.ui.local.yCoordinate = this.settingData.yAxis.join(',');
             new ChartTableModule(this.ui, this.wrapper, this.data, this.ftable);
 
-        } 
+        }
         if (!name) return;
         // this.chartDom.classList.contains
         if (name === 'yAxis') {
@@ -818,7 +849,14 @@ export class ChartTableModule {
                     this.ftable.recountWidth();
                     break;
                 case 'chartSetting':
+                    if(tools.isMb) {
+                        this.baffleDom.children[0].classList.remove('hideMain');
+                        this.baffleDom.children[0].classList.add('showMain');
+                    }
                     this.baffleDom.style.display = 'block';
+
+
+
                     // tools.isMb ? this.mbChartSetting() : this.pcChartSetting();
                     break;
             }
@@ -869,56 +907,76 @@ export class ChartTableModule {
 
 
     async initMap(chartEle: HTMLElement) {
+        const bodyData = this.data['data'];
+        
+        let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
+        let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
+        let yAxisNamesObj = {};
+        yAxisNames.forEach(name =>{
+            console.log(this.ui.cols.find(col=> col.name === name).caption)
+            // yAxisNamesObj[]
+            // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
+        });
+        //  yAxisNames.map(key => ({[key]: this.ui.cols.find(col=> col.name === key).caption}));
+        debugger;
+        console.log(yAxisNamesObj);
+        let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
+        let max = Math.max(...numArr);
+        // let min = Math.min(...numArr);
+
         chartEle.parentElement.style.height = '25rem';
         let chinaMap = echarts.init(chartEle);
         // let chart = echarts.init(chartEle);
         let mapJson = await $.get(`${baseUrl}../map/china.json`);
+        console.log(mapJson);
         let chart = echarts.registerMap('china', mapJson);
         let myData = [
 
-            {
-                name: '海门',
-                value: [121.15, 31.89, 90],
-                itemStyle: {
-                    color: '#609ee9'
-                }
+            // {
+            //     name: '海门',
+            //     value: [121.15, 31.89, 90],
+            //     itemStyle: {
+            //         color: '#609ee9'
+            //     }
 
-            },
-            {
-                name: '南平',
-                value: [1090.781327, 39.608266, 120],
-                itemStyle: {
-                    color: '#f7ba2a'
-                }
-            },
-            {
-                name: '招远',
-                value: [120.38, 370.35, 142],
-                itemStyle: {
-                    color: '#609ee9'
-                }
-            },
-            {
-                name: '舟山',
-                value: [121.509062, 25.044332, 123],
-                itemStyle: {
-                    color: 'red'
-                }
-            }
+            // },
+            // {
+            //     name: '南平',
+            //     value: [1090.781327, 39.608266, 120],
+            //     itemStyle: {
+            //         color: '#f7ba2a'
+            //     }
+            // },
+            // {
+            //     name: '招远',
+            //     value: [120.38, 370.35, 142],
+            //     itemStyle: {
+            //         color: '#609ee9'
+            //     }
+            // },
+            // {
+            //     name: '舟山',
+            //     value: [121.509062, 25.044332, 123],
+            //     itemStyle: {
+            //         color: 'red'
+            //     }
+            // }
         ];
 
-        function randomValue() {
-            return Math.round(Math.random() * 1500);
+        function provinceFn(province : string) {
+            let item = bodyData.find(item => item[xAxisName].indexOf(province) !== -1 );
+            console.log(item);
+            return item ? item[yAxisNames[0]] : 0;
         }
         let chinaMapOption = {
 
             tooltip: {
                 trigger: 'item',
-                formatter: '{b}<br/>{c} (p / km2)'
+                formatter: `{b}<br/>{c} )`
             },
             visualMap: {
                 min: 0,
-                max: 1500,
+                max,
                 left: 'left',
                 top: 'bottom',
                 text: ['High', 'Low'],
@@ -987,7 +1045,7 @@ export class ChartTableModule {
                     geoIndex: 0,
                     // tooltip: {show: false},
                     data: mapJson.features.map(city => city.properties.name).map(province => {
-                        return { name: province, value: Math.round(Math.random() * 1500) }
+                        return { name: province, value: provinceFn(province) }
                     })
                 }
 

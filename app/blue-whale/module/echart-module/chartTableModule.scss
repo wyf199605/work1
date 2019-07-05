@@ -137,10 +137,12 @@
     display: none;
     .mb-baffle-main {
         position: absolute;
+        border-radius: 5px;
         width: 100%;
         bottom: 0;
         background: white;
         padding: 25px 10px 10px 10px;
+        
         fieldset {
             margin-bottom: 8px;
             legend {
@@ -170,6 +172,28 @@
                 }
                 
             }
+        }
+    }
+    .showMain {
+        animation: doBaffleMain .3s ease-in-out ;
+    }
+    .hideMain{
+        height: 0;
+        animation: doBaffleMainRe .3s ease-in-out ;
+    }
+
+    @keyframes doBaffleMain {
+        from {
+            height: 0;
+        } to {
+            height: 600px;
+        }
+    }
+    @keyframes doBaffleMainRe {
+        from {
+            height: 600px;
+        } to {
+            height: 0px;
         }
     }
     
