@@ -9,7 +9,7 @@ import CONF = BW.CONF;
 import sys = BW.sys;
 import CityMap from './city-map';
 import Province from './province-map';
-import provinceMap from "./province-map";
+import ProvinceMap from "./province-map";
 // import { Modal } from "cashier/global/components/feedback/modal/Modal";
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 
@@ -83,8 +83,6 @@ export class ChartTableModule {
         }
         this.parentDom.insertBefore(this.render(), this.parentDom.childNodes[0]);
 
-
-        console.log(this.ui);
         this.settingData.type = this.ui.showType;
         this.settingData.xAxis = this.ui.local.xCoordinate;
         this.settingData.yAxis = this.ui.local.yCoordinate.split(',');
@@ -102,7 +100,15 @@ export class ChartTableModule {
             case 'drill':
             case 'detail':
                 if (this.ui.showType === 'map') {
-                    this.initMap(this.chartDom);
+                    if(this.ui.location === 'china') {
+                        this.chart = this.initMap(this.chartDom);
+                    } else if (/.*省$/.test(`${this.ui.location}`) || ProvinceMap[this.ui.location]) {
+                        let name = /.*省$/.test(`${this.ui.location}`) ? this.ui.location.slice(0, (this.ui.location.length -1)) : this.ui.location; 
+                        this.chart = this.initProvince(this.chartDom, name);
+                    } else {
+                        let name = /.*市$/.test(`${this.ui.location}`) ? this.ui.location : this.ui.location + '市';
+                        this.chart = this.initCity(this.chartDom, name);
+                    }
                 } else {
                     this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
                 }
@@ -138,7 +144,7 @@ export class ChartTableModule {
         let cols = this.ui.cols.filter(col => !col.noShow)
         let xAxisData = cols.map(col => ({ name: col.name, value: col.caption }));
         let yAxisData = cols.filter(col => dataTypes.includes(col.dataType)).map(col => ({ name: col.name, value: col.caption }));
-        console.log(yAxisData, xAxisData);
+        // console.log(yAxisData, xAxisData);
         let chartTypeData = {
             types: [
                 { name: 'line', value: '折线图' },
@@ -907,18 +913,19 @@ export class ChartTableModule {
 
 
     async initMap(chartEle: HTMLElement) {
-        const bodyData = this.data['data'];
+        const bodyData: Array<any> = this.data['data'];
         
         let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
         let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
-        let yAxisNamesObj = {};
+        let yAxisNamesObj: object = {};
         yAxisNames.forEach(name =>{
-            console.log(this.ui.cols.find(col=> col.name === name).caption)
+            // console.log(this.ui.cols.find(col=> col.name === name).caption)
             // yAxisNamesObj[]
             // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
+            yAxisNamesObj[name] = this.ui.cols.find(col=> col.name === name).caption
+            console.log(this.ui.cols.find(col=> col.name === name).caption)
         });
         //  yAxisNames.map(key => ({[key]: this.ui.cols.find(col=> col.name === key).caption}));
-        debugger;
         console.log(yAxisNamesObj);
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = Math.max(...numArr);
@@ -968,11 +975,24 @@ export class ChartTableModule {
             console.log(item);
             return item ? item[yAxisNames[0]] : 0;
         }
+
+        
         let chinaMapOption = {
 
             tooltip: {
                 trigger: 'item',
-                formatter: `{b}<br/>{c} )`
+                // formatter: `{b}<br/>${yAxisNamesObj[yAxisNames[0]]} : {c}`
+                formatter:  (param) => {
+                    let tipInfo = bodyData.find(item => item[xAxisName].indexOf(param.name) !== -1);
+                    if (!tipInfo) return param.name;
+                    // debugger;
+                    let tip = `${param.name}<br/>`;
+                    yAxisNames.forEach((name, i) => {
+                        tip += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${this.color[i]}"></span>${yAxisNamesObj[name]} : ${tipInfo[name]} <br/>`;
+                    });
+                    
+                    return tip;
+                }
             },
             visualMap: {
                 min: 0,
@@ -1053,28 +1073,83 @@ export class ChartTableModule {
         }
 
         chinaMap.setOption(chinaMapOption);
+        chinaMap.on('click', (params) => {
+            debugger;
+            let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, params.data.item);
+            if (tools.isMb && !ifBreak) {
+                let tipDom: HTMLDivElement
+                tipDom = this.tipLinkFn(`${params.name}: ${params.value}`);
+
+                d.query('.tip-link', this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link', this.chartBtnsContainer));
+
+                this.chartBtnsContainer.appendChild(tipDom);
+                tipDom.style.top = params.event.offsetY + 'px';
+                tipDom.style.left = (params.event.offsetX - 50) + 'px';
+                setTimeout(() => {
+                    this.chartBtnsContainer.removeChild(tipDom);
+                }, 3000);
+                tipDom.onclick = () => {
+                    this.chartBtnsContainer.removeChild(tipDom);
+                    // this.drillPage(params, params.data.item); 
+                    this.getAjax(defaultCol, dataCol, varNamesObj);
+                }
+                return;
+            }
+
+            !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
+
+        })
 
         return chinaMap;
     }
 
     async initProvince(chartEle: HTMLElement, name: string) {
+        const bodyData: Array<any> = this.data['data'];
+        
+        let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
+        let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
+        let yAxisNamesObj: object = {};
+        yAxisNames.forEach(name =>{
+            // console.log(this.ui.cols.find(col=> col.name === name).caption)
+            // yAxisNamesObj[]
+            // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
+            yAxisNamesObj[name] = this.ui.cols.find(col=> col.name === name).caption
+            console.log(this.ui.cols.find(col=> col.name === name).caption)
+        });
+        let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
+        let max = Math.max(...numArr);
+
         chartEle.parentElement.style.height = '25rem';
         let myData = [];
 
         // let chart = echarts.init(chartEle);
-        let provinceName = provinceMap[name];
+        let provinceName = ProvinceMap[name];
         let citysJson = await $.get(`${baseUrl}../map/province/${provinceName}.json`);
         echarts.registerMap(provinceName, citysJson);
         let provinceEchart = echarts.init(chartEle);
         let citys = citysJson.features.map(city => city.properties.name);
+        const cityFn = (city: string) => {
+            let item = bodyData.find(item => item[xAxisName].indexOf(city) !== -1 );
+            console.log(item);
+            return item ? item[yAxisNames[0]] : 0;
+            } 
         let options = {
             tooltip: {
                 trigger: 'item',
-                formatter: '{b}<br/>{c} (p / km2)'
+                formatter: (param) => {
+                    let tipInfo = bodyData.find(item => item[xAxisName].indexOf(param.name) !== -1);
+                    if (!tipInfo) return param.name;
+                    let tip = `${param.name}<br/>`;
+                    yAxisNames.forEach((name, i) => {
+                        tip += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${this.color[i]}"></span>${yAxisNamesObj[name]} : ${tipInfo[name]} <br/>`;
+                    });
+                    
+                    return tip;
+                }
             },
             visualMap: {
                 min: 0,
-                max: 1500,
+                max,
                 left: 'left',
                 top: 'bottom',
                 text: ['High', 'Low'],
@@ -1137,11 +1212,11 @@ export class ChartTableModule {
                     }
                 },
                 {
-                    name: 'categoryA',
+                    name: provinceName,
                     type: 'map',
                     geoIndex: 0,
                     data: citys.map(city => {
-                        return { name: city, value: Math.round(Math.random() * 1500) }
+                        return { name: city, value: cityFn(city) }
                     })
                 }
             ]
@@ -1152,6 +1227,26 @@ export class ChartTableModule {
     }
 
     async initCity(chartEle: HTMLElement, name: string) {
+        const bodyData: Array<any> = this.data['data'];
+        
+        let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
+        let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
+        let yAxisNamesObj: object = {};
+        yAxisNames.forEach(name =>{
+            // console.log(this.ui.cols.find(col=> col.name === name).caption)
+            // yAxisNamesObj[]
+            // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
+            yAxisNamesObj[name] = this.ui.cols.find(col=> col.name === name).caption
+            console.log(this.ui.cols.find(col=> col.name === name).caption)
+        });
+        let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
+        let max = Math.max(...numArr);
+        const countyFn = (county: string) => {
+            let item = bodyData.find(item => item[xAxisName].indexOf(county) !== -1 );
+            console.log(item);
+            return item ? item[yAxisNames[0]] : 0;
+            } 
+
         chartEle.parentElement.style.height = '25rem';
         let myData = [];
 
@@ -1165,11 +1260,20 @@ export class ChartTableModule {
         let options = {
             tooltip: {
                 trigger: 'item',
-                formatter: '{b}<br/>{c} (p / km2)'
+                formatter: (param) => {
+                    let tipInfo = bodyData.find(item => item[xAxisName].indexOf(param.name) !== -1);
+                    if (!tipInfo) return param.name;
+                    let tip = `${param.name}<br/>`;
+                    yAxisNames.forEach((name, i) => {
+                        tip += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${this.color[i]}"></span>${yAxisNamesObj[name]} : ${tipInfo[name]} <br/>`;
+                    });
+                    
+                    return tip;
+                }
             },
             visualMap: {
                 min: 0,
-                max: 1500,
+                max,
                 left: 'left',
                 top: 'bottom',
                 text: ['High', 'Low'],
@@ -1236,7 +1340,7 @@ export class ChartTableModule {
                     type: 'map',
                     geoIndex: 0,
                     data: districts.map(district => {
-                        return { name: district, value: Math.round(Math.random() * 1500) }
+                        return { name: district, value: countyFn(district) }
                     })
                 }
             ]
