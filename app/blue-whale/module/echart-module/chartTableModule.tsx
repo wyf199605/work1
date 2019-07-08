@@ -123,6 +123,7 @@ export class ChartTableModule {
         // this.chart = this.initMap(this.chartDom);
         // this.chart = this.initMap(this.chartDom)
         window.onresize = () => {
+            if (this.ui.showType === 'map') return;
             this.chart && this.chart.resize();
         }
         window.addEventListener("orientationchange", () => {
@@ -754,7 +755,7 @@ export class ChartTableModule {
         defaultCol.drillAddr && defaultCol.drillAddr.varList.forEach(list => {
             if (list.varName) {
                 varNamesObj[list.varName] = dataCol[list.varName];
-                !dataCol[list.varName] && (ifBreak = true);
+                // !dataCol[list.varName] && (ifBreak = true);
             }
         });
         if (ifBreak) return {
@@ -1074,8 +1075,9 @@ export class ChartTableModule {
 
         chinaMap.setOption(chinaMapOption);
         chinaMap.on('click', (params) => {
-            debugger;
-            let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, params.data.item);
+            let col = bodyData.find(col => col[xAxisName].indexOf(params.name) !== -1);
+            if (!col) return;
+            let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, col);
             if (tools.isMb && !ifBreak) {
                 let tipDom: HTMLDivElement
                 tipDom = this.tipLinkFn(`${params.name}: ${params.value}`);
@@ -1222,7 +1224,33 @@ export class ChartTableModule {
             ]
         };
         provinceEchart.setOption(options);
+        provinceEchart.on('click', (params) => {
+            let col = bodyData.find(col => col[xAxisName].indexOf(params.name) !== -1);
+            if (!col) return;
+            let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, col);
+            if (tools.isMb && !ifBreak) {
+                let tipDom: HTMLDivElement
+                tipDom = this.tipLinkFn(`${params.name}: ${params.value}`);
 
+                d.query('.tip-link', this.chartBtnsContainer) && this.chartBtnsContainer.removeChild(d.query('.tip-link', this.chartBtnsContainer));
+
+                this.chartBtnsContainer.appendChild(tipDom);
+                tipDom.style.top = params.event.offsetY + 'px';
+                tipDom.style.left = (params.event.offsetX - 50) + 'px';
+                setTimeout(() => {
+                    this.chartBtnsContainer.removeChild(tipDom);
+                }, 3000);
+                tipDom.onclick = () => {
+                    this.chartBtnsContainer.removeChild(tipDom);
+                    // this.drillPage(params, params.data.item); 
+                    this.getAjax(defaultCol, dataCol, varNamesObj);
+                }
+                return;
+            }
+
+            !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
+
+        })
         return provinceEchart;
     }
 
@@ -1347,7 +1375,7 @@ export class ChartTableModule {
         };
         // debugger;
         cityEchart.setOption(options);
-
+        
         return cityEchart;
     }
 
