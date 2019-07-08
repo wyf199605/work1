@@ -109,7 +109,7 @@ interface IBW_Table {
     initShow?: number; // 1（先图）, 0(无图)， 2（先表)
     showType?: string; // 图形类型 line(折线图), bar(柱状图)， pie(饼状图)
     location?: string; // china中国地图 省地图 市地图
-
+    riseRule?: string;
 }
 
 interface IBW_Detail {

@@ -120,10 +120,8 @@ export class ChartTableModule {
             //     this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
             //     break; break;
         }
-        // this.chart = this.initMap(this.chartDom);
-        // this.chart = this.initMap(this.chartDom)
         window.onresize = () => {
-            if (this.ui.showType === 'map') return;
+            // if (this.ui.showType === 'map') return;
             this.chart && this.chart.resize();
         }
         window.addEventListener("orientationchange", () => {
@@ -352,7 +350,7 @@ export class ChartTableModule {
 
             this.wrapper.style.display = 'none';
             this.chartBtnsContainer.style.display = 'block';
-            this.chart.resize();
+            this.chart && this.chart.resize();
         }
     }
 
@@ -930,6 +928,7 @@ export class ChartTableModule {
         console.log(yAxisNamesObj);
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = Math.max(...numArr);
+
         // let min = Math.min(...numArr);
 
         chartEle.parentElement.style.height = '25rem';
@@ -937,39 +936,66 @@ export class ChartTableModule {
         // let chart = echarts.init(chartEle);
         let mapJson = await $.get(`${baseUrl}../map/china.json`);
         console.log(mapJson);
-        let chart = echarts.registerMap('china', mapJson);
-        let myData = [
+        // const signName = /.*省$/.test(`${this.ui.location}`) ? this.ui.location.slice(0, (this.ui.location.length - 1)) : this.ui.location;
+        // const 
 
-            {
-                name: '海门',
-                value: [121.15, 31.89, 90],
-                itemStyle: {
-                    color: '#609ee9'
-                }
+        const signValue = bodyData.map(col => {
+            const signName = /.*(省|市)$/.test(`${col[xAxisName]}`) ? col[xAxisName].slice(0, (col[xAxisName].length - 1)) : col[xAxisName];
+            console.log(col[xAxisName].slice(0, (col[xAxisName].length - 1)));
+            let signValue = mapJson.features.find(feature => feature.properties.name === signName);
+            return signValue;
+        });
 
-            },
-            {
-                name: '南平',
-                value: [1090.781327, 39.608266, 120],
-                itemStyle: {
-                    color: '#f7ba2a'
-                }
-            },
-            {
-                name: '招远',
-                value: [120.38, 370.35, 142],
-                itemStyle: {
-                    color: '#609ee9'
-                }
-            },
-            {
-                name: '舟山',
-                value: [121.509062, 25.044332, 123],
-                itemStyle: {
-                    color: 'yellow'
-                }
+        let riseData = [ ];
+        if (this.ui.riseRule) {
+            let riseRule = this.ui.riseRule.split(',');
+            let riseValue: Array<any>;
+            let valueArr = bodyData.map(col => col[riseRule[0]]);
+            if (riseRule[1] === '1') {
+                let conditionArr = bodyData.map(col => col[riseRule[2]]);
+                valueArr.forEach((value, i) => {
+                    // if(value >= conditionArr[i]) {
+                    //     riseData.push({
+                    //         name: obj. properties.name,
+                    //         value: obj. properties.cp,
+                    //         itemStyle: {
+                    //             color: 'red'
+                    //         }});
+                    // }
+                    signValue.forEach((obj, i) => {
+                        if (valueArr[i] >= conditionArr[i]) {
+                            riseData.push({
+                                name: obj.properties.name,
+                                value: obj.properties.cp,
+                                itemStyle: {
+                                    color: 'red'
+                                }
+                            });
+                        }
+
+                    })
+                })
+            } else {
+                signValue.forEach((obj, i) => {
+                    if (valueArr[i] >= Number(riseRule[2])) {
+                        riseData.push({
+                            name: obj.properties.name,
+                            value: obj.properties.cp,
+                            itemStyle: {
+                                color: 'red'
+                            }
+                        });
+                    } else {
+
+                    }
+
+                })
             }
-        ];
+
+        }
+        debugger;
+        let chart = echarts.registerMap('china', mapJson);
+
 
         function provinceFn(province: string) {
             let item = bodyData.find(item => item[xAxisName].indexOf(province) !== -1);
@@ -980,7 +1006,7 @@ export class ChartTableModule {
 
         let chinaMapOption = {
 
-            
+
             visualMap: {
                 min: 0,
                 max,
@@ -1023,7 +1049,7 @@ export class ChartTableModule {
                 {
                     type: 'scatter',
                     coordinateSystem: 'geo',
-                    data: myData,
+                    data: riseData,
                     symbolSize: 10,
                     silent: true,
                     symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
@@ -1087,7 +1113,7 @@ export class ChartTableModule {
                 yAxisNames.forEach((name, i) => {
                     tip += `${yAxisNamesObj[name]} : ${col[name]} <br/>`;
                 });
-               
+
 
                 let tipDom: HTMLDivElement = <div class="tip-link">
                     <p>{params.name}</p>
@@ -1139,11 +1165,60 @@ export class ChartTableModule {
         let max = Math.max(...numArr);
 
         chartEle.parentElement.style.height = '25rem';
-        let myData = [];
-
+        // let myData = [];
+       
         // let chart = echarts.init(chartEle);
         let provinceName = ProvinceMap[name];
         let citysJson = await $.get(`${baseUrl}../map/province/${provinceName}.json`);
+
+        // 处理上升下降标记
+        const signValue = bodyData.map(col => {
+            debugger;
+            const signName = /.*市$/.test(`${col[xAxisName]}`) ?  col[xAxisName] : col[xAxisName] + '市' ;
+            console.log(col[xAxisName].slice(0, (col[xAxisName].length - 1)));
+            let signValue = citysJson.features.find(feature => feature.properties.name === signName);
+            return signValue;
+        });
+        let riseData = [ ];
+        if (this.ui.riseRule) {
+            let riseRule = this.ui.riseRule.split(',');
+            let riseValue: Array<any>;
+            let valueArr = bodyData.map(col => col[riseRule[0]]);
+            if (riseRule[1] === '1') {
+                let conditionArr = bodyData.map(col => col[riseRule[2]]);
+                valueArr.forEach((value, i) => {
+                    signValue.forEach((obj, i) => {
+                        if (valueArr[i] >= conditionArr[i]) {
+                            riseData.push({
+                                name: obj.properties.name,
+                                value: obj.properties.cp,
+                                itemStyle: {
+                                    color: 'red'
+                                }
+                            });
+                        }
+
+                    })
+                })
+            } else {
+                signValue.forEach((obj, i) => {
+                    if (valueArr[i] >= Number(riseRule[2])) {
+                        riseData.push({
+                            name: obj.properties.name,
+                            value: obj.properties.cp,
+                            itemStyle: {
+                                color: 'red'
+                            }
+                        });
+                    } else {
+
+                    }
+
+                })
+            }
+
+        }
+
         echarts.registerMap(provinceName, citysJson);
         let provinceEchart = echarts.init(chartEle);
         let citys = citysJson.features.map(city => city.properties.name);
@@ -1207,7 +1282,7 @@ export class ChartTableModule {
                 {
                     type: 'scatter',
                     coordinateSystem: 'geo',
-                    // data: myData,
+                    data: riseData,
                     symbolSize: 10,
                     silent: true,
                     symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
@@ -1337,7 +1412,7 @@ export class ChartTableModule {
             //             } else {
             //                 tip += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${this.color[i]}"></span>${yAxisNamesObj[name]} : ${tipInfo[name]} <br/>`;
             //             }
-                        
+
             //         });
 
             //         return tip;
@@ -1425,12 +1500,12 @@ export class ChartTableModule {
                     if (!tipInfo) return param.name;
                     let tip = `${param.name}<br/>`;
                     yAxisNames.forEach((name, i) => {
-                        if(tools.isMb) {
+                        if (tools.isMb) {
                             tip += `${yAxisNamesObj[name]} : ${tipInfo[name]} <br/>`;
                         } else {
                             tip += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${this.color[i]}"></span>${yAxisNamesObj[name]} : ${tipInfo[name]} <br/>`;
                         }
-                        
+
                     });
 
                     return tip;
