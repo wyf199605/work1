@@ -499,6 +499,7 @@ export class BwRule extends Rule {
      * @param {function} para.callback - 点击link执行的回调函数, 参数为 (需要执行的动作，动作需要的数据，所有的动作)
      */
     static link(para) {
+        console.log(para)
         let _linkAct = {
             OPEN_WIN: 1,
             DOWNLOAD: 2,
@@ -515,6 +516,7 @@ export class BwRule extends Rule {
 
         url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
         console.log(url);
+        console.log("------------------------------")
         if (para.dataType === BwRule.DT_FILE) {
 
             if (para.type === 'download') {

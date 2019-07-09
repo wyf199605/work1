@@ -838,7 +838,6 @@ export class BwTableModule extends Component {
                 field: R_Field = ftable.columnGet(colName).content,
                 row = ftable.rowGet(rowIndex),
                 rowData = row.data;
-
             if (field) {
                 self.tdClickHandler(field, rowData);
             }
@@ -2532,6 +2531,8 @@ export class BwTableModule extends Component {
                                     Modal.toast("请先要打印的内容");
                                     return false;
                                 }
+                                console.log(this.ftable)
+
                                 let printer = [];
                                 try {
                                     let printList = Shell.printer.get();
@@ -2604,6 +2605,8 @@ export class BwTableModule extends Component {
                                         }
 
                                     });
+                                }).catch(e=>{
+                                    console.log(e)
                                 })
                             } else {
                                 // 通用操作按钮
@@ -2732,24 +2735,64 @@ export class BwTableModule extends Component {
                         filePath: url,
                         count: 1
                     })
+                }else{
+                    reject(response)
                 }
             }).catch((e) => {
-                console.log(e);
+                reject(e)
             });
         })
     }
     getData = async (that, btn) => {
         let printData = [];
-        for (var i = 0; i < that.ftable.selectedRowsData.length; i++) {
-            let item = that.ftable.selectedRowsData[i];
-            if (item[btn.data.linkName]) {
-                let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                    "md5_field": btn.data.linkName,
-                    [btn.data.linkName]: item[btn.data.linkName],
-                    down: 'allow'
-                });
-                let result = await this.getItemData(btn, item, url)
-                printData.push(result)
+        var fileItem = [];
+        if (btn.data.linkName) {
+            fileItem = btn.data.linkName.split(",");
+        }
+        if (fileItem && fileItem.length > 0) {
+            for (var j = 0; j < fileItem.length; j++) {
+                let child = fileItem[j];
+                for (var i = 0; i < that.ftable.selectedRowsData.length; i++) {
+                    let item = that.ftable.selectedRowsData[i];
+                    if (item[btn.data.linkName]) {
+                        let field = that.ftable.columnGet(child).content;
+                        let url;
+                        if (field&&field.dataType == '43') {
+                            let link = field.link,
+                                rowData = item;
+                            if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
+                                let para = {
+                                    link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
+                                    varList: link.varList,
+                                    dataType: field.atrrs.dataType,
+                                    data: rowData,
+                                    needGps: link.needGps === 1,
+                                    type: link.type
+                                }
+                                para = Object.assign({
+                                    dataType: '',
+                                    varList: [],
+                                    data: {}
+                                }, para);
+                                url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
+                            }
+                        } else {
+                            url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                                "md5_field": child,
+                                [child]: item[child],
+                                down: 'allow'
+                            });
+                        }
+                        console.log(url);
+                        try {
+                            let result = await this.getItemData(btn, item, url);
+                            printData.push(result);
+                        } catch (err) {
+                            // Modal.toast("附件异常，无法打印")
+                            console.log(err)
+                        }
+                    }
+                }
             }
         }
         console.log(printData);
