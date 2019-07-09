@@ -682,6 +682,9 @@ namespace G {
             },
             setDownLoadUrl(data: obj, back?: IShellEventHandler) {
                 return ShellBase.handler('setDownLoadUrl', data, back)
+            },
+            filePrint(data: obj, back?: IShellEventHandler, infor?: IShellEventHandler) {
+                return ShellBase.handler('filePrint', data, back, infor);
             }
         }
         return {
@@ -736,7 +739,6 @@ namespace G {
         function windowsHandler<IShellHandler>(action: string, data, back?, infor?, isAutoOff = true) {
             if (typeof AppShell === 'object' || (tools.os.ios && 'webkit' in window && typeof webkit.messageHandlers.AppShell === 'object')) {
                 let dataStr = typeof data === 'string' ? data : JSON.stringify(data);
-
                 if (tools.isEmpty(back) && tools.isEmpty(infor)) {
                     if (tools.os.ios) {
                         return null;

@@ -59,15 +59,19 @@ export class LoginPcPage extends LoginPage {
             <a href="#" className="zhiwen">
                 <i className="iconfont icon-zhiwen" />
                 指纹登录
-                </a>
+            </a>
             <a href="#" className="device">
                 <i className="iconfont icon-device-mb" />
                 设备注册
-                </a>
+            </a>
             <a href="#" className="scanLogin">
                 <i class="iconfont icon-saoma"></i>
                 扫码登录
-                </a>
+            </a>
+            <a href="#" className="jiebang">
+                <i class="iconfont icon-jiebang"></i>
+                设备解绑
+            </a>
         </div>;
 
         d.append(form, loginOption);
@@ -103,6 +107,7 @@ export class LoginPcPage extends LoginPage {
             fingerPcBtn: d.query('.zhiwen', loginOption),
             regButton: d.query('.device', loginOption),
             scanButton: d.query(".scanLogin", loginOption),
+            jiebangButton:d.query(".jiebang",loginOption),
             fqaBtn
         });
     }

@@ -182,6 +182,9 @@ namespace C {
             },
             labelPrint(quantity: number, driveCode: number, image: string, back: IShellEventHandler) {
                 return ShellBase.handler('labelPrint', { quantity, driveCode, image }, back);
+            },
+            filePrint(data: obj, back: IShellEventHandler, infor: IShellEventHandler) {
+                return ShellBase.handler('filePrint', data, back, infor);
             }
         };
         const inventory = {

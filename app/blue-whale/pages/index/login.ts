@@ -29,7 +29,8 @@ interface IProps {
     utButton?: Button,
     SMSBtn?: HTMLElement | Button;
     fqaBtn?: Button,
-    scanButton?: HTMLElement
+    scanButton?: HTMLElement,
+    jiebangButton?: HTMLElement
 }
 /**
  * 移动和电脑的登录页面
@@ -661,7 +662,46 @@ export class LoginPage {
         // };
         return this._fingerModal;
     }
-
+    private handleCancelBind() {
+        this.renderCancelBind();
+    }
+    private renderCancelBind() {
+        let dom = d.create(`
+            <div class="cancel-bind-wrapper">
+                <div class='register-wrapper'>
+                    <div class="logo">
+                        <img data-action="selectServer" src= ${G.requireBaseUrl + '../img/logo/fastlion.png'} alt="fastlion" />
+                    </div>
+                    <div class="register-content mui-content">
+                        <div class="register-title">设备注册</div>
+                        <form class="register-form">
+                            <div class="form-group">
+                                <input id="tel" type="text" placeholder="请输入手机号"/>
+                            </div>
+                            <div class="form-group">
+                                <input id="verify" type="text" placeholder="请输入验证码"/>
+                                <div class="more-group"/>
+                            </div>
+                            <div class="btn-group-cancel"></div>
+                        </form>
+                    </div>
+                </div>
+           </div>
+         `)
+      
+        d.append(d.query(".login-page-container"), dom);
+        let container = d.query(".login-page-container")
+        let registerBtn = new Button({
+            container: d.query('.btn-group-cancel', container),
+            content: '注册',
+            className: 'register-submit',
+        });
+        let checkCodeBtn = new Button({
+            container: d.queryAll('.more-group', container)[0],
+            content: '获取验证码',
+            className: 'check-code',
+        });
+    }
     private loginByFinger() {
         // debugger;
         if (!this.validReg()) {
@@ -797,9 +837,9 @@ export class LoginPage {
                     }
                 });
             } catch (error) {
-                 Modal.alert("isPermission接口报错")
+                Modal.alert("isPermission接口报错")
             }
-           
+
         } else {
             this.loginFunc();
         }
@@ -935,7 +975,11 @@ export class LoginPage {
                 loginPage.loginByFinger()
             });
         }
-
+        if (props.jiebangButton) {
+            d.on(props.jiebangButton, 'click', () => {
+                loginPage.handleCancelBind()
+            });
+        }
         if (props.SMSBtn) {
             if (props.SMSBtn instanceof Button) {
                 props.SMSBtn.onClick = tools.pattern.throttling(() => {

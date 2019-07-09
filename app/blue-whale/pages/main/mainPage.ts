@@ -511,7 +511,7 @@ export = class MainPage {
         }));
         let items: IPopoverItemPara[] = [
             {
-                title: '<a href="javascript:void(0)" data-page-name="myself" data-action="myself">个人资料</a>',
+                title: '<a href="javascript:void(0)" data-page-name="myself" data-action="myself">个人资料222</a>',
                 onClick: () => {
                     sys.window.open({
                         url: tools.url.addObj(CONF.url.myself, {
@@ -627,17 +627,17 @@ export = class MainPage {
                 spinner && spinner.hide();
                 spinner = null;
                 toggleEl.classList.remove('disabled');
-                if (CONF.appid === 'app_fastlion_retail') {
-                    items = items.concat([{
-                        title: '<a href="javascript:void(0)" data-page-name="changePassword" data-action="changePassword">修改个人密码</a>',
-                        onClick: () => {
-                            sys.window.open({
-                                url: CONF.url.changePassword
-                            });
-                        }
-                    }]
-                    );
-                }
+                // if (CONF.appid === 'app_fastlion_retail') {
+                //     items = items.concat([{
+                //         title: '<a href="javascript:void(0)" data-page-name="changePassword" data-action="changePassword">修改个人密码</a>',
+                //         onClick: () => {
+                //             sys.window.open({
+                //                 url: CONF.url.changePassword
+                //             });
+                //         }
+                //     }]
+                //     );
+                // }
 
                 items.push({
                     title: '<a data-action="logout">退出登录</a>',

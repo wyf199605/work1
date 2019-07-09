@@ -86,6 +86,111 @@
   }
 }
 
+.printwrap {
+  height: 300px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  .result {
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    margin:0px li {
+      justify-content: center;
+      display: flex;
+      font-size: 16px;
+      span:first-child {
+        padding-right: 30px;
+        display: inline-block;
+        width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+  .printName {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    button {
+      width: 70px;
+      height: 40px;
+      background: rgba(42, 135, 235, 1);
+      border: 1px solid rgba(42, 135, 235, 1);
+      border-radius: 5px;
+      color: white;
+    }
+    .print-name {
+      font-size: 18px;
+      padding-left: 18px;
+      vertical-align: middle;
+      color: #333;
+      width: 350px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      &::after {
+        content: "";
+        display: inline-block;
+        height: 100%;
+        font-size: 0px;
+        vertical-align: middle;
+      }
+    }
+    li {
+      margin: 20px;
+      display: flex;
+      justify-content: space-between;
+      color: #333;
+    }
+  }
+  .pringting {
+    text-align: center;
+    font-size: 18px;
+    padding: 10px;
+    padding-top: 21px;
+  }
+}
+
+.zoomIn {
+  animation-name: zoomIn;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.slideInUp {
+  animation-name: slideInUp;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+@keyframes slideInUp {
+  from {
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
+    visibility: visible;
+  }
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    -webkit-transform: scale3d(0.3, 0.3, 0.3);
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .statistic-modal {
   .modal-body {
     max-height: none!important;
@@ -172,12 +277,11 @@
 
 .fl-pc {
   .table-module-wrapper {
-    overflow: hidden ; 
+    overflow: hidden;
     // overflow-x: scroll;
     // overflow-y: visible;
     // overflow-y: auto;
   }
-  
   .edit-btns {
     button {
       border: none;
