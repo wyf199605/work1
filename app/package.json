@@ -35,6 +35,10 @@
         "ts-loader": "^2.1.0",
         "typescript": "^2.7.2"
     },
+    "browserslist": [
+        "last 2 versions",
+        "Android >= 4.0"
+    ],
     "dependencies": {
         "loadash": "^1.0.0"
     }

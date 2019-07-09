@@ -64,13 +64,7 @@ module.exports = class Compiler {
             if (fun) {
                 funs = funs.pipe(fun());
             }
-            funs.pipe(autoprefixer({
-                browsers: ['last 2 versions', 'Android >= 4.0'],
-                cascade: true, //是否美化属性值 默认：true 像这样：
-                //-webkit-transform: rotate(45deg);
-                //        transform: rotate(45deg);
-                remove:true //是否去掉不必要的前缀 默认：true
-            }));
+            funs.pipe(autoprefixer());
 
             if (rname) {
                 funs.pipe(rename(rname))
@@ -133,6 +127,7 @@ module.exports = class Compiler {
             if (typeof this.rConfig.requireConfig !== 'undefined' && typeof this.rConfig.path !== 'undefined') {
                 createRequire(request, this.rConfig);
             }
+            
             if (typeof this.rConfig.btl !== 'undefined' && typeof this.rConfig.btl.filename !== 'undefined') {
                 for (let i = 0, len = this.rConfig.btl.dirs.length; i < len; i++) {
                     let filesurl = this.rConfig.btl.dirs[i] + this.rConfig.btl.filename;
@@ -176,7 +171,7 @@ module.exports = class Compiler {
      * 编译TS文件
      * @param src
      * @param rname - 打包输出文件名
-     * @param target 
+     * @param target
      * @param [watchSrc]
      */
     ts(src, rname, target, watchSrc = src) {
@@ -229,7 +224,7 @@ module.exports = class Compiler {
 
     static compressor(type, src, target) {
         // let fun = type === 'js' ? minifyjs() : minifycss();
-        
+
         // gulp.src(src)
         //     .pipe(fun)
         //     .pipe(gulp.dest(target));
@@ -237,7 +232,7 @@ module.exports = class Compiler {
             gulp.src(src)
             .pipe(minifyjs())
             .pipe(stripDebug())
-            .pipe(gulp.dest(target)); 
+            .pipe(gulp.dest(target));
         } else {
             gulp.src(src)
             .pipe(minifycss())
