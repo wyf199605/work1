@@ -2552,29 +2552,8 @@ export class BwTableModule extends Component {
                                 let printData = [];
                                 let body: HTMLDivElement;
                                 let printingDom;
-                                that.ftable.selectedRowsData.forEach(item => {
-                                    if (item[btn.data.linkName]) {
-                                        let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                                            "md5_field": btn.data.linkName,
-                                            [btn.data.linkName]: item[btn.data.linkName],
-                                            down: 'allow'
-                                        });
-                                        BwRule.getFileInfo(btn.data.linkName, item[btn.data.linkName]).then(({ response }) => {
-                                            response = JSON.parse(response);
-                                            if (response && response.dataArr && response.dataArr[0]) {
-                                                let data = response.dataArr[0];
-                                                printData.push({
-                                                    name: data.filename,
-                                                    filePath: url,
-                                                    count: 1
-                                                })
-                                            }
-                                        }).catch((e) => {
-                                            console.log(e);
-                                        });
-                                    }
-                                })
-                                setTimeout(() => {
+                                this.getData(that, btn).then(res => {
+                                    printData = res;
                                     if (printData.length <= 0) {
                                         Modal.toast("无打印内容")
                                         return false;
@@ -2602,17 +2581,13 @@ export class BwTableModule extends Component {
                                         d.query(".modal-title").style.fontSize = '16px';
                                     }
                                     d.on(d.query('.printName'), 'click', function (e: MouseEvent) {
-                                        console.log(11)
                                         let target: any = e.target;
                                         if (target && target.className === 'printbtn') {
                                             let data = JSON.parse(target.dataset.print);
                                             let obj: obj = {};
                                             obj.printer = data.text;
                                             obj.printData = printData;
-                                            console.log(obj);
                                             Shell.other.filePrint(obj, (e) => {
-                                                console.log(e);
-                                                console.log(111111)
                                                 let doms = <ul class="result slideInUp"> </ul>
                                                 e.data.printData.forEach(item => {
                                                     let itemDom = <li>
@@ -2629,8 +2604,7 @@ export class BwTableModule extends Component {
                                         }
 
                                     });
-                                }, 500);
-
+                                })
                             } else {
                                 // 通用操作按钮
                                 // if (multiselect === 2 && !selectedData[0]) {
@@ -2642,7 +2616,6 @@ export class BwTableModule extends Component {
                                 //     Modal.alert('请选最多一条数据');
                                 //     return;
                                 // }
-                                console.log('popup000000--=========');
                                 box.children.forEach((button) => {
                                     button && (button.isDisabled = true);
                                 });
@@ -2699,7 +2672,6 @@ export class BwTableModule extends Component {
                                         if (tools.isNotEmpty(locData)) {
                                             clearInterval(interval);
                                             ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                                console.log('0----------------');
                                                 box.children.forEach((button) => {
                                                     button && (button.isDisabled = false);
                                                 });
@@ -2749,7 +2721,40 @@ export class BwTableModule extends Component {
             initState: btnRefresh
         }
     })();
-
+    getItemData(btn, item, url) {
+        return new Promise((resolve, reject) => {
+            BwRule.getFileInfo(btn.data.linkName, item[btn.data.linkName]).then(({ response }) => {
+                response = JSON.parse(response);
+                if (response && response.dataArr && response.dataArr[0]) {
+                    let data = response.dataArr[0];
+                    resolve({
+                        name: data.filename,
+                        filePath: url,
+                        count: 1
+                    })
+                }
+            }).catch((e) => {
+                console.log(e);
+            });
+        })
+    }
+    getData = async (that, btn) => {
+        let printData = [];
+        for (var i = 0; i < that.ftable.selectedRowsData.length; i++) {
+            let item = that.ftable.selectedRowsData[i];
+            if (item[btn.data.linkName]) {
+                let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                    "md5_field": btn.data.linkName,
+                    [btn.data.linkName]: item[btn.data.linkName],
+                    down: 'allow'
+                });
+                let result = await this.getItemData(btn, item, url)
+                printData.push(result)
+            }
+        }
+        console.log(printData);
+        return printData;
+    }
     modify = (() => {
         let self = this,
             box: InputBox,
