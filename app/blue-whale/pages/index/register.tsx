@@ -29,6 +29,10 @@ declare const double_back: any;
 export class RegPage {
     constructor(private props: IProps) {
         let self = this;
+        let phone = localStorage.getItem('registerPhone');
+        if(phone){
+            props.tel.value=phone;
+        }
         self.getDevice();
         // self.setVerifyCode();
         d.on(props.goLogin, 'click', () => {
@@ -45,7 +49,7 @@ export class RegPage {
             });
         }
         d.on(props.saveReg, 'click', () => {
-        
+         
             // new UnBinding({check_code: "123", mobile: "13799914019", uuid: "8C-16-45-29-A5-B8", register: "on"})
             // return false;
             if (props.tel.value.trim().length === 0) {
@@ -96,6 +100,7 @@ export class RegPage {
             }).then(({ response }) => {
                 // console.log(response)
                 if (response.msg.indexOf('成功') > -1) {
+                    localStorage.setItem('registerPhone',props.tel.value);//写入缓存
                     Modal.toast('注册成功!');
                     setTimeout(() => {
                         sys.window.logout();
