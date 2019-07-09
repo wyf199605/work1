@@ -511,7 +511,7 @@ export = class MainPage {
         }));
         let items: IPopoverItemPara[] = [
             {
-                title: '<a href="javascript:void(0)" data-page-name="myself" data-action="myself">个人资料222</a>',
+                title: '<a href="javascript:void(0)" data-page-name="myself" data-action="myself">个人资料</a>',
                 onClick: () => {
                     sys.window.open({
                         url: tools.url.addObj(CONF.url.myself, {
