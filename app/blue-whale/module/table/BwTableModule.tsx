@@ -81,6 +81,7 @@ export class BwTableModule extends Component {
         this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
+        this.noEdit = tools.isEmpty(this.editParam);
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
         console.log('para', para);
@@ -1256,7 +1257,7 @@ export class BwTableModule extends Component {
                     .then(({ response }) => {
                         let attr:obj=this.ui.aggrList[0];
                         let value = tools.keysVal(response, 'data', 0, tools.keysVal(response, 'meta', 0));
-                        valSpan.innerHTML =  `${aggr.caption}:${BwRule.formatTableText(value||0,  attr.atrrs)} &nbsp;&nbsp;`; 
+                        valSpan.innerHTML =  `${aggr.caption}:${BwRule.formatTableText(value||0,  attr.atrrs)} &nbsp;&nbsp;`;
                     });
             });
         };
@@ -3258,7 +3259,7 @@ export class BwTableModule extends Component {
             if (box) {
                 for (let key in status) {
                     let btn = box.getItem(key);
-                    btn && (btn.isDisabled = !status[key]);
+                    btn && (btn.isDisabled = this.noEdit ? this.noEdit :!status[key]);
                 }
             }
             return status;
@@ -3275,6 +3276,8 @@ export class BwTableModule extends Component {
             editBtnStateInit
         }
     })();
+
+    noEdit = false;
 
     updateImgVersion(urls: string[]) {
         if (tools.isEmpty(urls)) {
