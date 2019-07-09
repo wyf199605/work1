@@ -82,6 +82,7 @@ export class BwTableModule extends Component {
         this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
+        this.noEdit = tools.isEmpty(this.editParam);
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
         console.log('para', para);
@@ -3411,7 +3412,7 @@ export class BwTableModule extends Component {
             if (box) {
                 for (let key in status) {
                     let btn = box.getItem(key);
-                    btn && (btn.isDisabled = !status[key]);
+                    btn && (btn.isDisabled = this.noEdit ? this.noEdit :!status[key]);
                 }
             }
             return status;
@@ -3428,6 +3429,8 @@ export class BwTableModule extends Component {
             editBtnStateInit
         }
     })();
+
+    noEdit = false;
 
     updateImgVersion(urls: string[]) {
         if (tools.isEmpty(urls)) {

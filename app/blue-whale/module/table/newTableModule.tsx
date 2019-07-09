@@ -528,6 +528,7 @@ export class NewTableModule extends AGroupTabItem {
         }
         return Promise.all(promise).then((arr) => {
             Object.values(this.sub).forEach((subTable) => {
+                subTable.noEdit = this.subNoEdit;
                 if (this.subTabActiveIndex !== 0 && this.editType === 'self' && subTable.isPivot) {
                     this.initEdit(subTable);
                 }
