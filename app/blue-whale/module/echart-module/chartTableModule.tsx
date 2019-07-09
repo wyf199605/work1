@@ -121,7 +121,7 @@ export class ChartTableModule {
             //     break; break;
         }
         window.onresize = () => {
-            // if (this.ui.showType === 'map') return;
+            if (this.ui.showType === 'map') return;
             this.chart && this.chart.resize();
         }
         window.addEventListener("orientationchange", () => {
@@ -947,6 +947,7 @@ export class ChartTableModule {
         });
 
         let riseData = [ ];
+        let declineData = [];
         if (this.ui.riseRule) {
             let riseRule = this.ui.riseRule.split(',');
             let riseValue: Array<any>;
@@ -971,6 +972,14 @@ export class ChartTableModule {
                                     color: 'red'
                                 }
                             });
+                        }else {
+                            declineData.push({
+                                name: obj.properties.name,
+                                value: obj.properties.cp,
+                                itemStyle: {
+                                    color: '#007AFF'
+                                }
+                            });
                         }
 
                     })
@@ -986,14 +995,19 @@ export class ChartTableModule {
                             }
                         });
                     } else {
-
+                        declineData.push({
+                            name: obj.properties.name,
+                            value: obj.properties.cp,
+                            itemStyle: {
+                                color: '#007AFF'
+                            }
+                        });
                     }
 
                 })
             }
 
         }
-        debugger;
         let chart = echarts.registerMap('china', mapJson);
 
 
@@ -1064,7 +1078,7 @@ export class ChartTableModule {
                         emphasis: {
                             show: true
                         },
-                        color: 'red'
+                        // color: 'red'
                     },
                     itemStyle: {
                         normal: {
@@ -1080,7 +1094,32 @@ export class ChartTableModule {
                     data: mapJson.features.map(city => city.properties.name).map(province => {
                         return { name: province, value: provinceFn(province) }
                     })
-                }
+                },{
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: declineData,
+                    symbolSize: 10,
+                    silent: true,
+                    symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
+                    // symbolRotate: 35,
+                    // symbolColor: 'red',
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        emphasis: {
+                            show: true
+                        },
+                        color: 'red'
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: 'red'
+                        }
+                    }
+                },
 
             ]
         }
@@ -1173,13 +1212,13 @@ export class ChartTableModule {
 
         // 处理上升下降标记
         const signValue = bodyData.map(col => {
-            debugger;
             const signName = /.*市$/.test(`${col[xAxisName]}`) ?  col[xAxisName] : col[xAxisName] + '市' ;
             console.log(col[xAxisName].slice(0, (col[xAxisName].length - 1)));
             let signValue = citysJson.features.find(feature => feature.properties.name === signName);
             return signValue;
         });
         let riseData = [ ];
+        let declineData = [];
         if (this.ui.riseRule) {
             let riseRule = this.ui.riseRule.split(',');
             let riseValue: Array<any>;
@@ -1194,6 +1233,14 @@ export class ChartTableModule {
                                 value: obj.properties.cp,
                                 itemStyle: {
                                     color: 'red'
+                                }
+                            });
+                        } else {
+                            declineData.push({
+                                name: obj.properties.name,
+                                value: obj.properties.cp,
+                                itemStyle: {
+                                    color: '#007AFF'
                                 }
                             });
                         }
@@ -1211,7 +1258,13 @@ export class ChartTableModule {
                             }
                         });
                     } else {
-
+                        declineData.push({
+                            name: obj.properties.name,
+                            value: obj.properties.cp,
+                            itemStyle: {
+                                color: '#007AFF'
+                            }
+                        });
                     }
 
                 })
@@ -1312,7 +1365,32 @@ export class ChartTableModule {
                     data: citys.map(city => {
                         return { name: city, value: cityFn(city) }
                     })
-                }
+                },{
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: declineData,
+                    symbolSize: 10,
+                    silent: true,
+                    symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
+                    // symbolRotate: 35,
+                    // symbolColor: 'red',
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        emphasis: {
+                            show: true
+                        },
+                        color: 'red'
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: 'red'
+                        }
+                    }
+                },
             ]
         };
         if (!tools.isMb) {
@@ -1396,6 +1474,72 @@ export class ChartTableModule {
         let cityCode = CityMap[name];
 
         let cityJson = await $.get(`${baseUrl}../map/citys/${cityCode}.json`);
+
+        // 处理上升下降标记
+        const signValue = bodyData.map(col => {
+            const signName = col[xAxisName] === '长乐市' ? '长乐区' : col[xAxisName]  ;
+            console.log(col[xAxisName].slice(0, (col[xAxisName].length - 1)));
+            let signValue = cityJson.features.find(feature => feature.properties.name === signName);
+            return signValue;
+        });
+        let riseData = [ ];
+        let declineData = [];
+        if (this.ui.riseRule) {
+            let riseRule = this.ui.riseRule.split(',');
+            let riseValue: Array<any>;
+            let valueArr = bodyData.map(col => col[riseRule[0]]);
+            if (riseRule[1] === '1') {
+                let conditionArr = bodyData.map(col => col[riseRule[2]]);
+                valueArr.forEach((value, i) => {
+                    signValue.forEach((obj, i) => {
+                        if(!obj) return ;
+                        if (valueArr[i] >= conditionArr[i]) {
+                            
+                            riseData.push({
+                                name: obj.properties.name,
+                                value: obj.properties.cp,
+                                itemStyle: {
+                                    color: 'red'
+                                }
+                            });
+                        } else {
+                            declineData.push({
+                                name: obj.properties.name,
+                                value: obj.properties.cp,
+                                itemStyle: {
+                                    color: '#007AFF'
+                                }
+                            });
+                        }
+
+                    })
+                })
+            } else {
+                signValue.forEach((obj, i) => {
+                    if(!obj) return ;
+                    if (valueArr[i] >= Number(riseRule[2])) {
+                        riseData.push({
+                            name: obj.properties.name,
+                            value: obj.properties.cp,
+                            itemStyle: {
+                                color: 'red'
+                            }
+                        });
+                    } else {
+                        declineData.push({
+                            name: obj.properties.name,
+                            value: obj.properties.cp,
+                            itemStyle: {
+                                color: '#007AFF'
+                            }
+                        });
+                    }
+
+                })
+            }
+
+        }
+
         echarts.registerMap(cityCode, cityJson);
         let cityEchart = echarts.init(chartEle);
         let districts = cityJson.features.map(district => district.properties.name);
@@ -1459,7 +1603,7 @@ export class ChartTableModule {
                 {
                     type: 'scatter',
                     coordinateSystem: 'geo',
-                    // data: myData,
+                    data: riseData,
                     symbolSize: 10,
                     silent: true,
                     symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
@@ -1489,7 +1633,32 @@ export class ChartTableModule {
                     data: districts.map(district => {
                         return { name: district, value: countyFn(district) }
                     })
-                }
+                },{
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: declineData,
+                    symbolSize: 10,
+                    silent: true,
+                    symbol: 'path://M694.021847 492.679245a208.460775 208.460775 0 0 1 112.873883 74.740815 197.275074 197.275074 0 0 1 37.624627 118.975173 234.899702 234.899702 0 0 1-34.065541 123.551142A203.376365 203.376365 0 0 1 711.817279 892.313803a440.309831 440.309831 0 0 1-168.802383 26.438928h-254.220457a50.844091 50.844091 0 0 1-50.844091-50.844091V168.802383a50.844091 50.844091 0 0 1 50.844091-50.844091h249.644489q145.922542 0 203.376365 63.555114a203.376365 203.376365 0 0 1 59.996028 140.838133 180.496524 180.496524 0 0 1-27.45581 97.112215 206.935452 206.935452 0 0 1-80.333664 73.215491z m-323.368421-39.14995h147.956306A563.860973 563.860973 0 0 0 610.129096 447.428004a122.53426 122.53426 0 0 0 64.063555-31.523337 101.688183 101.688183 0 0 0 27.964251-79.825223A111.34856 111.34856 0 0 0 672.667329 254.220457a121.008937 121.008937 0 0 0-67.114201-33.04866 681.310824 681.310824 0 0 0-101.688183-6.101291H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v187.614697a25.422046 25.422046 0 0 0 25.422046 25.422046z m0 370.144985h173.886792a227.781529 227.781529 0 0 0 148.464747-36.607746 127.618669 127.618669 0 0 0 41.692155-101.688182 124.059583 124.059583 0 0 0-44.234359-101.688183 259.304866 259.304866 0 0 0-159.650447-36.099305H370.653426a25.422046 25.422046 0 0 0-25.422046 25.422046v225.239324a25.422046 25.422046 0 0 0 25.422046 25.422046z',
+                    // symbolRotate: 35,
+                    // symbolColor: 'red',
+                    label: {
+                        normal: {
+                            formatter: '{b}',
+                            position: 'right',
+                            show: false
+                        },
+                        emphasis: {
+                            show: true
+                        },
+                        color: 'red'
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: 'red'
+                        }
+                    }
+                },
             ]
         };
         if (!tools.isMb) {
