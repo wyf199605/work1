@@ -630,14 +630,18 @@ export class NewTableModule extends AGroupTabItem {
     bwEl: IBW_Table;
 
     responsive() {
-        let sub = this.sub[this.subTabActiveIndex],
-            mainBox: InputBox = tools.keysVal(this.main, 'subBtns', 'box'),
-            subBox: InputBox = tools.keysVal(sub, 'subBtns', 'box'),
-            ftable = this.main.ftable;
-        mainBox && mainBox.responsive();
-        subBox && subBox.responsive();
-        ftable.recountWidth();
-        sub && sub.ftable && sub.ftable.recountWidth();
+        try {
+            let sub = this.sub[this.subTabActiveIndex],
+                mainBox: InputBox = tools.keysVal(this.main, 'subBtns', 'box'),
+                subBox: InputBox = tools.keysVal(sub, 'subBtns', 'box'),
+                ftable = this.main.ftable;
+            mainBox && mainBox.responsive();
+            subBox && subBox.responsive();
+            ftable.recountWidth();
+            sub && sub.ftable && sub.ftable.recountWidth();
+        }catch (e) {
+            console.log(e);
+        }
     }
 
     autoEdit = false;

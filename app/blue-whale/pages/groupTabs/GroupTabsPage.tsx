@@ -159,6 +159,21 @@ export class GroupTabsPage extends BasicPage {
             this.locationLine(line, para);
         }
 
+        function isTable(table): table is NewTableModule{
+            return 'responsive' in table;
+        }
+
+        this.on(BW.EVT_SHOW_PAGE, () => {
+            if(isTable(this.main)){
+                this.main.responsive();
+            }
+
+            this.subs && this.subs.forEach((sub) => {
+                if(isTable(sub)){
+                    sub.responsive();
+                }
+            });
+        });
 
         if(tableUi.autoRefresh) {
             sys.window.wake("wake", null);
