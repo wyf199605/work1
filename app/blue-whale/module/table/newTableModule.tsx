@@ -214,11 +214,13 @@ export class NewTableModule extends AGroupTabItem {
                                         tabEl = d.query(`.tab-pane[data-index="${index}"]`, this.tab.getPanel()),
                                         subUi = this.bwEl.subTableList[index];
 
-                                    this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
+                                    let subTable = this.subInit(this.bwEl.subTableList[index], subParam, selectedData, ajaxData, tabEl);
                                     this.currentSelectedIndexes.push(index);
+                                    subTable.noEdit = this.subNoEdit;
                                 } else {
                                     this.mobileModal && (this.mobileModal.isShow = true);
                                     if (!~this.currentSelectedIndexes.indexOf(index)) {
+                                        this.sub[index].noEdit = this.subNoEdit;
                                         this.sub[index].refresh(ajaxData).then(() => {
                                             this.sub[index].isPivot && this.initEdit(this.sub[index]);
                                         }).catch();
@@ -252,6 +254,8 @@ export class NewTableModule extends AGroupTabItem {
                     setTimeout(() => {
                         if (isFirst && !noLoadSub) {
                             let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
+
+                            this.subNoEdit = this.main.noEdit || (selectedData['EDITEXPRESS'] === 0);
                             if (tools.isNotEmpty(this.showSubField)) {
                                 if (tools.isNotEmpty(selectedData[this.showSubField])) {
                                     let list = selectedData[this.showSubField].split(',');
@@ -410,13 +414,17 @@ export class NewTableModule extends AGroupTabItem {
 
     protected subBtnShow: boolean = true;
 
+    subNoEdit = false;
+
     subRefreshByIndex(index: number) {
         let main = this.main,
             mftable = main.ftable,
             pseudoTable = main.ftable.pseudoTable,
             row = this.main.ftable.rowGet(index);
+
         this.subIndex = index;
         if (row && row.selected) {
+            this.subNoEdit = this.main.noEdit || (row.data['EDITEXPRESS'] === 0);
             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(row.data[this.showSubField])) {
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 // let showSubSeq = row.data[this.showSubField].split(',');
@@ -564,7 +572,9 @@ export class NewTableModule extends AGroupTabItem {
                     });
                 }
             }
-        }
+        };
+
+        return subTable;
     }
 
     protected dragged = (() => {
@@ -622,14 +632,18 @@ export class NewTableModule extends AGroupTabItem {
     bwEl: IBW_Table;
 
     responsive() {
-        let sub = this.sub[this.subTabActiveIndex],
-            mainBox: InputBox = tools.keysVal(this.main, 'subBtns', 'box'),
-            subBox: InputBox = tools.keysVal(sub, 'subBtns', 'box'),
-            ftable = this.main.ftable;
-        mainBox && mainBox.responsive();
-        subBox && subBox.responsive();
-        ftable.recountWidth();
-        sub && sub.ftable && sub.ftable.recountWidth();
+        try {
+            let sub = this.sub[this.subTabActiveIndex],
+                mainBox: InputBox = tools.keysVal(this.main, 'subBtns', 'box'),
+                subBox: InputBox = tools.keysVal(sub, 'subBtns', 'box'),
+                ftable = this.main.ftable;
+            mainBox && mainBox.responsive();
+            subBox && subBox.responsive();
+            ftable.recountWidth();
+            sub && sub.ftable && sub.ftable.recountWidth();
+        }catch (e) {
+            console.log(e);
+        }
     }
 
     autoEdit = false;
