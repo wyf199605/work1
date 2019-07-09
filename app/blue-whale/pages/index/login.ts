@@ -29,7 +29,8 @@ interface IProps {
     utButton?: Button,
     SMSBtn?: HTMLElement | Button;
     fqaBtn?: Button,
-    scanButton?: HTMLElement
+    scanButton?: HTMLElement,
+    jiebangButton?: HTMLElement
 }
 /**
  * 移动和电脑的登录页面
@@ -661,7 +662,158 @@ export class LoginPage {
         // };
         return this._fingerModal;
     }
+    private handleCancelBind() {
+        this.renderCancelBind();
+    }
+    private renderCancelBind = () => {
+        d.query('.login-wrapper').style.display = "none";
+        let dom = d.create(`
+            <div class="cancel-bind-wrapper">
+                <div class='register-wrapper'>
+                    <div class="logo">
+                        <img data-action="selectServer" src= ${G.requireBaseUrl + '../img/logo/fastlion.png'} alt="fastlion" />
+                    </div>
+                    <div class="register-content mui-content">
+                        <div class="register-title">设备解绑</div>
+                        <form class="register-form">
+                            <div class="form-group">
+                                <input id="name" type="text" placeholder="请输入用户名"/>
+                            </div>
+                            <div class="form-group">
+                                <input id="tel" type="text" placeholder="请输入手机号"/>
+                            </div>
+                            <div class="form-group">
+                                <input id="verify" type="text" placeholder="请输入验证码"/>
+                                <div class="more-group"/>
+                            </div>
+                            <div class="btn-group-cancel"></div>
+                        </form>
+                    </div>
+                </div>
+           </div>
+         `)
 
+        d.append(d.query(".login-page-container"), dom);
+        let container = d.query(".cancel-bind-wrapper")
+        let registerBtn = new Button({
+            container: d.query('.btn-group-cancel', container),
+            content: '解绑',
+            className: 'register-submit',
+        });
+        let checkCodeBtn = new Button({
+            container: d.queryAll('.more-group', container)[0],
+            content: '获取验证码',
+            className: 'check-code',
+        });
+        let goLogin = new Button({
+            container: d.query('.btn-group-cancel', container),
+            content: '返回登录',
+            className: 'goLogin'
+        });
+        let tel: any = d.query('#tel', container);
+        let verify: any = d.query('#verify', container);
+        let name: any = d.query('#name', container);
+        let that = this;
+        d.on(goLogin.wrapper, 'click', () => {
+            sys.window.load(CONF.url.login);
+        });
+        d.on(checkCodeBtn.wrapper, 'click', function (e) {
+            let sendVerify = this;
+            let mobile = G.tools.str.toEmpty(tel.value);
+            if (G.tools.isEmpty(mobile) || !G.tools.valid.isTel(mobile)) {
+                Modal.alert('手机号格式有误');
+                return;
+            }
+            let countdown = 60;
+            sendVerify.classList.add('disabled');
+            sendVerify.innerHTML = countdown + 's';
+
+            let timer = setInterval(function () {
+                countdown--;
+                if (countdown == 0) {
+                    clearInterval(timer);
+                    sendVerify.classList.remove('disabled');
+                    sendVerify.innerHTML = '获取';
+                } else {
+                    sendVerify.classList.add('disabled');
+                    sendVerify.innerHTML = countdown + 's';
+                }
+            }, 1000);
+
+            BwRule.Ajax.fetch(CONF.ajaxUrl.smsSend, {
+                data: {
+                    mobile: mobile,
+                    uuid: that.device.uuid
+                },
+                data2url: true,
+                type: 'POST',
+                headers: { uuid: that.device.uuid }
+            }).then(() => {
+                Modal.toast('验证码发送成功');
+            }).catch(() => {
+
+            }).finally(() => {
+                sendVerify.innerHTML = '获取';
+                sendVerify.classList.add('disabled');
+            });
+            e.stopPropagation();
+        });
+        d.on(registerBtn.wrapper, 'click', function (ev) {
+            ev.preventDefault();
+            let telVal = tel.value,
+                codeVal = verify.value,
+                userVal = name.value;
+            let deviceInfo = JSON.parse(localStorage.getItem("deviceInfo"));
+            if (G.tools.isEmpty(name.value)) {
+                Modal.alert('请输入用户名');
+                return;
+            }
+            let mobile = G.tools.str.toEmpty(tel.value);
+            if (G.tools.isEmpty(mobile) || !G.tools.valid.isTel(mobile)) {
+                Modal.alert('手机号格式有误');
+                return;
+            }
+            if (G.tools.isEmpty(verify.value)) {
+                Modal.alert('请输入验证码');
+                return;
+            }
+            if (tools.isEmpty(deviceInfo) && tools.isEmpty(deviceInfo.uuid)) {
+                Modal.alert('uuid为空');
+            }
+            G.Ajax.fetch(CONF.ajaxUrl.unBinding, {
+                data: {
+                    mobile: telVal,
+                    check_code: codeVal,
+                    userid: userVal,
+                    uuid: deviceInfo.uuid
+                },
+                type: 'get'
+            }).then(({ response }) => {
+                let res = JSON.parse(response);
+                // alert(response);
+                if (Number(res.errorCode) === 0) {
+                    new UnBinding({
+                        mobile: telVal,
+                        check_code: codeVal,
+                        userid: userVal,
+                        uuid: deviceInfo.uuid
+                    })
+                    return false;
+                } else if (res.errorCode == 50012) {
+                    if (res.msg === '当前设备已解绑成功') {
+                        Modal.alert(res.msg, null, () => { sys.window.load(CONF.url.reg); });
+                    } else {
+                        Modal.alert(res.msg);
+                    }
+                } else {
+                    Modal.alert(res.msg);
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+
+        })
+    }
     private loginByFinger() {
         // debugger;
         if (!this.validReg()) {
@@ -797,9 +949,9 @@ export class LoginPage {
                     }
                 });
             } catch (error) {
-                 Modal.alert("isPermission接口报错")
+                Modal.alert("isPermission接口报错")
             }
-           
+
         } else {
             this.loginFunc();
         }
@@ -935,7 +1087,11 @@ export class LoginPage {
                 loginPage.loginByFinger()
             });
         }
-
+        if (props.jiebangButton) {
+            d.on(props.jiebangButton, 'click', () => {
+                loginPage.handleCancelBind()
+            });
+        }
         if (props.SMSBtn) {
             if (props.SMSBtn instanceof Button) {
                 props.SMSBtn.onClick = tools.pattern.throttling(() => {

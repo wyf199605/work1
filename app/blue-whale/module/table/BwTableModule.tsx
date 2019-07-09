@@ -13,29 +13,30 @@ import { InputBox } from "../../../global/components/general/inputBox/InputBox";
 import { Button, IButton } from "../../../global/components/general/button/Button";
 import { Modal } from "../../../global/components/feedback/modal/Modal";
 import { FastTableCell } from "../../../global/components/newTable/FastTableCell";
+import { SelectBox } from "../../../global/components/form/SelectBox/SelectBox";
 import { InventoryBtn, ontimeRefresh } from "./InventoryBtn";
 import { Loading } from "../../../global/components/ui/loading/loading";
 import { LayoutImage } from "../../../global/components/view/LayoutImg/LayoutImage";
 import { NewTableModule } from "./newTableModule";
 import Shell = G.Shell;
-import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
-import {Inputs} from "../inputs/inputs";
-import {FlowDesigner} from "../flowDesigner/FlowDesigner";
-import {PasswdModal} from "../changePassword/passwdModal";
-import {Spinner} from "../../../global/components/ui/spinner/spinner";
-import {FormCom} from "../../../global/components/form/basic";
-import {EditModule} from "../edit/editModule";
-import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
-import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
-import {BwUploader} from "../uploadModule/bwUploader";
-import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
-import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
-import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
-import {FastTableColumn} from "../../../global/components/newTable/FastTabelColumn";
-import {NewIDB} from "../../../global/NewIDB";
-import {Datetime} from "../../../global/components/form/datetime/datetime";
-import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
-import {BwTableEditModule} from "./BwTableEditModule";
+import { ButtonAction } from "../../common/rule/ButtonAction/ButtonAction";
+import { Inputs } from "../inputs/inputs";
+import { FlowDesigner } from "../flowDesigner/FlowDesigner";
+import { PasswdModal } from "../changePassword/passwdModal";
+import { Spinner } from "../../../global/components/ui/spinner/spinner";
+import { FormCom } from "../../../global/components/form/basic";
+import { EditModule } from "../edit/editModule";
+import { TableDataCell } from "../../../global/components/newTable/base/TableCell";
+import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
+import { BwUploader } from "../uploadModule/bwUploader";
+import { ImgModal, ImgModalPara } from "../../../global/components/ui/img/img";
+import { BwLayoutImg } from "../uploadModule/bwLayoutImg";
+import { TableDataRow } from "../../../global/components/newTable/base/TableRow";
+import { FastTableColumn } from "../../../global/components/newTable/FastTabelColumn";
+import { NewIDB } from "../../../global/NewIDB";
+import { Datetime } from "../../../global/components/form/datetime/datetime";
+import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
+import { BwTableEditModule } from "./BwTableEditModule";
 import { ShareCode } from '../../common/share-code/shareCode';
 
 export interface IBwTableModulePara extends IComponentPara {
@@ -81,7 +82,6 @@ export class BwTableModule extends Component {
         this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
-        this.noEdit = tools.isEmpty(this.editParam);
         this.tableModule = para.tableModule;
         let ui = this.ui = para.ui;
         console.log('para', para);
@@ -449,8 +449,8 @@ export class BwTableModule extends Component {
             type: 'default',
             content: '二维码分享',
             onClick: () => {
-                console.log('二维码分享',ui);
-                new ShareCode(this.tableModule.main.ftable.selectedRowsData,ui);
+                console.log('二维码分享', ui);
+                new ShareCode(this.tableModule.main.ftable.selectedRowsData, ui);
 
             },
         });
@@ -1082,8 +1082,8 @@ export class BwTableModule extends Component {
                 setTimeout(() => {
                     this.subBtns.initState();
 
-                     this.ftable && this.ftable.clearSelectedRows();
-                     this.defaultSelected();
+                    this.ftable && this.ftable.clearSelectedRows();
+                    this.defaultSelected();
 
                 }, 500)
             });
@@ -1096,31 +1096,31 @@ export class BwTableModule extends Component {
      */
     protected defaultSelected() {
 
-            let keyField = localStorage.getItem('keyField');
-            localStorage.removeItem('keyField');
-            // localStorage.removeItem('keyField');
-            console.log('defaultSelected')
-            if(keyField) {
-                let shareData = JSON.parse(keyField);
-                this.ftable.clearSelectedRows();
+        let keyField = localStorage.getItem('keyField');
+        localStorage.removeItem('keyField');
+        // localStorage.removeItem('keyField');
+        console.log('defaultSelected')
+        if (keyField) {
+            let shareData = JSON.parse(keyField);
+            this.ftable.clearSelectedRows();
 
 
-                if(shareData.key) {
-                    this.ftable.data.forEach((row,i) => {
-                        if(Object.keys(row).includes(shareData.key)) {
-                            shareData.data && shareData.data.forEach( id => {
-                                if(id === row[shareData.key]) {
-                                    this.ftable.rows[i].selected = true;
-                                    this.ftable.rows[i].selected = true;
-                                    this.ftable._drawSelectedCells();
-                                    this.ftable.pseudoTable.setCheckBoxStatus();
-                                }
-                            })
-                        }
-                    })
-                }
-
+            if (shareData.key) {
+                this.ftable.data.forEach((row, i) => {
+                    if (Object.keys(row).includes(shareData.key)) {
+                        shareData.data && shareData.data.forEach(id => {
+                            if (id === row[shareData.key]) {
+                                this.ftable.rows[i].selected = true;
+                                this.ftable.rows[i].selected = true;
+                                this.ftable._drawSelectedCells();
+                                this.ftable.pseudoTable.setCheckBoxStatus();
+                            }
+                        })
+                    }
+                })
             }
+
+        }
 
     }
 
@@ -1255,9 +1255,9 @@ export class BwTableModule extends Component {
                 d.append(aggrWrap, valSpan);
                 BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(aggr.dataAddr, urlData))
                     .then(({ response }) => {
-                        let attr:obj=this.ui.aggrList[0];
+                        let attr: obj = this.ui.aggrList[0];
                         let value = tools.keysVal(response, 'data', 0, tools.keysVal(response, 'meta', 0));
-                        valSpan.innerHTML =  `${aggr.caption}:${BwRule.formatTableText(value||0,  attr.atrrs)} &nbsp;&nbsp;`;
+                        valSpan.innerHTML = `${aggr.caption}:${BwRule.formatTableText(value || 0, attr.atrrs)} &nbsp;&nbsp;`;
                     });
             });
         };
@@ -2324,9 +2324,9 @@ export class BwTableModule extends Component {
                         selectionFlag = btnField.selectionFlag,
                         len = btnField.selectionFlag ? allLen - selectedLen : selectedLen;
 
-                    if(btnField.multiselect === 0){
+                    if (btnField.multiselect === 0) {
                         btn.isDisabled = false;
-                        return ;
+                        return;
                     }
                     if (len === 0) {
                         btn.isDisabled = selectionFlag ? false : btnField.multiselect > 0;
@@ -2365,7 +2365,7 @@ export class BwTableModule extends Component {
                     level: btnUiItem.level_no,
                     isDisabled: !(btnUiItem.multiselect === 0 || btnUiItem.multiselect === 2 && btnUiItem.selectionFlag),
                     data: btnUiItem,
-                    onClick: () => {
+                    onClick: async () => {
                         this.tableModule.saveData().then(() => {
                             if (btn.data.openType.indexOf('rfid') > -1) {
                                 // RFID 操作按钮
@@ -2527,6 +2527,84 @@ export class BwTableModule extends Component {
                                     }
                                         break;
                                 }
+                            } else if (btn.data.openType === "batch_file_print") {
+                                if (this.ftable.selectedRowsData && this.ftable.selectedRowsData.length <= 0) {
+                                    Modal.toast("请先要打印的内容");
+                                    return false;
+                                }
+                                let printer = [];
+                                try {
+                                    let printList = Shell.printer.get();
+                                    if (printList.data && Array.isArray(printList.data.driveList)) {
+                                        let result = printList.data.driveList
+                                        for (let item of result) {
+                                            printer.push({
+                                                text: item.driveName,
+                                                value: item.driveCode,
+                                            });
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log(e);
+                                }
+
+                                let that = this;
+                                let printData = [];
+                                let body: HTMLDivElement;
+                                let printingDom;
+                                this.getData(that, btn).then(res => {
+                                    printData = res;
+                                    if (printData.length <= 0) {
+                                        Modal.toast("无打印内容")
+                                        return false;
+                                    } else {
+                                        body = <div class="printwrap"> <ul class="printName"></ul></div>
+                                        printer.forEach((item: any) => {
+                                            let itemDom = <li>
+                                                <span class="print-name">{item.text}</span>
+                                                <button data-print={JSON.stringify(item)} class="printbtn">打印</button>
+                                            </li>
+                                            d.query('.printName', body).append(itemDom)
+                                        })
+                                        printingDom = <p class="pringting zoomIn">正在打印中...</p>
+
+                                        let modal = new Modal({
+                                            header: '请选择打印机',
+                                            width: '500px',
+                                            className: 'chatModal',
+                                            top: 150,
+                                            body: body,
+                                            isBackground: false,
+                                            isOnceDestroy: true
+                                        });
+                                        modal.isShow = true;
+                                        d.query(".modal-title").style.fontSize = '16px';
+                                    }
+                                    d.on(d.query('.printName'), 'click', function (e: MouseEvent) {
+                                        let target: any = e.target;
+                                        if (target && target.className === 'printbtn') {
+                                            let data = JSON.parse(target.dataset.print);
+                                            let obj: obj = {};
+                                            obj.printer = data.text;
+                                            obj.printData = printData;
+                                            Shell.other.filePrint(obj, (e) => {
+                                                let doms = <ul class="result slideInUp"> </ul>
+                                                e.data.printData.forEach(item => {
+                                                    let itemDom = <li>
+                                                        <span class="print-name">{item.name}</span>
+                                                        <span>{item.msg}</span>
+                                                    </li>
+                                                    doms.append(itemDom)
+                                                })
+                                                body.innerHTML = "";
+                                                body.append(doms);
+                                            })
+                                            body.innerHTML = "";
+                                            body.append(printingDom);
+                                        }
+
+                                    });
+                                })
                             } else {
                                 // 通用操作按钮
                                 // if (multiselect === 2 && !selectedData[0]) {
@@ -2538,7 +2616,6 @@ export class BwTableModule extends Component {
                                 //     Modal.alert('请选最多一条数据');
                                 //     return;
                                 // }
-                                console.log('popup000000--=========');
                                 box.children.forEach((button) => {
                                     button && (button.isDisabled = true);
                                 });
@@ -2595,7 +2672,6 @@ export class BwTableModule extends Component {
                                         if (tools.isNotEmpty(locData)) {
                                             clearInterval(interval);
                                             ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                                console.log('0----------------');
                                                 box.children.forEach((button) => {
                                                     button && (button.isDisabled = false);
                                                 });
@@ -2645,7 +2721,40 @@ export class BwTableModule extends Component {
             initState: btnRefresh
         }
     })();
-
+    getItemData(btn, item, url) {
+        return new Promise((resolve, reject) => {
+            BwRule.getFileInfo(btn.data.linkName, item[btn.data.linkName]).then(({ response }) => {
+                response = JSON.parse(response);
+                if (response && response.dataArr && response.dataArr[0]) {
+                    let data = response.dataArr[0];
+                    resolve({
+                        name: data.filename,
+                        filePath: url,
+                        count: 1
+                    })
+                }
+            }).catch((e) => {
+                console.log(e);
+            });
+        })
+    }
+    getData = async (that, btn) => {
+        let printData = [];
+        for (var i = 0; i < that.ftable.selectedRowsData.length; i++) {
+            let item = that.ftable.selectedRowsData[i];
+            if (item[btn.data.linkName]) {
+                let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                    "md5_field": btn.data.linkName,
+                    [btn.data.linkName]: item[btn.data.linkName],
+                    down: 'allow'
+                });
+                let result = await this.getItemData(btn, item, url)
+                printData.push(result)
+            }
+        }
+        console.log(printData);
+        return printData;
+    }
     modify = (() => {
         let self = this,
             box: InputBox,
@@ -2799,7 +2908,7 @@ export class BwTableModule extends Component {
                     Object.assign(
                         {},
                         defData,
-                        this.linkedData && key in this.linkedData ? {[key]: this.linkedData[key]} : {}
+                        this.linkedData && key in this.linkedData ? { [key]: this.linkedData[key] } : {}
                     )
                 );
             });
@@ -2960,7 +3069,7 @@ export class BwTableModule extends Component {
                         validList.push(validate(editModule, cell))
                         // }, 100);
                     }) : validList.push(validate(editModule, cell));
-                }else {
+                } else {
                     // cell.errorMsg = '';
                 }
             });
@@ -2968,10 +3077,10 @@ export class BwTableModule extends Component {
 
         let validate = (editModule: EditModule, cell: FastTableCell, checkLinkCell = true): Promise<any> => {
             let promise: Promise<any> = new Promise((resolve, reject) => {
-                for(let cel of cell.frow.cells){
-                    if(cel !== cell){
+                for (let cel of cell.frow.cells) {
+                    if (cel !== cell) {
                         let field: R_Field = cel.column.content;
-                        if(field.elementType === 'lookup' && field.lookUpKeyField === cell.name){
+                        if (field.elementType === 'lookup' && field.lookUpKeyField === cell.name) {
                             cell = cel;
                             break;
                         }
@@ -3259,7 +3368,7 @@ export class BwTableModule extends Component {
             if (box) {
                 for (let key in status) {
                     let btn = box.getItem(key);
-                    btn && (btn.isDisabled = this.noEdit ? this.noEdit :!status[key]);
+                    btn && (btn.isDisabled = !status[key]);
                 }
             }
             return status;
@@ -3276,8 +3385,6 @@ export class BwTableModule extends Component {
             editBtnStateInit
         }
     })();
-
-    noEdit = false;
 
     updateImgVersion(urls: string[]) {
         if (tools.isEmpty(urls)) {

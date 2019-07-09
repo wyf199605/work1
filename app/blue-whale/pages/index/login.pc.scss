@@ -161,16 +161,15 @@
     font-stretch: normal;
     .logo {
       text-align: center;
-      .text{
+      .text {
         font-size: 30px;
         margin-top: 10px;
         color: $title;
         text-align: center;
       }
-      img{
+      img {
         max-height: 100px;
       }
-
     }
     .login-form {
       width: 100%;
@@ -237,20 +236,16 @@
         }
       }
       .login-option {
-        width: 218px;
+        width: 100%;
         height: 72px;
         margin: 0 auto;
         margin-top: 21px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-box-align: center;
-        display: -webkit-flex;
         display: flex;
-        -webkit-justify-content: space-around;
-        justify-content: space-around;
+        justify-content: center;
         a {
           display: inline-block;
           color: #333333;
+          margin-right: 18px;
           .iconfont {
             display: block;
             width: 46px;
@@ -262,7 +257,8 @@
           }
           &.zhiwen,
           &.device,
-          &.scanLogin {
+          &.scanLogin,
+          &.jiebang {
             .iconfont {
               line-height: 50px;
               font-size: 27px;
@@ -281,6 +277,11 @@
               background-color: #33c3a2;
             }
           }
+          &.jiebang {
+            .iconfont {
+              background-color: #ff7c83;
+            }
+          }
           &.scanLogin {
             .iconfont {
               background-color: #1AA0F9;
@@ -289,6 +290,9 @@
               }
             }
           }
+        }
+        a:last-child {
+          margin-right: 0px;
         }
       }
     }
@@ -331,5 +335,126 @@
 @media all and (min-width: 1200px) {
   .login-wrapper {
     width: 35% !important;
+  }
+}
+
+.cancel-bind-wrapper {
+  .register-wrapper {
+    min-width: 500px;
+    font-family: MicrosoftYaHei;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    .logo {
+      text-align: center;
+      img {
+        max-height: 100px;
+      }
+    }
+    .register-content {
+      width: 100%;
+      height: 438px;
+      margin-top: 8.1%;
+      background-color: #ffffff;
+      box-shadow: -2px 1px 21px 0px rgba(0, 91, 172, 0.11);
+      border-radius: 3px;
+      border-top: 5px solid #005bac;
+      padding-top: 48px;
+      .register-title {
+        text-align: center;
+        font-size: 24px;
+        color: #333333;
+        line-height: 50px;
+      }
+      .register-form {
+        .form-group {
+          margin: 0 auto;
+          margin-top: 20px;
+          width: 65.4%;
+          input {
+            padding: 0 10px;
+            width: 100%;
+            height: 40px;
+            background-color: #ffffff;
+            border-radius: 3px;
+            border: solid 1px #e2e2e2;
+            color: #b0b0b0;
+            padding-left: 10px;
+            color: #3a3a3a;
+            &:focus {
+              border: solid 1px #005bac;
+            }
+          }
+          .more-group {
+            width: 81px;
+            height: 22px;
+            position: absolute;
+            right: 1px;
+            top: 10px;
+            button {
+              width: calc(100% - 2px);
+              height: 22px;
+              line-height: 22px;
+              background-color: #f2f2f2;
+              border-radius: 2px;
+              span {
+                width: 60px;
+                height: 11px;
+                font-size: 12px;
+                line-height: 11px;
+                color: #005bac;
+              }
+            }
+          }
+        }
+        .btn-group-cancel {
+          display: block;
+          width: 100%;
+          height: 92px;
+          margin: 0 auto;
+          margin-top: 30px;
+          .register-submit {
+            width: 100%;
+            height: 40px;
+            background-color: #005bac;
+            border-radius: 3px;
+            color: #ffffff;
+          }
+          .goLogin {
+            margin-top: 20px;
+            background-color: transparent;
+            color: #005bac;
+            border: none;
+            position: relative;
+            left: 50%;
+            transform: translate(-50%);
+          }
+        }
+      }
+    }
+    .footer {
+      width: 33.7%;
+      height: 8.6%;
+      margin: 0 auto;
+      margin-top: 22px;
+      .login-fqa {
+        button {
+          border: none;
+          background-color: transparent;
+          color: #004078;
+          position: relative;
+          left: 50%;
+          transform: translate(-50%);
+          span {
+            margin: 0 auto;
+          }
+        }
+      }
+      .copyright {
+        color: #b0b0b0;
+        text-align: center;
+        min-width: 160px;
+      }
+    }
   }
 }
