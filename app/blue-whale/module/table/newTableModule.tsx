@@ -254,6 +254,8 @@ export class NewTableModule extends AGroupTabItem {
                     setTimeout(() => {
                         if (isFirst && !noLoadSub) {
                             let selectedData = this.rowData ? this.rowData : (mftable.selectedPreRowData || {});
+
+                            this.subNoEdit = this.main.noEdit || (selectedData['EDITEXPRESS'] === 0);
                             if (tools.isNotEmpty(this.showSubField)) {
                                 if (tools.isNotEmpty(selectedData[this.showSubField])) {
                                     let list = selectedData[this.showSubField].split(',');
