@@ -2745,9 +2745,9 @@ export class BwTableModule extends Component {
             initState: btnRefresh
         }
     })();
-    getItemData(btn, item, url) {
+    getItemData(child, item, url) {
         return new Promise((resolve, reject) => {
-            BwRule.getFileInfo(btn.data.linkName, item[btn.data.linkName]).then(({ response }) => {
+            BwRule.getFileInfo(child, item[child]).then(({ response }) => {
                 response = JSON.parse(response);
                 if (response && response.dataArr && response.dataArr[0]) {
                     let data = response.dataArr[0];
@@ -2771,23 +2771,20 @@ export class BwTableModule extends Component {
             fileItem = btn.data.linkName.split(",");
         }
         let status = true;
-        console.log(fileItem);
         if (fileItem && fileItem.length > 0) {
             for (var j = 0; j < fileItem.length; j++) {
                 let child = fileItem[j];
+                console.log(child)
                 for (var i = 0; i < that.ftable.selectedRowsData.length; i++) {
                     let item = that.ftable.selectedRowsData[i];
-                    console.log(item[btn.data.linkName])
-                    if (item[btn.data.linkName]) {
+                    if (item[child]) {
                         let field = that.ftable.columnGet(child).content;
                         let url;
                         let result = {};
-                        console.log(field);
                         if (field && field.dataType == '43') {
                             let link = field.link,
                                 rowData = item;
                             if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
-
                                 url = await BwRule.getLink({
                                     link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
                                     varList: link.varList,
@@ -2798,7 +2795,7 @@ export class BwTableModule extends Component {
                                 });
                                 if (url) {
                                     result = {
-                                        name: item[btn.data.linkName],
+                                        name: item[child],
                                         filePath: url,
                                         count: 1
                                     }
@@ -2813,10 +2810,14 @@ export class BwTableModule extends Component {
                                 [child]: item[child],
                                 down: 'allow'
                             });
+        
                             try {
-                                result = await this.getItemData(btn, item, url);
+                                console.log(1111111111111)
+                                result = await this.getItemData(child, item, url);
+                                console.log(result)
                                 printData.push(result);
                             } catch (err) {
+                                console.log(1111122222222222);
                                 // Modal.toast("附件异常，无法打印")
                                 status = false;
                                 console.log(err)
