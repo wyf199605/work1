@@ -2,143 +2,16 @@
 .page-container {
     background-color: #f7f7f8 !important;
     color: #333333;
-}
-.chart-page {
-    width: 100%;
-    padding: 10px 15px;
-    .mg-right-10 {
-        margin-right: 10px;
-    }
-    .common-chart {
-        height: 250px;
-        background-color: white;
-        position: relative;
-        overflow: scroll;
-    }
-
-    .main-first-part {
-        display: flex;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        .first-part-section {
-            width: calc(50% - 5px);
-            margin-bottom: 10px;
-            border-radius: 3px;
-        }
-        .first-part-section:nth-of-type(odd) {
-            margin-right: 10px;
-        }
-        .this-week {
-            display: flex;
-            justify-content: flex-start;
-            height: 120px;
-            &>div {
-                flex:1;
-                background-color: white;
-                
-            }
-        }
-        .my-base-info {
-            display: flex;
-            justify-content: flex-start;
-            flex-wrap: nowrap;
-            background-color: white;
-            &>p {
-                padding-top: 10px;
-                flex: 1;
-                text-align: center;
-                &:not(:last-of-type) {
-                    border-right: 3px solid #f7f7f8;
-                }
-                margin-bottom: 0;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                .base-info-span-bg {
-                    background-color: #609ee9;
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    display: inline-block;
-                    &:before {
-                        line-height: 40px;
-                        font-size: 22px;
-                        color: white;
-                    }
-                }
-                span {
-                    margin-bottom: 10px;
-                }
-            }
-        }
-        .china-map {
-            width: 100%;
-            margin-right: 0 !important;
-        }
-        .combine-pie-stack {
-            display: flex;
-            justify-content: center;
-            // flex-direction: column;
-            &>div{
-                flex:1;
-            }
-        }
-        
-    }
-    .main-china-map{
+    .chart {
         width: 100%;
         height: 500px;
-        margin-bottom: 10px;
-        background-color: white;
-        border-radius: 3px;
     }
-    .audit-process {
-        padding: 15px;
-        color: #333333;
-        .audit-title {
-            color: #333333 ;
-            font-size: 18px;
-            // font-weight: bold;
-            font-family: 'monospace';
-        }
-        ul {
-            padding: 0 !important;
-            li>p {
-                margin-bottom: 5px;
-            }
-            .my-progress-bar {
-                width: 100%;
-                
-                .progress-bar-bg {
-                    display: inline-block;
-                    width: 80%;
-                    height: 10px;
-                    background-color: #f2f2f2;
-                    border-radius: 10px;
-                    .my-progress-color {
-                        display: block;
-                        width: 65%;
-                        // background-color: #609ee9;
-                        border-radius: 10px;
-                        height: 100%;
-                    }
-                }
-                .my-progress-bar-info {
-                    display: inline-block;
-                    width: 20%;
-                    text-align: center;
-                }
-             }
-        }
-        
-
-    }
-    #stacked-chart, #one-line-chart {
-        position: absolute;
-    }
-    
-    
-    
-
 }
+// .chart-page {
+//     width: 100%;
+//     height: 500px;
+//     padding: 10px 15px;
+//     #china-map {
+//         height: 500px;
+//     }
+// }

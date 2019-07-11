@@ -342,7 +342,11 @@ gulp.task('js', function() {
 
     gulpTsModule(["chartPageComponents/stacked-histogram-component/stacked-histogram.component"], "StackedHistogramComponnet.js");
 
-    gulpTsModule(["chartPageComponents/chart-page.component"], "ChartPageComponnet.js");
+    
+    gulpTsModule(["echart-module/echartModule"], "EchartModule.js");
+    gulpTsModule(["echart-module/chartTableModule"], "ChartTableModule.js");
+    gulpTsModule(["echart-module/city-map"], "CityMap.js");
+    gulpTsModule(["echart-module/province-map"], "ProvinceMap.js");
 
     gulpTsPage(["lionetOnline/lionetOnline"], "lionetOnline.js");
 
@@ -386,7 +390,7 @@ gulp.task('js', function() {
     gulpTsPage("collectMain/collectPage", "CollectPage.js");
     gulpTsPage("index/recentPage", "RecentPage.js");
     // gulpTsPage('main/defaultTab', 'defaultTab.js');
-    gulpTsPage("index/chartPage", "ChartPage.js");
+    gulpTsPage("index/chartPage", "chartPage.js"); 
 
     gulpTsPage('main/mainMbPage', 'mainMbPage.js');
 

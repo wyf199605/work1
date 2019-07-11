@@ -1,5 +1,5 @@
 function __setRequireBaseUrl(baseUrl, urlArg) {
-    G.setRequire({
+    G.setRequire({ 
         baseUrl: baseUrl,
         paths: {},
         bundles: {}
