@@ -129,6 +129,20 @@ export class LoginPage {
                     } else {
                         d.remove(regButton);
                     }
+                    if (tools.isPc) {
+                        if (this.props.jiebangButton instanceof Button) {
+                            this.props.jiebangButton.destroy();
+                        } else {
+                            d.remove(this.props.jiebangButton);
+                        }
+                    }
+                    if (tools.isMb) {
+                        if (this.props.utButton instanceof Button) {
+                            this.props.utButton.destroy();
+                        } else {
+                            d.remove(this.props.utButton);
+                        }
+                    }
                 }
             }
         });
@@ -922,7 +936,8 @@ export class LoginPage {
             }, () => {
                 return new Promise((resolve) => {
                     loginPage.device.userid = userId.toUpperCase();
-                    // loginPage.device.password = password;
+                    loginPage.device.password = this.compileStr(password);
+                    localStorage.removeItem('registerPhone');
                     resolve();
                 });
             });
@@ -931,6 +946,21 @@ export class LoginPage {
     /**
      * 密码登录
      */
+    private compileStr(code) {
+        var c = String.fromCharCode(code.charCodeAt(0) + code.length);
+        for (var i = 1; i < code.length; i++) {
+            c += String.fromCharCode(code.charCodeAt(i) + code.charCodeAt(i - 1));
+        }
+        return escape(c);
+    }//加密函数
+    private uncompileStr(code) {
+        code = unescape(code);
+        var c = String.fromCharCode(code.charCodeAt(0) - code.length);
+        for (var i = 1; i < code.length; i++) {
+            c += String.fromCharCode(code.charCodeAt(i) - c.charCodeAt(i - 1));
+        }
+        return c;
+    }//解密函数
     private loginClick() {
         this.loginFunc();
         return false;
@@ -1204,8 +1234,10 @@ export class LoginPage {
             } else {
                 (<HTMLInputElement>saveButton).checked = true;
             }
+            // console.log(this.device)
             this.props.userId.value = tools.str.toEmpty(this.device.userid);
-            this.props.password.value = tools.str.toEmpty(this.device.password);
+            let pass = tools.str.toEmpty(this.device.password);
+            this.props.password.value = pass ? this.uncompileStr(pass) : pass
         }
     }
 
@@ -1268,7 +1300,6 @@ export class LoginPage {
     }
     //扫码登陆
     private scanHandle = (status: boolean = false) => {
-        alert('扫码');
         d.query(".login-wrapper", document.body).style.display = "none";
         // isLogin 判断是否初次登录,code 整个弹窗 close 关闭按钮
         let isLogin = status, code = null, close = null;
