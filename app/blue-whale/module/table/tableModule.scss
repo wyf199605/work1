@@ -345,6 +345,7 @@
 
 .table-module-wrapper {
   height: 100%;
+  overflow: scroll;
   background-color: #fafafa;
   &>.showDetail {
     position: fixed;
@@ -466,6 +467,7 @@
         .table-body-wrapper {
           height: 90%;
           height: calc(100% - 41px);
+          padding-bottom: 44px;
         }
       }
     }
