@@ -697,6 +697,7 @@ export class Modal extends Component {
      */
     private _isBackground: boolean;
     set isBackground(isBackground: boolean) {
+        
         this._isBackground = tools.isEmpty(isBackground) ? true : isBackground;
         //初始化遮罩层
         if (!this.modalScreen && this._isBackground) {
@@ -709,9 +710,9 @@ export class Modal extends Component {
         }
         //为遮罩层设置点击后的关闭事件，如果没有遮罩层，则不关闭
         if (this._isBackground) {
-            d.on(this.modalScreen, 'click', () => {
-                this.modalHidden();
-            });
+            // d.on(this.modalScreen, 'click', () => {
+            //     this.modalHidden();
+            // });
         }
     }
 

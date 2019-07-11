@@ -27,23 +27,6 @@ export class BwMainTableModule extends BwTableModule{
 
     protected tdClickHandler(field: R_Field, rowData: obj, empty = false)  {
         super.tdClickHandler(field, rowData, empty);
-        // linkName 快捷点击按键
-        if(!field) return;
-
-        let fieldName = field.name;
-        if(this.btnsLinkName.includes(fieldName)) {
-            let allBtn = (this.subBtns.box && this.subBtns.box.children) || [];
-            for (let btn of allBtn) {
-                let rBtn: R_Button = btn.data;
-                if (rBtn && rBtn.linkName && rBtn.linkName === fieldName) {
-
-                    // 等待表格行选中后
-                    setTimeout(() => {
-                        btn.onClick.call(btn, null);
-                    }, 100);
-                }
-            }
-        }
     }
     clickInit(){
         super.clickInit();

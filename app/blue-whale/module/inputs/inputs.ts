@@ -199,10 +199,10 @@ export class Inputs {
                     this.isProcess = false;
                     this.reOpen(open);
                 });
-                m.onClose = () => {
-                    this.isProcess = false;
-                    this.reOpen(open);
-                };
+                // m.onClose = () => {
+                //     this.isProcess = false;
+                //     this.reOpen(open);
+                // };
                 break;
             case 3:
                 // 提示信息,确定(下一步)/取消
@@ -236,7 +236,7 @@ export class Inputs {
                 break;
             default:
                 this.isProcess = false;
-                !atvarObj && this.reOpen(open);
+            // !atvarObj && this.reOpen(open);
         }
 
         dataType === 0 && this.dataCover(ftable, response);
@@ -538,7 +538,10 @@ export class KeyStep {
                                     this.p.callback(text, reg, conScan && open);
 
                                     // 没有通过正则匹配
-                                    !reg && conScan && open();
+                                    // !reg && conScan && open();
+                       if (!reg) {
+                                                       Modal.toast("条码不匹配")
+                                    }
                                 });
                             };
                             open();
@@ -587,6 +590,8 @@ export class KeyStep {
      */
     open(para: IKeyStepPara) {
         return new Promise((resolve) => {
+            console.log(121222222)
+                   resolve("412050")
             (ShellAction.get().device().scan as any)({
                 callback: (even) => {
                     resolve(JSON.parse(even.detail).data)

@@ -5,13 +5,13 @@ import sys = BW.sys;
 import Rule = G.Rule;
 import tools = G.tools;
 import Ajax = G.Ajax;
-import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
-import {ImgModalMobile} from "../ImgModalMobile";
-import {BugReportModal} from "../../module/BugReport/BugReport";
-import {Loading} from "../../../global/components/ui/loading/loading";
-import {TreeNodeBase} from "../../../global/dataStruct/tree/TreeNodeBase";
-import {IFastTableCol} from "../../../global/components/newTable/FastTable";
-import {IIDBPara} from "../../../global/NewIDB";
+import { ImgModal, ImgModalPara } from "../../../global/components/ui/img/img";
+import { ImgModalMobile } from "../ImgModalMobile";
+import { BugReportModal } from "../../module/BugReport/BugReport";
+import { Loading } from "../../../global/components/ui/loading/loading";
+import { TreeNodeBase } from "../../../global/dataStruct/tree/TreeNodeBase";
+import { IFastTableCol } from "../../../global/components/newTable/FastTable";
+import { IIDBPara } from "../../../global/NewIDB";
 
 export class BwRule extends Rule {
     /**
@@ -29,7 +29,7 @@ export class BwRule extends Rule {
     };
 
     static EVT_REFRESH = 'refreshData';
-    static FRESH_SYS_MSG='freshSysMsg';
+    static FRESH_SYS_MSG = 'freshSysMsg';
 
     static EVT_ASYN_QUERY = '__TABLE_ASYN_QUERY__';
 
@@ -498,6 +498,50 @@ export class BwRule extends Rule {
      * @param {object} para.data - 页面的数据
      * @param {function} para.callback - 点击link执行的回调函数, 参数为 (需要执行的动作，动作需要的数据，所有的动作)
      */
+    static getLink = async (para) => {
+        let url;
+        url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
+        let post = () => {
+            return new Promise((resolve, reject) => {
+                let rData;
+                BwRule.Ajax.fetch(url)
+                    .then(({ response }) => {
+                        // console.log(response);
+                        rData = response.data[0];
+                        resolve(CONF.siteUrl + rData.DOWNADDR)
+                    }).catch(err => {
+                        reject(err)
+                    })
+                // resolve("http://www.baidu.com")
+            })
+        }
+        return new Promise(async (resolve, reject) => {
+
+            para = Object.assign({
+                dataType: '',
+                varList: [],
+                data: {}
+            }, para);
+
+            if (para.dataType === BwRule.DT_FILE) {
+                if (para.type === 'download') {
+                    return url;
+                } else {
+                    try {
+                   
+                        console.log("-------------------------");
+                        console.log( await post());
+                        resolve( await post());
+                    } catch (err) {
+                        reject(err);
+                    }
+                }
+            } else {
+                resolve(url)
+            }
+        })
+
+    };
     static link(para) {
         console.log(para)
         let _linkAct = {
@@ -515,10 +559,7 @@ export class BwRule extends Rule {
         }, para);
 
         url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
-        console.log(url);
-        console.log("------------------------------")
         if (para.dataType === BwRule.DT_FILE) {
-
             if (para.type === 'download') {
                 sys.window.download(url);
             } else {

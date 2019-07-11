@@ -790,7 +790,7 @@ export class BwTableModule extends Component {
         if (!empty && tools.isEmpty(rowData[field.name])) {
             return;
         }
-
+        //下载
         if (BwRule.isNewFile(dataType)) {
             let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                 "md5_field": field.name,
@@ -818,6 +818,22 @@ export class BwTableModule extends Component {
         let url = drillUrlGet(field, rowData, this.ui.keyField);
         if (url) {
             sys.window.open({ url });
+            return;
+        }
+        //单元格快捷按钮
+        let fieldName = field.name;
+        if (this.btnsLinkName.includes(fieldName)) {
+            let allBtn = (this.subBtns.box && this.subBtns.box.children) || [];
+            for (let btn of allBtn) {
+                let rBtn: R_Button = btn.data;
+                if (rBtn && rBtn.linkName && rBtn.linkName === fieldName) {
+
+                    // 等待表格行选中后
+                    setTimeout(() => {
+                        btn.onClick.call(btn, null);
+                    }, 100);
+                }
+            }
         }
     };
 
@@ -2529,11 +2545,10 @@ export class BwTableModule extends Component {
                                 }
                             } else if (btn.data.openType === "batch_file_print") {
                                 if (this.ftable.selectedRowsData && this.ftable.selectedRowsData.length <= 0) {
-                                    Modal.toast("请先要打印的内容");
+                                    Modal.toast("请先选择要打印的内容");
                                     return false;
                                 }
                                 console.log(this.ftable)
-
                                 let printer = [];
                                 try {
                                     let printList = Shell.printer.get();
@@ -2555,7 +2570,12 @@ export class BwTableModule extends Component {
                                 let body: HTMLDivElement;
                                 let printingDom;
                                 this.getData(that, btn).then(res => {
-                                    printData = res;
+                                    console.log(res);
+                                    printData = res.printData;
+                                    if (res.printData.length <= 0 && !res.status) {
+                                        Modal.toast('打印附件地址无效');
+                                        return false;
+                                    }
                                     if (printData.length <= 0) {
                                         Modal.toast("无打印内容")
                                         return false;
@@ -2606,7 +2626,7 @@ export class BwTableModule extends Component {
                                         }
 
                                     });
-                                }).catch(e=>{
+                                }).catch(e => {
                                     console.log(e)
                                 })
                             } else {
@@ -2736,7 +2756,7 @@ export class BwTableModule extends Component {
                         filePath: url,
                         count: 1
                     })
-                }else{
+                } else {
                     reject(response)
                 }
             }).catch((e) => {
@@ -2750,32 +2770,42 @@ export class BwTableModule extends Component {
         if (btn.data.linkName) {
             fileItem = btn.data.linkName.split(",");
         }
+        let status = true;
+        console.log(fileItem);
         if (fileItem && fileItem.length > 0) {
             for (var j = 0; j < fileItem.length; j++) {
                 let child = fileItem[j];
                 for (var i = 0; i < that.ftable.selectedRowsData.length; i++) {
                     let item = that.ftable.selectedRowsData[i];
+                    console.log(item[btn.data.linkName])
                     if (item[btn.data.linkName]) {
                         let field = that.ftable.columnGet(child).content;
                         let url;
-                        if (field&&field.dataType == '43') {
+                        let result = {};
+                        console.log(field);
+                        if (field && field.dataType == '43') {
                             let link = field.link,
                                 rowData = item;
                             if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
-                                let para = {
+
+                                url = await BwRule.getLink({
                                     link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
                                     varList: link.varList,
                                     dataType: field.atrrs.dataType,
                                     data: rowData,
                                     needGps: link.needGps === 1,
                                     type: link.type
+                                });
+                                if (url) {
+                                    result = {
+                                        name: item[btn.data.linkName],
+                                        filePath: url,
+                                        count: 1
+                                    }
+                                    printData.push(result);
+                                } else {
+                                    status = false;
                                 }
-                                para = Object.assign({
-                                    dataType: '',
-                                    varList: [],
-                                    data: {}
-                                }, para);
-                                url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
                             }
                         } else {
                             url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
@@ -2783,21 +2813,20 @@ export class BwTableModule extends Component {
                                 [child]: item[child],
                                 down: 'allow'
                             });
-                        }
-                        console.log(url);
-                        try {
-                            let result = await this.getItemData(btn, item, url);
-                            printData.push(result);
-                        } catch (err) {
-                            // Modal.toast("附件异常，无法打印")
-                            console.log(err)
+                            try {
+                                result = await this.getItemData(btn, item, url);
+                                printData.push(result);
+                            } catch (err) {
+                                // Modal.toast("附件异常，无法打印")
+                                status = false;
+                                console.log(err)
+                            }
                         }
                     }
                 }
             }
         }
-        console.log(printData);
-        return printData;
+        return { status, printData };
     }
     modify = (() => {
         let self = this,
@@ -3412,7 +3441,7 @@ export class BwTableModule extends Component {
             if (box) {
                 for (let key in status) {
                     let btn = box.getItem(key);
-                    btn && (btn.isDisabled = this.noEdit ? this.noEdit :!status[key]);
+                    btn && (btn.isDisabled = this.noEdit ? this.noEdit : !status[key]);
                 }
             }
             return status;
