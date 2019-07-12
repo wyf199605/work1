@@ -38,6 +38,7 @@ import { Datetime } from "../../../global/components/form/datetime/datetime";
 import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
 import { BwTableEditModule } from "./BwTableEditModule";
 import { ShareCode } from '../../common/share-code/shareCode';
+import { ChartTableModule } from "../echart-module/chartTableModule";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -412,6 +413,8 @@ export class BwTableModule extends Component {
                             // 获取lookup数据
                             this.lookup
                         ]).then(([{ response }]) => {
+                            this.wrapper.style.display = 'block';
+                            this.ui.initShow && new ChartTableModule(this.ui, this.wrapper, response, this.ftable);
                             let { data, head } = response;
                             // 选项查询处理(wbf)
                             this.sectionField(response);
@@ -455,6 +458,19 @@ export class BwTableModule extends Component {
 
             },
         });
+
+        // !tools.isMb && this.ftable.btnAdd('switch-chart', {
+        //     type: 'default',
+        //     content: '图表',
+        //     onClick: () => {
+        //         let chartDom: HTMLElement | null = d.query('.chart-table', this.container);
+        //         if(chartDom) {
+        //             this.wrapper.style.display = 'none';
+        //             chartDom.style.display = 'block';
+        //         }
+
+        //     },
+        // });
 
         this.ftableReady();
 
