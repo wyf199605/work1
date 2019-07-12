@@ -825,14 +825,16 @@ export class ChartTableModule {
             : <div class="chart-table" >
 
                 <section class="chart-btns">
+                    
                     <button class="switch-table btn button-type-default button-small" data-type="switchTable">
                         <i class="appcommon app-biaoge" data-type="switchTable"></i>
                         表格
-                </button>
-                    <button class="switch-table btn button-type-default button-small" data-type="chartSetting">
+                    </button>
+                    {this.ui.showType === 'map'? '' : <button class="switch-table btn button-type-default button-small" data-type="chartSetting">
                         <i class="iconfont button-icon icon-bingzhuangtu" data-type="chartSetting"></i>
                         设置
-                </button>
+                    </button>}
+                    
                 </section>
 
                 {this.chartDom}
