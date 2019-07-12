@@ -3,11 +3,11 @@ import d = G.d;
 import tools = G.tools;
 import IComponentPara = G.IComponentPara;
 import Component = G.Component;
-import {IModalHeaderPara, ModalHeader} from "global/components/feedback/modal/ModalHeader";
-import {IModalFooterPara, ModalFooter} from "global/components/feedback/modal/ModalFooter";
-import {Button} from "../../general/button/Button";
-import {Drag} from "components/ui/drag/drag";
-import {InputBox} from "../../general/inputBox/InputBox";
+import { IModalHeaderPara, ModalHeader } from "global/components/feedback/modal/ModalHeader";
+import { IModalFooterPara, ModalFooter } from "global/components/feedback/modal/ModalFooter";
+import { Button } from "../../general/button/Button";
+import { Drag } from "components/ui/drag/drag";
+import { InputBox } from "../../general/inputBox/InputBox";
 
 export interface IModal extends IComponentPara {
     header?: IModalHeaderPara | string;
@@ -28,28 +28,28 @@ export interface IModal extends IComponentPara {
     size?: string;
     className?: string;
     opacity?: number;
-    onOk    ?: EventListener;
+    onOk?: EventListener;
     onCancel?: EventListener;
     escKey?: boolean;
     isMb?: boolean;
     isModal?: boolean; //移动端是否模态弹出
     isQuery?: boolean; // 是否查询器使用
 
-    onClose  ?(): void;
+    onClose?(): void;
 
     closeMsg?: string;
 
-    onLarge ?(): void;
+    onLarge?(): void;
 
-    alert   ?(): void;
+    alert?(): void;
 
-    confirm ?(): void;
+    confirm?(): void;
 
-    toast ?(): void
+    toast?(): void
 
-    destroy ?(): void;
+    destroy?(): void;
 
-    keyDownHandle? (e): void
+    keyDownHandle?(e): void
 }
 
 interface IConfirm {
@@ -219,7 +219,7 @@ export class Modal extends Component {
             container: this.headWrapper,
             dragEl: this.wrapper,
             isClose: true,
-        }, typeof header === 'string' ? {title: header} : header));
+        }, typeof header === 'string' ? { title: header } : header));
 
         // 为头部关闭按钮绑定事件
         let close = this._modalHeader.modalCloseEl;
@@ -249,7 +249,7 @@ export class Modal extends Component {
     private _bodyWrapper: HTMLElement = null;
     get bodyWrapper() {
         if (!this._bodyWrapper) {
-            this._bodyWrapper = <div className={`modal-body${tools.isMb ? ' modal-body-mobile' : ''}`}/>;
+            this._bodyWrapper = <div className={`modal-body${tools.isMb ? ' modal-body-mobile' : ''}`} />;
             tools.isNotEmpty(this.headWrapper) ? d.after(this.headWrapper, this._bodyWrapper) : d.prepend(this.wrapper, this._bodyWrapper);
         }
         return this._bodyWrapper;
@@ -266,7 +266,7 @@ export class Modal extends Component {
             return;
         }
         //生成身体元素，仅一次
-        let bodyWrapper:any = this.bodyWrapper;
+        let bodyWrapper: any = this.bodyWrapper;
         //删除掉原来挂载的身体
         if (this._body) {
             bodyWrapper.removeChild(this._body);
@@ -320,8 +320,8 @@ export class Modal extends Component {
     // private _height?: string;
     set height(height: string) {
         // this._height = tools.isEmpty(height) ? '' : height;
-        if(!this.wrapper){
-            return ;
+        if (!this.wrapper) {
+            return;
         }
         this.wrapper.style.height = height;
         let otherHeight = this.headWrapper ? this.headWrapper.offsetHeight : 0;
@@ -393,7 +393,7 @@ export class Modal extends Component {
         let isAdaptiveCenter = this.isAdaptiveCenter;
         switch (this._position) {
             //左右居中，距离顶部40px;
-            case 'default' :
+            case 'default':
                 if (isAdaptiveCenter) {
                     wrapper.style.left = '50%';
                     wrapper.style.transform = 'translateX(-50%)';
@@ -602,13 +602,13 @@ export class Modal extends Component {
             if (this._isBackground) {
                 this.modalScreen && (
                     this.modalScreen.classList.remove('lock-active-in'),
-                        this.modalScreen.classList.add('lock-active-out'),
-                        //     d.once(this.modalScreen, 'animationend', () => {
-                        //         this.modalScreen.style.display = 'none';
-                        //         this.modalScreen.classList.remove('lock-screen');
+                    this.modalScreen.classList.add('lock-active-out'),
+                    //     d.once(this.modalScreen, 'animationend', () => {
+                    //         this.modalScreen.style.display = 'none';
+                    //         this.modalScreen.classList.remove('lock-screen');
 
-                        this.modalScreen.style.display = 'none',
-                        this.modalScreen.classList.remove('lock-screen')
+                    this.modalScreen.style.display = 'none',
+                    this.modalScreen.classList.remove('lock-screen')
                 );
 
                 this._container && this._container.classList.remove('overflow-hidden');
@@ -697,7 +697,7 @@ export class Modal extends Component {
      */
     private _isBackground: boolean;
     set isBackground(isBackground: boolean) {
-        
+
         this._isBackground = tools.isEmpty(isBackground) ? true : isBackground;
         //初始化遮罩层
         if (!this.modalScreen && this._isBackground) {
@@ -710,9 +710,9 @@ export class Modal extends Component {
         }
         //为遮罩层设置点击后的关闭事件，如果没有遮罩层，则不关闭
         if (this._isBackground) {
-            // d.on(this.modalScreen, 'click', () => {
-            //     this.modalHidden();
-            // });
+            d.on(this.modalScreen, 'click', () => {
+                this.modalHidden();
+            });
         }
     }
 
@@ -827,7 +827,7 @@ export class Modal extends Component {
      * 类型：EventListener
      * 默认值：无
      */
-    private _onClose ?(): void;
+    private _onClose?(): void;
 
     set onClose(callback) {
         this._onClose = callback;
@@ -840,7 +840,7 @@ export class Modal extends Component {
     /**
      * 放大模态框时触发事件
      */
-    private _onLarge ?(): void;
+    private _onLarge?(): void;
 
     fullPosition: string;
 
@@ -881,7 +881,7 @@ export class Modal extends Component {
         // msg = tools.isEmpty(msg) ? '空' : msg;
 
         let inputBox = new InputBox({}),
-            okBtn = new Button({content: '确定', type: 'default', key: 'okBtn'});
+            okBtn = new Button({ content: '确定', type: 'default', key: 'okBtn' });
 
         if (onClick) {
             okBtn.onClick = () => onClick();
@@ -890,7 +890,7 @@ export class Modal extends Component {
         inputBox.addItem(okBtn);
         msg = msg.replace(/\n/g, "<br/>")
         msg = msg.replace(/↵/g, "<br/>");
-        msg=`<div>${msg}</div>`
+        msg = `<div>${msg}</div>`
         let m = new Modal({
             container,
             isOnceDestroy: true,
@@ -942,7 +942,7 @@ export class Modal extends Component {
         inputBox.addItem(new Button({
             content: leftContent,
             onClick: (index) => {
-                if (confirm && confirm.callback && typeof  confirm.callback === 'function') {
+                if (confirm && confirm.callback && typeof confirm.callback === 'function') {
                     confirm.callback(false);
                 }
                 m.isShow = false;
@@ -951,7 +951,7 @@ export class Modal extends Component {
         inputBox.addItem(new Button({
             content: rightContent,
             onClick: (index) => {
-                if (confirm && confirm.callback && typeof  confirm.callback === 'function') {
+                if (confirm && confirm.callback && typeof confirm.callback === 'function') {
                     confirm.callback(true);
                 }
                 if (!(confirm && confirm.noHide)) {
