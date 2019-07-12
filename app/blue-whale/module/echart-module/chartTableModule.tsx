@@ -815,9 +815,10 @@ export class ChartTableModule {
                     <button class="mb-switch-table btn button-type-default " data-type="switchTable">
                         <i class=" appcommon app-biaoge" data-type="switchTable"></i>
                     </button>
-                    <button class="mb-switch-table btn button-type-default " data-type="chartSetting">
+                    {this.ui.showType === 'map'? '': <button class="mb-switch-table btn button-type-default" data-type="chartSetting">
                         <i class=" iconfont button-icon icon-bingzhuangtu" data-type="chartSetting"></i>
-                    </button>
+                    </button>}
+                    
                 </section>
                 {this.chartDom}
             </div>
@@ -1184,7 +1185,7 @@ export class ChartTableModule {
             !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
 
         });
-        debugger;
+        // debugger;
 
         return chinaMap;
     }
@@ -1501,7 +1502,7 @@ export class ChartTableModule {
                         let sum = obj.geometry.coordinates[0][0].reduce((accumulator, currentValue) => {
                             return [accumulator[0]+ currentValue[0], accumulator[1]+ currentValue[1]]
                         });
-                        debugger;
+                        // debugger;
 
                         if (valueArr[i] >= conditionArr[i]) {
                             
