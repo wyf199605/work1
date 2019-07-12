@@ -739,7 +739,7 @@ export class QueryBuilder {
 
             } else if (param.op === 7) { // between
                 param.values = [v1];
-                if (v1 && !v2) {
+                if (v1 && !v2||!v1 &&v2) {
                     Modal.toast("请将条件填写完整");
                     throw new Error('请将条件填写完整')
                 }
