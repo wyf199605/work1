@@ -305,7 +305,8 @@ export class ChartTableModule {
             e.target['classList'].toggle('checked-radio');
         } else {
             e.target['previousElementSibling'].checked;
-            e.target['parentElement'].parentElement.querySelector('.checked-radio').classList.remove('checked-radio');
+            let checkedDom = e.target['parentElement'].parentElement.querySelector('.checked-radio');
+            checkedDom && checkedDom.classList.remove('checked-radio');
             e.target['classList'].add('checked-radio');
         }
         let prevEleValue = e.target['previousElementSibling'].value;
@@ -898,13 +899,10 @@ export class ChartTableModule {
             if (i > 1) {
                 body.removeChild(d.query('.max-chart', body));
                 // this.chart.resize();
-                d.query('.table-module-has-sub', body).style.height = '100vh';
+                let subDom = d.query('.table-module-has-sub', body);
+                subDom && (subDom.style.height = '100vh');
             }
         });
-
-
-
-
     }
 
     mbChartSetting() {
