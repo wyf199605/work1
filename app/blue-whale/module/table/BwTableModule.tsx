@@ -2661,7 +2661,7 @@ export class BwTableModule extends Component {
                                 });
                                 let spinner = new Spinner({
                                     el: btn.wrapper,
-                                    type: Spinner.SHOW_TYPE.replace,
+                                    type: Spinner.SHOW_TYPE.cover,
                                     time: 5000,
                                     onTimeout: () => {
                                         box.children.forEach((button) => {
