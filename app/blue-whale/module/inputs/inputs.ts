@@ -590,8 +590,6 @@ export class KeyStep {
      */
     open(para: IKeyStepPara) {
         return new Promise((resolve) => {
-            console.log(121222222)
-                   resolve("412050")
             (ShellAction.get().device().scan as any)({
                 callback: (even) => {
                     resolve(JSON.parse(even.detail).data)
