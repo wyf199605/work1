@@ -494,7 +494,6 @@ export class ShareCode {
         </div>
 
         shareEle.addEventListener('click', (e: Event) => {
-
             switch (e.target['className']) {
                 case 'qr-code-share':
                     this.generateCode();
