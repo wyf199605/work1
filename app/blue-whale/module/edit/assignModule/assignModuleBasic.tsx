@@ -2,40 +2,40 @@
 import tools = G.tools;
 import d = G.d;
 import sys = BW.sys;
-import {FormCom} from "../../../../global/components/form/basic";
-import {Modal} from "global/components/feedback/modal/Modal";
-export class AssignModuleBasic extends FormCom{
+import { FormCom } from "../../../../global/components/form/basic";
+import { Modal } from "global/components/feedback/modal/Modal";
+export class AssignModuleBasic extends FormCom {
     onSet: (val) => void;
-    get(): any {return undefined;}
-    set(...any): void {}
-    get value(){return undefined;}
-    set value(any) {}
+    get(): any { return undefined; }
+    set(...any): void { }
+    get value() { return undefined; }
+    set value(any) { }
 
     protected contactModal: Modal;
     protected sepValue = ';';
     public iframe;
 
-    public initPicker(pickDom: HTMLElement, href:string, data:obj , onSelect: Function){
+    public initPicker(pickDom: HTMLElement, href: string, data: obj, onSelect: Function) {
 
-        if(pickDom){
+        if (pickDom) {
             let captionName = pickDom.parentElement.dataset.name;
-            if(sys.isMb){
+            if (sys.isMb) {
                 // this.destroy();
-                this.iframe = tools.iPage( href, {id : 'iframe_' + captionName});
+                this.iframe = tools.iPage(href, { id: 'iframe_' + captionName });
             }
             d.on(pickDom, 'click', () => {
                 // contactModal.show();
                 localStorage.setItem('fromPickCaption', captionName);
                 localStorage.setItem('fromPickData', JSON.stringify(tools.str.toEmpty(data)));
-                if(sys.os === 'pc'){
+                if (sys.os === 'pc') {
                     this.initIframe(href);
                     this.contactModal.isShow = true;
-                }else {
+                } else {
                     this.iframe.show();
                 }
 
-                d.once(window, 'selectContact', (e:CustomEvent) => {
-                    if(this.contactModal){
+                d.once(window, 'selectContact', (e: CustomEvent) => {
+                    if (this.contactModal) {
                         this.contactModal.isShow = false;
                     }
                     onSelect(e.detail);
@@ -44,21 +44,26 @@ export class AssignModuleBasic extends FormCom{
         }
     }
 
-    protected initIframe(href:string){
+    protected initIframe(href: string) {
         /*初始化收件人模态框*/
-        if(this.contactModal){
-            return ;
-        }
-        if(!href){
+        if (this.contactModal) {
             return;
         }
-
-        let iframe: HTMLIFrameElement = <iframe className="pageIframe" src={tools.url.addObj(href, {isMb:true}, false)}></iframe>;
+        if (!href) {
+            return;
+        }
+        // debugger;
+        let iframe: HTMLIFrameElement = <iframe className="pageIframe" src={tools.url.addObj(href, { isMb: true }, false)}></iframe>;
 
         this.contactModal = new Modal({
-            body : iframe,
+            body: iframe,
             // isOnceDestroy : true,
             className: 'contact-modal'
+        });
+
+        let modalScreen = d.query('.modal-screen')//<div className="modal-screen lock-screen"></div>;
+        d.on(modalScreen, 'click', () => {
+            this.contactModal.isShow = false
         });
 
         // iframe.onload = () => {
@@ -85,28 +90,28 @@ export class AssignModuleBasic extends FormCom{
         }
     }
 
-    public assignDataGet(data, resData){
+    public assignDataGet(data, resData) {
         let assignValueArr = {},
             assignData: obj = {};
 
-        if(typeof resData !== 'object' || !resData){
+        if (typeof resData !== 'object' || !resData) {
             return assignData;
         }
 
         let keyArr = Object.keys(resData);
 
-        keyArr.forEach( key => {
+        keyArr.forEach(key => {
             let data = resData[key];
             assignValueArr[key] = typeof data === 'string' ? data.split(this.sepValue) : [data];
         });
 
-        (typeof data === 'string' ? data.split(this.sepValue) : [data]).forEach( (v, i) => {
+        (typeof data === 'string' ? data.split(this.sepValue) : [data]).forEach((v, i) => {
             if (tools.isEmpty(v)) {
                 return;
             }
             // let assignD : obj = {};
             keyArr.forEach((key) => {
-                if(!assignData[key]){
+                if (!assignData[key]) {
                     assignData[key] = [];
                 }
                 assignData[key].push(assignValueArr[key][i])
@@ -120,8 +125,8 @@ export class AssignModuleBasic extends FormCom{
         return undefined;
     }
 
-    destroy(){
-        if(this.iframe){
+    destroy() {
+        if (this.iframe) {
             d.remove(this.iframe.get());
         }
         this.contactModal && this.contactModal.destroy();

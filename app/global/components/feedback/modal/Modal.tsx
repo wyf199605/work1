@@ -710,9 +710,9 @@ export class Modal extends Component {
         }
         //为遮罩层设置点击后的关闭事件，如果没有遮罩层，则不关闭
         if (this._isBackground) {
-            d.on(this.modalScreen, 'click', () => {
-                this.modalHidden();
-            });
+            // d.on(this.modalScreen, 'click', () => {
+            //     this.modalHidden();
+            // });
         }
     }
 
