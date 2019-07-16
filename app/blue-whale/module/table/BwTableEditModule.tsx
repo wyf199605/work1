@@ -24,10 +24,9 @@ export class BwTableEditModule {
     protected container: HTMLElement;
     protected wrapper: HTMLElement;
     protected editModule: EditModule;
-    onFinish: (data: obj) => void; 
+    onFinish: (data: obj) => void;
 
     constructor(para: IBwTableEditPara){
-        console.log('..............bwTable',para)
         this.wrapper = <div className="detail-content"/>;
         this.container = para.container;
         this.bwTable = para.bwTable;
@@ -77,6 +76,7 @@ export class BwTableEditModule {
                     dom: el ? d.query('.detail-item-content', el) : null,
                     field: f,
                     onExtra: (data, relateCols, isEmptyClear = false) => {
+                        console.log(data);
                         let editModule = this.editModule,
                             com = editModule.getDom(f.name);
                         for(let key of relateCols){
@@ -90,9 +90,12 @@ export class BwTableEditModule {
                                     continue;
                                 }
                                 let hField = hCom.custom as R_Field;
+                                let onSet = hCom.onSet;
+                                hCom.onSet = null;
                                 hCom.set(data[key] || '');
+                                hCom.onSet = onSet;
 
-                                if (hField.assignSelectFields && hField.assignAddr) {
+                                /*if (hField.assignSelectFields && hField.assignAddr) {
                                     BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(hField.assignAddr, this.get()), {
                                         cache: true,
                                     }).then(({response}) => {
@@ -100,12 +103,17 @@ export class BwTableEditModule {
                                         if (res && res[0]) {
                                             hField.assignSelectFields.forEach((name) => {
                                                 let assignCom = editModule.getDom(name);
+                                                let onSet = assignCom.onSet;
+                                                assignCom.onSet = null;
                                                 assignCom && assignCom.set(res[0][name]);
+                                                assignCom.onSet = onSet;
                                             });
                                             let data = this.get();
                                             this.fields.forEach((field) => {
                                                 if(field.elementType === 'lookup'){
                                                     let lCom = editModule.getDom(field.name);
+                                                    let onSet = lCom.onSet;
+                                                    lCom.onSet = null;
                                                     if(!data[field.lookUpKeyField]){
                                                         lCom.set('');
                                                     }else{
@@ -116,12 +124,13 @@ export class BwTableEditModule {
                                                             }
                                                         }
                                                     }
+                                                    lCom.onSet = onSet;
                                                 }
                                             })
                                         }
 
                                     })
-                                }
+                                }*/
                             }
                         }
                     }
@@ -176,12 +185,18 @@ export class BwTableEditModule {
                         let options = lookUpData[name] || [];
                         for (let opt of options) {
                             if (opt.value == data[field.lookUpKeyField]) {
+                                let onSet = com.onSet;
+                                com.onSet = null;
                                 com.set(opt || '');
+                                com.onSet = onSet;
                                 break;
                             }
                         }
                     }else if(name in data){
+                        let onSet = com.onSet;
+                        com.onSet = null;
                         com.set(data[name] || '');
+                        com.onSet = onSet;
                     }
                 }
             });
