@@ -2602,6 +2602,11 @@ export class BwTableModule extends Component {
                                         modal.isShow = true;
                                         d.query(".modal-title").style.fontSize = '16px';
                                     }
+                                    // let a = [{ name: 'xxx.jpg', msg: '成功' },{ name: 'xxx.jpg', msg: '成功' }]
+                                    // let doms = <ul class="result slideInUp"> </ul>
+                                    // let ab = 1;
+
+                                    // return false;
                                     d.on(d.query('.printName'), 'click', function (e: MouseEvent) {
                                         let target: any = e.target;
                                         if (target && target.className === 'printbtn') {
@@ -2612,10 +2617,85 @@ export class BwTableModule extends Component {
                                             Shell.other.filePrint(obj, (e) => {
                                                 let doms = <ul class="result slideInUp"> </ul>
                                                 e.data.printData.forEach(item => {
-                                                    let itemDom = <li>
-                                                        <span class="print-name">{item.name}</span>
-                                                        <span>{item.msg}</span>
-                                                    </li>
+                                                    let itemDom = null;
+                                                    if (item.name.indexOf('jpg') > -1 || item.name.indexOf('png') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#32A0FF,fontSize:16px" class="iconfont icon-image"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('txt') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#4E99FF" class="iconfont icon-txt"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('doc') > -1 || item.name.indexOf('docx') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#666666" class="iconfont icon-word1"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('xlsx') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#41A771" class="iconfont icon-Excel"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('ppx') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color#FF704E" class="iconfont icon-ppt"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('pdf') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#4E99FF" class="iconfont icon-pdf"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    }
+
                                                     doms.append(itemDom)
                                                 })
                                                 body.innerHTML = "";
@@ -2810,7 +2890,7 @@ export class BwTableModule extends Component {
                                 [child]: item[child],
                                 down: 'allow'
                             });
-        
+
                             try {
                                 console.log(1111111111111)
                                 result = await this.getItemData(child, item, url);
