@@ -337,17 +337,21 @@ export class ChartTableModule {
         let btnsContainer: HTMLElement = d.query('.fast-table-btns', this.wrapper);
         if (!btnsContainer) return;
 
-        let btn: HTMLElement = tools.isMb ?
+        
+        // d.query('.chart-btn', btnsContainer) && d.query('.chart-btn', btnsContainer).parentElement.removeChild(d.query('.chart-btn', btnsContainer));
+        // let chartBtnEle: HTMLElement = d.query('.chart-btn', btnsContainer);
+        // chartBtnEle && chartBtnEle.parentElement.removeChild(chartBtnEle);
+        let chartBtn: HTMLElement = btnsContainer.querySelector('.chart-btn');
+        if (!chartBtn) {
+            chartBtn = tools.isMb ?
             <button class="btn button-type-default button-small chart-btn mb-chart-btn">
                 <i class="appcommon app-tuxing" ></i>
             </button>
             : <button class="btn button-type-default button-small chart-btn ">图表</button>
-        // d.query('.chart-btn', btnsContainer) && d.query('.chart-btn', btnsContainer).parentElement.removeChild(d.query('.chart-btn', btnsContainer));
-        // let chartBtnEle: HTMLElement = d.query('.chart-btn', btnsContainer);
-        // chartBtnEle && chartBtnEle.parentElement.removeChild(chartBtnEle);
-
-        btnsContainer.children.length > 0 ? btnsContainer.children[0].appendChild(btn) : btnsContainer.appendChild(btn);
-        btn.onclick = () => {
+            btnsContainer.children.length > 0 ? btnsContainer.children[0].appendChild(chartBtn) : btnsContainer.appendChild(chartBtn);
+        }
+        
+        chartBtn.onclick = () => {
 
             this.wrapper.style.display = 'none';
             this.chartBtnsContainer.style.display = 'block';
