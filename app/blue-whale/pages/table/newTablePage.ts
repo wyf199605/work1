@@ -23,7 +23,7 @@ let queryModuleName = sys.isMb ? 'QueryModuleMb' : 'QueryModulePc';
 
 export class NewTablePage extends BasicPage{
 
-    
+
     constructor(para: ITablePagePara) {
         super(para);
         d.classAdd(this.dom.parentElement, 'table-page');
@@ -173,7 +173,7 @@ export class BwTableElement extends Component{
             });
         } else {
 
-          
+
 
             if(hasQuery) {
                 require([queryModuleName], (Query) => {
@@ -190,16 +190,16 @@ export class BwTableElement extends Component{
                                     bwEl: bwTableEl,
                                     container: this.container
                                 });
-                                
+
                                 !sys.isMb && query.toggleCancle();
                                 if(tools.isMb) {
                                     //打开查询面板
                                     d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
                                         this.queryModule.show();
                                     });
-                                    
+
                                 } else {
-            
+
                                     let main = this.tableModule.main;
                                     let addBtn = () => {
                                         main.ftable.btnAdd('query', {
@@ -211,7 +211,7 @@ export class BwTableElement extends Component{
                                     };
                                     // if( bwTableEl.querier.queryType===1&&bwTableEl.querier.autTag===1){
                                     //     main.wrapper.style.visibility='hidden';
-                                      
+
                                     // }
                                     if(main.ftable){
                                         addBtn()
@@ -234,7 +234,7 @@ export class BwTableElement extends Component{
                         container: this.container,
                         tableGet: () => this.tableModule.main
                     });
-                    
+
                     !sys.isMb && query.toggleCancle();
                 })
             }else{
@@ -262,7 +262,7 @@ export class BwTableElement extends Component{
         }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
             this.locationLine(line, para);
         }
-        
+
         // 移动端二维码分享
         if(tools.isMb) {
             console.log('二维码',para);
@@ -270,10 +270,10 @@ export class BwTableElement extends Component{
                new ShareCode(this.tableModule.main.ftable.selectedRowsData, para.tableEl, para.tagId);
             });
         }
-        
+
     }
 
-    
+
 
     private asynQuery(asynData){
         require(['AsynQuery'], asyn => {
@@ -281,12 +281,7 @@ export class BwTableElement extends Component{
         })
     }
     refresh(){
-        let inputs = this._inputs || (this.queryModule && this.queryModule.Inputs);
-        if(inputs && inputs.isMatch){
-            return inputs.refresh();
-        }else{
-            return this.tableModule && this.tableModule.refresh();
-        }
+        return this.tableModule && this.tableModule.refresh();
     }
 
     protected _inputs: Inputs;

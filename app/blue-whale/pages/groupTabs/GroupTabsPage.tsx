@@ -954,15 +954,9 @@ export class GroupTabsPage extends BasicPage {
 
 
     refresh(ajaxData?){
-
-        let inputs = this._inputs || (this.queryModule && this.queryModule.Inputs);
-        if(inputs && inputs.isMatch){
-            return inputs.refresh();
-        }else{
-            return this.main ? this.main.refresh(ajaxData).then(() => {
-                this.subRefresh();
-            }) : Promise.reject();
-        }
+        return this.main ? this.main.refresh(ajaxData).then(() => {
+            this.subRefresh();
+        }) : Promise.reject();
     }
     /**
      * @author WUML
