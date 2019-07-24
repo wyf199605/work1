@@ -1393,7 +1393,7 @@ export class LoginPage {
     }
     // 点击登录 --非初次登录 通知服务端该用户点击登录了，服务端websocket给userid对应的用户弹出确认登录弹窗
     req_sendServer() {
-        //userid=XXX 
+        //userid=XXX
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
             data: {
                 userid: this.props.userId.value
@@ -1408,7 +1408,9 @@ export class LoginPage {
     }
     //扫码登录获取LgToken
     req_getLgToken = () => {
-        G.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code ").then(({ response }) => {
+        G.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
+            data: {uuid: this.device.uuid}
+        }).then(({ response }) => {
             response = JSON.parse(response)
             QrCode.toCanvas(response.lgToken, 150, 150, d.query("#code_login_cav"));
             this.req_countdown(response.lgToken, () => {
@@ -1497,7 +1499,8 @@ export class LoginPage {
     req_polling(lgToken: string) {
         return BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/state", {
             data: {
-                lgtoken: lgToken
+                lgtoken: lgToken,
+                uuid: this.device.uuid
             }
         })
     }
