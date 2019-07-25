@@ -12,6 +12,11 @@ export class BwMainTableModule extends BwTableModule{
     constructor(protected para: IBwTableModulePara) {
         super(para);
         d.classAdd(this.wrapper, 'table-module-main');
+        $(window).on('orientationchange',(event) => {
+           setTimeout(() => {
+            this.tableHeightInit();
+           }, 300);
+        })
 
     }
     protected ftableReady(){
