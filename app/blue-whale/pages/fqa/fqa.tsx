@@ -188,7 +188,7 @@ export class FqaModal {
     static initDeviceMsg() : HTMLElement{
         let device = this.deviceData as any;
         return <div>
-            <p>请截图以下信息，发送给后台人员(QQ:303200649)或测试群</p>
+            <p>请截图以下信息，加测试群：939903987</p>
             <p>uuid：{device.uuid}</p>
             <p>os_name：{device.name}</p>
             <p>os_version：{device.version}</p>
