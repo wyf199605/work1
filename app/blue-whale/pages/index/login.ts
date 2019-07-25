@@ -1412,7 +1412,6 @@ export class LoginPage {
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
             data: {uuid: this.device.uuid}
         }).then(({ response }) => {
-            response = JSON.parse(response)
             QrCode.toCanvas(response.lgToken, 150, 150, d.query("#code_login_cav"));
             this.req_countdown(response.lgToken, () => {
                 let dom = d.query("#code_login_cav")
