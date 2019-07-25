@@ -1409,7 +1409,7 @@ export class LoginPage {
     }
     //扫码登录获取LgToken
     req_getLgToken = () => {
-        G.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
+        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
             data: {uuid: this.device.uuid}
         }).then(({ response }) => {
             response = JSON.parse(response)
