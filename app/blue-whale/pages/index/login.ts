@@ -1396,7 +1396,8 @@ export class LoginPage {
         //userid=XXX
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
             data: {
-                userid: this.props.userId.value
+                userid: this.props.userId.value,
+                uuid: this.device.uuid
             }
         }).then(({ response }) => {
             Modal.toast("请打开速狮APP确认登录")
