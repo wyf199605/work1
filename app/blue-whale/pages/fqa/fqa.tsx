@@ -14,7 +14,6 @@ export interface IFqaModalPara {
 export class FqaModal {
     protected modal: Modal;
     constructor(para: IFqaModalPara) {
-        FqaModal.getDevice();
         let body = <div className="fqa-content"/>;
         FqaModal.initPanel(body);
         this.modal = new Modal({
@@ -158,8 +157,12 @@ export class FqaModal {
         </div>;
     }
 
-    static deviceData = {};
-    static getDevice() {
+    static deviceData = null;
+    static getDevice(callback: () => void) {
+        if(this.deviceData){
+            callback && callback();
+            return ;
+        }
         if (sys.os === 'ip') {
             let shell:any = ShellAction.get();
             shell.device().getInfo({callback:(e:CustomEvent) => {
@@ -169,6 +172,7 @@ export class FqaModal {
                     } else {
                         Modal.toast(json.msg);
                     }
+                    callback && callback();
                 }});
         } else if (sys.os === 'ad') {
             let shell:any = ShellAction.get();
@@ -178,11 +182,14 @@ export class FqaModal {
             } else {
                 Modal.toast(data.msg);
             }
+            callback && callback();
         } else if('AppShell' in window) {
             this.deviceData = G.Shell.base.device.data;
+            callback && callback();
         } else if ('BlueWhaleShell' in window) {
             let shell:any = ShellAction.get();
             this.deviceData = shell.device().getInfo().data;
+            callback && callback();
         }
     }
     static initDeviceMsg() : HTMLElement{

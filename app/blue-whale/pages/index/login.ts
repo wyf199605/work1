@@ -1148,8 +1148,11 @@ export class LoginPage {
                 new Promise((resolve, reject) => {
                     if (tools.isMb) {
                         require(['FqaModal'], (f) => {
-                            new f.FqaModal({});
-                            resolve();
+                            let FqaModal = f.FqaModal;
+                            FqaModal.getDevice(() => {
+                                new FqaModal({});
+                                resolve();
+                            });
                         });
                     }
                     else {
