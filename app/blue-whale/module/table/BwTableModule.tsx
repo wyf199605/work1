@@ -45,7 +45,8 @@ export interface IBwTableModulePara extends IComponentPara {
     isSub?: boolean;
     ajaxData?: obj;
     editParam?: IBW_TableAddrParam;
-    btnShow?: boolean
+    btnShow?: boolean;
+    autoLoad?: boolean;
 }
 
 interface IEditImgModuleUploadHandler {
@@ -72,6 +73,7 @@ export class BwTableModule extends Component {
     protected btnsLinkName: string[] = []; // 快捷按钮的字段名称
 
     protected ajax = new BwRule.Ajax();
+    protected autoLoad = true;
 
     public ftable: FastBtnTable;
     public isModalEdit: boolean = true;
@@ -79,6 +81,7 @@ export class BwTableModule extends Component {
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
         super(para);
+        this.autoLoad = para.autoLoad;
         this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
@@ -127,7 +130,9 @@ export class BwTableModule extends Component {
         }
         if (this.isPivot) {
             // 交叉制表
-            this.pivotInit(para.ajaxData);
+            if(this.autoLoad){
+                this.pivotInit(para.ajaxData);
+            }
         } else {
             // 正常表格
             this.ftableInit(para.ajaxData);
@@ -571,88 +576,6 @@ export class BwTableModule extends Component {
      * @param ajaxData - 查询参数
      */
     private pivotInit(ajaxData: obj = {}) {
-        /**
-         * 把返回的数据与UI合并成交叉制表的列参数(具体规则要问下小路, 太久记不清了)
-         * @param meta
-         */
-        /*let colsParaGet = (meta: string[]): obj[] => {
-
-            let originCols = this._cols,
-                fields: R_Field[] = BwRule.getCrossTableCols(meta, originCols).cols;
-
-            BwRule.createCrossTableCols(meta, originCols);
-            let countFields = [], // 统计字段
-                otherFields = []; // 其他字段
-
-            fields.forEach(field => {
-                let hasDot = ~field.title.indexOf('.');
-                if ((hasDot && ~field.name.indexOf('小计')) || !hasDot) {
-                    countFields.push(field);
-                } else {
-                    otherFields.push(field);
-                }
-            });
-
-            // 将统计字段前置
-            fields = [...countFields, ...otherFields];
-
-            let colsPara: IFastTableCol[][] = [[], []],
-                currentOriginField = {
-                    name: '',
-                    count: 1
-                };
-            fields.forEach((field, i) => {
-
-                let [mainName, subName] = field.name.split('.'),
-                    nextField = fields[i + 1] || {name: ''},
-                    [nextMainName] = nextField.name.split('.');
-
-                if (mainName !== nextMainName) {
-                    let mainField = originCols.filter(col => col.name === mainName)[0];
-                    // if(mainField) {
-
-                    colsPara[0].push({
-                        title: mainField ? mainField.caption : mainName,
-                        name: mainField ? mainField.name : mainName,
-                        isFixed: !colsPara[0],
-                        colspan: subName ? currentOriginField.count : 1,
-                        rowspan: subName ? 1 : 2,
-                        content: subName ? void 0 : field,
-                        isNumber: subName ? void 0 :
-                            BwRule.isNumber(field.atrrs && field.atrrs.dataType),
-                        isVirtual: subName ? void 0 : field.noShow,
-                        isCanSort: field.isCanSort,
-                        sortName: field.sortName,
-                    } as IFastTableCol);
-
-                    currentOriginField = {
-                        name: nextMainName,
-                        count: 1
-                    };
-                } else {
-                    currentOriginField.count++;
-                }
-
-                if (subName) {
-
-                    colsPara[1].push({
-                        title: field.caption,
-                        name: field.name,
-                        content: field,
-                        isNumber: BwRule.isNumber(field.atrrs && field.atrrs.dataType),
-                        isVirtual: field.noShow,
-                        colspan: 1,
-                        rowspan: 1,
-                        isCanSort: field.isCanSort
-                    } as IFastTableCol);
-                }
-
-            });
-
-            return colsPara;
-        };*/
-
-        // let isFirst = tableDom.classList.contains('mobileTable');
         return this.pivotRefresh(ajaxData).then((response) => {
             if (tools.isEmpty(response)) {
                 return;
@@ -2586,7 +2509,7 @@ export class BwTableModule extends Component {
                                                 <span class="print-name">{item.text}</span>
                                                 <button data-print={JSON.stringify(item)} class="printbtn">打印</button>
                                             </li>
-                                            d.query('.printName', body).append(itemDom)
+                                            d.query('.printName', body).appendChild(itemDom)
                                         })
                                         printingDom = <p class="pringting zoomIn">正在打印中...</p>
 
@@ -2699,10 +2622,10 @@ export class BwTableModule extends Component {
                                                     doms.append(itemDom)
                                                 })
                                                 body.innerHTML = "";
-                                                body.append(doms);
+                                                body.appendChild(doms);
                                             })
                                             body.innerHTML = "";
-                                            body.append(printingDom);
+                                            body.appendChild(printingDom);
                                         }
 
                                     });

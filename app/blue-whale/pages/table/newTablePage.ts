@@ -188,7 +188,8 @@ export class BwTableElement extends Component{
                             if(!this.tableModule){
                                 this.tableModule = new NewTableModule({
                                     bwEl: bwTableEl,
-                                    container: this.container
+                                    container: this.container,
+                                    autoLoad: false
                                 });
 
                                 !sys.isMb && query.toggleCancle();
