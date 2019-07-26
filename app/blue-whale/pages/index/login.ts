@@ -729,7 +729,7 @@ export class LoginPage {
         let name: any = d.query('#name', container);
         let that = this;
         d.on(goLogin.wrapper, 'click', () => {
-            sys.window.load(CONF.url.login);
+            sys.window.load(CONF.url.index);
         });
         d.on(checkCodeBtn.wrapper, 'click', function (e) {
             let sendVerify = this;

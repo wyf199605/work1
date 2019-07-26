@@ -36,7 +36,7 @@ export class RegPage {
         self.getDevice();
         // self.setVerifyCode();
         d.on(props.goLogin, 'click', () => {
-            sys.window.load(CONF.url.index);
+            sys.window.load(CONF.url.login);
         });
         if (tools.isMb) {
             this.code = this.renderCheckCode(props.verifyELCode);
