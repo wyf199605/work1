@@ -130,7 +130,7 @@ export class BwTableModule extends Component {
         }
         if (this.isPivot) {
             // 交叉制表
-            if(this.autoLoad){
+            if(!this.hasQuery){
                 this.pivotInit(para.ajaxData);
             }
         } else {
