@@ -1161,7 +1161,10 @@ export class LoginPage {
                             resolve();
                         });
                     }
-                }).then(() => {
+                }).catch((e) => {
+                    Modal.toast('常见问题加载失败');
+                    console.log(e);
+                }).finally(() => {
                     spinner.hide();
                     props.fqaBtn.disabled = false;
                 })
