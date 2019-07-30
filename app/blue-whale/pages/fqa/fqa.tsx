@@ -191,6 +191,7 @@ export class FqaModal {
             this.deviceData = shell.device().getInfo().data;
             callback && callback();
         } else{
+            this.deviceData = {};
             callback && callback();
         }
     }
