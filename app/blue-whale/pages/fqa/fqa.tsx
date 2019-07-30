@@ -190,6 +190,8 @@ export class FqaModal {
             let shell:any = ShellAction.get();
             this.deviceData = shell.device().getInfo().data;
             callback && callback();
+        } else{
+            callback && callback();
         }
     }
     static initDeviceMsg() : HTMLElement{
