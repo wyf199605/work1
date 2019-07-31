@@ -378,6 +378,7 @@
   i {
     font-size: 20px!important;
   }
+  .btn.button-type-default:hover {}
   button {
     width: 40px!important;
     height: 40px!important;
@@ -387,11 +388,20 @@
     &.xiaoxi {
       background: #FF9800;
     }
+    &.xiaoxi:hover {
+      background: #FF9800!important;
+    }
     &.call {
       background: #0baf0b;
     }
+    &.call:hover {
+      background: #0baf0b!important;
+    }
     &.message {
       background: #3478F7;
+    }
+    &.message:hover {
+      background: #3478F7!important;
     }
     i {
       font-size: 20px;

@@ -76,10 +76,10 @@ export class DetailModule extends AGroupTabItem {
             })
             : setTimeout(() => {
                 this.render({});
+
             }, 100);
 
         this.clickEvent.on();
-        this.phoneBtnInit();
 
     }
 
@@ -106,8 +106,12 @@ export class DetailModule extends AGroupTabItem {
             compactWidth: 1,
             className: 'call-call'
         });
-        let mobile = d.query('[data-col="MOBILE"]');
+        let parent = d.query('[data-name="MOBILE"]');
+        let mobile = parent && d.query(".detail-item-content", parent);
+        // debugger;
+
         if (mobile && mobile.textContent) {
+
             inputBox.addItem(new Button({
                 content: '拨号',
                 icon: 'call',
@@ -124,7 +128,8 @@ export class DetailModule extends AGroupTabItem {
                     sys.window.load('sms:' + mobile.textContent);
                 }
             }));
-            let userId = d.query('[data-col="USERID"]')&&d.query('[data-col="USERID"]').textContent;
+            let userparent = d.query('[data-name="USERID"]');
+            let userId = userparent && d.query(".detail-item-content", userparent).textContent;
             if (userId) {
                 inputBox.addItem(new Button({
                     content: '邮件',
@@ -150,6 +155,7 @@ export class DetailModule extends AGroupTabItem {
                 // 渲染方法
                 // tools.isEmpty(this.dataManager.data) && Modal.alert('数据为空', '温馨提示', null, this.container);
                 this.render(this.dataManager.data[0] || {});
+
             },
             container: this.wrapper,
             ajax: {
@@ -183,6 +189,10 @@ export class DetailModule extends AGroupTabItem {
 
                                 // 生成`old_${name}`数据
                                 BwRule.addOldField(this.getOldField(), data);
+                                // debugger;
+                                setTimeout(() => {
+                                    this.phoneBtnInit();
+                                }, 200);
                                 resolve({
                                     data,
                                     total
