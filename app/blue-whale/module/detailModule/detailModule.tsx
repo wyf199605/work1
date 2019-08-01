@@ -2,22 +2,23 @@
 
 import Component = G.Component;
 import IComponentPara = G.IComponentPara;
-import {BwRule} from "../../common/rule/BwRule";
-import {DetailItem, IDetailFormatData} from "./detailItem";
+import { BwRule } from "../../common/rule/BwRule";
+import { DetailItem, IDetailFormatData } from "./detailItem";
 import d = G.d;
 import tools = G.tools;
-import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
+import { LayoutImage } from "../../../global/components/view/LayoutImg/LayoutImage";
 import CONF = BW.CONF;
 import sys = BW.sys;
-import {DetailDataManager} from "./detailDataManager";
-import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
-import {DetailEditModule} from "./detailEditModule";
+import { DetailDataManager } from "./detailDataManager";
+import { ImgModal, ImgModalPara } from "../../../global/components/ui/img/img";
+import { DetailEditModule } from "./detailEditModule";
 import AGroupTabItem = BW.AGroupTabItem;
 import IGroupTabItemPara = BW.IGroupTabItemPara;
-import {FormCom} from "../../../global/components/form/basic";
-import {NewIDB} from "../../../global/NewIDB";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-
+import { FormCom } from "../../../global/components/form/basic";
+import { NewIDB } from "../../../global/NewIDB";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { InputBox } from "../../../global/components/general/inputBox/InputBox";
+import { Button } from "../../../global/components/general/button/Button";
 export interface IDetailModulePara extends IGroupTabItemPara {
     ui: IBW_Detail; // 根据ui生成detail页
     ajaxData?: obj;
@@ -27,7 +28,7 @@ export class DetailModule extends AGroupTabItem {
     protected wrapperInit() {
         return <div className="detail-wrapper">
             <div className="detail-container">
-                <div className="detail-content"/>
+                <div className="detail-content" />
             </div>
         </div>;
     }
@@ -48,7 +49,7 @@ export class DetailModule extends AGroupTabItem {
     protected _btnWrapper: HTMLElement;
     get btnWrapper() {
         if (!this._btnWrapper) {
-            this._btnWrapper = <div className="detail-btn-group"/>;
+            this._btnWrapper = <div className="detail-btn-group" />;
             d.append(this.wrapper, this._btnWrapper);
         }
         return this._btnWrapper
@@ -75,12 +76,14 @@ export class DetailModule extends AGroupTabItem {
             })
             : setTimeout(() => {
                 this.render({});
+
             }, 100);
 
         this.clickEvent.on();
+
     }
 
-    editInit(inputInit: (field: R_Field, item: DetailItem) => FormCom){
+    editInit(inputInit: (field: R_Field, item: DetailItem) => FormCom) {
         this.items.forEach((item) => {
             item.edit.init(inputInit);
         });
@@ -93,6 +96,58 @@ export class DetailModule extends AGroupTabItem {
         return this.dataManager ? this.dataManager.total : 0;
     }
 
+    private phoneBtnInit() {
+        if (this.ui.operationType && this.ui.operationType.autoEdit) {
+            return false;
+        }
+        let inputBox = new InputBox({
+            container: this.wrapper,
+            size: 'middle',
+            compactWidth: 1,
+            className: 'call-call'
+        });
+        let parent = d.query('[data-name="MOBILE"]');
+        let mobile = parent && d.query(".detail-item-content", parent);
+        // debugger;
+
+        if (mobile && mobile.textContent) {
+
+            inputBox.addItem(new Button({
+                content: '拨号',
+                icon: 'call',
+                className: 'call',
+                onClick: () => {
+                    sys.window.load('tel:' + mobile.textContent);
+                }
+            }));
+            inputBox.addItem(new Button({
+                content: '短信',
+                icon: 'xiaoxi',
+                className: 'xiaoxi',
+                onClick: () => {
+                    sys.window.load('sms:' + mobile.textContent);
+                }
+            }));
+            let userparent = d.query('[data-name="USERID"]');
+            let userId = userparent && d.query(".detail-item-content", userparent).textContent;
+            if (userId) {
+                inputBox.addItem(new Button({
+                    content: '邮件',
+                    icon: 'message',
+                    className: 'message',
+                    onClick: () => {
+                        BW.sys.window.open({
+                            url: tools.url.addObj(BW.CONF.url.mail, {
+                                defaultvalue: '{"RECEIVERID":"' + userId + '"}'
+                            })
+                        });
+                        // sys.window.load('sms:' + mobile.textContent);
+                    }
+                }));
+            }
+
+        }
+    }
     protected initDataManager() {
         // 初始化数据管理模块
         this.dataManager = new DetailDataManager({
@@ -100,17 +155,18 @@ export class DetailModule extends AGroupTabItem {
                 // 渲染方法
                 // tools.isEmpty(this.dataManager.data) && Modal.alert('数据为空', '温馨提示', null, this.container);
                 this.render(this.dataManager.data[0] || {});
+
             },
             container: this.wrapper,
             ajax: {
                 auto: false,
                 resetCurrent: false, // 是否重新设置当前页
                 timeout: (this.ui.timeOut || 0) * 1000,
-                fun: ({pageSize, current, sort, custom,timeout}) => {
+                fun: ({ pageSize, current, sort, custom, timeout }) => {
                     return new Promise((resolve, reject) => {
                         let ui = this.ui,
                             url = tools.isNotEmpty(ui.dataAddr) ? BW.CONF.siteUrl + BwRule.reqAddr(ui.dataAddr) : '';
-                        current ++;
+                        current++;
                         if (tools.isNotEmpty(url)) {
                             Promise.all([
                                 BwRule.Ajax.fetch(url, {
@@ -125,7 +181,7 @@ export class DetailModule extends AGroupTabItem {
                                     }
                                 }),
                                 this.lookup // 获取lookup数据
-                            ]).then(([{response}]) => {
+                            ]).then(([{ response }]) => {
                                 console.log(response);
                                 let data = tools.keysVal(response, 'data') || [{}], // 数据
                                     total = tools.keysVal(response, 'head', 'totalNum'); // 总条数
@@ -133,6 +189,10 @@ export class DetailModule extends AGroupTabItem {
 
                                 // 生成`old_${name}`数据
                                 BwRule.addOldField(this.getOldField(), data);
+                                // debugger;
+                                setTimeout(() => {
+                                    this.phoneBtnInit();
+                                }, 200);
                                 resolve({
                                     data,
                                     total
@@ -153,7 +213,7 @@ export class DetailModule extends AGroupTabItem {
     initItems(container: HTMLElement): DetailItem[] {
         let groupInfos = this.ui.groupInfo,
             fields = this.fields;
-        if(tools.isPc && tools.isNotEmpty(groupInfos)){
+        if (tools.isPc && tools.isNotEmpty(groupInfos)) {
             let items: DetailItem[] = [];
             container.classList.add('group-container-wrapper');
             d.append(container, <div className="group-wrapper">
@@ -166,14 +226,14 @@ export class DetailModule extends AGroupTabItem {
                         <div className={"group-content " + "group-column-" + groupInfo.columnNumber}>
                             {names.map((name) => {
                                 let field = fields.find((field) => field.name === name);
-                                if(field){
+                                if (field) {
                                     let detailItem = <DetailItem field={field} detail={this}
-                                                                 format={(f, cellData, rowData) => {
-                                                                     return this.format(f, cellData, rowData);
-                                                                 }}/>;
+                                        format={(f, cellData, rowData) => {
+                                            return this.format(f, cellData, rowData);
+                                        }} />;
                                     items.push(detailItem);
                                     return detailItem;
-                                }else{
+                                } else {
                                     return null;
                                 }
                             })}
@@ -182,12 +242,12 @@ export class DetailModule extends AGroupTabItem {
                 })}
             </div>);
             return items;
-        }else{
+        } else {
             return fields.map((field) => {
                 return <DetailItem field={field} detail={this} container={container}
-                                   format={(f, cellData, rowData) => {
-                                       return this.format(f, cellData, rowData);
-                                   }}
+                    format={(f, cellData, rowData) => {
+                        return this.format(f, cellData, rowData);
+                    }}
                 />
             })
         }
@@ -319,7 +379,7 @@ export class DetailModule extends AGroupTabItem {
         return this.detailData;
     }
 
-    setData(data: obj){
+    setData(data: obj) {
         this.dataManager.data = [data];
         this.render();
     }
@@ -344,7 +404,7 @@ export class DetailModule extends AGroupTabItem {
                 if (tools.isNotEmpty(defAddrs)) {
                     Promise.all(defAddrs.map(url => {
                         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(url))
-                            .then(({response}) => {
+                            .then(({ response }) => {
                                 // TODO data可能不存在
                                 let resultData = tools.keysVal(response, 'data', 0) || {};
                                 data = Object.assign(data, resultData);
@@ -368,7 +428,7 @@ export class DetailModule extends AGroupTabItem {
     noData = false; // 有没有数据
 
     protected _promises: Promise<any>[] = [];
-    addPromise(promise: Promise<any>){
+    addPromise(promise: Promise<any>) {
         this._promises.push(promise);
     }
     // 渲染方法
@@ -475,8 +535,8 @@ export class DetailModule extends AGroupTabItem {
         return this._pageUrl;
     }
 
-    updateImgVersion(urls: string[]){
-        if(tools.isEmpty(urls)){
+    updateImgVersion(urls: string[]) {
+        if (tools.isEmpty(urls)) {
             return Promise.reject();
         }
         return new Promise((resolve, reject) => {
@@ -486,11 +546,11 @@ export class DetailModule extends AGroupTabItem {
                     return urls.indexOf(val['url']) > -1;
                 }).then((response) => {
                     let data = response || [];
-                    for(let url of urls){
-                        if(tools.isEmpty(url)){
+                    for (let url of urls) {
+                        if (tools.isEmpty(url)) {
                             continue;
                         }
-                        if(data.some((item) => item['url'] === url)){
+                        if (data.some((item) => item['url'] === url)) {
                             // update
                             store.update((val) => {
                                 return url === val['url'];
@@ -498,7 +558,7 @@ export class DetailModule extends AGroupTabItem {
                                 url: url,
                                 version: new Date().getTime()
                             }));
-                        }else{
+                        } else {
                             // insert
                             store.insert({
                                 url: url,
@@ -539,18 +599,18 @@ export class DetailModule extends AGroupTabItem {
                         store.find((val) => {
                             return val['url'] === url;
                         }).then((response) => {
-                            if(tools.isNotEmpty(response)){
+                            if (tools.isNotEmpty(response)) {
                                 let data = response[0],
                                     version = data['version'];
-                                version && (url = tools.url.addObj(url, {version: version}));
+                                version && (url = tools.url.addObj(url, { version: version }));
                             }
                             idb.destroy();
-                            text = <img src={url}/>;
+                            text = <img src={url} />;
                             classes.push('cell-img');
-                            resolve({text, classes, bgColor, color, data});
+                            resolve({ text, classes, bgColor, color, data });
                         });
                     });
-                    return ;
+                    return;
                 } else if (BwRule.isNewImg(dataType)) {
                     classes.push('cell-img');
                     if (cellData && typeof cellData === 'string') {
@@ -568,7 +628,7 @@ export class DetailModule extends AGroupTabItem {
                                 return <img style={{
                                     maxWidth: width - 2 + '%',
                                     marginRight: '2%'
-                                }} src={url} alt=""/>
+                                }} src={url} alt="" />
                             })}
                         </div>;
                     }
@@ -582,7 +642,7 @@ export class DetailModule extends AGroupTabItem {
 
                         // 多图缩略图控件
                         if (tools.isNotEmptyArray(urls)) {
-                            text = new LayoutImage({urls}).wrapper;
+                            text = new LayoutImage({ urls }).wrapper;
                         }
                     }
 
@@ -592,14 +652,14 @@ export class DetailModule extends AGroupTabItem {
                     classes.push('cell-link');
                     color = 'blue';
                     if (cellData) {
-                        BwRule.getFileInfo(field.name, cellData).then(({response}) => {
+                        BwRule.getFileInfo(field.name, cellData).then(({ response }) => {
                             response = JSON.parse(response);
                             if (response && response.dataArr && response.dataArr[0]) {
                                 text = response.dataArr[0].filename;
                             }
-                            resolve({text, classes, bgColor, color, data});
+                            resolve({ text, classes, bgColor, color, data });
                         }).catch(() => {
-                            resolve({text, classes, bgColor, color, data});
+                            resolve({ text, classes, bgColor, color, data });
                         });
                         return;
                     }
@@ -612,8 +672,8 @@ export class DetailModule extends AGroupTabItem {
 
                 } else if (field.name === 'STDCOLORVALUE') {
                     // 显示颜色
-                    let {r, g, b} = tools.val2RGB(cellData);
-                    text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"/>;
+                    let { r, g, b } = tools.val2RGB(cellData);
+                    text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%" />;
 
                 } else if (field.elementType === 'lookup') {
                     // lookUp替换
@@ -667,13 +727,13 @@ export class DetailModule extends AGroupTabItem {
                 let when = field.backWhen;
                 if (when) {
                     if (eval(tools.str.parseTpl(when, rowData))) {
-                        let {r, g, b} = tools.val2RGB(field.backColor);
+                        let { r, g, b } = tools.val2RGB(field.backColor);
                         bgColor = `rgb(${r},${g},${b})`
                     }
                 }
             }
 
-            resolve({text, classes, bgColor, color, data});
+            resolve({ text, classes, bgColor, color, data });
         })
     }
 }
