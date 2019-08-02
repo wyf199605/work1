@@ -434,8 +434,9 @@ export class NewTableModule extends AGroupTabItem {
                 let showSubSeq = this.computedIndex(list);
                 this.tab.setTabsShow(showSubSeq);
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
-                // this.tab.active(parseInt(showSubSeq[0]) - 1);
-                this.tab.active(0);
+                // 1448bug的解决方案
+                this.tab.active(parseInt(showSubSeq[0]) - 1);
+                // this.tab.active(0);
                 this.currentSelectedIndexes.push(0);
             } else {
                 pseudoTable && pseudoTable.setPresentSelected(index);
