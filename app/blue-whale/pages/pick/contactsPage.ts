@@ -217,9 +217,9 @@ export = class contactsPage {
                      */
                     let searchInput = document.getElementById('searchInput') as HTMLInputElement,
                         value = searchInput.value;
-                    if (value !== queryparam && typeof queryparam !== 'undefined') {
-                        return;
-                    }
+                    // if (typeof queryparam !== 'undefined' && value.toLowerCase() !== queryparam.toLowerCase()) {
+                    //     return;
+                    // }
                     self.response = response;
                     let res = G.tools.obj.merge(true, response);
                     if (ajaxData.queryparam) {
@@ -279,7 +279,7 @@ export = class contactsPage {
 
                     isEnd = response.data.length < page;
                     console.time('arr');
-
+                    debugger;
                     showList(list, level, response.data, true);
                     callback(isEnd, response.data);
                     console.timeEnd('arr');
@@ -291,7 +291,6 @@ export = class contactsPage {
 
             function showList(dom, level, data, append?) {
                 // debugger;
-                console.log(queryData)
                 let ul = dom.querySelector('ul.mui-table-view'),
                     idField = levelField[level],
                     nameField = treeField[level],
@@ -439,7 +438,7 @@ export = class contactsPage {
                     if (~Object.keys(m).indexOf(BwRule.ColorField)) {
                         let { r, g, b } = tools.val2RGB(m[BwRule.ColorField]);
                         parseData.name = m[highlightName]
-                            + `<span style="height: 14px;display: inline-block;margin-left: 10px;height: 14px; width:50px; background: rgb(${r},${g},${b})"></span>`;
+                            + `<span style="height: 14px;display: inline-block;margin-left: 10px; width:50px; background: rgb(${r},${g},${b})"></span>`;
                     }
                     // parseData.valueJson && (parseData.valueJson = tools.str.htmlEncode(parseData.valueJson));
                     ul.appendChild(G.d.create(

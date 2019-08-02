@@ -49,7 +49,7 @@ export class RegPage {
             });
         }
         d.on(props.saveReg, 'click', () => {
-         
+
             // new UnBinding({check_code: "123", mobile: "13799914019", uuid: "8C-16-45-29-A5-B8", register: "on"})
             // return false;
             if (props.tel.value.trim().length === 0) {
@@ -397,16 +397,16 @@ export class RegPage {
          let randomArray = [],
              resultArray = [];
          for (let i = 48; i <= 57; i++) {
-             randomArray.push(String.fromCharCode(i));            
+             randomArray.push(String.fromCharCode(i));
          }
          for (let i = 65; i <= 90; i++) {
-             randomArray.push(String.fromCharCode(i));            
+             randomArray.push(String.fromCharCode(i));
          }
          for (let i = 97; i <= 122; i++) {
-             randomArray.push(String.fromCharCode(i));            
+             randomArray.push(String.fromCharCode(i));
          }
          let len = randomArray.length;
-         
+
          while (resultArray.length < 5){
              let random = Math.floor(Math.random() * len);
              let randomCode = randomArray[random];
@@ -414,7 +414,7 @@ export class RegPage {
                  resultArray.push(randomCode);
              }
          }
- 
+
          return resultArray;
      }*/
     /**
@@ -430,7 +430,7 @@ export class RegPage {
             span.innerHTML = codeArr[i];
             let randomAngle = Math.random() * 20;
             let symbol = Math.random() > 0.5 ? '+' : '-';
-            span.style.transform = 'rotate(' + symbol+randomAngle +'deg)';          
+            span.style.transform = 'rotate(' + symbol+randomAngle +'deg)';
         }
     }*/
 

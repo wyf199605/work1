@@ -69,6 +69,7 @@ export class NewTableModule extends AGroupTabItem {
     constructor(para: ITableModulePara) {
         super(para);
         console.log(para, '----------------------');
+        let autoLoad = 'autoLoad' in para ? para.autoLoad : true;
         this.bwEl = para.bwEl;
         this.showSubField = para.bwEl.showSubField;
         this._defaultData = para.data || null;
@@ -88,6 +89,7 @@ export class NewTableModule extends AGroupTabItem {
             editParam: mainParam,
             ajaxData: para.ajaxData,
             tableModule: this,
+            autoLoad
         });
 
         let operationType = this.bwEl.operationType;

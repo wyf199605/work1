@@ -436,7 +436,7 @@ export class QueryBuilder {
 
         // 是否出现第一个选择框
         /*   control.input1 = op !== 10;
-    
+
             // 是否出现第二个选择框
             control.input2 = op === 7; // 7:between, 8:in*/
 
@@ -869,7 +869,7 @@ export class AtVarBuilder {
                         return { text: keys.map((k) => d[k]).join(','), value: tools.str.toEmpty(d[keys[0]]) }
                     });
                 let multi = conf.atrrs && conf.atrrs.multiValueFlag;
-                return { data, useInputVal: false, multi: multi === 1, isScan: hasScan };
+                return { data, useInputVal: true, multi: multi === 1, isScan: hasScan };
 
             case 'number':
                 return { max: atrrs.maxValue, min: atrrs.minValue, isScan: hasScan }

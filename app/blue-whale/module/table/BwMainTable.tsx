@@ -12,6 +12,11 @@ export class BwMainTableModule extends BwTableModule{
     constructor(protected para: IBwTableModulePara) {
         super(para);
         d.classAdd(this.wrapper, 'table-module-main');
+        $(window).on('orientationchange',(event) => {
+           setTimeout(() => {
+            this.tableHeightInit();
+           }, 300);
+        })
 
         // 根据UI 的initShow 判断是否先展示图表， 先默认设置为展示图表
         this.wrapper.style.display = 'none';

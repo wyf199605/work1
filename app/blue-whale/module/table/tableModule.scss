@@ -93,30 +93,42 @@
   justify-content: center;
   .result {
     width: 100%;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     padding: 0px;
     margin: 0px;
+    height: 100%;
+    .iconfont {
+      font-size: 18px!important;
+    }
     li {
-      justify-content: center;
-      display: flex;
+      width: 100%;
       font-size: 16px;
-      span:first-child {
-        padding-right: 30px;
+      display: flex;
+      margin-bottom: 18px;
+      span {
+        padding-left: 14px;
         display: inline-block;
-        width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        width: 48%;
+        display: flex;
+        // align-items: center;
+        // overflow: hidden;
+        // text-overflow: ellipsis;
+        // white-space: nowrap;
       }
+      // span:first-child {
+      //   padding-right: 30px;
+      //   display: inline-block;
+      //   width: 300px;
+      //   overflow: hidden;
+      //   text-overflow: ellipsis;
+      //   white-space: nowrap;
+      // }
     }
   }
   .printName {
     margin: 0px;
     padding: 0px;
     width: 100%;
+    height: 100%;
     button {
       width: 70px;
       height: 40px;
@@ -345,7 +357,7 @@
 
 .table-module-wrapper {
   height: 100%;
-  overflow: scroll;
+  // overflow: scroll;
   background-color: #fafafa;
   &>.showDetail {
     position: fixed;
@@ -467,7 +479,8 @@
         .table-body-wrapper {
           height: 90%;
           height: calc(100% - 41px);
-          // padding-bottom: 44px;
+          padding-bottom: 15px;
+          overflow: scroll;
         }
       }
     }

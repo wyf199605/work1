@@ -129,6 +129,20 @@ export class LoginPage {
                     } else {
                         d.remove(regButton);
                     }
+                    if (tools.isPc) {
+                        if (this.props.jiebangButton instanceof Button) {
+                            this.props.jiebangButton.destroy();
+                        } else {
+                            d.remove(this.props.jiebangButton);
+                        }
+                    }
+                    if (tools.isMb) {
+                        if (this.props.utButton instanceof Button) {
+                            this.props.utButton.destroy();
+                        } else {
+                            d.remove(this.props.utButton);
+                        }
+                    }
                 }
             }
         });
@@ -715,7 +729,7 @@ export class LoginPage {
         let name: any = d.query('#name', container);
         let that = this;
         d.on(goLogin.wrapper, 'click', () => {
-            sys.window.load(CONF.url.login);
+            sys.window.load(CONF.url.index);
         });
         d.on(checkCodeBtn.wrapper, 'click', function (e) {
             let sendVerify = this;
@@ -922,7 +936,8 @@ export class LoginPage {
             }, () => {
                 return new Promise((resolve) => {
                     loginPage.device.userid = userId.toUpperCase();
-                    // loginPage.device.password = password;
+                    loginPage.device.password = this.compileStr(password);
+                    localStorage.removeItem('registerPhone');
                     resolve();
                 });
             });
@@ -931,6 +946,21 @@ export class LoginPage {
     /**
      * 密码登录
      */
+    private compileStr(code) {
+        var c = String.fromCharCode(code.charCodeAt(0) + code.length);
+        for (var i = 1; i < code.length; i++) {
+            c += String.fromCharCode(code.charCodeAt(i) + code.charCodeAt(i - 1));
+        }
+        return escape(c);
+    }//加密函数
+    private uncompileStr(code) {
+        code = unescape(code);
+        var c = String.fromCharCode(code.charCodeAt(0) - code.length);
+        for (var i = 1; i < code.length; i++) {
+            c += String.fromCharCode(code.charCodeAt(i) - c.charCodeAt(i - 1));
+        }
+        return c;
+    }//解密函数
     private loginClick() {
         this.loginFunc();
         return false;
@@ -1118,8 +1148,11 @@ export class LoginPage {
                 new Promise((resolve, reject) => {
                     if (tools.isMb) {
                         require(['FqaModal'], (f) => {
-                            new f.FqaModal({});
-                            resolve();
+                            let FqaModal = f.FqaModal;
+                            FqaModal.getDevice(() => {
+                                new FqaModal({});
+                                resolve();
+                            });
                         });
                     }
                     else {
@@ -1128,7 +1161,10 @@ export class LoginPage {
                             resolve();
                         });
                     }
-                }).then(() => {
+                }).catch((e) => {
+                    Modal.toast('常见问题加载失败');
+                    console.log(e);
+                }).finally(() => {
                     spinner.hide();
                     props.fqaBtn.disabled = false;
                 })
@@ -1204,8 +1240,10 @@ export class LoginPage {
             } else {
                 (<HTMLInputElement>saveButton).checked = true;
             }
+            // console.log(this.device)
             this.props.userId.value = tools.str.toEmpty(this.device.userid);
-            this.props.password.value = tools.str.toEmpty(this.device.password);
+            let pass = tools.str.toEmpty(this.device.password);
+            this.props.password.value = pass ? this.uncompileStr(pass) : pass
         }
     }
 
@@ -1268,7 +1306,6 @@ export class LoginPage {
     }
     //扫码登陆
     private scanHandle = (status: boolean = false) => {
-        alert('扫码');
         d.query(".login-wrapper", document.body).style.display = "none";
         // isLogin 判断是否初次登录,code 整个弹窗 close 关闭按钮
         let isLogin = status, code = null, close = null;
@@ -1362,10 +1399,11 @@ export class LoginPage {
     }
     // 点击登录 --非初次登录 通知服务端该用户点击登录了，服务端websocket给userid对应的用户弹出确认登录弹窗
     req_sendServer() {
-        //userid=XXX 
+        //userid=XXX
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
             data: {
-                userid: this.props.userId.value
+                userid: this.props.userId.value,
+                uuid: this.device.uuid
             }
         }).then(({ response }) => {
             Modal.toast("请打开速狮APP确认登录")
@@ -1377,8 +1415,9 @@ export class LoginPage {
     }
     //扫码登录获取LgToken
     req_getLgToken = () => {
-        G.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code ").then(({ response }) => {
-            response = JSON.parse(response)
+        BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
+            data: {uuid: this.device.uuid}
+        }).then(({ response }) => {
             QrCode.toCanvas(response.lgToken, 150, 150, d.query("#code_login_cav"));
             this.req_countdown(response.lgToken, () => {
                 let dom = d.query("#code_login_cav")
@@ -1466,7 +1505,8 @@ export class LoginPage {
     req_polling(lgToken: string) {
         return BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/state", {
             data: {
-                lgtoken: lgToken
+                lgtoken: lgToken,
+                uuid: this.device.uuid
             }
         })
     }

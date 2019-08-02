@@ -46,7 +46,8 @@ export interface IBwTableModulePara extends IComponentPara {
     isSub?: boolean;
     ajaxData?: obj;
     editParam?: IBW_TableAddrParam;
-    btnShow?: boolean
+    btnShow?: boolean;
+    autoLoad?: boolean;
 }
 
 interface IEditImgModuleUploadHandler {
@@ -73,6 +74,7 @@ export class BwTableModule extends Component {
     protected btnsLinkName: string[] = []; // 快捷按钮的字段名称
 
     protected ajax = new BwRule.Ajax();
+    protected autoLoad = true;
 
     public ftable: FastBtnTable;
     public isModalEdit: boolean = true;
@@ -80,6 +82,7 @@ export class BwTableModule extends Component {
     public readonly isSub: boolean;        // 是否子表
     constructor(para: IBwTableModulePara) {
         super(para);
+        this.autoLoad = para.autoLoad;
         this._btnShow = tools.isEmpty(para.btnShow) ? true : para.btnShow;
         this.isSub = !!para.isSub;
         this.editParam = para.editParam;
@@ -128,7 +131,9 @@ export class BwTableModule extends Component {
         }
         if (this.isPivot) {
             // 交叉制表
-            this.pivotInit(para.ajaxData);
+            if(!this.hasQuery){
+                this.pivotInit(para.ajaxData);
+            }
         } else {
             // 正常表格
             this.ftableInit(para.ajaxData);
@@ -587,88 +592,6 @@ export class BwTableModule extends Component {
      * @param ajaxData - 查询参数
      */
     private pivotInit(ajaxData: obj = {}) {
-        /**
-         * 把返回的数据与UI合并成交叉制表的列参数(具体规则要问下小路, 太久记不清了)
-         * @param meta
-         */
-        /*let colsParaGet = (meta: string[]): obj[] => {
-
-            let originCols = this._cols,
-                fields: R_Field[] = BwRule.getCrossTableCols(meta, originCols).cols;
-
-            BwRule.createCrossTableCols(meta, originCols);
-            let countFields = [], // 统计字段
-                otherFields = []; // 其他字段
-
-            fields.forEach(field => {
-                let hasDot = ~field.title.indexOf('.');
-                if ((hasDot && ~field.name.indexOf('小计')) || !hasDot) {
-                    countFields.push(field);
-                } else {
-                    otherFields.push(field);
-                }
-            });
-
-            // 将统计字段前置
-            fields = [...countFields, ...otherFields];
-
-            let colsPara: IFastTableCol[][] = [[], []],
-                currentOriginField = {
-                    name: '',
-                    count: 1
-                };
-            fields.forEach((field, i) => {
-
-                let [mainName, subName] = field.name.split('.'),
-                    nextField = fields[i + 1] || {name: ''},
-                    [nextMainName] = nextField.name.split('.');
-
-                if (mainName !== nextMainName) {
-                    let mainField = originCols.filter(col => col.name === mainName)[0];
-                    // if(mainField) {
-
-                    colsPara[0].push({
-                        title: mainField ? mainField.caption : mainName,
-                        name: mainField ? mainField.name : mainName,
-                        isFixed: !colsPara[0],
-                        colspan: subName ? currentOriginField.count : 1,
-                        rowspan: subName ? 1 : 2,
-                        content: subName ? void 0 : field,
-                        isNumber: subName ? void 0 :
-                            BwRule.isNumber(field.atrrs && field.atrrs.dataType),
-                        isVirtual: subName ? void 0 : field.noShow,
-                        isCanSort: field.isCanSort,
-                        sortName: field.sortName,
-                    } as IFastTableCol);
-
-                    currentOriginField = {
-                        name: nextMainName,
-                        count: 1
-                    };
-                } else {
-                    currentOriginField.count++;
-                }
-
-                if (subName) {
-
-                    colsPara[1].push({
-                        title: field.caption,
-                        name: field.name,
-                        content: field,
-                        isNumber: BwRule.isNumber(field.atrrs && field.atrrs.dataType),
-                        isVirtual: field.noShow,
-                        colspan: 1,
-                        rowspan: 1,
-                        isCanSort: field.isCanSort
-                    } as IFastTableCol);
-                }
-
-            });
-
-            return colsPara;
-        };*/
-
-        // let isFirst = tableDom.classList.contains('mobileTable');
         return this.pivotRefresh(ajaxData).then((response) => {
             if (tools.isEmpty(response)) {
                 return;
@@ -2602,7 +2525,7 @@ export class BwTableModule extends Component {
                                                 <span class="print-name">{item.text}</span>
                                                 <button data-print={JSON.stringify(item)} class="printbtn">打印</button>
                                             </li>
-                                            d.query('.printName', body).append(itemDom)
+                                            d.query('.printName', body).appendChild(itemDom)
                                         })
                                         printingDom = <p class="pringting zoomIn">正在打印中...</p>
 
@@ -2618,6 +2541,11 @@ export class BwTableModule extends Component {
                                         modal.isShow = true;
                                         d.query(".modal-title").style.fontSize = '16px';
                                     }
+                                    // let a = [{ name: 'xxx.jpg', msg: '成功' },{ name: 'xxx.jpg', msg: '成功' }]
+                                    // let doms = <ul class="result slideInUp"> </ul>
+                                    // let ab = 1;
+
+                                    // return false;
                                     d.on(d.query('.printName'), 'click', function (e: MouseEvent) {
                                         let target: any = e.target;
                                         if (target && target.className === 'printbtn') {
@@ -2628,17 +2556,92 @@ export class BwTableModule extends Component {
                                             Shell.other.filePrint(obj, (e) => {
                                                 let doms = <ul class="result slideInUp"> </ul>
                                                 e.data.printData.forEach(item => {
-                                                    let itemDom = <li>
-                                                        <span class="print-name">{item.name}</span>
-                                                        <span>{item.msg}</span>
-                                                    </li>
+                                                    let itemDom = null;
+                                                    if (item.name.indexOf('jpg') > -1 || item.name.indexOf('png') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#32A0FF,fontSize:16px" class="iconfont icon-image"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('txt') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#4E99FF" class="iconfont icon-txt"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('doc') > -1 || item.name.indexOf('docx') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#666666" class="iconfont icon-word1"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('xlsx') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#41A771" class="iconfont icon-Excel"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('ppx') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color#FF704E" class="iconfont icon-ppt"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else if (item.name.indexOf('pdf') > -1) {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                <i style="color:#4E99FF" class="iconfont icon-pdf"></i>
+                                                                &nbsp; {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    } else {
+                                                        itemDom = <li>
+                                                            <span class="print-name">
+                                                                {item.name}
+                                                            </span>
+                                                            <span>
+                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                &nbsp;{item.msg}
+                                                            </span>
+                                                        </li>
+                                                    }
+
                                                     doms.append(itemDom)
                                                 })
                                                 body.innerHTML = "";
-                                                body.append(doms);
+                                                body.appendChild(doms);
                                             })
                                             body.innerHTML = "";
-                                            body.append(printingDom);
+                                            body.appendChild(printingDom);
                                         }
 
                                     });
@@ -2761,9 +2764,9 @@ export class BwTableModule extends Component {
             initState: btnRefresh
         }
     })();
-    getItemData(btn, item, url) {
+    getItemData(child, item, url) {
         return new Promise((resolve, reject) => {
-            BwRule.getFileInfo(btn.data.linkName, item[btn.data.linkName]).then(({ response }) => {
+            BwRule.getFileInfo(child, item[child]).then(({ response }) => {
                 response = JSON.parse(response);
                 if (response && response.dataArr && response.dataArr[0]) {
                     let data = response.dataArr[0];
@@ -2787,23 +2790,20 @@ export class BwTableModule extends Component {
             fileItem = btn.data.linkName.split(",");
         }
         let status = true;
-        console.log(fileItem);
         if (fileItem && fileItem.length > 0) {
             for (var j = 0; j < fileItem.length; j++) {
                 let child = fileItem[j];
+                console.log(child)
                 for (var i = 0; i < that.ftable.selectedRowsData.length; i++) {
                     let item = that.ftable.selectedRowsData[i];
-                    console.log(item[btn.data.linkName])
-                    if (item[btn.data.linkName]) {
+                    if (item[child]) {
                         let field = that.ftable.columnGet(child).content;
                         let url;
                         let result = {};
-                        console.log(field);
                         if (field && field.dataType == '43') {
                             let link = field.link,
                                 rowData = item;
                             if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
-
                                 url = await BwRule.getLink({
                                     link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
                                     varList: link.varList,
@@ -2814,7 +2814,7 @@ export class BwTableModule extends Component {
                                 });
                                 if (url) {
                                     result = {
-                                        name: item[btn.data.linkName],
+                                        name: item[child],
                                         filePath: url,
                                         count: 1
                                     }
@@ -2829,10 +2829,14 @@ export class BwTableModule extends Component {
                                 [child]: item[child],
                                 down: 'allow'
                             });
+
                             try {
-                                result = await this.getItemData(btn, item, url);
+                                console.log(1111111111111)
+                                result = await this.getItemData(child, item, url);
+                                console.log(result)
                                 printData.push(result);
                             } catch (err) {
+                                console.log(1111122222222222);
                                 // Modal.toast("附件异常，无法打印")
                                 status = false;
                                 console.log(err)
