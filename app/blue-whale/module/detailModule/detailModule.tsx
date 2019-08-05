@@ -97,7 +97,7 @@ export class DetailModule extends AGroupTabItem {
     }
 
     private phoneBtnInit() {
-        if (this.ui.operationType && this.ui.operationType.autoEdit) {
+        if (tools.isMb&&this.ui.operationType && this.ui.operationType.autoEdit) {
             return false;
         }
         let inputBox = new InputBox({
