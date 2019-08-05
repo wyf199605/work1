@@ -23,6 +23,7 @@ export class NewStatisticBase {
      * @param {boolean} isMulit 是否是多维表头
      */
     protected tableRender(result : resType,container : HTMLElement, isMulit = false) {
+        
         let tempTable  = dom.create('<div style="height: 100%;"></div>');
             // tempResult: TableModulePara = {
             //     cols: isMulit ? result.colsIndex : result.cols,
@@ -92,12 +93,22 @@ export class NewStatisticBase {
             isResizeCol: true,
             clickSelect: true,
             dragSelect: !tools.isMb,
+            
             cellFormat: (cellData, cell: FastTableCell) => {
                 let col = cell.column,
                     content = col.content;
 
                 let text = cellData,
                     classes = [];
+                if(typeof cellData === 'number') {
+                    // const name = result.find(x => {
+                    //     console.log(x);
+                    //     debugger;
+                    //     return x;
+                    // });
+                    text = BwRule.parseNumber(cellData, '##.00');
+                    return ({text, classes});
+                }
                 if(content && content.content){
                     let field = content.content as R_Field;
                     text = BwRule.formatTableText(cellData, field);
