@@ -104,7 +104,7 @@ export class NewTableModule extends AGroupTabItem {
                 this.initEdit(main);
                 this.active.onChange = (isMain) => {
                     if (isMain) {
-                            this.main.modify.end();
+                        this.main.modify.end();
                     } else {
                         let sub = this.sub[this.subTabActiveIndex];
                         sub && sub.ftable && sub.modify.end();
@@ -343,7 +343,7 @@ export class NewTableModule extends AGroupTabItem {
 
         })
         // console.log("输出选项" + showSubSeq)
-        if(showSubSeq.length>0&&this.subWrapper.classList.contains('hide')){
+        if (showSubSeq.length > 0 && this.subWrapper.classList.contains('hide')) {
             this.subWrapper.classList.remove('hide');
         }
         return showSubSeq;
@@ -434,8 +434,9 @@ export class NewTableModule extends AGroupTabItem {
                 let showSubSeq = this.computedIndex(list);
                 this.tab.setTabsShow(showSubSeq);
                 this.subTabActiveIndex = parseInt(showSubSeq[0]) - 1;
-                // this.tab.active(parseInt(showSubSeq[0]) - 1);
-                this.tab.active(0);
+                // 1448bug的解决方案
+                this.tab.active(parseInt(showSubSeq[0]) - 1);
+                // this.tab.active(0);
                 this.currentSelectedIndexes.push(0);
             } else {
                 pseudoTable && pseudoTable.setPresentSelected(index);
@@ -499,7 +500,7 @@ export class NewTableModule extends AGroupTabItem {
         this.mobileModal && (this.mobileModal.isShow = true);
         if (tools.isNotEmpty(this.showSubField)) {
             // let showSubSeq = selectedData[this.showSubField].split(',');
-            if(tools.isNotEmpty(selectedData[this.showSubField])){
+            if (tools.isNotEmpty(selectedData[this.showSubField])) {
                 let list = selectedData[this.showSubField].split(',');
                 let showSubSeq = this.computedIndex(list);
                 this.tab.setTabsShow(showSubSeq);
@@ -517,7 +518,7 @@ export class NewTableModule extends AGroupTabItem {
                 if (tools.isEmpty(this.sub[this.subTabActiveIndex])) {
                     this.tab.active(this.subTabActiveIndex);
                 }
-            }else{
+            } else {
                 this.subWrapper.classList.add('hide');
             }
 
@@ -539,7 +540,7 @@ export class NewTableModule extends AGroupTabItem {
         });
     }
 
-    initLabel(printList: printListArr[]){
+    initLabel(printList: printListArr[]) {
         this.main && this.main.initLabelModal(printList);
     }
 
@@ -644,7 +645,7 @@ export class NewTableModule extends AGroupTabItem {
             subBox && subBox.responsive();
             ftable.recountWidth();
             sub && sub.ftable && sub.ftable.recountWidth();
-        }catch (e) {
+        } catch (e) {
             console.log(e);
         }
     }
