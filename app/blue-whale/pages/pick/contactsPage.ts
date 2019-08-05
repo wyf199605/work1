@@ -391,6 +391,7 @@ export = class contactsPage {
                                 name: m[fromField],
                                 level: level,
                                 id: m[subId],
+                                from: m[fromField],
                                 valueJson: JSON.stringify(m)
                             };
                         } else if (para.recursion === 0) {
@@ -406,6 +407,7 @@ export = class contactsPage {
                             parseData = {
                                 name: m[highlightName],
                                 level: level,
+                                from: m[fromField],
                                 id: id,
                                 valueJson: JSON.stringify(m)
                             };
