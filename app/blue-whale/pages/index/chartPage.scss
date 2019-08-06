@@ -3,15 +3,49 @@
     padding: 0;
 }
 .chart-page{
+    background: gainsboro;
     height: calc(100vh - 63px);
     width: 100%;
     position: relative;
-    &>section {
-        width: 10%;
-        height: 10%;
+    .workbeanch-menu {
+        font-family: 'Arial Normal', 'Arial';
+        font-style: normal;
+        font-size: 13px;
+        display: flex;
+        justify-content: space-around;
         position: absolute;
-        top: 20%;
-        left: 20%;
-        background-color: yellow;
+        flex-wrap: wrap;
+        // align-items: flex-start;
+        align-content: flex-start;
+        margin: 5px;
+        background: white;
+        overflow: scroll;
+        button {
+            width: 140px;
+            height: 40px;
+            background-color: #609ee9;
+            border-radius: 5px;
+            color: #FFFFFF;
+            border: none;
+            margin-top: 8px;
+            &:hover {
+                background-color: #007AFF;
+            }
+            &:click {
+                opacity: 0.8;
+            }
+        }
+    }
+    .workbeanch-chart, .table-chart {
+        position: absolute;
+        padding: 5px;
+        // box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+        .chart-table {
+            height: 100% !important;
+            width: 100% !important;
+            .chart-container {
+                height: 100% !important;
+            }
+        }
     }
 }
