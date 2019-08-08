@@ -60,9 +60,14 @@ export class ChartPageMb extends BasicPage {
         G.d.append(para.dom, this.container);
         this.uiCharts = para.ui;
         this.initData();
+        this.footerBtn(this.param.dom);
+       
+        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=static%2Fmain"})
+        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/hint/read"})
         
     }
     async initData() {
+        debugger;
         console.log(CONF.siteUrl);
         // let url: string = CONF.siteUrl + '/app_sanfu_retail/null/home_page/workbench?modulesId=1';
         // await $.get(url, (res) => {
@@ -80,7 +85,8 @@ export class ChartPageMb extends BasicPage {
                 case 'table':
                     this.tableFn(data);
             }
-        })
+        });
+        
 
         
     }
@@ -149,8 +155,16 @@ export class ChartPageMb extends BasicPage {
             chartPage: true,
             dom: divDom
         }
-        debugger;
+        // debugger;
         new NewTablePage(para);
+    }
+
+    footerBtn(parentDom:HTMLElement) {
+        debugger;
+        let footerDom: HTMLElement = <div class='chart-footer'>
+            test
+        </div>
+        parentDom.appendChild(footerDom);
     }
     
     render() {

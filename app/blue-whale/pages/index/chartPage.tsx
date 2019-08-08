@@ -100,7 +100,7 @@ export class ChartPage extends BasicPage {
             btnDom.textContent = ele.menuName;
             divDom.appendChild(btnDom);
             btnDom.onclick = () => {
-                debugger;
+                // debugger;
                 const url = CONF.siteUrl + ele.menuPath.dataAddr;
                 sys.window.open({ url, gps: ele.menuPath.needGps });
             }
