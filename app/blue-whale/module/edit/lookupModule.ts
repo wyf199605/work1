@@ -20,7 +20,6 @@ export class LookupModule extends FormCom{
         super(para);
 
         this.onSet = (item) => {
-            console.log(item);
             this.setValue(item, false);
             this.para.onExtra && this.para.onExtra(item);
             para.onSet && para.onSet(item);
