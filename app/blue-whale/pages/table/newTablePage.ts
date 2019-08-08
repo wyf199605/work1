@@ -16,6 +16,8 @@ import {Inputs} from "../../module/inputs/inputs";
 import { ShareCode } from "blue-whale/common/share-code/shareCode";
 
 export interface ITablePagePara extends BasicPagePara{
+    chartPageDom?: Element;
+    chartPage?: boolean;
     ui: IBW_UI<IBW_Table>
 }
 
@@ -26,7 +28,12 @@ export class NewTablePage extends BasicPage{
 
     constructor(para: ITablePagePara) {
         super(para);
-        d.classAdd(this.dom.parentElement, 'table-page');
+        if ( para.chartPage) {
+            d.classAdd(para.chartPageDom, 'table-page'); 
+        } else {
+            d.classAdd(this.dom.parentElement, 'table-page');
+        }
+        
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
         let bwTable = new BwTableElement({

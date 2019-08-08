@@ -391,6 +391,7 @@ gulp.task('js', function() {
     gulpTsPage("index/recentPage", "RecentPage.js");
     // gulpTsPage('main/defaultTab', 'defaultTab.js');
     gulpTsPage("index/chartPage", "chartPage.js"); 
+    gulpTsPage("index/chartPage.mb", "chartPage.mb.js");
 
     gulpTsPage('main/mainMbPage', 'mainMbPage.js');
 

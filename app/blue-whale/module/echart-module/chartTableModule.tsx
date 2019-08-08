@@ -63,7 +63,6 @@ export class ChartTableModule {
         this.wrapper = wrapper;
         this.ftable = ftable;
         this.data = data;
-        // debugger;
         this.initData();
         this.initTableBtns();
         // console.log(CityMap);
@@ -90,7 +89,7 @@ export class ChartTableModule {
         tools.isMb ? d.query('body').appendChild(this.baffleDom) : this.chartBtnsContainer.appendChild(this.baffleDom);
         this.baffleDom.addEventListener('click', this.baffleDomClkFn.bind(this));
 
-        tools.isMb || (this.chartBtnsContainer.style.height = '25rem');
+        !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '25rem'));
         // this.parentDom.appendChild(this.render());
         // let chart;
         switch (this.ui.uiType) {
@@ -99,15 +98,16 @@ export class ChartTableModule {
             case 'web':
             case 'drill':
             case 'detail':
+            case 'panel':
                 if (this.ui.showType === 'map') {
                     if (this.ui.location === 'china') {
-                         this.initMap(this.chartDom).then(res => this.chart = res);
+                        this.chart =this.initMap(this.chartDom).then(res => this.chart = res);
                     } else if (/.*省$/.test(`${this.ui.location}`) || ProvinceMap[this.ui.location]) {
                         let name = /.*省$/.test(`${this.ui.location}`) ? this.ui.location.slice(0, (this.ui.location.length - 1)) : this.ui.location;
-                        this.initProvince(this.chartDom, name).then(res => this.chart = res);;
+                        this.chart = this.initProvince(this.chartDom, name).then(res => this.chart = res);;
                     } else {
                         let name = /.*市$/.test(`${this.ui.location}`) ? this.ui.location : this.ui.location + '市';
-                        this.initCity(this.chartDom, name).then(res => this.chart = res);
+                        this.chart = this.initCity(this.chartDom, name).then(res => this.chart = res);
                     }
                 } else {
                     this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
@@ -115,7 +115,6 @@ export class ChartTableModule {
                 break;
 
             // case 'detail':
-            //     debugger;
             //     this.ui.cols = this.ui.fields;
             //     this.chart = this.ui.showType === 'pie' ? this.initPieChartFn() : this.initCommonChartFn(this.chartDom);
             //     break; break;
@@ -261,7 +260,6 @@ export class ChartTableModule {
             if (tools.isMb) {
                 this.baffleDom.children[0].classList.remove('showMain');
                 this.baffleDom.children[0].classList.add('hideMain');
-                // debugger;
                 setTimeout(() => {
                     this.baffleDom.style.display = 'none';
                 }, 300);
@@ -280,7 +278,6 @@ export class ChartTableModule {
             if (tools.isMb) {
                 this.baffleDom.children[0].classList.remove('showMain');
                 this.baffleDom.children[0].classList.add('hideMain');
-                // debugger;
                 setTimeout(() => {
                     this.baffleDom.style.display = 'none';
                 }, 300);
@@ -363,8 +360,10 @@ export class ChartTableModule {
      * 通用表格处理方法 
      */
     initCommonChartFn(chartEle: HTMLElement, max?: boolean) {
-        chartEle.parentElement.style.height = '25rem';
-        !max && (chartEle.style.height = '20rem');
+        if(!this.ui.chartPage) {
+            chartEle.parentElement.style.height = '25rem';
+            !max && (chartEle.style.height = '20rem');
+        }
         // this.chartBtnsContainer.style.width = '100%';
         // alert(chartEle.style.width);
         let chart = echarts.init(chartEle);
@@ -495,7 +494,6 @@ export class ChartTableModule {
             //     this.drillPage(params);
             // }
             //
-            // debugger;
             let col;
             if (tools.isMb) {
                 let tipDom: HTMLDivElement
@@ -520,7 +518,6 @@ export class ChartTableModule {
                     d.query('.tip-link', chartEle) && chartEle.removeChild(tipDom);
                 }, 2500);
                 tipDom.onclick = (e) => {
-                    // debugger;
                     chartEle.removeChild(tipDom);
                     this.getAjax(defaultCol, dataCol, varNamesObj);
                 }
@@ -569,7 +566,6 @@ export class ChartTableModule {
      * 饼状图
      */
     initPieChartFn() {
-        // debugger;
         // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
         this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 20}rem` : '20rem';
@@ -604,7 +600,7 @@ export class ChartTableModule {
             }
             let seriesItem = {
                 type: 'pie',
-                radius: tools.isMb ? 70 : 90,
+                radius: this.ui.chartPage ? 60 : tools.isMb ? 70 : 90,
                 center: [xAxis, yAxis],
                 data: this.data.bodyData.map((item, j) => {
                     return {
@@ -752,7 +748,6 @@ export class ChartTableModule {
             ifBreak: true,
         };
 
-        // debugger;
         let varNamesObj: object = {};
         let ifBreak: boolean = false;
         defaultCol.drillAddr && defaultCol.drillAddr.varList.forEach(list => {
@@ -844,6 +839,7 @@ export class ChartTableModule {
 
                 {this.chartDom}
             </div>
+        this.chartBtnsContainer = this.ui.chartPage ? <div class="chart-table" >{this.chartDom}</div> : this.chartBtnsContainer;
         return this.chartBtnsContainer;
     }
 
@@ -917,8 +913,16 @@ export class ChartTableModule {
 
     // 地图处理的三个函数
     async initMap(chartEle: HTMLElement) {
-        const bodyData: Array<any> = this.data['data'];
-
+        const bodyData: Array<any> = this.data['data'] || [];
+        if (bodyData.length === 0) {
+            this.data.body.bodyList[0].dataList.forEach(list => {
+                let obj = {};
+                list.forEach((ele, index) => {
+                    obj[this.data.body.bodyList[0].meta[index]] = ele;
+                });
+                bodyData.push(obj);
+            });
+        }
         let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
         let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let yAxisNamesObj: object = {};
@@ -1136,7 +1140,6 @@ export class ChartTableModule {
                 formatter: (param) => {
                     let tipInfo = bodyData.find(item => item[xAxisName].indexOf(param.name) !== -1);
                     if (!tipInfo) return param.name;
-                    // debugger;
                     let tip = `${param.name}<br/>`;
                     yAxisNames.forEach((name, i) => {
                         tip += `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${this.color[i]}"></span>${yAxisNamesObj[name]} : ${tipInfo[name]} <br/>`;
@@ -1189,14 +1192,21 @@ export class ChartTableModule {
             !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
 
         });
-        // debugger;
 
         return chinaMap;
     }
 
     async initProvince(chartEle: HTMLElement, name: string) {
         const bodyData: Array<any> = this.data['data'];
-
+        if (!bodyData) {
+            this.data.body.bodyList[0].dataList.forEach(list => {
+                let obj = {};
+                list.forEach((ele, index) => {
+                    obj[this.data.body.bodyList[0].meta[index]] = ele;
+                });
+                bodyData.push(obj);
+            });
+        }
         let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
         let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let yAxisNamesObj: object = {};
@@ -1456,7 +1466,15 @@ export class ChartTableModule {
 
     async initCity(chartEle: HTMLElement, name: string) {
         const bodyData: Array<any> = this.data['data'];
-
+        if (!bodyData) {
+            this.data.body.bodyList[0].dataList.forEach(list => {
+                let obj = {};
+                list.forEach((ele, index) => {
+                    obj[this.data.body.bodyList[0].meta[index]] = ele;
+                });
+                bodyData.push(obj);
+            });
+        }
         let xAxisName: string = this.ui.local.xCoordinate.toUpperCase();
         let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let yAxisNamesObj: object = {};
