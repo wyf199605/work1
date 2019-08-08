@@ -485,6 +485,7 @@ export class EditModule {
                 return;
             }
 
+            let onSet = com.onSet;
             com.onSet = (val) => {
                 // debugger;
                 // setTimeout(() => {
@@ -497,6 +498,7 @@ export class EditModule {
                     assignData = Object.assign({}, data, assignData, { [field.name]: val });
                     assignSend(field, val, assignData, onExtra);
                 }
+                onSet && onSet(val);
 
                 // }, 30);
             };
