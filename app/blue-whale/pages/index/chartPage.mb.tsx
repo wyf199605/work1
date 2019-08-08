@@ -1,4 +1,4 @@
-/// <amd-module name="ChartPage"/>
+/// <amd-module name="ChartPageMb"/>
 /// <amd-dependency path="echarts" name="echarts"/>
 
 import BasicPage from "blue-whale/pages/basicPage";
@@ -47,7 +47,7 @@ interface DataAddr {
     type?: string
     varType?: boolean
 }
-export class ChartPage extends BasicPage {
+export class ChartPageMb extends BasicPage {
     
     container: HTMLElement;   // btl 获取的dom元素即当前页面的容器
     uiCharts ;   // 获取的UI绘制
@@ -58,10 +58,12 @@ export class ChartPage extends BasicPage {
         super(para);
         this.container = this.render();
         G.d.append(para.dom, this.container);
+        this.container.style.width = para.ui.body.elements.length * 100 + '%';
         this.uiCharts = para.ui;
-        $('#app').toggleClass('app-sidebar-closed');
         this.initData();
-        
+       
+        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=static%2Fmain"})
+        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/hint/read"})
         
     }
     async initData() {
@@ -82,25 +84,21 @@ export class ChartPage extends BasicPage {
                 case 'table':
                     this.tableFn(data);
             }
-        })
+        });
+        
 
         
     }
     menuFn(data: any) {
         let divDom: HTMLDivElement = <div class="workbeanch-menu"></div>
         this.container.appendChild(divDom);
-        let width = data.positionInfo.width * 10 + '%';
-        let height = data.positionInfo.heigh * 10 + '%';
-        divDom.style.width = `calc(${width} - 10px)`;
-        divDom.style.height = `calc(${height} - 10px)`;
-        divDom.style.left = Number(data.positionInfo.coordinatePairs.split(',')[0]) * 10 + '%';
-        divDom.style.top = Number(data.positionInfo.coordinatePairs.split(',')[1]) * 10 + '%';
+        divDom.style.width = '100vw';
+        divDom.style.height = '100vh';
         data.blockInfo.element.forEach(ele => {
             let btnDom: HTMLElement = <button></button>;
             btnDom.textContent = ele.menuName;
             divDom.appendChild(btnDom);
             btnDom.onclick = () => {
-                // debugger;
                 const url = CONF.siteUrl + ele.menuPath.dataAddr;
                 sys.window.open({ url, gps: ele.menuPath.needGps });
             }
@@ -111,10 +109,8 @@ export class ChartPage extends BasicPage {
     async panelFn(data: any) {
         let divDom: HTMLDivElement = <div class="workbeanch-chart"></div>
         this.container.appendChild(divDom);
-        divDom.style.width = data.positionInfo.width * 10 + '%';
-        divDom.style.height = data.positionInfo.heigh * 10 + '%';
-        divDom.style.left = Number(data.positionInfo.coordinatePairs.split(',')[0]) * 10 + '%';
-        divDom.style.top = Number(data.positionInfo.coordinatePairs.split(',')[1]) * 10 + '%';
+        divDom.style.width = '100vw';
+        divDom.style.height = '100vh';
         let { uiType , caption, element } = data.blockInfo;
         Object.assign(element, {
             local: {
@@ -139,10 +135,8 @@ export class ChartPage extends BasicPage {
     tableFn(data: any) {
         let divDom: HTMLDivElement = <div class="table-chart"></div>
         this.container.appendChild(divDom);
-        divDom.style.width = data.positionInfo.width * 10 + '%';
-        divDom.style.height = data.positionInfo.heigh * 10 + '%';
-        divDom.style.left = Number(data.positionInfo.coordinatePairs.split(',')[0]) * 10 + '%';
-        divDom.style.top = Number(data.positionInfo.coordinatePairs.split(',')[1]) * 10 + '%';
+        divDom.style.width = '100vw';
+        divDom.style.height = '100vh';
         
         const ui = {
             body: {},
@@ -160,9 +154,11 @@ export class ChartPage extends BasicPage {
             chartPage: true,
             dom: divDom
         }
-        
-         new NewTablePage(para);
+        // debugger;
+        new NewTablePage(para);
     }
+
+    
     
     render() {
 

@@ -13,7 +13,7 @@
         font-size: 13px;
         display: flex;
         justify-content: space-around;
-        position: absolute;
+        // position: absolute;
         flex-wrap: wrap;
         // align-items: flex-start;
         align-content: flex-start;
@@ -21,7 +21,7 @@
         background: white;
         overflow: scroll;
         button {
-            width: 140px;
+            width: 80%;
             height: 40px;
             background-color: #609ee9;
             border-radius: 5px;
@@ -32,11 +32,10 @@
                 background-color: #007AFF;
             }
             
-            
         }
     }
     .workbeanch-chart, .table-chart {
-        position: absolute;
+        // position: absolute;
         padding: 5px;
         // box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
         .chart-table {
@@ -47,4 +46,8 @@
             }
         }
     }
+}
+.chart-footer {
+    position: fixed;
+    bottom: 0;
 }

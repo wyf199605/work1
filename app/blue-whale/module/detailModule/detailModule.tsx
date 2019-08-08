@@ -96,11 +96,16 @@ export class DetailModule extends AGroupTabItem {
         return this.dataManager ? this.dataManager.total : 0;
     }
 
+    protected phoneInputBox: InputBox;
     private phoneBtnInit() {
-        if (tools.isMb&&this.ui.operationType && this.ui.operationType.autoEdit) {
+        if (tools.isPc) {
             return false;
         }
-        let inputBox = new InputBox({
+        if(this.ui.operationType && this.ui.operationType.autoEdit){
+            return false;
+        }
+        this.phoneInputBox && this.phoneInputBox.destroy();
+        let inputBox = this.phoneInputBox = new InputBox({
             container: this.wrapper,
             size: 'middle',
             compactWidth: 1,

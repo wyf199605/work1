@@ -462,7 +462,7 @@ export class EditModule {
 
         let com = this.comTnit[type](initP);
         this.assign.init(com, initP);
-        if (initP && com instanceof FormCom) {
+        if (com instanceof FormCom) {
             let onSet = com.onSet;
             com.onSet = (val) => {
                 onSet && onSet(val);
@@ -497,7 +497,6 @@ export class EditModule {
                     assignData = Object.assign({}, data, assignData, { [field.name]: val });
                     assignSend(field, val, assignData, onExtra);
                 }
-
                 // }, 30);
             };
         };
