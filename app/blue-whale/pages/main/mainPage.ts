@@ -121,7 +121,7 @@ export = class MainPage {
         /*let url = `${conf.urlAppid}/v1/commonui/pageroute?page=defaultTab`;
           sys.window.open({url});*/
           
-    sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/home_page/workbench?modulesId=1"})
+    // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/home_page/workbench?modulesId=1"})
     }
 
     private static search = (function () {

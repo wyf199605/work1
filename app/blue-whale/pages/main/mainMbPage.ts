@@ -69,11 +69,14 @@ export = class mainMbPage {
                     });
                     d.closest((e.target as HTMLElement), '[data-page-name]').classList.add('mui-active');
                     SUB_PAGE.showIframe(name);
+                    
                 });
-
+                // 
             }
         };
         SUB_PAGE.initPages();
         sys.window.close = double_back;
+        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/home_page/workbench?modulesId=1"})
+        
     }
 }

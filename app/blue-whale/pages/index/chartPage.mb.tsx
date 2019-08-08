@@ -58,8 +58,12 @@ export class ChartPageMb extends BasicPage {
         super(para);
         this.container = this.render();
         G.d.append(para.dom, this.container);
+        this.container.style.width = para.ui.body.elements.length * 100 + '%';
         this.uiCharts = para.ui;
         this.initData();
+       
+        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=static%2Fmain"})
+        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/hint/read"})
         
     }
     async initData() {
@@ -80,7 +84,8 @@ export class ChartPageMb extends BasicPage {
                 case 'table':
                     this.tableFn(data);
             }
-        })
+        });
+        
 
         
     }
@@ -149,9 +154,11 @@ export class ChartPageMb extends BasicPage {
             chartPage: true,
             dom: divDom
         }
-        debugger;
+        // debugger;
         new NewTablePage(para);
     }
+
+    
     
     render() {
 

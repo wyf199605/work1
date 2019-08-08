@@ -1,7 +1,7 @@
 
-#content_page > div > div {
-    padding: 0;
-}
+// #content_page > div > div {
+//     padding: 0;
+// }
 .chart-page{
     background: gainsboro;
     height: calc(100vh - 63px);
@@ -31,9 +31,8 @@
             &:hover {
                 background-color: #007AFF;
             }
-            &:click {
-                opacity: 0.8;
-            }
+            
+            
         }
     }
     .workbeanch-chart, .table-chart {
