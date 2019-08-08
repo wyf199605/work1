@@ -263,8 +263,8 @@ export class NewTableModule extends AGroupTabItem {
                                     let list = selectedData[this.showSubField].split(',');
                                     let showSubSeq = this.computedIndex(list);
                                     this.tab.setTabsShow(showSubSeq);
-                                    // this.tab.active(parseInt(showSubSeq[0]) - 1);
-                                    this.tab.active(0);
+                                    this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    // this.tab.active(0);
                                     parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
                                 }
                             } else {
