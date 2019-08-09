@@ -124,7 +124,7 @@ export = class MainPage {
         //     debugger;
         //     console.log(result);
         // })
-        if (sessionStorage.getItem('showWorkBench') === 'true') {
+        if (sessionStorage.getItem('showWorkBench') === 'true') {   
             sys.window.open({url: CONF.siteUrl + '/' + CONF.appid+ "/null/home_page/workbench?modulesId=1"})
         }
         
