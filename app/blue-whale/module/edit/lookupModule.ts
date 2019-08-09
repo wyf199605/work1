@@ -19,12 +19,6 @@ export class LookupModule extends FormCom{
     constructor(private para: ILookupModulePara){
         super(para);
 
-        this.onSet = (item) => {
-            this.setValue(item, false);
-            this.para.onExtra && this.para.onExtra(item);
-            para.onSet && para.onSet(item);
-        };
-
         this.selectInput = new (sys.isMb ? SelectInputMb : SelectInput)({
             container: this.para.container,
             ajax: {
@@ -33,7 +27,10 @@ export class LookupModule extends FormCom{
                 }
             },
             readonly: !!para.field.noEdit,
-            onSet: this.onSet
+            onSet:(item) => {
+                this.setValue(item, false);
+                this.para.onExtra && this.para.onExtra(item);
+            }
         });
     }
 
@@ -64,7 +61,6 @@ export class LookupModule extends FormCom{
     protected setValue(value, isSetSelect = true){
         value = (typeof value === 'object' && value !== null) ? value.value : value;
         if(tools.isEmpty(this.options)){
-            this.selectInput.onSet = this.onSet;
             this.ajax((options:ListItem[])=>{
                 this.selectInput.setPara({
                     data: options
@@ -73,19 +69,18 @@ export class LookupModule extends FormCom{
                     let option = options[i];
                     if(option.value === value){
                         isSetSelect && this.selectInput.set(option);
-                        this.selectInput.onSet = this.onSet;
+                        typeof this.onSet === 'function' && this.onSet(option);
                         return;
                     }
                 }
-                this.selectInput.onSet = this.onSet;
                 this.clear(isSetSelect);
             });
         } else{
-            this.selectInput.onSet = this.onSet;
             for(let i = 0; i < this.options.length; i ++) {
                 let option = this.options[i];
                 if(option.value === value){
                     isSetSelect && this.selectInput.set(option);
+                    typeof this.onSet === 'function' && this.onSet(option);
                     return;
                 }
             }
