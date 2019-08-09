@@ -263,8 +263,10 @@ export class NewTableModule extends AGroupTabItem {
                                     let list = selectedData[this.showSubField].split(',');
                                     let showSubSeq = this.computedIndex(list);
                                     this.tab.setTabsShow(showSubSeq);
-                                    // this.tab.active(parseInt(showSubSeq[0]) - 1);
-                                    this.tab.active(0);
+                                    //1476bug单
+                                    this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    // console.log(this.tab);
+                                    // this.tab.active(0);
                                     parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);
                                 }
                             } else {
@@ -330,6 +332,7 @@ export class NewTableModule extends AGroupTabItem {
         };
     }
     private computedIndex(list: Array<string>): Array<string> {
+        // list=['esdata-7402'];
         // console.log("配置选项" + list);
         let showSubSeq: string[] = [];
         let bwEl = this.bwEl;
