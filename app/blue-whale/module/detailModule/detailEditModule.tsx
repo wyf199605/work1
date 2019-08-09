@@ -158,23 +158,42 @@ export class DetailEditModule {
                 return
             }
             let data = this.editModule.get();
-            this.fetch(data).then(() => {
-                let urls = [];
-                this.field.forEach((field) => {
-                    if(field.link && field.atrrs && field.atrrs.dataType === '20'){
-                        let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, data), this.detail.ajaxData || {}, true, true);
-                        urls.push(url);
-                    }
+            Promise.all(this.field.filter((field) => field.chkAddr).map((field) => {
+                return EditModule.checkValue(field, data, () => {
+                    let com = this.editModule.getDom(field.name);
+                    com && com.set('');
                 });
-                this.detail.updateImgVersion(urls)
-                    .then(() => {})
-                    .catch((e) => console.log(e))
-                    .finally(() => {
-                        resolve();
+            })).then((checkMsgList) => {
+                for (let checkValueResult of checkMsgList) {
+                    let {errors} = checkValueResult;
+                    if(Array.isArray(errors) && errors[0]){
+                        let msg = errors[0].msg;
+                        if(msg){
+                            Modal.alert(msg);
+                            return ;
+                        }
+                    }
+                    this.fetch(data).then(() => {
+                        let urls = [];
+                        this.field.forEach((field) => {
+                            if(field.link && field.atrrs && field.atrrs.dataType === '20'){
+                                let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, data), this.detail.ajaxData || {}, true, true);
+                                urls.push(url);
+                            }
+                        });
+                        this.detail.updateImgVersion(urls)
+                            .then(() => {})
+                            .catch((e) => console.log(e))
+                            .finally(() => {
+                                resolve();
+                            });
+                        this.cancel();
+                    }).catch((e) => {
+                        reject(e);
                     });
-                this.cancel();
+                }
             }).catch((e) => {
-                reject(e);
+                console.log(e);
             });
         })
     }

@@ -823,6 +823,9 @@ export class EditModule {
         //         emptyCheckResult.okNames.push(colName)
         //     }
         // }
+        if(!chkAddr){
+            return Promise.resolve({});
+        }
 
         return new Promise((resolve, reject) => {
             // if(emptyCheckResult.errors[0]) {
@@ -847,13 +850,13 @@ export class EditModule {
                     Modal.confirm({
                         msg: showText,
                         callback: (flag: boolean) => {
-                            if (!flag) {
-                                clear();
-                                reject();
-                            } else {
+                            if (flag) {
                                 resolve({
                                     okNames: chkAddr.varList.map(v => v.varName)
                                 });
+                            } else {
+                                clear();
+                                reject();
                             }
                         }
                     });
