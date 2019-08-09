@@ -11,6 +11,7 @@ import { EchartModule } from "blue-whale/module/echart-module/echartModule";
 import sys = BW.sys;
 import { ChartTableModule } from "blue-whale/module/echart-module/chartTableModule";
 import { NewTablePage, ITablePagePara } from "../table/newTablePage";
+import { Button, IButton } from "global/components/general/button/Button";
 
 
 
@@ -58,9 +59,11 @@ export class ChartPageMb extends BasicPage {
         super(para);
         this.container = this.render();
         G.d.append(para.dom, this.container);
-        this.container.style.width = para.ui.body.elements.length * 100 + '%';
+        const containerWidth = para.ui.body.elements.length * 100 ;
+        this.container.style.width = containerWidth  + '%';
         this.uiCharts = para.ui;
         this.initData();
+        this.footerFn(para.dom, containerWidth);
        
         // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=static%2Fmain"})
         // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/hint/read"})
@@ -72,6 +75,11 @@ export class ChartPageMb extends BasicPage {
         // await $.get(url, (res) => {
         //     this.uiCharts = res;
         // });
+
+        $('.jump-menu').click((e:Event) => {
+            sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/commonui/pageroute?page=static%2Fmain"});
+        })
+
         console.log(this.uiCharts);
         this.uiCharts.body.elements.forEach(data => {
             switch (data.blockInfo.uiType) {
@@ -93,7 +101,7 @@ export class ChartPageMb extends BasicPage {
         let divDom: HTMLDivElement = <div class="workbeanch-menu"></div>
         this.container.appendChild(divDom);
         divDom.style.width = '100vw';
-        divDom.style.height = '100vh';
+        // divDom.style.height = '100vh';
         data.blockInfo.element.forEach(ele => {
             let btnDom: HTMLElement = <button></button>;
             btnDom.textContent = ele.menuName;
@@ -110,7 +118,7 @@ export class ChartPageMb extends BasicPage {
         let divDom: HTMLDivElement = <div class="workbeanch-chart"></div>
         this.container.appendChild(divDom);
         divDom.style.width = '100vw';
-        divDom.style.height = '100vh';
+        // divDom.style.height = '100vh';
         let { uiType , caption, element } = data.blockInfo;
         Object.assign(element, {
             local: {
@@ -136,7 +144,7 @@ export class ChartPageMb extends BasicPage {
         let divDom: HTMLDivElement = <div class="table-chart"></div>
         this.container.appendChild(divDom);
         divDom.style.width = '100vw';
-        divDom.style.height = '100vh';
+        // divDom.style.height = '100vh';
         
         const ui = {
             body: {},
@@ -157,7 +165,45 @@ export class ChartPageMb extends BasicPage {
         // debugger;
         new NewTablePage(para);
     }
-
+    footerFn(parentDom: HTMLElement, width: number) {
+        let footerDom = <footer class="chart-footer">
+            <button class="prev">上一页</button>
+            <button class="next">下一页</button>
+        </footer>
+        parentDom.appendChild(footerDom);
+        let positionLeft = 0;
+        footerDom.onclick = (e: Event) => {
+            console.log(e);
+            movePage(this.container, e.target['className'], width);
+            // switch(e.target['className']) {
+            //     case 'prev':
+                    
+            //         break;
+            //     case 'next':
+            //         break;
+            // }
+        }
+        function movePage(containerDom: HTMLElement,type: string, containerWidth: number) {
+            
+            if (type === 'prev'){
+                if(positionLeft === 0) {
+                    positionLeft = containerWidth / 100 - 1;
+                    containerDom.style.left = -(positionLeft * 100)+ '%';
+                }else {
+                    positionLeft -= 1;
+                    containerDom.style.left = -positionLeft * 100 + '%';
+                }
+            }else if(type === 'next') {
+                if(positionLeft * 100 === containerWidth - 100) {
+                    positionLeft = 0;
+                    containerDom.style.left = 0 + 'px';
+                } else {
+                    positionLeft +=1;
+                    containerDom.style.left = -positionLeft * 100 + '%';
+                }
+            }
+        }
+    }
     
     
     render() {

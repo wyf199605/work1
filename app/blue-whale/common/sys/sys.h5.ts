@@ -79,8 +79,15 @@ namespace BW {
                     // self.ui.toast('清除成功');
                 },
                 opentab: function (url, accessToken, noShow: string[] = null) {
+                    
                     let win = window.parent ? window.parent : window;
-                    win.location.href = CONF.url.main;
+                    debugger;
+                    if (sessionStorage.getItem('showWorkBench') === 'false') {
+                        win.location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
+                    } else {
+                        win.location.href = CONF.url.main;
+                    }
+                   
                     localStorage.setItem('hideBaseMenu', JSON.stringify(noShow));
                 },
                 logout: function () {

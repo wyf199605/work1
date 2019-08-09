@@ -2,12 +2,39 @@
 // #content_page > div > div {
 //     padding: 0;
 // }
+.chart-body {
+    >.mui-bar>.mui-btn {
+        .btn{
+           line-height: 44px;
+           padding: 0;
+          
+        }
+        
+        
+    }
+}
+.chart-contianer {
+    // height: calc(100% - 2.5rem);
+    // position: relative;
+    height: calc(100% - 84px );
+    position: absolute;
+    top: 44px;
+    width: 100%;
+
+}
 .chart-page{
     background: gainsboro;
-    height: calc(100vh - 63px);
-    width: 100%;
-    position: relative;
+    height: 100%;
+    // width: 100%;
+    
+    display: flex;
+    flex-wrap: nowrap;
+    position: absolute;
+    left: 0;
+    top: 0;
     .workbeanch-menu {
+        height: 100%;
+        overflow: scroll;
         font-family: 'Arial Normal', 'Arial';
         font-style: normal;
         font-size: 13px;
@@ -16,8 +43,9 @@
         // position: absolute;
         flex-wrap: wrap;
         // align-items: flex-start;
-        align-content: flex-start;
-        margin: 5px;
+        align-content: flex-end;
+        padding-bottom: 15px;
+       
         background: white;
         overflow: scroll;
         button {
@@ -36,7 +64,10 @@
     }
     .workbeanch-chart, .table-chart {
         // position: absolute;
+        background-color: white;
+        height: 100%;
         padding: 5px;
+        overflow: scroll;
         // box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
         .chart-table {
             height: 100% !important;
@@ -50,4 +81,17 @@
 .chart-footer {
     position: fixed;
     bottom: 0;
+    height: 40px;
+    width: 100%;
+    line-height: 40px;
+    border-top: 1px solid gainsboro;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    button {
+        margin: 0 10px;
+        :hover{
+            color: #609ee9
+        }
+    }
 }

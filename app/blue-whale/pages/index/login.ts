@@ -1031,16 +1031,28 @@ export class LoginPage {
                             noShow = col.VALUE.split(',');
                         } else if (col.NAME === 'PLATFORM_NAME') {
                             user.platformName = col.VALUE;
+                        }else if (col.NAME === 'showWorkBench') {
+                            sessionStorage.setItem('showWorkBench', col.VALUE);
                         }
                     });
                     if (sys.os === 'ad' || sys.os === 'ip') {
                         let accessToken = response.head.accessToken || '',
                             jwtToken = response.head.jwtToken || '',
                             refreshToken = response.head.refreshToken || '';
-                        sys.window.opentab(user.userid, accessToken.toString(), noShow, {
+                        
+                        // sys.window.open
+                        if (sessionStorage.getItem('showWorkBench') === 'true') {
+                            sys.window.open({
+                                url: CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1'
+                            })
+                        } else {
+                            sys.window.opentab(user.userid, accessToken.toString(), noShow, {
                             refreshToken,
                             jwtToken
                         });
+                        }
+                        
+                        // location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
                     } else {
                         BW.sysPcHistory.setLockKey(user.userid);
                         BW.sysPcHistory.setInitType('1');
