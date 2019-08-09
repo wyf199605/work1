@@ -173,25 +173,25 @@ export class DetailEditModule {
                             return ;
                         }
                     }
-                    this.fetch(data).then(() => {
-                        let urls = [];
-                        this.field.forEach((field) => {
-                            if(field.link && field.atrrs && field.atrrs.dataType === '20'){
-                                let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, data), this.detail.ajaxData || {}, true, true);
-                                urls.push(url);
-                            }
-                        });
-                        this.detail.updateImgVersion(urls)
-                            .then(() => {})
-                            .catch((e) => console.log(e))
-                            .finally(() => {
-                                resolve();
-                            });
-                        this.cancel();
-                    }).catch((e) => {
-                        reject(e);
-                    });
                 }
+                this.fetch(data).then(() => {
+                    let urls = [];
+                    this.field.forEach((field) => {
+                        if(field.link && field.atrrs && field.atrrs.dataType === '20'){
+                            let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, data), this.detail.ajaxData || {}, true, true);
+                            urls.push(url);
+                        }
+                    });
+                    this.detail.updateImgVersion(urls)
+                        .then(() => {})
+                        .catch((e) => console.log(e))
+                        .finally(() => {
+                            resolve();
+                        });
+                    this.cancel();
+                }).catch((e) => {
+                    reject(e);
+                });
             }).catch((e) => {
                 console.log(e);
             });
