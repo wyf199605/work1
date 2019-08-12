@@ -82,7 +82,7 @@ namespace BW {
                     
                     let win = window.parent ? window.parent : window;
                     debugger;
-                    if (sessionStorage.getItem('showWorkBench') === 'false') {
+                    if (sessionStorage.getItem('showWorkBench') === 'true') {
                         win.location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
                     } else {
                         win.location.href = CONF.url.main;
