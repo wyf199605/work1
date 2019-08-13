@@ -76,7 +76,7 @@ export = class mainMbPage {
         };
         SUB_PAGE.initPages();
         sys.window.close = double_back;
-        // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/home_page/workbench?modulesId=1"})
+        
         
     }
 }
