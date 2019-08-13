@@ -187,7 +187,14 @@ export abstract class QueryModule {
 
         queryJson.textCase = this.textCase.get();
         console.log(queryJson);
-
+        if (queryJson.atvarparams) {
+            for (var i in queryJson.atvarparams) {
+                let item = queryJson.atvarparams[i];
+                if (/[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/g.test(item)) {
+                    delete queryJson.atvarparams[i]
+                }
+            }
+        }
         BwRule.Ajax.fetch(settingSaveUrl, {
             type: 'PUT',
             data2url: true,
@@ -277,7 +284,7 @@ export abstract class QueryModule {
     }
 
     //查询
-    private queryLoad(queryJson){
+    private queryLoad(queryJson) {
         localStorage.setItem('queryer', JSON.stringify(queryJson));
         this.hide();
         return this.para.refresher(queryJson);
