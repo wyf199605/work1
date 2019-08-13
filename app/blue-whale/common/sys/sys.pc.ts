@@ -145,7 +145,7 @@ namespace BW {
                     localStorage.setItem('tableUrl',url);
                     if (self.inMain) {
                         let isNew = self.pages.open(o),
-                            isNotBtl = url.indexOf('newPage') > -1;
+                            isNotBtl = o.notBtl || url.indexOf('newPage') > -1;
                         if (isNotBtl) { // 不走btl模板的页面
                             let title = o.title;
                             self.tabs.open(url, title);

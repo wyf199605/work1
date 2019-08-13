@@ -168,6 +168,7 @@ interface winOpen {
     header?: object;
     extras?: object;
     isDownLoad?: boolean;
+    notBtl?: boolean;
 }
 interface R_Button extends Btn {
     actionAddr: R_ReqAddr;// 操作提交后台地址

@@ -120,7 +120,7 @@ export = class MainPage {
         d.query('.navbar-brand .nav-bluewhale', window.document.body).innerText = platformName || '速狮';
         /*let url = `${conf.urlAppid}/v1/commonui/pageroute?page=defaultTab`;
           sys.window.open({url});*/
-          
+
     // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/home_page/workbench?modulesId=1"})
     }
 
@@ -414,38 +414,6 @@ export = class MainPage {
                     }else{
                         d.remove(icon);
                     }
-                    /*if (data.length === 1) {
-                        let item = data[0],
-                            el = d.create(`<li class="dropdown pull-right">
-                                    <a href="#">
-                                        <span class="${'iconfont icon-' + item.systemIcon}"></span>
-                                        ${item.systemName}
-                                    </a>
-                                </li>`);
-                        d.on(el, 'click', () => {
-                            handlerClick(item);
-                        });
-                        d.replace(el, li);
-                    } else {
-                        let popover = new Popover({
-                            target: li,
-                            // container: <HTMLElement>d.query('.popover-toggle').parentNode.parentNode,
-                            isWatch: true,
-                            items: data.map((item) => {
-                                return {
-                                    title: item.systemName,
-                                    icon: 'iconfont icon-' + item.systemIcon,
-                                    onClick: () => {
-                                        handlerClick(item);
-                                    }
-                                }
-                            }),
-                            isBackground: false,
-                            onClick: function () {
-                                popover.show = false;
-                            }
-                        });
-                    }*/
                 } else {
                     d.remove(li);
                 }
@@ -454,27 +422,34 @@ export = class MainPage {
         };
         let handlerClick = (item) => {
             getSystemMsg(item.systemId).then((response) => {
-                console.log(response);
                 let loading: Loading,
                     path = tools.keysVal(response, 'LOGIN_VAR', 'SYSTEM_PATH') || '',
+                    type = tools.keysVal(response, 'SYSTEM_TYPE') || 0,
                     params = tools.keysVal(response, 'LOGIN_VAR', 'PARAMS') || '';
 
-                let flag = Shell.openSystem(path, params, (result) => {
-                    loading && loading.hide();
-                    loading = null;
-                    if (!result.success) {
-                        Modal.alert(result.msg || '打开失败');
-                    }
-                });
-
-                if (flag) {
-                    loading = new Loading({
-                        msg: '打开中...',
-                        duration: 10
+                if(type === 0){
+                    let flag = Shell.openSystem(path, params, (result) => {
+                        loading && loading.hide();
+                        loading = null;
+                        if (!result.success) {
+                            Modal.alert(result.msg || '打开失败');
+                        }
                     });
-                    loading.show();
-                } else {
-                    Modal.alert('打开失败');
+                    if (flag) {
+                        loading = new Loading({
+                            msg: '打开中...',
+                            duration: 10
+                        });
+                        loading.show();
+                    } else {
+                        Modal.alert('打开失败');
+                    }
+                }else if(type === 1){
+                    sys.window.open({
+                        url: path,
+                        title: item.systemName,
+                        notBtl: true
+                    });
                 }
             })
         };
