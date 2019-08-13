@@ -120,8 +120,15 @@ export = class MainPage {
         d.query('.navbar-brand .nav-bluewhale', window.document.body).innerText = platformName || '速狮';
         /*let url = `${conf.urlAppid}/v1/commonui/pageroute?page=defaultTab`;
           sys.window.open({url});*/
+        // $.get(CONF.siteUrl + "/app_sanfu_retail/null/home_page/workbench?modulesId=1",(result) => {
+        //     debugger;
+        //     console.log(result);
+        // })
+        if (sessionStorage.getItem('showWorkBench') === 'true') {
+            sys.window.open({url: CONF.siteUrl + '/' + CONF.appid+ "/null/home_page/workbench?modulesId=1"})
+        }
 
-    // sys.window.open({url: CONF.siteUrl + "/app_sanfu_retail/null/home_page/workbench?modulesId=1"})
+
     }
 
     private static search = (function () {

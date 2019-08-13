@@ -36,8 +36,9 @@ export class NewTablePage extends BasicPage{
         
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
+        // debugger;
         let bwTable = new BwTableElement({
-            container: tools.isPc ? this.dom : d.query('body > .mui-content'),
+            container: tools.isPc ? this.dom : para.chartPage? para.dom: d.query('body > .mui-content'),
             tableEl: bwTableEl,
             asynData : para.ui.body.elements[1], // 异步查询
             tagId: para.ui.tagId
