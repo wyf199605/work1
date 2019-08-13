@@ -1,27 +1,27 @@
 /// <amd-module name="NewTablePage"/>
 import BasicPage from "../basicPage";
-import {BwRule} from "../../common/rule/BwRule";
+import { BwRule } from "../../common/rule/BwRule";
 import tools = G.tools;
 import sys = BW.sys;
 import CONF = BW.CONF;
-import {NewTableModule} from "../../module/table/newTableModule";
+import { NewTableModule } from "../../module/table/newTableModule";
 import d = G.d;
-import {QueryModule} from "../../module/query/queryModule";
-import {Modal} from "../../../global/components/feedback/modal/Modal";
-import {Loading} from "../../../global/components/ui/loading/loading";
+import { QueryModule } from "../../module/query/queryModule";
+import { Modal } from "../../../global/components/feedback/modal/Modal";
+import { Loading } from "../../../global/components/ui/loading/loading";
 import IComponentPara = G.IComponentPara; import Component = G.Component;
-import {BwTableModule} from "../../module/table/BwTableModule";
-import {FastTable} from "global/components/newTable/FastTable";
-import {Inputs} from "../../module/inputs/inputs";
+import { BwTableModule } from "../../module/table/BwTableModule";
+import { FastTable } from "global/components/newTable/FastTable";
+import { Inputs } from "../../module/inputs/inputs";
 import { ShareCode } from "blue-whale/common/share-code/shareCode";
 
-export interface ITablePagePara extends BasicPagePara{
+export interface ITablePagePara extends BasicPagePara {
     ui: IBW_UI<IBW_Table>
 }
 
 let queryModuleName = sys.isMb ? 'QueryModuleMb' : 'QueryModulePc';
 
-export class NewTablePage extends BasicPage{
+export class NewTablePage extends BasicPage {
 
 
     constructor(para: ITablePagePara) {
@@ -32,7 +32,7 @@ export class NewTablePage extends BasicPage{
         let bwTable = new BwTableElement({
             container: tools.isPc ? this.dom : d.query('body > .mui-content'),
             tableEl: bwTableEl,
-            asynData : para.ui.body.elements[1], // 异步查询
+            asynData: para.ui.body.elements[1], // 异步查询
             tagId: para.ui.tagId
         });
 
@@ -50,14 +50,14 @@ export class NewTablePage extends BasicPage{
     }
 }
 
-interface IBwTableElementPara extends IComponentPara{
+interface IBwTableElementPara extends IComponentPara {
     tableEl: IBW_Table
-    asynData? : obj[],
+    asynData?: obj[],
     tagId?: string,
 }
-export class BwTableElement extends Component{
+export class BwTableElement extends Component {
 
-    tableModule : NewTableModule;
+    tableModule: NewTableModule;
     queryModule: QueryModule;
 
     protected wrapperInit(para: IBwTableElementPara): HTMLElement {
@@ -70,11 +70,11 @@ export class BwTableElement extends Component{
         console.log('bw table ele', para);
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
-            hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
+            hasQuery = bwTableEl.querier && ([1, 2, 3, 13].includes(bwTableEl.querier.queryType));
 
-        if(isDynamic ) {
+        if (isDynamic) {
             // 动态加载查询模块
-            let bwQueryEl:IBw_Query = bwTableEl as any;
+            let bwQueryEl: IBw_Query = bwTableEl as any;
             require([queryModuleName], Query => {
                 // console.log(this.para)
                 let isFirst = true;
@@ -87,9 +87,9 @@ export class BwTableElement extends Component{
 
                         ajaxData['output'] = 'json';
 
-                        if(tools.isEmpty(uiPath)) {
+                        if (tools.isEmpty(uiPath)) {
                             Modal.alert('查询地址为空');
-                            return ;
+                            return;
                         }
 
                         let loading = new Loading({
@@ -99,13 +99,13 @@ export class BwTableElement extends Component{
                         return BwRule.Ajax.fetch(G.tools.url.addObj(url, ajaxData), {
                             timeout: 30000,
                             needGps: !!uiPath.needGps
-                        }).then(({response}) => {
+                        }).then(({ response }) => {
                             delete ajaxData['output'];
                             d.off(window, 'wake');
                             this.tableModule && this.tableModule.destroy();
 
-                            let tableEl =  response.body.elements[0];
-                            if(noQuery){
+                            let tableEl = response.body.elements[0];
+                            if (noQuery) {
                                 tableEl.noQuery = noQuery;
                             }
                             ;
@@ -115,27 +115,52 @@ export class BwTableElement extends Component{
                                 container: this.container,
                                 ajaxData: ajaxData,
                             });
-                            this.tableModule.main.ftable.on(FastTable.EVT_RENDERED, () => {
-                                let locationLine = tableEl.scannableLocationLine;
-                                if(locationLine && ajaxData.mobilescan){
-                                    this.tableModule.main.ftable.locateToRow(locationLine,ajaxData.mobilescan);
-                                }
-                            });
+                            try {
+                                this.tableModule.main.ftable.on(FastTable.EVT_RENDERED, () => {
+                                    let locationLine = tableEl.scannableLocationLine;
+                                    if (locationLine && ajaxData.mobilescan) {
+                                        this.tableModule.main.ftable.locateToRow(locationLine, ajaxData.mobilescan);
+                                    }
+                                });
+                            } catch (error) {
+                                console.log(error)
+                            }
 
                             if (!sys.isMb) {
-                                isFirst && query.toggleCancle();
-                                this.tableModule.main.ftable.btnAdd('query', {
-                                    content: '查询器',
-                                    type: 'default',
-                                    icon: 'shaixuan',
-                                    onClick: () => {
-                                        query.show()
-                                    }
-                                }, 0);
-                            }
-                            isFirst = false;
+                                // isFirst && query.toggleCancle();
+                                // this.tableModule.main.ftable.btnAdd('query', {
+                                //     content: '查询器',
+                                //     type: 'default',
+                                //     icon: 'shaixuan',
+                                //     onClick: () => {
+                                //         query.show()
+                                //     }
+                                // }, 0);
 
-                            if(tableEl.autoRefresh) {
+                                let main = this.tableModule.main;
+                                let addBtn = () => {
+                                    main.ftable.btnAdd('query', {
+                                        content: '查询器',
+                                        type: 'default',
+                                        icon: 'shaixuan',
+                                        onClick: () => { query.show() }
+                                    }, 0);
+                                };
+                                // if( bwTableEl.querier.queryType===1&&bwTableEl.querier.autTag===1){
+                                //     main.wrapper.style.visibility='hidden';
+
+                                // }
+                                if (main.ftable) {
+                                    addBtn()
+                                } else {
+                                    main.on(BwTableModule.EVT_READY, () => {
+                                        addBtn()
+                                    });
+                                }
+                            }
+                            // isFirst = false;
+
+                            if (tableEl.autoRefresh) {
                                 sys.window.wake("wake", null);
                                 d.on(window, 'wake', () => {
                                     this.tableModule && this.tableModule.refresh();
@@ -155,18 +180,18 @@ export class BwTableElement extends Component{
                     tableGet: () => this.tableModule && this.tableModule.main
                 });
                 !sys.isMb && query.toggleCancle();
-                if(sys.isMb) {
+                if (sys.isMb) {
                     //打开查询面板
-                    d.on(d.query('body > header [data-action="showQuery"]'), 'click',  () => {
+                    d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
                         query.show();
                     });
                 }
-                if(para.asynData){
+                if (para.asynData) {
                     let asynData = {
-                        query : query,
-                        qm : bwTableEl,
-                        container : this.container,
-                        asynData : para.asynData
+                        query: query,
+                        qm: bwTableEl,
+                        container: this.container,
+                        asynData: para.asynData
                     };
                     this.asynQuery(asynData);
                 }
@@ -175,24 +200,24 @@ export class BwTableElement extends Component{
 
 
 
-            if(hasQuery) {
+            if (hasQuery) {
                 require([queryModuleName], (Query) => {
                     let autTag = localStorage.getItem('autTag');
-                    if(autTag) {
+                    if (autTag) {
                         bwTableEl.querier.autTag = 0;
                         localStorage.removeItem('autTag');
                     }
                     let query = this.queryModule = new Query({
                         qm: bwTableEl.querier,
                         refresher: (ajaxData) => {
-                            if(!this.tableModule){
+                            if (!this.tableModule) {
                                 this.tableModule = new NewTableModule({
                                     bwEl: bwTableEl,
                                     container: this.container,
                                 });
 
                                 !sys.isMb && query.toggleCancle();
-                                if(tools.isMb) {
+                                if (tools.isMb) {
                                     //打开查询面板
                                     d.on(d.query('body > header [data-action="showQuery"]'), 'click', () => {
                                         this.queryModule.show();
@@ -206,16 +231,16 @@ export class BwTableElement extends Component{
                                             content: '查询器',
                                             type: 'default',
                                             icon: 'shaixuan',
-                                            onClick: () => {this.queryModule.show()}
+                                            onClick: () => { this.queryModule.show() }
                                         }, 0);
                                     };
                                     // if( bwTableEl.querier.queryType===1&&bwTableEl.querier.autTag===1){
                                     //     main.wrapper.style.visibility='hidden';
 
                                     // }
-                                    if(main.ftable){
+                                    if (main.ftable) {
                                         addBtn()
-                                    }else{
+                                    } else {
                                         main.on(BwTableModule.EVT_READY, () => {
                                             addBtn()
                                         });
@@ -224,8 +249,8 @@ export class BwTableElement extends Component{
                             }
                             return this.tableModule.refresh(ajaxData).then(() => {
                                 let locationLine = bwTableEl.scannableLocationLine;
-                                if(locationLine && ajaxData.mobilescan){
-                                    this.tableModule.main.ftable.locateToRow(locationLine,ajaxData.mobilescan);
+                                if (locationLine && ajaxData.mobilescan) {
+                                    this.tableModule.main.ftable.locateToRow(locationLine, ajaxData.mobilescan);
                                 }
                             })
                         },
@@ -237,13 +262,13 @@ export class BwTableElement extends Component{
 
                     !sys.isMb && query.toggleCancle();
                 })
-            }else{
+            } else {
                 this.tableModule = new NewTableModule({
                     bwEl: bwTableEl,
                     container: this.container
                 });
             }
-            if(bwTableEl.autoRefresh) {
+            if (bwTableEl.autoRefresh) {
                 sys.window.wake("wake", null);
                 d.on(window, 'wake', () => {
                     this.tableModule && this.tableModule.refresh();
@@ -255,19 +280,19 @@ export class BwTableElement extends Component{
         let inputs = para.tableEl.inputs,
             line = para.tableEl.scannableLocationLine,
             querier = para.tableEl.querier;
-        if(!isDynamic && bwTableEl.scannableField){
+        if (!isDynamic && bwTableEl.scannableField) {
             this.mobileScanInit(bwTableEl);
-        }else if(!isDynamic && inputs && !bwTableEl.scannableField){
+        } else if (!isDynamic && inputs && !bwTableEl.scannableField) {
             this.inputs(inputs, line)
-        }else if(line && (!querier || (!querier.inputs && !querier.scannableField))){
+        } else if (line && (!querier || (!querier.inputs && !querier.scannableField))) {
             this.locationLine(line, para);
         }
 
         // 移动端二维码分享
-        if(tools.isMb) {
-            console.log('二维码',para);
+        if (tools.isMb) {
+            console.log('二维码', para);
             d.on(d.query('body > header [data-action="showBtns"]'), 'click', () => {
-               new ShareCode(this.tableModule.main.ftable.selectedRowsData, para.tableEl, para.tagId);
+                new ShareCode(this.tableModule.main.ftable.selectedRowsData, para.tableEl, para.tagId);
             });
         }
 
@@ -275,29 +300,29 @@ export class BwTableElement extends Component{
 
 
 
-    private asynQuery(asynData){
+    private asynQuery(asynData) {
         require(['AsynQuery'], asyn => {
             new asyn.AsynQuery(asynData);
         })
     }
-    refresh(){
+    refresh() {
         return this.tableModule && this.tableModule.refresh();
     }
 
     protected _inputs: Inputs;
-    private inputs(inputs,line){
+    private inputs(inputs, line) {
         require(['Inputs'], (i) => {
             this._inputs = new i.Inputs({
                 inputs: inputs,
                 container: this.container,
-                locationLine : line,
-                table : () => {
+                locationLine: line,
+                table: () => {
                     return this.tableModule && this.tableModule.main.ftable
                 },
-                tableModule : () => {
+                tableModule: () => {
                     return this.tableModule
                 },
-                queryModule : () => {
+                queryModule: () => {
                     return this.queryModule;
                 }
             })
@@ -309,17 +334,17 @@ export class BwTableElement extends Component{
      * @param line
      * @param para
      */
-    private locationLine(line : string, para){
-        if(tools.isMb){
+    private locationLine(line: string, para) {
+        if (tools.isMb) {
             require(['Inputs'], (e) => {
                 new e.KeyStep({
-                    locationLine : line,
-                    callback : (ajaxData) => {
+                    locationLine: line,
+                    callback: (ajaxData) => {
                         this.rowSelect(line, ajaxData);
                     }
                 })
             });
-        }else {
+        } else {
             let text = '', timer = null;
             d.on(para.container, 'keydown', (e: KeyboardEvent) => {
                 let handle = () => {
@@ -328,9 +353,9 @@ export class BwTableElement extends Component{
                     text = '';
                 },
                     code = e.keyCode || e.which || e.charCode;
-                if(code === 13){
+                if (code === 13) {
                     handle();
-                }else {
+                } else {
                     text += e.key;
                     if (timer) {
                         clearTimeout(timer);
@@ -343,9 +368,9 @@ export class BwTableElement extends Component{
 
     }
 
-    private rowSelect(line, text){
+    private rowSelect(line, text) {
         let index = this.tableModule.main.ftable.locateToRow(line, text, true);
-        if(tools.isNotEmpty(index) && this.tableModule.bwEl.subTableList){
+        if (tools.isNotEmpty(index) && this.tableModule.bwEl.subTableList) {
             this.tableModule.subRefreshByIndex(index);
         }
     }
@@ -355,23 +380,23 @@ export class BwTableElement extends Component{
         if (tools.isPc) {
             return;
         }
-        require(['MobileScan'],  (M) => {
+        require(['MobileScan'], (M) => {
             new M.MobileScan({
                 container: this.container,
                 cols: ui.cols,
-                scannableField : field.toUpperCase(),
-                scannableType : ui.scannableType,
-                scannableTime : ui.scannableTime,
+                scannableField: field.toUpperCase(),
+                scannableType: ui.scannableType,
+                scannableTime: ui.scannableTime,
                 callback: (ajaxData) => {
                     let query = this.queryModule,
                         table = this.tableModule;
-                    if(query){
+                    if (query) {
                         query.hide();
                         return query.search(ajaxData, true)
-                    }else {
+                    } else {
                         return table.refresh(Object.assign(table.main.ajaxData, ajaxData)).then(() => {
                             let locationLine = ui.scannableLocationLine;
-                            if(locationLine){
+                            if (locationLine) {
                                 table.main.ftable.locateToRow(locationLine, ajaxData.mobilescan)
                             }
                         })
