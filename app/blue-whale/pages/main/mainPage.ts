@@ -430,7 +430,7 @@ export = class MainPage {
         let handlerClick = (item) => {
             getSystemMsg(item.systemId).then((response) => {
                 let loading: Loading,
-                    path = tools.keysVal(response, 'LOGIN_VAR', 'SYSTEM_PATH') || '',
+                    path = tools.keysVal(response, 'SYSTEM_PATH') || '',
                     type = tools.keysVal(response, 'SYSTEM_TYPE') || 0,
                     params = tools.keysVal(response, 'LOGIN_VAR', 'PARAMS') || '';
 
