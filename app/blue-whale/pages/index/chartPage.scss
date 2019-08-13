@@ -47,4 +47,81 @@
             }
         }
     }
+    .table-notice-bar {
+        position: absolute;
+        margin: 5px;
+        background-color: white;
+        overflow: scroll;
+        display: flex;
+        justify-content: flex-start;
+        align-content: flex-start;
+        flex-wrap: wrap;
+        padding: 5px;
+        min-width: calc(10% - 10px);
+        .notice-column {
+            width: 170px;
+            height: 50px;
+            position: relative;
+            line-height: 50px;
+            padding: 0 10px;
+            
+            i{
+                // display: inline-block;
+                float: left;
+            }
+            span{
+                width: 62px;
+                display: inline-block;
+                overflow: hidden;
+                white-space:nowrap;
+                text-overflow:ellipse;
+                text-align: center;
+                &.notice-value {
+                    text-align: left;
+                }
+                &.notice-name {
+                    font-weight: 900;
+                    font-size: 16px;
+
+                }
+            }
+            &::after{
+                content: '';
+                position: absolute;
+                display: block;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border: 1px solid gainsboro;
+            }
+        }
+    }
+    .table-module {
+        position: absolute;
+        margin: 5px;
+        background-color: white;
+        overflow: scroll;
+        font-size: 25px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .notice-column {
+            display: inline-block;
+        }
+        
+        i{
+            font-weight: 900;
+            margin: 0 5px;
+            
+        }
+        .icon-asc {
+            color: red;
+        }
+        .icon-desc {
+            color: rgb(111,207,14);
+            
+        }
+    }
 }
