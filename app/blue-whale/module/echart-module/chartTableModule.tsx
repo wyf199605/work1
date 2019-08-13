@@ -415,17 +415,17 @@ export class ChartTableModule {
         });
 
         let chartData = {
-            // title: {
-            //     text: caption,
-            //     textStyle: {
-            //         fontFamily: 'monospace',
-            //         fontSize: 18,
-            //         color: '#333'
-            //         // fontWeight: 'bold',
+            title: {
+                text: caption,
+                textStyle: {
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                    color: '#333'
+                    // fontWeight: 'bold',
 
-            //     },
-            //     padding: 15,
-            // },
+                },
+                padding: 15,
+            },
             grid: {
                 // top: 15,
                 left: 15,
@@ -578,7 +578,7 @@ export class ChartTableModule {
             });
             this.data.bodyData.push(obj);
         });
-        // let caption = this.ui.caption;
+        let caption = this.ui.caption;
         let xAxisName: string = this.ui.local.xCoordinate.split(',').length >= 2 ? this.ui.local.xCoordinate.split(',')[0].toUpperCase() : this.ui.local.xCoordinate.toUpperCase();
         let xAxisData: Array<any> = this.data.bodyData.map(item => (item[xAxisName] ? item[xAxisName] : ''));
         let legendName: Array<string> = yCoordinate;
@@ -588,20 +588,42 @@ export class ChartTableModule {
         //     xAxisData = this.data.bodyData.map(item => item[name]);
         // });
         legendName.forEach((legend, i) => {
+            
             let yAxis: string;
             let xAxis = '50%';
             if (tools.isMb) {
                 yAxis = ((i + 0.5) / legendName.length * 100) + '%';
             } else {
-                let floor = Math.ceil(legendName.length / 3);
-                let redidue = i % 3;
-                yAxis = (50 / floor) + 6 + '%';
-                xAxis = (25 + redidue * 25) + '%';
+                if(legendName.length === 1) {
+                    let floor = Math.ceil(legendName.length / 3);
+                    let redidue = i % 3;
+                    yAxis = 50 + '%';
+                    xAxis = 50 + '%';
+                } else if(legendName.length === 2) {
+                    let floor = Math.ceil(legendName.length / 3);
+                    let redidue = i % 3;
+                    xAxis = 35*(i+1) + '%';
+                    yAxis = 50 + '%';
+                } else {
+                    let floor = Math.ceil(legendName.length / 3);
+                    let redidue = i % 3;
+                    yAxis = (50 / floor) + 6 + '%';
+                    xAxis = (25 + redidue * 25) + '%';
+                }
+                
             }
+            debugger;
+            let name = this.ui.cols.find(col => col.name === legend).caption;
             let seriesItem = {
+                name: name,
                 type: 'pie',
                 radius: this.ui.chartPage ? 60 : tools.isMb ? 70 : 90,
                 center: [xAxis, yAxis],
+                label:{
+                    normal: {
+                        formatter: sys.isMb ?'{b}\n{d}%' :'{a}\n {b}: {d}%'
+                    }
+                },
                 data: this.data.bodyData.map((item, j) => {
                     return {
                         name: item[xAxisName],
@@ -623,19 +645,19 @@ export class ChartTableModule {
             // });
             series.push(seriesItem);
         });
-
+        // debugger;
         let chartData = {
-            // title: {
-            //     text: caption,
-            //     textStyle: {
-            //         fontFamily: 'monospace',
-            //         fontSize: 18,
-            //         color: '#333'
-            //         // fontWeight: 'bold',
+            title: {
+                text: caption,
+                textStyle: {
+                    fontFamily: 'monospace',
+                    fontSize: 18,
+                    color: '#333'
+                    // fontWeight: 'bold',
 
-            //     },
-            //     padding: 15,
-            // },
+                },
+                padding: 15,
+            },
             grid: {
                 // top: 15,
                 left: 15,
@@ -651,7 +673,9 @@ export class ChartTableModule {
             },
             series: series
         };
-        !tools.isMb && (chartData['tooltip'] = {});
+        !tools.isMb && (chartData['tooltip'] = {
+            trigger: 'item',
+            formatter: "{a} <br/>{b} : {c} ({d}%)"});
         chart.setOption(chartData);
         chart.on('click', (params) => {
             let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, params.data.item);
@@ -930,13 +954,14 @@ export class ChartTableModule {
             // console.log(this.ui.cols.find(col=> col.name === name).caption)
             // yAxisNamesObj[]
             // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
+            debugger;
             yAxisNamesObj[name] = this.ui.cols.find(col => col.name === name).caption
             console.log(this.ui.cols.find(col => col.name === name).caption)
         });
         //  yAxisNames.map(key => ({[key]: this.ui.cols.find(col=> col.name === key).caption}));
         console.log(yAxisNamesObj);
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
-        let max = Math.max(...numArr);
+        let max = numArr.length === 0? 1 : Math.max(...numArr) ;
 
         // let min = Math.min(...numArr);
 
@@ -955,6 +980,7 @@ export class ChartTableModule {
             let signValue = mapJson.features.find(feature => feature.properties.name === signName);
             return signValue;
         });
+        debugger;
 
         let riseData = [ ];
         let declineData = [];
@@ -1197,8 +1223,9 @@ export class ChartTableModule {
     }
 
     async initProvince(chartEle: HTMLElement, name: string) {
-        const bodyData: Array<any> = this.data['data'];
+        const bodyData: Array<any> = this.data['data']? this.data['data'] : [];
         if (!bodyData) {
+            
             this.data.body.bodyList[0].dataList.forEach(list => {
                 let obj = {};
                 list.forEach((ele, index) => {
@@ -1218,8 +1245,8 @@ export class ChartTableModule {
             console.log(this.ui.cols.find(col => col.name === name).caption)
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
-        let max = Math.max(...numArr);
-
+        let max = numArr.length === 0? 1 : Math.max(...numArr) ;
+        
         chartEle.parentElement.style.height = '100%';
         chartEle.style.height = '100%';
         // let myData = [];
@@ -1465,7 +1492,7 @@ export class ChartTableModule {
     }
 
     async initCity(chartEle: HTMLElement, name: string) {
-        const bodyData: Array<any> = this.data['data'];
+        const bodyData: Array<any> = this.data['data']? this.data['data'] : [];
         if (!bodyData) {
             this.data.body.bodyList[0].dataList.forEach(list => {
                 let obj = {};
@@ -1486,7 +1513,7 @@ export class ChartTableModule {
             console.log(this.ui.cols.find(col => col.name === name).caption)
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
-        let max = Math.max(...numArr);
+        let max = numArr.length === 0? 1 : Math.max(...numArr) ;
         const countyFn = (county: string) => {
             let item = bodyData.find(item => item[xAxisName].indexOf(county) !== -1);
             console.log(item);

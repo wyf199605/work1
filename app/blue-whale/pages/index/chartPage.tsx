@@ -11,6 +11,7 @@ import { EchartModule } from "blue-whale/module/echart-module/echartModule";
 import sys = BW.sys;
 import { ChartTableModule } from "blue-whale/module/echart-module/chartTableModule";
 import { NewTablePage, ITablePagePara } from "../table/newTablePage";
+import tools = G.tools;
 
 
 
@@ -48,9 +49,9 @@ interface DataAddr {
     varType?: boolean
 }
 export class ChartPage extends BasicPage {
-    
+
     container: HTMLElement;   // btl 获取的dom元素即当前页面的容器
-    uiCharts ;   // 获取的UI绘制
+    uiCharts;   // 获取的UI绘制
 
 
     constructor(para: ICollectPara) {
@@ -61,8 +62,8 @@ export class ChartPage extends BasicPage {
         this.uiCharts = para.ui;
         $('#app').toggleClass('app-sidebar-closed');
         this.initData();
-        
-        
+
+
     }
     async initData() {
         console.log(CONF.siteUrl);
@@ -81,10 +82,17 @@ export class ChartPage extends BasicPage {
                     break;
                 case 'table':
                     this.tableFn(data);
+                    break;
+                case 'modules':
+                    this.noticeBarFn(data);
+                    break;
+                case 'module':
+                    this.moduleFn(data);
+                    break;
             }
         })
 
-        
+
     }
     menuFn(data: any) {
         let divDom: HTMLDivElement = <div class="workbeanch-menu"></div>
@@ -104,8 +112,8 @@ export class ChartPage extends BasicPage {
                 const url = CONF.siteUrl + ele.menuPath.dataAddr;
                 sys.window.open({ url, gps: ele.menuPath.needGps });
             }
-            
-            
+
+
         });
     }
     async panelFn(data: any) {
@@ -115,11 +123,11 @@ export class ChartPage extends BasicPage {
         divDom.style.height = data.positionInfo.heigh * 10 + '%';
         divDom.style.left = Number(data.positionInfo.coordinatePairs.split(',')[0]) * 10 + '%';
         divDom.style.top = Number(data.positionInfo.coordinatePairs.split(',')[1]) * 10 + '%';
-        let { uiType , caption, element } = data.blockInfo;
+        let { uiType, caption, element } = data.blockInfo;
         Object.assign(element, {
             local: {
-              xCoordinate: data.showInfo.xFieldName,
-              yCoordinate: data.showInfo.yFieldNames  
+                xCoordinate: data.showInfo.xFieldName,
+                yCoordinate: data.showInfo.yFieldNames
             },
             showType: data.showInfo.showType,
             riseRule: data.showInfo.riseRule,
@@ -128,13 +136,13 @@ export class ChartPage extends BasicPage {
             caption,
             chartPage: true
         });
-        const chartData = await $.get(CONF.siteUrl + data.blockInfo.element.dataAddr.dataAddr,{nopage: true});
-        
+        const chartData = await $.get(CONF.siteUrl + data.blockInfo.element.dataAddr.dataAddr, { nopage: true });
+
         console.log(element);
         let chartDom = <div></div>;
         divDom.appendChild(chartDom);
-        new ChartTableModule(element, chartDom,chartData, null);
-        
+        new ChartTableModule(element, chartDom, chartData, null);
+
     }
     tableFn(data: any) {
         let divDom: HTMLDivElement = <div class="table-chart"></div>
@@ -143,13 +151,13 @@ export class ChartPage extends BasicPage {
         divDom.style.height = data.positionInfo.heigh * 10 + '%';
         divDom.style.left = Number(data.positionInfo.coordinatePairs.split(',')[0]) * 10 + '%';
         divDom.style.top = Number(data.positionInfo.coordinatePairs.split(',')[1]) * 10 + '%';
-        
+
         const ui = {
             body: {},
             chartPage: true,
             dom: divDom
         }
-        Object.assign(ui.body, {ui: data.blockInfo});
+        Object.assign(ui.body, { ui: data.blockInfo });
         let para: ITablePagePara = {
             ui: {
                 body: {
@@ -160,10 +168,96 @@ export class ChartPage extends BasicPage {
             chartPage: true,
             dom: divDom
         }
-        
-         new NewTablePage(para);
+
+        new NewTablePage(para);
     }
-    
+
+     noticeBarFn(data: any) {
+        let divDom: HTMLDivElement = <div class="table-notice-bar"></div>
+        this.container.appendChild(divDom);
+        const width = data.positionInfo.width * 10 + '%';
+        const height = data.positionInfo.heigh * 10 + '%';
+        divDom.style.width = `calc(${width} - 10px)`;
+        divDom.style.height = `calc(${height} - 10px)`;
+        divDom.style.lineHeight = `calc(${height} - 10px)`;
+        divDom.style.left = Number(data.positionInfo.coordinatePairs.split(',')[0]) * 10 + '%';
+        divDom.style.top = Number(data.positionInfo.coordinatePairs.split(',')[1]) * 10 + '%';
+        data.blockInfo.element.forEach(ele =>{
+             const col = ele.cols.find(col => {
+                 return !col.noShow;
+             })
+             let url = CONF.siteUrl + ele.dataAddr.dataAddr;
+            BwRule.Ajax.fetch(tools.url.addObj(url, {nopage: true})).then(({response}) => {
+                console.log(response);
+                let eleDom = <section onclick={eleClk} class="notice-column"><i class={ele.icon}></i><span class="notice-name">{col.caption}</span><span class="notice-value">{response.data[0][col.name]}</span></section>
+                function eleClk() {
+                    console.log(11);
+                    if(col.supportLink) {
+                        let param = {
+
+                        };
+                        col.link.varList.forEach(obj => {
+                            if(Object.keys(response.data[0]).includes(obj.varName)) {
+                                param[obj.varName] = response.data[0][obj.varName]
+                            }
+                            
+                        });
+                    
+                        sys.window.open({url: CONF.siteUrl + col.link.dataAddr, data: param, gps: col.link.needGps })
+                    }
+                }
+                divDom.appendChild(eleDom);
+            });
+             
+         })
+        
+    }
+
+    moduleFn(data: any) {
+         let divDom: HTMLDivElement = <div class="table-module"></div>
+        this.container.appendChild(divDom);
+        const width = data.positionInfo.width * 10 + '%';
+        const height = data.positionInfo.heigh * 10 + '%';
+        divDom.style.width = `calc(${width} - 10px)`;
+        divDom.style.height = `calc(${height} - 10px)`;
+        divDom.style.left = Number(data.positionInfo.coordinatePairs.split(',')[0]) * 10 + '%';
+        divDom.style.top = Number(data.positionInfo.coordinatePairs.split(',')[1]) * 10 + '%';
+        const ele = data.blockInfo.element;
+        const col = ele.cols.find(col => {
+            return !col.noShow;
+        })
+        let url = CONF.siteUrl + ele.dataAddr.dataAddr;
+        const rules = data.showInfo.riseRule.split(',');
+       BwRule.Ajax.fetch(tools.url.addObj(url, {nopage: true})).then(({response}) => {
+           let riseDom: HTMLElement ;
+        //    debugger;
+           if(rules[1] === '0') {
+             riseDom = response.data[0][rules[0]] >= +rules[2] ? <i class='iconfont icon-asc'></i> : <i class='iconfont icon-desc'></i>;
+           }else {
+            riseDom = response.data[0][rules[0]] >= +response.data[0][rules[2]] ? <i class='iconfont icon-asc'></i> : <i class='iconfont icon-desc'></i>;
+           }
+           let value = BwRule.parseNumber(response.data[0][col.name], 'number');
+           let eleDom = <section onclick={eleClk} class="notice-column"><span>{col.caption}</span>{riseDom}<span class="notice-value">{value}</span></section>
+           function eleClk() {
+               console.log(11);
+               if(col.supportLink) {
+                   let param = {
+
+                   };
+                   col.link.varList.forEach(obj => {
+                       if(Object.keys(response.data[0]).includes(obj.varName)) {
+                           param[obj.varName] = response.data[0][obj.varName]
+                       }
+                       
+                   });
+               
+                   sys.window.open({url: CONF.siteUrl + col.link.dataAddr, data: param, gps: col.link.needGps })
+               }
+           }
+           divDom.appendChild(eleDom);
+       });
+    }
+
     render() {
 
         return (
