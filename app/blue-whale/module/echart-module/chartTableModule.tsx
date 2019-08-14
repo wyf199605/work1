@@ -1227,9 +1227,9 @@ export class ChartTableModule {
 
     async initProvince(chartEle: HTMLElement, name: string) {
         const bodyData: Array<any> = this.data['data']? this.data['data'] : [];
-        if (!bodyData) {
-            
-            this.data.body.bodyList[0].dataList.forEach(list => {
+        if (bodyData.length === 0) {
+            let dataList = this.data.body.bodyList[0].dataList
+            dataList.forEach(list => {
                 let obj = {};
                 list.forEach((ele, index) => {
                     obj[this.data.body.bodyList[0].meta[index]] = ele;
@@ -1249,6 +1249,7 @@ export class ChartTableModule {
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = numArr.length === 0? 1 : Math.max(...numArr) ;
+        debugger;
         
         chartEle.parentElement.style.height = '100%';
         chartEle.style.height = '100%';
@@ -1496,7 +1497,7 @@ export class ChartTableModule {
 
     async initCity(chartEle: HTMLElement, name: string) {
         const bodyData: Array<any> = this.data['data']? this.data['data'] : [];
-        if (!bodyData) {
+        if (bodyData.length === 0) {
             this.data.body.bodyList[0].dataList.forEach(list => {
                 let obj = {};
                 list.forEach((ele, index) => {
@@ -1517,6 +1518,7 @@ export class ChartTableModule {
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = numArr.length === 0? 1 : Math.max(...numArr) ;
+        debugger;
         const countyFn = (county: string) => {
             let item = bodyData.find(item => item[xAxisName].indexOf(county) !== -1);
             console.log(item);
