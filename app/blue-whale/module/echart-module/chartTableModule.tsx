@@ -401,6 +401,7 @@ export class ChartTableModule {
                 smooth: true,
                 symbol: 'circle',
                 symbolSize: 15,
+                barMaxWidth: 60,
             }
             this.settingData.type === 'area' && (seriesItem['areaStyle'] = {});
             seriesItem.data = this.data.bodyData.map(item => item[legend]);

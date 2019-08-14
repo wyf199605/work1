@@ -52,10 +52,10 @@
         margin: 5px;
         background-color: white;
         overflow: scroll;
-        display: flex;
-        justify-content: flex-start;
-        align-content: flex-start;
-        flex-wrap: wrap;
+        // display: flex;
+        // justify-content: flex-start;
+        // align-content: flex-start;
+        // flex-wrap: wrap;
         padding: 5px;
         min-width: calc(10% - 10px);
         .notice-column {
@@ -64,6 +64,7 @@
             position: relative;
             line-height: 50px;
             padding: 0 10px;
+            float: left;
             
             i{
                 // display: inline-block;
