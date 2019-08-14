@@ -12,6 +12,7 @@ import sys = BW.sys;
 import { ChartTableModule } from "blue-whale/module/echart-module/chartTableModule";
 import { NewTablePage, ITablePagePara } from "../table/newTablePage";
 import { Button, IButton } from "global/components/general/button/Button";
+import tools = G.tools;
 
 
 
@@ -59,8 +60,11 @@ export class ChartPageMb extends BasicPage {
         super(para);
         this.container = this.render();
         G.d.append(para.dom, this.container);
-        const containerWidth = para.ui.body.elements.length * 100 ;
-        this.container.style.width = containerWidth  + '%';
+        let moduleWidth = para.ui.body.elements.filter(ele => ele.blockInfo.uiType === 'modules' || ele.blockInfo.uiType === 'module').length;
+        const containerWidth = (para.ui.body.elements.length - moduleWidth + 1) * 100 ;
+        
+        // this.container.style.width = moduleWidth> 1 ? containerWidth - (moduleWidth - 1) * 100 + '%' : containerWidth  + '%';
+        // debugger;
         this.uiCharts = para.ui;
         this.initData();
         this.footerFn(para.dom, containerWidth);
@@ -81,6 +85,13 @@ export class ChartPageMb extends BasicPage {
         })
 
         console.log(this.uiCharts);
+        let ifModule = this.uiCharts.body.elements.find(ele => ele.blockInfo.uiType === 'modules' || ele.blockInfo.uiType === 'module');
+        let divDom: HTMLDivElement;
+        if(ifModule) {
+             divDom = <div class="table-notice-bar"></div>
+            this.container.appendChild(divDom);
+            divDom.style.width = '100vw';
+        }
         this.uiCharts.body.elements.forEach(data => {
             switch (data.blockInfo.uiType) {
                 case 'menu':
@@ -91,6 +102,13 @@ export class ChartPageMb extends BasicPage {
                     break;
                 case 'table':
                     this.tableFn(data);
+                    break;
+                case 'modules':
+                        this.noticeBarFn(data, divDom);
+                        break;
+                case 'module':
+                    this.moduleFn(data, divDom);
+                    break;
             }
         });
         
@@ -164,6 +182,78 @@ export class ChartPageMb extends BasicPage {
         }
         // debugger;
         new NewTablePage(para);
+    }
+    noticeBarFn(data: any, divDom: HTMLElement) {
+        
+
+        data.blockInfo.element.forEach(ele =>{
+             const col = ele.cols.find(col => {
+                 return !col.noShow;
+             })
+             let url = CONF.siteUrl + ele.dataAddr.dataAddr;
+            BwRule.Ajax.fetch(tools.url.addObj(url, {nopage: true})).then(({response}) => {
+                console.log(response);
+                let eleDom = <section onclick={eleClk} class="notice-column"><i class={ele.icon}></i><span class="notice-name">{col.caption}</span><span class="notice-value">{response.data[0][col.name]}</span></section>
+                function eleClk() {
+                    console.log(11);
+                    if(col.supportLink) {
+                        let param = {
+
+                        };
+                        col.link.varList.forEach(obj => {
+                            if(Object.keys(response.data[0]).includes(obj.varName)) {
+                                param[obj.varName] = response.data[0][obj.varName]
+                            }
+                            
+                        });
+                    
+                        sys.window.open({url: CONF.siteUrl + col.link.dataAddr, data: param, gps: col.link.needGps })
+                    }
+                }
+                divDom.appendChild(eleDom);
+            });
+             
+         })
+        
+    }
+
+    moduleFn(data: any, divDom: HTMLElement) {
+         
+
+        const ele = data.blockInfo.element;
+        const col = ele.cols.find(col => {
+            return !col.noShow;
+        })
+        let url = CONF.siteUrl + ele.dataAddr.dataAddr;
+        const rules = data.showInfo.riseRule.split(',');
+       BwRule.Ajax.fetch(tools.url.addObj(url, {nopage: true})).then(({response}) => {
+           let riseDom: HTMLElement ;
+        //    debugger;
+           if(rules[1] === '0') {
+             riseDom = response.data[0][rules[0]] >= +rules[2] ? <i class='iconfont icon-asc'></i> : <i class='iconfont icon-desc'></i>;
+           }else {
+            riseDom = response.data[0][rules[0]] >= +response.data[0][rules[2]] ? <i class='iconfont icon-asc'></i> : <i class='iconfont icon-desc'></i>;
+           }
+           let value = BwRule.parseNumber(response.data[0][col.name], 'number');
+           let eleDom = <section onclick={eleClk} class="notice-module"><span>{col.caption}</span>{riseDom}<span class="notice-value">{value}</span></section>
+           function eleClk() {
+               console.log(11);
+               if(col.supportLink) {
+                   let param = {
+
+                   };
+                   col.link.varList.forEach(obj => {
+                       if(Object.keys(response.data[0]).includes(obj.varName)) {
+                           param[obj.varName] = response.data[0][obj.varName]
+                       }
+                       
+                   });
+               
+                   sys.window.open({url: CONF.siteUrl + col.link.dataAddr, data: param, gps: col.link.needGps })
+               }
+           }
+           divDom.appendChild(eleDom);
+       });
     }
     footerFn(parentDom: HTMLElement, width: number) {
         let footerDom = <footer class="chart-footer">

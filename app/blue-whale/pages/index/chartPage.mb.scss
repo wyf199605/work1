@@ -62,6 +62,90 @@
             
         }
     }
+    .table-notice-bar {
+        height: 100%;
+        overflow: scroll;
+        font-family: 'Arial Normal', 'Arial';
+        font-style: normal;
+        font-size: 13px;
+        
+        padding-bottom: 15px;
+        background-color: white;
+        .notice-column {
+            width: 80%;
+            height: 50px;
+            position: relative;
+            line-height: 50px;
+            padding: 0 10px;
+            margin-bottom: 5px;
+            margin-left: 10%;
+            
+            i{
+                // display: inline-block;
+                float: left;
+            }
+            span{
+                width: 62px;
+                display: inline-block;
+                overflow: hidden;
+                white-space:nowrap;
+                text-overflow:ellipse;
+                text-align: center;
+                &.notice-value {
+                    text-align: left;
+                }
+                &.notice-name {
+                    font-weight: 900;
+                    font-size: 16px;
+
+                }
+            }
+            &::after{
+                content: '';
+                position: absolute;
+                display: block;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border: 1px solid gainsboro;
+            }
+        }
+        .notice-module {
+            width: 80%;
+            height: 50px;
+            position: relative;
+            line-height: 50px;
+            padding: 0 10px;
+            margin-left: 10%;
+            font-size: 25px;
+            margin-bottom: 5px;
+            i{
+                font-weight: 900;
+                margin: 0 5px;
+                
+            }
+            .icon-asc {
+                color: red;
+            }
+            .icon-desc {
+                color: rgb(111,207,14);
+                
+            }
+            &::after{
+                content: '';
+                position: absolute;
+                display: block;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border: 1px solid gainsboro;
+            }
+        }
+       
+    }
+    
     .workbeanch-chart, .table-chart {
         // position: absolute;
         background-color: white;

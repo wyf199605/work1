@@ -425,6 +425,7 @@ export class ChartTableModule {
 
                 },
                 padding: 15,
+                top: 15,
             },
             grid: {
                 // top: 15,
@@ -612,7 +613,7 @@ export class ChartTableModule {
                 }
                 
             }
-            debugger;
+            // debugger;
             let name = this.ui.cols.find(col => col.name === legend).caption;
             let seriesItem = {
                 name: name,
@@ -621,7 +622,7 @@ export class ChartTableModule {
                 center: [xAxis, yAxis],
                 label:{
                     normal: {
-                        formatter: sys.isMb ?'{b}\n{d}%' :'{a}\n {b}: {d}%'
+                        formatter: '{a}\n {b}: {d}%'
                     }
                 },
                 data: this.data.bodyData.map((item, j) => {
@@ -657,6 +658,7 @@ export class ChartTableModule {
 
                 },
                 padding: 15,
+                top: 30,
             },
             grid: {
                 // top: 15,
