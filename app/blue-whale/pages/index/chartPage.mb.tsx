@@ -61,9 +61,10 @@ export class ChartPageMb extends BasicPage {
         this.container = this.render();
         G.d.append(para.dom, this.container);
         let moduleWidth = para.ui.body.elements.filter(ele => ele.blockInfo.uiType === 'modules' || ele.blockInfo.uiType === 'module').length;
-        const containerWidth = (para.ui.body.elements.length - moduleWidth + 1) * 100 ;
         
-        // this.container.style.width = moduleWidth> 1 ? containerWidth - (moduleWidth - 1) * 100 + '%' : containerWidth  + '%';
+        const containerWidth = moduleWidth > 0 ?(para.ui.body.elements.length - moduleWidth + 1) * 100 : para.ui.body.elements.length * 100  ;
+        
+        this.container.style.width =  containerWidth  + '%';
         // debugger;
         this.uiCharts = para.ui;
         this.initData();
