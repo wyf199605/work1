@@ -44,11 +44,6 @@ namespace BW{
             if (lastUrl) {
                 // console.log(this.tabs[lastUrl])
                 this.tabs[lastUrl] && this.tabs[lastUrl].classList.remove('open');
-                
-            }else {
-                this.tabs[Object.keys(this.tabs)[0]] && this.tabs[Object.keys(this.tabs)[0]].classList.remove('open');
-                let dom: HTMLElement = document.querySelector('.page-container');
-                dom && (dom.style.display = 'none');
             }
             console.log(Object.keys(this.tabs));
             if (active) {
