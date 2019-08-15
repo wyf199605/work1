@@ -108,7 +108,6 @@ export class BwTableElement extends Component {
                             if (noQuery) {
                                 tableEl.noQuery = noQuery;
                             }
-                            ;
                             // this.para.tableDom = null;
                             this.tableModule = new NewTableModule({
                                 bwEl: tableEl,
@@ -197,9 +196,6 @@ export class BwTableElement extends Component {
                 }
             });
         } else {
-
-
-
             if (hasQuery) {
                 require([queryModuleName], (Query) => {
                     let autTag = localStorage.getItem('autTag');
@@ -257,7 +253,8 @@ export class BwTableElement extends Component {
                         cols: bwTableEl.cols,
                         url: CONF.siteUrl + BwRule.reqAddr(bwTableEl.dataAddr),
                         container: this.container,
-                        tableGet: () => this.tableModule.main
+                        tableGet: () => this.tableModule.main,
+                        bwTableEl:bwTableEl
                     });
 
                     !sys.isMb && query.toggleCancle();

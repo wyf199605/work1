@@ -21,6 +21,7 @@ export interface QueryModulePara {
     url: string,
     // table?: BasicTable,
     tableGet(): BwMainTableModule;
+    bwTableEl?: IBW_Table
 }
 
 
@@ -287,7 +288,24 @@ export abstract class QueryModule {
     private queryLoad(queryJson) {
         localStorage.setItem('queryer', JSON.stringify(queryJson));
         this.hide();
-        return this.para.refresher(queryJson);
+        this.para.refresher(queryJson);
+        setTimeout(() => {
+            if (this.para.bwTableEl) {
+                let aggrList = this.para.bwTableEl.aggrList;
+                let aggrWrap = d.query(".aggr-wrapper");
+                aggrWrap.innerHTML="";
+                aggrList.forEach(aggr => {
+                    let valSpan = <span>{aggr.caption}:</span>;
+                    d.append(aggrWrap, valSpan);
+                    BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(aggr.dataAddr, queryJson))
+                    let query = G.tools.url.addObj(aggr.dataAddr.dataAddr, queryJson).split("?");
+                    BwRule.Ajax.fetch(`${CONF.siteUrl}${aggr.dataAddr.dataAddr}?${query[1]}`, {}).then(({ response }) => {
+                        let value = tools.keysVal(response, 'data', 0, tools.keysVal(response, 'meta', 0));
+                        valSpan.innerHTML = `${aggr.caption}:${value || 0} &nbsp;&nbsp;`;
+                    });
+                });
+            }
+        }, 1000);
     }
 
     //仅查项数,不勾选显示字段
