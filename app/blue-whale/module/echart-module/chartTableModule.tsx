@@ -92,6 +92,11 @@ export class ChartTableModule {
         !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '25rem'));
         // this.parentDom.appendChild(this.render());
         // let chart;
+        if(this.parentDom.classList.contains('panel-body')) {
+            // let dom: HTMLElement = this.parentDom.querySelector('.chart-table');
+            // dom && (dom.style.minHeight = '25rem');
+            this.chartDom.style.minHeight = '20rem';
+        }
         switch (this.ui.uiType) {
             case 'select':
             case 'table':
@@ -99,6 +104,7 @@ export class ChartTableModule {
             case 'drill':
             case 'detail':
             case 'panel':
+            case 'webdrill':
                 if (this.ui.showType === 'map') {
                     if (this.ui.location === 'china') {
                         this.chart =this.initMap(this.chartDom).then(res => this.chart = res);
