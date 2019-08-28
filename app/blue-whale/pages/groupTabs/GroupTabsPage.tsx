@@ -926,15 +926,17 @@ export class GroupTabsPage extends BasicPage {
      * @date 2019/2/18
      * @Description: 根据UI创建表格/单页
      */
-    static createTable(tableUi: IBW_Slave_Ui, wrapper: HTMLElement, ajaxData?): AGroupTabItem {
+    static createTable(tableUi: IBW_Slave_Ui, wrapper: HTMLElement, data?): AGroupTabItem {
         let item;
+        let ajaxData = Object.assign({}, BwRule.varList(tableUi.dataAddr.varList, data));
         switch (tableUi.uiType) {
             case 'table':
             case 'select': {
                 item = new NewTableModule({
                     bwEl: tableUi as IBW_Table,
                     container: wrapper,
-                    ajaxData
+                    ajaxData,
+                    linkedData: data
                 });
             }
                 break;
@@ -944,7 +946,8 @@ export class GroupTabsPage extends BasicPage {
                     container: wrapper,
                     ui: tableUi as IBW_Detail,
                     ajaxData,
-                    autoLoad: !tableUi.offline
+                    autoLoad: !tableUi.offline,
+                    linkedData: data
                 });
             }
                 break;

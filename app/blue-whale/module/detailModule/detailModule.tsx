@@ -22,6 +22,7 @@ import { Button } from "../../../global/components/general/button/Button";
 export interface IDetailModulePara extends IGroupTabItemPara {
     ui: IBW_Detail; // 根据ui生成detail页
     ajaxData?: obj;
+    linkedData?: obj;
 }
 
 export class DetailModule extends AGroupTabItem {
@@ -35,6 +36,7 @@ export class DetailModule extends AGroupTabItem {
 
     static backUp = '__back_up_flag__'; // 单页无数据是否返回上一级
     public ajaxData = {}; // 关联数据
+    public linkedData = {}; // 关联数据
     protected dataManager: DetailDataManager; // 数据管理
     protected ui: IBW_Detail; // ui 数据
     protected fields: R_Field[]; // ui 中的fields字段数据，用于构建detailItem
@@ -59,6 +61,7 @@ export class DetailModule extends AGroupTabItem {
         super(para);
         this.ui = para.ui as IBW_Detail;
         this.ajaxData = para.ajaxData || {};
+        this.linkedData = para.linkedData || {};
         BwRule.beforeHandle.detail(this.ui); // 处理ui的fields字段
         this.fields = this.ui.fields;
         this.editType = (this.ui.operationType && this.ui.operationType.editType) || 'current';

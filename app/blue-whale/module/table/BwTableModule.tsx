@@ -45,6 +45,7 @@ export interface IBwTableModulePara extends IComponentPara {
     tableModule?: NewTableModule;
     isSub?: boolean;
     ajaxData?: obj;
+    linkedData?: obj;
     editParam?: IBW_TableAddrParam;
     btnShow?: boolean;
     autoLoad?: boolean;
@@ -120,7 +121,7 @@ export class BwTableModule extends Component {
             para.ajaxData = para.ajaxData || {};
             para.ajaxData['uiurl'] = this.pageUrl.substring(find(this.pageUrl, '/', 5), this.pageUrl.length);
         }
-        this.linkedData = para.ajaxData || {};
+        this.linkedData = para.linkedData || {};
 
         function find(str, cha, num) {
             let x = str.indexOf(cha);

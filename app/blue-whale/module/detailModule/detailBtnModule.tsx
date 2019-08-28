@@ -250,7 +250,7 @@ export class DetailBtnModule extends DetailModule {
                             key: 'insert',
                             onClick: () => {
                                 this.defData.then((defData) => {
-                                    detailEdit.insert(Object.assign({}, defData, this.ajaxData || {}));
+                                    detailEdit.insert(Object.assign({}, defData, this.linkedData || {}));
                                 });
                             }
                         }))

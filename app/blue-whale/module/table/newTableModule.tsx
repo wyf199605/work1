@@ -25,6 +25,7 @@ import IGroupTabItemPara = BW.IGroupTabItemPara;
 export interface ITableModulePara extends IGroupTabItemPara {
     bwEl: IBW_Table;
     ajaxData?: obj;
+    linkedData?: obj;
     data?: obj[];
 }
 
@@ -89,6 +90,7 @@ export class NewTableModule extends AGroupTabItem {
             editParam: mainParam,
             ajaxData: para.ajaxData,
             tableModule: this,
+            linkedData: para.linkedData,
             autoLoad
         });
 
