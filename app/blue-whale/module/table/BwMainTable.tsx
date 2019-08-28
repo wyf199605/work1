@@ -19,7 +19,7 @@ export class BwMainTableModule extends BwTableModule{
         })
 
         // 根据UI 的initShow 判断是否先展示图表， 先默认设置为展示图表
-        this.wrapper.style.display = 'none';
+        // this.wrapper.style.display = 'none';
     }
     protected ftableReady(){
         super.ftableReady();

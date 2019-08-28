@@ -92,6 +92,11 @@ export class ChartTableModule {
         !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '25rem'));
         // this.parentDom.appendChild(this.render());
         // let chart;
+        if(this.parentDom.classList.contains('panel-body')) {
+            // let dom: HTMLElement = this.parentDom.querySelector('.chart-table');
+            // dom && (dom.style.minHeight = '25rem');
+            this.chartDom.style.minHeight = '20rem';
+        }
         switch (this.ui.uiType) {
             case 'select':
             case 'table':
@@ -99,6 +104,7 @@ export class ChartTableModule {
             case 'drill':
             case 'detail':
             case 'panel':
+            case 'webdrill':
                 if (this.ui.showType === 'map') {
                     if (this.ui.location === 'china') {
                         this.chart =this.initMap(this.chartDom).then(res => this.chart = res);
@@ -496,6 +502,7 @@ export class ChartTableModule {
             //     this.drillPage(params);
             // }
             //
+            
             let col;
             if (tools.isMb) {
                 let tipDom: HTMLDivElement
@@ -534,6 +541,7 @@ export class ChartTableModule {
                 }
                 let { defaultCol, dataCol, varNamesObj, ifBreak } = this.drillPage(params, col);
                 // this.drillPage(params, col);
+                
                 !ifBreak && this.getAjax(defaultCol, dataCol, varNamesObj);
             }
 
@@ -728,6 +736,7 @@ export class ChartTableModule {
                 cols = this.ui.cols.filter(col => col.drillAddr);
                 break;
             case 'select':
+            case 'panel':
                 cols = this.ui.cols.filter(col => col.link);
                 cols.forEach(col => {
                     col.drillAddr = col.link;
@@ -766,7 +775,7 @@ export class ChartTableModule {
         }
         // let caption = this.ui.showType === 'pie' ? params.name : params.seriesName;
 
-        let defaultCol = col ? col : defaultCols ? defaultCols : null;
+        let defaultCol = col ? col : defaultCols ? defaultCols : cols.length> 0? cols[0] : null;
 
         if (!defaultCol) return {
             defaultCol: null,
@@ -777,7 +786,8 @@ export class ChartTableModule {
 
         let varNamesObj: object = {};
         let ifBreak: boolean = false;
-        defaultCol.drillAddr && defaultCol.drillAddr.varList.forEach(list => {
+        
+        defaultCol.drillAddr && defaultCol.drillAddr.varList&& defaultCol.drillAddr.varList.forEach(list => {
             if (list.varName) {
                 varNamesObj[list.varName] = dataCol[list.varName];
                 // !dataCol[list.varName] && (ifBreak = true);
@@ -789,7 +799,13 @@ export class ChartTableModule {
             dataCol: null,
             ifBreak: true,
         };
-        // this.getAjax(defaultCol, dataCol, varNamesObj);
+        
+        if(defaultCol.drillAddr.parseVarList) {
+            let parseVarList =   G.Rule.parseVarList(defaultCol.drillAddr.parseVarList, dataCol);
+            
+            Object.assign(varNamesObj,parseVarList);
+        }
+        
         return {
             defaultCol,
             varNamesObj,
@@ -820,10 +836,11 @@ export class ChartTableModule {
             //     needGps: col.drillAddr.needGps,
             // }, varNamesObj);
             let url = CONF.siteUrl + col.drillAddr.dataAddr;
+            url = tools.url.addObj(url, varNamesObj)
             // BwRule.Ajax.fetch(url, param).then(({response}) => {
             //     console.log(response);
             // })
-            sys.window.open({ url, data: varNamesObj, gps: col.drillAddr.needGps });
+            sys.window.open({ url,  gps: col.drillAddr.needGps });
         }
 
 
@@ -957,7 +974,7 @@ export class ChartTableModule {
             // console.log(this.ui.cols.find(col=> col.name === name).caption)
             // yAxisNamesObj[]
             // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
-            debugger;
+            
             yAxisNamesObj[name] = this.ui.cols.find(col => col.name === name).caption
             console.log(this.ui.cols.find(col => col.name === name).caption)
         });
@@ -983,7 +1000,7 @@ export class ChartTableModule {
             let signValue = mapJson.features.find(feature => feature.properties.name === signName);
             return signValue;
         });
-        debugger;
+      
 
         let riseData = [ ];
         let declineData = [];
@@ -1249,7 +1266,7 @@ export class ChartTableModule {
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = numArr.length === 0? 1 : Math.max(...numArr) ;
-        debugger;
+        
         
         chartEle.parentElement.style.height = '100%';
         chartEle.style.height = '100%';
@@ -1518,7 +1535,7 @@ export class ChartTableModule {
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = numArr.length === 0? 1 : Math.max(...numArr) ;
-        debugger;
+        
         const countyFn = (county: string) => {
             let item = bodyData.find(item => item[xAxisName].indexOf(county) !== -1);
             console.log(item);
