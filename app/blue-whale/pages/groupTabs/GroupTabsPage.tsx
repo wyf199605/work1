@@ -285,7 +285,7 @@ export class GroupTabsPage extends BasicPage {
                         query.hide();
                         return query.search(ajaxData, true)
                     }else {
-                        return table.refresh(Object.assign(table.main.ajaxData, ajaxData)).then(() => {
+                        return table.refresh().then(() => {
                             let locationLine = ui.scannableLocationLine;
                             if(locationLine){
                                 table.main.ftable && table.main.ftable.locateToRow(locationLine, ajaxData.mobilescan)
@@ -866,7 +866,7 @@ export class GroupTabsPage extends BasicPage {
             let sub = this.subs[index - 1];
             if (tools.isNotEmpty(sub)) {
                 if (!((index - 1) in this.subIndexes)) {
-                    sub.refresh(this.main.getData()).then(() => {
+                    sub.refresh().then(() => {
                         this.subIndexes[index - 1] = index - 1;
                     }).catch((e) => {
                         console.log(e);
@@ -970,7 +970,7 @@ export class GroupTabsPage extends BasicPage {
         if (tools.isNotEmpty(this.subs)) {
             this.subs.forEach((sub, index) => {
                 if (tools.isNotEmpty(sub)) {
-                    sub.refresh(this.main.getData()).catch(() => {
+                    sub.refresh().catch(() => {
 
                     });
                     this.subIndexes[index] = index;
