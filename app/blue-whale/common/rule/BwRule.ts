@@ -168,14 +168,16 @@ export class BwRule extends Rule {
 
                             let isLogout = response.errorCode === 50001;
                             if (isLogout) {
-                                Modal.confirm({
-                                    msg: '登录已超时,是否跳转到登录页',
-                                    callback: (index) => {
-                                        if (index) {
-                                            BW.sys.window.logout();
-                                        }
-                                    }
-                                });
+                                window.alert('登录已超时');
+                                BW.sys.window.logout();
+                                // Modal.confirm({
+                                //     msg: '登录已超时,是否跳转到登录页',
+                                //     callback: (index) => {
+                                //         if (index) {
+                                //             BW.sys.window.logout();
+                                //         }
+                                //     }
+                                // });
                                 reject(Ajax.errRes(xhr, 'logout', ''));
                                 return;
                             }
@@ -528,7 +530,7 @@ export class BwRule extends Rule {
                     return url;
                 } else {
                     try {
-                   
+
                         console.log("-------------------------");
                         console.log( await post());
                         resolve( await post());
