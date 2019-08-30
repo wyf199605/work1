@@ -748,7 +748,8 @@ export class BwTableModule extends Component {
                 dataType: field.atrrs.dataType,
                 data: rowData,
                 needGps: link.needGps === 1,
-                type: link.type
+                type: link.type,
+                addrType: link.addrType
             });
 
             return;

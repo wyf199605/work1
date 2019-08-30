@@ -594,7 +594,7 @@ export class BwRule extends Rule {
                         let filename = rData.FILENAME || '附件';
                         switch (action) {
                             case _linkAct.OPEN_WIN:
-                                sys.window.open({ url: rData.url }, para.openUrl);
+                                sys.window.open({ url: rData.url, notBtl: para.addrType }, para.openUrl);
                                 break;
                             case _linkAct.SHOW_IMGS:
                                 let img = [],
@@ -636,7 +636,7 @@ export class BwRule extends Rule {
             }
         } else {
             // action = _linkAct.OPEN_WIN;
-            sys.window.open({ url, gps: para.needGps }, para.openUrl);
+            sys.window.open({ url, gps: para.needGps, notBtl: para.addrType }, para.openUrl);
             // para.callback(action, rData, _linkAct);
         }
     };
