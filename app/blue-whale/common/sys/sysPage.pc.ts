@@ -84,6 +84,9 @@ namespace BW{
                 // 外网url, 创建iframe
                 let iframe = <HTMLIFrameElement>d.create(`<iframe width="100%" src="${o.url}"></iframe>`);
                 d.append(page, iframe);
+                iframe.onload = () => {
+                    sys.window.setTitle(o.url, iframe.contentWindow.document.title);
+                };
                 page.classList.add('iframe');
                 callback(page);
 

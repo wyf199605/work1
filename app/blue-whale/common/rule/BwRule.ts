@@ -560,7 +560,7 @@ export class BwRule extends Rule {
             data: {}
         }, para);
 
-        url = tools.url.addObj(CONF.siteUrl + para.link, BwRule.varList(para.varList, para.data));
+        url = tools.url.addObj((para.addrType ? '' : CONF.siteUrl) + para.link, BwRule.varList(para.varList, para.data));
         if (para.dataType === BwRule.DT_FILE) {
             if (para.type === 'download') {
                 sys.window.download(url);
