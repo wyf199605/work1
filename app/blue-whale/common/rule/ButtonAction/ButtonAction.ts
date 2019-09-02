@@ -319,7 +319,8 @@ export class ButtonAction {
             case 'download':
             case 'newwin':
             default: {
-                let openUrl = tools.url.addObj(BW.CONF.siteUrl + addr, data);
+                let addrType = btn.actionAddr.addrType,
+                    openUrl = tools.url.addObj(addrType ? '' : BW.CONF.siteUrl + addr, data);
                 if (varType === 3 && res) {
                     openUrl = tools.url.addObj(openUrl, { bodyParams: res }, false)
                 }
@@ -329,6 +330,7 @@ export class ButtonAction {
                     BW.sys.window.open({
                         url: openUrl,
                         gps: !!btn.actionAddr.needGps,
+                        notBtl: addrType
                     }, url);
                 }
 
