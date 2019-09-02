@@ -101,7 +101,7 @@ export class ChartTableModule {
             case 'select':
             case 'table':
             case 'web':
-                this.chartDom.style.minHeight = '20rem';  // web 地图太小；
+                this.chartDom.style.minHeight = tools.isPc ? '320px' : '20rem';  // web 地图太小；
             case 'drill':
             case 'detail':
             case 'panel':
@@ -578,12 +578,12 @@ export class ChartTableModule {
      */
     initPieChartFn() {
         // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
-        if(!this.ui.chartPage) {
-            this.chartDom.parentElement.style.height = tools.isMb ? '25rem' : '400px';
-            this.chartDom.style.height = tools.isMb ? '25rem' : '320px';
-        }
+        // if(!this.ui.chartPage) {
+        //     this.chartDom.parentElement.style.height = tools.isMb ? '25rem' : '400px';
+        //     this.chartDom.style.height = tools.isMb ? '25rem' : '320px';
+        // }
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
-        this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 20}rem` : '20rem';
+        this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 320}px` : '320px';
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
