@@ -101,6 +101,7 @@ export class ChartTableModule {
             case 'select':
             case 'table':
             case 'web':
+                this.chartDom.style.minHeight = '20rem';  // web 地图太小；
             case 'drill':
             case 'detail':
             case 'panel':
@@ -367,8 +368,8 @@ export class ChartTableModule {
      */
     initCommonChartFn(chartEle: HTMLElement, max?: boolean) {
         if(!this.ui.chartPage) {
-            chartEle.parentElement.style.height = '25rem';
-            !max && (chartEle.style.height = '20rem');
+            chartEle.parentElement.style.height = tools.isMb ? '25rem' : '400px';
+            !max && (chartEle.style.height = tools.isMb ? '25rem' : '320px');
         }
         // this.chartBtnsContainer.style.width = '100%';
         // alert(chartEle.style.width);
@@ -577,6 +578,10 @@ export class ChartTableModule {
      */
     initPieChartFn() {
         // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
+        if(!this.ui.chartPage) {
+            this.chartDom.parentElement.style.height = tools.isMb ? '25rem' : '400px';
+            this.chartDom.style.height = tools.isMb ? '25rem' : '320px';
+        }
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
         this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 20}rem` : '20rem';
         let chart = echarts.init(this.chartDom);
