@@ -3057,11 +3057,11 @@ export class BwTableModule extends Component {
                                     let cellData = tools.isEmpty(data[key]) ? '' : data[key];
                                     if (hCell.data != cellData) {
                                         hCell.data = cellData;
+                                        isValid && validate(editModule, row.cellGet(key))
                                     }
                                 }
                             }
                             let content = cell.column.content as R_Field;
-                            console.log(isValid);
                             if (isValid && content.assignSelectFields && content.assignSelectFields[0]) {
                                 validate(editModule, cell);
                             }
