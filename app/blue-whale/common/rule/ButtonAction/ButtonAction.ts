@@ -200,8 +200,13 @@ export class ButtonAction {
      * openTyp="popup";//弹出新窗口,"newwin";//打开新窗口,"none";//保持在原界面
      * 处理按钮规则buttonType=0:get,1:post,2put,3delete
      */
-    private btnAction(btn: R_Button, dataObj: obj | obj[], callback = (r) => {
-    }, url?: string, avtData?: obj) {
+    private btnAction(
+        btn: R_Button,
+        dataObj: obj | obj[],
+        callback = (r) => {},
+        url?: string,
+        avtData?: obj
+    ) {
         let actionAddr = btn.actionAddr,
             { addr, data } = actionAddr && BwRule.reqAddrFull(actionAddr, dataObj) || { addr: null, data: null },
             self = this,
@@ -260,8 +265,8 @@ export class ButtonAction {
                     //创建条码扫码页面
                     self.btnPopup(response, () => {
                         self.btnRefresh(btn.refresh, url);
-                    }, url);
-                    callback(response);
+                        callback(response);
+                    }, url, btn);
                 }, () => callback(null));
                 break;
             case 'integrated':
@@ -607,7 +612,7 @@ export class ButtonAction {
      * @param onOk 回调
      * @param url
      */
-    private btnPopup(response, onOk, url) {
+    private btnPopup(response, onOk, url, btn: R_Button) {
         let res = <any>response.body.elements[0],
             len = res.cols && res.cols.length,
             selectInput = [],
@@ -655,7 +660,10 @@ export class ButtonAction {
                         }
                     });
                     if (type === 3 || type === 13) {
-                        BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
+                        let refresh = btn.refresh;
+                        if (refresh === 1 || refresh === 3) {
+                            BW.sys.window.fire(BwRule.EVT_REFRESH, null, url);
+                        }
                     }
                 }
             };
