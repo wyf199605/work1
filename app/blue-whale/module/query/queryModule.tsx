@@ -287,7 +287,11 @@ export abstract class QueryModule {
     private queryLoad(queryJson) {
         localStorage.setItem('queryer', JSON.stringify(queryJson));
         this.hide();
-        return this.para.refresher(queryJson);
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 500)
+        }).then(() => this.para.refresher(queryJson));
     }
 
     //仅查项数,不勾选显示字段
