@@ -89,13 +89,13 @@ export class ChartTableModule {
         tools.isMb ? d.query('body').appendChild(this.baffleDom) : this.chartBtnsContainer.appendChild(this.baffleDom);
         this.baffleDom.addEventListener('click', this.baffleDomClkFn.bind(this));
 
-        !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '25rem'));
+        !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '400px'));
         // this.parentDom.appendChild(this.render());
         // let chart;
         if(this.parentDom.classList.contains('panel-body')) {
             // let dom: HTMLElement = this.parentDom.querySelector('.chart-table');
             // dom && (dom.style.minHeight = '25rem');
-            this.chartDom.style.minHeight = '20rem';
+            this.chartDom.style.minHeight = tools.isMb ? '20rem' : '320px';
         }
         switch (this.ui.uiType) {
             case 'select':
@@ -578,9 +578,10 @@ export class ChartTableModule {
      */
     initPieChartFn() {
         // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
-        // if(!this.ui.chartPage) {
-        //     this.chartDom.parentElement.style.height = tools.isMb ? '25rem' : '400px';
-        //     this.chartDom.style.height = tools.isMb ? '25rem' : '320px';
+        // if(!this.ui.chartPage && tools.isPc) {
+        //     this.chartDom.parentElement.style.minHeight = '400px';
+        //     // this.chartDom.style.height = tools.isMb ? '25rem' : '320px';
+        //     // debugger;
         // }
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
         this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 320}px` : '320px';
