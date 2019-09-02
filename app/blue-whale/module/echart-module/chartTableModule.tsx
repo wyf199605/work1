@@ -89,18 +89,19 @@ export class ChartTableModule {
         tools.isMb ? d.query('body').appendChild(this.baffleDom) : this.chartBtnsContainer.appendChild(this.baffleDom);
         this.baffleDom.addEventListener('click', this.baffleDomClkFn.bind(this));
 
-        !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '25rem'));
+        !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '400px'));
         // this.parentDom.appendChild(this.render());
         // let chart;
         if(this.parentDom.classList.contains('panel-body')) {
             // let dom: HTMLElement = this.parentDom.querySelector('.chart-table');
             // dom && (dom.style.minHeight = '25rem');
-            this.chartDom.style.minHeight = '20rem';
+            this.chartDom.style.minHeight = tools.isMb ? '20rem' : '320px';
         }
         switch (this.ui.uiType) {
             case 'select':
             case 'table':
             case 'web':
+                this.chartDom.style.minHeight = tools.isPc ? '320px' : '20rem';  // web 地图太小；
             case 'drill':
             case 'detail':
             case 'panel':
@@ -367,8 +368,8 @@ export class ChartTableModule {
      */
     initCommonChartFn(chartEle: HTMLElement, max?: boolean) {
         if(!this.ui.chartPage) {
-            chartEle.parentElement.style.height = '25rem';
-            !max && (chartEle.style.height = '20rem');
+            chartEle.parentElement.style.height = tools.isMb ? '25rem' : '400px';
+            !max && (chartEle.style.height = tools.isMb ? '25rem' : '320px');
         }
         // this.chartBtnsContainer.style.width = '100%';
         // alert(chartEle.style.width);
@@ -577,8 +578,13 @@ export class ChartTableModule {
      */
     initPieChartFn() {
         // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
+        // if(!this.ui.chartPage && tools.isPc) {
+        //     this.chartDom.parentElement.style.minHeight = '400px';
+        //     // this.chartDom.style.height = tools.isMb ? '25rem' : '320px';
+        //     // debugger;
+        // }
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
-        this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 20}rem` : '20rem';
+        this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 320}px` : '320px';
         let chart = echarts.init(this.chartDom);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
