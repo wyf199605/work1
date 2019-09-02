@@ -608,7 +608,7 @@ export class ChartTableModule {
             let yAxis: string;
             let xAxis = '50%';
             if (tools.isMb) {
-                yAxis = ((i + 0.5) / legendName.length * 100) + '%';
+                yAxis = ((i + 0.5) / legendName.length * 100) + 12 + '%';
             } else {
                 if(legendName.length === 1) {
                     let floor = Math.ceil(legendName.length / 3);
