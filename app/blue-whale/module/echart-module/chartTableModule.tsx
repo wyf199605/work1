@@ -453,7 +453,7 @@ export class ChartTableModule {
                 axisLabel: {
                     color: '#333333',
                     // interval: 0,
-                    fontSize: '12px',
+                    fontSize: 12,
                     //rotate:30,
                     formatter: function (name) {
                         return (name.length > 8 ? (name.slice(0, 8) + "...") : name);
