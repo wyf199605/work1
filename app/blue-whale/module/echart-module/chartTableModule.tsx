@@ -453,12 +453,16 @@ export class ChartTableModule {
                 axisLabel: {
                     color: '#333333',
                     // interval: 0,
-                    fontSize: 12,
+                    fontSize: '12px',
                     //rotate:30,
                     formatter: function (name) {
                         return (name.length > 8 ? (name.slice(0, 8) + "...") : name);
                     },
                 }
+            },
+            dataZoom: {
+                type: 'inside',
+                show: true
             },
 
             yAxis: {
@@ -479,14 +483,7 @@ export class ChartTableModule {
             },
             series: series
         };
-        if ((chartEle.offsetWidth * 0.8) < this.strWidth(xAxisData.map(item => item.value))) {
-            Object.assign(chartData, {
-                dataZoom: {
-                    type: 'slider',
-                    show: true
-                }
-            })
-        }
+       
         if (!tools.isMb) {
             chartData['tooltip'] = {
                 trigger: 'axis',
@@ -1721,18 +1718,7 @@ export class ChartTableModule {
     }
 
 
-    strWidth(strArr: string[]):number {
-        let strJoin = '';
-        strJoin = strArr.reduce( (strAdd, currStr) => {
-            let str  = (currStr.length > 8 ? (currStr.slice(0, 8) + "...") : currStr)
-            return strAdd + str;
-        });
-        const canvas = document.createElement('canvas'); 
-        const ctx = canvas.getContext("2d"); 
-        ctx.font = "12px";   
-        const width = ctx.measureText(strJoin).width; 
-        return width;
-    }
+    
 
 
 
