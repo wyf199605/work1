@@ -65,10 +65,7 @@ export class ChartTableModule {
         this.data = data;
         this.initData();
         this.initTableBtns();
-        // console.log(CityMap);
         let img = CONF.siteUrl + '/map/china.json';
-        // console.log(baseUrl);
-        // $('body').append(img);
 
     }
 
@@ -90,11 +87,8 @@ export class ChartTableModule {
         this.baffleDom.addEventListener('click', this.baffleDomClkFn.bind(this));
 
         !this.ui.chartPage && (tools.isMb || (this.chartBtnsContainer.style.height = '400px'));
-        // this.parentDom.appendChild(this.render());
-        // let chart;
+        
         if(this.parentDom.classList.contains('panel-body')) {
-            // let dom: HTMLElement = this.parentDom.querySelector('.chart-table');
-            // dom && (dom.style.minHeight = '25rem');
             this.chartDom.style.minHeight = tools.isMb ? '20rem' : '320px';
         }
         switch (this.ui.uiType) {
@@ -127,7 +121,6 @@ export class ChartTableModule {
             //     break; break;
         }
         window.onresize = () => {
-            // if (this.ui.showType === 'map') return;
             this.chart && this.chart.resize();
         }
         window.addEventListener("orientationchange", () => {
@@ -149,7 +142,7 @@ export class ChartTableModule {
         let cols = this.ui.cols.filter(col => !col.noShow)
         let xAxisData = cols.map(col => ({ name: col.name, value: col.caption }));
         let yAxisData = cols.filter(col => dataTypes.includes(col.dataType)).map(col => ({ name: col.name, value: col.caption }));
-        // console.log(yAxisData, xAxisData);
+        
         let chartTypeData = {
             types: [
                 { name: 'line', value: '折线图' },
@@ -293,7 +286,6 @@ export class ChartTableModule {
             }
             let chartTableEle = d.query('.chart-table', this.parentDom);
             chartTableEle && this.parentDom.removeChild(chartTableEle);
-            console.log(this.settingData);
             this.ui.showType = this.settingData.type;
             this.ui.local.xCoordinate = this.settingData.xAxis;
             this.ui.local.yCoordinate = this.settingData.yAxis.join(',');
@@ -304,8 +296,6 @@ export class ChartTableModule {
         // this.chartDom.classList.contains
         if (name === 'yAxis') {
             e.target['previousElementSibling'].checked;
-            // e.target['parentElement'].parentElement.querySelector('.checked-radio').classList.remove('checked-radio');
-            // e.target['classList'].add('checked-radio');
             e.target['classList'].toggle('checked-radio');
         } else {
             e.target['previousElementSibling'].checked;
@@ -330,7 +320,6 @@ export class ChartTableModule {
                     }
                 }
         }
-        console.log(this.settingData);
     }
 
 
@@ -371,8 +360,6 @@ export class ChartTableModule {
             chartEle.parentElement.style.height = tools.isMb ? '25rem' : '400px';
             chartEle.style.height = tools.isMb ? '25rem' : '320px';
         }
-        // this.chartBtnsContainer.style.width = '100%';
-        // alert(chartEle.style.width);
         let chart = echarts.init(chartEle);
         this.data.bodyData = [];
         this.data.body.bodyList[0].dataList.forEach(list => {
@@ -512,10 +499,6 @@ export class ChartTableModule {
 
         chart.setOption(chartData);
         chart.on('click', (params) => {
-            // if (this.ui.uiType === 'web' || this.ui.uiType === 'drill') {
-            //     this.drillPage(params);
-            // }
-            //
             
             let col;
             if (tools.isMb) {
@@ -560,14 +543,6 @@ export class ChartTableModule {
             }
 
 
-            // this.drillPage(params, dataCol);
-            // let tr = d.query('.pseudo-table', this.wrapper).getElementsByTagName('tr');
-            // console.log(d.query('.pseudo-table', this.wrapper));
-            // let tableEle = this.wrapper.querySelector('.fast-table-container>.tables>.new-table-wrapper>.table-body-wrapper');
-            // let tr = tableEle.querySelector('.table-scroll-wrapper>.pseudo-table>table>body')
-            // console.log(tr);
-
-
         });
         return chart;
 
@@ -590,12 +565,6 @@ export class ChartTableModule {
      * 饼状图
      */
     initPieChartFn() {
-        // let xCoordinate = this.ui.local.xCoordinate.toLocaleUpperCase();
-        // if(!this.ui.chartPage && tools.isPc) {
-        //     this.chartDom.parentElement.style.minHeight = '400px';
-        //     // this.chartDom.style.height = tools.isMb ? '25rem' : '320px';
-        //     // debugger;
-        // }
         let yCoordinate = this.ui.local.yCoordinate.toUpperCase().split(',');
         this.chartDom.style.height = tools.isMb ? `${yCoordinate.length * 20}rem` : yCoordinate ? `${Math.ceil(yCoordinate.length / 3) * 320}px` : '320px';
         let chart = echarts.init(this.chartDom);
@@ -641,7 +610,6 @@ export class ChartTableModule {
                 }
                 
             }
-            // debugger;
             let name = this.ui.cols.find(col => col.name === legend).caption;
             let seriesItem = {
                 name: name,
@@ -664,17 +632,8 @@ export class ChartTableModule {
                     }
                 })
             }
-            // seriesItem.data = this.data.bodyData.map(item => item[legend]);
-            // // seriesItem.name = legendData[i];
-            // this.ui.cols.forEach(col => {
-            //     if (col.name === legend) {
-            //         legendData.push(col.caption);
-            //         seriesItem.name = col.caption;
-            //     }
-            // });
             series.push(seriesItem);
         });
-        // debugger;
         let chartData = {
             title: {
                 text: caption,
@@ -850,23 +809,14 @@ export class ChartTableModule {
             url = `${url}&page=drill`;
             sys.window.open({ url, gps: col.drillAddr.needGps });
         } else {
-
-            // let param = Object.assign({
-            //     type: 'GET',
-            //     needGps: col.drillAddr.needGps,
-            // }, varNamesObj);
             let url = CONF.siteUrl + col.drillAddr.dataAddr;
             url = tools.url.addObj(url, varNamesObj)
-            // BwRule.Ajax.fetch(url, param).then(({response}) => {
-            //     console.log(response);
-            // })
+           
             sys.window.open({ url,  gps: col.drillAddr.needGps });
         }
 
 
     }
-
-
 
     /**
      * 图表渲染函数
@@ -973,8 +923,6 @@ export class ChartTableModule {
 
     }
 
-
-
     // 地图处理的三个函数
     async initMap(chartEle: HTMLElement) {
         const bodyData: Array<any> = this.data['data'] || [];
@@ -991,15 +939,8 @@ export class ChartTableModule {
         let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let yAxisNamesObj: object = {};
         yAxisNames.forEach(name => {
-            // console.log(this.ui.cols.find(col=> col.name === name).caption)
-            // yAxisNamesObj[]
-            // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
-            
             yAxisNamesObj[name] = this.ui.cols.find(col => col.name === name).caption
-            console.log(this.ui.cols.find(col => col.name === name).caption)
         });
-        //  yAxisNames.map(key => ({[key]: this.ui.cols.find(col=> col.name === key).caption}));
-        console.log(yAxisNamesObj);
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = numArr.length === 0? 1 : Math.max(...numArr) ;
 
@@ -1010,13 +951,9 @@ export class ChartTableModule {
         let chinaMap = echarts.init(chartEle);
         // let chart = echarts.init(chartEle);
         let mapJson = await $.get(`${baseUrl}../map/china.json`);
-        console.log(mapJson);
-        // const signName = /.*省$/.test(`${this.ui.location}`) ? this.ui.location.slice(0, (this.ui.location.length - 1)) : this.ui.location;
-        // const 
 
         const signValue = bodyData.map(col => {
             const signName = /.*(省|市)$/.test(`${col[xAxisName]}`) ? col[xAxisName].slice(0, (col[xAxisName].length - 1)) : col[xAxisName];
-            console.log(col[xAxisName].slice(0, (col[xAxisName].length - 1)));
             let signValue = mapJson.features.find(feature => feature.properties.name === signName);
             return signValue;
         });
@@ -1089,7 +1026,6 @@ export class ChartTableModule {
 
         function provinceFn(province: string) {
             let item = bodyData.find(item => item[xAxisName].indexOf(province) !== -1);
-            console.log(item);
             return item ? item[yAxisNames[0]] : 0;
         }
 
@@ -1278,11 +1214,9 @@ export class ChartTableModule {
         let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let yAxisNamesObj: object = {};
         yAxisNames.forEach(name => {
-            // console.log(this.ui.cols.find(col=> col.name === name).caption)
             // yAxisNamesObj[]
             // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
-            yAxisNamesObj[name] = this.ui.cols.find(col => col.name === name).caption
-            console.log(this.ui.cols.find(col => col.name === name).caption)
+            yAxisNamesObj[name] = this.ui.cols.find(col => col.name === name).caption;
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = numArr.length === 0? 1 : Math.max(...numArr) ;
@@ -1299,7 +1233,6 @@ export class ChartTableModule {
         // 处理上升下降标记
         const signValue = bodyData.map(col => {
             const signName = /.*市$/.test(`${col[xAxisName]}`) ?  col[xAxisName] : col[xAxisName] + '市' ;
-            console.log(col[xAxisName].slice(0, (col[xAxisName].length - 1)));
             let signValue = citysJson.features.find(feature => feature.properties.name === signName);
             return signValue;
         });
@@ -1363,7 +1296,6 @@ export class ChartTableModule {
         let citys = citysJson.features.map(city => city.properties.name);
         const cityFn = (city: string) => {
             let item = bodyData.find(item => item[xAxisName].indexOf(city) !== -1);
-            console.log(item);
             return item ? item[yAxisNames[0]] : 0;
         }
         let options = {
@@ -1547,18 +1479,15 @@ export class ChartTableModule {
         let yAxisNames: Array<any> = this.ui.local.yCoordinate.toUpperCase().split(',');
         let yAxisNamesObj: object = {};
         yAxisNames.forEach(name => {
-            // console.log(this.ui.cols.find(col=> col.name === name).caption)
             // yAxisNamesObj[]
             // Object.defineProperty(yAxisNamesObj, name, this.ui.cols.find(col=> col.name === name).caption);
-            yAxisNamesObj[name] = this.ui.cols.find(col => col.name === name).caption
-            console.log(this.ui.cols.find(col => col.name === name).caption)
+            yAxisNamesObj[name] = this.ui.cols.find(col => col.name === name).caption;
         });
         let numArr: Array<number> = bodyData.map(item => item[yAxisNames[0]]);
         let max = numArr.length === 0? 1 : Math.max(...numArr) ;
         
         const countyFn = (county: string) => {
             let item = bodyData.find(item => item[xAxisName].indexOf(county) !== -1);
-            console.log(item);
             return item ? item[yAxisNames[0]] : 0;
         }
 
@@ -1574,7 +1503,6 @@ export class ChartTableModule {
         // 处理上升下降标记
         const signValue = bodyData.map(col => {
             const signName =  col[xAxisName];
-            console.log(col[xAxisName].slice(0, (col[xAxisName].length - 1)));
             let signValue = cityJson.features.find(feature => feature.properties.name === signName);
             return signValue;
         });
@@ -1799,7 +1727,6 @@ export class ChartTableModule {
             let str  = (currStr.length > 8 ? (currStr.slice(0, 8) + "...") : currStr)
             return strAdd + str;
         });
-        console.log(strJoin);
         const canvas = document.createElement('canvas'); 
         const ctx = canvas.getContext("2d"); 
         ctx.font = "12px";   
