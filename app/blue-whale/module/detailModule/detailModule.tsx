@@ -190,13 +190,13 @@ export class DetailModule extends AGroupTabItem {
                                 }),
                                 this.lookup // 获取lookup数据
                             ]).then(([{ response }]) => {
-                                console.log(response);
                                 let data = tools.keysVal(response, 'data') || [{}], // 数据
                                     total = tools.keysVal(response, 'head', 'totalNum'); // 总条数
                                 // this.detailData = data;
 
                                 // 生成`old_${name}`数据
-                                BwRule.addOldField(this.getOldField(), data);
+                                data = BwRule.addOldField(this.getOldField(), data);
+                                console.log(data);
                                 // debugger;
                                 setTimeout(() => {
                                     this.phoneBtnInit();
@@ -369,13 +369,25 @@ export class DetailModule extends AGroupTabItem {
     // 获取`old_${name}`数据
     getOldField() {
         let btns = this.ui.subButtons,
+            editParam = tools.keysVal(this.ui, 'tableAddr', 'param', 0),
             varList: R_VarList[] = [];
+
         Array.isArray(btns) && btns.forEach(btn => {
             let addr = btn.actionAddr;
             if (addr && Array.isArray(addr.varList)) {
                 varList = varList.concat(addr.varList)
             }
         });
+
+        editParam && ['insert', 'update', 'delete'].forEach(type => {
+            let canOld = ['update', 'delete'].indexOf(editParam[`${type}Type`]) > -1,
+                typeVarList = editParam[type];
+
+            if (canOld && Array.isArray(typeVarList)) {
+                varList = varList.concat(typeVarList)
+            }
+        });
+
         return BwRule.getOldField(varList);
     }
 

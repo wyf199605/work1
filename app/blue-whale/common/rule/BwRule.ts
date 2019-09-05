@@ -753,16 +753,15 @@ export class BwRule extends Rule {
      * @param {R_VarList[]} varList
      * @return {string[]}
      */
-    static getOldField(varList: R_VarList[]) {
+    static getOldField(varList: R_VarList[]): string[] {
         // 获取有OLD_开头的字段
-        let olds: string[] = [];
+        let olds: objOf<boolean> = {};
         Array.isArray(varList) && varList.forEach(v => {
             if (v.varName.match(/^OLD_/)) {
-                olds.push(v.varName.slice(4));
+                olds[v.varName.slice(4)] = true;
             }
         });
-
-        return olds;
+        return Object.keys(olds);
     }
 
     static addOldField(olds: string[], data: obj[] | obj) {

@@ -157,7 +157,8 @@ export class DetailEditModule {
                 reject();
                 return
             }
-            let data = this.editModule.get();
+            let data = Object.assign({}, this.detail.getData(), this.editModule.get());
+            console.log(data);
             Promise.all(this.field.filter((field) => field.chkAddr).map((field) => {
                 return EditModule.checkValue(field, data, () => {
                     let com = this.editModule.getDom(field.name);
