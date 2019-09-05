@@ -21,6 +21,7 @@ export interface IDetailItemPara extends IComponentPara{
     field: R_Field;
     format: (field: R_Field, data: any, rowData: obj) => Promise<IDetailFormatData>;
     detail: DetailModule;
+    insert: boolean;
 }
 
 export class DetailItem extends Component{
@@ -29,7 +30,7 @@ export class DetailItem extends Component{
         let field = para.field,
             name = field.name,
             title = field.caption,
-            isShow = !field.noShow,
+            isShow = para.insert ? !field.noAdd : !field.noShow,
             dataType = field.dataType || field.atrrs.dataType;
 
         this._name = name;
@@ -48,6 +49,12 @@ export class DetailItem extends Component{
             {this._titleEl = <div className="detail-item-title">{title}</div>}
             {this._contentEl = <div className="detail-item-content"/>}
         </div> : null;
+    }
+
+    set show(show: boolean){
+        if(this.wrapper){
+            this.wrapper.style.display = show ? "" : "none";
+        }
     }
 
     static isBlock(dataType: string){
@@ -79,15 +86,17 @@ export class DetailItem extends Component{
         return this._contentEl;
     }
 
-    public custom: R_Field;
+    public readonly custom: R_Field;
     public detail: DetailModule;
+    protected isInsert: boolean;
 
     protected format: (field: R_Field, data: any, rowData: obj) => Promise<IDetailFormatData>;
 
-    constructor(para: IDetailItemPara){
+    constructor(protected para: IDetailItemPara){
         super(para);
         this.detail = para.detail;
         this.format = para.format;
+        this.isInsert = para.insert;
         this.custom = para.field;
     }
 

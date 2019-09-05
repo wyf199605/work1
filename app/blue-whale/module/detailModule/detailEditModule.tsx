@@ -50,12 +50,12 @@ export class DetailEditModule {
 
     protected isEdit = false;
 
-    protected createItem(type: 'current' | 'modal' = 'current') {
+    protected createItem(type: 'current' | 'modal' = 'current', insert = false) {
         let items: DetailItem[];
         switch (type){
             case 'modal':
                 this.initModal();
-                items = this.detail.initItems(d.query('.detail-content', this.modal.bodyWrapper));
+                items = this.detail.initItems(d.query('.detail-content', this.modal.bodyWrapper), insert);
                 items.forEach((item) => {
                     item.edit.init((field, item) => this.initEditCom(field, item.contentEl));
                 });
@@ -64,6 +64,9 @@ export class DetailEditModule {
             default:
                 items = this.detail.items;
                 items.forEach((item) => {
+                    if(insert){
+                        item.show = !item.custom.noAdd;
+                    }
                     item.edit.init((field, item) => this.initEditCom(field, item.contentEl))
                 });
                 break;
@@ -201,6 +204,7 @@ export class DetailEditModule {
 
     cancel() {
         this.detail && this.detail.items && this.detail.items.forEach((item) => {
+            item.show = !item.custom.noShow;
             item.disabled = false;
             item.wrapper && item.wrapper.classList.remove('editing');
         });
@@ -234,7 +238,7 @@ export class DetailEditModule {
     insert(defData: obj = {}) {
         this.editType = 'insert';
         this.isEdit = true;
-        this.createItem('modal');
+        this.createItem('modal', true);
         this.setData(defData);
     }
 

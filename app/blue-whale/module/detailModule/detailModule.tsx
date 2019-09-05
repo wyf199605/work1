@@ -218,7 +218,7 @@ export class DetailModule extends AGroupTabItem {
     }
 
     // 初始化detailItem
-    initItems(container: HTMLElement): DetailItem[] {
+    initItems(container: HTMLElement, insert = false): DetailItem[] {
         let groupInfos = this.ui.groupInfo,
             fields = this.fields;
         if (tools.isPc && tools.isNotEmpty(groupInfos)) {
@@ -235,7 +235,10 @@ export class DetailModule extends AGroupTabItem {
                             {names.map((name) => {
                                 let field = fields.find((field) => field.name === name);
                                 if (field) {
-                                    let detailItem = <DetailItem field={field} detail={this}
+                                    let detailItem = <DetailItem
+                                        insert={insert}
+                                        field={field}
+                                        detail={this}
                                         format={(f, cellData, rowData) => {
                                             return this.format(f, cellData, rowData);
                                         }} />;
@@ -252,7 +255,11 @@ export class DetailModule extends AGroupTabItem {
             return items;
         } else {
             return fields.map((field) => {
-                return <DetailItem field={field} detail={this} container={container}
+                return <DetailItem
+                    insert={insert}
+                    field={field}
+                    detail={this}
+                    container={container}
                     format={(f, cellData, rowData) => {
                         return this.format(f, cellData, rowData);
                     }}
