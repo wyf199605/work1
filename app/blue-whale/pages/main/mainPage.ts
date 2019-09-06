@@ -125,10 +125,10 @@ export = class MainPage {
         //     console.log(result);
         // })
         if (sessionStorage.getItem('showWorkBench') === 'true') {
-            setTimeout(() => {
-                sys.window.open({url: CONF.siteUrl + '/' + CONF.appid+ "/null/home_page/workbench?modulesId=1"});
-            }, 500);
-            
+            // setTimeout(() => {
+            //     sys.window.open({url: CONF.siteUrl + '/' + CONF.appid+ "/null/home_page/workbench?modulesId=1"});
+            // }, 500);
+
         }
 
 

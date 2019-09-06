@@ -43,6 +43,7 @@ export class DetailModule extends AGroupTabItem {
     items: DetailItem[]; // 存放实例化的detailItem
     editType: 'current' | 'modal'; // 存放实例化的detailItem
     autoEdit: boolean;
+    onlyEdit: boolean;
 
     onRender: Function;
     onDataChange: Function;
@@ -66,6 +67,7 @@ export class DetailModule extends AGroupTabItem {
         this.fields = this.ui.fields;
         this.editType = (this.ui.operationType && this.ui.operationType.editType) || 'current';
         this.autoEdit = (this.ui.operationType && this.ui.operationType.autoEdit) || false;
+        this.onlyEdit = (this.ui.operationType && this.ui.operationType.onlyEdit) || false;
 
         let content = d.query('.detail-content', this.wrapper);
         this.items = this.initItems(content);

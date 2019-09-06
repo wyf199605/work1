@@ -52,6 +52,7 @@ export class DetailEditModule {
 
     protected createItem(type: 'current' | 'modal' = 'current', insert = false) {
         let items: DetailItem[];
+        let onlyEdit = this.detail.onlyEdit;
         switch (type){
             case 'modal':
                 this.initModal();
@@ -70,6 +71,13 @@ export class DetailEditModule {
                     item.edit.init((field, item) => this.initEditCom(field, item.contentEl))
                 });
                 break;
+        }
+        console.log(onlyEdit);
+        if(onlyEdit){
+            items.forEach((item) => {
+                let field = item.custom;
+                item.show = insert ? !field.noModify : !field.noEdit;
+            });
         }
         return items;
     }

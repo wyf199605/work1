@@ -91,6 +91,7 @@ interface IBW_Table {
     rowLinkField?: string;
     operationType?: {
         autoEdit: boolean;
+        onlyEdit?: boolean;
         editType: 'current' | 'modal';
     };
     exhibitionType: {
@@ -133,6 +134,7 @@ interface IBW_Detail {
     offline?: boolean // 是否为离线
     operationType?: {
         autoEdit: boolean;
+        onlyEdit: boolean;
         editType: 'current' | 'modal';
     };
     exhibitionType: {
