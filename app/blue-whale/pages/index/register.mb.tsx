@@ -19,12 +19,12 @@ export class RegisterMbPage extends RegPage {
                 <div className="form-group">
                     <input id="tel" type="number" placeholder="输入手机号码" />
                 </div>
-                <div className="form-group">
-                    <input id="verifyCodeInput" type="number" maxLength="6" placeholder="输入验证码" />
-                    <div className="more-group">
-                        <canvas width="80" height="30">您的浏览器不支持canvas，请用其他浏览器打开。</canvas>
-                    </div>
-                </div>
+                {/*<div className="form-group">*/}
+                {/*    <input id="verifyCodeInput" type="number" maxLength="6" placeholder="输入验证码" />*/}
+                {/*    <div className="more-group">*/}
+                {/*        <canvas width="80" height="30">您的浏览器不支持canvas，请用其他浏览器打开。</canvas>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
                 <div className="form-group">
                     <input id="verify" type="number" maxLength="6" placeholder="输入短信验证码" />
                     <div className="more-group" />
@@ -39,9 +39,9 @@ export class RegisterMbPage extends RegPage {
         d.on(d.query("#tel", body), "blur", () => {
             document.body.scrollTop = 0;
         })
-        d.on(d.query("#verifyCodeInput", body), "blur", () => {
-            document.body.scrollTop = 0;
-        })
+        // d.on(d.query("#verifyCodeInput", body), "blur", () => {
+        //     document.body.scrollTop = 0;
+        // })
         d.on(d.query("#verify", body), "blur", () => {
             document.body.scrollTop = 0;
         })
@@ -67,8 +67,8 @@ export class RegisterMbPage extends RegPage {
             goLogin: d.query('#goLogin', header),
             saveReg: registerBtn.wrapper,
             tel: d.query('#tel', body) as HTMLInputElement,
-            verifyELCodeInput: d.query('#verifyCodeInput', body) as HTMLInputElement,
-            verifyELCode: d.query('.more-group>canvas', body) as HTMLCanvasElement,
+            // verifyELCodeInput: d.query('#verifyCodeInput', body) as HTMLInputElement,
+            // verifyELCode: d.query('.more-group>canvas', body) as HTMLCanvasElement,
             sendVerify: checkCodeBtn.wrapper,
             smsCheckCode: d.query('#verify', body) as HTMLInputElement,
         });

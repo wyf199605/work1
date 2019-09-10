@@ -38,7 +38,7 @@ export class RegPage {
         d.on(props.goLogin, 'click', () => {
             sys.window.load(CONF.url.login);
         });
-        if (tools.isMb) {
+        if (tools.isMb && props.verifyELCode && props.verifyELCodeInput) {
             this.code = this.renderCheckCode(props.verifyELCode);
             d.on(props.verifyELCode.parentElement, 'click', () => {
                 // self.setVerifyCode();

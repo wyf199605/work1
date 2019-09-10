@@ -136,14 +136,11 @@ export class EditModule {
 
         pickInput: (p) => {
             // console.log(dom,field,6)
-            let atrrs = p.field.atrrs,
-                multiValueFlag = atrrs && 'multiValueFlag' in atrrs ? atrrs.multiValueFlag : true;
             return new PickModule({
                 custom: p.field,
                 container: p.dom,
                 field: p.field,
                 data: p.data,
-                multi: multiValueFlag, //field.multiValue
                 dataGet: () => p.data ? p.data : this.get(),
                 onGetData: (dataArr: obj[], otherField: string) => {
                     this.pickOnGet(p, dataArr, otherField);
