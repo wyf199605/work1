@@ -52,7 +52,7 @@ export class RegisterMbPage extends RegPage {
         });
 
         let checkCodeBtn = new Button({
-            container: d.queryAll('.more-group', body)[1],
+            container: d.queryAll('.more-group', body)[0],
             content: '获取验证码',
             className: 'check-code',
         });
