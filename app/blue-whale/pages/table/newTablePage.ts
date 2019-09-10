@@ -29,11 +29,11 @@ export class NewTablePage extends BasicPage{
     constructor(para: ITablePagePara) {
         super(para);
         if ( para.chartPage) {
-            d.classAdd(para.chartPageDom, 'table-page'); 
+            d.classAdd(para.chartPageDom, 'table-page');
         } else {
             d.classAdd(this.dom.parentElement, 'table-page');
         }
-        
+
         let bwTableEl = para.ui.body.elements[0];
         bwTableEl.subButtons = (bwTableEl.subButtons || []).concat(para.ui.body.subButtons || []);
         // debugger;
@@ -62,20 +62,36 @@ interface IBwTableElementPara extends IComponentPara{
     tableEl: IBW_Table
     asynData? : obj[],
     tagId?: string,
+    multi?: boolean;
 }
 export class BwTableElement extends Component{
 
     tableModule : NewTableModule;
     queryModule: QueryModule;
+    protected multi: boolean = true;
 
     protected wrapperInit(para: IBwTableElementPara): HTMLElement {
         return undefined;
     }
 
+    tableReady(tableModule: NewTableModule){
+        let ready = () => {
+            tableModule.main.ftable.multiSelect = this.multi;
+        };
+        if (tableModule.main.isFtableReady) {
+            ready();
+        }else{
+            tableModule.main.on(BwTableModule.EVT_READY, () => {
+                ready();
+            });
+        }
+    }
+
     constructor(para: IBwTableElementPara) {
         super(para);
+        this.multi = 'multi' in para ? para.multi : true;
         // d.classAdd(this.dom.parentElement, 'table-page');
-        console.log('bw table ele', para);
+
         let bwTableEl = para.tableEl,
             isDynamic = tools.isEmpty(bwTableEl.cols),
             hasQuery = bwTableEl.querier && ([1,2,3, 13].includes(bwTableEl.querier.queryType));
@@ -116,13 +132,14 @@ export class BwTableElement extends Component{
                             if(noQuery){
                                 tableEl.noQuery = noQuery;
                             }
-                            ;
+
                             // this.para.tableDom = null;
                             this.tableModule = new NewTableModule({
                                 bwEl: tableEl,
                                 container: this.container,
                                 ajaxData: ajaxData,
                             });
+                            this.tableReady(this.tableModule);
                             this.tableModule.main.ftable.on(FastTable.EVT_RENDERED, () => {
                                 let locationLine = tableEl.scannableLocationLine;
                                 if(locationLine && ajaxData.mobilescan){
@@ -198,6 +215,7 @@ export class BwTableElement extends Component{
                                     bwEl: bwTableEl,
                                     container: this.container,
                                 });
+                                this.tableReady(this.tableModule);
 
                                 !sys.isMb && query.toggleCancle();
                                 if(tools.isMb) {
@@ -250,6 +268,7 @@ export class BwTableElement extends Component{
                     bwEl: bwTableEl,
                     container: this.container
                 });
+                this.tableReady(this.tableModule);
             }
             if(bwTableEl.autoRefresh) {
                 sys.window.wake("wake", null);

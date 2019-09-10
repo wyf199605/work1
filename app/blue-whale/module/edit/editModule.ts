@@ -136,11 +136,14 @@ export class EditModule {
 
         pickInput: (p) => {
             // console.log(dom,field,6)
+            let atrrs = p.field.atrrs,
+                multiValueFlag = atrrs && 'multiValueFlag' in atrrs ? atrrs.multiValueFlag : true;
             return new PickModule({
                 custom: p.field,
                 container: p.dom,
                 field: p.field,
                 data: p.data,
+                multi: multiValueFlag, //field.multiValue
                 dataGet: () => p.data ? p.data : this.get(),
                 onGetData: (dataArr: obj[], otherField: string) => {
                     this.pickOnGet(p, dataArr, otherField);
@@ -153,6 +156,8 @@ export class EditModule {
                 return this.comTnit['assignText'](p);
             } else {
                 let sepValue = ';';
+                let atrrs = p.field.atrrs,
+                    multiValueFlag = atrrs && 'multiValueFlag' in atrrs ? atrrs.multiValueFlag : true;
                 return new AssignModule({
                     data: p.data,
                     container: p.dom,
@@ -160,7 +165,7 @@ export class EditModule {
                     name: p.field.name,
                     pickerUrl: p.field.dataAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.dataAddr) : '',
                     ajaxUrl: p.field.assignAddr ? CONF.siteUrl + BwRule.reqAddr(p.field.assignAddr) : '',
-                    multi: p.field.atrrs && p.field.atrrs.multiValueFlag ? p.field.atrrs.multiValueFlag === 1 : true, //field.multiValue,
+                    multi: multiValueFlag, //field.multiValue,
                     sepValue: sepValue,
                     onSet: this.getAssignSetHandler(p.field),
                     onGetData: (dataArr: obj[], otherField: string) => {

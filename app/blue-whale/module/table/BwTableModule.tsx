@@ -497,7 +497,7 @@ export class BwTableModule extends Component {
         })
     }
 
-    protected isFtableReady;
+    public isFtableReady;
     protected _ftableReadyHandler: Function;
 
     set onFtableReady(handler: Function) {

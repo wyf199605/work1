@@ -14,6 +14,7 @@ interface PickModulePara extends ITextInputBasicPara {
     field: R_Field,
     data : obj,
     dataGet(): obj,
+    multi?: boolean;
     onGetData?(data: obj[], otherField: string): void
 }
 
@@ -40,6 +41,7 @@ export class PickModule extends TextInput {
     private otherField: string;
     private modal: Modal;
     private spinner: Spinner;
+    private multiSelect: boolean;
 
     constructor(para: PickModulePara) {
 
@@ -51,6 +53,7 @@ export class PickModule extends TextInput {
             },
             container: para.container,
         } as ITextInputPara);
+        this.multiSelect = para.multi;
         this.p = para;
     }
 
@@ -70,7 +73,7 @@ export class PickModule extends TextInput {
                 dataAddr = self.p.field.dataAddr;
 
                 self.body = <div></div>;
-                ajaxData = {output: 'json'}; 
+                ajaxData = {output: 'json'};
                 isDefault = false;
             }
 
@@ -148,7 +151,8 @@ export class PickModule extends TextInput {
 
                 self.bwTable = new BwTableElement({
                     tableEl: res,
-                    container : self.body
+                    container : self.body,
+                    multi: this.multiSelect
                 });
 
                 self.fromField = res.fromField;

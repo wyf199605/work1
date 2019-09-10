@@ -1524,6 +1524,8 @@ export class FastTable extends Component {
             let td = d.closest((e.target as HTMLElement), 'td'),
                 isCanSelectMb = false,// 在移动端是否可被点击选中
                 rowIndex = parseInt(td.parentElement.dataset.index), // 当前行
+                ctrlKey = e.ctrlKey,
+                shiftKey = e.shiftKey,
                 columnIndex = this.getColIndex(td.dataset.name);//当前列
             // console.log(columnIndex);
 
@@ -1536,15 +1538,19 @@ export class FastTable extends Component {
                     }
                 }
             }
+            if(!this.multiSelect){
+                ctrlKey = false;
+                shiftKey = false;
+            }
 
             if (this.pseudoTable && td.dataset.name === 'selectCol') {
                 if (this.pseudoTable._type === 'number') {
                     // 未使用checkbox
-                    if (e.ctrlKey === true) {
+                    if (ctrlKey === true) {
                         singleSelectedPseudoTableCell(rowIndex, true);
                         shiftComparePosition.rowIndex = rowIndex;
                         shiftComparePosition.columnIndex = 0;
-                    } else if (e.shiftKey === true) {
+                    } else if (shiftKey === true) {
                         if (shiftComparePosition.rowIndex === -1) {
                             shiftComparePosition.rowIndex = rowIndex;
                         }
@@ -1562,7 +1568,7 @@ export class FastTable extends Component {
                 this.trigger(FastTable.EVT_SELECTED, rowIndex);
             } else if(!tools.isMb || isCanSelectMb) {
                 // 点击表格cell选中只在 “PC端” 或者 “cell 为link类型的 ”开启；
-                if (e.ctrlKey === true) {
+                if (ctrlKey === true) {
                     // if (this.selectedCells[rowIndex].length === this.rowGet(rowIndex).cells.length) {
                     //     let row = this.rowGet(rowIndex);
                     //     row && row._selectedInnerRowSet(true);
@@ -1572,7 +1578,7 @@ export class FastTable extends Component {
                     singleSelectedTabelCell(rowIndex, columnIndex);
                     shiftComparePosition.rowIndex = rowIndex;
                     shiftComparePosition.columnIndex = columnIndex;
-                } else if (e.shiftKey === true) {
+                } else if (shiftKey === true) {
                     if (shiftComparePosition.columnIndex === -1 && shiftComparePosition.rowIndex === -1) {
                         shiftComparePosition.columnIndex = columnIndex;
                         shiftComparePosition.rowIndex = rowIndex;
@@ -3126,4 +3132,20 @@ export class FastTable extends Component {
             }
         }
     })();
+
+    protected _multiSelect: boolean = true;
+    set multiSelect(value: boolean){
+        this._multiSelect = value;
+        if(value){
+            this.selectedEvent.dragOff();
+            this.selectedEvent.dragOn();
+            this.pseudoTable.checkAllBox.disabled = false;
+        }else{
+            this.selectedEvent.dragOff();
+            this.pseudoTable.checkAllBox.disabled = true;
+        }
+    }
+    get multiSelect(){
+        return this._multiSelect;
+    }
 }
