@@ -57,21 +57,28 @@ export class PermissionTree extends Component {
         });
     }
 
-    private getDeep(children: ITreeNode[]) {
+    private getDeep(children: ITreeNode[], deep = 1): number {
         if (tools.isEmpty(children)) {
-            return 1;
+            return deep;
         }
-        let i = 1;
-        lookDeep(children || []);
-
-        function lookDeep(children: ITreeNode[]) {
-            i += 1;
-            if (tools.isNotEmpty(children[0].CHILDREN)) {
-                lookDeep(children[0].CHILDREN);
+        deep ++;
+        return Math.max(...children.map((child) => {
+            if(tools.isEmpty(child.CHILDREN)){
+                return deep;
             }
-        }
-
-        return i;
+            return this.getDeep(child.CHILDREN, deep);
+        }));
+        // let i = 1;
+        // lookDeep(children || []);
+        //
+        // function lookDeep(children: ITreeNode[]) {
+        //     i += 1;
+        //     if (tools.isNotEmpty(children[0].CHILDREN)) {
+        //         lookDeep(children[0].CHILDREN);
+        //     }
+        // }
+        //
+        // return i;
     }
 
     private treeItems: PermissionTreeItem[] = [];
