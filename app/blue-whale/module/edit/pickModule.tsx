@@ -128,20 +128,18 @@ export class PickModule extends TextInput {
     private ajaxLoad(ajaxUrl: string, ajaxData : obj, isDefault: boolean) {
         let self = this;
         //加载效果
-        if (self.p.field.multiPick) {
-            self.spinner = new Spinner({
-                el: d.query('.btn-group', self.p.container),
-                type: 1
-            });
-            self.spinner.show();
-        }
+        self.spinner = new Spinner({
+            el: d.query('.btn-group', self.p.container),
+            type: 1
+        });
+        self.spinner.show();
+        this.disabled = true;
 
         BwRule.Ajax.fetch(ajaxUrl, {
             data: ajaxData
         }).then(({response}) => {
             if (self.p.field.multiPick) {
                 self.multiPick(response);
-                self.spinner.hide();
             } else {
                 let res = response.body.elements[0];
                 self.modalInit();
@@ -155,6 +153,9 @@ export class PickModule extends TextInput {
                 self.fromField = res.fromField;
                 self.otherField = res.otherField;
             }
+        }).finally(() => {
+            self.spinner.hide();
+            this.disabled = false;
         });
     }
 
