@@ -77,6 +77,8 @@ export class PickModule extends TextInput {
             self.ajaxLoad(CONF.siteUrl + BwRule.reqAddr(dataAddr, this.p.dataGet()), ajaxData, isDefault);
         } else {
             this.modal.isShow = true;
+            let tableModule = this.bwTable && this.bwTable.tableModule;
+            tableModule && tableModule.responsive();
         }
     }
 
@@ -179,7 +181,7 @@ export class PickModule extends TextInput {
             width: width,
             height: '80%',
             container: d.closest(this.para.container, '.page-container[data-src]'),
-            isBackground: false,
+            isBackground: true,
             footer: {},
             top: 40,
             isMb: false
