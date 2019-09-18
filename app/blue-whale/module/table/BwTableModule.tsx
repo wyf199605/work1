@@ -2731,9 +2731,10 @@ export class BwTableModule extends Component {
                                     window.localStorage.removeItem('nextKeyField');
                                     window.localStorage.removeItem('currentKeyField');
                                     ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                        box.children.forEach((button) => {
-                                            button && (button.isDisabled = false);
-                                        });
+                                        // box.children.forEach((button) => {
+                                        //     button && (button.isDisabled = false);
+                                        // });
+                                        btnRefresh();
                                         spinner && spinner.hide();
                                     }, this.pageUrl, this.ui.itemId);
                                 }
