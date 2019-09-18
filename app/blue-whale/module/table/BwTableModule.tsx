@@ -2669,9 +2669,10 @@ export class BwTableModule extends Component {
                                     type: Spinner.SHOW_TYPE.cover,
                                     time: 5000,
                                     onTimeout: () => {
-                                        box.children.forEach((button) => {
-                                            button && (button.isDisabled = false);
-                                        });
+                                        // box.children.forEach((button) => {
+                                        //     button && (button.isDisabled = false);
+                                        // });
+                                        btnRefresh();
                                         // Modal.toast('当前网络不佳～');
                                     }
                                 });
@@ -2717,9 +2718,10 @@ export class BwTableModule extends Component {
                                         if (tools.isNotEmpty(locData)) {
                                             clearInterval(interval);
                                             ButtonAction.get().clickHandle(btnUi, select, (res) => {
-                                                box.children.forEach((button) => {
-                                                    button && (button.isDisabled = false);
-                                                });
+                                                // box.children.forEach((button) => {
+                                                //     button && (button.isDisabled = false);
+                                                // });
+                                                btnRefresh();
                                                 spinner && spinner.hide();
                                             }, this.pageUrl, this.ui.itemId);
                                         }
