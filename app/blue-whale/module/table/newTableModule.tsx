@@ -431,7 +431,7 @@ export class NewTableModule extends AGroupTabItem {
 
         this.subIndex = index;
         if (row && row.selected) {
-            this.subNoEdit = this.main.noEdit || (row.data['EDITEXPRESS'] === 0);
+            this.subNoEdit = (row.data['EDITEXPRESS'] === 0);
             if (tools.isNotEmpty(this.showSubField) && tools.isNotEmpty(row.data[this.showSubField])) {
                 pseudoTable && pseudoTable.setPresentSelected(index);
                 // let showSubSeq = row.data[this.showSubField].split(',');

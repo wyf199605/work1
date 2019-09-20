@@ -133,6 +133,18 @@ namespace G {
                     path: path
                 })
             },
+            saveAs(path: string, back: IShellEventHandler, info?: IShellEventHandler){
+                return ShellBase.handler("dealFile", {
+                    type: 1,
+                    downPath: path
+                }, back, info);
+            },
+            openFile(path: string, back: IShellEventHandler, info?: IShellEventHandler){
+                return ShellBase.handler("dealFile", {
+                    type: 0,
+                    downPath: path
+                }, back, info);
+            }
         };
 
         const casio = {
