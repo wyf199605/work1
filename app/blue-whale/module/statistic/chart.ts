@@ -686,7 +686,7 @@ export = class ChartBasic {
             // 指定图表的配置项和数据
             echart = new Echart();
             echart.title = {
-                text: '订单明细图',
+                text: '',
                 x: 'center'
             };
             if (!sys.isMb) {
@@ -708,11 +708,11 @@ export = class ChartBasic {
                 };
             }
             echart.title = sys.isMb ? {
-                text: '订单明细图',
+                text: '',
                 x: 'center',
                 top: '20px'
             } : {
-                    text: '订单明细图',
+                    text: '',
                     x: 'center'
                 };
             echart.legend = sys.isMb ? {

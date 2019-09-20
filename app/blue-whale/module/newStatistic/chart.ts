@@ -106,7 +106,7 @@ export = class NewChartBasic{
                                 echartBody = d.query('.Echart_body', wrapper.parentElement),
                                 tableBut, fullScreenBut;
                             echartBody && d.remove(echartBody);
-                            
+
                             wrapper.style.display = 'block';
                             echartBody = document.createElement('div');
                             echartBody.className = 'Echart_body';
@@ -694,7 +694,7 @@ export = class NewChartBasic{
             // 指定图表的配置项和数据
             echart = new Echart();
             echart.title = {
-                text: '订单明细图',
+                text: '',
                 x:'center'
             };
             if(!sys.isMb) {
@@ -716,11 +716,11 @@ export = class NewChartBasic{
                 };
             }
             echart.title =  sys.isMb ? {
-                text : '订单明细图',
+                text : '',
                 x : 'center',
                 top : '20px'
             } : {
-                text : '订单明细图',
+                text : '',
                 x : 'center'
             };
             echart.legend = sys.isMb ? {

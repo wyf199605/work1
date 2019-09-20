@@ -105,7 +105,7 @@ export class Echart{
 
     private setDefault(){
         this._title = {
-            text : '订单明细图',
+            text : '',
             x : 'center'
         };
         this._grid = tools.isMb ? {
