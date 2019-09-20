@@ -1,44 +1,44 @@
 /// <amd-module name="BwTableModule"/>
-import { BwRule } from "../../common/rule/BwRule";
+import {BwRule} from "../../common/rule/BwRule";
 import IComponentPara = G.IComponentPara;
 import Component = G.Component;
 import d = G.d;
 import tools = G.tools;
 import sys = BW.sys;
-import { FastTable, IFastTableCol } from "../../../global/components/newTable/FastTable";
+import {FastTable, IFastTableCol} from "../../../global/components/newTable/FastTable";
 import CONF = BW.CONF;
-import { FastBtnTable, IFastBtnTablePara } from "../../../global/components/FastBtnTable/FastBtnTable";
-import { ITableCol, TableBase } from "../../../global/components/newTable/base/TableBase";
-import { InputBox } from "../../../global/components/general/inputBox/InputBox";
-import { Button, IButton } from "../../../global/components/general/button/Button";
-import { Modal } from "../../../global/components/feedback/modal/Modal";
-import { FastTableCell } from "../../../global/components/newTable/FastTableCell";
-import { SelectBox } from "../../../global/components/form/SelectBox/SelectBox";
-import { InventoryBtn, ontimeRefresh } from "./InventoryBtn";
-import { Loading } from "../../../global/components/ui/loading/loading";
-import { LayoutImage } from "../../../global/components/view/LayoutImg/LayoutImage";
-import { NewTableModule } from "./newTableModule";
+import {FastBtnTable, IFastBtnTablePara} from "../../../global/components/FastBtnTable/FastBtnTable";
+import {ITableCol, TableBase} from "../../../global/components/newTable/base/TableBase";
+import {InputBox} from "../../../global/components/general/inputBox/InputBox";
+import {Button, IButton} from "../../../global/components/general/button/Button";
+import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {FastTableCell} from "../../../global/components/newTable/FastTableCell";
+import {SelectBox} from "../../../global/components/form/SelectBox/SelectBox";
+import {InventoryBtn, ontimeRefresh} from "./InventoryBtn";
+import {Loading} from "../../../global/components/ui/loading/loading";
+import {LayoutImage} from "../../../global/components/view/LayoutImg/LayoutImage";
+import {NewTableModule} from "./newTableModule";
 import Shell = G.Shell;
-import { ButtonAction } from "../../common/rule/ButtonAction/ButtonAction";
-import { Inputs } from "../inputs/inputs";
-import { FlowDesigner } from "../flowDesigner/FlowDesigner";
-import { PasswdModal } from "../changePassword/passwdModal";
-import { Spinner } from "../../../global/components/ui/spinner/spinner";
-import { FormCom } from "../../../global/components/form/basic";
-import { EditModule } from "../edit/editModule";
-import { TableDataCell } from "../../../global/components/newTable/base/TableCell";
-import { CheckBox } from "../../../global/components/form/checkbox/checkBox";
-import { BwUploader } from "../uploadModule/bwUploader";
-import { ImgModal, ImgModalPara } from "../../../global/components/ui/img/img";
-import { BwLayoutImg } from "../uploadModule/bwLayoutImg";
-import { TableDataRow } from "../../../global/components/newTable/base/TableRow";
-import { FastTableColumn } from "../../../global/components/newTable/FastTabelColumn";
-import { NewIDB } from "../../../global/NewIDB";
-import { Datetime } from "../../../global/components/form/datetime/datetime";
-import { DatetimeMb } from "../../../global/components/form/datetime/datetimeInput.mb";
-import { BwTableEditModule } from "./BwTableEditModule";
-import { ShareCode } from '../../common/share-code/shareCode';
-import { ChartTableModule } from "../echart-module/chartTableModule";
+import {ButtonAction} from "../../common/rule/ButtonAction/ButtonAction";
+import {Inputs} from "../inputs/inputs";
+import {FlowDesigner} from "../flowDesigner/FlowDesigner";
+import {PasswdModal} from "../changePassword/passwdModal";
+import {Spinner} from "../../../global/components/ui/spinner/spinner";
+import {FormCom} from "../../../global/components/form/basic";
+import {EditModule} from "../edit/editModule";
+import {TableDataCell} from "../../../global/components/newTable/base/TableCell";
+import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import {BwUploader} from "../uploadModule/bwUploader";
+import {ImgModal, ImgModalPara} from "../../../global/components/ui/img/img";
+import {BwLayoutImg} from "../uploadModule/bwLayoutImg";
+import {TableDataRow} from "../../../global/components/newTable/base/TableRow";
+import {FastTableColumn} from "../../../global/components/newTable/FastTabelColumn";
+import {NewIDB} from "../../../global/NewIDB";
+import {Datetime} from "../../../global/components/form/datetime/datetime";
+import {DatetimeMb} from "../../../global/components/form/datetime/datetimeInput.mb";
+import {BwTableEditModule} from "./BwTableEditModule";
+import {ShareCode} from '../../common/share-code/shareCode';
+import {ChartTableModule} from "../echart-module/chartTableModule";
 
 export interface IBwTableModulePara extends IComponentPara {
     ui: IBW_Table;
@@ -61,7 +61,7 @@ export class BwTableModule extends Component {
     static EVT_READY = '__TABLE_READY__';  // 创建fastTable完成后的事件
 
     protected wrapperInit(para: IBwTableModulePara): HTMLElement {
-        return <div className="table-module-wrapper" />;
+        return <div className="table-module-wrapper"/>;
     }
 
     protected readonly isDrill: boolean;   // 是否钻取
@@ -130,9 +130,10 @@ export class BwTableModule extends Component {
             }
             return x;
         }
+
         if (this.isPivot) {
             // 交叉制表
-            if(!this.hasQuery){
+            if (!this.hasQuery) {
                 this.pivotInit(para.ajaxData);
             }
         } else {
@@ -174,18 +175,18 @@ export class BwTableModule extends Component {
                 name: null,
                 isReplaceTable: this.isDrill,
             } : {
-                    name: [this.isRfid ? null : null, 'statistic', 'export'],
-                    type: tools.isMb ? "dropdown" : "button",
-                    target: tools.isMb ? d.query('[data-target="popover"]>[data-action="down-menu"]') : void 0,
-                    isReplaceTable: this.isDrill,
-                },
+                name: [this.isRfid ? null : null, 'statistic', 'export'],
+                type: tools.isMb ? "dropdown" : "button",
+                target: tools.isMb ? d.query('[data-target="popover"]>[data-action="down-menu"]') : void 0,
+                isReplaceTable: this.isDrill,
+            },
             cellFormat: (cellData, cell: FastTableCell) => {
                 let col = cell.column,
                     rowData = this.ftable.data[cell.row.index]; // 行数据
                 if (col) {
                     return this.cellFormat(cell, cellData, rowData);
                 } else {
-                    return { text: cellData }
+                    return {text: cellData}
                 }
             },
             rowFormat: (rowData: obj) => {
@@ -198,7 +199,7 @@ export class BwTableModule extends Component {
                     let colorVal = rowData[name];
                     if (colorVal) {
                         // 显示颜色
-                        let { r, g, b } = tools.val2RGB(colorVal),
+                        let {r, g, b} = tools.val2RGB(colorVal),
                             colorStr = `rgb(${r},${g},${b})`;
                         if (i === 0) {
                             bgColor = colorStr
@@ -207,62 +208,106 @@ export class BwTableModule extends Component {
                         }
                     }
                 });
-                return { color, bgColor, attr };
+                return {color, bgColor, attr};
             },
             page: this.ui.multPage === 0 ? null : {
                 size: 50,
                 options: [50, 100, 500],
                 isPulldownRefresh: true
             },
-            menu: [this.isPivot ? null : {
-                colMulti: 1,
-                title: '锁定/解锁列',
-                onClick: (cell) => {
-                    let column = cell.column as FastTableColumn,
-                        isFixed = column.isFixed;
-                    column.isFixed = !isFixed;
-                    Modal.toast(!isFixed ? '已锁定' : '已解锁');
-                }
-            }, {
-                title: '复制单元格',
-                onClick: (cell) => {
-                    sys.window.copy(cell.text);
-                }
-            }, {
-                title: '复制行',
-                onClick: (cell, rows, columns) => {
-                    let col = columns[0];
-                    if (col) {
-                        sys.window.copy(rows.map(row => row.cells.map(cell => cell.text).join("\t")).join("\r\n"));
+            menu: [
+                this.isPivot ? null : {
+                    colMulti: 1,
+                    title: '锁定/解锁列',
+                    onClick: (cell) => {
+                        let column = cell.column as FastTableColumn,
+                            isFixed = column.isFixed;
+                        column.isFixed = !isFixed;
+                        Modal.toast(!isFixed ? '已锁定' : '已解锁');
                     }
-                }
-            }, {
-                colMulti: 1,
-                title: '复制列',
-                onClick: (cell, rows, columns) => {
-                    let col = columns[0];
-                    if (col) {
-                        let cells = [...col.cells[0], ...col.cells[1]].map(cell => cell.text).join("\r\n");
-                        sys.window.copy(cells)
+                }, {
+                    title: '复制单元格',
+                    onClick: (cell) => {
+                        sys.window.copy(cell.text);
                     }
-                }
-            }, {
-                rowMulti: 1,
-                title: '列复制',
-                children: this.cols.filter(col => !col.noShow).map(col => {
-                    return {
-                        title: col.title,
-                        onClick: (cell: FastTableCell) => {
-                            sys.window.copy(cell.frow.data[col.name]);
+                }, {
+                    title: '复制行',
+                    onClick: (cell, rows, columns) => {
+                        let col = columns[0];
+                        if (col) {
+                            sys.window.copy(rows.map(row => row.cells.map(cell => cell.text).join("\t")).join("\r\n"));
                         }
                     }
-                })
-            }, tools.isMb ? {
-                title: '列排序',
-                onClick: () => {
-                    this.ftable.colsSort.open();
-                }
-            } : null],
+                }, {
+                    colMulti: 1,
+                    title: '复制列',
+                    onClick: (cell, rows, columns) => {
+                        let col = columns[0];
+                        if (col) {
+                            let cells = [...col.cells[0], ...col.cells[1]].map(cell => cell.text).join("\r\n");
+                            sys.window.copy(cells)
+                        }
+                    }
+                }, {
+                    rowMulti: 1,
+                    title: '列复制',
+                    children: this.cols.filter(col => !col.noShow).map(col => {
+                        return {
+                            title: col.title,
+                            onClick: (cell: FastTableCell) => {
+                                sys.window.copy(cell.frow.data[col.name]);
+                            }
+                        }
+                    })
+                }, tools.isMb ? {
+                    title: '列排序',
+                    onClick: () => {
+                        this.ftable.colsSort.open();
+                    }
+                } : null,
+                tools.isPc ? {
+                    title: '另存为',
+                    canShow: (cell) => {
+                        let field: R_Field = cell.column.content;
+                        return "AppShell" in window && BwRule.isNewFile(field.atrrs.dataType);
+                    },
+                    onClick: (cell) => {
+                        // Shell.file.openFile();
+                        let field: R_Field = cell.column.content,
+                            dataType = field.atrrs.dataType,
+                            rowData = cell.frow.data;
+                        if (BwRule.isNewFile(dataType)) {
+                            let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                                "md5_field": field.name,
+                                [field.name]: rowData[field.name],
+                                down: 'allow'
+                            });
+                            url = "http://bwt.fastlion.cn:7777/hy/rest/attachment/download/file?md5_field=ATTACHNAME1&attachname1=9625F1A5CDC1F14DFF3536A85D481B21&down=allow";
+                            Shell.file.saveAs(url, (e) => {
+                                console.log(e);
+                                if (e.success) {
+                                    Modal.confirm({
+                                        msg: "文件已下载成功！是否打开？",
+                                        callback: (flag) => {
+                                            if(flag){
+                                                Shell.file.openFile(url, (e) => {
+                                                    if(!e.success){
+                                                        Modal.alert(e.msg);
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }else{
+                                    e.msg &&  Modal.alert(e.msg);
+                                }
+                            });
+                        }else{
+                            Modal.alert("文件下载失败");
+                        }
+                    }
+                } : null
+            ],
             dataAction: (data, type, callback) => {
                 let editModule = this.initModalEdit(),
                     isEdit = type !== 'show',
@@ -325,7 +370,7 @@ export class BwTableModule extends Component {
                         {/* <input type="text" placeholder="请选择时间" disabled /> */}
                         {
                             start = <DatetimeMb className="datetime" c-var="time" format="yyyy-MM-dd HH:mm"
-                                placeholder="请选择时间" />
+                                                placeholder="请选择时间"/>
                         }
                         {/* <i className="iconfont icon-arrow-right"></i> */}
                     </div>
@@ -333,7 +378,7 @@ export class BwTableModule extends Component {
                         {/* <input type="text" placeholder="请选择时间" disabled /> */}
                         {
                             end = <DatetimeMb className="datetime" c-var="time" format="yyyy-MM-dd HH:mm"
-                                placeholder="请选择时间" />
+                                              placeholder="请选择时间"/>
                         }
                         {/* <i className="iconfont icon-arrow-right"></i> */}
                     </div>
@@ -371,11 +416,11 @@ export class BwTableModule extends Component {
             }
             body.remove();
             let user_id = JSON.parse(localStorage.getItem("userInfo")).userid || "";
-            let params = { "start_time": start.value, "end_time": end.value, user_id }
+            let params = {"start_time": start.value, "end_time": end.value, user_id}
             BwRule.Ajax.fetch(CONF.ajaxUrl.location, {
                 type: "POST",
                 data: params
-            }).then(({ response }) => {
+            }).then(({response}) => {
                 G.Shell.location.localSubmit(response)
             })
         })
@@ -397,7 +442,7 @@ export class BwTableModule extends Component {
                     once: ui.multPage !== 1, // =1时后台分页, 0 不分页, 2,前台分页
                     auto: !this.hasQuery,    // 有查询器时不自动查询
                     timeout: (this.ui.timeOut || 0) * 1000,
-                    fun: ({ pageSize, current, sort, custom, timeout }) => {
+                    fun: ({pageSize, current, sort, custom, timeout}) => {
                         let url = CONF.siteUrl + BwRule.reqAddr(ui.dataAddr);
                         pageSize = pageSize === -1 ? 3000 : pageSize;
 
@@ -418,10 +463,10 @@ export class BwTableModule extends Component {
                             }),
                             // 获取lookup数据
                             this.lookup
-                        ]).then(([{ response }]) => {
+                        ]).then(([{response}]) => {
                             this.wrapper.style.display = 'block';
                             this.ui.initShow && new ChartTableModule(this.ui, this.wrapper, response, this.ftable);
-                            let { data, head } = response;
+                            let {data, head} = response;
                             // 选项查询处理(wbf)
                             this.sectionField(response);
                             data = this.addOldData(data);
@@ -575,8 +620,8 @@ export class BwTableModule extends Component {
                 container: this.container
             });
             this.ajax.fetch(CONF.siteUrl + BwRule.reqAddr(this.ui.dataAddr), {
-                data: Object.assign({}, ajaxData, { pageparams: `{"index"=1,"size"=3000,"total"=1}` })  //设置初始分页条件
-            }).then(({ response }) => {
+                data: Object.assign({}, ajaxData, {pageparams: `{"index"=1,"size"=3000,"total"=1}`})  //设置初始分页条件
+            }).then(({response}) => {
                 resolve(response);
             }).catch((e) => {
                 reject(e);
@@ -758,7 +803,7 @@ export class BwTableModule extends Component {
         // 是否为钻取
         let url = drillUrlGet(field, rowData, this.ui.keyField);
         if (url) {
-            sys.window.open({ url });
+            sys.window.open({url});
             return;
         }
         //单元格快捷按钮
@@ -1113,7 +1158,7 @@ export class BwTableModule extends Component {
                 if (tools.isNotEmpty(defAddrs)) {
                     Promise.all(defAddrs.map(url => {
                         return BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(url))
-                            .then(({ response }) => {
+                            .then(({response}) => {
                                 // TODO data可能不存在
                                 let resultData = tools.keysVal(response, 'data', 0) || {};
                                 data = Object.assign(data, resultData);
@@ -1192,7 +1237,7 @@ export class BwTableModule extends Component {
             if (!Array.isArray(this.ui.aggrList) || !this.ui.aggrList[0]) {
                 return false;
             }
-            aggrWrap = <div className="aggr-wrapper" />;
+            aggrWrap = <div className="aggr-wrapper"/>;
             d.before(this.ftable.wrapper, aggrWrap);
             return true;
         };
@@ -1211,7 +1256,7 @@ export class BwTableModule extends Component {
                 let valSpan = <span>{aggr.caption}:</span>;
                 d.append(aggrWrap, valSpan);
                 BwRule.Ajax.fetch(CONF.siteUrl + BwRule.reqAddr(aggr.dataAddr, urlData))
-                    .then(({ response }) => {
+                    .then(({response}) => {
                         let attr: obj = this.ui.aggrList[0];
                         let value = tools.keysVal(response, 'data', 0, tools.keysVal(response, 'meta', 0));
                         valSpan.innerHTML = `${aggr.caption}:${BwRule.formatTableText(value || 0, attr.atrrs)} &nbsp;&nbsp;`;
@@ -1219,7 +1264,7 @@ export class BwTableModule extends Component {
             });
         };
 
-        return { get };
+        return {get};
     })();
 
     protected filter = (() => {
@@ -1240,14 +1285,14 @@ export class BwTableModule extends Component {
             if (builder === null) {
                 let body = tools.isMb ?
                     <div className="mui-content">
-                        <ul className="mui-table-view" data-query-name="local" />
+                        <ul className="mui-table-view" data-query-name="local"/>
                         <div data-action="add" data-name="local" className="mui-btn mui-btn-block mui-btn-primary">
-                            <span className="mui-icon mui-icon-plusempty" /> 添加条件
+                            <span className="mui-icon mui-icon-plusempty"/> 添加条件
                         </div>
                     </div>
                     :
                     <div className="filter-form" data-query-name="local">
-                        <span data-action="add" className="iconfont blue icon-jiahao" />
+                        <span data-action="add" className="iconfont blue icon-jiahao"/>
                     </div>;
 
                 modal = new Modal({
@@ -1391,7 +1436,7 @@ export class BwTableModule extends Component {
             let calcCols = rfidCols.calc.cols || {},
                 when = rfidCols.calc.when || {},
                 countElements = this.countElements,
-                { calculate, calculateScan, calculateDiff, calculateAdd } = calcCols,
+                {calculate, calculateScan, calculateDiff, calculateAdd} = calcCols,
                 calcRule = rfidCols.calc.calcRule || [],
                 calculateEl = countElements[calculate],
                 calculateScanEL = countElements[calculateScan],
@@ -1450,7 +1495,7 @@ export class BwTableModule extends Component {
                 }
 
                 calcRule.forEach(calc => {
-                    let { field, rule } = calc;
+                    let {field, rule} = calc;
                     if (rule.slice(0, 3) == 'SUM') {
                         let sum = this.countCalcSum(ftable, field),
                             el = countElements[field];
@@ -1483,7 +1528,7 @@ export class BwTableModule extends Component {
             let calcCols = rfidCols.calc.cols || {},
                 when = rfidCols.calc.when || {},
                 countElements = this.countElements,
-                { calculate, calculateScan, calculateDiff, calculateAdd } = calcCols,
+                {calculate, calculateScan, calculateDiff, calculateAdd} = calcCols,
                 calcRule = rfidCols.calc.calcRule || [],
                 calculateEl = countElements[calculate],
                 calculateScanEL = countElements[calculateScan],
@@ -1531,7 +1576,7 @@ export class BwTableModule extends Component {
                     colHeadStr[rfidCols.scanField.toUpperCase()] = countElements['scanyet'].innerHTML;
                 }
                 calcRule.forEach(calc => {
-                    let { field, rule } = calc;
+                    let {field, rule} = calc;
                     if (rule.slice(0, 3) == 'SUM') {
                         let sum = this.countCalcSum(ftable, field),
                             el = countElements[field];
@@ -1665,7 +1710,7 @@ export class BwTableModule extends Component {
             let calcCols = rfidCols.calc.cols || {},
                 when = rfidCols.calc.when || {},
                 countElements = this.countElements,
-                { calculate, calculateScan, calculateDiff, calculateAdd } = calcCols,
+                {calculate, calculateScan, calculateDiff, calculateAdd} = calcCols,
                 calcRule = rfidCols.calc.calcRule || [],
                 calculateEl = countElements[calculate],
                 calculateScanEL = countElements[calculateScan],
@@ -1721,7 +1766,7 @@ export class BwTableModule extends Component {
 
                     setTimeout(() => {
                         calcRule.forEach(calc => {
-                            let { field, rule } = calc;
+                            let {field, rule} = calc;
                             if (rule.slice(0, 3) == 'SUM') {
                                 let sum = this.countCalcSum(ftable, field),
                                     el = countElements[field];
@@ -1764,9 +1809,9 @@ export class BwTableModule extends Component {
             if (isImg && field.link) {
                 // 缩略图
                 let url = tools.url.addObj(CONF.siteUrl + BwRule.reqAddr(field.link, rowData), this.ajaxData, true, true);
-                url = tools.url.addObj(url, { version: new Date().getTime() });
+                url = tools.url.addObj(url, {version: new Date().getTime()});
 
-                text = <img src={url} />;
+                text = <img src={url}/>;
                 classes.push('cell-img');
 
             } else if (BwRule.isNewImg(dataType)) {
@@ -1785,7 +1830,7 @@ export class BwTableModule extends Component {
                             return <img style={{
                                 maxWidth: width - 2 + '%',
                                 marginRight: '2%'
-                            }} src={url} alt="" />
+                            }} src={url} alt=""/>
                         })}
                     </div>;
                 }
@@ -1800,7 +1845,7 @@ export class BwTableModule extends Component {
 
                     // 多图缩略图控件
                     if (tools.isNotEmptyArray(urls)) {
-                        text = new LayoutImage({ urls }).wrapper;
+                        text = new LayoutImage({urls}).wrapper;
                     }
                 }
 
@@ -1808,7 +1853,7 @@ export class BwTableModule extends Component {
 
             } else if (BwRule.isNewFile(dataType)) {
                 if (cellData) {
-                    BwRule.getFileInfo(field.name, cellData).then(({ response }) => {
+                    BwRule.getFileInfo(field.name, cellData).then(({response}) => {
                         response = JSON.parse(response);
                         if (response && response.dataArr && response.dataArr[0]) {
                             let data = response.dataArr[0];
@@ -1816,7 +1861,7 @@ export class BwTableModule extends Component {
                         }
                         classes.push('cell-link');
                         color = 'blue';
-                        cell.formatCell({ text, classes, bgColor, color, data });
+                        cell.formatCell({text, classes, bgColor, color, data});
                     }).catch((e) => {
                         console.log(e);
                     });
@@ -1830,7 +1875,7 @@ export class BwTableModule extends Component {
 
             } else if (field.name === 'STDCOLORVALUE') {
                 // 显示颜色
-                let { r, g, b } = tools.val2RGB(cellData);
+                let {r, g, b} = tools.val2RGB(cellData);
                 text = <div style={`backgroundColor: rgb(${r},${g},${b})`} height="100%"></div>;
 
             } else if (field.elementType === 'lookup') {
@@ -1885,7 +1930,7 @@ export class BwTableModule extends Component {
             let when = field.backWhen;
             if (when) {
                 if (eval(tools.str.parseTpl(when, rowData))) {
-                    let { r, g, b } = tools.val2RGB(field.backColor);
+                    let {r, g, b} = tools.val2RGB(field.backColor);
                     bgColor = `rgb(${r},${g},${b})`
                 }
             }
@@ -1899,7 +1944,7 @@ export class BwTableModule extends Component {
             //         sys.window.openImg(picture);
             //     }
             // }
-            return { text, classes, bgColor, color, data };
+            return {text, classes, bgColor, color, data};
         }
     }
 
@@ -1909,8 +1954,8 @@ export class BwTableModule extends Component {
 
         let imgCreate = (url: string, md5: string, isClose: boolean = true) => {
             return <div className="img">
-                {isClose ? <div className="appcommon app-guanbi1 img-close" data-md5={md5} /> : ''}
-                <img src={url} />
+                {isClose ? <div className="appcommon app-guanbi1 img-close" data-md5={md5}/> : ''}
+                <img src={url}/>
             </div>
         };
 
@@ -1948,7 +1993,7 @@ export class BwTableModule extends Component {
             let btnWrapper: HTMLElement = null,
                 imgWrapper: HTMLElement = null,
                 wrapper = <div className="table-img-wrapper">
-                    {btnWrapper = <div className="table-img-wrapper-btns" />}
+                    {btnWrapper = <div className="table-img-wrapper-btns"/>}
                     {imgWrapper = <div className="table-img">
                         {md5Arr.map(md5 => imgCreate(BwRule.fileUrlGet(md5, fieldName), md5, updatable))}
                     </div>}
@@ -1988,7 +2033,7 @@ export class BwTableModule extends Component {
             let dataType = field.dataType || field.atrrs.dataType,
                 isSign = dataType === BwRule.DT_SIGN;
             if (updatable) {
-                let imgContainer = <div className="table-img-uploader" />;
+                let imgContainer = <div className="table-img-uploader"/>;
                 d.append(btnWrapper, imgContainer);
                 uploadModule = new BwUploader({
                     uploadType: isSign ? 'sign' : 'file',
@@ -2034,7 +2079,7 @@ export class BwTableModule extends Component {
 
         };
 
-        return { show };
+        return {show};
     })();
 
     // 单图查看与编辑
@@ -2107,9 +2152,9 @@ export class BwTableModule extends Component {
         let imgWrapperGet = (field: R_Field, imgIndex: number) => {
             let nameField = field.name,
                 wrapper = <div className="table-img-wrapper" data-field={nameField}>
-                    <div className="table-img-wrapper-btns" />
+                    <div className="table-img-wrapper-btns"/>
                     <div className="table-img">
-                        <img data-index={imgIndex} style="max-height:500px;max-width:700px" />
+                        <img data-index={imgIndex} style="max-height:500px;max-width:700px"/>
                     </div>
                 </div>;
 
@@ -2163,7 +2208,7 @@ export class BwTableModule extends Component {
                     onClick: () => {
                         // this.md5s[nameField] = '';
                         img.src = '';
-                        tools.isFunction(onUploaded) && onUploaded({ [nameField]: '' });
+                        tools.isFunction(onUploaded) && onUploaded({[nameField]: ''});
                     }
                 });
             }
@@ -2228,7 +2273,7 @@ export class BwTableModule extends Component {
                                 if (tools.isNotEmpty(response)) {
                                     let data = response[0],
                                         version = data['version'];
-                                    version && (url = tools.url.addObj(url, { version: version }));
+                                    version && (url = tools.url.addObj(url, {version: version}));
                                 }
                                 idb.destroy();
                                 resolve(url);
@@ -2420,10 +2465,10 @@ export class BwTableModule extends Component {
                                                     ajaxData['up' + key] = res[key];
                                                 }
                                             }
-                                            return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, { isAdmin: 1 }, false), {
+                                            return BwRule.Ajax.fetch(tools.url.addObj(CONF.ajaxUrl.personPassword, {isAdmin: 1}, false), {
                                                 type: 'POST',
                                                 data: JSON.stringify([ajaxData])
-                                            }).then(({ response }) => {
+                                            }).then(({response}) => {
                                                 return new Promise((resolve) => {
                                                     if (response.errorCode === 0) {
                                                         resolve(true);
@@ -2442,7 +2487,7 @@ export class BwTableModule extends Component {
                             } else if (btn.data.openType.indexOf('flow') > -1) {
                                 // 流程引擎操作按钮
                                 let btnUi = btn.data as R_Button,
-                                    { multiselect, selectionFlag } = btnUi,
+                                    {multiselect, selectionFlag} = btnUi,
                                     selectedData = multiselect === 2 && selectionFlag ?
                                         ftable.unselectedRowsData : ftable.selectedRowsData;
                                 let select = multiselect === 1 ? selectedData[0] : selectedData,
@@ -2466,7 +2511,7 @@ export class BwTableModule extends Component {
                                 let field = btn.data.openType.split('-')[1];
                                 switch (field) {
                                     case 'look': {
-                                        BwRule.Ajax.fetch(dataAddr).then(({ response }) => {
+                                        BwRule.Ajax.fetch(dataAddr).then(({response}) => {
                                             new FlowDesigner(response, field);
                                         }).catch(err => {
                                             console.log(err);
@@ -2476,7 +2521,7 @@ export class BwTableModule extends Component {
                                     case 'design': {
                                         BwRule.Ajax.fetch(dataAddr, {
                                             type: 'GET'
-                                        }).then(({ response }) => {
+                                        }).then(({response}) => {
                                             new FlowDesigner(response, field);
                                         }).catch(err => {
                                             console.log(err);
@@ -2521,7 +2566,9 @@ export class BwTableModule extends Component {
                                         Modal.toast("无打印内容")
                                         return false;
                                     } else {
-                                        body = <div class="printwrap"> <ul class="printName"></ul></div>
+                                        body = <div class="printwrap">
+                                            <ul class="printName"></ul>
+                                        </div>
                                         printer.forEach((item: any) => {
                                             let itemDom = <li>
                                                 <span class="print-name">{item.text}</span>
@@ -2556,17 +2603,19 @@ export class BwTableModule extends Component {
                                             obj.printer = data.text;
                                             obj.printData = printData;
                                             Shell.other.filePrint(obj, (e) => {
-                                                let doms = <ul class="result slideInUp"> </ul>
+                                                let doms = <ul class="result slideInUp"></ul>
                                                 e.data.printData.forEach(item => {
                                                     let itemDom = null;
                                                     if (item.name.indexOf('jpg') > -1 || item.name.indexOf('png') > -1) {
                                                         itemDom = <li>
                                                             <span class="print-name">
-                                                                <i style="color:#32A0FF,fontSize:16px" class="iconfont icon-image"></i>
+                                                                <i style="color:#32A0FF,fontSize:16px"
+                                                                   class="iconfont icon-image"></i>
                                                                 &nbsp; {item.name}
                                                             </span>
                                                             <span>
-                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                <i style="color:#3FE0B7"
+                                                                   class="iconfont icon-dagou2"></i>
                                                                 &nbsp;{item.msg}
                                                             </span>
                                                         </li>
@@ -2577,29 +2626,34 @@ export class BwTableModule extends Component {
                                                                 &nbsp; {item.name}
                                                             </span>
                                                             <span>
-                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                <i style="color:#3FE0B7"
+                                                                   class="iconfont icon-dagou2"></i>
                                                                 &nbsp;{item.msg}
                                                             </span>
                                                         </li>
                                                     } else if (item.name.indexOf('doc') > -1 || item.name.indexOf('docx') > -1) {
                                                         itemDom = <li>
                                                             <span class="print-name">
-                                                                <i style="color:#666666" class="iconfont icon-word1"></i>
+                                                                <i style="color:#666666"
+                                                                   class="iconfont icon-word1"></i>
                                                                 &nbsp; {item.name}
                                                             </span>
                                                             <span>
-                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                <i style="color:#3FE0B7"
+                                                                   class="iconfont icon-dagou2"></i>
                                                                 &nbsp;{item.msg}
                                                             </span>
                                                         </li>
                                                     } else if (item.name.indexOf('xlsx') > -1) {
                                                         itemDom = <li>
                                                             <span class="print-name">
-                                                                <i style="color:#41A771" class="iconfont icon-Excel"></i>
+                                                                <i style="color:#41A771"
+                                                                   class="iconfont icon-Excel"></i>
                                                                 &nbsp; {item.name}
                                                             </span>
                                                             <span>
-                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                <i style="color:#3FE0B7"
+                                                                   class="iconfont icon-dagou2"></i>
                                                                 &nbsp;{item.msg}
                                                             </span>
                                                         </li>
@@ -2610,7 +2664,8 @@ export class BwTableModule extends Component {
                                                                 &nbsp; {item.name}
                                                             </span>
                                                             <span>
-                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                <i style="color:#3FE0B7"
+                                                                   class="iconfont icon-dagou2"></i>
                                                                 &nbsp;{item.msg}
                                                             </span>
                                                         </li>
@@ -2621,7 +2676,8 @@ export class BwTableModule extends Component {
                                                                 &nbsp; {item.name}
                                                             </span>
                                                             <span>
-                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                <i style="color:#3FE0B7"
+                                                                   class="iconfont icon-dagou2"></i>
                                                                 &nbsp;{item.msg}
                                                             </span>
                                                         </li>
@@ -2631,7 +2687,8 @@ export class BwTableModule extends Component {
                                                                 {item.name}
                                                             </span>
                                                             <span>
-                                                                <i style="color:#3FE0B7" class="iconfont icon-dagou2"></i>
+                                                                <i style="color:#3FE0B7"
+                                                                   class="iconfont icon-dagou2"></i>
                                                                 &nbsp;{item.msg}
                                                             </span>
                                                         </li>
@@ -2678,7 +2735,7 @@ export class BwTableModule extends Component {
                                 });
                                 spinner.show();
                                 let btnUi = btn.data as R_Button,
-                                    { multiselect, selectionFlag } = btnUi,
+                                    {multiselect, selectionFlag} = btnUi,
                                     selectedData = multiselect === 2 && selectionFlag ?
                                         ftable.unselectedRowsData : ftable.selectedRowsData;
                                 let linkedData = this.linkedData || {};
@@ -2769,9 +2826,10 @@ export class BwTableModule extends Component {
             initState: btnRefresh
         }
     })();
+
     getItemData(child, item, url) {
         return new Promise((resolve, reject) => {
-            BwRule.getFileInfo(child, item[child]).then(({ response }) => {
+            BwRule.getFileInfo(child, item[child]).then(({response}) => {
                 response = JSON.parse(response);
                 if (response && response.dataArr && response.dataArr[0]) {
                     let data = response.dataArr[0];
@@ -2788,6 +2846,7 @@ export class BwTableModule extends Component {
             });
         })
     }
+
     getData = async (that, btn) => {
         let printData = [];
         var fileItem = [];
@@ -2851,7 +2910,7 @@ export class BwTableModule extends Component {
                 }
             }
         }
-        return { status, printData };
+        return {status, printData};
     }
     modify = (() => {
         let self = this,
@@ -2942,14 +3001,14 @@ export class BwTableModule extends Component {
             if (tools.isMb) {
                 console.log('footer bar');
                 d.classAdd(this.wrapper, 'has-footer-btn');
-                this._btnWrapper = <footer className="mui-bar mui-bar-footer" />;
+                this._btnWrapper = <footer className="mui-bar mui-bar-footer"/>;
                 //
                 d.append(this.wrapper, this._btnWrapper);
                 if (this.tableModule && ((this.tableModule.editType === 'linkage'
                     && this.tableModule.editable && tools.isNotEmpty(this.ui.subButtons))
                     || (this.tableModule.editType === 'self')
                     && this.editParam && tools.isNotEmpty(this.ui.subButtons))) {
-                    let btnWrapper = <div className="all-btn" />;
+                    let btnWrapper = <div className="all-btn"/>;
 
                     new CheckBox({
                         className: 'edit-toggle',
@@ -3006,7 +3065,7 @@ export class BwTableModule extends Component {
                     Object.assign(
                         {},
                         defData,
-                        this.linkedData && key in this.linkedData ? { [key]: this.linkedData[key] } : {}
+                        this.linkedData && key in this.linkedData ? {[key]: this.linkedData[key]} : {}
                     )
                 );
             });
@@ -3077,7 +3136,7 @@ export class BwTableModule extends Component {
 
                                     if (hField.assignSelectFields && hField.assignAddr) {
                                         BwTableModule.initAssignData(hField.assignAddr, row ? row.data : {})
-                                            .then(({ response }) => {
+                                            .then(({response}) => {
                                                 let data = response.data;
                                                 if (data && data[0]) {
                                                     hField.assignSelectFields.forEach((name) => {
@@ -3235,7 +3294,7 @@ export class BwTableModule extends Component {
                             }
 
                             // chkAdd.varList包含修改的cell的字段则不继续验证
-                            if (!varList.some(({ varName }) => varName === chkName)) {
+                            if (!varList.some(({varName}) => varName === chkName)) {
                                 continue;
                             }
                             let linkCell: FastTableCell = row ? row.cellGet(fieldName) as FastTableCell : null;
@@ -3255,9 +3314,9 @@ export class BwTableModule extends Component {
                         }
                     }, name)
                         .then((res) => {
-                            let { errors, okNames } = res;
+                            let {errors, okNames} = res;
                             Array.isArray(errors) && errors.forEach(err => {
-                                let { name, msg } = err,
+                                let {name, msg} = err,
                                     cell = fastRow.cellGet(name);
                                 if (cell /*&& !cell.editing*/) {
                                     cell.errorMsg = msg;

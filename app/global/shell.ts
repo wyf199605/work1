@@ -779,7 +779,9 @@ namespace G {
                                         d.off(window, eventBack);
                                     }
                                     try {
-                                        detail = typeof detail === 'string' ? JSON.parse(detail) : detail;
+                                        detail = typeof detail === 'string'
+                                            ? JSON.parse(detail.replace(/\\/g, '\\'))
+                                            : detail;
                                     } catch (e) {
                                         console.log(e, 'JSON解析错误');
                                         console.log(detail);

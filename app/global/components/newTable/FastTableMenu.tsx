@@ -17,7 +17,8 @@ export interface IFastTableMenuItem extends INewPopMenuItem {
     rowMulti?: number; // 0 不用选择, 1 单选, 2 多选
     colMulti?: number; // 同上
     onClick?(cell: FastTableCell, rows: FastTableRow[], columns: FastTableColumn[], a?: any): void; // 有children时 不执行
-    children?: IFastTableMenuItem[]
+    children?: IFastTableMenuItem[];
+    canShow?: (cell: FastTableCell, rows: FastTableRow[], columns: FastTableColumn[]) => boolean;
 }
 
 export class FastTableMenu {
@@ -163,7 +164,13 @@ export class FastTableMenu {
         let children: any[] = this.ftableMenu.contextMenu.children;
         children = tools.isMb ? children as NewPopMenuItem[] : children as Menu[];
         children && children.forEach(node => {
-            node.disabled = this.jageItemDisabled(node.content.rowMulti, node.content.colMulti);
+            let content: IFastTableMenuItem = node.content,
+                wrapper = node.wrapper,
+                show = typeof content.canShow === "function"
+                    ? content.canShow(this.cell, this.ftable.getSelectedRows(), this.ftable.getSelectedCols())
+                    : true;
+            wrapper && (wrapper.style.display = show ? '' : 'none');
+            node.disabled = this.jageItemDisabled(content.rowMulti, content.colMulti);
             node.selected = false;
             if (tools.isNotEmpty(node.children) && !tools.isMb) {
                 this.updatePCChildren(node.children);
@@ -173,7 +180,13 @@ export class FastTableMenu {
 
     private updatePCChildren(children: Menu[]) {
         children && children.forEach(node => {
-            node.disabled = this.jageItemDisabled(node.content.rowMulti, node.content.colMulti);
+            let content: IFastTableMenuItem = node.content,
+                wrapper = node.wrapper,
+                show = typeof content.canShow === "function"
+                    ? content.canShow(this.cell, this.ftable.getSelectedRows(), this.ftable.getSelectedCols())
+                    : true;
+            wrapper && (wrapper.style.display = show ? '' : 'none');
+            node.disabled = this.jageItemDisabled(content.rowMulti, content.colMulti);
             node.selected = false;
             if (tools.isNotEmpty(node.children) && !tools.isMb) {
                 this.updatePCChildren(node.children);
@@ -269,7 +282,8 @@ class FastTablePCMenu {
             menuObj['content'] = {
                 rowMulti: rowMulti,
                 colMulti: colMulti,
-                click: null
+                click: null,
+                canShow: item.canShow
             };
             if (tools.isNotEmpty(item.children)) {
                 menuObj['children'] = this.handlerMenuData(item.children);
