@@ -545,8 +545,104 @@ export class BwRule extends Rule {
         })
 
     };
+
+    static getUrl(para, callback: (url: string, type: 'download' | 'open' | 'image') => void){
+        let _linkAct = {
+            OPEN_WIN: 1,
+            DOWNLOAD: 2,
+            SHOW_IMG: 3,
+            SHOW_IMGS: 4
+        };
+
+        let url, rData, action;
+        para = Object.assign({
+            dataType: '',
+            varList: [],
+            data: {}
+        }, para);
+
+        url = tools.url.addObj((para.addrType ? '' : CONF.siteUrl) + para.link, BwRule.varList(para.varList, para.data));
+        if (para.dataType === BwRule.DT_FILE) {
+            if (para.type === 'download') {
+                callback(url, "image");
+            } else {
+                BwRule.Ajax.fetch(url)
+                    .then(({ response }) => {
+                        rData = response.data[0];
+                        //地址加上域名
+                        if (rData.IMGADDR) {
+                            rData.IMGADDR = CONF.siteUrl + rData.IMGADDR;
+                        }
+                        if (rData.DOWNADDR) {
+                            rData.DOWNADDR = CONF.siteUrl + rData.DOWNADDR;
+                        }
+                        //执行动作判断
+                        if (rData.IMGADDR) {
+                            action = _linkAct.SHOW_IMGS;
+                        } else {
+                            let fileExt = '';
+                            if (rData.FILENAME) {
+                                fileExt = rData.FILENAME.split('.').pop().toLowerCase();
+                            }
+                            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'ttif'].indexOf(fileExt) !== -1) {
+                                action = _linkAct.SHOW_IMG;
+                            } else {
+                                action = _linkAct.DOWNLOAD;
+                            }
+                        }
+
+                        // para.callback(action, rData, _linkAct);
+                        let filename = rData.FILENAME || '附件';
+                        switch (action) {
+                            case _linkAct.OPEN_WIN:
+                                callback(rData.url, "open");
+                                break;
+                            case _linkAct.SHOW_IMGS:
+                                let img = [],
+                                    len = rData.PAGENUM,
+                                    imgAddr = rData.IMGADDR;
+                                for (let i = 1, d, item; i <= len; i++) {
+                                    d = { page: i };
+                                    item = BwRule.parseURL(imgAddr, d);
+                                    img.push(item)
+                                }
+                                let imgData: ImgModalPara = {
+                                    downAddr: rData.DOWNADDR,
+                                    title: rData.FILENAME,
+                                    img: img,
+                                    onDownload(url) {
+                                        callback(rData.url, "download");
+                                    }
+                                };
+                                // ImgModalMb.show(imgData);
+                                if (tools.isMb) {
+                                    ImgModalMobile.show(imgData);
+                                } else {
+                                    ImgModal.show(imgData);
+                                }
+                                break;
+                            case _linkAct.SHOW_IMG:
+                                if (sys.os === 'ad' || sys.os === 'ip') {
+                                    callback(rData.DOWNADDR, "image");
+                                } else {
+                                    callback(rData.DOWNADDR, "download");
+                                }
+                                break;
+                            case _linkAct.DOWNLOAD:
+                                callback(rData.DOWNADDR, "download");
+                                break;
+                            default:
+                        }
+                    });
+            }
+        } else {
+            callback(url, "open");
+            // action = _linkAct.OPEN_WIN;
+            // para.callback(action, rData, _linkAct);
+        }
+    }
+
     static link(para) {
-        console.log(para)
         let _linkAct = {
             OPEN_WIN: 1,
             DOWNLOAD: 2,

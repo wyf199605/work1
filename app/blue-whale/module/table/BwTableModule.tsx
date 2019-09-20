@@ -269,21 +269,24 @@ export class BwTableModule extends Component {
                     title: '另存为',
                     canShow: (cell) => {
                         let field: R_Field = cell.column.content;
-                        return "AppShell" in window && BwRule.isNewFile(field.atrrs.dataType);
+                        return "AppShell" in window && BwRule.isFile(field.atrrs.dataType);
                     },
                     onClick: (cell) => {
                         // Shell.file.openFile();
                         let field: R_Field = cell.column.content,
+                            loading = new Loading({
+                                msg: '下载中...',
+                                container: this.container,
+                                duration: 5
+                            }),
                             dataType = field.atrrs.dataType,
+                            link = field.link,
                             rowData = cell.frow.data;
-                        if (BwRule.isNewFile(dataType)) {
-                            let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                                "md5_field": field.name,
-                                [field.name]: rowData[field.name],
-                                down: 'allow'
-                            });
+                        loading.show();
+                        let openFile = (url: string) => {
                             Shell.file.saveAs(url, (e) => {
-                                console.log(e);
+                                loading && loading.hide();
+                                loading = null;
                                 if (e.success) {
                                     Modal.confirm({
                                         msg: "文件已下载成功！是否打开？",
@@ -298,7 +301,29 @@ export class BwTableModule extends Component {
                                         }
                                     });
                                 }else{
-                                    e.msg &&  Modal.alert(e.msg);
+                                    e.msg && Modal.alert(e.msg);
+                                }
+                            });
+                        };
+                        if (BwRule.isNewFile(dataType)) {
+                            let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                                "md5_field": field.name,
+                                [field.name]: rowData[field.name],
+                                down: 'allow'
+                            });
+                            openFile(url);
+                        }else if (link && (field.endField ? rowData[field.endField] === 1 : true)){
+                            BwRule.getUrl({
+                                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
+                                varList: link.varList,
+                                dataType: field.atrrs.dataType,
+                                data: rowData,
+                                needGps: link.needGps === 1,
+                                type: link.type,
+                                addrType: link.addrType
+                            }, (url, type) => {
+                                if(type === "download"){
+                                    openFile(url);
                                 }
                             });
                         }else{
