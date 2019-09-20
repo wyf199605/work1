@@ -282,7 +282,6 @@ export class BwTableModule extends Component {
                                 [field.name]: rowData[field.name],
                                 down: 'allow'
                             });
-                            url = "http://bwt.fastlion.cn:7777/hy/rest/attachment/download/file?md5_field=ATTACHNAME1&attachname1=9625F1A5CDC1F14DFF3536A85D481B21&down=allow";
                             Shell.file.saveAs(url, (e) => {
                                 console.log(e);
                                 if (e.success) {
