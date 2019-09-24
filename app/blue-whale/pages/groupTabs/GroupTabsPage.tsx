@@ -847,7 +847,12 @@ export class GroupTabsPage extends BasicPage {
             if(this.main) {
                 console.log(this.main);
                 this.main.onDataChange = () => {
-                    this.subIndexes = [];
+                    let styleType = this.styleType;
+                    if(styleType === 'panel-on' || styleType === 'panel-off'){
+                        this.subRefresh();
+                    }else{
+                        this.subIndexes = [];
+                    }
                 };
             }
 
