@@ -975,7 +975,13 @@ export class GroupTabsPage extends BasicPage {
         if (tools.isNotEmpty(this.subs)) {
             this.subs.forEach((sub, index) => {
                 if (tools.isNotEmpty(sub)) {
-                    sub.refresh().catch(() => {
+                    let ui = this.subUi[index];
+                    let ajaxData = {};
+                    if('tableAddr' in ui){
+                        ajaxData = BwRule.varList(ui.dataAddr.varList, this.main.getData())
+                    }
+                    sub['linkedData'] = this.main.getData();
+                    sub.refresh(ajaxData).catch(() => {
 
                     });
                     this.subIndexes[index] = index;
