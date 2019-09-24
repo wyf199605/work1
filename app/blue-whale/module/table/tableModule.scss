@@ -685,3 +685,13 @@
 //  }
 //
 //}
+
+.download-file-modal{
+  right: 0!important;
+  bottom: 0!important;
+  top: auto!important;
+  left: auto!important;
+  .modal-header, .modal-footer{
+    border: none!important;
+  }
+}

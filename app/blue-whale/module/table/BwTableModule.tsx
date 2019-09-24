@@ -273,62 +273,7 @@ export class BwTableModule extends Component {
                     },
                     onClick: (cell) => {
                         // Shell.file.openFile();
-                        let field: R_Field = cell.column.content,
-                            loading = new Loading({
-                                msg: '下载中...',
-                                container: this.container,
-                                duration: 5
-                            }),
-                            dataType = field.atrrs.dataType,
-                            link = field.link,
-                            rowData = cell.frow.data;
-                        loading.show();
-                        let openFile = (url: string) => {
-                            Shell.file.saveAs(url, (e) => {
-                                loading && loading.hide();
-                                loading = null;
-                                if (e.success) {
-                                    Modal.confirm({
-                                        msg: "文件已下载成功！是否打开？",
-                                        callback: (flag) => {
-                                            if(flag){
-                                                Shell.file.openFile(url, (e) => {
-                                                    if(!e.success){
-                                                        Modal.alert(e.msg);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    });
-                                }else{
-                                    e.msg && Modal.alert(e.msg);
-                                }
-                            });
-                        };
-                        if (BwRule.isNewFile(dataType)) {
-                            let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
-                                "md5_field": field.name,
-                                [field.name]: rowData[field.name],
-                                down: 'allow'
-                            });
-                            openFile(url);
-                        }else if (link && (field.endField ? rowData[field.endField] === 1 : true)){
-                            BwRule.getUrl({
-                                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
-                                varList: link.varList,
-                                dataType: field.atrrs.dataType,
-                                data: rowData,
-                                needGps: link.needGps === 1,
-                                type: link.type,
-                                addrType: link.addrType
-                            }, (url, type) => {
-                                if(type === "download"){
-                                    openFile(url);
-                                }
-                            });
-                        }else{
-                            Modal.alert("文件下载失败");
-                        }
+                        this.saveAs(cell);
                     }
                 } : null
             ],
@@ -351,6 +296,76 @@ export class BwTableModule extends Component {
             }
         }
     }
+
+    private saveAs = (() => {
+        return (cell: FastTableCell) => {
+            let field: R_Field = cell.column.content,
+                loading = new Loading({
+                    msg: '下载中...',
+                    container: this.container,
+                    duration: 5
+                }),
+                dataType = field.atrrs.dataType,
+                link = field.link,
+                rowData = cell.frow.data;
+            loading.show();
+            let openFile = (url: string) => {
+                Shell.file.saveAs(url, (e) => {
+                    loading && loading.hide();
+                    loading = null;
+                    if (e.success) {
+                        let downloadModal = new Modal({
+                            header: "文件已下载成功！是否打开？",
+                            width: '250px',
+                            className: 'download-file-modal',
+                            isBackground: false,
+                            footer: {},
+                            onOk: () => {
+                                downloadModal && downloadModal.destroy();
+                                downloadModal = null;
+                                Shell.file.openFile(url, (e) => {
+                                    if (!e.success) {
+                                        Modal.alert(e.msg);
+                                    }
+                                });
+                            }
+                        });
+                        setTimeout(() => {
+                            downloadModal && downloadModal.destroy();
+                            downloadModal = null;
+                        }, 5000);
+
+                    } else {
+                        e.msg && Modal.alert(e.msg);
+                    }
+                });
+            };
+            if (BwRule.isNewFile(dataType)) {
+                let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
+                    "md5_field": field.name,
+                    [field.name]: rowData[field.name],
+                    down: 'allow'
+                });
+                openFile(url);
+            } else if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
+                BwRule.getUrl({
+                    link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
+                    varList: link.varList,
+                    dataType: field.atrrs.dataType,
+                    data: rowData,
+                    needGps: link.needGps === 1,
+                    type: link.type,
+                    addrType: link.addrType
+                }, (url, type) => {
+                    if (type === "download") {
+                        openFile(url);
+                    }
+                });
+            } else {
+                Modal.alert("文件下载失败");
+            }
+        }
+    })();
 
     private addOldData(data: obj[]): obj[] {
         let res = data;
@@ -794,6 +809,7 @@ export class BwTableModule extends Component {
             return;
         }
         let link = field.link,
+            isPcShell = tools.isPc && "AppShell" in window,
             dataType = field.dataType || (field.atrrs && field.atrrs.dataType);
 
         if (!empty && tools.isEmpty(rowData[field.name])) {
@@ -806,20 +822,49 @@ export class BwTableModule extends Component {
                 [field.name]: rowData[field.name],
                 down: 'allow'
             });
-            sys.window.download(url, rowData[field.name]);
+            url = "http://bwt.fastlion.cn:7777/hy/rest/attachment/download/file?md5_field=ATTACHNAME1&attachname1=9625F1A5CDC1F14DFF3536A85D481B21&down=allow"
+            if (isPcShell) {
+                Shell.file.openFile(url, (e) => {
+                    if (!e.success) {
+                        Modal.alert(e.msg);
+                    }
+                });
+            }else{
+                sys.window.download(url, rowData[field.name]);
+            }
             return;
         }
 
         if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
-            BwRule.link({
-                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
-                varList: link.varList,
-                dataType: field.atrrs.dataType,
-                data: rowData,
-                needGps: link.needGps === 1,
-                type: link.type,
-                addrType: link.addrType
-            });
+            if (!isPcShell) {
+                BwRule.link({
+                    link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
+                    varList: link.varList,
+                    dataType: field.atrrs.dataType,
+                    data: rowData,
+                    needGps: link.needGps === 1,
+                    type: link.type,
+                    addrType: link.addrType
+                });
+            }else{
+                BwRule.getUrl({
+                    link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
+                    varList: link.varList,
+                    dataType: field.atrrs.dataType,
+                    data: rowData,
+                    needGps: link.needGps === 1,
+                    type: link.type,
+                    addrType: link.addrType
+                }, (url, type) => {
+                    if (type === "download") {
+                        Shell.file.openFile(url, (e) => {
+                            if (!e.success) {
+                                Modal.alert(e.msg);
+                            }
+                        });
+                    }
+                });
+            }
 
             return;
         }
