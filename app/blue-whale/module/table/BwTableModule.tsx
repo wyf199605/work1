@@ -310,7 +310,7 @@ export class BwTableModule extends Component {
                 rowData = cell.frow.data;
             loading.show();
             let openFile = (url: string) => {
-                Shell.file.saveAs(url, (e) => {
+                if(!Shell.file.saveAs(url, (e) => {
                     loading && loading.hide();
                     loading = null;
                     if (e.success) {
@@ -338,7 +338,10 @@ export class BwTableModule extends Component {
                     } else {
                         e.msg && Modal.alert(e.msg);
                     }
-                });
+                })){
+                    loading && loading.hide();
+                    loading = null;
+                }
             };
             if (BwRule.isNewFile(dataType)) {
                 let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
