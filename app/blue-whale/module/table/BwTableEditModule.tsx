@@ -148,7 +148,7 @@ export class BwTableEditModule {
         this.fields.forEach(field => {
             let isEdit = isInsert ? !field.noModify : !field.noEdit,
                 com = this.editModule.getDom(field.name),
-                wrapper = com.wrapper || com.container,
+                wrapper = com.wrapper,
                 parent = d.closest(wrapper, '.detail-item');
             parent && parent.classList.remove('disabled');
             if(isModify){

@@ -836,36 +836,15 @@ export class BwTableModule extends Component {
         }
 
         if (link && (field.endField ? rowData[field.endField] === 1 : true)) {
-            if (!isPcShell) {
-                BwRule.link({
-                    link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
-                    varList: link.varList,
-                    dataType: field.atrrs.dataType,
-                    data: rowData,
-                    needGps: link.needGps === 1,
-                    type: link.type,
-                    addrType: link.addrType
-                });
-            }else{
-                BwRule.getUrl({
-                    link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
-                    varList: link.varList,
-                    dataType: field.atrrs.dataType,
-                    data: rowData,
-                    needGps: link.needGps === 1,
-                    type: link.type,
-                    addrType: link.addrType
-                }, (url, type) => {
-                    if (type === "download") {
-                        Shell.file.openFile(url, (e) => {
-                            if (!e.success) {
-                                Modal.alert(e.msg);
-                            }
-                        });
-                    }
-                });
-            }
-
+            BwRule.link({
+                link: tools.url.addObj(link.dataAddr, G.Rule.parseVarList(link.parseVarList, rowData)),
+                varList: link.varList,
+                dataType: field.atrrs.dataType,
+                data: rowData,
+                needGps: link.needGps === 1,
+                type: link.type,
+                addrType: link.addrType
+            });
             return;
         }
 

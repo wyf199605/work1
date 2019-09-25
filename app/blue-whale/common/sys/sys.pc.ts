@@ -296,11 +296,19 @@ namespace BW {
                     self.window.download(url);
                 },
                 download: function (url: string, fileName: string = '') {
-                    let a = d.create(`<a href="${url}" download="${fileName}"></a>`);
-                    d.append(document.body, a);
-                    a.click();
-                    d.remove(a);
-                    a = null;
+                    if ("AppShell" in window) {
+                        Shell.file.openFile(url, (e) => {
+                            if (!e.success) {
+                                alert(e.msg);
+                            }
+                        });
+                    }else {
+                        let a = d.create(`<a href="${url}" download="${fileName}"></a>`);
+                        d.append(document.body, a);
+                        a.click();
+                        d.remove(a);
+                        a = null;
+                    }
                 },
                 wake: function (event, data) {
                 },
