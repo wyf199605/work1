@@ -520,7 +520,8 @@ export = class contactsPage {
             });
         }());
         BW.sys && (BW.sys.window.close = function () {
-            window.parent.document.getElementById('iframe_' + localStorage.getItem('fromPickCaption')).classList.remove('active');
+            console.log(window["iframeId"]);
+            window.parent.document.getElementById(window["iframeId"]).classList.remove('active');
         });
         done && d.on(done, clickEvent, function () {
             let checkboxArray = <HTMLInputElement[]>d.queryAll('input[type="checkbox"]:checked', list),
@@ -550,7 +551,7 @@ export = class contactsPage {
                 G.tools.event.fire('selectContact', passData, window.parent);
 
                 if (BW.sys.os !== 'pc') {
-                    window.parent.document.getElementById('iframe_' + caption).classList.remove('active');
+                    window.parent.document.getElementById(window["iframeId"]).classList.remove('active');
                 }
             }
         });

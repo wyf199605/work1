@@ -859,11 +859,12 @@ namespace G {
         //     }
         // },
 
-        iPage: function (src, attrs) {
-            let iframe = d.create(`<iframe class="pageIframe" src="${src}" ${tools.obj.toAttr(attrs)}></iframe>`);
-
+        iPage: function (src, attrs = {}, iframeId = tools.getGuid('iframe-id-')) {
+            let iframe = d.create(`<iframe id="${iframeId}" class="pageIframe" src="${src}" ${tools.obj.toAttr(attrs)}></iframe>`) as HTMLIFrameElement;
             document.body.appendChild(iframe);
-
+            iframe.addEventListener('load', () => {
+                iframe.contentWindow["iframeId"] = iframeId;
+            });
             return {
                 show: function () {
                     // console.log(1);

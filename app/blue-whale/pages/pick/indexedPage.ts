@@ -59,7 +59,7 @@ class indexedPage{
                 },  400);
 
                 tools.event.fire('selectContact', passData, window.parent);
-                window.parent.document.getElementById('iframe_'+caption).style.right = '-100%';
+                window.parent.document.getElementById(window["iframeId"]).style.right = '-100%';
                 window.parent.document.getElementById('hideContact').style.display='none';
                 window.parent.document.getElementById('contactPicker').style.display='block';
             }

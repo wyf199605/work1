@@ -22,7 +22,7 @@ export class ContactsModule {
         let captionName = para.field.name,
             href = para.field.dataAddr ? BW.CONF.siteUrl + BwRule.reqAddr(para.field.dataAddr) : '';
         if (tools.isMb) {
-            this.iframe = tools.iPage(href, { id: 'iframe_' + captionName });
+            this.iframe = tools.iPage(href);
         }
         localStorage.setItem('fromPickCaption', captionName);
         localStorage.setItem('fromPickData', JSON.stringify(tools.str.toEmpty({})));

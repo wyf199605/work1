@@ -933,9 +933,11 @@ export class NewTableModule extends AGroupTabItem {
         };
 
         let windowControl = (bwTable: BwTableModule) => {
+
             switch (this.editType) {
                 case 'self': {
                     let ftable = bwTable.ftable;
+                    ftable && ftable.closeCellInput();
                     ftable && ftable.dataControl();
                     break;
                 }
@@ -944,6 +946,7 @@ export class NewTableModule extends AGroupTabItem {
                         sub = this.sub[this.subTabActiveIndex],
                         table = this.active.isMain ? main : sub;
                     let ftable = table.ftable;
+                    ftable && ftable.closeCellInput();
                     ftable && ftable.dataControl();
                 }
             }

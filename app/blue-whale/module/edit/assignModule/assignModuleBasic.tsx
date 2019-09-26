@@ -21,7 +21,7 @@ export class AssignModuleBasic extends FormCom {
             let captionName = pickDom.parentElement.dataset.name;
             if (sys.isMb) {
                 // this.destroy();
-                this.iframe = tools.iPage(href, { id: 'iframe_' + captionName });
+                this.iframe = tools.iPage(href);
             }
             d.on(pickDom, 'click', () => {
                 // contactModal.show();
