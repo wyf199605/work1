@@ -144,6 +144,9 @@ namespace G {
                     type: 0,
                     downPath: path
                 }, back, info);
+            },
+            openFileByPath(path: string, back: IShellEventHandler, info?: IShellEventHandler){
+                return ShellBase.handler("openFile", path, back, info);
             }
         };
 

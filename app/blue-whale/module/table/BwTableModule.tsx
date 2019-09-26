@@ -300,19 +300,12 @@ export class BwTableModule extends Component {
     private saveAs = (() => {
         return (cell: FastTableCell) => {
             let field: R_Field = cell.column.content,
-                loading = new Loading({
-                    msg: '下载中...',
-                    container: this.container,
-                    duration: 5
-                }),
                 dataType = field.atrrs.dataType,
                 link = field.link,
                 rowData = cell.frow.data;
-            loading.show();
+
             let openFile = (url: string) => {
-                if(!Shell.file.saveAs(url, (e) => {
-                    loading && loading.hide();
-                    loading = null;
+                Shell.file.saveAs(url, (e) => {
                     if (e.success) {
                         let downloadModal = new Modal({
                             header: "文件已下载成功！是否打开？",
@@ -323,7 +316,8 @@ export class BwTableModule extends Component {
                             onOk: () => {
                                 downloadModal && downloadModal.destroy();
                                 downloadModal = null;
-                                Shell.file.openFile(url, (e) => {
+                                console.log(e.data);
+                                Shell.file.openFileByPath(e.data.savaPath, (e) => {
                                     if (!e.success) {
                                         Modal.alert(e.msg);
                                     }
@@ -338,10 +332,7 @@ export class BwTableModule extends Component {
                     } else {
                         e.msg && Modal.alert(e.msg);
                     }
-                })){
-                    loading && loading.hide();
-                    loading = null;
-                }
+                })
             };
             if (BwRule.isNewFile(dataType)) {
                 let url = tools.url.addObj(CONF.ajaxUrl.fileDownload, {
