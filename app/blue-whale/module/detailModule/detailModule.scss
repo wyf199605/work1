@@ -267,8 +267,15 @@
         height: 100%;
         .detail-wrapper {
           padding-bottom: 0;
+          display: flex;
+          flex-direction: column-reverse;
+          & > div{
+            width: 100%;
+          }
           .detail-btn-group {
             position: relative;
+            border-bottom: 1px solid #ddd;
+            border-top: none;
           }
         }
       }

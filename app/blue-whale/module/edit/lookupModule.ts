@@ -32,6 +32,7 @@ export class LookupModule extends FormCom{
                 this.para.onExtra && this.para.onExtra(item);
             }
         });
+        this._wrapper = this.selectInput.wrapper;
     }
 
     get disabled(){

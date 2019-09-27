@@ -121,7 +121,7 @@ namespace G{
         /**
          * 包装组件dom的根元素
          */
-        private _wrapper: HTMLElement;
+        protected _wrapper: HTMLElement;
         get wrapper() {
             return this._wrapper;
         }

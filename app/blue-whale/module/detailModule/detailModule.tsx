@@ -110,17 +110,17 @@ export class DetailModule extends AGroupTabItem {
             return false;
         }
         this.phoneInputBox && this.phoneInputBox.destroy();
-        let inputBox = this.phoneInputBox = new InputBox({
-            container: this.wrapper,
-            size: 'middle',
-            compactWidth: 1,
-            className: 'call-call'
-        });
         let parent = d.query('[data-name="MOBILE"]');
         let mobile = parent && d.query(".detail-item-content", parent);
         // debugger;
 
         if (mobile && mobile.textContent) {
+            let inputBox = this.phoneInputBox = new InputBox({
+                container: this.wrapper,
+                size: 'middle',
+                compactWidth: 1,
+                className: 'call-call'
+            });
 
             inputBox.addItem(new Button({
                 content: '拨号',

@@ -895,6 +895,9 @@ export class GroupTabsPage extends BasicPage {
                     sub.onRender = () => {
                         this.imports.init();
                         sub.onRender = null;
+                        if (this.tab instanceof Panel) {
+                            this.tab.wrapper.scrollTop = 0;
+                        }
                     }
                 }
             });
