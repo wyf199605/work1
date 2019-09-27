@@ -181,6 +181,19 @@ export class GroupTabsPage extends BasicPage {
                 this.refresh();
             });
         }
+
+        if (tools.isMb && this.styleType === 'panel-on' && this.tab instanceof Panel) {
+            let wrapper = this.tab.wrapper,
+                handler,
+                body = document.body;
+            let timer = setInterval(() => {
+                wrapper && (wrapper.scrollTop = 0);
+            }, 16);
+            body.addEventListener('touchstart', handler = () => {
+                clearInterval(timer);
+                body.removeEventListener('touchstart', handler);
+            });
+        }
     }
 
     protected _inputs: Inputs;
@@ -832,8 +845,13 @@ export class GroupTabsPage extends BasicPage {
             sub: []
         };
 
+    protected mainNotRefresh = false;
     protected createTabItem(index: number, wrapper: HTMLElement) {
+        console.log(index);
         if (index === 0) {
+            if(this.mainNotRefresh){
+                return;
+            }
             // 主表
             if (tools.isNotEmpty(this.main)) {
                 return;
@@ -858,7 +876,11 @@ export class GroupTabsPage extends BasicPage {
 
             this.main.onRender = () => {
                 if (this.styleType === 'panel-on' && this.tab instanceof Panel) {
+                    this.mainNotRefresh = true;
                     this.tab.toggleAll(true);
+                    setTimeout(() => {
+                        this.mainNotRefresh = false;
+                    }, 500)
                 }
 
                 if (this.ui.offline) {
@@ -895,9 +917,6 @@ export class GroupTabsPage extends BasicPage {
                     sub.onRender = () => {
                         this.imports.init();
                         sub.onRender = null;
-                        if (this.tab instanceof Panel) {
-                            this.tab.wrapper.scrollTop = 0;
-                        }
                     }
                 }
             });

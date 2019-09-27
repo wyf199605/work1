@@ -81,11 +81,12 @@ namespace BW {
                 opentab: function (url, accessToken, noShow: string[] = null) {
 
                     let win = window.parent ? window.parent : window;
-                    if (sessionStorage.getItem('showWorkBench') === 'true') {
-                        win.location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
-                    } else {
-                        win.location.href = CONF.url.main;
-                    }
+                    win.location.href = CONF.url.main;
+                    // if (sessionStorage.getItem('showWorkBench') === 'true') {
+                    //     win.location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
+                    // } else {
+                    //     win.location.href = CONF.url.main;
+                    // }
 
                     localStorage.setItem('hideBaseMenu', JSON.stringify(noShow));
                 },
