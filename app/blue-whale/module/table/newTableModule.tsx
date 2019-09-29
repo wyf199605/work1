@@ -197,7 +197,6 @@ export class NewTableModule extends AGroupTabItem {
                     pseudoTable && pseudoTable.setPresentSelected(this.subIndex);
                     firstRow.selected = true;
                     let noLoadSub = this.noLoadSub(mftable, main);
-
                     if (tools.isEmpty(this.tab)) {
 
                         // if (tools.isNotEmpty(this.showSubField) && tools.isEmpty(selectedData[this.showSubField])) {
@@ -230,6 +229,7 @@ export class NewTableModule extends AGroupTabItem {
                                         }).catch();
                                         this.currentSelectedIndexes.push(index);
                                     }
+                                    console.log('select:', this.sub[index]);
                                     this.sub[index].linkedData = selectedData;
                                     this.sub[index].ftable && this.sub[index].ftable.recountWidth();
                                 }
@@ -266,7 +266,12 @@ export class NewTableModule extends AGroupTabItem {
                                     let showSubSeq = this.computedIndex(list);
                                     this.tab.setTabsShow(showSubSeq);
                                     //1476bug单
-                                    this.tab.active(parseInt(showSubSeq[0]) - 1);
+                                    if(tools.isEmpty(showSubSeq)){
+                                        this.mobileModal && (this.mobileModal.isShow = false);
+                                    }else{
+                                        this.tab.active(parseInt(showSubSeq[0]) - 1);
+
+                                    }
                                     // console.log(this.tab);
                                     // this.tab.active(0);
                                     parseInt(showSubSeq[0]) - 1 >= 0 && this.currentSelectedIndexes.push(parseInt(showSubSeq[0]) - 1);

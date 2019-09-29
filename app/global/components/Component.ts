@@ -236,7 +236,7 @@ namespace G{
         }
         trigger(type: string, ...para){
             const handlers = this._eventHandlers[type];
-            handlers && handlers.forEach((item) => {
+            handlers && [...handlers].forEach((item) => {
                 typeof item === 'function' && item(...para);
             });
         }
