@@ -99,8 +99,8 @@ export class TableBase extends Component {
     static readonly EVT_CELL_EDIT_CANCEL = '__EVENT_CELL_EDIT_CANCEL__'; // 编辑组件销毁事件
     static readonly EVT_WIDTH_CANCEL = '__EVENT_WIDTH_CANCEL__'; // 宽度改变是触发事件
 
-    static readonly GUID_INDEX = tools.getGuid(); 
-    
+    static readonly GUID_INDEX = tools.getGuid();
+
     protected wrapperInit(para): HTMLElement {
         if (typeof para._wrapper !== 'undefined') {
             return para._wrapper;
@@ -400,10 +400,9 @@ export class TableBase extends Component {
 
     //创建列对象TableColumn
     private createCol(cols: ITableColPara | ITableColPara[]) {
-        cols = tools.toArray(cols);
         let columns: TableColumn[] = this.columns || [],
             index = columns.length;
-        cols.forEach((item, i) => {
+        tools.toArray(cols).forEach((item, i) => {
             columns.push(new this.ColConstruct(Object.assign({
                 table: this,
                 index: index,

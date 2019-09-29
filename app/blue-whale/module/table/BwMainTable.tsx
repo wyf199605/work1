@@ -6,6 +6,7 @@ import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {BwRule} from "../../common/rule/BwRule";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
 import {CheckBox} from "../../../global/components/form/checkbox/checkBox";
+import {FastTable} from "../../../global/components/newTable/FastTable";
 
 export class BwMainTableModule extends BwTableModule{
 
@@ -29,6 +30,12 @@ export class BwMainTableModule extends BwTableModule{
                 this.initLabelPrint();
                 this.initFormPrint();
             }
+        }else{
+            let handler;
+            this.ftable.on(FastTable.EVT_RENDERED, handler = () => {
+                this.ftable.off(FastTable.EVT_RENDERED, handler);
+                this.tableHeightAdaptive();
+            });
         }
     }
 
@@ -49,6 +56,7 @@ export class BwMainTableModule extends BwTableModule{
 
 
     }
+
     private tableHeightInit(){
         let ui = this.ui,
             clientHeight = this.wrapper.clientHeight;
@@ -74,6 +82,18 @@ export class BwMainTableModule extends BwTableModule{
                 console.log(this.ftable.wrapper.style.height + '----------------------------')
             }else{
                 this.ftable.wrapper.style.height = clientHeight + 'px';
+            }
+        }
+    }
+
+    private tableHeightAdaptive(){
+        if(document.body.classList.contains('panel-on-main-sub')){
+            let ftable = this.ftable,
+                clientHeight = this.wrapper.clientHeight,
+                bodyHeight = d.query('.table-scroll-wrapper', ftable.mainTable.body.wrapper).clientHeight,
+                headHeight = d.query('.table-scroll-wrapper', ftable.mainTable.head.wrapper).clientHeight;
+            if(bodyHeight + headHeight + 40 < clientHeight){
+                this.ftable.wrapper.style.height = bodyHeight + headHeight + 40 + 'px';
             }
         }
     }

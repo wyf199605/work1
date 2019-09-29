@@ -1910,11 +1910,11 @@ export class FastTable extends Component {
 
         }
 
+        this.recountWidth();
         let handlers = this.eventHandlers[FastTable.EVT_RENDERED];
         Array.isArray(handlers) && handlers.forEach(handler => {
             handler();
         });
-        this.recountWidth();
     }
 
     loadedError = () => {
