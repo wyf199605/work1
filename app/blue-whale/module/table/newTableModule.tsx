@@ -530,6 +530,8 @@ export class NewTableModule extends AGroupTabItem {
                 }
             } else {
                 this.subWrapper.classList.add('hide');
+                this.mobileModal && (this.mobileModal.isShow = false);
+
             }
 
         } else {
