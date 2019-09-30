@@ -267,7 +267,11 @@ export class NewTableModule extends AGroupTabItem {
                                     this.tab.setTabsShow(showSubSeq);
                                     //1476bug单
                                     if(tools.isEmpty(showSubSeq)){
-                                        this.mobileModal && (this.mobileModal.isShow = false);
+                                        if (tools.isPc) {
+                                            this.dragged.subHeight = 0;
+                                        }else{
+                                            this.mobileModal && (this.mobileModal.isShow = false);
+                                        }
                                     }else{
                                         this.tab.active(parseInt(showSubSeq[0]) - 1);
 
@@ -530,8 +534,11 @@ export class NewTableModule extends AGroupTabItem {
                 }
             } else {
                 this.subWrapper.classList.add('hide');
-                this.mobileModal && (this.mobileModal.isShow = false);
-
+                if(tools.isPc){
+                    this.dragged.subHeight = 0;
+                }else {
+                    this.mobileModal && (this.mobileModal.isShow = false);
+                }
             }
 
         } else {
