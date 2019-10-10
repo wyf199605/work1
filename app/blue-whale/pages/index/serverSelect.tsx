@@ -22,12 +22,17 @@ export class ServerSelect extends BasicPage {
         d.on(d.query('#login'), 'click', () => {
             let urls = tools.keysVal(this.data, 'data', 'content', 'appUrls');
             let url = '';
-            urls && urls.map(item => {
+            let verUrl='';
+            urls && urls.forEach(item => {
                 if (item.envUrl == text.value) {
                     url = item.downloadAdd;
                 }
+                if (item.envUrl == text.value) {
+                    verUrl = item.verifyAdd;
+                }
             })
             Shell.other.setDownLoadUrl({ downloadAdd: url }, () => { })
+            Shell.other.setVerifyAdd({ verifyAdd: verUrl }, () => { })
             sys.window.load(tools.url.addObj(text.value, { uuid: uuid }));
             // sys.window.load(tools.url.addObj(text.value, {uuid: uuid}));
         });
