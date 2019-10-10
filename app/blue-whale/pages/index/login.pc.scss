@@ -80,6 +80,18 @@
       color: rgb(153, 153, 153);
     }
   }
+  .wxscan-login {
+    text-align: center;
+    #scan-close {
+      cursor: pointer;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      &:hover {
+        color: #2a77eb;
+      }
+    }
+  }
   .code_login {
     width: 328px;
     box-shadow: -2px 1px 21px 0px rgba(0, 91, 172, 0.11);
@@ -256,6 +268,7 @@
             margin: 0 auto 10px;
           }
           &.zhiwen,
+          &.wxscan,
           &.device,
           &.scanLogin,
           &.jiebang {
@@ -282,7 +295,8 @@
               background-color: #ff7c83;
             }
           }
-          &.scanLogin {
+          &.scanLogin,
+          &.wxscan {
             .iconfont {
               background-color: #1AA0F9;
               &::before {

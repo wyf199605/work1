@@ -1862,7 +1862,8 @@ export class BwTableModule extends Component {
                         urls.push(tools.url.addObj(CONF.ajaxUrl.fileDownload, {
                             "md5_field": field.name,
                             [field.name]: data,
-                            down: 'allow'
+                            down: 'allow',
+                            imagetype: 'thumbnail'
                         }))
                     });
                     text = <div>

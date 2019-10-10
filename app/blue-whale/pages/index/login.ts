@@ -15,6 +15,7 @@ import Shell = G.Shell;
 import { Spinner } from "../../../global/components/ui/spinner/spinner";
 import { QrCode } from "../../../global/utils/QRCode";
 import { ShareCode } from "blue-whale/common/share-code/shareCode";
+declare var WxLogin;
 interface IProps {
     drive?: string,
     responseBean: obj,
@@ -30,7 +31,8 @@ interface IProps {
     SMSBtn?: HTMLElement | Button;
     fqaBtn?: Button,
     scanButton?: HTMLElement,
-    jiebangButton?: HTMLElement
+    jiebangButton?: HTMLElement,
+    wxscan?: HTMLElement
 }
 /**
  * 移动和电脑的登录页面
@@ -39,6 +41,20 @@ export class LoginPage {
     private LoginModal: Modal;
     private Interval: number;
     constructor(private props: IProps) {
+        if (window.location.href.indexOf('?') > -1) {
+            let code = this.getQueryVariable('code');
+            console.log(code)
+            console.log(CONF)
+            if (code) {
+                let url = `${CONF.ajaxUrl.sendWxCode}?wxcode=${code}`;
+                G.Ajax.fetch(url).then(res => {
+                    // this.ajaxLogin(CONF.ajaxUrl.loginWeiXin, {
+                    //     openid: res.openid
+                    // });
+                })
+            }
+
+        }
         tools.isMb && this.getVersion();
         let response = props.responseBean;
         this.device = Device.get();
@@ -74,7 +90,15 @@ export class LoginPage {
             }
         })
     }
-
+    private getQueryVariable(variable: string) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) { return pair[1]; }
+        }
+        return (false);
+    }
     protected setLoginType() {
         G.Ajax.fetch(tools.url.addObj(CONF.url.login, {
             output: 'json'
@@ -1031,7 +1055,7 @@ export class LoginPage {
                             noShow = col.VALUE.split(',');
                         } else if (col.NAME === 'PLATFORM_NAME') {
                             user.platformName = col.VALUE;
-                        }else if (col.NAME === 'showWorkBench') {
+                        } else if (col.NAME === 'showWorkBench') {
                             sessionStorage.setItem('showWorkBench', col.VALUE);
                         }
                     });
@@ -1039,19 +1063,19 @@ export class LoginPage {
                         let accessToken = response.head.accessToken || '',
                             jwtToken = response.head.jwtToken || '',
                             refreshToken = response.head.refreshToken || '';
-                        
+
                         // sys.window.open
                         if (sessionStorage.getItem('showWorkBench') === 'true') {
                             sys.window.open({
-                                url: CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1'
+                                url: CONF.siteUrl + '/' + CONF.appid + '/null/home_page/workbench?modulesId=1'
                             })
                         } else {
                             sys.window.opentab(user.userid, accessToken.toString(), noShow, {
-                            refreshToken,
-                            jwtToken
-                        });
+                                refreshToken,
+                                jwtToken
+                            });
                         }
-                        
+
                         // location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
                     } else {
                         BW.sysPcHistory.setLockKey(user.userid);
@@ -1122,6 +1146,11 @@ export class LoginPage {
                 // console.log(this.props.userId.value.replace(/\s+/g, ""))
                 let userName = this.props.userId.value.replace(/\s+/g, "")
                 this.scanHandle(tools.isEmpty(userName) ? false : true);
+            })
+        }
+        if (props.wxscan) {
+            d.on(props.wxscan, 'click', () => {
+                this.wxScanHandle();
             })
         }
         if (props.fingerPcBtn) {
@@ -1316,6 +1345,40 @@ export class LoginPage {
             //this.device.uuid = '28-D2-44-0C-4E-B5';
         }
     }
+    private wxScanHandle = () => {
+        d.query(".login-wrapper", document.body).style.display = "none";
+        let code = this.renderWxScan();
+        let close = d.query("#scan-close", code);
+        // 其他方式登录,退回旧的登录弹窗
+        new WxLogin({
+            self_redirect: false,
+            id: "wx_login_container",
+            appid: "wxbdc5610cc59c1631",
+            scope: "snsapi_login",
+            redirect_uri: "https%3A%2F%2Fpassport.yhd.com%2Fwechat%2Fcallback.do&response_type=code&scope=snsapi_login&state=bfbb680470bae9ecceb04c91315d1f42#wechat_redirect",
+            state: "",
+            style: "",
+            href: ""
+        })
+        d.on(close, "click", () => {
+            d.query(".login-wrapper", document.body).style.display = "block";
+            code.parentNode.removeChild(code)
+        })
+    }
+    renderWxScan = () => {
+        let wrap = d.query(".wxscan-login", document.body);
+        if (wrap) {
+            wrap.style.display = "none";
+        }
+        let dom = d.create(`
+            <div class='wxscan-login'>
+              <div id="wx_login_container"></div>
+              <div id="scan-close">其他方式登录</div>
+            </div>
+        `)
+        d.append(d.query(".login-page-container"), dom);
+        return dom;
+    }
     //扫码登陆
     private scanHandle = (status: boolean = false) => {
         d.query(".login-wrapper", document.body).style.display = "none";
@@ -1428,7 +1491,7 @@ export class LoginPage {
     //扫码登录获取LgToken
     req_getLgToken = () => {
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
-            data: {uuid: this.device.uuid}
+            data: { uuid: this.device.uuid }
         }).then(({ response }) => {
             QrCode.toCanvas(response.lgToken, 150, 150, d.query("#code_login_cav"));
             this.req_countdown(response.lgToken, () => {
