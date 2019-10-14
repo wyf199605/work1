@@ -698,6 +698,9 @@ namespace G {
             setDownLoadUrl(data: obj, back?: IShellEventHandler) {
                 return ShellBase.handler('setDownLoadUrl', data, back)
             },
+            setVerifyAdd(data: obj, back?: IShellEventHandler) {
+                return ShellBase.handler('setVerifyAdd', data, back)
+            },
             filePrint(data: obj, back?: IShellEventHandler, infor?: IShellEventHandler) {
                 return ShellBase.handler('filePrint', data, back, infor);
             }
