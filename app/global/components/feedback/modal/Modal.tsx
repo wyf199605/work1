@@ -905,8 +905,9 @@ export class Modal extends Component {
             }
         });
         m.modalScreen.style.zIndex = '1001';
+        let isT
         m.onOk = () => {
-            m.isShow = false;
+            m.destroy();
             onClick && onClick();
         };
         m.onClose = () => {
