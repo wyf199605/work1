@@ -3264,7 +3264,7 @@ export class BwTableModule extends Component {
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
                 if (cell.isEdited) {
                     editModule ? editModule.assignPromise.then(() => {
-                        // setTimeout(() => {
+                        // setTimeout(() => {l
                         validList.push(validate(editModule, cell))
                         // }, 100);
                     }) : validList.push(validate(editModule, cell));

@@ -38,6 +38,9 @@ interface FileType {
 }
 
 export class BwUploader extends FormCom {
+    get isValue(){
+        return false;
+    }
 
     static EVT_FILE_JOIN_QUEUE = '__event_file_join_the_queue__'; // 文件加入上传队列是调用
     static EVT_UPLOAD_ERROR = '__event_file_upload_error__';    // 文件上传失败时调用
