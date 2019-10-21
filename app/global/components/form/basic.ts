@@ -21,6 +21,10 @@ export abstract class FormCom extends Component{
     abstract get value():any;
     abstract set value(val);
 
+    get isValue(): boolean{
+        return true;
+    }
+
     constructor(para: IFormComPara = {}){
         super(para);
         this.onSet = para && para.onSet;
