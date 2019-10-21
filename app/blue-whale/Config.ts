@@ -123,7 +123,8 @@ namespace BW {
             scanMbSure:"/app_sanfu_retail/null/codelogin/change",//手机扫码后点击确认登录
 
             pingUrl:'moblie/ping',
-            location:'buildmap'
+            location:'buildmap',
+            verifySoft:'commonsvc/detection'
         },
 
         init(siteUrl: string, appid: string, version: string, webscoket) {

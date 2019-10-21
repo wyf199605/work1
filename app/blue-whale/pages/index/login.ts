@@ -104,7 +104,7 @@ export class LoginPage {
 
                 if (data.loginMessage == 1) {
                     if (SMSBtn instanceof Button) {
-                        SMSBtn.destroy();
+                        SMSBtn.destroy()
                     } else {
                         d.remove(SMSBtn);
                     }
@@ -990,6 +990,7 @@ export class LoginPage {
      * 登录ajax
      */
     ajaxLogin(url: string, loginData, callback = (result) => Promise.resolve()) {
+        console.log("登录")
         let loginPage = this,
             loginBtn = loginPage.props.loginButton,
             login = loginBtn instanceof Button ? loginBtn.wrapper : loginBtn;
@@ -1006,6 +1007,7 @@ export class LoginPage {
                 data: [loginData],
                 headers: { 'auth_code': loginPage.device.auth_code, 'uuid': loginPage.device.uuid }
             }).then(({ response }) => {
+                console.log(JSON.stringify(response))
                 result.success = true;
                 result.data = response;
                 let token = response.head.accessToken || '';
@@ -1031,7 +1033,7 @@ export class LoginPage {
                             noShow = col.VALUE.split(',');
                         } else if (col.NAME === 'PLATFORM_NAME') {
                             user.platformName = col.VALUE;
-                        }else if (col.NAME === 'showWorkBench') {
+                        } else if (col.NAME === 'showWorkBench') {
                             sessionStorage.setItem('showWorkBench', col.VALUE);
                         }
                     });
@@ -1039,21 +1041,28 @@ export class LoginPage {
                         let accessToken = response.head.accessToken || '',
                             jwtToken = response.head.jwtToken || '',
                             refreshToken = response.head.refreshToken || '';
-                        
+
                         // sys.window.open
                         if (sessionStorage.getItem('showWorkBench') === 'true') {
                             sys.window.open({
-                                url: CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1'
+                                url: CONF.siteUrl + '/' + CONF.appid + '/null/home_page/workbench?modulesId=1'
                             })
                         } else {
                             sys.window.opentab(user.userid, accessToken.toString(), noShow, {
-                            refreshToken,
-                            jwtToken
-                        });
+                                refreshToken,
+                                jwtToken
+                            });
                         }
-                        
+
                         // location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
                     } else {
+                        console.log(response.dataArr)
+                        localStorage.removeItem('checkSoft')
+                        let status = response.dataArr.some(item => item.NAME == 'DetectionFlag' && item.VALUE === '1')
+                        if (status) {
+                            //软件检测
+                            localStorage.setItem('checkSoft', 'true')
+                        }
                         BW.sysPcHistory.setLockKey(user.userid);
                         BW.sysPcHistory.setInitType('1');
                         sys.window.opentab(void 0, void 0, noShow);
@@ -1428,7 +1437,7 @@ export class LoginPage {
     //扫码登录获取LgToken
     req_getLgToken = () => {
         BwRule.Ajax.fetch(CONF.siteUrl + "/app_sanfu_retail/null/codelogin/code", {
-            data: {uuid: this.device.uuid}
+            data: { uuid: this.device.uuid }
         }).then(({ response }) => {
             QrCode.toCanvas(response.lgToken, 150, 150, d.query("#code_login_cav"));
             this.req_countdown(response.lgToken, () => {
