@@ -523,7 +523,7 @@ export class TableDataCell extends TableCell {
                     // 设置新的值
                     if(tools.isNotEmpty(this.input) && this.input instanceof FormCom) {
                         let str = this.input.get();
-                        if(this.data !== str && (tools.isNotEmpty(str) || tools.isNotEmpty(this.data))){
+                        if(this.input.isValue && this.data !== str && (tools.isNotEmpty(str) || tools.isNotEmpty(this.data))){
                             this.data = str;
                         }else{
                             this.render();

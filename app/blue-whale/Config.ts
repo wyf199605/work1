@@ -124,7 +124,8 @@ namespace BW {
 
             pingUrl:'moblie/ping',
             location:'buildmap',
-            verifySoft:'commonsvc/detection'
+            verifySoft:'commonsvc/detection',
+            sendWxCode:'/commonsvc/wxopenid'
         },
 
         init(siteUrl: string, appid: string, version: string, webscoket) {

@@ -3264,7 +3264,7 @@ export class BwTableModule extends Component {
             bwTable.ftable.on(FastTable.EVT_CELL_EDIT_CANCEL, handler = (cell: FastTableCell) => {
                 if (cell.isEdited) {
                     editModule ? editModule.assignPromise.then(() => {
-                        // setTimeout(() => {
+                        // setTimeout(() => {l
                         validList.push(validate(editModule, cell))
                         // }, 100);
                     }) : validList.push(validate(editModule, cell));
@@ -3566,8 +3566,11 @@ export class BwTableModule extends Component {
 
             if (box) {
                 for (let key in status) {
+                    if(this.noEdit){
+                        status[key] = false;
+                    }
                     let btn = box.getItem(key);
-                    btn && (btn.isDisabled = this.noEdit ? this.noEdit : !status[key]);
+                    btn && (btn.isDisabled = !status[key]);
                 }
             }
             return status;
