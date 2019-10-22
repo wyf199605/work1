@@ -667,6 +667,9 @@ namespace G {
             }
         };
         const other = {
+            checkSoftInfo(data:obj,back?:IShellEventHandler){
+                return ShellBase.handler('checkSoftInfo', data, back);
+            },
             //消息数量
             sendMsgCount(data: obj, back?: IShellEventHandler) {
                 return ShellBase.handler('receiveMessage', data, back);
