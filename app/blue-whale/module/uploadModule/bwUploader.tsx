@@ -201,7 +201,7 @@ export class BwUploader extends FormCom {
     protected acceptVerify(file: CustomFile) {
         if (this.accept && this.accept.extensions && file.name) {
             let arr = file.name.split('.'),
-                ext = arr.reverse()[0],
+                ext = arr.reverse()[0].toLocaleLowerCase(),
                 exts = this.accept.extensions.split(',');
             return exts.indexOf(ext) > -1;
         } else {

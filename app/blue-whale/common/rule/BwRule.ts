@@ -168,7 +168,7 @@ export class BwRule extends Rule {
 
                             let isLogout = response.errorCode === 50001;
                             if (isLogout) {
-                                Modal.alert('登录已超时', '温馨提示', void 0, void 0, () => {
+                                Modal.alert('登录已超时', '温馨提示', () => {
                                     BW.sys.window.logout();
                                 });
                                 // Modal.confirm({
