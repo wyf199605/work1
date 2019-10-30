@@ -270,21 +270,21 @@ namespace BW {
                 },
                 update: function () {
                     // G.Modal.toast('已经是最新版本');
-                    if ('AppShell' in window) {
-                        Shell.base.versionUpdate(CONF.ajaxUrl.pcVersion, (e) => {
-                            if (!e.success) {
-                                require(['Modal'], (m) => {
-                                    m.Modal.toast('已经是最新版本');
-                                })
-                            }
-                        }, (e) => {
-                            console.log(e);
-                        });
-                    } else {
-                        require(['Modal'], (m) => {
-                            m.Modal.toast('已经是最新版本');
-                        })
-                    }
+                    // if ('AppShell' in window) {
+                    //     Shell.base.versionUpdate(CONF.ajaxUrl.pcVersion, (e) => {
+                    //         if (!e.success) {
+                    //             require(['Modal'], (m) => {
+                    //                 m.Modal.toast('已经是最新版本');
+                    //             })
+                    //         }
+                    //     }, (e) => {
+                    //         console.log(e);
+                    //     });
+                    // } else {
+                    //     require(['Modal'], (m) => {
+                    //         m.Modal.toast('已经是最新版本');
+                    //     })
+                    // }
                 },
                 clear: function () {
                     // G.Modal.toast('清除成功');

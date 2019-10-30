@@ -1314,12 +1314,12 @@ export class LoginPage {
             //         //sys.ui.alert(versionText);
             //     }
             // });
-            BwRule.Ajax.fetch(CONF.ajaxUrl.pcVersion, {
-                data: { getversion: versionText },
-                silent: true,
-            }).then(({ response }) => {
-                BlueWhaleShell.postMessage('downloadFile', JSON.stringify(response.data[0]));
-            });
+            // BwRule.Ajax.fetch(CONF.ajaxUrl.pcVersion, {
+            //     data: { getversion: versionText },
+            //     silent: true,
+            // }).then(({ response }) => {
+            //     BlueWhaleShell.postMessage('downloadFile', JSON.stringify(response.data[0]));
+            // });
 
             let json = BlueWhaleShell.postMessage('getDevice', '');
             if (!tools.isEmpty(json)) {
@@ -1341,7 +1341,7 @@ export class LoginPage {
             this.device.uuid = sys.window.getDevice("uuid").msg;
         } else if ('AppShell' in window && tools.isPc) {
             let base = Shell.base;
-            base.versionUpdate(CONF.ajaxUrl.pcVersion, () => { }, () => { });
+            // base.versionUpdate(CONF.ajaxUrl.pcVersion, () => { }, () => { });
 
             let result = base.device;
             if (result.success) {
