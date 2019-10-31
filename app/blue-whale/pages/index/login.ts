@@ -128,7 +128,7 @@ export class LoginPage {
 
                 if (data.loginMessage == 1) {
                     if (SMSBtn instanceof Button) {
-                        SMSBtn.destroy();
+                        SMSBtn.destroy()
                     } else {
                         d.remove(SMSBtn);
                     }
@@ -1014,6 +1014,7 @@ export class LoginPage {
      * 登录ajax
      */
     ajaxLogin(url: string, loginData, callback = (result) => Promise.resolve()) {
+        console.log("登录")
         let loginPage = this,
             loginBtn = loginPage.props.loginButton,
             login = loginBtn instanceof Button ? loginBtn.wrapper : loginBtn;
@@ -1030,6 +1031,7 @@ export class LoginPage {
                 data: [loginData],
                 headers: { 'auth_code': loginPage.device.auth_code, 'uuid': loginPage.device.uuid }
             }).then(({ response }) => {
+                console.log(JSON.stringify(response))
                 result.success = true;
                 result.data = response;
                 let token = response.head.accessToken || '';
@@ -1078,6 +1080,13 @@ export class LoginPage {
 
                         // location.href = CONF.siteUrl +'/' + CONF.appid + '/null/home_page/workbench?modulesId=1';
                     } else {
+                        console.log(response.dataArr)
+                        localStorage.removeItem('checkSoft')
+                        let status = response.dataArr.some(item => item.NAME == 'DetectionFlag' && item.VALUE === '1')
+                        if (status) {
+                            //软件检测
+                            localStorage.setItem('checkSoft', 'true')
+                        }
                         BW.sysPcHistory.setLockKey(user.userid);
                         BW.sysPcHistory.setInitType('1');
                         sys.window.opentab(void 0, void 0, noShow);
@@ -1305,12 +1314,12 @@ export class LoginPage {
             //         //sys.ui.alert(versionText);
             //     }
             // });
-            BwRule.Ajax.fetch(CONF.ajaxUrl.pcVersion, {
-                data: { getversion: versionText },
-                silent: true,
-            }).then(({ response }) => {
-                BlueWhaleShell.postMessage('downloadFile', JSON.stringify(response.data[0]));
-            });
+            // BwRule.Ajax.fetch(CONF.ajaxUrl.pcVersion, {
+            //     data: { getversion: versionText },
+            //     silent: true,
+            // }).then(({ response }) => {
+            //     BlueWhaleShell.postMessage('downloadFile', JSON.stringify(response.data[0]));
+            // });
 
             let json = BlueWhaleShell.postMessage('getDevice', '');
             if (!tools.isEmpty(json)) {
@@ -1332,7 +1341,7 @@ export class LoginPage {
             this.device.uuid = sys.window.getDevice("uuid").msg;
         } else if ('AppShell' in window && tools.isPc) {
             let base = Shell.base;
-            base.versionUpdate(CONF.ajaxUrl.pcVersion, () => { }, () => { });
+            // base.versionUpdate(CONF.ajaxUrl.pcVersion, () => { }, () => { });
 
             let result = base.device;
             if (result.success) {

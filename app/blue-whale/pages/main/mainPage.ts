@@ -19,6 +19,8 @@ import { Spinner } from "../../../global/components/ui/spinner/spinner";
 import { Notify } from "../../../global/components/feedback/notify/Notify";
 import { RfidConfig } from "../../module/rfid/RfidConfig";
 import Shell = G.Shell;
+import { ShellErpManageAd } from "global/shell/androidImpl/ShellErpManage";
+import { FlowBase } from "blue-whale/module/flowReport/FlowBase";
 
 interface IProps {
     pageContainer: HTMLDivElement;
@@ -72,6 +74,36 @@ export = class MainPage {
         return new Blob([uInt8Array], { type: contentType });
     }
     public static init = (props: IProps) => {
+        console.log(localStorage.getItem('checkSoft'))
+        if (localStorage.getItem('checkSoft') === 'true') {
+            BwRule.Ajax.fetch(CONF.ajaxUrl.verifySoft, {
+                type: 'get',
+                data: { rtype: 'soft', dtype: 2 }
+            }).then(backData => {
+                console.log(backData.response.body)
+                if (tools.isEmpty(backData.response.body)) {
+                    localStorage.removeItem('checkSoft');
+                    return false
+                }
+                let dom = `<div class="soft-check">
+                    <div class="spinner">
+                        <div class="double-bounce1"></div>
+                        <div class="double-bounce2"></div>
+                    </div>
+                    <div class="text"> 软件检测中，请稍后...</div>
+                </div>`
+                document.body.append(d.create(dom))
+
+                Shell.other.checkSoftInfo(backData.response, () => {
+                    document.body.removeChild(document.querySelector('.soft-check'));
+                    localStorage.removeItem('checkSoft');
+                })
+
+            }).catch(error => {
+                // console.log('失败了')
+                // console.log(error)
+            })
+        }
         document.oncontextmenu = (event: obj) => {
             if (event.target.nodeName == 'IMG') {
                 event.preventDefault();
@@ -86,7 +118,7 @@ export = class MainPage {
                                 let n = Math.round(Math.random() * (array.length - 1));//此处注意越界问题
                                 str += array[n]
                             }
-                            if(/^http(s)?/.test(event.target.currentSrc)){
+                            if (/^http(s)?/.test(event.target.currentSrc)) {
                                 sys.window.download(event.target.currentSrc, str + '.png');
                             } else {
                                 MainPage.downloadFile(str + ".png", event.target.currentSrc);
@@ -401,7 +433,7 @@ export = class MainPage {
                     d.on(span, 'click', () => {
                         handlerClick(item);
                     });
-                    if(data.length > 1){
+                    if (data.length > 1) {
                         let popover = new Popover({
                             className: 'system-menu-popover',
                             target: icon,
@@ -421,7 +453,7 @@ export = class MainPage {
                                 popover.show = false;
                             }
                         });
-                    }else{
+                    } else {
                         d.remove(icon);
                     }
                 } else {
@@ -437,7 +469,7 @@ export = class MainPage {
                     type = tools.keysVal(response, 'SYSTEM_TYPE') || 0,
                     params = tools.keysVal(response, 'LOGIN_VAR', 'PARAMS') || '';
 
-                if(type === 0){
+                if (type === 0) {
                     let flag = Shell.openSystem(path, params, (result) => {
                         loading && loading.hide();
                         loading = null;
@@ -454,7 +486,7 @@ export = class MainPage {
                     } else {
                         Modal.alert('打开失败');
                     }
-                }else if(type === 1){
+                } else if (type === 1) {
                     sys.window.open({
                         url: path,
                         title: item.systemName,
@@ -485,8 +517,8 @@ export = class MainPage {
         //顶部个人信息下拉窗口点击事件
         let rfid: RfidConfig,
             conf = Shell.other.getData();
-            // console.log(conf);
-        tools.isEmpty(conf)&& Shell.other.putData(JSON.stringify({
+        // console.log(conf);
+        tools.isEmpty(conf) && Shell.other.putData(JSON.stringify({
             line: 0,
             ip: '192.168.1.200',
             port: 100,
