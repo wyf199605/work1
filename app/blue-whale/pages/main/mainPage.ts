@@ -80,7 +80,8 @@ export = class MainPage {
                 type: 'get',
                 data: { rtype: 'soft', dtype: 2 }
             }).then(backData => {
-                if(!backData.response.body.bodyList||backData.response.body.bodyList.length==0){
+                console.log(backData.response.body)
+                if (tools.isEmpty(backData.response.body)) {
                     localStorage.removeItem('checkSoft');
                     return false
                 }
