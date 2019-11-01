@@ -84,9 +84,9 @@ export class FastTable extends Component {
 
     protected wrapperInit(): HTMLElement {
         if (tools.isMb) {
-            return <div className="fast-table-container"></div>
+            return <div className="fast-table-container" tabIndex="-1"></div>
         } else {
-            return <div className="fast-table-container">
+            return <div className="fast-table-container" tabIndex="-1">
                 <div className="tables"></div>
                 <div className="scroll-container">
                     <div className="scroll-content"></div>
@@ -1209,7 +1209,7 @@ export class FastTable extends Component {
     // 编辑相关方法与事件
     public edit = (() => {
         let self = this,
-            editingCell: TableDataCell = null,
+            editingCell: FastTableCell = null,
             editedAddIndexes: Array<number> = [],
             deletedIndexes: Array<number> = [],
             deletedData: Array<obj> = [],
@@ -1226,10 +1226,10 @@ export class FastTable extends Component {
 
                 if (tools.isNotEmpty(editingCell) && !editingCell.editing &&
                     (this.editor.updatable || (isInsert && this.editor.insertble))) {
-                    if (this.editor.rowCanInit(this.rows[rowIndex]) &&
-                        this.editor.cellCanInit(editingCell.column as FastTableColumn,
-                            isInsert ? 1 : 0)) {
-
+                    // if (this.editor.rowCanInit(this.rows[rowIndex]) &&
+                    //     this.editor.cellCanInit(editingCell.column as FastTableColumn,
+                    //         isInsert ? 1 : 0)) {
+                    if(!editingCell.disabled){
                         editingCell.editing = true;
                     }
                 }
@@ -1358,6 +1358,158 @@ export class FastTable extends Component {
             destroyCellInput() {
                 editingCell && (editingCell.editing = false);
                 editingCell = null;
+            },
+            getEditingCell(){
+                return editingCell;
+            },
+            setEditingCell(cell: FastTableCell){
+                editingCell && (editingCell.editing = false);
+                cell.editing = true;
+                self.selectedEvent.selectCell(cell.frow.index, cell.name);
+                editingCell = cell;
+            }
+        }
+    })();
+
+    posChangeEvent = (() => {
+        let handler;
+        // 获取上一个可编辑的cell
+        let getPrevEditCell = (cell: FastTableCell): FastTableCell => {
+            let prevCell: FastTableCell = null,
+                fieldName = cell.name;
+            for (let item of cell.frow.cells) {
+                if(item.name === fieldName) {
+                    return prevCell;
+                }
+                if(item.show && !item.isVirtual && !item.disabled){
+                    prevCell = item;
+                }
+            }
+            return null;
+        };
+
+        // 获取下一个可编辑的cell
+        let getNextEditCell = (cell: FastTableCell): FastTableCell => {
+            let match = false,
+                fieldName = cell.name;
+
+            for (let item of cell.frow.cells) {
+                if(match){
+                    if(item.show && !item.isVirtual && !item.disabled){
+                        return item;
+                    }
+                }else{
+                    if(item.name === fieldName) {
+                        match = true;
+                    }
+                }
+            }
+            return null;
+        };
+
+        // 获取上一行可编辑的cell
+        let getPrevRowEditCell = (cell: FastTableCell, start = false): FastTableCell => {
+            let rowIndex = cell.frow.index,
+                prevRow = this.rowGet(rowIndex - 1);
+
+            if(prevRow){
+                if(start){
+                    let prevCell: FastTableCell = null;
+                    for (let cell of prevRow.cells) {
+                        if(cell.show && !cell.isVirtual && !cell.disabled){
+                            prevCell = cell;
+                        }
+                    }
+                    return prevCell;
+                }else {
+            return prevRow.cellGet(cell.name);
+                }
+            }
+            return null;
+        };
+
+        // 获取下一行可编辑的cell
+        let getNextRowEditCell = (cell: FastTableCell, start = false): FastTableCell => {
+            let rowIndex = cell.frow.index,
+                nextRow = this.rowGet(rowIndex + 1);
+
+            if(nextRow){
+                if(start){
+                    for (let cell of nextRow.cells) {
+                        if(cell.show && !cell.isVirtual && !cell.disabled){
+                            return cell;
+                        }
+                    }
+                }else {
+                    return nextRow.cellGet(cell.name);
+                }
+            }
+            return null;
+        };
+
+        return {
+            on: () => {
+                this.posChangeEvent.off();
+                d.on(this.wrapper, 'keydown', handler = (e: KeyboardEvent) => {
+                    if(this.editing){
+                        if (e.ctrlKey || e.key === "Tab") {
+                            let cell: FastTableCell = this.edit.getEditingCell();
+
+                            switch (e.key) {
+                                case "ArrowUp": {
+                                    let prevRowCell = getPrevRowEditCell(cell);
+                                    if (prevRowCell) {
+                                        this.edit.setEditingCell(prevRowCell);
+                                    }
+                                    e.preventDefault();
+                                }
+                                    break;
+                                case "ArrowDown": {
+                                    let nextRowCell = getNextRowEditCell(cell);
+                                    if (nextRowCell) {
+                                        this.edit.setEditingCell(nextRowCell);
+                                    }
+                                    e.preventDefault();
+                                }
+                                    break;
+                                case "ArrowLeft": {
+                                    let prevCell = getPrevEditCell(cell);
+                                    if (prevCell) {
+                                        this.edit.setEditingCell(prevCell);
+                                    }
+                                    e.preventDefault();
+                                }
+                                    break;
+                                case "ArrowRight": {
+                                    let nextCell = getNextEditCell(cell);
+                                    if (nextCell) {
+                                        this.edit.setEditingCell(nextCell);
+                                    }
+                                    e.preventDefault();
+                                }
+                                    break;
+                                case "Tab": {
+                                    let nextCell: FastTableCell;
+                                    if(e.shiftKey){
+                                        nextCell = getPrevEditCell(cell);
+                                        !nextCell && (nextCell = getPrevRowEditCell(cell, true));
+                                    }else{
+                                        nextCell = getNextEditCell(cell);
+                                        !nextCell && (nextCell = getNextRowEditCell(cell, true));
+                                    }
+                                    if (nextCell) {
+                                        this.edit.setEditingCell(nextCell);
+                                    }
+                                    e.preventDefault();
+                                }
+                                    break;
+                            }
+                        }
+                    }
+                });
+            },
+            off: () => {
+                d.off(this.wrapper, 'keydown', handler);
             }
         }
     })();
@@ -1730,7 +1882,13 @@ export class FastTable extends Component {
                 }
             },
             dragOn: () => d.on(this.wrapper, 'mousedown', selector, dragSelectedEvent),
-            dragOff: () => d.off(this.wrapper, 'mousedown', selector, dragSelectedEvent)
+            dragOff: () => d.off(this.wrapper, 'mousedown', selector, dragSelectedEvent),
+            selectCell: (row: number, column: string) => {
+                this._clearAllSelectedCells();
+                singleSelectedTabelCell(row, column);
+                this._drawSelectedCells();
+                this.pseudoTable.setCheckBoxStatus();
+            }
         }
     })();
 
@@ -2902,6 +3060,7 @@ export class FastTable extends Component {
                 this.mainTable.initEditor(this.editor.inputInit);
                 this.leftTable && this.leftTable.initEditor(this.editor.inputInit);
                 this.edit.event.scroll.on();
+                this.posChangeEvent.on();
                 if (this.editor.autoInsert) {
                     let num = this.rowAdd();
                 } else {
@@ -2911,6 +3070,7 @@ export class FastTable extends Component {
                 this.mainTable.cancelEditor();
                 this.leftTable && this.leftTable.cancelEditor();
                 this.edit.event.click.off();
+                this.posChangeEvent.off();
                 !tools.isMb && this.hoverMoreEvent.on();
                 this.sortEvent.on();
                 this.click.on();

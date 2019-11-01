@@ -566,6 +566,7 @@ export class EditModule {
                             fields: fields,
                             data: resData,
                             title: field.caption,
+                            multi: false,
                             container: this.para.container,
                             onDataGet: (data) => {
                                 resolve(data[0] || {});
