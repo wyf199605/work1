@@ -142,7 +142,7 @@ export class FastTable extends Component {
                 if (item.name === fieldName) {
                     return prevCell;
                 }
-                if (item.show && !item.isVirtual && (!edit || !item.disabled)) {
+                if (item.show && !item.isVirtual && (!edit || (!item.disabled && !cell.frow.disabled))) {
                     prevCell = item;
                 }
             }
@@ -156,7 +156,7 @@ export class FastTable extends Component {
 
             for (let item of cell.frow.cells) {
                 if (match) {
-                    if (item.show && !item.isVirtual && (!edit || !item.disabled)) {
+                    if (item.show && !item.isVirtual && (!edit || (!item.disabled && !cell.frow.disabled))) {
                         return item;
                     }
                 } else {
@@ -177,7 +177,7 @@ export class FastTable extends Component {
                 if (start) {
                     let prevCell: FastTableCell = null;
                     for (let cell of prevRow.cells) {
-                        if (cell.show && !cell.isVirtual && (!edit || !cell.disabled)) {
+                        if (cell.show && !cell.isVirtual && (!edit || (!cell.disabled && !prevRow.disabled))) {
                             prevCell = cell;
                         }
                     }
@@ -197,7 +197,7 @@ export class FastTable extends Component {
             if (nextRow) {
                 if (start) {
                     for (let cell of nextRow.cells) {
-                        if (cell.show && !cell.isVirtual && (!edit || !cell.disabled)) {
+                        if (cell.show && !cell.isVirtual && (!edit || (!cell.disabled && !nextRow.disabled))) {
                             return cell;
                         }
                     }
