@@ -2,7 +2,8 @@
 import {IColumnDelObj, ITableCellFormatter, ITableCol, TableBase} from "./base/TableBase";
 import {FastTableRow, IFastTableRowPara} from "./FastTableRow";
 import {FastTableColumn} from "./FastTabelColumn";
-import IComponentPara = G.IComponentPara; import Component = G.Component;
+import IComponentPara = G.IComponentPara;
+import Component = G.Component;
 import {FastPseudoTable, PseudoTableType} from "./FastPseudoTable";
 import {FastTableCell} from "./FastTableCell";
 import {FastTableData} from "./FastTableData";
@@ -121,7 +122,7 @@ export class FastTable extends Component {
     }
 
     protected _isLockRight: boolean;
-    get isLockRight(){
+    get isLockRight() {
         return this._isLockRight;
     }
 
@@ -152,17 +153,18 @@ export class FastTable extends Component {
     }
 
     public dataAction: (data: obj, type: 'show' | 'edit' | 'insert', callback?: (data: obj) => void) => void;
-    dataControl(){
+
+    dataControl() {
         let row = this.selectedRows[0],
             type: 'show' | 'edit' | 'insert' = 'show';
-        if(!row){
+        if (!row) {
             Modal.alert('请选中要进行操作的数据');
-            return ;
+            return;
         }
 
-        if(!this.editing){
+        if (!this.editing) {
             this.dataAction(row.data, type);
-            return ;
+            return;
         }
 
         let index = row.data[TableBase.GUID_INDEX],
@@ -176,14 +178,14 @@ export class FastTable extends Component {
         });
     }
 
-    get errorMsg(){
+    get errorMsg() {
         let errorMsg = null;
-        for(let row of this.rows){
-            if(errorMsg){
+        for (let row of this.rows) {
+            if (errorMsg) {
                 break;
             }
-            for(let cell of row.cells){
-                if(cell.show && !cell.isVirtual && tools.isNotEmpty(cell.errorMsg)){
+            for (let cell of row.cells) {
+                if (cell.show && !cell.isVirtual && tools.isNotEmpty(cell.errorMsg)) {
                     errorMsg = cell.errorMsg;
                     break;
                 }
@@ -198,7 +200,7 @@ export class FastTable extends Component {
     }
 
     // 重新计算表格宽度
-    recountWidth (){
+    recountWidth() {
         this.tablesEach(table => {
             table.adjustColWidth();
         });
@@ -230,8 +232,8 @@ export class FastTable extends Component {
             data: para.data,
             ftable: this,
             render: (start, length, isRefresh) => {
-                if(!tools.isMb && !this.tableData.serverMode){
-                    if(isRefresh){
+                if (!tools.isMb && !this.tableData.serverMode) {
+                    if (isRefresh) {
                         this.tableData.originalData = this.tableData.data;
                         console.log(this.tableData.originalData);
                     }
@@ -326,12 +328,12 @@ export class FastTable extends Component {
         if (para.dragCol) {
             this.dragColumnsEvent.on();
         }
-        if(this.isWrapLine){
+        if (this.isWrapLine) {
             this.on(FastTable.EVT_CELL_EDIT_CANCEL, (cell) => {
                 this.setRowHeight(cell);
             });
         }
-        if(!tools.isMb) {
+        if (!tools.isMb) {
             this.hoverEvent.on();
             this.hoverMoreEvent.on();
         }
@@ -378,7 +380,7 @@ export class FastTable extends Component {
                             if (col.sortState === 'NO') {
                                 ctrl ? col.sort('ASC', true) : col.sortState = 'ASC';
                             } else if (col.sortState === 'DESC') {
-                                ctrl ? col.sort('ASC', true) :  col.sortState = 'ASC';
+                                ctrl ? col.sort('ASC', true) : col.sortState = 'ASC';
                             } else if (col.sortState === 'ASC') {
                                 ctrl ? col.sort('DESC', true) : col.sortState = 'DESC';
                             }
@@ -460,7 +462,7 @@ export class FastTable extends Component {
                     fastTableCols[0].push(cols[0][i]);
                 }
             }
-        }else{
+        } else {
             fastTableCols[0][0] = [];
             for (let i = 0; i < cols[0].length; i++) {
                 let rowspan = tools.isEmpty(cols[0][i].rowspan) ? 0 : cols[0][i].rowspan;
@@ -579,37 +581,37 @@ export class FastTable extends Component {
             if (this.pseudoTable) {
                 width += 40;
             }
-            if(this.isLockRight){
+            if (this.isLockRight) {
                 width -= 10;
             }
             // console.log(width);
             if (this.leftTable) {
                 width += this.leftTable.width;
                 let widthStr = 'calc(100% - ' + width + 'px)';
-                if(!tools.cssSupports('width', widthStr)){
+                if (!tools.cssSupports('width', widthStr)) {
                     let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
-                    if(offsetWidth == 0){
+                    if (offsetWidth == 0) {
                         setTimeout(() => {
                             this.setMainTableWidth();
-                        },  1000);
-                        return ;
-                    }else{
+                        }, 1000);
+                        return;
+                    } else {
                         widthStr = offsetWidth - width + 'px';
                     }
                 }
                 this.mainTable.body.innerWrapper.style.width = widthStr;
                 this.mainTable.head.innerWrapper.style.width = widthStr;
                 this.colCount && (this.mainTable.foot.innerWrapper.style.width = widthStr);
-            }else{
+            } else {
                 let widthStr = this.isLockRight ? 'calc(100% - 10px)' : '100%';
-                if(!tools.cssSupports('width', widthStr)){
+                if (!tools.cssSupports('width', widthStr)) {
                     let offsetWidth = this.mainTable.body.innerWrapper.offsetWidth;
-                    if(offsetWidth == 0){
+                    if (offsetWidth == 0) {
                         setTimeout(() => {
                             this.setMainTableWidth();
-                        },  1000);
-                        return ;
-                    }else{
+                        }, 1000);
+                        return;
+                    } else {
                         widthStr = offsetWidth - 10 + 'px';
                     }
                 }
@@ -712,7 +714,7 @@ export class FastTable extends Component {
     rowDel(index: number[]): FastTableRow[];
     rowDel(index: number): FastTableRow;
     rowDel(index) {
-        if(tools.isNotEmpty(index)) {
+        if (tools.isNotEmpty(index)) {
             let row = [];
             index = tools.toArray(index);
             index.sort((a, b) => {
@@ -726,7 +728,7 @@ export class FastTable extends Component {
             });
             let isCanDel = this.editing ? index.every((i) => this.editor.rowCanInit(this.rows[i])) : true,
                 tableData = this.tableData.data;
-            if(isCanDel){
+            if (isCanDel) {
                 for (let value of index) {
                     row.push(this.rows[value]);
                     let data = Object.assign({}, tableData[value]);
@@ -760,11 +762,11 @@ export class FastTable extends Component {
                 }
                 this.noData.toggle(Object.keys(this.tableData.data).length === 0);
                 return row.length === 1 ? row[0] : row;
-            }else{
+            } else {
                 Modal.alert('系统禁止删除当前记录');
             }
 
-        }else{
+        } else {
             return null;
         }
     }
@@ -795,9 +797,9 @@ export class FastTable extends Component {
         let columns: FastTableColumn[] = [];
         this.tablesEach((table, i) => {
             if (table) {
-                if(this.isLockRight){
+                if (this.isLockRight) {
                     columns = columns.concat(table.columns as FastTableColumn[]);
-                }else{
+                } else {
                     columns = table.columns.concat(columns) as FastTableColumn[];
                 }
             }
@@ -823,12 +825,12 @@ export class FastTable extends Component {
 
     columnAdd(col: IFastTableCol, data?: any[], index = -1) {
         this.mainTable.columnAdd(col, data);
-        if(index !== -1){
+        if (index !== -1) {
             this.changeColIndex(col.name, index);
         }
     }
 
-    changeColIndex(colIndex: string | number, index: number){
+    changeColIndex(colIndex: string | number, index: number) {
         colIndex = this.getColIndex(colIndex);
         let leftLen = this.leftTable ? this.leftTable.columns.length : 0,
             insertTable = index >= leftLen ? this.mainTable : this.leftTable,
@@ -879,15 +881,15 @@ export class FastTable extends Component {
                 }
             });
 
-            rowLen ++;
-            if(rowLen === maxRowLen) {
+            rowLen++;
+            if (rowLen === maxRowLen) {
                 this.render(dataLen, index, -1);
             }
         });
-        if(rowLen < maxRowLen) {
+        if (rowLen < maxRowLen) {
             this.render(this.rows.length, tools.toArray(data).length, -1);
         }
-        if(!this.tableData.serverMode){
+        if (!this.tableData.serverMode) {
             this.tableData.total = this.tableData.data.length;
         }
     }
@@ -1005,7 +1007,7 @@ export class FastTable extends Component {
 
         let touchMoveHandler = function (e) {
             let currentScrollLeft = self.mainTable.body.innerWrapper.scrollLeft;
-            if(displacement !== currentScrollLeft) {
+            if (displacement !== currentScrollLeft) {
                 displacement = currentScrollLeft;
 
                 headTable = d.query("table", self.mainTable.head.innerWrapper);
@@ -1050,13 +1052,13 @@ export class FastTable extends Component {
                 mainIndexes = self.mainTable ? self.mainTable.tableData.colCount(key, values) : null,
                 leftIndexes = self.leftTable ? self.leftTable.tableData.colCount(key, values) : null;
 
-            if(mainIndexes !== null && leftIndexes !== null){
+            if (mainIndexes !== null && leftIndexes !== null) {
                 indexes = mainIndexes.filter((val) => leftIndexes.indexOf(val) > -1);
-            }else if(mainIndexes !== null && leftIndexes === null){
+            } else if (mainIndexes !== null && leftIndexes === null) {
                 indexes = mainIndexes;
-            }else if(mainIndexes === null && leftIndexes !== null){
+            } else if (mainIndexes === null && leftIndexes !== null) {
                 indexes = leftIndexes;
-            }else{
+            } else {
                 indexes = null;
             }
 
@@ -1071,7 +1073,7 @@ export class FastTable extends Component {
             });
             self.render(0, void 0, void 0, false);
             // self.body.render(0, Object.keys(self.tableData.get()).length, void 0, false);
-            if(tools.isMb){
+            if (tools.isMb) {
                 document.body.scrollTop = 0;
             }
         }
@@ -1229,7 +1231,7 @@ export class FastTable extends Component {
                     // if (this.editor.rowCanInit(this.rows[rowIndex]) &&
                     //     this.editor.cellCanInit(editingCell.column as FastTableColumn,
                     //         isInsert ? 1 : 0)) {
-                    if(!editingCell.disabled){
+                    if (!editingCell.disabled) {
                         editingCell.editing = true;
                     }
                 }
@@ -1274,9 +1276,9 @@ export class FastTable extends Component {
                     }
                 },
                 get: () => {
-                    if(this.editor) {
+                    if (this.editor) {
                         return editedAddIndexes.slice(0, this.editor.autoInsert ? editedAddIndexes.length - 1 : editedAddIndexes.length);
-                    }else{
+                    } else {
                         return editedAddIndexes.slice();
                     }
                 },
@@ -1359,10 +1361,10 @@ export class FastTable extends Component {
                 editingCell && (editingCell.editing = false);
                 editingCell = null;
             },
-            getEditingCell(){
+            getEditingCell() {
                 return editingCell;
             },
-            setEditingCell(cell: FastTableCell){
+            setEditingCell(cell: FastTableCell) {
                 editingCell && (editingCell.editing = false);
                 cell.editing = true;
                 self.selectedEvent.selectCell(cell.frow.index, cell.name);
@@ -1378,10 +1380,10 @@ export class FastTable extends Component {
             let prevCell: FastTableCell = null,
                 fieldName = cell.name;
             for (let item of cell.frow.cells) {
-                if(item.name === fieldName) {
+                if (item.name === fieldName) {
                     return prevCell;
                 }
-                if(item.show && !item.isVirtual && !item.disabled){
+                if (item.show && !item.isVirtual && !item.disabled) {
                     prevCell = item;
                 }
             }
@@ -1394,12 +1396,12 @@ export class FastTable extends Component {
                 fieldName = cell.name;
 
             for (let item of cell.frow.cells) {
-                if(match){
-                    if(item.show && !item.isVirtual && !item.disabled){
+                if (match) {
+                    if (item.show && !item.isVirtual && !item.disabled) {
                         return item;
                     }
-                }else{
-                    if(item.name === fieldName) {
+                } else {
+                    if (item.name === fieldName) {
                         match = true;
                     }
                 }
@@ -1412,17 +1414,17 @@ export class FastTable extends Component {
             let rowIndex = cell.frow.index,
                 prevRow = this.rowGet(rowIndex - 1);
 
-            if(prevRow){
-                if(start){
+            if (prevRow) {
+                if (start) {
                     let prevCell: FastTableCell = null;
                     for (let cell of prevRow.cells) {
-                        if(cell.show && !cell.isVirtual && !cell.disabled){
+                        if (cell.show && !cell.isVirtual && !cell.disabled) {
                             prevCell = cell;
                         }
                     }
                     return prevCell;
-                }else {
-            return prevRow.cellGet(cell.name);
+                } else {
+                    return prevRow.cellGet(cell.name);
                 }
             }
             return null;
@@ -1433,14 +1435,14 @@ export class FastTable extends Component {
             let rowIndex = cell.frow.index,
                 nextRow = this.rowGet(rowIndex + 1);
 
-            if(nextRow){
-                if(start){
+            if (nextRow) {
+                if (start) {
                     for (let cell of nextRow.cells) {
-                        if(cell.show && !cell.isVirtual && !cell.disabled){
+                        if (cell.show && !cell.isVirtual && !cell.disabled) {
                             return cell;
                         }
                     }
-                }else {
+                } else {
                     return nextRow.cellGet(cell.name);
                 }
             }
@@ -1451,7 +1453,7 @@ export class FastTable extends Component {
             on: () => {
                 this.posChangeEvent.off();
                 d.on(this.wrapper, 'keydown', handler = (e: KeyboardEvent) => {
-                    if(this.editing){
+                    if (this.editing) {
                         if (e.ctrlKey || e.key === "Tab") {
                             let cell: FastTableCell = this.edit.getEditingCell();
 
@@ -1490,10 +1492,10 @@ export class FastTable extends Component {
                                     break;
                                 case "Tab": {
                                     let nextCell: FastTableCell;
-                                    if(e.shiftKey){
+                                    if (e.shiftKey) {
                                         nextCell = getPrevEditCell(cell);
                                         !nextCell && (nextCell = getPrevRowEditCell(cell, true));
-                                    }else{
+                                    } else {
                                         nextCell = getNextEditCell(cell);
                                         !nextCell && (nextCell = getNextRowEditCell(cell, true));
                                     }
@@ -1603,7 +1605,7 @@ export class FastTable extends Component {
         return cells;
     }
 
-    clearSelectedRows(){
+    clearSelectedRows() {
         this.selectedRows.forEach((row) => {
             row.selected = false;
         });
@@ -1625,12 +1627,12 @@ export class FastTable extends Component {
         return this.selectedRows.map(row => row.data);
     }
 
-    get selectedPreRowData(){
-        if(!this.pseudoTable){
+    get selectedPreRowData() {
+        if (!this.pseudoTable) {
             return null;
         }
         let index = this.pseudoTable.selectIndex;
-        if(index in this.rows){
+        if (index in this.rows) {
             return this.rows[index].data;
         }
         return null;
@@ -1682,15 +1684,15 @@ export class FastTable extends Component {
             // console.log(columnIndex);
 
             //判断td在移动端是否可被选中
-            if(tools.isMb && td){
-                for(let className of canSelectMbSet){
-                    if(td.classList.contains(className)){
+            if (tools.isMb && td) {
+                for (let className of canSelectMbSet) {
+                    if (td.classList.contains(className)) {
                         isCanSelectMb = true;
                         break;
                     }
                 }
             }
-            if(!this.multiSelect){
+            if (!this.multiSelect) {
                 ctrlKey = false;
                 shiftKey = false;
             }
@@ -1718,7 +1720,7 @@ export class FastTable extends Component {
                     }
                 }
                 this.trigger(FastTable.EVT_SELECTED, rowIndex);
-            } else if(!tools.isMb || isCanSelectMb) {
+            } else if (!tools.isMb || isCanSelectMb) {
                 // 点击表格cell选中只在 “PC端” 或者 “cell 为link类型的 ”开启；
                 if (ctrlKey === true) {
                     // if (this.selectedCells[rowIndex].length === this.rowGet(rowIndex).cells.length) {
@@ -1867,7 +1869,7 @@ export class FastTable extends Component {
         return {
             selectedOn: () => {
                 d.on(this.wrapper, eventName, 'tbody td:not(.disabled-cell)', selectedEvent);
-                if(tools.isMb && this.pseudoTable){
+                if (tools.isMb && this.pseudoTable) {
                     d.on(this.wrapper, 'press', '.pseudo-table tbody td', dblclickHandle = (ev) => {
                         this.clearSelectedRows();
                         let td = d.closest((ev.target as HTMLElement), 'td');
@@ -1877,7 +1879,7 @@ export class FastTable extends Component {
             },
             selectedOff: () => {
                 d.off(this.wrapper, eventName, 'tbody td:not(.disabled-cell)', selectedEvent);
-                if(tools.isMb && this.pseudoTable){
+                if (tools.isMb && this.pseudoTable) {
                     d.off(this.wrapper, 'press', '.pseudo-table tbody td', dblclickHandle);
                 }
             },
@@ -1897,10 +1899,10 @@ export class FastTable extends Component {
             let fullWidth = this.container.clientWidth,
                 allWidth = this.mainTable.width,
                 cols: FastTableColumn[] = this.columns || []; // 存放每一列的宽度
-            if(this.leftTable){
+            if (this.leftTable) {
                 allWidth += this.leftTable.width;
             }
-            if(this.pseudoTable){
+            if (this.pseudoTable) {
                 allWidth += this.pseudoTable.width;
             }
             let len = 0;
@@ -1923,12 +1925,12 @@ export class FastTable extends Component {
             }
 
             // 判断有右侧滚动条时，设置右侧锁列与锁头对齐
-            if(this.mainTable.body.scrollWrapper.offsetHeight > this.mainTable.body.wrapper.offsetHeight + 10){
-                if(this.isLockRight){
+            if (this.mainTable.body.scrollWrapper.offsetHeight > this.mainTable.body.wrapper.offsetHeight + 10) {
+                if (this.isLockRight) {
                     this.leftTable && (this.leftTable.body.innerWrapper.style.marginRight = '-10px');
                 }
-            }else{
-                if(this.isLockRight) {
+            } else {
+                if (this.isLockRight) {
                     this.leftTable && this.leftTable.body.innerWrapper.style.removeProperty('margin-right');
                 }
             }
@@ -2280,7 +2282,7 @@ export class FastTable extends Component {
                         rowIndex = td.parentElement.dataset['index'],
                         colName = td.dataset['name'],
                         cell = this.rows[rowIndex].cellGet(colName);
-                    if(cell.isMore){
+                    if (cell.isMore) {
                         moreWrapper = <div className="more-detail"/>;
                         moreWrapper.innerHTML = cell.text;
                         d.setPosition(moreWrapper, cell.wrapper, true);
@@ -2424,11 +2426,11 @@ export class FastTable extends Component {
             }
         });
         procedure && procedure.forEach((items) => {
-            if(items[0] === 'hide'){
+            if (items[0] === 'hide') {
                 this.columnGet(items[1]).show = false;
-            }else if(items[0] === 'show'){
+            } else if (items[0] === 'show') {
                 this.columnGet(items[1]).show = true;
-            }else{
+            } else {
                 this.mainTable.columnExchange(items[0], items[1]);
             }
         });
@@ -2437,14 +2439,14 @@ export class FastTable extends Component {
         }
 
         let result = {}, index = 0;
-        for(let column of this.columns){
-            if(!column.isVirtual){
+        for (let column of this.columns) {
+            if (!column.isVirtual) {
                 result[column.name] = {
                     index,
                     isShow: column.show,
                     isFixed: column.isFixed
                 };
-                index ++;
+                index++;
             }
         }
 
@@ -2574,26 +2576,26 @@ export class FastTable extends Component {
             draggingItem && draggingItem.classList.remove('dragging');
             selectedItem && selectedItem.classList.remove('selected');
             if (draggedItem !== selectedItem) {
-                if(selectedItem.classList.contains('list-' + draggingType)){
+                if (selectedItem.classList.contains('list-' + draggingType)) {
                     d.remove(draggedItem.parentElement);
                     draggingItem.removeAttribute('style');
                     let li = <li className="col-list-item">{draggingItem}</li>;
-                    if(draggingType === 'hide'){
+                    if (draggingType === 'hide') {
                         d.append(hideList, li);
-                        for(let i = 0; i < items.length; i ++){
+                        for (let i = 0; i < items.length; i++) {
                             let item = items[i];
-                            if(item.el.dataset['name'] === draggedItem.dataset['name']){
+                            if (item.el.dataset['name'] === draggedItem.dataset['name']) {
                                 let item = items.splice(i, 1)[0];
                                 item.el = draggingItem;
                                 hideItems.push(item);
                                 break;
                             }
                         }
-                    }else{
+                    } else {
                         d.append(showList, li);
-                        for(let i = 0; i < hideItems.length; i ++){
+                        for (let i = 0; i < hideItems.length; i++) {
                             let item = hideItems[i];
-                            if(item.el.dataset['name'] === draggedItem.dataset['name']){
+                            if (item.el.dataset['name'] === draggedItem.dataset['name']) {
                                 let item = hideItems.splice(i, 1)[0];
                                 item.el = draggingItem;
                                 items.push(item);
@@ -2602,7 +2604,7 @@ export class FastTable extends Component {
                         }
                     }
                     procedure.push([draggingType, draggedItem.dataset.name]);
-                } else{
+                } else {
                     let cloneNode = selectedItem.cloneNode(true) as HTMLElement;
                     draggingItem.removeAttribute('style');
                     for (let item of items) {
@@ -2625,11 +2627,11 @@ export class FastTable extends Component {
 
         let moveChange = (x: number, y: number) => {
 
-            if((draggingType === 'hide' && y > hideListTop) || (draggingType === 'show' && y < showListTop)){
+            if ((draggingType === 'hide' && y > hideListTop) || (draggingType === 'show' && y < showListTop)) {
                 selectedItem && selectedItem.classList.remove('selected');
                 selectedItem = draggingType === 'hide' ? hideList : showList;
                 selectedItem.classList.add('selected');
-            }else{
+            } else {
                 let begin = (Math.pow(items[0].x - x, 2) + Math.pow(items[0].y - y, 2));
                 selectedIndex = 0;
                 for (let i = 1; i < items.length; i++) {
@@ -2655,13 +2657,13 @@ export class FastTable extends Component {
                 let showFrag = document.createDocumentFragment(),
                     hideFrag = document.createDocumentFragment();
                 this.columns.forEach((col, index) => {
-                    if(!col.isVirtual){
+                    if (!col.isVirtual) {
                         let div = <div data-index={index + ''} data-name={col.name}><span>{col.title}</span></div>;
                         let li = <li className="col-list-item">{div}</li>;
-                        if(col.show){
+                        if (col.show) {
                             showFrag.appendChild(li);
                             items.push({el: div, index});
-                        }else{
+                        } else {
 
                             hideFrag.appendChild(li);
                             hideItems.push({el: div, index});
@@ -2739,8 +2741,8 @@ export class FastTable extends Component {
                 let dx = e.clientX - tools.offset.left(th),
                     dy = e.clientY + tools.scrollTop() - tools.offset.top(th), mouseMoveEvent, thMouseUpEvent;
                 resouceCol = this.columnGet(th.dataset.name);
-                if(!resouceCol){
-                    return ;
+                if (!resouceCol) {
+                    return;
                 }
                 if (leftTableColsName.indexOf(resouceCol.name) < 0) {
                     scrollLeft = this.currentSccrollLeft;
@@ -2828,22 +2830,22 @@ export class FastTable extends Component {
 
         let deleteCol: IColumnDelObj = deleteTable.columnsDel(resouceName, false);
         insertTable.columnInsertBefore(deleteCol, destinationName);
-        this.leftTable && this.leftTable.columns.forEach((col: FastTableColumn,index:number) => {
-            if (index < len){
+        this.leftTable && this.leftTable.columns.forEach((col: FastTableColumn, index: number) => {
+            if (index < len) {
                 col._setColumnFixedNotRender(true);
-            }else{
+            } else {
                 col._setColumnFixed(false);
             }
         });
     }
 
-    protected static sepPivotData(obj: obj): {keys: string[], data: obj}{
+    protected static sepPivotData(obj: obj): { keys: string[], data: obj } {
         let keys = [],
             data = {};
-        for(let key in obj){
-            if(key.indexOf('.') > -1){
+        for (let key in obj) {
+            if (key.indexOf('.') > -1) {
                 keys.push(key);
-            }else{
+            } else {
                 data[key] = obj[key];
             }
         }
@@ -2862,7 +2864,7 @@ export class FastTable extends Component {
         return rows;
     }
 
-    closeCellInput(){
+    closeCellInput() {
         this.edit.destroyCellInput();
     }
 
@@ -2912,7 +2914,7 @@ export class FastTable extends Component {
             });
 
             // 在交叉表模式下表格编辑的数据格式与普通表格不一样
-            if(this.editor.isPivot){
+            if (this.editor.isPivot) {
                 let pivotResult = {
                     update: [],
                     insert: [],
@@ -2922,16 +2924,16 @@ export class FastTable extends Component {
                 let rowsName = this.columns.map((col) => {
                     return col.name;
                 }).filter((name) => name.search(/\./) === -1);
-                for(let operation in result){
+                for (let operation in result) {
                     result[operation].forEach((obj, index) => {
                         let sepData = FastTable.sepPivotData(obj);
-                        switch (operation){
+                        switch (operation) {
                             case 'insert':
-                                for(let name of rowsName){
+                                for (let name of rowsName) {
                                     let oldData = oldUpdateData[index] ? oldUpdateData[index][name] : null,
                                         data = obj[name];
 
-                                    if(data != oldData){
+                                    if (data != oldData) {
                                         sepData.keys.forEach((key) => {
                                             let data = obj[key];
 
@@ -2962,11 +2964,11 @@ export class FastTable extends Component {
                                 });
                                 break;
                             case 'update':
-                                for(let name of rowsName){
+                                for (let name of rowsName) {
                                     let oldData = oldUpdateData[index] ? oldUpdateData[index][name] : null,
                                         data = obj[name];
 
-                                    if(data != oldData){
+                                    if (data != oldData) {
                                         sepData.keys.forEach((key) => {
                                             let oldData = oldUpdateData[index] ? oldUpdateData[index][key] : null,
                                                 data = obj[key];
@@ -2984,9 +2986,9 @@ export class FastTable extends Component {
                                             //     pivotResult.delete.push(Object.assign({}, delData,
                                             //         {[key]: oldData}));
                                             // }else{
-                                                // 修改 （原始数据与修改过的数据都不为空，且不与原始数据一样）
-                                                pivotResult.update.push(Object.assign({}, sepData.data,
-                                                    {[key]: data}));
+                                            // 修改 （原始数据与修改过的数据都不为空，且不与原始数据一样）
+                                            pivotResult.update.push(Object.assign({}, sepData.data,
+                                                {[key]: data}));
                                             // }
                                         });
                                         return;
@@ -3007,7 +3009,7 @@ export class FastTable extends Component {
                                     //     pivotResult.delete.push(Object.assign({}, sepData.data,
                                     //         {[key]: oldData}));
                                     // }else
-                                    if(oldData != data){
+                                    if (oldData != data) {
                                         // 修改 （原始数据与修改过的数据都不为空，且不与原始数据一样）
                                         pivotResult.update.push(Object.assign({}, sepData.data,
                                             {[key]: data}));
@@ -3028,12 +3030,12 @@ export class FastTable extends Component {
         return null;
     }
 
-    get editedCells(): FastTableCell[]{
+    get editedCells(): FastTableCell[] {
         let editedCells: FastTableCell[] = [];
         this.rows.forEach((row) => {
-            if(row.isAdd){
+            if (row.isAdd) {
                 editedCells = editedCells.concat(row.cells);
-            }else{
+            } else {
                 row.cells.forEach((cell) => {
                     cell.isEdited && editedCells.push(cell);
                 });
@@ -3078,7 +3080,7 @@ export class FastTable extends Component {
                 this.rowDel(this.edit.addIndex.spaceRowIndex());
                 this.tablesEach(table => {
                     table.tableData.edit.close();
-                    if(table.body && table.body.rows)
+                    if (table.body && table.body.rows)
                         table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
 
@@ -3086,7 +3088,7 @@ export class FastTable extends Component {
                 this.edit.delIndex.del();
                 this.edit.changeIndex.del();
                 this.tablesEach(table => {
-                    if(table.body && table.body.rows)
+                    if (table.body && table.body.rows)
                         table.body.rows = table.body.rows.filter(row => tools.isNotEmpty(row));
                 });
                 this._rows = this.rows.filter(row => tools.isNotEmpty(row));
@@ -3135,11 +3137,11 @@ export class FastTable extends Component {
             table.off(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index]);
             table.on(TableBase.EVT_CELL_EDIT_CANCEL, this.editHandlers[index] = (cell: TableDataCell) => {
                 let index = cell.row.index;
-                if(!this.rows[index]){
+                if (!this.rows[index]) {
                     return
                 }
                 let isChange = this.rows[index].cells.some((cell: TableDataCell) => cell.isEdited);
-                if(!isChange){
+                if (!isChange) {
                     let index = this.data[cell.row.index][TableBase.GUID_INDEX];
                     // if (this.edit.addIndex.get().indexOf(index) > -1) {
                     //     this.edit.addIndex.del(index);
@@ -3148,7 +3150,7 @@ export class FastTable extends Component {
                     // }
 
                     // 修改数据时，若数据无改变，则删除编辑的行
-                    if(this.edit.changeIndex.get().indexOf(index) > -1){
+                    if (this.edit.changeIndex.get().indexOf(index) > -1) {
                         this.edit.changeIndex.del(index);
                     }
                 }
@@ -3186,7 +3188,7 @@ export class FastTable extends Component {
             wrapper = this.wrapper;
         wrapper && (this.wrapper.style.display = 'none');
         this.rows.forEach((row) => {
-            if(row){
+            if (row) {
                 let rowCanInit = editor.rowCanInit(row);
                 row.cells.forEach((cell: TableDataCell) => {
                     let column = cell.column;
@@ -3213,7 +3215,7 @@ export class FastTable extends Component {
     }
 
     protected _isWrapLine = false;
-    get isWrapLine(){
+    get isWrapLine() {
         return this._isWrapLine;
     }
 
@@ -3228,8 +3230,8 @@ export class FastTable extends Component {
             width = getTextWidth(text),
             scale = Math.ceil(width / (column.maxWidth - 14));
 
-        let nowHeight = (scale -  1) * 17 + 40;
-        if(nowHeight > row.height){
+        let nowHeight = (scale - 1) * 17 + 40;
+        if (nowHeight > row.height) {
             row._setHeight(nowHeight);
             this.rows[row.index]._setHeight();
             this.pseudoTable.body.rows[row.index].height = row.height;
@@ -3247,7 +3249,7 @@ export class FastTable extends Component {
     // colName 列名称， data 任意数据
     locateToRow(colName: string, data: any, isClear = false): number {
         let index = null;
-        if(isClear){
+        if (isClear) {
             this.rows && this.rows.forEach((row) => {
                 row.selected = false;
             });
@@ -3255,9 +3257,9 @@ export class FastTable extends Component {
 
         this.rows && this.rows.forEach((row) => {
             let cell = row.cellGet(colName);
-            if(cell && cell.data == data){
+            if (cell && cell.data == data) {
                 row.selected = true;
-                if(tools.isEmpty(index)){
+                if (tools.isEmpty(index)) {
                     index = row.index;
                 }
             }
@@ -3266,7 +3268,7 @@ export class FastTable extends Component {
         return index;
     }
 
-    protected setRowsHeight(){
+    protected setRowsHeight() {
         this.rows.forEach((row, i) => {
             row._setHeight();
             this.pseudoTable.body.rows[i].height = row.height;
@@ -3291,18 +3293,19 @@ export class FastTable extends Component {
     })();
 
     protected _multiSelect: boolean = true;
-    set multiSelect(value: boolean){
+    set multiSelect(value: boolean) {
         this._multiSelect = value;
-        if(value){
+        if (value) {
             this.selectedEvent.dragOff();
             this.selectedEvent.dragOn();
             this.pseudoTable.checkAllBox.disabled = false;
-        }else{
+        } else {
             this.selectedEvent.dragOff();
             this.pseudoTable.checkAllBox.disabled = true;
         }
     }
-    get multiSelect(){
+
+    get multiSelect() {
         return this._multiSelect;
     }
 }
