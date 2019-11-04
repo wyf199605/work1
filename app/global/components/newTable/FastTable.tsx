@@ -325,8 +325,10 @@ export class FastTable extends Component {
                                         } else {
                                             nextCell = getNextCell(cell);
                                             if (!nextCell) {
-                                                scrollToStart(wrapper);
                                                 nextCell = getNextRowCell(cell, true);
+                                                if(nextCell){
+                                                    scrollToStart(wrapper);
+                                                }
                                             }
                                         }
                                         if (nextCell) {
