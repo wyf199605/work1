@@ -134,7 +134,22 @@ export class FastTable extends Component {
     static keyboardEvent = (() => {
         let listen = false;
 
-        // 获取上一个可编辑的cell
+        /**
+         * 判断当前cell是否可选中
+         * @param {FastTableCell} cell
+         * @param {boolean} edit 获取的cell是否可编辑
+         * @return {boolean} 是否可选中
+         */
+        let getCanSelected = (cell: FastTableCell, edit: boolean): boolean => {
+            return cell.show && !cell.isVirtual && (!edit || !cell.disabled);
+        };
+
+        /**
+         * 获取上一个cell
+         * @param {FastTableCell} cell 根据的当前cell
+         * @param {boolean} edit 获取的cell是否可编辑
+         * @return {FastTableCell}
+         */
         let getPrevCell = (cell: FastTableCell, edit = true): FastTableCell => {
             let prevCell: FastTableCell = null,
                 fieldName = cell.name;
@@ -142,21 +157,26 @@ export class FastTable extends Component {
                 if (item.name === fieldName) {
                     return prevCell;
                 }
-                if (item.show && !item.isVirtual && (!edit || (!item.disabled && !cell.frow.disabled))) {
+                if (getCanSelected(item, edit)) {
                     prevCell = item;
                 }
             }
             return null;
         };
 
-        // 获取下一个可编辑的cell
+        /**
+         * 获取下一个可编辑的cell
+         * @param {FastTableCell} cell 根据的当前cell
+         * @param {FastTableCell} edit 获取的cell是否可编辑
+         * @return {FastTableCell}
+         */
         let getNextCell = (cell: FastTableCell, edit = true): FastTableCell => {
             let match = false,
                 fieldName = cell.name;
 
             for (let item of cell.frow.cells) {
                 if (match) {
-                    if (item.show && !item.isVirtual && (!edit || (!item.disabled && !cell.frow.disabled))) {
+                    if (getCanSelected(item, edit)) {
                         return item;
                     }
                 } else {
@@ -168,44 +188,74 @@ export class FastTable extends Component {
             return null;
         };
 
-        // 获取上一行可编辑的cell
-        let getPrevRowCell = (cell: FastTableCell, start = false, edit = true): FastTableCell => {
+        /**
+         * 获取上一行可选中的cell
+         * @param {FastTableCell} cell 当前cell
+         * @param {boolean} end 是否从最后一个开始获取
+         * @param {boolean} edit 获取的cell是否需要可编辑
+         * @return {FastTableCell}
+         */
+        let getPrevRowCell = (cell: FastTableCell, end = false, edit = true): FastTableCell => {
             let rowIndex = cell.frow.index,
-                prevRow = FastTable.table.rowGet(rowIndex - 1);
+                index = -1;
 
-            if (prevRow) {
-                if (start) {
-                    let prevCell: FastTableCell = null;
-                    for (let cell of prevRow.cells) {
-                        if (cell.show && !cell.isVirtual && (!edit || (!cell.disabled && !prevRow.disabled))) {
-                            prevCell = cell;
+            while (true) {
+                let prevRow = FastTable.table.rowGet(rowIndex + index);
+                if (!prevRow) {
+                    return null;
+                }
+                if (!edit || !prevRow.disabled) {
+                    if (end) {
+                        let cells = prevRow.cells;
+                        for (let i = cells.length - 1; i >= 0; i--) {
+                            let prevCell = cells[i];
+                            if (getCanSelected(prevCell, edit)) {
+                                return prevCell;
+                            }
+                        }
+                    } else {
+                        let prevCell = prevRow.cellGet(cell.name);
+                        if (getCanSelected(prevCell, edit)) {
+                            return prevCell;
                         }
                     }
-                    return prevCell;
-                } else {
-                    return prevRow.cellGet(cell.name);
                 }
+                index--;
             }
-            return null;
         };
 
-        // 获取下一行可编辑的cell
+        /**
+         * 获取下一行可选中的cell
+         * @param {FastTableCell} cell 当前cell
+         * @param {boolean} start 是否从下一行的第一个开始获取
+         * @param {boolean} edit 获取的cell是否需要可编辑
+         * @return {FastTableCell}
+         */
         let getNextRowCell = (cell: FastTableCell, start = false, edit = true): FastTableCell => {
             let rowIndex = cell.frow.index,
-                nextRow = FastTable.table.rowGet(rowIndex + 1);
+                index = 1;
 
-            if (nextRow) {
-                if (start) {
-                    for (let cell of nextRow.cells) {
-                        if (cell.show && !cell.isVirtual && (!edit || (!cell.disabled && !nextRow.disabled))) {
-                            return cell;
+            while (true) {
+                let nextRow = FastTable.table.rowGet(rowIndex + index);
+                if (!nextRow) {
+                    return null;
+                }
+                if (!edit || !nextRow.disabled) {
+                    if (start) {
+                        for (let nextCell of nextRow.cells) {
+                            if (getCanSelected(nextCell, edit)) {
+                                return nextCell;
+                            }
+                        }
+                    } else {
+                        let nextCell = nextRow.cellGet(cell.name);
+                        if (getCanSelected(nextCell, edit)) {
+                            return nextCell;
                         }
                     }
-                } else {
-                    return nextRow.cellGet(cell.name);
                 }
+                index++;
             }
-            return null;
         };
 
         let scrollToStart = (wrapper: HTMLElement) => {
@@ -217,12 +267,12 @@ export class FastTable extends Component {
 
         return {
             on: () => {
-                if(!listen){
+                if (!listen) {
                     listen = true;
                     d.on(document.body, 'keydown', (e: KeyboardEvent) => {
                         let table = FastTable.table;
-                        if(!table){
-                            return ;
+                        if (!table) {
+                            return;
                         }
                         if (table.editing) {
                             if (e.ctrlKey || e.key === "Tab") {
@@ -267,14 +317,14 @@ export class FastTable extends Component {
                                         let nextCell: FastTableCell;
                                         if (e.shiftKey) {
                                             nextCell = getPrevCell(cell);
-                                            if(!nextCell){
+                                            if (!nextCell) {
                                                 nextCell = getPrevRowCell(cell, true)
-                                            }else{
+                                            } else {
                                                 scrollToStart(wrapper);
                                             }
                                         } else {
                                             nextCell = getNextCell(cell);
-                                            if(!nextCell){
+                                            if (!nextCell) {
                                                 scrollToStart(wrapper);
                                                 nextCell = getNextRowCell(cell, true);
                                             }
@@ -288,14 +338,14 @@ export class FastTable extends Component {
                                 }
                             }
                         } else {
-                            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)){
+                            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
                                 e.preventDefault();
 
                                 let targetCell: FastTableCell = null,
                                     cell: FastTableCell = table.firstSelectCell;
 
-                                if(!cell){
-                                    return ;
+                                if (!cell) {
+                                    return;
                                 }
 
                                 switch (e.key) {
@@ -314,7 +364,7 @@ export class FastTable extends Component {
                                         break;
                                 }
 
-                                if(targetCell){
+                                if (targetCell) {
                                     table.selectedEvent.selectCell(targetCell.row.index, targetCell.name);
 
                                     let td = targetCell.wrapper;
@@ -1667,11 +1717,11 @@ export class FastTable extends Component {
         return cells;
     }
 
-    get firstSelectCell(): FastTableCell{
-        for(let row of this.rows){
-            if(row && row.cells){
-                for(let cell of row.cells){
-                    if(cell.selected === true){
+    get firstSelectCell(): FastTableCell {
+        for (let row of this.rows) {
+            if (row && row.cells) {
+                for (let cell of row.cells) {
+                    if (cell.selected === true) {
                         return cell;
                     }
                 }
