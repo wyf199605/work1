@@ -72,10 +72,10 @@ export class LoginPcPage extends LoginPage {
                 <i class="iconfont icon-jiebang"></i>
                 设备解绑
             </a>
-            {/* <a href="#" className="wxscan">
+            <a href="#" className="wxscan">
                 <i class="iconfont icon-saoma"></i>
                 微信扫码
-            </a> */}
+            </a>
         </div>;
 
         d.append(form, loginOption);
@@ -112,7 +112,7 @@ export class LoginPcPage extends LoginPage {
             regButton: d.query('.device', loginOption),
             scanButton: d.query(".scanLogin", loginOption),
             jiebangButton: d.query(".jiebang", loginOption),
-            // wxscan: d.query('.wxscan', loginOption),
+            wxscan: d.query('.wxscan', loginOption),
             fqaBtn
         });
     }

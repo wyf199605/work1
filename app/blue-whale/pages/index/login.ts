@@ -41,19 +41,32 @@ export class LoginPage {
     private LoginModal: Modal;
     private Interval: number;
     constructor(private props: IProps) {
-        if (window.location.href.indexOf('?') > -1) {
-            let code = this.getQueryVariable('code');
-            console.log(code)
-            console.log(CONF)
-            if (code) {
-                let url = `${CONF.ajaxUrl.sendWxCode}?wxcode=${code}`;
-                G.Ajax.fetch(url).then(res => {
-                    // this.ajaxLogin(CONF.ajaxUrl.loginWeiXin, {
-                    //     openid: res.openid
-                    // });
-                })
+        let code = new URLSearchParams(location.search).get("code");
+        if (code) {
+            d.query('.login-wrapper').style.display="none";
+            let wrap = d.query(".wx-logining", document.body);
+            if (wrap) {
+                wrap.style.display = "none";
             }
-
+            let dom = d.create(`
+                <div class='wx-logining'>
+                  <div class="logining">微信登录中,请稍后...</div>
+                </div>
+            `)
+            d.append(d.query(".login-page-container"), dom);
+            let url = `${CONF.ajaxUrl.sendWxCode}?wxcode=${code}`;
+            G.Ajax.fetch(url).then(({ response }) => {
+                response = JSON.parse(response);
+                let result = tools.keysVal(response, 'body', 'bodyList', 0);
+                let { meta, dataList } = result;
+                let data = BwRule.getCrossTableData(meta, dataList);
+                this.ajaxLogin(CONF.ajaxUrl.loginWeiXin, {
+                    openid: data[0].openid
+                });
+            }).catch(err=>{
+                d.query('.login-wrapper').style.display="inline-block";
+                wrap.style.display = "none";
+            })
         }
         tools.isMb && this.getVersion();
         let response = props.responseBean;
@@ -90,15 +103,6 @@ export class LoginPage {
             }
         })
     }
-    private getQueryVariable(variable: string) {
-        var query = window.location.search.substring(1);
-        var vars = query.split("&");
-        for (var i = 0; i < vars.length; i++) {
-            var pair = vars[i].split("=");
-            if (pair[0] == variable) { return pair[1]; }
-        }
-        return (false);
-    }
     protected setLoginType() {
         G.Ajax.fetch(tools.url.addObj(CONF.url.login, {
             output: 'json'
@@ -111,7 +115,8 @@ export class LoginPage {
                 wxButton,
                 fingerMbBtn,
                 fingerPcBtn,
-                regButton
+                regButton,
+                wxscan
             } = this.props;
 
             if (data) {
@@ -140,6 +145,7 @@ export class LoginPage {
 
                 if (data.loginWechat == 1) {
                     d.remove(wxButton);
+                    d.remove(wxscan);
                 }
 
                 if (data.loginFingerprint == 1) {
@@ -174,6 +180,7 @@ export class LoginPage {
 
     protected getVersion() {
         G.Ajax.fetch(CONF.ajaxUrl.getVersion).then(({ response }) => {
+            console.log(response)
             response = JSON.parse(response);
             sys.window.uploadVersion(response.data.version);
         }).catch((e) => {
@@ -1358,17 +1365,38 @@ export class LoginPage {
         d.query(".login-wrapper", document.body).style.display = "none";
         let code = this.renderWxScan();
         let close = d.query("#scan-close", code);
-        // 其他方式登录,退回旧的登录弹窗
-        new WxLogin({
-            self_redirect: false,
-            id: "wx_login_container",
-            appid: "wxbdc5610cc59c1631",
-            scope: "snsapi_login",
-            redirect_uri: "https%3A%2F%2Fpassport.yhd.com%2Fwechat%2Fcallback.do&response_type=code&scope=snsapi_login&state=bfbb680470bae9ecceb04c91315d1f42#wechat_redirect",
-            state: "",
-            style: "",
-            href: ""
+        let url = `${CONF.ajaxUrl.wxcode}`;
+        G.Ajax.fetch(url).then(({ response }) => {
+            response = JSON.parse(response);
+            let result = tools.keysVal(response, 'body', 'bodyList', 0);
+            let { meta, dataList } = result;
+            let data = BwRule.getCrossTableData(meta, dataList);
+            new WxLogin({
+                self_redirect: false,
+                id: "wx_login_container",
+                appid: data[0].appid,
+                scope: "snsapi_login",
+                redirect_uri: CONF.siteUrl + '/' + CONF.appid +'/'+CONF.version+ '/index?page=login',
+                state: "",
+                style: "",
+                href: ""
+            })
         })
+        // BwRule.Ajax.fetch(CONF.siteUrl + "/app_fastlion_retail/null/commonsvc/wxappid").then(({ response }) => {
+        //     console.log(response)
+        //     new WxLogin({
+        //         self_redirect: false,
+        //         id: "wx_login_container",
+        //         appid: response.data[0].appid,
+        //         scope: "snsapi_login",
+        //         redirect_uri: CONF.siteUrl + '/' + CONF.appid + '/index',
+        //         state: "",
+        //         style: "",
+        //         href: ""
+        //     })
+        // })
+        // 其他方式登录,退回旧的登录弹窗
+
         d.on(close, "click", () => {
             d.query(".login-wrapper", document.body).style.display = "block";
             code.parentNode.removeChild(code)
