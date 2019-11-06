@@ -43,7 +43,7 @@ export class LoginPage {
     constructor(private props: IProps) {
         let code = new URLSearchParams(location.search).get("code");
         if (code) {
-            d.query('.login-wrapper').style.display="none";
+            d.query('.login-wrapper').style.display = "none";
             let wrap = d.query(".wx-logining", document.body);
             if (wrap) {
                 wrap.style.display = "none";
@@ -63,8 +63,8 @@ export class LoginPage {
                 this.ajaxLogin(CONF.ajaxUrl.loginWeiXin, {
                     openid: data[0].openid
                 });
-            }).catch(err=>{
-                d.query('.login-wrapper').style.display="inline-block";
+            }).catch(err => {
+                d.query('.login-wrapper').style.display = "inline-block";
                 wrap.style.display = "none";
             })
         }
@@ -1106,6 +1106,12 @@ export class LoginPage {
                     loginPage.loginBtnState(0);
                     reject(ev);
                 });
+                let code = new URLSearchParams(location.search).get("code");
+                if (code) {
+                    let wrap = d.query(".wx-logining", document.body);
+                    d.query('.login-wrapper').style.display = "inline-block";
+                    wrap.style.display = "none";
+                }
             });
         })
     }
@@ -1376,7 +1382,7 @@ export class LoginPage {
                 id: "wx_login_container",
                 appid: data[0].appid,
                 scope: "snsapi_login",
-                redirect_uri: CONF.siteUrl + '/' + CONF.appid +'/'+CONF.version+ '/index?page=login',
+                redirect_uri: CONF.siteUrl + '/' + CONF.appid + '/' + CONF.version + '/index?page=login',
                 state: "",
                 style: "",
                 href: ""
