@@ -14,7 +14,7 @@ namespace BW {
                     if (typeof o.data === "object") {
                         o.data = JSON.stringify(o.data);
                     }
-                    
+
                     localStorage.setItem('tableUrl',o.url);
 
                     // alert('111'+sessionStorage.getItem('tableUrl'));
@@ -215,7 +215,7 @@ namespace BW {
                 fire: function (type: string, data?: obj,) {
                     tools.event.fire(type, data, window);
                 },
-                getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function) {
+                getFile: function (callback: (file: CustomFile[]) => void, multi: boolean = false, accpet: string, error: Function, option = {}) {
                     let event = '__EVT_GET_IMG_BY_DEVICE__',
                         handler = null;
                     d.on(window, event, handler = function (response: CustomEvent) {
@@ -234,7 +234,7 @@ namespace BW {
                             error && error();
                         }
                     });
-                    self.handle('getImg', {event});
+                    self.handle('getImg', {event, data: option});
                 },
                 getEditImg(image: string | Function, callback?: Function) {
                     if (typeof image === 'function') {

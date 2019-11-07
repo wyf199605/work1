@@ -194,19 +194,30 @@ export class BwUploader extends FormCom {
     }
 
     protected getFile(callback: (file: CustomFile[]) => void, error?: Function) {
+        let picMeta = this.picMeta,
+            compressScale = picMeta.compressScale || '1,1,1',
+            maxSize = picMeta.maxSize || "512,512,512",
+            osType = picMeta.osType || "111",
+            index = tools.os.android ? 0 : tools.os.ios ? 1 : 2;
+
+        let compress = {
+            compress: Number(compressScale.split(',')[index]),
+            max_size: Number(maxSize.split(',')[index]),
+            os_type: osType,
+        };
         switch (this.uploadType) {
             case "file":
                 if (this.actionSheet) {
                     this.actionSheet.isShow = true;
                 } else {
-                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error, compress);
                 }
                 break;
             case 'sign':
                 if (sys.window.getSign) {
                     sys.window.getSign(callback, error);
                 } else {
-                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error);
+                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error, compress);
                 }
                 break;
         }
