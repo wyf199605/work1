@@ -6,6 +6,7 @@ import Shell = G.Shell;
 
 import { Modal } from "../../feedback/modal/Modal";
 import { Loading } from "../loading/loading";
+import {DropDown} from "../dropdown/dropdown";
 
 
 export interface ImgModalPara {
@@ -74,12 +75,11 @@ export const ImgModal = (() => {
                 //     // next.classList.add('hide');
                 // }
 
-
                 let pswpElement = d.query('.pswp', container),
                     len = para.img.length,
                     pros = [];
                 for (let i = 0; i <= len - 1; i++) {
-                    pros.push(new Promise((resolve) => {
+                    pros.push(new Promise((resolve, reject) => {
                         let imgTep = new Image();
                         imgTep.src = para.img[i];
                         imgTep.onload = function () {
@@ -88,6 +88,9 @@ export const ImgModal = (() => {
                                 w: imgTep.width,
                                 h: imgTep.height
                             });
+                        };
+                        imgTep.onerror = () => {
+                            reject();
                         }
                     }));
                 }
@@ -100,13 +103,13 @@ export const ImgModal = (() => {
                             , focus: false
                             , page: false
                             , pinchToClose: false
-                            , closeOnScroll: false
+                            , closeOnScroll: true
                             , closeOnVerticalDrag: false
                             , mouseUsed: false
                             , escKey: true
                             , arrowKeys: true
                             , modal: false
-                            , clickToCloseNonZoomable: false
+                            , clickToCloseNonZoomable: true
                             , closeElClasses: []
                             // , fullscreenEl: false
                             , shareEl: false
@@ -121,7 +124,6 @@ export const ImgModal = (() => {
                         gallery.listen('download', function () {
                             // var base64 = Shell.image.getBase64Image(para.img[0]);
                             // Shell.image.downloadImg(base64, (res) => {});
-                            console.log('download', gallery.getCurrentIndex());
                             var image = new Image();
                             image.src = para.img[gallery.getCurrentIndex()]; //s是图片的路径
                             image.onload = function () { //image.onload是等待图片加载完毕，等待图片加载完毕之后，才能对图片进行操作
@@ -133,7 +135,6 @@ export const ImgModal = (() => {
                                 canvas.height = height;
                                 cax.drawImage(image, 0, 0, width, height); //重绘
                                 var dataUrl = canvas.toDataURL("image/png"); //dataUrl 即为base编码字符串
-                                console.log(image.src);
                                 // return dataUrl;
                                 Shell.image.downloadImg(dataUrl, () => { });
                             }
@@ -146,7 +147,60 @@ export const ImgModal = (() => {
                         //     console.log(321);
                         //     // para.turnPage(true);
                         // });
+                        console.log(gallery);
+                        let i = 0;
+                        d.on(gallery.scrollWrap, 'click', '.pswp__button--rotate', () => {
+                            i ++;
+                            gallery.container.querySelectorAll('img').forEach((img) => {
+                                img.style.transform = `rotate(${i * 90}deg)`;
+                            });
+                        });
+                        let button = d.query('.pswp__button--scale', gallery.scrollWrap);
+                        let dropdown = new DropDown({
+                            el: button,
+                            isAdapt: true,
+                            onSelect(item: ListItem, index: number): void {
+                                button.innerText = item.text;
+                                gallery.applyZoomPan(item.value, 0, 0)
+                            }
+                        });
+                        d.on(gallery.scrollWrap, 'click', '.pswp__button--scale', () => {
+                            dropdown.showList();
+                        });
+                        dropdown.setData([
+                            {
+                                text: '25%',
+                                value: 0.25
+                            },
+                            {
+                                text: '50%',
+                                value: 0.5
+                            },
+                            {
+                                text: '75%',
+                                value: 0.75
+                            },
+                            {
+                                text: '100%',
+                                value: 1
+                            },
+                            {
+                                text: '200%',
+                                value: 2
+                            },
+                            {
+                                text: '300%',
+                                value: 3
+                            },
+                            {
+                                text: '500%',
+                                value: 5
+                            }
+                        ]);
+
                     }
+                }).catch(() => {
+                    Modal.toast('图片加载失败');
                 }).finally(() => {
                     loading && loading.hide();
                     loading = null;
@@ -217,39 +271,39 @@ export const ImgModal = (() => {
 })();
 
 // const imgModalTpl = `
-// <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true"> 
-//     <div class="pswp__bg"></div> 
-//     <div class="pswp__scroll-wrap"> 
-//         <div class="pswp__container"> 
-//             <div class="pswp__item"></div> 
-//             <div class="pswp__item"></div> 
-//             <div class="pswp__item"></div> 
-//         </div> 
-//         <div class="pswp__ui pswp__ui--hidden"> 
-//             <div class="pswp__top-bar"> 
-//                 <div class="pswp__counter"></div> 
-//                     <button class="pswp__button pswp__button--close iconfont icon-close"></button> 
-//                     <button class="pswp__button pswp__button--download iconfont icon-download"> </button> 
-//                     <button class="pswp__button pswp__button--next next-page iconfont icon-arrow-right "></button> 
-//                      <button class="pswp__button pswp__button--prev pre-page iconfont icon-arrow-left "></button> 
-//                     <div class="pswp__preloader"> 
-//                         <div class="pswp__preloader__icn"> 
-//                             <div class="pswp__preloader__cut"> 
-//                                 <div class="pswp__preloader__donut"></div> 
+// <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+//     <div class="pswp__bg"></div>
+//     <div class="pswp__scroll-wrap">
+//         <div class="pswp__container">
+//             <div class="pswp__item"></div>
+//             <div class="pswp__item"></div>
+//             <div class="pswp__item"></div>
+//         </div>
+//         <div class="pswp__ui pswp__ui--hidden">
+//             <div class="pswp__top-bar">
+//                 <div class="pswp__counter"></div>
+//                     <button class="pswp__button pswp__button--close iconfont icon-close"></button>
+//                     <button class="pswp__button pswp__button--download iconfont icon-download"> </button>
+//                     <button class="pswp__button pswp__button--next next-page iconfont icon-arrow-right "></button>
+//                      <button class="pswp__button pswp__button--prev pre-page iconfont icon-arrow-left "></button>
+//                     <div class="pswp__preloader">
+//                         <div class="pswp__preloader__icn">
+//                             <div class="pswp__preloader__cut">
+//                                 <div class="pswp__preloader__donut"></div>
 //                             </div>
 //                         </div>
 //                     </div>
-//                 </div> 
-//                 <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"> 
-//                     <div class="pswp__share-tooltip"></div> 
-//                 </div> 
-//                 <button class="pswp__button pswp__button--arrow--left  iconfont icon-arrow-left"> 
-//                     <span class=" iconfont icon-arrow-left"></span> 
-//                 </button> 
-//                 <button class="pswp__button pswp__button--arrow--right "> 
-//                      <span class=" iconfont icon-arrow-right"></span> 
-//                 </button> 
-//                  <div class="pswp__caption">  
+//                 </div>
+//                 <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+//                     <div class="pswp__share-tooltip"></div>
+//                 </div>
+//                 <button class="pswp__button pswp__button--arrow--left  iconfont icon-arrow-left">
+//                     <span class=" iconfont icon-arrow-left"></span>
+//                 </button>
+//                 <button class="pswp__button pswp__button--arrow--right ">
+//                      <span class=" iconfont icon-arrow-right"></span>
+//                 </button>
+//                  <div class="pswp__caption">
 //                     <div class="pswp__caption__center">
 //                 </div>
 //             </div>
@@ -278,6 +332,8 @@ const imgModalTpl = `
                 <button class="pswp__button pswp__button--close iconfont icon-close"></button> 
 
                 <button class="pswp__button pswp__button--download iconfont icon-download"> </button> 
+                <button class="pswp__button pswp__button--rotate"><span class="iconfont icon-shuaxin2"></span></button> 
+                <button class="pswp__button pswp__button--scale">100%</button>
 
                 <div class="pswp__preloader">
                     <div class="pswp__preloader__icn">

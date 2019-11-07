@@ -1056,6 +1056,7 @@ export class BwTableModule extends Component {
                         dataType = field.dataType || field.atrrs.dataType,
                         multi = dataType === '28';
                     layoutImg = new BwLayoutImg({
+                        picMeta: field.picMete,
                         isCloseMsg: true,
                         isDelete: dataType !== '20',
                         multi: multi,
@@ -2002,7 +2003,7 @@ export class BwTableModule extends Component {
         };
 
         let show = (fieldName: string, rowIndex: number) => {
-            let field = this.cols.filter(col => col.name === fieldName)[0],
+            let field: R_Field = this.cols.filter(col => col.name === fieldName)[0],
                 ftable = this.ftable,
                 row = ftable.rowGet(rowIndex),
                 column = ftable.columnGet(fieldName),
@@ -2078,6 +2079,7 @@ export class BwTableModule extends Component {
                 let imgContainer = <div className="table-img-uploader"/>;
                 d.append(btnWrapper, imgContainer);
                 uploadModule = new BwUploader({
+                    picMeta: field.picMete,
                     uploadType: isSign ? 'sign' : 'file',
                     nameField: fieldName,
                     // thumbField: thumbField,
@@ -2212,6 +2214,7 @@ export class BwTableModule extends Component {
                 let imgContainer = <div className="table-img-uploader"></div>;
                 d.append(btnWrapper, imgContainer);
                 new BwUploader({
+                    picMeta: field.picMete,
                     uploadType: isSign ? 'sign' : 'file',
                     nameField,
                     loading: {

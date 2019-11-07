@@ -69,7 +69,7 @@ export class List{
         }
         let arr : HTMLElement[] = [];
         data && data[0] && data.forEach((d, i) => {
-            let html = tools.str.parseTpl(this.tpl, d, false);
+            let html: string = tools.str.parseTpl(this.tpl, d, false);
             let el = G.d.create(html);
             arr.push(el);
         });

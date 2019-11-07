@@ -151,6 +151,7 @@ export class Accessory extends FormCom {
             return;
         }
         this.uploader = new BwUploader({
+            picMeta: this.para.field.picMete,
             loading: {
                 msg: '上传中',
                 container: document.body,
