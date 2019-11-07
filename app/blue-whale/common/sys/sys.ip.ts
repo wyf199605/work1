@@ -234,7 +234,7 @@ namespace BW {
                             error && error();
                         }
                     });
-                    self.handle('getImg', {event, data: option});
+                    self.handle('getImg', {event, data: JSON.stringify(option)});
                 },
                 getEditImg(image: string | Function, callback?: Function) {
                     if (typeof image === 'function') {
