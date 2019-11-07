@@ -49,6 +49,7 @@ export class BwUploader extends FormCom {
 
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
     protected maxSize: number;  // 上传文件大小，-1为不限制
+    protected minSize: number;  // 上传文件大小，-1为不限制
     protected chunkSize = 2 * 1024 * 1024;  // 分块大小 5M
     protected nameField: string;
     protected thumbField: string;
@@ -67,7 +68,7 @@ export class BwUploader extends FormCom {
     protected uploadType: uploadType;
     protected actionSheet: ActionSheet;
     protected autoUpload: boolean;
-    protected picMeta: R_PicMete;
+    protected picMeta = {};
 
     protected wrapperInit(para) {
         this.text = typeof para.text === 'string' ? para.text : '点击上传';
@@ -94,7 +95,21 @@ export class BwUploader extends FormCom {
         this.multi = para.multi || false;
         this.isChangeText = para.isChangeText || false;
         this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
-        this.picMeta = para.picMeta || {};
+
+        let picMeta = para.picMeta || {},
+            compressScale = picMeta.compressScale || '1,1,1',
+            maxSize = picMeta.maxSize || "512,512,512",
+            osType = picMeta.osType || "111",
+            index = tools.os.android ? 0 : tools.os.ios ? 1 : 2;
+
+        this.picMeta = {
+            compress: Number(compressScale.split(',')[index]),
+            max_size: Number(maxSize.split(',')[index]),
+            os_type: osType,
+        };
+
+        this.minSize = Number(picMeta.minSize) || -1;
+        this.maxSize = this.picMeta['max_size'] || -1;
 
         // ios暂未支持新接口
         if (/*sys.os === 'ip' || */sys.os === 'ad') {
@@ -124,6 +139,8 @@ export class BwUploader extends FormCom {
             files.forEach((file) => {
                 if (this.maxSize !== -1 && file.size > this.maxSize) {
                     Modal.alert('文件' + file.name + '大小超过限制');
+                } else if (this.minSize !== -1 && file.size < this.minSize) {
+                    Modal.alert('文件' + file.name + '大小超过限制');
                 } else if (!this.acceptVerify(file)) {
                     Modal.alert('文件' + file.name + '类型有误');
                 } else {
@@ -140,17 +157,6 @@ export class BwUploader extends FormCom {
     }
 
     protected initActionSheet(buttons: IActionSheetButton[] = []) {
-        let picMeta = this.picMeta,
-            compressScale = picMeta.compressScale || '1,1,1',
-            maxSize = picMeta.maxSize || "512,512,512",
-            osType = picMeta.osType || "111",
-            index = tools.os.android ? 0 : tools.os.ios ? 1 : 2;
-
-        let compress = {
-            compress: Number(compressScale.split(',')[index]),
-            max_size: Number(maxSize.split(',')[index]),
-            os_type: osType,
-        };
         this.actionSheet = new ActionSheet({
             buttons: [
                 {
@@ -158,7 +164,7 @@ export class BwUploader extends FormCom {
                     onClick: () => {
                         Shell.image.photograph(((files) => {
                             this.addFile(files);
-                        }), BwUploader.hintMsg, compress);
+                        }), BwUploader.hintMsg, this.picMeta);
                     }
                 },
 
@@ -167,7 +173,7 @@ export class BwUploader extends FormCom {
                     onClick: () => {
                         Shell.image.photoAlbum(((files) => {
                             this.addFile(files);
-                        }), BwUploader.hintMsg, compress);
+                        }), BwUploader.hintMsg, this.picMeta);
                     }
                 },
 
@@ -194,30 +200,19 @@ export class BwUploader extends FormCom {
     }
 
     protected getFile(callback: (file: CustomFile[]) => void, error?: Function) {
-        let picMeta = this.picMeta,
-            compressScale = picMeta.compressScale || '1,1,1',
-            maxSize = picMeta.maxSize || "512,512,512",
-            osType = picMeta.osType || "111",
-            index = tools.os.android ? 0 : tools.os.ios ? 1 : 2;
-
-        let compress = {
-            compress: Number(compressScale.split(',')[index]),
-            max_size: Number(maxSize.split(',')[index]),
-            os_type: osType,
-        };
         switch (this.uploadType) {
             case "file":
                 if (this.actionSheet) {
                     this.actionSheet.isShow = true;
                 } else {
-                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error, compress);
+                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error, this.picMeta);
                 }
                 break;
             case 'sign':
                 if (sys.window.getSign) {
                     sys.window.getSign(callback, error);
                 } else {
-                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error, compress);
+                    sys.window.getFile(callback, this.multi, this.accept && this.accept.mimeTypes, error, this.picMeta);
                 }
                 break;
         }
