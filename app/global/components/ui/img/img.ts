@@ -7,6 +7,7 @@ import Shell = G.Shell;
 import { Modal } from "../../feedback/modal/Modal";
 import { Loading } from "../loading/loading";
 import {DropDown} from "../dropdown/dropdown";
+import log = d3.scale.log;
 
 
 export interface ImgModalPara {
@@ -75,9 +76,11 @@ export const ImgModal = (() => {
                 //     // next.classList.add('hide');
                 // }
 
+                para.img = ['http://bwt.fastlion.cn:7777/k_img/img/logo/fastlion_logo.png'];
                 let pswpElement = d.query('.pswp', container),
                     len = para.img.length,
                     pros = [];
+
                 for (let i = 0; i <= len - 1; i++) {
                     pros.push(new Promise((resolve, reject) => {
                         let imgTep = new Image();
@@ -103,13 +106,13 @@ export const ImgModal = (() => {
                             , focus: false
                             , page: false
                             , pinchToClose: false
-                            , closeOnScroll: true
+                            , closeOnScroll: false
                             , closeOnVerticalDrag: false
                             , mouseUsed: false
                             , escKey: true
                             , arrowKeys: true
                             , modal: false
-                            , clickToCloseNonZoomable: true
+                            , clickToCloseNonZoomable: false
                             , closeElClasses: []
                             // , fullscreenEl: false
                             , shareEl: false
@@ -154,14 +157,21 @@ export const ImgModal = (() => {
                                 img.style.transform = `rotate(${i * 90}deg)`;
                             });
                         });
+
                         if (tools.isPc) {
                             let button = d.query('.pswp__button--scale', gallery.scrollWrap);
                             let dropdown = new DropDown({
                                 el: button,
                                 isAdapt: true,
                                 onSelect(item: ListItem, index: number): void {
+                                    let {x, y} = gallery.viewportSize,
+                                        {h, w} = gallery.currItem;
+
+                                    let startY = (y - h * item.value) / 2,
+                                        startX = (x - w * item.value) / 2;
+
+                                    gallery.applyZoomPan(item.value, startX, startY);
                                     button.innerText = item.text;
-                                    gallery.applyZoomPan(item.value, 0, 0)
                                 }
                             });
                             d.on(button, 'click', () => {
@@ -197,9 +207,29 @@ export const ImgModal = (() => {
                                     value: 5
                                 }
                             ]);
+                            gallery.listen("afterChange", () => {
+                                console.log('aaa');
+                            });
+                            d.on(gallery.scrollWrap, 'wheel', (e: WheelEvent) => {
+                                let scale = gallery.getZoomLevel();
+                                if(e.wheelDelta > 0){
+                                    scale += 0.05;
+                                }else{
+                                    scale -= 0.05;
+                                }
+                                scale = Math.max(0.25, scale);
+                                scale = Math.min(5, scale);
+                                let {x, y} = gallery.viewportSize,
+                                    {h, w} = gallery.currItem;
+
+                                let startY = (y - h * scale) / 2,
+                                    startX = (x - w * scale) / 2;
+                                gallery.applyZoomPan(scale, startX, startY);
+                                button.innerText = Math.round(scale * 100) + '%';
+                            });
+                            let scale = gallery.getZoomLevel();
+                            button.innerText = Math.round(scale * 100) + '%';
                         }
-
-
                     }
                 }).catch(() => {
                     Modal.toast('图片加载失败');
