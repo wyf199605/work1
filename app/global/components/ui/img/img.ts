@@ -27,6 +27,7 @@ export const ImgModal = (() => {
         wrapper: HTMLElement,
         container: HTMLElement,
         downAddr: string,
+        rotateWrapper: HTMLElement,
         onDownload: Function;
 
     function showPhotoSwipe(para: ImgModalPara, index = 0) {
@@ -76,6 +77,7 @@ export const ImgModal = (() => {
                 //     // next.classList.add('hide');
                 // }
 
+                para.img = ['http://bwt.fastlion.cn:7777/k_img/img/logo/fastlion_logo.png'];
                 let pswpElement = d.query('.pswp', container),
                     len = para.img.length,
                     pros = [];
@@ -126,20 +128,21 @@ export const ImgModal = (() => {
                         gallery.listen('download', function () {
                             // var base64 = Shell.image.getBase64Image(para.img[0]);
                             // Shell.image.downloadImg(base64, (res) => {});
-                            var image = new Image();
-                            image.src = para.img[gallery.getCurrentIndex()]; //s是图片的路径
-                            image.onload = function () { //image.onload是等待图片加载完毕，等待图片加载完毕之后，才能对图片进行操作
-                                var width = image.width; //根据图片的宽高，将图片进行压缩
-                                var height = image.height;
-                                var canvas = document.createElement("canvas");
-                                var cax = canvas.getContext('2d');
-                                canvas.width = width;
-                                canvas.height = height;
-                                cax.drawImage(image, 0, 0, width, height); //重绘
-                                var dataUrl = canvas.toDataURL("image/png"); //dataUrl 即为base编码字符串
-                                // return dataUrl;
-                                Shell.image.downloadImg(dataUrl, () => { });
-                            }
+                            Shell.image.downloadImg(para.img[gallery.getCurrentIndex()], () => {});
+                            // var image = new Image();
+                            // image.src = para.img[gallery.getCurrentIndex()]; //s是图片的路径
+                            // image.onload = function () { //image.onload是等待图片加载完毕，等待图片加载完毕之后，才能对图片进行操作
+                            //     var width = image.width; //根据图片的宽高，将图片进行压缩
+                            //     var height = image.height;
+                            //     var canvas = document.createElement("canvas");
+                            //     var cax = canvas.getContext('2d');
+                            //     canvas.width = width;
+                            //     canvas.height = height;
+                            //     cax.drawImage(image, 0, 0, width, height); //重绘
+                            //     var dataUrl = canvas.toDataURL("image/png"); //dataUrl 即为base编码字符串
+                            //     // return dataUrl;
+                            //     Shell.image.downloadImg(dataUrl, () => { });
+                            // }
                         });
                         // gallery.listen('prevImg', function () {
                         //     console.log(para);
@@ -149,13 +152,24 @@ export const ImgModal = (() => {
                         //     console.log(321);
                         //     // para.turnPage(true);
                         // });
-                        let i = 0;
-                        d.on(d.query('.pswp__button--rotate', gallery.scrollWrap), 'click', () => {
-                            i ++;
-                            gallery.container.querySelectorAll('img').forEach((img) => {
-                                img.style.transform = `rotate(${i * 90}deg)`;
+                        let rotateBtn = d.query('.pswp__button--rotate', gallery.scrollWrap);
+                        if (rotateBtn) {
+                            let {width, height, left, top} = rotateBtn.getBoundingClientRect();
+                            rotateWrapper = document.createElement("div");
+                            rotateWrapper.style.cssText = `cursor: pointer; position: fixed; z-index: 1501; width: ${width}px; height: ${height}px; left: ${left}px; top: ${top}px`;
+                            document.body.appendChild(rotateWrapper);
+                            let i = 0;
+                            rotateWrapper.addEventListener("click", () => {
+                                i ++;
+                                gallery.container.querySelectorAll('img').forEach((img) => {
+                                    img.style.transform = `rotate(${i * 90}deg)`;
+                                });
+                            }, true);
+                            gallery.listen("resize", () => {
+                                let {width, height, left, top} = rotateBtn.getBoundingClientRect();
+                                rotateWrapper.style.cssText = `cursor: pointer; position: fixed; z-index: 1501; width: ${width}px; height: ${height}px; left: ${left}px; top: ${top}px`;
                             });
-                        });
+                        }
 
                         if (tools.isPc) {
                             let button = d.query('.pswp__button--scale', gallery.scrollWrap);
@@ -248,6 +262,8 @@ export const ImgModal = (() => {
         if (tools.isMb) {
             document.body.style.overflow = '';
         }
+        rotateWrapper && d.remove(rotateWrapper);
+        rotateWrapper = null;
     }
 
     function show(para: ImgModalPara, index = 0) {
