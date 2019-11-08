@@ -15,7 +15,7 @@ export class AssignModuleBasic extends FormCom {
     protected sepValue = ';';
     public iframe;
 
-    public initPicker(pickDom: HTMLElement, href: string, data: obj, onSelect: Function) {
+    public initPicker(pickDom: HTMLElement, input: HTMLInputElement, href: string, data: obj, onSelect: Function) {
 
         if (pickDom) {
             let captionName = pickDom.parentElement.dataset.name;
@@ -23,8 +23,7 @@ export class AssignModuleBasic extends FormCom {
                 // this.destroy();
                 this.iframe = tools.iPage(href);
             }
-            d.on(pickDom, 'click', () => {
-                // contactModal.show();
+            let init = () => {
                 localStorage.setItem('fromPickCaption', captionName);
                 localStorage.setItem('fromPickData', JSON.stringify(tools.str.toEmpty(data)));
                 if (sys.os === 'pc') {
@@ -40,6 +39,17 @@ export class AssignModuleBasic extends FormCom {
                     }
                     onSelect(e.detail);
                 });
+            };
+            input && d.on(input, 'keydown', (e: KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    init();
+                }
+            });
+            d.on(pickDom, 'click', () => {
+                // contactModal.show();
+                init();
             });
         }
     }

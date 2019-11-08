@@ -48,8 +48,8 @@ export class BwUploader extends FormCom {
     static EVT_UPLOAD_SUCCESS = '__event_file_upload_success__';    // 文件上传成功时调用
 
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
-    protected maxSize: number;  // 上传文件大小，-1为不限制
-    protected minSize: number;  // 上传文件大小，-1为不限制
+    protected maxSize: number = -1;  // 上传文件大小，-1为不限制
+    protected minSize: number = -1;  // 上传文件大小，-1为不限制
     protected chunkSize = 2 * 1024 * 1024;  // 分块大小 5M
     protected nameField: string;
     protected thumbField: string;
@@ -96,20 +96,27 @@ export class BwUploader extends FormCom {
         this.isChangeText = para.isChangeText || false;
         this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
 
-        let picMeta = para.picMeta || {},
-            compressScale = picMeta.compressScale || '1,1,1',
-            maxSize = picMeta.maxSize || "512,512,512",
-            osType = picMeta.osType || "111",
-            index = tools.os.android ? 0 : tools.os.ios ? 1 : 2;
+        if(para.picMeta){
+            let picMeta = para.picMeta || {},
+                compressScale = picMeta.compressScale || '1,1,1',
+                maxSize = picMeta.maxSize || "512000,512000,512000",
+                osType = picMeta.osType || "000",
+                index = tools.os.android ? 0 : tools.os.ios ? 1 : 2,
+                compressScaleList = compressScale.split(','),
+                maxSizeList = maxSize.split(',');
 
-        this.picMeta = {
-            compress: Number(compressScale.split(',')[index]),
-            max_size: Number(maxSize.split(',')[index]),
-            os_type: osType,
-        };
-
-        this.minSize = Number(picMeta.minSize) || -1;
-        this.maxSize = this.picMeta['max_size'] || -1;
+            this.picMeta = {
+                compress: Number(compressScaleList[index] || compressScaleList[0]) || null,
+                max_size: Number(maxSizeList[index] || maxSizeList[0]) || null,
+                os_type: osType,
+            };
+            this.minSize = Number(picMeta.minSize) || -1;
+            this.maxSize = this.picMeta['max_size'] || -1;
+        }else {
+            this.picMeta = {
+                os_type: '000',
+            };
+        }
 
         // ios暂未支持新接口
         if (/*sys.os === 'ip' || */sys.os === 'ad') {
@@ -138,9 +145,9 @@ export class BwUploader extends FormCom {
         if (tools.isNotEmpty(files)) {
             files.forEach((file) => {
                 if (this.maxSize !== -1 && file.size > this.maxSize) {
-                    Modal.alert('文件' + file.name + '大小超过限制');
+                    Modal.alert(`文件${tools.str.cut(file.name, 10)}(${tools.formatByte(file.size)})太大了`);
                 } else if (this.minSize !== -1 && file.size < this.minSize) {
-                    Modal.alert('文件' + file.name + '大小超过限制');
+                    Modal.alert(`文件${tools.str.cut(file.name, 10)}(${tools.formatByte(file.size)})太小了`);
                 } else if (!this.acceptVerify(file)) {
                     Modal.alert('文件' + file.name + '类型有误');
                 } else {

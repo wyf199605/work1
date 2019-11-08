@@ -46,7 +46,7 @@ export default class AssignModule extends AssignModuleBasic{
 
         this.para.container.parentElement.dataset.name = para.name;
 
-        this.initPicker(pickDom, this.para.pickerUrl, para.data, (detail) => {
+        this.initPicker(pickDom, null, this.para.pickerUrl, para.data, (detail) => {
             this.selectedData = detail;
             if(!para.multi){
                 this.tagsInput.removeItems();
