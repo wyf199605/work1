@@ -77,7 +77,6 @@ export const ImgModal = (() => {
                 //     // next.classList.add('hide');
                 // }
 
-                para.img = ['http://bwt.fastlion.cn:7777/k_img/img/logo/fastlion_logo.png'];
                 let pswpElement = d.query('.pswp', container),
                     len = para.img.length,
                     pros = [];
