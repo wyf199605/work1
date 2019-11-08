@@ -147,56 +147,58 @@ export const ImgModal = (() => {
                         //     console.log(321);
                         //     // para.turnPage(true);
                         // });
-                        console.log(gallery);
                         let i = 0;
-                        d.on(gallery.scrollWrap, 'click', '.pswp__button--rotate', () => {
+                        d.on(d.query('.pswp__button--rotate', gallery.scrollWrap), 'click', () => {
                             i ++;
                             gallery.container.querySelectorAll('img').forEach((img) => {
                                 img.style.transform = `rotate(${i * 90}deg)`;
                             });
                         });
-                        let button = d.query('.pswp__button--scale', gallery.scrollWrap);
-                        let dropdown = new DropDown({
-                            el: button,
-                            isAdapt: true,
-                            onSelect(item: ListItem, index: number): void {
-                                button.innerText = item.text;
-                                gallery.applyZoomPan(item.value, 0, 0)
-                            }
-                        });
-                        d.on(gallery.scrollWrap, 'click', '.pswp__button--scale', () => {
-                            dropdown.showList();
-                        });
-                        dropdown.setData([
-                            {
-                                text: '25%',
-                                value: 0.25
-                            },
-                            {
-                                text: '50%',
-                                value: 0.5
-                            },
-                            {
-                                text: '75%',
-                                value: 0.75
-                            },
-                            {
-                                text: '100%',
-                                value: 1
-                            },
-                            {
-                                text: '200%',
-                                value: 2
-                            },
-                            {
-                                text: '300%',
-                                value: 3
-                            },
-                            {
-                                text: '500%',
-                                value: 5
-                            }
-                        ]);
+                        if (tools.isPc) {
+                            let button = d.query('.pswp__button--scale', gallery.scrollWrap);
+                            let dropdown = new DropDown({
+                                el: button,
+                                isAdapt: true,
+                                onSelect(item: ListItem, index: number): void {
+                                    button.innerText = item.text;
+                                    gallery.applyZoomPan(item.value, 0, 0)
+                                }
+                            });
+                            d.on(button, 'click', () => {
+                                dropdown.showList();
+                            });
+                            dropdown.setData([
+                                {
+                                    text: '25%',
+                                    value: 0.25
+                                },
+                                {
+                                    text: '50%',
+                                    value: 0.5
+                                },
+                                {
+                                    text: '75%',
+                                    value: 0.75
+                                },
+                                {
+                                    text: '100%',
+                                    value: 1
+                                },
+                                {
+                                    text: '200%',
+                                    value: 2
+                                },
+                                {
+                                    text: '300%',
+                                    value: 3
+                                },
+                                {
+                                    text: '500%',
+                                    value: 5
+                                }
+                            ]);
+                        }
+
 
                     }
                 }).catch(() => {
@@ -333,7 +335,7 @@ const imgModalTpl = `
 
                 <button class="pswp__button pswp__button--download iconfont icon-download"> </button> 
                 <button class="pswp__button pswp__button--rotate"><span class="iconfont icon-shuaxin2"></span></button> 
-                <button class="pswp__button pswp__button--scale">100%</button>
+                ${tools.isPc ? '<button class="pswp__button pswp__button--scale">100%</button>' : ''}
 
                 <div class="pswp__preloader">
                     <div class="pswp__preloader__icn">

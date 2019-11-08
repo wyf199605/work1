@@ -196,6 +196,9 @@ export class PickModule extends TextInput {
         this.modal.onOk = () => {
             this.getData();
         };
+        this.modal.onClose = () => {
+            this.input.click();
+        }
     }
 
 
