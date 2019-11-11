@@ -119,6 +119,7 @@ export const ImgModal = (() => {
                             , showAnimationDuration: 0
                             , hideAnimationDuration: 0
                             , index: index
+                            , getDoubleTapZoom: null
                         });
                         gallery.init()
                         gallery.listen('close', function () {
@@ -226,11 +227,11 @@ export const ImgModal = (() => {
                                 let scale = gallery.getZoomLevel();
                                 if(e.wheelDelta > 0){
                                     scale += 0.05;
+                                    scale = Math.min(5, scale);
                                 }else{
                                     scale -= 0.05;
+                                    scale = Math.max(initScale, scale);
                                 }
-                                scale = Math.max(0.25, scale);
-                                scale = Math.min(5, scale);
                                 let {x, y} = gallery.viewportSize,
                                     {h, w} = gallery.currItem;
 
@@ -239,8 +240,8 @@ export const ImgModal = (() => {
                                 gallery.applyZoomPan(scale, startX, startY);
                                 button.innerText = Math.round(scale * 100) + '%';
                             });
-                            let scale = gallery.getZoomLevel();
-                            button.innerText = Math.round(scale * 100) + '%';
+                            let initScale = gallery.getZoomLevel();
+                            button.innerText = Math.round(initScale * 100) + '%';
                         }
                     }
                 }).catch(() => {
