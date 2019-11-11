@@ -47,17 +47,22 @@ export = class MainPage {
     }
     //下载
     static downloadFile = (fileName, content) => {
-        let aLink = document.createElement('a');
-        let blob = MainPage.base64ToBlob(content); //new Blob([content]);
-
-        let evt = document.createEvent("HTMLEvents");
-        evt.initEvent("click", true, true);//initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
-        aLink.download = fileName;
-        aLink.href = URL.createObjectURL(blob);
-
+        // let aLink = document.createElement('a');
+        // let blob = MainPage.base64ToBlob(content); //new Blob([content]);
+        // let evt = document.createEvent("HTMLEvents");
+        // evt.initEvent("click", true, true);//initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
+        // aLink.download = fileName;
+        // aLink.href = URL.createObjectURL(blob);
+        let blob = MainPage.base64ToBlob(content);
+        let url= URL.createObjectURL(blob)
+        Shell.file.saveAs(url, (data) => {
+            if (data.success === false) {
+                Modal.toast(data.msg)
+            }
+        });
         // aLink.dispatchEvent(evt);
         //aLink.click()
-        aLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));//兼容火狐
+        // aLink.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));//兼容火狐
     }
     //base64转blob
     static base64ToBlob = (code) => {
@@ -119,7 +124,12 @@ export = class MainPage {
                                 str += array[n]
                             }
                             if (/^http(s)?/.test(event.target.currentSrc)) {
-                                sys.window.download(event.target.currentSrc, str + '.png');
+                                Shell.file.saveAs(event.target.currentSrc, (data) => {
+                                    if (data.success === false) {
+                                        Modal.toast(data.msg)
+                                    }
+                                });
+                                // sys.window.download(event.target.currentSrc, str + '.png');
                             } else {
                                 MainPage.downloadFile(str + ".png", event.target.currentSrc);
                             }

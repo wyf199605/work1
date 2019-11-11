@@ -622,6 +622,7 @@ namespace G {
             },
             // 移动端下载图片
             downloadImg(url: string, back: IShellEventHandler) {
+                console.log(url);
                 ShellBase.handler('downloadImg', {
                     url
                 }, back);
