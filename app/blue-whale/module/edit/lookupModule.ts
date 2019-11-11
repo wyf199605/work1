@@ -71,6 +71,7 @@ export class LookupModule extends FormCom{
                     if(option.value === value){
                         isSetSelect && this.selectInput.set(option);
                         typeof this.onSet === 'function' && this.onSet(option);
+                        this.selectInput.focus();
                         return;
                     }
                 }
@@ -82,6 +83,7 @@ export class LookupModule extends FormCom{
                 if(option.value === value){
                     isSetSelect && this.selectInput.set(option);
                     typeof this.onSet === 'function' && this.onSet(option);
+                    this.selectInput.focus();
                     return;
                 }
             }
@@ -98,6 +100,7 @@ export class LookupModule extends FormCom{
         };
         isSetSelect && this.selectInput.set(option);
         typeof this.onSet === 'function' && this.onSet(option);
+        this.selectInput.focus();
     }
 
 
