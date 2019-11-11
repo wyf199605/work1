@@ -7,6 +7,7 @@ import Shell = G.Shell;
 import { Modal } from "../../feedback/modal/Modal";
 import { Loading } from "../loading/loading";
 import {DropDown} from "../dropdown/dropdown";
+import log = d3.scale.log;
 
 
 export interface ImgModalPara {
@@ -26,6 +27,7 @@ export const ImgModal = (() => {
         wrapper: HTMLElement,
         container: HTMLElement,
         downAddr: string,
+        rotateWrapper: HTMLElement,
         onDownload: Function;
 
     function showPhotoSwipe(para: ImgModalPara, index = 0) {
@@ -78,6 +80,7 @@ export const ImgModal = (() => {
                 let pswpElement = d.query('.pswp', container),
                     len = para.img.length,
                     pros = [];
+
                 for (let i = 0; i <= len - 1; i++) {
                     pros.push(new Promise((resolve, reject) => {
                         let imgTep = new Image();
@@ -103,19 +106,20 @@ export const ImgModal = (() => {
                             , focus: false
                             , page: false
                             , pinchToClose: false
-                            , closeOnScroll: true
+                            , closeOnScroll: false
                             , closeOnVerticalDrag: false
                             , mouseUsed: false
                             , escKey: true
                             , arrowKeys: true
                             , modal: false
-                            , clickToCloseNonZoomable: true
+                            , clickToCloseNonZoomable: false
                             , closeElClasses: []
                             // , fullscreenEl: false
                             , shareEl: false
                             , showAnimationDuration: 0
                             , hideAnimationDuration: 0
                             , index: index
+                            , getDoubleTapZoom: null
                         });
                         gallery.init()
                         gallery.listen('close', function () {
@@ -124,20 +128,21 @@ export const ImgModal = (() => {
                         gallery.listen('download', function () {
                             // var base64 = Shell.image.getBase64Image(para.img[0]);
                             // Shell.image.downloadImg(base64, (res) => {});
-                            var image = new Image();
-                            image.src = para.img[gallery.getCurrentIndex()]; //s是图片的路径
-                            image.onload = function () { //image.onload是等待图片加载完毕，等待图片加载完毕之后，才能对图片进行操作
-                                var width = image.width; //根据图片的宽高，将图片进行压缩
-                                var height = image.height;
-                                var canvas = document.createElement("canvas");
-                                var cax = canvas.getContext('2d');
-                                canvas.width = width;
-                                canvas.height = height;
-                                cax.drawImage(image, 0, 0, width, height); //重绘
-                                var dataUrl = canvas.toDataURL("image/png"); //dataUrl 即为base编码字符串
-                                // return dataUrl;
-                                Shell.image.downloadImg(dataUrl, () => { });
-                            }
+                            Shell.image.downloadImg(para.img[gallery.getCurrentIndex()], () => {});
+                            // var image = new Image();
+                            // image.src = para.img[gallery.getCurrentIndex()]; //s是图片的路径
+                            // image.onload = function () { //image.onload是等待图片加载完毕，等待图片加载完毕之后，才能对图片进行操作
+                            //     var width = image.width; //根据图片的宽高，将图片进行压缩
+                            //     var height = image.height;
+                            //     var canvas = document.createElement("canvas");
+                            //     var cax = canvas.getContext('2d');
+                            //     canvas.width = width;
+                            //     canvas.height = height;
+                            //     cax.drawImage(image, 0, 0, width, height); //重绘
+                            //     var dataUrl = canvas.toDataURL("image/png"); //dataUrl 即为base编码字符串
+                            //     // return dataUrl;
+                            //     Shell.image.downloadImg(dataUrl, () => { });
+                            // }
                         });
                         // gallery.listen('prevImg', function () {
                         //     console.log(para);
@@ -147,57 +152,97 @@ export const ImgModal = (() => {
                         //     console.log(321);
                         //     // para.turnPage(true);
                         // });
-                        console.log(gallery);
-                        let i = 0;
-                        d.on(gallery.scrollWrap, 'click', '.pswp__button--rotate', () => {
-                            i ++;
-                            gallery.container.querySelectorAll('img').forEach((img) => {
-                                img.style.transform = `rotate(${i * 90}deg)`;
+                        let rotateBtn = d.query('.pswp__button--rotate', gallery.scrollWrap);
+                        if (rotateBtn) {
+                            let {width, height, left, top} = rotateBtn.getBoundingClientRect();
+                            rotateWrapper = document.createElement("div");
+                            rotateWrapper.style.cssText = `cursor: pointer; position: fixed; z-index: 1501; width: ${width}px; height: ${height}px; left: ${left}px; top: ${top}px`;
+                            document.body.appendChild(rotateWrapper);
+                            let i = 0;
+                            rotateWrapper.addEventListener("click", () => {
+                                i ++;
+                                gallery.container.querySelectorAll('img').forEach((img) => {
+                                    img.style.transform = `rotate(${i * 90}deg)`;
+                                });
+                            }, true);
+                            gallery.listen("resize", () => {
+                                let {width, height, left, top} = rotateBtn.getBoundingClientRect();
+                                rotateWrapper.style.cssText = `cursor: pointer; position: fixed; z-index: 1501; width: ${width}px; height: ${height}px; left: ${left}px; top: ${top}px`;
                             });
-                        });
-                        let button = d.query('.pswp__button--scale', gallery.scrollWrap);
-                        let dropdown = new DropDown({
-                            el: button,
-                            isAdapt: true,
-                            onSelect(item: ListItem, index: number): void {
-                                button.innerText = item.text;
-                                gallery.applyZoomPan(item.value, 0, 0)
-                            }
-                        });
-                        d.on(gallery.scrollWrap, 'click', '.pswp__button--scale', () => {
-                            dropdown.showList();
-                        });
-                        dropdown.setData([
-                            {
-                                text: '25%',
-                                value: 0.25
-                            },
-                            {
-                                text: '50%',
-                                value: 0.5
-                            },
-                            {
-                                text: '75%',
-                                value: 0.75
-                            },
-                            {
-                                text: '100%',
-                                value: 1
-                            },
-                            {
-                                text: '200%',
-                                value: 2
-                            },
-                            {
-                                text: '300%',
-                                value: 3
-                            },
-                            {
-                                text: '500%',
-                                value: 5
-                            }
-                        ]);
+                        }
 
+                        if (tools.isPc) {
+                            let button = d.query('.pswp__button--scale', gallery.scrollWrap);
+                            let dropdown = new DropDown({
+                                el: button,
+                                isAdapt: true,
+                                onSelect(item: ListItem, index: number): void {
+                                    let {x, y} = gallery.viewportSize,
+                                        {h, w} = gallery.currItem;
+
+                                    let startY = (y - h * item.value) / 2,
+                                        startX = (x - w * item.value) / 2;
+
+                                    gallery.applyZoomPan(item.value, startX, startY);
+                                    button.innerText = item.text;
+                                }
+                            });
+                            d.on(button, 'click', () => {
+                                dropdown.showList();
+                            });
+                            dropdown.setData([
+                                {
+                                    text: '25%',
+                                    value: 0.25
+                                },
+                                {
+                                    text: '50%',
+                                    value: 0.5
+                                },
+                                {
+                                    text: '75%',
+                                    value: 0.75
+                                },
+                                {
+                                    text: '100%',
+                                    value: 1
+                                },
+                                {
+                                    text: '200%',
+                                    value: 2
+                                },
+                                {
+                                    text: '300%',
+                                    value: 3
+                                },
+                                {
+                                    text: '500%',
+                                    value: 5
+                                }
+                            ]);
+                            gallery.listen("afterChange", () => {
+                                console.log('aaa');
+                            });
+                            d.on(gallery.scrollWrap, 'wheel', (e: WheelEvent) => {
+                                let scale = gallery.getZoomLevel();
+                                if(e.wheelDelta > 0){
+                                    scale += 0.05;
+                                    scale = Math.min(5, scale);
+                                }else{
+                                    scale -= 0.05;
+                                    scale = Math.max(initScale, scale);
+                                }
+                                let {x, y} = gallery.viewportSize,
+                                    {h, w} = gallery.currItem;
+
+                                let startY = (y - h * scale) / 2,
+                                    startX = (x - w * scale) / 2;
+                                gallery.applyZoomPan(scale, startX, startY);
+                                button.innerText = Math.round(scale * 100) + '%';
+                            });
+                            let initScale = gallery.getZoomLevel();
+                            button.innerText = Math.round(initScale * 100) + '%';
+                        }
                     }
                 }).catch(() => {
                     Modal.toast('图片加载失败');
@@ -217,6 +262,8 @@ export const ImgModal = (() => {
         if (tools.isMb) {
             document.body.style.overflow = '';
         }
+        rotateWrapper && d.remove(rotateWrapper);
+        rotateWrapper = null;
     }
 
     function show(para: ImgModalPara, index = 0) {
@@ -333,7 +380,7 @@ const imgModalTpl = `
 
                 <button class="pswp__button pswp__button--download iconfont icon-download"> </button> 
                 <button class="pswp__button pswp__button--rotate"><span class="iconfont icon-shuaxin2"></span></button> 
-                <button class="pswp__button pswp__button--scale">100%</button>
+                ${tools.isPc ? '<button class="pswp__button pswp__button--scale">100%</button>' : ''}
 
                 <div class="pswp__preloader">
                     <div class="pswp__preloader__icn">

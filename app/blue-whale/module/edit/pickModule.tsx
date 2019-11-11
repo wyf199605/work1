@@ -52,6 +52,13 @@ export class PickModule extends TextInput {
             container: para.container,
         } as ITextInputPara);
         this.p = para;
+        d.on(this.input, 'keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.pickInit();
+            }
+        })
     }
 
     pickInit() {
@@ -189,6 +196,9 @@ export class PickModule extends TextInput {
         this.modal.onOk = () => {
             this.getData();
         };
+        this.modal.onClose = () => {
+            this.input && this.input.click && this.input.click();
+        }
     }
 
 

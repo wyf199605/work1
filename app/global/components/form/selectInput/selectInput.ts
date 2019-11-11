@@ -34,7 +34,6 @@ export class SelectInput extends TextInput {
     }
 
     constructor(para: ISelectInputPara) {
-
         super(<ITextInputPara>tools.obj.merge(para, {
             icons: tools.isNotEmpty(para.arrowIcon) ? [(tools.isNotEmpty(para.arrowIconPre) ? para.arrowIconPre : 'iconfont') +  ' ' + para.arrowIcon]:['iconfont icon-arrow-down'],
             iconHandle: para.clickType !== 0 ? () => {
@@ -85,6 +84,13 @@ export class SelectInput extends TextInput {
         });
 
         this.dropdown = new DropDown(dropPara);
+        d.on(this.input, 'keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                !this.dropdown.isShow && this.toggle();
+            }
+        });
     }
 
     protected keyHandle = (e: KeyboardEvent) => {

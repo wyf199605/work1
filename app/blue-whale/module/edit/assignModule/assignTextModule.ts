@@ -30,7 +30,7 @@ export class AssignTextModule extends TextInput{
 
         if(p.pickerUrl){
             this.iconGroup.parentElement.dataset.name = p.name;
-            this.assignBasic.initPicker(this.iconGroup, this.para.pickerUrl, p.data, (detail) => {
+            this.assignBasic.initPicker(this.iconGroup, this.input, this.para.pickerUrl, p.data, (detail) => {
                 let dataStr = detail.data.map(obj => obj[detail.fromField]).join(';');
                 this.set(dataStr);
                 this.para.onGetData(detail.data, detail.otherField);

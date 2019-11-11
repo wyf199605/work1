@@ -3273,6 +3273,7 @@ export class BwTableModule extends Component {
                     }) : validList.push(validate(editModule, cell));
                 } else {
                     // cell.errorMsg = '';
+                    !cell.errorMsg && (cell.errorMsg = '');
                 }
             });
         };

@@ -766,6 +766,19 @@ namespace G {
                 return obj.offsetTop + (obj.offsetParent ? this.top(obj.offsetParent) : 0);
             }
         },
+
+        /**
+         * 格式化字节大小
+         * @param value
+         */
+        formatByte(value: number): string {
+            let unitArr = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+            let index = 0;
+            index = Math.floor(Math.log(value) / Math.log(1024));
+            let size = value / Math.pow(1024, index);
+            //  保留的小数位数
+            return size.toFixed(2) + unitArr[index];
+        },
         /**
          * 获取滚动条scrollTop
          * @author yrh

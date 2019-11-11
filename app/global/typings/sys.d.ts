@@ -40,7 +40,7 @@ interface SYS_Window{
     powerManager?();
     whiteBat?();
     uploadVersion?(version: string);
-    getFile(callback: (file: CustomFile[]) => void, multi: boolean, accept: string, error?: Function);
+    getFile(callback: (file: CustomFile[]) => void, multi: boolean, accept: string, error?: Function, option?);
     editImgGet?(image: string, callback: Function, error?: Function);
     editImgGet?(callback: Function, error?: Function);
     getSign?(callback: Function, error?: Function);
@@ -58,6 +58,5 @@ interface SYS_UI{
     notice(obj : {msg :string, url?:string, position?:string, time?:number, title?:string, type?:string}) :void;
 }
 
-    
-    
-    
+
+

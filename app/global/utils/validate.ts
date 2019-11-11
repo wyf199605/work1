@@ -46,7 +46,7 @@ const strategies = {
     },
 
     maxValue: function (data, value) {
-        return tools.isEmpty(data) ? true : (typeof data == "number" ? data <= value : true);
+        return tools.isEmpty(data) ? true : (typeof data == "number" ? !(data > value) : true);
     },
 
     minLength: function (data, value) {

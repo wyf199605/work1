@@ -112,7 +112,7 @@ interface R_ReqAddr {
 interface R_PicMete{
     compressScale?: string;
     maxSize?: string;
-    minSize?: string;
+    minSize?: number;
     osType?: string;
     tag?: string;
 }

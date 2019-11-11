@@ -97,6 +97,9 @@ export class RegPage {
                     finger_type: '1',
                 },
                 data2url: true,
+                loading: {
+                    msg: '注册中...'
+                }
             }).then(({ response }) => {
                 // console.log(response)
                 if (response.msg.indexOf('成功') > -1) {
@@ -145,6 +148,8 @@ export class RegPage {
                         }
                     });
                 }
+            }).catch(() => {
+                Modal.alert('注册失败');
             });
         });
 
