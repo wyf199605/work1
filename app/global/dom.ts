@@ -1187,7 +1187,7 @@ export const d = {
             el.style.position = 'absolute';
             el.style.left = `${left}px`;
             el.style.top = `${top}px`;
-            el.style.zIndex = '1020';
+            el.style.zIndex = '1500';
             //是否将el的宽度设置为relEl的宽度
         }
 

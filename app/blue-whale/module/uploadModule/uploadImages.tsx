@@ -203,6 +203,7 @@ export class UploadImages extends FormCom {
 
     private createUploader() {
         let uploader: BwUploader = new BwUploader({
+            picMeta: this.para.field.picMete,
             loading: {
                 msg: '上传中...',
                 container: document.body,

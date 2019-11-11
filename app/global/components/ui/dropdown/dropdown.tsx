@@ -33,7 +33,7 @@ export class DropDown {
     // private values : any[] = null;
     // private texts : string[] = null;
     private selectIndex: number = -1;
-    private ulDom: HTMLUListElement;
+    ulDom: HTMLUListElement;
     private isVisible = false;
     private list: List;
     private data: ListItem[];

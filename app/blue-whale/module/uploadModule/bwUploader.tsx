@@ -30,6 +30,7 @@ export interface IBwUploaderPara extends IFormComPara {
     uploadUrl?: string;
     loading?: ILoadingPara;
     buttons?: IActionSheetButton[];
+    picMeta?: R_PicMete;
 }
 interface FileType {
     title: string;
@@ -66,6 +67,7 @@ export class BwUploader extends FormCom {
     protected uploadType: uploadType;
     protected actionSheet: ActionSheet;
     protected autoUpload: boolean;
+    protected picMeta: R_PicMete;
 
     protected wrapperInit(para) {
         this.text = typeof para.text === 'string' ? para.text : '点击上传';
@@ -92,6 +94,7 @@ export class BwUploader extends FormCom {
         this.multi = para.multi || false;
         this.isChangeText = para.isChangeText || false;
         this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
+        this.picMeta = para.picMeta || {};
 
         // ios暂未支持新接口
         if (/*sys.os === 'ip' || */sys.os === 'ad') {
@@ -137,6 +140,17 @@ export class BwUploader extends FormCom {
     }
 
     protected initActionSheet(buttons: IActionSheetButton[] = []) {
+        let picMeta = this.picMeta,
+            compressScale = picMeta.compressScale || '1,1,1',
+            maxSize = picMeta.maxSize || "512,512,512",
+            osType = picMeta.osType || "111",
+            index = tools.os.android ? 0 : tools.os.ios ? 1 : 2;
+
+        let compress = {
+            compress: Number(compressScale.split(',')[index]),
+            max_size: Number(maxSize.split(',')[index]),
+            os_type: osType,
+        };
         this.actionSheet = new ActionSheet({
             buttons: [
                 {
@@ -144,7 +158,7 @@ export class BwUploader extends FormCom {
                     onClick: () => {
                         Shell.image.photograph(((files) => {
                             this.addFile(files);
-                        }), BwUploader.hintMsg);
+                        }), BwUploader.hintMsg, compress);
                     }
                 },
 
@@ -153,7 +167,7 @@ export class BwUploader extends FormCom {
                     onClick: () => {
                         Shell.image.photoAlbum(((files) => {
                             this.addFile(files);
-                        }), BwUploader.hintMsg);
+                        }), BwUploader.hintMsg, compress);
                     }
                 },
 

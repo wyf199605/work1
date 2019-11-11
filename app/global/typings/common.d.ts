@@ -109,6 +109,14 @@ interface R_ReqAddr {
     addrType?:boolean;
 }
 
+interface R_PicMete{
+    compressScale?: string;
+    maxSize?: string;
+    minSize?: string;
+    osType?: string;
+    tag?: string;
+}
+
 interface R_Field extends COL {
     caption?: string;//标题
     subcols?: R_Field[],
@@ -143,7 +151,7 @@ interface R_Field extends COL {
     backWhen? : string   // 后台计算规则表格单元格显示 true：显示backColor颜色
     backColor? : number  // 色码
     caculateExpr? : string // 数据渲染完成后调用计算规则
-
+    picMete?: R_PicMete;
 }
 interface R_SubTable_Field{
     caption : string;//panel 标题，有可能为空

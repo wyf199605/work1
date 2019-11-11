@@ -13,6 +13,7 @@
     "devDependencies": {
         "@babel/core": "^7.4.3",
         "@babel/preset-env": "^7.4.3",
+        "@types/photoswipe": "^4.0.29",
         "browser-sync": "^2.18.12",
         "concurrently": "^4.1.0",
         "del": "^3.0.0",

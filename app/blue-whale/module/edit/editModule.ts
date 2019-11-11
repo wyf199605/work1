@@ -124,6 +124,7 @@ export class EditModule {
     private comTnit: objOf<ComInitFun> = {
         image: (p) => {
             return new UploadImages({
+                picMeta: p.field.picMete,
                 container: p.dom,
                 nameField: p.field.name,
                 uploadUrl: BW.CONF.ajaxUrl.fileUpload,
@@ -231,6 +232,7 @@ export class EditModule {
 
         file: (p): FormCom => {
             let com = new BwUploader({
+                picMeta: p.field.picMete,
                 nameField: p.field.name,
                 custom: p.field,
                 container: p.dom,

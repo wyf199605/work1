@@ -259,7 +259,7 @@ namespace G {
              * @param num 1:{}  2:{{}}
              * @return {string}
              */
-            parseTpl: function (tpl: string, data: obj, isEncode = true, num : number = 2, regExp? : RegExp) {
+            parseTpl: function (tpl: string, data: obj, isEncode = true, num : number = 2, regExp? : RegExp): string {
                 let parseReg = regExp || /\{\{\S+?}}/g,
                     self = this;
                 return tpl.replace(parseReg, function (param) {

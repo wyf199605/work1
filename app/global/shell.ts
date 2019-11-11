@@ -560,12 +560,12 @@ namespace G {
                 ShellBase.handler('upLoadFile', {}, back)
             },
             // 拍照
-            photograph(callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
-                this.getImg(0, callback, error);
+            photograph(callback: (file: CustomFile[]) => void, error?: (msg: string) => void, option?) {
+                this.getImg(0, callback, error, option);
             },
             // 图库
-            photoAlbum(callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
-                this.getImg(1, callback, error);
+            photoAlbum(callback: (file: CustomFile[]) => void, error?: (msg: string) => void, option?) {
+                this.getImg(1, callback, error, option);
             },
             fileGet(callback: (file: CustomFile[]) => void) {
                 let input = <HTMLInputElement>d.create('<input type="file" class="hide"/>');
@@ -583,9 +583,15 @@ namespace G {
                 });
                 input.click();
             },
-            getImg(type: number, callback: (file: CustomFile[]) => void, error?: (msg: string) => void) {
+            getImg(
+                type: number,
+                callback: (file: CustomFile[]) => void,
+                error?: (msg: string) => void,
+                option = {compress: 1, max_size: 512, os_type: '000'}
+            ) {
                 ShellBase.handler('getImg', {
-                    type: type
+                    type: type,
+                    ...option
                 }, (result: IShellResult) => {
                     //alert(JSON.stringify(result.data));
                     if (result.success) {
