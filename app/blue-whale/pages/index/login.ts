@@ -41,33 +41,6 @@ export class LoginPage {
     private LoginModal: Modal;
     private Interval: number;
     constructor(private props: IProps) {
-        let code = new URLSearchParams(location.search).get("code");
-        if (code) {
-            d.query('.login-wrapper').style.display = "none";
-            let wrap = d.query(".wx-logining", document.body);
-            if (wrap) {
-                wrap.style.display = "none";
-            }
-            let dom = d.create(`
-                <div class='wx-logining'>
-                  <div class="logining">微信登录中,请稍后...</div>
-                </div>
-            `)
-            d.append(d.query(".login-page-container"), dom);
-            let url = `${CONF.ajaxUrl.sendWxCode}?wxcode=${code}`;
-            G.Ajax.fetch(url).then(({ response }) => {
-                response = JSON.parse(response);
-                let result = tools.keysVal(response, 'body', 'bodyList', 0);
-                let { meta, dataList } = result;
-                let data = BwRule.getCrossTableData(meta, dataList);
-                this.ajaxLogin(CONF.ajaxUrl.loginWeiXin, {
-                    openid: data[0].openid
-                });
-            }).catch(err => {
-                d.query('.login-wrapper').style.display = "inline-block";
-                wrap.style.display = "none";
-            })
-        }
         tools.isMb && this.getVersion();
         let response = props.responseBean;
         this.device = Device.get();
@@ -96,6 +69,45 @@ export class LoginPage {
         //     container: document.body
         // });
         this.setLoginType();
+
+
+
+        /**
+         * 微信扫码登录
+         */
+
+
+        let code = new URLSearchParams(location.search).get("code");
+        if (code) {
+            d.query('.login-wrapper').style.display = "none";
+            let wrap = d.query(".wx-logining", document.body);
+            if (wrap) {
+                wrap.style.display = "none";
+            }
+            let dom = d.create(`
+                <div class='wx-logining'>
+                  <div class="logining">微信登录中,请稍后...</div>
+                </div>
+            `)
+            d.append(d.query(".login-page-container"), dom);
+            let url = `${CONF.ajaxUrl.sendWxCode}?wxcode=${code}`;
+            G.Ajax.fetch(url).then(({ response }) => {
+                response = JSON.parse(response);
+                let result = tools.keysVal(response, 'body', 'bodyList', 0);
+                let { meta, dataList } = result;
+                let data = BwRule.getCrossTableData(meta, dataList);
+                this.ajaxLogin(CONF.ajaxUrl.loginWeiXin, {
+                    openid: data[0].openid
+                });
+            }).catch(err => {
+                d.query('.login-wrapper').style.display = "inline-block";
+                wrap.style.display = "none";
+                if (wrap) {
+                    wrap.style.display = "none";
+                }
+            })
+        }
+
         //判断是否拥有指纹识别
         Shell.other.isSupportFinger((res) => {
             if (!res) {
@@ -1111,6 +1123,7 @@ export class LoginPage {
                     let wrap = d.query(".wx-logining", document.body);
                     d.query('.login-wrapper').style.display = "inline-block";
                     wrap.style.display = "none";
+                    this.wxScanHandle();
                 }
             });
         })
@@ -1388,19 +1401,6 @@ export class LoginPage {
                 href: ""
             })
         })
-        // BwRule.Ajax.fetch(CONF.siteUrl + "/app_fastlion_retail/null/commonsvc/wxappid").then(({ response }) => {
-        //     console.log(response)
-        //     new WxLogin({
-        //         self_redirect: false,
-        //         id: "wx_login_container",
-        //         appid: response.data[0].appid,
-        //         scope: "snsapi_login",
-        //         redirect_uri: CONF.siteUrl + '/' + CONF.appid + '/index',
-        //         state: "",
-        //         style: "",
-        //         href: ""
-        //     })
-        // })
         // 其他方式登录,退回旧的登录弹窗
 
         d.on(close, "click", () => {

@@ -575,7 +575,7 @@ export class FastBtnTable extends FastTable{
                 {content: 'excel',icon: 'excel',type:'default',onClick:() => this.export('xls')},
                 {content: 'word',icon: 'word',type:'default',onClick:() => this.export('doc')},
                 // {content: 'pdf',icon: 'pdf',type:'default', onClick:() => this.export('pdf')},
-                {content: 'png',icon: 'png',type:'default',onClick:() => this.export('image')}
+                // {content: 'png',icon: 'png',type:'default',onClick:() => this.export('image')}
             ];
             btn.dropDown = new DropDown({
                 el: btn.wrapper,
@@ -593,7 +593,8 @@ export class FastBtnTable extends FastTable{
                 {value: 'xls', text: '导出excel'},
                 {value: 'doc', text: '导出word'},
                 // {value: 'pdf', text: '导出pdf'},
-                {value: 'image', text: '导出png'}];
+                // {value: 'image', text: '导出png'}
+            ];
             return {
                 title: '导出报表',
                 onClick: () => {
