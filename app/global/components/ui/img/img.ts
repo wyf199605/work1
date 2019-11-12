@@ -242,6 +242,7 @@ export const ImgModal = (() => {
                             });
                             let initScale = gallery.getZoomLevel();
                             button.innerText = Math.round(initScale * 100) + '%';
+                            initScale = Math.min(0.05, initScale);
                         }
                     }
                 }).catch(() => {
