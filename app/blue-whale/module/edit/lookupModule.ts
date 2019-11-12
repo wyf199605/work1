@@ -115,4 +115,10 @@ export class LookupModule extends FormCom{
         return undefined;
     }
 
+    destroy() {
+        this.selectInput && this.selectInput.destroy();
+        this.selectInput = null
+        super.destroy();
+    }
+
 }
