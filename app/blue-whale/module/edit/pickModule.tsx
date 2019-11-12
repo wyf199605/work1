@@ -1,6 +1,7 @@
 /// <amd-module name="PickModule"/>
 import d = G.d;
 import CONF = BW.CONF;
+import tools = G.tools;
 import sys = BW.sys;
 import {Modal} from "global/components/feedback/modal/Modal";
 import {SelectBox} from "global/components/form/selectBox/selectBox";
@@ -9,6 +10,7 @@ import {TextInput, ITextInputBasicPara, ITextInputPara} from "global/components/
 import {Spinner} from "../../../global/components/ui/spinner/spinner";
 import {BwRule} from "../../common/rule/BwRule";
 import {BwTableElement} from "../../pages/table/newTablePage";
+import {FastTable} from "../../../global/components/newTable/FastTable";
 
 interface PickModulePara extends ITextInputBasicPara {
     field: R_Field,
@@ -57,11 +59,13 @@ export class PickModule extends TextInput {
                 e.preventDefault();
                 e.stopPropagation();
                 this.pickInit();
+                this.input.blur();
             }
         })
     }
 
     pickInit() {
+        this.event.on();
         if (!this.modal) {
             let self = this,
                 isDefault = true,
@@ -88,6 +92,45 @@ export class PickModule extends TextInput {
             tableModule && tableModule.responsive();
         }
     }
+
+    protected event = (() => {
+        let handler;
+        return {
+            on: () => {
+                this.event.off();
+                d.on(document.body, 'keydown', handler = (e) => {
+                    let ftable: FastTable = tools.keysVal(this.bwTable, 'tableModule', 'main', 'ftable');
+                    if(!ftable){
+                        return ;
+                    }
+                    if(["Enter", "ArrowUp", "ArrowDown"].includes(e.key)) {
+                        e.preventDefault();
+
+                        let selectIndex: number,
+                            selectRow = ftable.selectedRows[0];
+
+                        if(selectRow){
+                            selectIndex = selectRow.index;
+                        }
+                        switch (e.key) {
+                            case "Enter":
+                                this.getData();
+                                break;
+                            case "ArrowUp":
+                                ftable.setRowSelectByIndex(typeof selectIndex === "number" ? selectIndex - 1 : 0);
+                                break;
+                            case "ArrowDown":
+                                ftable.setRowSelectByIndex(typeof selectIndex === "number" ? selectIndex + 1 : 0);
+                                break;
+                        }
+                    }
+                });
+            },
+            off: () => {
+                d.off(document.body, 'keydown', handler || (() => {}));
+            }
+        }
+    })();
 
     private getData() {
         let self = this;
@@ -197,7 +240,10 @@ export class PickModule extends TextInput {
             this.getData();
         };
         this.modal.onClose = () => {
-            this.input && this.input.click && this.input.click();
+            this.event.off();
+            setTimeout(() => {
+                this.input && this.input.focus && this.input.focus();
+            }, 300);
         }
     }
 

@@ -2022,6 +2022,16 @@ export class FastTable extends Component {
         }
     })();
 
+    setRowSelectByIndex(index: number){
+        let row = this.rowGet(index);
+        if (row) {
+            this.clearSelectedRows();
+            row._selectedInnerRowSet(true);
+            this._drawSelectedCells();
+            this.pseudoTable.setCheckBoxStatus();
+        }
+    }
+
     calcWidth() {
         if (this.container) {
             let fullWidth = this.container.clientWidth,

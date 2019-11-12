@@ -121,6 +121,27 @@ export class DropDown {
         }
     }
 
+    get active(){
+        return this.list.active;
+    }
+    get activeData(){
+        let index = this.list.active;
+        if(index in this.data){
+            return this.data[index];
+        }else{
+            return null;
+        }
+    }
+
+    toNext(){
+        let active = this.list.active;
+        this.list.active = typeof active === "number" ? active + 1 : 0;
+    }
+    toPrev(){
+        let active = this.list.active;
+        this.list.active = typeof active === "number" ? active - 1 : 0;
+    }
+
     get selectedIndex() {
         return this.selectIndex;
     }
@@ -308,6 +329,7 @@ export class DropDown {
     }
 
     public hideList() {
+        this.list.active = null;
         this.spinner && this.spinner.hide();
         this.ulDom && this.ulDom.classList.contains('show') && this.ulDom.classList.remove('show');
         this.isVisible = false;

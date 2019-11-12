@@ -85,10 +85,27 @@ export class SelectInput extends TextInput {
 
         this.dropdown = new DropDown(dropPara);
         d.on(this.input, 'keydown', (e: KeyboardEvent) => {
-            if (e.key === 'Enter') {
+            if(["Enter", "ArrowUp", "ArrowDown"].includes(e.key)){
                 e.preventDefault();
                 e.stopPropagation();
-                !this.dropdown.isShow && this.toggle();
+                switch (e.key) {
+                    case "Enter":
+                        let activeData = this.dropdown.activeData;
+                        if (activeData) {
+                            this.input.value = this.para.useInputVal ? activeData.value.toString() : activeData.text;
+                            this.onSet && this.onSet(activeData, this.dropdown.active);
+                            this.toggle();
+                        }else{
+                            !this.dropdown.isShow && this.toggle();
+                        }
+                        break;
+                    case "ArrowUp":
+                        this.dropdown.toPrev();
+                        break;
+                    case "ArrowDown":
+                        this.dropdown.toNext();
+                        break;
+                }
             }
         });
     }

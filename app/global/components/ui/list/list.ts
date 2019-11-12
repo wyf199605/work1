@@ -36,6 +36,28 @@ export class List{
         }
     }
 
+    protected prevActiveLi: HTMLElement;
+    protected _active: number;
+    get active(){
+        return this._active;
+    }
+    set active(active: number){
+        if(typeof active === "number"){
+            let len = this.listDom.length;
+            active = Math.min(active, len - 1);
+            active = Math.max(active, 0);
+        }
+        this.prevActiveLi && this.prevActiveLi.classList.remove('active');
+        this.prevActiveLi = null;
+        let li = this.listDom[active];
+        this._active = active;
+        if (li) {
+            li.classList.add('active');
+            this.prevActiveLi = li;
+            li.scrollIntoView();
+        }
+    }
+
     setTpl(tpl : string){
         this.tpl = tpl;
     }

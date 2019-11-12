@@ -360,7 +360,7 @@ export class DetailEditModule {
             isMb: tools.isMb,
             height: tools.isMb ? void 0 : '80%',
             width: tools.isMb ? void 0 : '80%',
-            className: 'detail-edit-modal',
+            className: 'detail-edit-modal editing',
             isShow: true,
             body: <div className="detail-content"/>,
             closeMsg: '确定取消编辑吗?',
