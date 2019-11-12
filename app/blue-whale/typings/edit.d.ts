@@ -5,7 +5,7 @@ interface ComInitP {
     onSet?: (val: any) => void;
     isOffLine?: boolean;
     isNewData?: boolean;
-    onExtra?(data: obj, relateCols: string[], isEmptyClear?, isValid?, isReplace?): void
+    onExtra?(data: obj, relateCols: string[], isEmptyClear?, isValid?, isReplace?): void;
 }
 
 interface EditModulePara {

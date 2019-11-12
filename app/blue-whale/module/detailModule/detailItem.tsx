@@ -8,6 +8,7 @@ import {DetailModule} from "./detailModule";
 import {BwRule} from "../../common/rule/BwRule";
 import {FormCom} from "../../../global/components/form/basic";
 import {Modal} from "../../../global/components/feedback/modal/Modal";
+import {Tooltip} from "../../../global/components/ui/tooltip/tooltip";
 
 export interface IDetailFormatData{
     text: string | Node,
@@ -26,7 +27,6 @@ export interface IDetailItemPara extends IComponentPara{
 
 export class DetailItem extends Component{
     wrapperInit(para: IDetailItemPara){
-        // console.log(para)
         let field = para.field,
             name = field.name,
             title = field.caption,
@@ -43,7 +43,6 @@ export class DetailItem extends Component{
                 className += ' item-column';
             }
         }
-
 
         return isShow ? <div className={"detail-item " + className} data-name={name}>
             {this._titleEl = <div className="detail-item-title">{title}</div>}
@@ -211,4 +210,25 @@ export class DetailItem extends Component{
     get classes() {
         return [...(this._classes || [])]
     }
+
+    protected _errorMsg: string = '';
+    set errorMsg(errorMsg){
+        this._errorMsg = errorMsg || '';
+        if(errorMsg){
+            this.wrapper.classList.add('error');
+            Tooltip.clear(this.wrapper);
+            new Tooltip({
+                el: this.wrapper,
+                errorMsg
+            });
+        }else{
+            Tooltip.clear(this.wrapper);
+            this.wrapper.classList.remove('error');
+        }
+    }
+
+    get errorMsg(){
+        return this._errorMsg;
+    }
+
 }

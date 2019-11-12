@@ -58,7 +58,7 @@ export class DetailEditModule {
                 this.initModal();
                 items = this.detail.initItems(d.query('.detail-content', this.modal.bodyWrapper), insert);
                 items.forEach((item) => {
-                    item.edit.init((field, item) => this.initEditCom(field, item.contentEl));
+                    item.edit.init((field, item) => this.initEditCom(field, item));
                 });
                 break;
             case 'current':
@@ -68,11 +68,10 @@ export class DetailEditModule {
                     if(insert){
                         item.show = !item.custom.noAdd;
                     }
-                    item.edit.init((field, item) => this.initEditCom(field, item.contentEl))
+                    item.edit.init((field, item) => this.initEditCom(field, item))
                 });
                 break;
         }
-        console.log(onlyEdit);
         if(onlyEdit){
             items.forEach((item) => {
                 let field = item.custom;
@@ -82,10 +81,10 @@ export class DetailEditModule {
         return items;
     }
 
-    initEditCom(field: R_Field, wrapper: HTMLElement){
+    initEditCom(field: R_Field, item: DetailItem){
 
         let com = this.editModule.init(field.name, {
-            dom: wrapper,
+            dom: item.contentEl,
             data: this.detail.detailData,
             field,
             onExtra: (data, relateCols, isEmptyClear = false) => {
@@ -103,6 +102,35 @@ export class DetailEditModule {
                         }
                     }
                 }
+            },
+            onSet: (e) => {
+                let fieldName = field.name;
+                let valid = this.editModule.validate.start(fieldName, e);
+                if(valid && fieldName in valid){
+                    if (valid[fieldName].errMsg) {
+                        item.errorMsg = valid[fieldName].errMsg;
+                        return ;
+                    }
+                }
+                if (field.chkAddr) {
+                    let data = Object.assign({}, this.detail.getData(), this.editModule.get());
+                    EditModule.checkValue(field, data, () => {
+                        let com = this.editModule.getDom(field.name);
+                        com && com.set('');
+                    }).then((res) => {
+                        let errors = res.errors;
+                        if(Array.isArray(errors) && errors[0]){
+                            let msg = errors[0].msg;
+                            if(msg){
+                                item.errorMsg = msg;
+                                return ;
+                            }
+                        }
+                        item.errorMsg = '';
+                    });
+                    return ;
+                }
+                item.errorMsg = '';
             }
         });
         return com;
@@ -127,6 +155,7 @@ export class DetailEditModule {
 
     protected editType: 'insert' | 'update' | 'delete';
     start(type: 'current' | 'modal' = 'current') {
+        this.detail.editing = true;
         this.editType = 'update';
         this.isEdit = true;
         let data = this.detail.detailData,
@@ -169,8 +198,23 @@ export class DetailEditModule {
                 return
             }
             let data = Object.assign({}, this.detail.getData(), this.editModule.get());
-            console.log(data);
-            Promise.all(this.field.filter((field) => field.chkAddr).map((field) => {
+
+            let validData = this.editModule.validate.start();
+            Promise.all(this.field.map((field) => {
+                let fieldName = field.name;
+                if(validData && field.name in validData){
+                    if (validData[fieldName].errMsg) {
+                        return Promise.resolve({
+                            errors: [
+                                {
+                                    name: fieldName,
+                                    msg: validData[fieldName].errMsg
+                                }
+                            ]
+                        });
+                    }
+                }
+
                 return EditModule.checkValue(field, data, () => {
                     let com = this.editModule.getDom(field.name);
                     com && com.set('');
@@ -211,6 +255,7 @@ export class DetailEditModule {
     }
 
     cancel() {
+        this.detail.editing = false;
         this.detail && this.detail.items && this.detail.items.forEach((item) => {
             item.show = !item.custom.noShow;
             item.disabled = false;

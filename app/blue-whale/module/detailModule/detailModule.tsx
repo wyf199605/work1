@@ -522,7 +522,6 @@ export class DetailModule extends AGroupTabItem {
     set editing(flag: boolean) {
         this._editing = flag;
         this.wrapper.classList.toggle('editing', flag);
-        this.detailEdit && this.detailEdit.start();
     }
 
     // detailEdit模块
@@ -715,7 +714,7 @@ export class DetailModule extends AGroupTabItem {
                     }
                 } else {
                     // 其他文字(金额,百分比,数字 等)
-                    text = BwRule.formatTableText(cellData, field);
+                    text = BwRule.formatText(cellData, field);
                 }
 
                 // 时间
