@@ -319,12 +319,15 @@ export class DetailEditModule {
                         msg: '加载中...',
                         disableEl: detail.container
                     }
-                }).then(() => {
-                    resolve();
+                }).then(({response}) => {
+                    BwRule.checkValue(response, saveData, () => {
+                        // 主表子表刷新
+                        resolve();
+                    });
                 }).catch(e => {
-                    reject(e);
+                    reject('保存失败');
                 })
-            }) : reject();
+            }) : reject('保存失败');
         })
 
     }
