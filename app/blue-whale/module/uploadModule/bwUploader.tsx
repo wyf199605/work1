@@ -48,8 +48,6 @@ export class BwUploader extends FormCom {
     static EVT_UPLOAD_SUCCESS = '__event_file_upload_success__';    // 文件上传成功时调用
 
     protected uploadUrl: string = BW.CONF.ajaxUrl.fileUpload; // 上传地址
-    protected maxSize: number = -1;  // 上传文件大小，-1为不限制
-    protected minSize: number = -1;  // 上传文件大小，-1为不限制
     protected chunkSize = 2 * 1024 * 1024;  // 分块大小 5M
     protected nameField: string;
     protected thumbField: string;
@@ -89,7 +87,6 @@ export class BwUploader extends FormCom {
         this.uploadUrl = para.uploadUrl || BW.CONF.ajaxUrl.fileUpload;
         this.nameField = para.nameField || 'FILE_ID';
         this.thumbField = para.thumbField;
-        this.maxSize = para.maxSize || -1;
         this.onSuccess = para.onSuccess;
         this.accept = para.accept;
         this.multi = para.multi || false;
@@ -136,11 +133,12 @@ export class BwUploader extends FormCom {
         this.temFiles = [];
         if (tools.isNotEmpty(files)) {
             files.forEach((file) => {
-                if (this.maxSize !== -1 && file.size > this.maxSize) {
+                /*if (this.maxSize !== -1 && file.size > this.maxSize) {
                     Modal.alert(`文件${tools.str.cut(file.name, 10)}(${tools.formatByte(file.size)})太大了`);
                 } else if (this.minSize !== -1 && file.size < this.minSize) {
                     Modal.alert(`文件${tools.str.cut(file.name, 10)}(${tools.formatByte(file.size)})太小了`);
-                } else if (!this.acceptVerify(file)) {
+                } else */
+                if (!this.acceptVerify(file)) {
                     Modal.alert('文件' + file.name + '类型有误');
                 } else {
                     this.temFiles.push(file);
