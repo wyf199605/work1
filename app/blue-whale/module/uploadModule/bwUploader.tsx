@@ -97,7 +97,7 @@ export class BwUploader extends FormCom {
             this.picMeta = {
                 compressSize: para.picMeta.compressSize || 512,
                 maxSize: para.picMeta.maxSize || 0,
-                minSize: para.picMeta.maxSize || 0
+                minSize: para.picMeta.minSize || 0
             };
         }else{
             this.picMeta = {
