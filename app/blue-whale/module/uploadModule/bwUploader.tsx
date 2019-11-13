@@ -68,7 +68,7 @@ export class BwUploader extends FormCom {
     protected uploadType: uploadType;
     protected actionSheet: ActionSheet;
     protected autoUpload: boolean;
-    protected picMeta = {};
+    protected picMeta: R_PicMete = {};
 
     protected wrapperInit(para) {
         this.text = typeof para.text === 'string' ? para.text : '点击上传';
@@ -97,24 +97,16 @@ export class BwUploader extends FormCom {
         this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
 
         if(para.picMeta){
-            let picMeta = para.picMeta || {},
-                compressScale = picMeta.compressScale || '1,1,1',
-                maxSize = picMeta.maxSize || "512000,512000,512000",
-                osType = picMeta.osType || "000",
-                index = tools.os.android ? 0 : tools.os.ios ? 1 : 2,
-                compressScaleList = compressScale.split(','),
-                maxSizeList = maxSize.split(',');
-
             this.picMeta = {
-                compress: Number(compressScaleList[index] || compressScaleList[0]) || null,
-                max_size: Number(maxSizeList[index] || maxSizeList[0]) || null,
-                os_type: osType,
+                compressSize: para.picMeta.compressSize || 512,
+                maxSize: para.picMeta.maxSize || 0,
+                minSize: para.picMeta.maxSize || 0
             };
-            this.minSize = Number(picMeta.minSize) || -1;
-            this.maxSize = this.picMeta['max_size'] || -1;
-        }else {
+        }else{
             this.picMeta = {
-                os_type: '000',
+                compressSize: 0,
+                maxSize: 0,
+                minSize: 0
             };
         }
 

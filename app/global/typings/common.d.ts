@@ -110,11 +110,9 @@ interface R_ReqAddr {
 }
 
 interface R_PicMete{
-    compressScale?: string;
-    maxSize?: string;
+    compressSize?: number;
+    maxSize?: number;
     minSize?: number;
-    osType?: string;
-    tag?: string;
 }
 
 interface R_Field extends COL {
