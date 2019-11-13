@@ -86,8 +86,11 @@ export class SelectInput extends TextInput {
         this.dropdown = new DropDown(dropPara);
         d.on(this.input, 'keydown', (e: KeyboardEvent) => {
             if(["Enter", "ArrowUp", "ArrowDown"].includes(e.key)){
-                e.preventDefault();
-                e.stopPropagation();
+                let isShow = this.dropdown.isShow;
+                if (isShow || e.key === "Enter") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
                 switch (e.key) {
                     case "Enter":
                         let activeData = this.dropdown.activeData;
@@ -96,7 +99,7 @@ export class SelectInput extends TextInput {
                             this.onSet && this.onSet(activeData, this.dropdown.active);
                             this.toggle();
                         }else{
-                            !this.dropdown.isShow && this.toggle();
+                            !isShow && this.toggle();
                         }
                         break;
                     case "ArrowUp":

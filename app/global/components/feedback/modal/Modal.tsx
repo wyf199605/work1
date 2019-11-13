@@ -326,7 +326,11 @@ export class Modal extends Component {
         this.wrapper.style.height = height;
         let otherHeight = this.headWrapper ? this.headWrapper.offsetHeight : 0;
         otherHeight = otherHeight + (this._footWrapper ? this._footWrapper.offsetHeight : 0);
-        this.bodyWrapper.style.height = `calc(100% - ${otherHeight}px)`;
+        if(tools.cssSupports('height', `calc(100% - ${otherHeight}px - env(safe-area-inset-bottom))`)){
+            this.bodyWrapper.style.height = `calc(100% - ${otherHeight}px - env(safe-area-inset-bottom))`;
+        }else{
+            this.bodyWrapper.style.height = `calc(100% - ${otherHeight}px)`;
+        }
     }
 
     get height() {

@@ -296,6 +296,7 @@
     .modal-footer {
       display: block;
       bottom: 0;
+      bottom: unquote("env(safe-area-inset-bottom)");
       position: fixed;
       height: 50px;
       width: 100%;
