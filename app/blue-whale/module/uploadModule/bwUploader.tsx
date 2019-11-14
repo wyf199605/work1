@@ -94,10 +94,15 @@ export class BwUploader extends FormCom {
         this.autoUpload = tools.isEmpty(para.autoUpload) ? true : para.autoUpload;
 
         if(para.picMeta){
+            let {
+                compressSize,
+                maxSize,
+                minSize
+            } = para.picMeta;
             this.picMeta = {
-                compressSize: para.picMeta.compressSize || 512,
-                maxSize: para.picMeta.maxSize || 0,
-                minSize: para.picMeta.minSize || 0
+                compressSize: typeof compressSize === "number" ? compressSize || 0 : 512,
+                maxSize: maxSize || 0,
+                minSize: minSize || 0
             };
         }else{
             this.picMeta = {
