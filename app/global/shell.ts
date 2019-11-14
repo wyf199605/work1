@@ -133,19 +133,20 @@ namespace G {
                     path: path
                 })
             },
-            saveAs(path: string, back: IShellEventHandler, info?: IShellEventHandler){
+            saveAs(path: string, back: IShellEventHandler, info?: IShellEventHandler) {
                 return ShellBase.handler("dealFile", {
                     type: 1,
-                    downPath: path
+                    downPath: path,
+                    token: localStorage.getItem('token')
                 }, back, info);
             },
-            openFile(path: string, back: IShellEventHandler, info?: IShellEventHandler){
+            openFile(path: string, back: IShellEventHandler, info?: IShellEventHandler) {
                 return ShellBase.handler("dealFile", {
                     type: 0,
                     downPath: path
                 }, back, info);
             },
-            openFileByPath(path: string, back: IShellEventHandler, info?: IShellEventHandler){
+            openFileByPath(path: string, back: IShellEventHandler, info?: IShellEventHandler) {
                 return ShellBase.handler("openFile", path, back, info);
             }
         };
@@ -587,7 +588,7 @@ namespace G {
                 type: number,
                 callback: (file: CustomFile[]) => void,
                 error?: (msg: string) => void,
-                option = {compress: 1, max_size: 512, os_type: '000'}
+                option = { compress: 1, max_size: 512, os_type: '000' }
             ) {
                 ShellBase.handler('getImg', {
                     type: type,
@@ -674,7 +675,7 @@ namespace G {
             }
         };
         const other = {
-            checkSoftInfo(data:obj,back?:IShellEventHandler){
+            checkSoftInfo(data: obj, back?: IShellEventHandler) {
                 return ShellBase.handler('checkSoftInfo', data, back);
             },
             //消息数量
